@@ -153,7 +153,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
         val labels = options.map { it.toTimeoutLabel() }
         val selectedIndex = options.indexOf(currentSelection).takeIf { it >= 0 }?.plus(1)
         RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.afterInactivityOptionTitle)
+            .setTitle(R.string.afterInactivityDialogTitle)
             .setOptions(labels, selectedIndex)
             .setPositiveButton(com.duckduckgo.mobile.android.R.string.dialogSave)
             .setNegativeButton(R.string.cancel)

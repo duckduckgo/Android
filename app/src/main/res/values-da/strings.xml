@@ -905,8 +905,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Vis ved app-start</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Sidst åbnede fane</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Ny faneside</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Sidst brugte fane</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Ny fane</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifik side</string>
 
     <!-- Privacy Dashboard -->
@@ -976,4 +976,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Søg privat med DuckDuckGo, eller spørg Duck.ai. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søg eller besøg dine yndlingssider privat med ét tryk. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Efter inaktivitet</string>
+    <string name="afterInactivityOptionTitle">Åbningsskærm</string>
+    <string name="afterInactivityTimeoutRowTitle">Vælg en inaktivitetstimer</string>
+    <string name="afterInactivityScreenSectionHeader">Vælg, hvad du ser, når du vender tilbage til DuckDuckGo</string>
+    <string name="afterInactivityTimeoutAlways">Ingen</string>
+    <string name="afterInactivityTimeout1Minute">1 minut</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d minutter</string>
+    <string name="afterInactivityTimeout1Hour">1 time</string>
+    <string name="afterInactivityTimeoutXHours">%1$d timer</string>
+
 </resources>

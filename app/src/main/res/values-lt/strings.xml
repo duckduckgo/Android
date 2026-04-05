@@ -945,8 +945,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Rodyti paleidus programą</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Paskutinį kartą atidarytas skirtukas</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Naujas skirtuko puslapis</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Paskutinį kartą naudotas skirtukas</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nauja kortelė</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkretus puslapis</string>
 
     <!-- Privacy Dashboard -->
@@ -1016,4 +1016,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Ieškokite privačiai naudodami „DuckDuckGo“ arba paklauskite „Duck.ai“. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Po neaktyvumo</string>
+    <string name="afterInactivityOptionTitle">Atidarymo ekranas</string>
+    <string name="afterInactivityTimeoutRowTitle">Pasirinkite neaktyvumo laikmatį</string>
+    <string name="afterInactivityScreenSectionHeader">Pasirinkite, ką matysite grįžę į „DuckDuckGo“</string>
+    <string name="afterInactivityTimeoutAlways">Jokie</string>
+    <string name="afterInactivityTimeout1Minute">1 min.</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d min.</string>
+    <string name="afterInactivityTimeout1Hour">1 val.</string>
+    <string name="afterInactivityTimeoutXHours">%1$d val.</string>
+
 </resources>

@@ -905,8 +905,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Weergeven bij het starten van de app</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Laatst geopende tabblad</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Nieuwe tabbladpagina</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Laatst gebruikte tabblad</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nieuw tabblad</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifieke pagina</string>
 
     <!-- Privacy Dashboard -->
@@ -976,4 +976,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Zoek privé met DuckDuckGo of vraag het aan Duck.ai. Voice Search en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Zoek of bezoek je favoriete sites in de privémodus met één tik. Zoeken via spraak en Duck.ai zijn beschikbaar indien ingeschakeld.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Na inactiviteit</string>
+    <string name="afterInactivityOptionTitle">Openingsscherm</string>
+    <string name="afterInactivityTimeoutRowTitle">Kies een inactiviteitstimer</string>
+    <string name="afterInactivityScreenSectionHeader">Kies wat je wilt zien als je terugkeert naar DuckDuckGo.</string>
+    <string name="afterInactivityTimeoutAlways">Geen</string>
+    <string name="afterInactivityTimeout1Minute">1 minuut</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d minuten</string>
+    <string name="afterInactivityTimeout1Hour">1 uur</string>
+    <string name="afterInactivityTimeoutXHours">%1$d uur</string>
+
 </resources>

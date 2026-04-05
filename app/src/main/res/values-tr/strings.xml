@@ -905,8 +905,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Uygulama Başlatıldığında Göster</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Son Açılan Sekme</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme Sayfası</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Son Kullanılan Sekme</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Yeni Sekme</string>
     <string name="showOnAppLaunchOptionSpecificPage">Belirli Bir Sayfa</string>
 
     <!-- Privacy Dashboard -->
@@ -976,4 +976,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">DuckDuckGo ile gizli arama yapın veya Duck.ai\'a sorun. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Hareketsizlik Sonrası</string>
+    <string name="afterInactivityOptionTitle">Açılış Ekranı</string>
+    <string name="afterInactivityTimeoutRowTitle">Bir hareketsizlik zamanlayıcısı seçin</string>
+    <string name="afterInactivityScreenSectionHeader">DuckDuckGo\'ya döndüğünüzde ne göreceğinizi seçin</string>
+    <string name="afterInactivityTimeoutAlways">Yok</string>
+    <string name="afterInactivityTimeout1Minute">1 dakika</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d dakika</string>
+    <string name="afterInactivityTimeout1Hour">1 saat</string>
+    <string name="afterInactivityTimeoutXHours">%1$d saat</string>
+
 </resources>
