@@ -25,9 +25,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.internal.R
+import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlin.getValue
+import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 
-@SuppressLint("NoFragment") // we don't use DI here
+@SuppressLint("NoFragment", "DenyListedApi") // we don't use DI here
 abstract class ComponentFragment : Fragment() {
+
+    private val appComponentsViewModel by appComponentsViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +51,9 @@ abstract class ComponentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceBundle)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-        val adapter = ComponentAdapter()
+
+        val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val adapter = ComponentAdapter(isDarkTheme = isDarkTheme)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         adapter.submitList(getComponents())
