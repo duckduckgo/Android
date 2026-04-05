@@ -22,8 +22,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.common.ui.compose.cards.DaxCard
+import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.internal.R
+import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
@@ -40,7 +50,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
-    open fun bind(component: Component) {
+    open fun bind(component: Component, isDarkTheme: Boolean = false) {
         // Override in subclass if needed.
     }
 
@@ -69,7 +79,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 topIllustration = CommonR.drawable.ic_announce,
@@ -148,7 +158,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class HeaderSectionComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_section_header_item)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             view.findViewById<SectionHeaderListItem>(R.id.sectionHeaderItemTitle).apply {
                 revertUpperCaseTitleText()
             }
@@ -162,7 +172,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class OneLineListItemComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_one_line_item)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             view.findViewById<OneLineListItem>(R.id.oneLineListItem).apply {
                 setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
             }
@@ -232,7 +242,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class TwoLineItemComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
@@ -333,7 +343,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
     class CardComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             view.findViewById<MaterialCardView>(R.id.ticketViewCard).apply {
                 val cornerSize = resources.getDimension(CommonR.dimen.smallShapeCornerRadius)
                 val edgeTreatment = TriangleEdgeTreatment(cornerSize, true)
@@ -346,12 +356,38 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
                 setOnClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
+
+            view.setupThemedComposeView(R.id.composeCards, isDarkTheme) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    DaxCard(
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                    ) { }
+                    DaxCard(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
+                    ) { }
+                }
+            }
         }
     }
 
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
-        override fun bind(component: Component) {
+        override fun bind(component: Component, isDarkTheme: Boolean) {
             view.findViewById<SettingsListItem>(R.id.settingsListItemWithBetaTag).apply {
                 showPillIcon(true)
             }
