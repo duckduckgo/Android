@@ -40,7 +40,7 @@ class RealSecureStorageKeyRepositoryTest {
     fun whenPasswordIsSetThenUpdateKeyForPasswordInKeyStore() = runTest {
         testee.setPassword(testValue)
 
-        verify(keyStore).updateKey("KEY_GENERATED_PASSWORD", testValue)
+        verify(keyStore).updateKey(Pair("KEY_GENERATED_PASSWORD", testValue))
     }
 
     @Test
@@ -54,7 +54,7 @@ class RealSecureStorageKeyRepositoryTest {
     fun whenL1KeyIsSetThenUpdateKeyForL1KeyInKeyStore() = runTest {
         testee.setL1Key(testValue)
 
-        verify(keyStore).updateKey("KEY_L1KEY", testValue)
+        verify(keyStore).updateKey(Pair("KEY_L1KEY", testValue))
     }
 
     @Test
@@ -68,7 +68,7 @@ class RealSecureStorageKeyRepositoryTest {
     fun whenPasswordSaltIsSetThenUpdateKeyForPasswordSaltInKeyStore() = runTest {
         testee.setPasswordSalt(testValue)
 
-        verify(keyStore).updateKey("KEY_PASSWORD_SALT", testValue)
+        verify(keyStore).updateKey(Pair("KEY_PASSWORD_SALT", testValue))
     }
 
     @Test
@@ -82,7 +82,7 @@ class RealSecureStorageKeyRepositoryTest {
     fun whenEncryptedL2KeyIsSetThenUpdateKeyForEncryptedL2KeyInKeyStore() = runTest {
         testee.setEncryptedL2Key(testValue)
 
-        verify(keyStore).updateKey("KEY_ENCRYPTED_L2KEY", testValue)
+        verify(keyStore).updateKey(Pair("KEY_ENCRYPTED_L2KEY", testValue))
     }
 
     @Test
@@ -96,7 +96,7 @@ class RealSecureStorageKeyRepositoryTest {
     fun whenEncryptedL2KeyIVIsSetThenUpdateKeyForEncryptedL2KeyIVInKeyStore() = runTest {
         testee.setEncryptedL2KeyIV(testValue)
 
-        verify(keyStore).updateKey("KEY_ENCRYPTED_L2KEY_IV", testValue)
+        verify(keyStore).updateKey(Pair("KEY_ENCRYPTED_L2KEY_IV", testValue))
     }
 
     @Test

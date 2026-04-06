@@ -404,5 +404,19 @@
                 "enum": ["search", "duckAI", "lastUsed"]
             }
         ]
+    },
+    "m_aichat_contextual_fire_button_tapped": {
+        "description": "User tapped the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_confirmed": {
+        "description": "User confirmed chat deletion via the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

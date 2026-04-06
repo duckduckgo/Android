@@ -41,6 +41,11 @@ class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) :
     override suspend fun getEncryptedL2KeyIV(): ByteArray? = _encryptedL2KeyIV
     override suspend fun setEncryptedL2KeyIV(value: ByteArray) { _encryptedL2KeyIV = value }
     override suspend fun canUseEncryption(): Boolean = canUseEncryption
+
+    override suspend fun setEncryptedL2Key(value: EncryptedBytes) {
+        _encryptedL2Key = value.data
+        _encryptedL2KeyIV = value.iv
+    }
 }
 
 class FakeEncryptionHelper constructor(

@@ -582,7 +582,8 @@
       "pageObserver",
       "hover",
       "browserUiLock",
-      "trackerProtection"
+      "trackerProtection",
+      "tabSuspension"
     ]
   );
   var platformSupport = {
@@ -601,7 +602,8 @@
       "webEvents",
       "webInterferenceDetection",
       "pageObserver",
-      "hover"
+      "hover",
+      "tabSuspension"
     ],
     "apple-ai-clear": ["duckAiDataClearing"],
     "apple-ai-history": ["duckAiChatHistory"],

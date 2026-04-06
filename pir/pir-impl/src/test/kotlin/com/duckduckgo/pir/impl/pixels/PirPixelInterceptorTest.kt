@@ -18,6 +18,8 @@ package com.duckduckgo.pir.impl.pixels
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -41,7 +43,10 @@ class PirPixelInterceptorTest {
 
     @Before
     fun setUp() {
-        testee = PirPixelInterceptor(mockAppBuildConfig)
+        testee = PirPixelInterceptor(
+            mockAppBuildConfig,
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
+        )
         whenever(mockChain.proceed(any())).thenReturn(mockResponse)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
         whenever(mockAppBuildConfig.manufacturer).thenReturn("TestManufacturer")

@@ -74,6 +74,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiBinding
@@ -119,6 +120,10 @@ class DuckChatContextualFragment :
     }
 
     private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels({ requireParentFragment() })
+
+    private val duckChatSharedViewModel: DuckChatSharedViewModel by lazy {
+        ViewModelProvider(requireActivity())[DuckChatSharedViewModel::class.java]
+    }
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -473,6 +478,9 @@ class DuckChatContextualFragment :
             hideKeyboard(binding.inputField)
             viewModel.onNewChatRequested()
         }
+        binding.contextualFire.setOnClickListener {
+            viewModel.onFireButtonClicked()
+        }
         binding.contextualModeButtons.setOnClickListener { }
         binding.contextualModeRoot.setOnClickListener { }
         binding.inputField.setOnEditorActionListener(
@@ -580,6 +588,10 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
                         sharedContextualViewModel.requestPageContext()
                     }
+
+                    is DuckChatContextualViewModel.Command.ShowFireConfirmation -> {
+                        showFireConfirmationDialog()
+                    }
                 }
             }.launchIn(lifecycleScope)
 
@@ -598,6 +610,10 @@ class DuckChatContextualFragment :
                         logcat { "Duck.ai Contextual: OpenSheet" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
+                    }
+
+                    is DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed -> {
+                        viewModel.onContextualFireConfirmed()
                     }
 
                     else -> {}
@@ -632,6 +648,7 @@ class DuckChatContextualFragment :
                 contextualNativeInputManager.onInputMode()
 
                 binding.contextualNewChat.gone()
+                binding.contextualFire.gone()
 
                 renderPageContext(viewState.contextTitle, viewState.contextUrl, viewState.tabId)
 
@@ -654,9 +671,14 @@ class DuckChatContextualFragment :
                 binding.contextualModeNativeContent.gone()
                 binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
+                if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
         }
+    }
+
+    private fun showFireConfirmationDialog() {
+        duckChatSharedViewModel.onContextualFireButtonClicked()
     }
 
     private fun observeSubscriptionEventDataChannel() {

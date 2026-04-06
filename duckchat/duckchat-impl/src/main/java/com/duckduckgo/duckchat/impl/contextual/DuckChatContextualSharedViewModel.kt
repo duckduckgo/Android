@@ -38,6 +38,10 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         _command.tryEmit(Command.CollectPageContext)
     }
 
+    fun onContextualFireConfirmed() {
+        _command.tryEmit(Command.OnContextualFireConfirmed)
+    }
+
     fun onMainBrowserPageFinished(url: String?, isStorePageContextEnabled: Boolean = false) {
         logcat { "Duck.ai: onMainBrowserPageFinished $url" }
         _command.tryEmit(Command.MainBrowserPageFinished(isStorePageContextEnabled))
@@ -55,5 +59,7 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         data object CollectPageContext : Command()
 
         data class MainBrowserPageFinished(val isStorePageContextEnabled: Boolean = false) : Command()
+
+        data object OnContextualFireConfirmed : Command()
     }
 }

@@ -114,11 +114,7 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         with(binding) {
-            if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
-                duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
-            } else {
-                duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_ddg_128)
-            }
+            duckAiPaidSettingsIcon.setImageResource(DuckChatR.drawable.duckai_128)
 
             statusIndicator.setStatus(viewState.isDuckAIEnabled)
             duckAiPaidSettingsOpenDuckAi.isVisible = viewState.isDuckAIEnabled

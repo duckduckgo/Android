@@ -88,6 +88,19 @@
             app:typography="h2" />
 
         <ImageView
+            android:id="@+id/contextualFire"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:contentDescription="@string/duckAIContextualFireButtonContentDescription"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/contextualClose"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_fire_24" />
+
+        <ImageView
             android:id="@+id/contextualClose"
             android:layout_width="@dimen/toolbarIcon"
             android:layout_height="@dimen/toolbarIcon"

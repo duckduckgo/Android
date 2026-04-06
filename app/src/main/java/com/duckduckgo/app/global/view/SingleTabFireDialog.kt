@@ -229,10 +229,13 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    private fun sendFragmentResult(event: String) {
+    private fun sendFragmentResult(event: String, origin: String? = null) {
         parentFragmentManager.setFragmentResult(
             FireDialog.REQUEST_KEY,
-            Bundle().apply { putString(FireDialog.RESULT_KEY_EVENT, event) },
+            Bundle().apply {
+                putString(FireDialog.RESULT_KEY_EVENT, event)
+                origin?.let { putString(FireDialog.RESULT_KEY_ORIGIN, it) }
+            },
         )
     }
 
@@ -364,7 +367,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                     deletedTabCount = loaded?.stateData?.tabCount ?: 0,
                 )
             } else {
-                pendingFragmentResultEvent?.let { sendFragmentResult(it) }
+                pendingFragmentResultEvent?.let { sendFragmentResult(it, arguments?.getString(ARG_ORIGIN)) }
                 pendingFragmentResultEvent = null
 
                 dismissSingleTabClear()

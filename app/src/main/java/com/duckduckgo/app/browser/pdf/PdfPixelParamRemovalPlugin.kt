@@ -14,28 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.features.browseruilock
+package com.duckduckgo.app.browser.pdf
 
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class BrowserUiLockFeaturePlugin @Inject constructor(
-    private val browserUiLockRepository: BrowserUiLockRepository,
-) : PrivacyFeaturePlugin {
-
-    override fun store(featureName: String, jsonString: String): Boolean {
-        return if (featureName == this.featureName) {
-            return runBlocking {
-                browserUiLockRepository.insertJsonData(jsonString)
-            }
-        } else {
-            false
-        }
+class PdfPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return PdfPixelName.entries.map { it.pixelName to PixelParameter.removeAtb() }
     }
-
-    override val featureName: String = BROWSER_UI_LOCK_FEATURE_NAME
 }

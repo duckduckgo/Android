@@ -28,4 +28,7 @@
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
     <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
     <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Clear chat</string>
 </resources>

@@ -706,7 +706,7 @@ class CardsListRemoteMessageViewModelTest {
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
 
         viewModel.init(messageId)
-        viewModel.onRemoteImageLoadSuccess()
+        viewModel.onImageLoadSuccess(ImageLoadSource.Header)
 
         verify(pixel).fire(
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
@@ -735,11 +735,69 @@ class CardsListRemoteMessageViewModelTest {
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
 
         viewModel.init(messageId)
-        viewModel.onRemoteImageLoadFailed()
+        viewModel.onImageLoadFailed(ImageLoadSource.Header)
 
         verify(pixel).fire(
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
             mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId),
+        )
+    }
+
+    @Test
+    fun whenCardImageLoadSuccessThenCardPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = emptyList(),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+        viewModel.onImageLoadSuccess(ImageLoadSource.CardItem("card-1"))
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId, "card" to "card-1"),
+        )
+    }
+
+    @Test
+    fun whenCardImageLoadFailedThenCardPixelFired() = runTest {
+        val messageId = "message-123"
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Content.Placeholder.DDG_ANNOUNCE,
+            listItems = emptyList(),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.init(messageId)
+        viewModel.onImageLoadFailed(ImageLoadSource.CardItem("card-1"))
+
+        verify(pixel).fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId, "card" to "card-1"),
         )
     }
 }

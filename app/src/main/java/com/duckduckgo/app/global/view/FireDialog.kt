@@ -35,6 +35,7 @@ interface FireDialog {
     companion object {
         const val REQUEST_KEY = "FireDialogRequestKey"
         const val RESULT_KEY_EVENT = "event"
+        const val RESULT_KEY_ORIGIN = "origin"
         const val EVENT_ON_SHOW = "onShow"
         const val EVENT_ON_CANCEL = "onCancel"
         const val EVENT_ON_CLEAR_STARTED = "onClearStarted"

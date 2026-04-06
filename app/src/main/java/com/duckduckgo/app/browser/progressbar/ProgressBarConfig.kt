@@ -21,7 +21,7 @@ data class ProgressBarConfig(
     val fastStartDuration: Long = 600L,
     val springStiffness: Float = 2.0f,
     val dampingRatio: Float = 8.5f,
-    val creepVelocity: Float = 0.004f,
+    val creepVelocity: Float = 0.04f,
     val endDuration: Long = 300L,
     val fadeInDuration: Long = 100L,
     val fadeOutDuration: Long = 100L,
@@ -31,4 +31,6 @@ data class ProgressBarConfig(
     val shimmerBandEndWidthDp: Float = 20f,
     val shimmerBandStartOpacity: Float = 0.4f,
     val shimmerBandEndOpacity: Float = 0.55f,
+    val shimmerLightenFractionLight: Float = 0.9f,
+    val shimmerLightenFractionDark: Float = 0.5f,
 )
