@@ -6,6 +6,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_DUCK_AI_PAID_USED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D0
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D14
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D3
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D30
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import org.junit.Assert.*
@@ -28,6 +34,12 @@ class SubscriptionPixelTest(
                 FREE_TRIAL_START,
                 FREE_TRIAL_VPN_ACTIVATION,
                 FREE_TRIAL_DUCK_AI_PAID_USED,
+                PAYWALL_SHOWN_FIRST_TIME,
+                PAYWALL_NOT_SEEN_D0,
+                PAYWALL_NOT_SEEN_D3,
+                PAYWALL_NOT_SEEN_D7,
+                PAYWALL_NOT_SEEN_D14,
+                PAYWALL_NOT_SEEN_D30,
             ),
         )
 

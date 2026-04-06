@@ -46,6 +46,12 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_DUC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_VPN_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D0
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D14
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D3
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D30
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_ACCOUNT_CREATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_BACKEND
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_OTHER
@@ -70,6 +76,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_S
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_PLATFORM
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.DAYS_SINCE_INSTALL
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -126,12 +133,14 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialStart()
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
+    fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
+    private val paywallMetricsManager: PaywallMetricsManager,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -143,8 +152,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             ),
         )
 
-    override fun reportOfferScreenShown() =
+    override fun reportOfferScreenShown() {
+        paywallMetricsManager.recordFirstPaywallSeen()?.let { dayBucket ->
+            fire(PAYWALL_SHOWN_FIRST_TIME, mapOf(DAYS_SINCE_INSTALL to dayBucket))
+        }
         fire(OFFER_SCREEN_SHOWN)
+    }
 
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
@@ -311,6 +324,24 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String) {
         fire(FREE_TRIAL_DUCK_AI_PAID_USED, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
+    }
+
+    override fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean) {
+        val pixel = when (dayBucket) {
+            "d0" -> PAYWALL_NOT_SEEN_D0
+            "d3" -> PAYWALL_NOT_SEEN_D3
+            "d7" -> PAYWALL_NOT_SEEN_D7
+            "d14" -> PAYWALL_NOT_SEEN_D14
+            "d30" -> PAYWALL_NOT_SEEN_D30
+            else -> return
+        }
+        fire(
+            pixel,
+            mapOf(
+                SubscriptionPixelParameter.RETURNING_USER to returningUser.toString(),
+                SubscriptionPixelParameter.PRIVACY_DASHBOARD_EVER_OPENED to privacyDashboardEverOpened.toString(),
+            ),
+        )
     }
 
     private fun fire(
