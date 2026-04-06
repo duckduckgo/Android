@@ -843,7 +843,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenPrivacyShieldItemHighlightedThenViewStateCorrect() = runTest {
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = true))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = true, duckAiButton = false))
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(
@@ -866,7 +866,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenFireButtonItemHighlightedThenViewStateCorrect() = runTest {
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false, duckAiButton = false))
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(
@@ -889,7 +889,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenFireButtonItemHighlightedRemovedThenViewStateCorrect() = runTest {
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = false))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = false, duckAiButton = false))
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(
@@ -913,7 +913,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenFireIconPressedAndFireIconHighlightedThenViewStateCorrectAndPixelSent() = runTest {
         val animationPlaying = true
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false, duckAiButton = false))
         testee.onFireIconPressed(true)
 
         testee.viewState.test {
@@ -936,7 +936,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun whenPrivacyShieldIconPressedAndFireIconHighlightedThenViewStateCorrectAndPixelSent() = runTest {
         whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(1)
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = true))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = false, privacyShield = true, duckAiButton = false))
         testee.onPrivacyShieldButtonPressed()
 
         testee.viewState.test {
@@ -2674,7 +2674,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenFireIconPressedAndLockedForOnboardingThenHighlightPreserved() = runTest {
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false, duckAiButton = false))
         testee.onLockForOnboarding(true)
         testee.onFireIconPressed(true)
 
@@ -2693,7 +2693,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenFireIconPressedAndNotLockedForOnboardingThenHighlightCleared() = runTest {
-        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false, duckAiButton = false))
         testee.onFireIconPressed(true)
 
         testee.viewState.test {

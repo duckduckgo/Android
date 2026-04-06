@@ -389,6 +389,7 @@ class Omnibar(
             HighlightOmnibarItem(
                 fireButton = viewState.fireButton.isHighlighted(),
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
+                duckAiButton = viewState.duckAiButton.isHighlighted(),
             ),
         )
         omnibarView.decorate(Decoration.LockForOnboarding(viewState.isOmnibarLockedForOnboarding))

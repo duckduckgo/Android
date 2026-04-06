@@ -221,6 +221,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
+        val highlightDuckAiButton: HighlightableButton = HighlightableButton.Visible(),
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
@@ -760,7 +761,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onHighlightItem(decoration: Decoration.HighlightOmnibarItem) {
         // We only want to disable scrolling if one of the elements is highlighted
         logcat { "Omnibar: onHighlightItem" }
-        val isScrollingDisabled = decoration.privacyShield || decoration.fireButton
+        val isScrollingDisabled = decoration.privacyShield || decoration.fireButton || decoration.duckAiButton
         _viewState.update {
             it.copy(
                 highlightPrivacyShield = HighlightableButton.Visible(
@@ -770,6 +771,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                 highlightFireButton = HighlightableButton.Visible(
                     enabled = true,
                     highlighted = decoration.fireButton,
+                ),
+                highlightDuckAiButton = HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = decoration.duckAiButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
             )

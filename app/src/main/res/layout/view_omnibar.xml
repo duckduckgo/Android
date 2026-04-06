@@ -435,6 +435,32 @@
 
             </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/aiChatPulseAnimationContainer"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/omnibarCardMarginTop"
+                android:paddingBottom="@dimen/omnibarCardMarginBottom"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/toolbar"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:documentation="Overlay container for the AI chat button pulse animation, positioned outside the
+                MaterialCardView to avoid clipping. The marginEnd is tweaked to align the pulse circle
+                with the aiChatIconMenu button inside the card.">
+
+                <View
+                    android:id="@+id/aiChatPulseAnimationPlaceholder"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:visibility="invisible"
+                    tools:documentation="Reference view for PulseAnimation.kt, same as the shield placeholder.
+                    PulseAnimation adds an ImageView to the parent FrameLayout with Gravity.CENTER,
+                    sized to this view, then scales it from 0.95x to 2.0x." />
+
+            </FrameLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/customTabToolbarContainerWrapper"
                 android:layout_width="0dp"

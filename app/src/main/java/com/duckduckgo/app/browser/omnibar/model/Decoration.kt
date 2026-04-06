@@ -50,6 +50,7 @@ sealed class Decoration {
     data class HighlightOmnibarItem(
         val fireButton: Boolean,
         val privacyShield: Boolean,
+        val duckAiButton: Boolean,
     ) : Decoration()
 
     data class DisableVoiceSearch(

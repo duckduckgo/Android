@@ -280,6 +280,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
     internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
+    private val aiChatPulseAnimationPlaceholder: View by lazy { findViewById(R.id.aiChatPulseAnimationPlaceholder) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
@@ -1026,6 +1027,8 @@ class OmnibarLayout @JvmOverloads constructor(
                 fireIconImageView
             } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
                 placeholder
+            } else if (viewState.highlightDuckAiButton.isHighlighted() && viewState.showChatMenu) {
+                aiChatPulseAnimationPlaceholder
             } else {
                 null
             }

@@ -31,6 +31,7 @@ data class BrowserViewState(
     val canChangeBrowsingMode: Boolean = false,
     val showPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
     val fireButton: HighlightableButton = HighlightableButton.Visible(),
+    val duckAiButton: HighlightableButton = HighlightableButton.Visible(),
     val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
     val showSelectDefaultBrowserMenuItem: Boolean = false,
     val canSharePage: Boolean = false,
