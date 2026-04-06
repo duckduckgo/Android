@@ -1,0 +1,115 @@
+{
+  "name": "SpyFly",
+  "url": "spyfly.com",
+  "version": "0.3.0",
+  "addedDatetime": 1775214750818,
+  "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spyfly.com/help-center/privacy-requests",
+          "id": "scan-navigate-to-privacy-page"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "scan-expect-page-loaded"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "_comment": "This input doesn't follow the same id pattern as the rest",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "scan-fill-user-profile"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "_comment": "Ensure the Turnstile captcha is solved before proceeding",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "scan-expect-turnstile-solved"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "scan-click-submit"
+        },
+        {
+          "_comment": "Last supported action. If we reach here, Cloudflare did not block us. The scan will fail after this because generateEmail is not yet implemented.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "scan-expect-email-page-loaded"
+        },
+        {
+          "_comment": "Terminal action. We are on the email page, not results. noResultsSelector matches #email-address so extract returns empty results cleanly.",
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "#email-address",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            }
+          },
+          "id": "scan-extract-terminal"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
