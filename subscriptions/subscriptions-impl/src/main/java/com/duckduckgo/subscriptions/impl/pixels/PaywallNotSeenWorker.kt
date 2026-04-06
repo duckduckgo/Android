@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,10 +57,15 @@ class PaywallNotSeenWorker(
     @Inject
     lateinit var subscriptions: Subscriptions
 
+    @Inject
+    lateinit var privacyProFeature: PrivacyProFeature
+
     override suspend fun doWork(): Result {
         val dayBucket = inputData.getString(KEY_DAY_BUCKET) ?: return Result.failure()
 
+        if (!privacyProFeature.schedulePaywallNotSeenPixels().isEnabled()) return Result.success()
         if (!subscriptions.isEligible()) return Result.success()
+        if (subscriptions.getSubscriptionStatus().isActive()) return Result.success()
 
         if (paywallMetricsManager.paywallEverSeen || paywallMetricsManager.isNotSeenDayFired(dayBucket)) {
             return Result.success()
