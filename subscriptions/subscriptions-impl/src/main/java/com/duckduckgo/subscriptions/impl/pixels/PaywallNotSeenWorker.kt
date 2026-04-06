@@ -121,10 +121,11 @@ class PaywallNotSeenScheduler @Inject constructor(
     private fun scheduleMilestones() {
         MILESTONES.forEach { (dayBucket, checkAfterDays) ->
             if (paywallMetricsManager.isNotSeenDayFired(dayBucket)) return@forEach
+            val delay = paywallMetricsManager.delayUntilMilestone(checkAfterDays) ?: return@forEach
 
             val request = OneTimeWorkRequestBuilder<PaywallNotSeenWorker>()
                 .setInputData(workDataOf(PaywallNotSeenWorker.KEY_DAY_BUCKET to dayBucket))
-                .setInitialDelay(paywallMetricsManager.delayUntilMilestone(checkAfterDays), TimeUnit.MILLISECONDS)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .addTag(workTag(dayBucket))
                 .build()
 

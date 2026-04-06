@@ -56,12 +56,13 @@ class PaywallMetricsManager @Inject constructor(
     fun markNotSeenDayFired(dayBucket: String) = paywallMetricsStore.markNotSeenDayFired(dayBucket)
 
     /**
-     * Returns the delay in milliseconds until [checkAfterDays] have elapsed since install.
-     * Returns 0 if that point is already in the past.
+     * Returns the delay in milliseconds until [checkAfterDays] have elapsed since install,
+     * or null if that point is already in the past (milestone should not be scheduled).
      */
-    fun delayUntilMilestone(checkAfterDays: Long): Long {
+    fun delayUntilMilestone(checkAfterDays: Long): Long? {
         val checkAtMillis = paywallMetricsStore.firstInstallTimestamp + TimeUnit.DAYS.toMillis(checkAfterDays)
-        return maxOf(0L, checkAtMillis - System.currentTimeMillis())
+        val delay = checkAtMillis - System.currentTimeMillis()
+        return if (delay < 0) null else delay
     }
 
     private fun getDayBucket(firstInstallTimestamp: Long): String {

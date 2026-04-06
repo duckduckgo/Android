@@ -106,6 +106,41 @@ class PaywallNotSeenSchedulerTest {
     }
 
     @Test
+    fun `when all milestones are in the past then no workers are scheduled`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(paywallMetricsManager.isNotSeenDayFired(any())).thenReturn(false)
+        whenever(paywallMetricsManager.delayUntilMilestone(any())).thenReturn(null)
+
+        scheduler.onStart(mock())
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(workManager, never()).enqueueUniqueWork(
+            any<String>(),
+            any<ExistingWorkPolicy>(),
+            any<OneTimeWorkRequest>(),
+        )
+    }
+
+    @Test
+    fun `when some milestones are in the past then only future milestones are scheduled`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(paywallMetricsManager.isNotSeenDayFired(any())).thenReturn(false)
+        whenever(paywallMetricsManager.delayUntilMilestone(any())).thenReturn(null)
+        whenever(paywallMetricsManager.delayUntilMilestone(PaywallNotSeenScheduler.MILESTONES["d7"]!!)).thenReturn(0L)
+        whenever(paywallMetricsManager.delayUntilMilestone(PaywallNotSeenScheduler.MILESTONES["d14"]!!)).thenReturn(1000L)
+        whenever(paywallMetricsManager.delayUntilMilestone(PaywallNotSeenScheduler.MILESTONES["d30"]!!)).thenReturn(2000L)
+
+        scheduler.onStart(mock())
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(workManager, times(3)).enqueueUniqueWork(
+            any<String>(),
+            any<ExistingWorkPolicy>(),
+            any<OneTimeWorkRequest>(),
+        )
+    }
+
+    @Test
     fun `when a day bucket was already fired then that worker is not scheduled`() = runTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired(any())).thenReturn(false)

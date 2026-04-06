@@ -131,17 +131,17 @@ class PaywallMetricsManagerTest {
     }
 
     @Test
-    fun `delayUntilMilestone returns 0 when milestone is in the past`() {
+    fun `delayUntilMilestone returns null when milestone is in the past`() {
         whenever(store.firstInstallTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(10))
 
-        assertEquals(0L, manager.delayUntilMilestone(checkAfterDays = 4))
+        assertNull(manager.delayUntilMilestone(checkAfterDays = 4))
     }
 
     @Test
     fun `delayUntilMilestone returns positive delay when milestone is in the future`() {
         whenever(store.firstInstallTimestamp).thenReturn(System.currentTimeMillis())
 
-        assertTrue(manager.delayUntilMilestone(checkAfterDays = 4) > 0)
+        assertTrue(manager.delayUntilMilestone(checkAfterDays = 4)!! > 0)
     }
 
     @Test
