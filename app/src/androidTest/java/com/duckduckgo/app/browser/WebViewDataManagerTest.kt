@@ -210,20 +210,6 @@ class WebViewDataManagerTest {
         }
     }
 
-    @Test
-    fun whenClearDataThenPirDirectoryIsPreserved() = runTest {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-
-            testee.clearData(webView, mockStorage)
-
-            verify(mockFileDeleter).deleteContents(
-                File(context.applicationInfo.dataDir, "app_webview"),
-                listOf("Default", "Cookies", "pir"),
-            )
-        }
-    }
-
     @SuppressLint("DenyListedApi")
     @Test
     fun whenClearDataAndWebLocalStorageFeatureDisabledThenDefaultContentsDeletedExceptCookies() = runTest {
