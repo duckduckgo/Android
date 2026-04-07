@@ -811,11 +811,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
-                binding.welcomeScreenWalkingDax.isVisible = false
-                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    verticalBias = 0f
-                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                val showWalkingDax = applyWalkingDaxLayout()
+                if (showWalkingDax) {
+                    with(binding.welcomeScreenWalkingDax) {
+                        cancelAnimation()
+                        progress = 1f
+                        alpha = 1f
+                        translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
+                    }
                 }
 
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
