@@ -564,7 +564,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     changeBoundsTransition = transition
                     val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            if (!isAdded) return
+                            // Transition callbacks can still arrive after removeListener() if the
+                            // end event was already in flight; unlike Animator.cancel(), this is
+                            // not a synchronous stop.
+                            if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
                                 getString(R.string.preOnboardingDaxDialog2Title),
                             ) {

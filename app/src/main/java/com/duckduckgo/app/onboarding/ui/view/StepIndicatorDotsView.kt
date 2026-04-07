@@ -188,7 +188,6 @@ internal class StepIndicatorDotsView @JvmOverloads constructor(
 
     fun cancelAnimation() {
         animator?.cancel()
-        isAnimating = false
     }
 
     companion object {

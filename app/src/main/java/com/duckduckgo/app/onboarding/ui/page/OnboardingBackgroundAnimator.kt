@@ -85,10 +85,10 @@ class OnboardingBackgroundAnimator(
         onAnimationStarted: () -> Unit = {},
         onAnimationEnd: () -> Unit = {},
     ) {
+        cancel()
+
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
-
-        cancel()
 
         // Layouts that use fitCenter (tablet, landscape) need dimensionRatio to eliminate gaps
         val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
