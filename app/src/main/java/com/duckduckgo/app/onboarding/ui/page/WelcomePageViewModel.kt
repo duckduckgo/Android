@@ -31,8 +31,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_MODE_DEMO
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -156,7 +156,7 @@ class WelcomePageViewModel @Inject constructor(
 
         data class ShowInputScreenDialog(val showDuckAiCopy: Boolean) : Command
 
-        data class ShowInputModeDemoDialog(
+        data class ShowInputScreenPreviewDialog(
             val searchSuggestions: List<DaxDialogIntroOption>,
             val chatSuggestions: List<DaxDialogIntroOption>,
         ) : Command
@@ -247,7 +247,7 @@ class WelcomePageViewModel @Inject constructor(
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                     } else {
-                        _commands.send(buildShowInputModeDemoCommand())
+                        _commands.send(buildShowInputScreenPreviewCommand())
                     }
                 }
             }
@@ -264,7 +264,7 @@ class WelcomePageViewModel @Inject constructor(
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     val command = if (inputScreenSelected) {
                         // TODO: experiment enrollment
-                        buildShowInputModeDemoCommand()
+                        buildShowInputScreenPreviewCommand()
                     } else {
                         Finish
                     }
@@ -272,7 +272,7 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
                 viewModelScope.launch {
                     _commands.send(Finish)
                 }
@@ -320,7 +320,7 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
                 // no-op
             }
         }
@@ -378,7 +378,7 @@ class WelcomePageViewModel @Inject constructor(
             INPUT_SCREEN -> {
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             }
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
                 // no pixel yet
             }
         }
@@ -435,7 +435,7 @@ class WelcomePageViewModel @Inject constructor(
             appBuildConfig.isAppReinstall()
         }
 
-    private fun buildShowInputModeDemoCommand() = Command.ShowInputModeDemoDialog(
+    private fun buildShowInputScreenPreviewCommand() = Command.ShowInputScreenPreviewDialog(
         searchSuggestions = onboardingStore.getSearchOptions(),
         chatSuggestions = onboardingStore.getChatSuggestions(),
     )

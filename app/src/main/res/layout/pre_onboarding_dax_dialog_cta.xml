@@ -263,7 +263,7 @@
                     app:typography="caption" />
 
                 <include
-                    android:id="@+id/input_mode_demo"
+                    android:id="@+id/input_screen_preview"
                     layout="@layout/pre_onboarding_input_mode_demo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

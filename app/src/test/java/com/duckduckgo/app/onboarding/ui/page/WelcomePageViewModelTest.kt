@@ -30,8 +30,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputModeDemoDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenPreviewDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.app.pixels.AppPixelName
@@ -257,13 +257,13 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedOnAddressBarPositionThenShowInputModeDemoDialog() =
+    fun whenOnPrimaryCtaClickedOnAddressBarPositionThenShowInputScreenPreviewDialog() =
         runTest {
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
             testee.commands.test {
                 val command = awaitItem()
-                assertTrue(command is ShowInputModeDemoDialog)
+                assertTrue(command is ShowInputScreenPreviewDialog)
             }
         }
 
@@ -502,7 +502,7 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndShowInputModeDemo() =
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndShowInputScreenPreview() =
         runTest {
             mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             testee.onInputScreenOptionSelected(true)
@@ -510,7 +510,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                assertTrue(command is ShowInputModeDemoDialog)
+                assertTrue(command is ShowInputScreenPreviewDialog)
             }
             verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(true)
@@ -598,8 +598,7 @@ class WelcomePageViewModelTest {
                 testee.onInputScreenOptionSelected(true)
                 testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
 
-                val inputModeDemoCommand = awaitItem()
-                assertTrue(inputModeDemoCommand is ShowInputModeDemoDialog)
+                assertTrue(awaitItem() is ShowInputScreenPreviewDialog)
             }
             verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
         }
@@ -693,8 +692,8 @@ class WelcomePageViewModelTest {
     // endregion
 
     @Test
-    fun givenInputModeDemoDialogWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
-        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_MODE_DEMO)
+    fun givenInputScreenPreviewDialogWhenOnPrimaryCtaClickedThenFinishFlow() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW)
 
         testee.commands.test {
             val command = awaitItem()
@@ -703,14 +702,14 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenAddressBarPositionDialogWhenInputScreenDisabledThenShowInputModeDemoDialog() = runTest {
+    fun givenAddressBarPositionDialogWhenInputScreenDisabledThenShowInputScreenPreviewDialog() = runTest {
         mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
         val viewModel = createViewModel()
         viewModel.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
         viewModel.commands.test {
             val command = awaitItem()
-            Assert.assertTrue(command is ShowInputModeDemoDialog)
+            Assert.assertTrue(command is ShowInputScreenPreviewDialog)
         }
     }
 }

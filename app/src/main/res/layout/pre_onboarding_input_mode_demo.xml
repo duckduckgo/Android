@@ -29,7 +29,7 @@
     tools:visibility="visible">
 
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
-        android:id="@+id/inputModeDemoSwitch"
+        android:id="@+id/input_mode_toggle"
         style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/inputModeSwitchHeight">

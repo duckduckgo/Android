@@ -48,8 +48,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_MODE_DEMO
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.InputMode.*
@@ -61,8 +61,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputModeDemoDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenPreviewDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -126,8 +126,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
-                is ShowInputModeDemoDialog -> configureDaxCta(
-                    INPUT_MODE_DEMO,
+                is ShowInputScreenPreviewDialog -> configureDaxCta(
+                    INPUT_SCREEN_PREVIEW,
                     searchSuggestions = it.searchSuggestions,
                     chatSuggestions = it.chatSuggestions,
                 )
@@ -486,7 +486,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
-                INPUT_MODE_DEMO -> {
+                INPUT_SCREEN_PREVIEW -> {
                     TransitionManager.beginDelayedTransition(binding.longDescriptionContainer, AutoTransition())
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.primaryCta.gone()
@@ -507,19 +507,19 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     val ctaText = it.getString(R.string.preOnboardingInputModeDemoTitle)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.inputModeDemo.root.show()
-                    binding.daxDialogCta.inputModeDemo.root.alpha = MIN_ALPHA
+                    binding.daxDialogCta.inputScreenPreview.root.show()
+                    binding.daxDialogCta.inputScreenPreview.root.alpha = MIN_ALPHA
 
-                    configureInputModeDemoField(SEARCH, searchSuggestions)
-                    binding.daxDialogCta.inputModeDemo.inputModeDemoSwitch.addOnTabSelectedListener(
+                    setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
+                    binding.daxDialogCta.inputScreenPreview.inputModeToggle.addOnTabSelectedListener(
                         object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
                             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
                                 TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
 
                                 if (tab.position == 0) {
-                                    configureInputModeDemoField(SEARCH, searchSuggestions)
+                                    setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
                                 } else {
-                                    configureInputModeDemoField(CHAT, chatSuggestions)
+                                    setInputScreenPreviewInputMode(CHAT, chatSuggestions)
                                 }
                             }
                             override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
@@ -529,15 +529,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        if (binding.daxDialogCta.inputModeDemo.root.alpha == 0f) {
-                            binding.daxDialogCta.inputModeDemo.root.animate()
+                        if (binding.daxDialogCta.inputScreenPreview.root.alpha == 0f) {
+                            binding.daxDialogCta.inputScreenPreview.root.animate()
                                 .alpha(MAX_ALPHA)
                                 .setDuration(ANIMATION_DURATION)
                                 .withEndAction {
                                     val buttons = listOf(
-                                        binding.daxDialogCta.inputModeDemo.suggestion1,
-                                        binding.daxDialogCta.inputModeDemo.suggestion2,
-                                        binding.daxDialogCta.inputModeDemo.suggestion3,
+                                        binding.daxDialogCta.inputScreenPreview.suggestion1,
+                                        binding.daxDialogCta.inputScreenPreview.suggestion2,
+                                        binding.daxDialogCta.inputScreenPreview.suggestion3,
                                     )
 
                                     fun animateButton(index: Int) {
@@ -574,27 +574,27 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureInputModeDemoField(
+    private fun setInputScreenPreviewInputMode(
         inputMode: InputMode,
         suggestions: List<DaxDialogIntroOption>,
     ) {
-        val demoBinding = binding.daxDialogCta.inputModeDemo
+        val inputScreenPreviewBinding = binding.daxDialogCta.inputScreenPreview
 
-        listOf(demoBinding.suggestion1, demoBinding.suggestion2, demoBinding.suggestion3)
+        listOf(inputScreenPreviewBinding.suggestion1, inputScreenPreviewBinding.suggestion2, inputScreenPreviewBinding.suggestion3)
             .forEachIndexed { index, button -> suggestions[index].setOptionView(button) }
 
         when (inputMode) {
             SEARCH -> {
-                demoBinding.inputText.minLines = 1
-                demoBinding.inputText.maxLines = 1
-                demoBinding.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
-                demoBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+                inputScreenPreviewBinding.inputText.minLines = 1
+                inputScreenPreviewBinding.inputText.maxLines = 1
+                inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
             }
             CHAT -> {
-                demoBinding.inputText.minLines = 3
-                demoBinding.inputText.maxLines = 3
-                demoBinding.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
-                demoBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+                inputScreenPreviewBinding.inputText.minLines = 3
+                inputScreenPreviewBinding.inputText.maxLines = 3
+                inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
+                inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
             }
         }
     }

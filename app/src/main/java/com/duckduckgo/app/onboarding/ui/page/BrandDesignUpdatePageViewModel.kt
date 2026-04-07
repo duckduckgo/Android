@@ -142,7 +142,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
             }
         }
     }
@@ -260,7 +260,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 }
             }
 
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
                 // no-op
             }
         }
@@ -280,7 +280,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_MODE_DEMO -> {
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW -> {
                 // no-op
             }
         }

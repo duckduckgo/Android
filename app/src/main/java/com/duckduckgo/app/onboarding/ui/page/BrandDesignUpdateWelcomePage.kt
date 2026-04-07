@@ -511,7 +511,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     // TODO
                 }
 
-                INPUT_MODE_DEMO -> {
+                INPUT_SCREEN_PREVIEW -> {
                     // TODO
                 }
             }
@@ -585,7 +585,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 // TODO
             }
 
-            INPUT_MODE_DEMO -> {
+            INPUT_SCREEN_PREVIEW -> {
                 // TODO
             }
         }
