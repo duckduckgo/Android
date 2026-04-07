@@ -624,6 +624,7 @@ class BrowserTabViewModel @Inject constructor(
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
+    private var selectedTabObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var hasExitedFixedProgress = false
@@ -900,8 +901,9 @@ class BrowserTabViewModel @Inject constructor(
 
     fun observeSelectedTab(isRestored: Boolean) {
         isTabRestored = isRestored
+        selectedTabObserver?.cancel()
         // auto-launch input screen for new, empty tabs (New Tab Page)
-        tabRepository.flowSelectedTab
+        selectedTabObserver = tabRepository.flowSelectedTab
             .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
             .filter { selectedTab ->
                 // fire event when activating a new, empty tab
