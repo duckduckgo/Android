@@ -583,6 +583,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     )
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
                                             binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                             playCheckIconAnimation()
                                         }
@@ -964,11 +965,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         comparisonChartDetailAnimatorSet = AnimatorSet().apply {
             playTogether(iconAnimators + stepIndicatorFadeIn)
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    isAnimating = false
-                }
-            })
             start()
         }
     }
