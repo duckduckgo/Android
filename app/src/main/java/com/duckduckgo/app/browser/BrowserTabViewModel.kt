@@ -4914,6 +4914,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBookmarksMenuItemClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
         launchBookmarksActivity()
     }
 

@@ -21,5 +21,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "vpnMenuItemStatus"]
+    },
+    "m_nav_bookmarks_menu_item_pressed": {
+        "description": "Fires when the user taps the Bookmarks menu item in the browser menu",
+        "owners": ["gpaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
