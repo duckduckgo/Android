@@ -68,7 +68,6 @@ import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
@@ -100,10 +99,10 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -306,6 +305,7 @@ class OmnibarLayout @JvmOverloads constructor(
         findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
     }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    internal val pageLoadProgressBar: PageLoadProgressBar by lazy { findViewById(R.id.pageLoadProgressBar) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
     internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
@@ -873,12 +873,16 @@ class OmnibarLayout @JvmOverloads constructor(
             setExpanded(true, viewState.expandedAnimated)
         }
 
-        if (viewState.isLoading) {
-            pageLoadingIndicator.show()
-        }
-        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
-            if (!viewState.isLoading) {
-                pageLoadingIndicator.hide()
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            if (viewState.isLoading) {
+                pageLoadingIndicator.show()
+            }
+            smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
+                if (!viewState.isLoading) {
+                    pageLoadingIndicator.hide()
+                }
             }
         }
 
@@ -905,8 +909,25 @@ class OmnibarLayout @JvmOverloads constructor(
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
-        pageLoadingIndicator.isVisible = viewState.isLoading
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            pageLoadingIndicator.isVisible = viewState.isLoading
+        }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+    }
+
+    private fun updatePageLoadProgressBar(viewState: ViewState) {
+        if (viewState.isLoading) {
+            if (!pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.start()
+            }
+            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+        } else {
+            if (pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.triggerCompletion()
+            }
+        }
     }
 
     private fun renderCustomTabMode(
@@ -1173,21 +1194,6 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabShieldIcon.setOnClickListener { _ ->
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
                     }
-
-                    customTabToolbar.setOnClickListener {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
-                    }
-
-                    daxIcon.setOnClickListener {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
-                    }
-
-                    customTabSceneRoot.setOnClickListener {
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED)
-                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY, type = PixelType.Daily())
-                    }
                 }
             }
         } else {
@@ -1425,6 +1431,7 @@ class OmnibarLayout @JvmOverloads constructor(
         newCustomTabToolbarContainer.customTabDomain.isSaveEnabled = false
 
         pageLoadingIndicator.isSaveEnabled = false
+        pageLoadProgressBar.isSaveEnabled = false
         shieldIcon.isSaveEnabled = false
         omnibarTextInput.isSaveEnabled = false
     }

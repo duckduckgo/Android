@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_4"
         android:adjustViewBounds="true"
+        android:importantForAccessibility="no"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/bottomSheetPromoContent"
         app:layout_constraintEnd_toStartOf="@id/bottomSheetPromoContent"

@@ -40,6 +40,7 @@ interface ContextualNativeInputManager {
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
+        onImageButtonPressed: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -61,12 +62,13 @@ class RealContextualNativeInputManager @Inject constructor(
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
+        onImageButtonPressed: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted)
+        setupWidget(widget, onSearchSubmitted, onImageButtonPressed)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -90,10 +92,11 @@ class RealContextualNativeInputManager @Inject constructor(
             .build()
     }
 
-    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit) {
+    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
         widget.selectChatTab()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
+        widget.onImageClick = onImageButtonPressed
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
@@ -101,7 +104,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
-                sendPrompt(prompt)
+                sendPrompt(prompt, widget.getSelectedModelId())
                 widget.text = ""
             },
         )
@@ -113,7 +116,7 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String) {
+    private fun sendPrompt(prompt: String, modelId: String? = null) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -122,6 +125,9 @@ class RealContextualNativeInputManager @Inject constructor(
                 JSONObject().apply {
                     put("prompt", prompt)
                     put("autoSubmit", true)
+                    if (modelId != null) {
+                        put("modelId", modelId)
+                    }
                 },
             )
         }

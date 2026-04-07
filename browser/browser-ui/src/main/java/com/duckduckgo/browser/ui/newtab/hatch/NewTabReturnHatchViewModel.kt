@@ -17,13 +17,16 @@
 package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -36,6 +39,8 @@ import javax.inject.Inject
 class NewTabReturnHatchViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
+    private val duckChat: DuckChat,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -44,17 +49,22 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val tabId: String = "",
         val currentTabId: String = "",
         val shouldShow: Boolean = false,
+        val isDuckChat: Boolean = false,
+        val isSerp: Boolean = false,
     )
 
     val viewState = tabRepository.flowLastAccessedTab
         .map { lastTab ->
             if (lastTab != null) {
+                val url = lastTab.url.orEmpty()
                 ViewState(
                     tabTitle = lastTab.title.orEmpty(),
-                    url = lastTab.url.orEmpty(),
+                    url = url,
                     tabId = lastTab.tabId,
                     currentTabId = lastTab.tabId,
                     shouldShow = true,
+                    isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
+                    isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                 )
             } else {
                 ViewState(shouldShow = false)

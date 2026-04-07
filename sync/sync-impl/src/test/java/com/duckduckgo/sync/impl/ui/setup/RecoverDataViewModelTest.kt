@@ -156,8 +156,7 @@ class RecoverDataViewModelTest {
             testee.onNextClicked()
             val command = awaitItem()
             assertTrue(command is Next)
-            verify(syncAutoRestoreManager).setRestoreOnReinstallEnabled(true)
-            verify(syncAutoRestoreManager).saveRecoveryPayload("test-recovery-code", "test-device-id")
+            verify(syncAutoRestoreManager).saveAutoRestoreData("test-recovery-code", "test-device-id")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -178,8 +177,7 @@ class RecoverDataViewModelTest {
             testee.onNextClicked()
             val command = awaitItem()
             assertTrue(command is Next)
-            verify(syncAutoRestoreManager).setRestoreOnReinstallEnabled(false)
-            verify(syncAutoRestoreManager).clearRecoveryCode()
+            verify(syncAutoRestoreManager).clearAutoRestoreData()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -200,8 +198,7 @@ class RecoverDataViewModelTest {
             testee.onBackPressed()
             val command = awaitItem()
             assertTrue(command is Close)
-            verify(syncAutoRestoreManager).setRestoreOnReinstallEnabled(true)
-            verify(syncAutoRestoreManager).saveRecoveryPayload("test-recovery-code", "test-device-id")
+            verify(syncAutoRestoreManager).saveAutoRestoreData("test-recovery-code", "test-device-id")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -222,8 +219,7 @@ class RecoverDataViewModelTest {
             testee.onBackPressed()
             val command = awaitItem()
             assertTrue(command is Close)
-            verify(syncAutoRestoreManager).setRestoreOnReinstallEnabled(false)
-            verify(syncAutoRestoreManager).clearRecoveryCode()
+            verify(syncAutoRestoreManager).clearAutoRestoreData()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -243,9 +239,8 @@ class RecoverDataViewModelTest {
             testee.onNextClicked()
             val command = awaitItem()
             assertTrue(command is Next)
-            verify(syncAutoRestoreManager, never()).setRestoreOnReinstallEnabled(any())
-            verify(syncAutoRestoreManager, never()).saveRecoveryPayload(any(), any())
-            verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+            verify(syncAutoRestoreManager, never()).saveAutoRestoreData(any(), any())
+            verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -265,9 +260,8 @@ class RecoverDataViewModelTest {
             testee.onBackPressed()
             val command = awaitItem()
             assertTrue(command is Close)
-            verify(syncAutoRestoreManager, never()).setRestoreOnReinstallEnabled(any())
-            verify(syncAutoRestoreManager, never()).saveRecoveryPayload(any(), any())
-            verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+            verify(syncAutoRestoreManager, never()).saveAutoRestoreData(any(), any())
+            verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
             cancelAndIgnoreRemainingEvents()
         }
     }

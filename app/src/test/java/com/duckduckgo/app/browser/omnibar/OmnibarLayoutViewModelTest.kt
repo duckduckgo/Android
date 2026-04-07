@@ -16,6 +16,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -39,6 +40,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -106,6 +108,7 @@ class OmnibarLayoutViewModelTest {
     private val setFavouriteFeatureEnabledFlow = MutableStateFlow(false)
 
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
+    private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
     private lateinit var testee: OmnibarLayoutViewModel
@@ -183,6 +186,7 @@ class OmnibarLayoutViewModelTest {
             serpEasterEggLogosToggles = serpEasterEggLogosToggles,
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
+            progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
         )
     }
 

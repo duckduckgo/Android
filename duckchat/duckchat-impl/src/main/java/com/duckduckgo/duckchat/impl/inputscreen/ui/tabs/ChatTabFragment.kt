@@ -29,6 +29,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -41,6 +43,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAd
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -64,14 +67,19 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
 
     private var chatSuggestionsRecyclerView: SwipeableRecyclerView? = null
     private lateinit var chatSuggestionsAdapter: ChatSuggestionsAdapter
+    private var chatUrlSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter? = null
     private var bottomBlurView: BottomBlurView? = null
     private var bottomBlurLayoutListener: View.OnLayoutChangeListener? = null
     private var bottomBlurDataObserver: RecyclerView.AdapterDataObserver? = null
+    private var bottomBlurObserverAdapter: RecyclerView.Adapter<*>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!duckChatFeature.aiChatSuggestions().isEnabled()) return
         configureChatSuggestions()
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            configureChatUrlSuggestions()
+        }
         configureObservers()
         configureBottomBlur()
     }
@@ -101,6 +109,39 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private fun configureObservers() {
         val parentFragment = requireParentFragment() as InputScreenFragment
 
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) {
+            configureLegacyObservers(parentFragment)
+            return
+        }
+
+        combine(
+            viewModel.chatSuggestions,
+            viewModel.chatUrlSuggestions,
+        ) { chatSuggestions, urlSuggestions ->
+            Pair(chatSuggestions, urlSuggestions)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { (chatSuggestions, urlSuggestions) ->
+                if (viewModel.visibilityState.value.searchMode) return@onEach
+                val hasChatSuggestions = chatSuggestions.isNotEmpty()
+                val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
+
+                if (hasChatSuggestions) {
+                    chatSuggestionsRecyclerView?.adapter = chatSuggestionsAdapter
+                    chatSuggestionsAdapter.submitList(chatSuggestions)
+                    parentFragment.updateChatSuggestionsVisibility(true)
+                } else if (hasUrlSuggestions) {
+                    chatSuggestionsRecyclerView?.adapter = chatUrlSuggestionsAdapter
+                    chatUrlSuggestionsAdapter?.updateData(urlSuggestions.query, urlSuggestions.suggestions)
+                    parentFragment.updateChatSuggestionsVisibility(true)
+                } else {
+                    chatSuggestionsRecyclerView?.adapter = chatSuggestionsAdapter
+                    chatSuggestionsAdapter.submitList(emptyList())
+                    parentFragment.updateChatSuggestionsVisibility(false)
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun configureLegacyObservers(parentFragment: InputScreenFragment) {
         viewModel.chatSuggestions
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { suggestions ->
@@ -109,6 +150,17 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
                     parentFragment.updateChatSuggestionsVisibility(suggestions.isNotEmpty())
                 }
             }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun configureChatUrlSuggestions() {
+        chatUrlSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+            immediateSearchClickListener = { viewModel.userSelectedAutocomplete(it, fromChatUrlSuggestions = true) },
+            editableSearchClickListener = { viewModel.onUserSelectedToEditQuery(it.phrase) },
+            autoCompleteInAppMessageDismissedListener = { },
+            autoCompleteOpenSettingsClickListener = { },
+            autoCompleteLongPressClickListener = { },
+            omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
+        )
     }
 
     private fun configureBottomBlur() {
@@ -150,7 +202,8 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
                     recyclerView.post { bottomBlurView?.invalidate() }
                 }
             }
-            recyclerView.adapter?.registerAdapterDataObserver(bottomBlurDataObserver!!)
+            bottomBlurObserverAdapter = recyclerView.adapter
+            bottomBlurObserverAdapter?.registerAdapterDataObserver(bottomBlurDataObserver!!)
         }
     }
 
@@ -161,8 +214,9 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         }
         bottomBlurLayoutListener = null
         bottomBlurDataObserver?.let { observer ->
-            chatSuggestionsRecyclerView?.adapter?.unregisterAdapterDataObserver(observer)
+            bottomBlurObserverAdapter?.unregisterAdapterDataObserver(observer)
         }
+        bottomBlurObserverAdapter = null
         bottomBlurDataObserver = null
         (bottomBlurView?.parent as? FrameLayout)?.removeView(bottomBlurView)
         bottomBlurView = null

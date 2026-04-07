@@ -391,4 +391,75 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.setUserAcceptedTerms()
         assertTrue(testee.hasUserAcceptedTerms())
     }
+
+    @Test
+    fun `when observeDefaultTogglePosition then receive updates`() = runTest {
+        val results = mutableListOf<String?>()
+        val job = launch {
+            testee.observeDefaultTogglePosition()
+                .take(2)
+                .toList(results)
+        }
+        testee.setDefaultTogglePosition("DUCK_AI")
+        job.join()
+
+        assertEquals(listOf(null, "DUCK_AI"), results)
+    }
+
+    @Test
+    fun `when getDefaultTogglePosition default then return null`() = runTest {
+        assertNull(testee.getDefaultTogglePosition())
+    }
+
+    @Test
+    fun `when setDefaultTogglePosition then getDefaultTogglePosition returns value`() = runTest {
+        testee.setDefaultTogglePosition("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getDefaultTogglePosition())
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then observeLastUsedTogglePosition receives update`() = runTest {
+        val results = mutableListOf<String?>()
+        val job = launch {
+            testee.observeLastUsedTogglePosition()
+                .take(2)
+                .toList(results)
+        }
+        testee.setLastUsedTogglePosition("DUCK_AI")
+        job.join()
+
+        assertEquals(listOf(null, "DUCK_AI"), results)
+    }
+
+    @Test
+    fun whenNoModelStoredThenGetSelectedModelReturnsNull() = runTest {
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelStoredThenGetSelectedModelReturnsIt() = runTest {
+        testee.setSelectedModel(SelectedModel("id", "model"))
+
+        val result = testee.getSelectedModel()
+        assertEquals("id", result?.id)
+        assertEquals("model", result?.shortName)
+    }
+
+    @Test
+    fun whenNullModelStoredThenGetSelectedModelReturnsNull() = runTest {
+        testee.setSelectedModel(SelectedModel("id", "model"))
+        testee.setSelectedModel(null)
+
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelOverwrittenThenGetSelectedModelReturnsLatest() = runTest {
+        testee.setSelectedModel(SelectedModel("id1", "model1"))
+        testee.setSelectedModel(SelectedModel("id2", "model2"))
+
+        val result = testee.getSelectedModel()
+        assertEquals("id2", result?.id)
+        assertEquals("model2", result?.shortName)
+    }
 }

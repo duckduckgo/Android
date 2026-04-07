@@ -17,6 +17,7 @@
 package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.app.pixels.campaign.params.AdditionalPixelParamsGenerator
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -36,8 +37,51 @@ class CampaignPixelParamsAdditionInterceptor @Inject constructor(
     private val additionalPixelParamsGenerator: AdditionalPixelParamsGenerator,
     private val additionalPixelParamsFeature: AdditionalPixelParamsFeature,
     private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+
+        if (!additionalPixelParamsFeature.self().isEnabled()) {
+            return chain.proceed(originalRequest)
+        }
+
+        val queryParamsString = originalRequest.url.query
+            ?: return chain.proceed(originalRequest)
+
+        val pixel = originalRequest.url.pathSegments.last()
+        var paramsAdded = false
+        val urlBuilder = originalRequest.url.newBuilder()
+
+        pixelsPlugin.getPlugins().forEach { plugin ->
+            if (plugin.names().any { pixel.startsWith(it) }) {
+                val queryParams = queryParamsString.toParamsMap()
+                if (plugin.isEligible(queryParams)) {
+                    runBlocking {
+                        /**
+                         * The additional parameters being collected only apply to a single promotion about a DuckDuckGo product.
+                         * The parameters are temporary, collected in aggregate, and anonymous.
+                         */
+                        additionalPixelParamsGenerator.generateAdditionalParams().forEach { (key, value) ->
+                            urlBuilder.addQueryParameter(key, value)
+                            paramsAdded = true
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!paramsAdded) {
+            return chain.proceed(originalRequest)
+        }
+
+        return chain.proceed(originalRequest.newBuilder().url(urlBuilder.build()).build())
+    }
+
+    private fun interceptLegacy(chain: Chain): Response {
         val request = chain.request().newBuilder()
         val url = chain.request().url.newBuilder()
 

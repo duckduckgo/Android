@@ -17,5 +17,10 @@
 <resources>
 
     <string name="tabSwitcherContentDescription">Tabs</string>
+    <string name="newTabReturnHatchText">Return to…</string>
+    <string name="newTabReturnHatchSerpPlaceholderTitle">DuckDuckGo - Protection. Privacy. Peace of mind.</string>
+    <string name="newTabReturnHatchDuckChatPlaceholderTitle">Duck.ai by DuckDuckGo. Private AI chat. Free.</string>
+    <string name="duck_ai_tab_label">Duck.ai</string>
+    <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
 
 </resources>

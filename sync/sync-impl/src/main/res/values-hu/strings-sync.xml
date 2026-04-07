@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Helyreállítás</string>
+    <string name="sync_settings_download_recovery_code_item">Helyreállítási kód letöltése PDF-ként</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Használd ezt a kódot az adataid helyreállításához, ha elveszíted a hozzáférést ehhez az eszközhöz – őrizd meg egy biztonságos helyen.</string>
+    <string name="sync_settings_data_expiration">A Sync &amp; Backup-adatok 18 hónapnyi inaktivitás után nem állíthatók vissza. <annotation type="learn_more_link">További információ</annotation></string>
 </resources>

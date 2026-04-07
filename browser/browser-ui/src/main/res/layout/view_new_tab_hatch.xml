@@ -17,7 +17,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.DuckDuckGo.MessageCta"
+    style="@style/Widget.DuckDuckGo.Hatch"
     android:id="@+id/returnHatchRoot"
     android:clipChildren="false"
     android:visibility="gone">
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 app:textType="secondary"
                 app:typography="caption"
-                android:text="Return to..." />
+                android:text="@string/newTabReturnHatchText" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/returnHatchSiteTitle"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:ellipsize="end"
-                app:typography="body1"
+                app:typography="h3"
                 tools:text="Site Title" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:textType="secondary"
-                app:typography="body1"
+                app:typography="h4"
                 tools:text="www.url.com" />
 
         </LinearLayout>

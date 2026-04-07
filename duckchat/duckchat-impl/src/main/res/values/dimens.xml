@@ -22,5 +22,15 @@
     <dimen name="inputScreenAutocompleteListBottomSpace">64dp</dimen>
     <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
-    <dimen name="inputScreenLogoBottomBarTopMargin">114dp</dimen>
+    <dimen name="inputScreenLogoBottomBarTopMargin">68dp</dimen>
+    <dimen name="inputScreenLogoTopBarTopMargin">180dp</dimen>
+    <dimen name="inputScreenLogoTopBarWithHatchTopMargin">260dp</dimen>
+    <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
+
+    <!-- Model Picker -->
+    <dimen name="modelPickerChipHeight">32dp</dimen>
+    <dimen name="modelPickerChipCornerRadius">16dp</dimen>
+    <dimen name="modelPickerChipStrokeWidth">1dp</dimen>
+    <dimen name="modelPickerChipTextSize">13sp</dimen>
+    <dimen name="modelPickerMenuElevation">6dp</dimen>
 </resources>

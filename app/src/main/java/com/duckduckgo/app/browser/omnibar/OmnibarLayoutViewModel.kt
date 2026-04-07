@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimatio
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.omnibar.model.StateChange.OmnibarStateChange
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -111,9 +112,11 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
+    private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
+    private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.self().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
@@ -122,6 +125,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showFireIcon = !isSplitOmnibarEnabled,
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
+            isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
         ),
     )
 
@@ -225,6 +229,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
+        val isProgressBarUpgradeEnabled: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,

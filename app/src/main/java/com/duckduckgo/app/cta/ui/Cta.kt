@@ -865,8 +865,7 @@ sealed class HomePanelCta(
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
-    // Base class to hold the shared configuration. This is temporary, for an experiment.
-    open class AddWidgetAutoBase :
+    data object AddWidgetAutoOnboarding :
         HomePanelCta(
             CtaId.ADD_WIDGET,
             R.drawable.add_widget_cta_icon,
@@ -878,10 +877,6 @@ sealed class HomePanelCta(
             AppPixelName.WIDGET_CTA_LAUNCHED,
             AppPixelName.WIDGET_CTA_DISMISSED,
         )
-
-    data object AddWidgetAuto : AddWidgetAutoBase()
-
-    data object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
 
     data object AddWidgetInstructions : HomePanelCta(
         CtaId.ADD_WIDGET,
@@ -934,17 +929,17 @@ class SubscriptionPromoModalCta(
     override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
     override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
     override val okPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
-    override val cancelPixel: Pixel.PixelName? = null
+    override val cancelPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
     override val closePixel: Pixel.PixelName? = null
 
     private fun pixelParams(): Map<String, String> = mapOf(
-        Pixel.PixelParameter.RU to "true",
+        Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.MODAL_SUBSCRIPTION_CTA,
         Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
     )
 
     override fun pixelShownParameters(): Map<String, String> = pixelParams()
     override fun pixelOkParameters(): Map<String, String> = pixelParams()
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+    override fun pixelCancelParameters(): Map<String, String> = pixelParams()
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {

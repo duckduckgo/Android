@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
@@ -988,5 +989,21 @@ class DuckChatSettingsViewModelTest {
         runTest {
             testee.onDefaultTogglePositionSelected(DefaultTogglePosition.LAST_USED)
             verify(duckChat).setDefaultTogglePosition(DefaultTogglePosition.LAST_USED)
+        }
+
+    @Test
+    fun `when default toggle position selected then count and daily pixels fired with correct value`() =
+        runTest {
+            testee.onDefaultTogglePositionSelected(DefaultTogglePosition.DUCK_AI)
+
+            verify(mockPixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT,
+                parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
+            )
+            verify(mockPixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY,
+                parameters = mapOf(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION_VALUE to "duckAI"),
+                type = Pixel.PixelType.Daily(),
+            )
         }
 }

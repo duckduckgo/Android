@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Hämta webbläsare för dator</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo för Mac och Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Återställning</string>
+    <string name="sync_settings_download_recovery_code_item">Ladda ner återställningskoden som PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Använd den här koden för att återställa dina data om du förlorar åtkomsten till den här enheten.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-data kan inte återställas efter 18 månaders inaktivitet. <annotation type="learn_more_link">Läs mer</annotation></string>
 </resources>

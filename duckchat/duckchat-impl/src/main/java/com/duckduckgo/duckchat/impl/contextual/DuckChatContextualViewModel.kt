@@ -26,11 +26,13 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -56,6 +58,8 @@ class DuckChatContextualViewModel @Inject constructor(
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val duckChatFeature: DuckChatFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -82,6 +86,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data class OpenFullscreenMode(val url: String) : Command()
         data class ChangeSheetState(val newState: Int) : Command()
         data object RequestPageContext : Command()
+        data object ShowFireConfirmation : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -96,9 +101,22 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
+                isFireButtonEnabled = false,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val isSingleTabFireEnabled = featureTogglesInventory
+                .getAllTogglesForParent("androidBrowserConfig")
+                .find { it.featureName().name == "singleTabFireDialog" }
+                ?.isEnabled() == true
+            _viewState.update {
+                it.copy(isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled)
+            }
+        }
+    }
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
@@ -110,6 +128,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val contextTitle: String = "",
         val tabId: String = "",
         val prompt: String = "",
+        val isFireButtonEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
@@ -582,7 +601,19 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetNewChat()
     }
 
-    private fun renderNewChatState() {
+    fun onFireButtonClicked() {
+        duckChatPixels.reportContextualFireButtonTapped()
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ShowFireConfirmation)
+        }
+    }
+
+    fun onContextualFireConfirmed() {
+        duckChatPixels.reportContextualFireButtonConfirmed()
+        renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
+    }
+
+    private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
@@ -596,14 +627,16 @@ class DuckChatContextualViewModel @Inject constructor(
                             prompt = "",
                         )
                     }
-                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    commandChannel.trySend(Command.ChangeSheetState(sheetState))
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                     _subscriptionEventDataChannel.trySend(subscriptionEvent)
                 }
             }
         }
-        duckChatPixels.reportContextualPlaceholderContextShown()
+        if (sheetState != BottomSheetBehavior.STATE_HIDDEN) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
+        }
     }
 
     private fun hasChatId(url: String?): Boolean {

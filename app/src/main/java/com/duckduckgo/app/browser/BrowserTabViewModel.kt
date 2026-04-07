@@ -104,8 +104,7 @@ import com.duckduckgo.app.browser.commands.Command.HideSSLError
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
-import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
-import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboardingExperiment
+import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboarding
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
@@ -174,6 +173,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -202,6 +202,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -516,6 +517,8 @@ class BrowserTabViewModel @Inject constructor(
     private val pageLoadWideEvent: PageLoadWideEvent,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val browserUiLockFeature: BrowserUiLockFeature,
+    private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -619,11 +622,14 @@ class BrowserTabViewModel @Inject constructor(
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
+    private var faviconRequestedForDomain: String? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var hasExitedFixedProgress = false
+    private var hasCompletedPageLoad = false
+
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
@@ -1428,6 +1434,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun prefetchFavicon(url: String) {
+        if (faviconFetchingFixFeature.self().isEnabled()) {
+            val domain = url.toUri().baseHost ?: return
+            if (faviconRequestedForDomain == domain) return
+            faviconRequestedForDomain = domain
+        }
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob =
             viewModelScope.launch {
@@ -1449,6 +1460,10 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(dispatchers.io()) {
+            if (faviconFetchingFixFeature.self().isEnabled()) {
+                val existing = faviconManager.loadFromDisk(currentTab.tabId, url)
+                if (existing != null && existing.width >= icon.width) return@launch
+            }
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, ImageFavicon(icon, url))
             faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
@@ -1787,6 +1802,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
+        hasCompletedPageLoad = false
         showWebContent()
     }
 
@@ -1898,6 +1914,7 @@ class BrowserTabViewModel @Inject constructor(
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
         hasExitedFixedProgress = false
+        hasCompletedPageLoad = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2060,8 +2077,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun titleUpdated(title: String?) {
-        logcat(VERBOSE) { "Page title updated: $title" }
-        site?.title = title
+        if (title != null) {
+            logcat(VERBOSE) { "Page title updated: $title" }
+            viewModelScope.launch(dispatchers.main()) {
+                updateTabTitle(tabId, newTitle = title)
+            }
+        }
     }
 
     @VisibleForTesting
@@ -2134,33 +2155,38 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
+        if (!currentBrowserViewState().browserShowing) return
+
+        // Once a page load completes, ignore subsequent progress events (iframes, subresources)
+        // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
+        if (progressBarUpgradeFeature.self().isEnabled() && hasCompletedPageLoad) return
+
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
         }
-
-        if (!currentBrowserViewState().browserShowing) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        val visualProgress =
-            if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
-                FIXED_PROGRESS
-            } else {
-                newProgress
-            }
+        val reportedProgress = if (progressBarUpgradeFeature.self().isEnabled()) {
+            newProgress
+        } else {
+            if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
+        }
 
-        // Track the first time we escape from fixed progress for Wide Events
+        // Track the first time we escape from max progress threshold for Wide Events
         val currentUrl = webViewNavigationState.currentUrl
-        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
+        val progressThreshold = if (progressBarUpgradeFeature.self().isEnabled()) UPGRADED_PROGRESS_THRESHOLD else FIXED_PROGRESS
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > progressThreshold) {
             hasExitedFixedProgress = true
             pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = reportedProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
+            hasCompletedPageLoad = true
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2243,6 +2269,14 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
+        hasCompletedPageLoad = false
+
+        // Reset progress so stale progress=100 from the previous page doesn't
+        // trigger tracker animations before the new page's progress events arrive
+        val progress = currentLoadingViewState()
+        if (progressBarUpgradeFeature.self().isEnabled() && progress.progress == 100) {
+            loadingViewState.value = progress.copy(progress = 0)
+        }
 
         command.value = Command.PageStarted
     }
@@ -3246,11 +3280,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         val onboardingCommand =
             when (cta) {
-                is HomePanelCta.AddWidgetAutoOnboardingExperiment -> LaunchAddWidgetOnboardingExperiment
-                is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> {
-                    LaunchAddWidget
-                }
-
+                is HomePanelCta.AddWidgetInstructions, is HomePanelCta.AddWidgetAutoOnboarding -> LaunchAddWidgetOnboarding
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
                 is DaxBubbleCta -> {
                     onDaxBubbleCtaOkButtonClicked(cta)
@@ -3258,8 +3288,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        ctaViewModel.onUserDismissedCta(cta)
-                        val origin = "funnel_reinstallmodal_android"
+                        val origin = "funnel_skippedonboarding_android"
                         command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
                     }
                     null
@@ -4939,6 +4968,7 @@ class BrowserTabViewModel @Inject constructor(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        private const val UPGRADED_PROGRESS_THRESHOLD = 95
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

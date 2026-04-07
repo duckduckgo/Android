@@ -31,6 +31,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_CARD_ID
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
@@ -42,6 +43,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class ImageLoadSource {
+    data object Header : ImageLoadSource()
+    data class CardItem(val cardId: String) : ImageLoadSource()
+}
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
@@ -121,7 +127,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    private fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+    private suspend fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
         val items = mutableListOf<ModalListItem>()
 
         items.add(
@@ -134,8 +140,13 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         )
 
         items.addAll(
-            cardsList.listItems.map {
-                ModalListItem.CardListItem(id = it.id, cardItem = it)
+            cardsList.listItems.map { cardItem ->
+                val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
+                    remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
+                } else {
+                    null
+                }
+                ModalListItem.CardListItem(id = cardItem.id, cardItem = cardItem, imageFilePath = itemImagePath)
             },
         )
 
@@ -146,18 +157,34 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         )
     }
 
-    fun onRemoteImageLoadFailed() {
-        pixel.fire(
-            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
-            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
-        )
+    fun onImageLoadFailed(source: ImageLoadSource) {
+        val (pixelName, params) = when (source) {
+            is ImageLoadSource.Header ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED to
+                    mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty())
+            is ImageLoadSource.CardItem ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_FAILED to
+                    mapOf(
+                        Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty(),
+                        PARAM_NAME_CARD_ID to source.cardId,
+                    )
+        }
+        pixel.fire(pixelName, params)
     }
 
-    fun onRemoteImageLoadSuccess() {
-        pixel.fire(
-            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
-            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
-        )
+    fun onImageLoadSuccess(source: ImageLoadSource) {
+        val (pixelName, params) = when (source) {
+            is ImageLoadSource.Header ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS to
+                    mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty())
+            is ImageLoadSource.CardItem ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_SUCCESS to
+                    mapOf(
+                        Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty(),
+                        PARAM_NAME_CARD_ID to source.cardId,
+                    )
+        }
+        pixel.fire(pixelName, params)
     }
 
     override fun onItemClicked(item: CardItem.ListItem) {

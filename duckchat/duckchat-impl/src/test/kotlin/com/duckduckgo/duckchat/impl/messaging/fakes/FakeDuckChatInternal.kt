@@ -184,6 +184,10 @@ class FakeDuckChatInternal(
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         _defaultTogglePosition.map { DefaultTogglePosition.fromName(it) }
 
+    override suspend fun saveLastUsedTogglePosition(position: String) { }
+
+    override fun observeLastUsedTogglePosition(): Flow<String?> = MutableStateFlow(null)
+
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled
     }

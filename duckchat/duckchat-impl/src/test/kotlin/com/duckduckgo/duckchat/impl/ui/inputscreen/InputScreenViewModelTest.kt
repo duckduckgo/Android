@@ -25,7 +25,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentI
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
@@ -93,7 +94,7 @@ class InputScreenViewModelTest {
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
-    private val duckChat: DuckChat = mock()
+    private val duckChat: DuckChatInternal = mock()
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
@@ -2824,6 +2825,351 @@ class InputScreenViewModelTest {
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT)
             verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
             verify(duckChat).openVoiceDuckChat()
+        }
+
+    // endregion
+
+    // region default toggle position
+
+    @Test
+    fun `getNewTabTogglePosition returns SEARCH when feature flag is off`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+
+            val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.SEARCH, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `getNewTabTogglePosition returns SEARCH when setting is SEARCH`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.SEARCH, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `getNewTabTogglePosition returns DUCK_AI when setting is DUCK_AI`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.DUCK_AI, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `getNewTabTogglePosition returns SEARCH when setting is LAST_USED and last used is null`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.LAST_USED))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.SEARCH, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `getNewTabTogglePosition returns DUCK_AI when setting is LAST_USED and last used is DUCK_AI`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.LAST_USED))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI.name))
+
+            val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.DUCK_AI, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition never called when feature flag is off`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+            whenever(queryUrlPredictor.isUrl(any())).thenReturn(false)
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSubmitted("test query")
+            viewModel.onChatSelected()
+            viewModel.onChatSubmitted("test prompt")
+            viewModel.onUserSubmittedQuery("test autocomplete")
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("test ai prompt"))
+            viewModel.onChatSuggestionSelected("chat-id", pinned = false)
+
+            verify(duckChat, never()).saveLastUsedTogglePosition(any())
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called with SEARCH on search submission`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSubmitted("test query")
+
+            verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.SEARCH.name)
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called with DUCK_AI on chat submission`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+            whenever(queryUrlPredictor.isUrl(any())).thenReturn(false)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatSubmitted("test prompt")
+
+            verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.DUCK_AI.name)
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called with SEARCH on autocomplete selection`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onUserSubmittedQuery("test query")
+
+            verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.SEARCH.name)
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called with DUCK_AI on duck ai prompt autocomplete`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("test prompt"))
+
+            verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.DUCK_AI.name)
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called with DUCK_AI on chat suggestion selected`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatSuggestionSelected("chat-id-123", pinned = false)
+
+            verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.DUCK_AI.name)
+        }
+
+    // endregion
+
+    // region mode switched pixel
+
+    @Test
+    fun `mode switched pixel includes default_position when feature flag is on`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onChatSelected()
+
+            verify(pixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+                parameters = mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "false",
+                    DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION to "duckAI",
+                ),
+            )
+        }
+
+    @Test
+    fun `mode switched pixel excludes default_position when feature flag is off`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onChatSelected()
+
+            verify(pixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+                parameters = mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "false",
+                ),
+            )
+        }
+
+    // endregion
+
+    // region chat URL suggestions
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty and autocomplete not called when feature flag is off`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+
+            val viewModel = createViewModel()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+            verify(autoComplete, never()).autoComplete(any())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions filters out non-URL suggestions when feature flag is on`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val bookmarkSuggestion = AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion(
+                phrase = "example.com",
+                title = "Example",
+                url = "https://example.com",
+            )
+            val searchSuggestion = AutoCompleteSearchSuggestion(
+                phrase = "example",
+                isUrl = false,
+                isAllowedInTopHits = false,
+            )
+            val urlSearchSuggestion = AutoCompleteSearchSuggestion(
+                phrase = "example.com",
+                isUrl = true,
+                isAllowedInTopHits = false,
+            )
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(AutoCompleteResult("example", listOf(searchSuggestion, bookmarkSuggestion, urlSearchSuggestion))),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            val result = viewModel.chatUrlSuggestions.value
+            assertEquals(2, result.suggestions.size)
+            assertTrue(result.suggestions[0] is AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion)
+            assertTrue(result.suggestions[1] is AutoCompleteSearchSuggestion)
+            assertTrue((result.suggestions[1] as AutoCompleteSearchSuggestion).isUrl)
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when chat input is empty`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+            verify(autoComplete, never()).autoComplete("")
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when chat suggestions exist`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(
+                listOf(ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false)),
+            )
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(AutoCompleteResult("test", listOf(AutoCompleteSearchSuggestion("test.com", isUrl = true, isAllowedInTopHits = false)))),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("test")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when autocomplete suggestions disabled`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatSuggestionsVisible is true when only URL suggestions exist`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(
+                    AutoCompleteResult(
+                        "example",
+                        listOf(AutoCompleteSearchSuggestion("example.com", isUrl = true, isAllowedInTopHits = false)),
+                    ),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty())
+            assertTrue(viewModel.visibilityState.value.chatSuggestionsVisible)
+            assertFalse(viewModel.visibilityState.value.showChatLogo)
         }
 
     // endregion

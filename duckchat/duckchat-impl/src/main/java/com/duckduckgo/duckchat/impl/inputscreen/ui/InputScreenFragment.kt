@@ -86,6 +86,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -225,9 +226,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
         inputModeWidget.provideInitialInputState(initialText, showMainButtons)
 
-        configureHatchView(params?.showReturnHatch)
-
         val useTopBar = inputScreenConfigResolver.useTopBar()
+
+        configureHatchView(params?.showReturnHatch, useTopBar)
+
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
@@ -282,11 +284,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureLogoAnimation()
         configureKeyboardListener()
 
-        val launchOnChat = params?.launchOnChat ?: false
-        if (launchOnChat) {
-            inputModeWidget.initOnChat()
+        val launchOnChat = if (duckChatFeature.rememberTogglePosition().isEnabled() && params?.isNewTab == true) {
+            viewModel.getNewTabTogglePosition() == DefaultTogglePosition.DUCK_AI
         } else {
-            inputModeWidget.initOnSearch()
+            params?.launchOnChat ?: false
+        }
+        if (launchOnChat) {
+            inputModeWidget.initOnChat(animate = false)
+        } else {
+            inputModeWidget.initOnSearch(animate = false)
         }
         updateMenuIconButton(params?.useBottomSheetMenu ?: false)
 
@@ -458,13 +464,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             onBack = {
                 requireActivity().onBackPressed()
             }
-            onSearchSelected = {
-                binding.viewPager.setCurrentItem(0, true)
+            onSearchSelected = { animate ->
+                binding.viewPager.setCurrentItem(0, animate)
                 viewModel.onSearchSelected()
                 viewModel.onSearchInputTextChanged(inputModeWidget.text)
             }
-            onChatSelected = {
-                binding.viewPager.setCurrentItem(1, true)
+            onChatSelected = { animate ->
+                binding.viewPager.setCurrentItem(1, animate)
                 viewModel.onChatSelected()
                 viewModel.onChatInputTextChanged(inputModeWidget.text)
                 if (!useTopBar) {
@@ -539,18 +545,50 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         exitInputScreen()
     }
 
-    private fun configureHatchView(showReturnHatch: Boolean?) {
-        binding.inputScreenHatch.isVisible = showReturnHatch ?: false
-        binding.inputScreenHatch.setHatchPressedListener(
-            object : NewTabReturnHatchView.ItemPressedListener {
+    private fun configureHatchView(
+        showReturnHatch: Boolean?,
+        useTopBar: Boolean,
+    ) {
+        val shouldShowHatch = showReturnHatch ?: false
+
+        binding.inputScreenHatch.isVisible = shouldShowHatch
+        if (shouldShowHatch) {
+            binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
+            }
+        } else {
+            restoreLogoTopMargin(shouldShowHatch)
+        }
+
+        binding.inputScreenHatch.setHatchListener(
+            object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
                     exitInputScreen()
                 }
+
+                override fun onHatchRendered(visible: Boolean) {
+                    logcat { "Hatch: onHatchRendered $visible shouldShowHatch $shouldShowHatch" }
+                    if (shouldShowHatch) {
+                        if (useTopBar) {
+                            restoreLogoTopMargin(visible)
+                        }
+                    }
+                }
             },
         )
+    }
+
+    private fun restoreLogoTopMargin(hatchVisible: Boolean) {
+        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = if (hatchVisible) {
+                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
+            } else {
+                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarTopMargin)
+            }
+        }
     }
 
     private fun configureVoice(useTopBar: Boolean) {
@@ -734,7 +772,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 autoCompleteTargetVisibility = false
                 hideOverlayImmediately(binding.autoCompleteOverlay, ::invalidateAutoCompleteBlurView)
             }
-            updateChatSuggestionsVisibility(viewModel.chatSuggestions.value.isNotEmpty())
+            updateChatSuggestionsVisibility(
+                viewModel.chatSuggestions.value.isNotEmpty() || viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty(),
+            )
         }
     }
 

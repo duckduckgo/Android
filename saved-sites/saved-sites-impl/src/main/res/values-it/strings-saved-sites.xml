@@ -28,6 +28,12 @@
         <item quantity="one">Il tuo segnalibro per %1$s non può essere sincronizzato perché uno dei suoi campi supera il limite di caratteri.</item>
         <item quantity="other">I tuoi segnalibri per %1$s e altri %2$d siti non possono essere sincronizzati perché alcuni dei loro campi superano il limite di caratteri.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Cerca segnalibri</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Aggiungi cartella</string>
+    <string name="bookmarksMenuContentDescription">Altre opzioni</string>
+    <string name="newTabFavoritesToggleContentDescription">Attiva/disattiva la visibilità dei preferiti</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gestisci segnalibri</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importa da Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri...</string>
     <string name="bookmarksImportDialogClose">Chiudi</string>
+
 </resources>

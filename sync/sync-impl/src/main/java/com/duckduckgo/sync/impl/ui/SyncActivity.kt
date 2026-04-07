@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -24,6 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -35,6 +38,7 @@ import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
@@ -58,6 +62,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
@@ -159,6 +164,11 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.onScreenExit()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -228,6 +238,17 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.viewSyncEnabled.disableSyncButton.setClickListener {
             viewModel.onTurnOffClicked()
         }
+
+        binding.viewSyncEnabled.dataExpirationText.addClickableSpan(
+            textSequence = getText(R.string.sync_settings_data_expiration),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
 
         binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
             viewModel.onSaveRecoveryCodeClicked()
@@ -340,6 +361,10 @@ class SyncActivity : DuckDuckGoActivity() {
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(command.source)
             is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
+            is LaunchLearnMore -> globalActivityStarter.start(
+                this,
+                SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
+            )
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,
@@ -484,6 +509,15 @@ class SyncActivity : DuckDuckGoActivity() {
 
         binding.viewSyncDisabled.getDesktopBrowser.isVisible = viewState.newDesktopBrowserSettingEnabled
         binding.viewSyncDisabled.syncSetupOtherPlatforms.isVisible = !viewState.newDesktopBrowserSettingEnabled
+
+        binding.viewSyncEnabled.restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
+        if (viewState.showAutoRestoreToggle) {
+            binding.viewSyncEnabled.restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled) { _, isChecked ->
+                viewModel.onAutoRestoreToggleChanged(isChecked)
+            }
+            val iconRes = if (viewState.autoRestoreEnabled) R.drawable.device_default_24 else R.drawable.device_soft_alert_24
+            binding.viewSyncEnabled.restoreOnReinstallItem.setLeadingIconResource(iconRes)
+        }
 
         if (viewState.showAccount) {
             syncedDevicesAdapter.updateData(viewState.syncedDevices)

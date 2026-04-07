@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -37,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
@@ -597,26 +599,29 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
-        val normalTabs = tabEntities.map {
-            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+        if (mode is Selection) {
+            return tabEntities.map { entity ->
+                val uri = entity.url?.let { Uri.parse(it) }
+                val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
+                SelectableTab(entity, isSelected = entity.tabId in mode.selectedTabs, isDuckAi = isDuckAi)
+            }
         }
 
-        suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (!isTrackersAnimationInfoPanelHidden) {
-                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-
-                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
+        val tabs = tabEntities.map { entity ->
+            val isActive = entity.tabId == activeTab?.tabId
+            val uri = entity.url?.let { Uri.parse(it) }
+            if (uri != null && duckChat.isDuckChatUrl(uri)) {
+                DuckAiTab(entity, isActive)
             } else {
-                normalTabs
+                NormalTab(entity, isActive)
             }
         }
 
-        return if (mode is Selection) {
-            tabEntities.map {
-                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
-            }
+        return if (!isTrackersAnimationInfoPanelHidden) {
+            val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
-            getNormalTabItemsWithOptionalAnimationTile()
+            tabs
         }
     }
 

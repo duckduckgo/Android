@@ -65,7 +65,7 @@ class SyncAutoRestoreAccountDisabledObserverTest {
 
         isSignedInFlow.emit(false)
 
-        verify(syncAutoRestoreManager).clearRecoveryCode()
+        verify(syncAutoRestoreManager).clearAutoRestoreData()
     }
 
     @Test
@@ -76,7 +76,7 @@ class SyncAutoRestoreAccountDisabledObserverTest {
 
         isSignedInFlow.emit(true)
 
-        verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+        verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
     }
 
     @Test
@@ -86,7 +86,7 @@ class SyncAutoRestoreAccountDisabledObserverTest {
 
         testee.onCreate(mock())
 
-        verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+        verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
     }
 
     @Test
@@ -98,7 +98,7 @@ class SyncAutoRestoreAccountDisabledObserverTest {
 
         isSignedInFlow.emit(false)
 
-        verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+        verify(syncAutoRestoreManager, never()).clearAutoRestoreData()
     }
 
     @Test
@@ -111,6 +111,6 @@ class SyncAutoRestoreAccountDisabledObserverTest {
         isSignedInFlow.emit(true)
         isSignedInFlow.emit(false)
 
-        verify(syncAutoRestoreManager, times(2)).clearRecoveryCode()
+        verify(syncAutoRestoreManager, times(2)).clearAutoRestoreData()
     }
 }

@@ -8,7 +8,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="560"
+            line="581"
             column="24"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="575"
+            line="602"
             column="24"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="580"
+            line="607"
             column="24"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="633"
+            line="662"
             column="20"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="779"
+            line="808"
             column="32"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="332"
+            line="345"
             column="24"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="342"
+            line="355"
             column="24"/>
     </issue>
 
@@ -118,7 +118,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="347"
+            line="360"
             column="24"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="362"
+            line="375"
             column="24"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="369"
+            line="382"
             column="24"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="540"
+            line="592"
             column="24"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="609"
+            line="666"
             column="23"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="703"
+            line="732"
             column="33"/>
     </issue>
 
@@ -382,7 +382,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="166"
+            line="167"
             column="22"/>
     </issue>
 
@@ -404,7 +404,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="166"
+            line="167"
             column="22"/>
     </issue>
 
@@ -426,7 +426,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="283"
+            line="287"
             column="13"/>
     </issue>
 
@@ -437,96 +437,8 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="283"
+            line="287"
             column="35"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="106"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="124"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="147"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="173"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
-            line="65"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                            &lt;ImageView"
-        errorLine2="                             ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
-            line="78"
-            column="30"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="181"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="209"
-            column="18"/>
     </issue>
 
     <issue
@@ -536,7 +448,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="294"
+            line="295"
             column="25"/>
     </issue>
 

@@ -45,8 +45,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -85,6 +85,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -104,6 +105,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -138,7 +140,7 @@ class InputScreenViewModel @AssistedInject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
-    private val duckChat: DuckChat,
+    private val duckChat: DuckChatInternal,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatFeature: DuckChatFeature,
     private val pixel: Pixel,
@@ -203,6 +205,22 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
+    private val defaultTogglePosition: StateFlow<DefaultTogglePosition> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            duckChat.observeDefaultTogglePosition()
+                .stateIn(appCoroutineScope, SharingStarted.Eagerly, DefaultTogglePosition.SEARCH)
+        } else {
+            MutableStateFlow(DefaultTogglePosition.SEARCH)
+        }
+
+    private val lastUsedTogglePosition: StateFlow<String?> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            duckChat.observeLastUsedTogglePosition()
+                .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
+        } else {
+            MutableStateFlow(null)
+        }
+
     /**
      * This becomes true when either:
      * 1. The user has modified the input text from its initial state, OR
@@ -259,6 +277,38 @@ class InputScreenViewModel @AssistedInject constructor(
             }.flowOn(dispatchers.main())
             .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val chatUrlSuggestions: StateFlow<AutoCompleteResult> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            combine(
+                chatInputTextState.debounceExceptFirst(timeoutMillis = 100),
+                _chatSuggestions,
+                autoCompleteSuggestionsEnabled,
+            ) { chatInput, chatSuggestions, autoCompleteEnabled ->
+                if (autoCompleteEnabled && chatInput.isNotEmpty() && chatSuggestions.isEmpty()) chatInput else null
+            }.distinctUntilChanged()
+                .flatMapLatest { query ->
+                    if (query != null) {
+                        autoComplete.autoComplete(query).map { result ->
+                            result.copy(
+                                suggestions = result.suggestions.filter {
+                                    it is AutoCompleteBookmarkSuggestion ||
+                                        it is AutoCompleteSwitchToTabSuggestion ||
+                                        it is AutoCompleteHistorySuggestion ||
+                                        (it is AutoCompleteSearchSuggestion && it.isUrl)
+                                },
+                            )
+                        }
+                    } else {
+                        flowOf(AutoCompleteResult("", emptyList()))
+                    }
+                }.flowOn(dispatchers.io())
+                .catch { t -> logcat(WARN) { "Failed to get chat URL suggestions: ${t.asLog()}" } }
+                .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+        } else {
+            MutableStateFlow(AutoCompleteResult("", emptyList()))
+        }
 
     private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
     val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
@@ -321,10 +371,13 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        _chatSuggestions.onEach { suggestions ->
-            val hasChatSuggestions = suggestions.isNotEmpty()
+        combine(_chatSuggestions, chatUrlSuggestions) { chatSuggestions, urlSuggestions ->
+            Pair(chatSuggestions, urlSuggestions)
+        }.onEach { (chatSuggestions, urlSuggestions) ->
+            val hasChatSuggestions = chatSuggestions.isNotEmpty()
+            val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
             _visibilityState.update {
-                it.copy(showChatLogo = !hasChatSuggestions, chatSuggestionsVisible = hasChatSuggestions)
+                it.copy(showChatLogo = !hasChatSuggestions && !hasUrlSuggestions, chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions)
             }
         }.launchIn(viewModelScope)
 
@@ -357,9 +410,14 @@ class InputScreenViewModel @AssistedInject constructor(
         voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
-    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion, fromChatUrlSuggestions: Boolean = false) {
         appCoroutineScope.launch(dispatchers.io()) {
-            autoComplete.fireAutocompletePixel(autoCompleteSuggestionResults.value.suggestions, suggestion, true)
+            val suggestions = if (duckChatFeature.rememberTogglePosition().isEnabled() && fromChatUrlSuggestions) {
+                chatUrlSuggestions.value.suggestions
+            } else {
+                autoCompleteSuggestionResults.value.suggestions
+            }
+            autoComplete.fireAutocompletePixel(suggestions, suggestion, true)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase)
@@ -394,6 +452,7 @@ class InputScreenViewModel @AssistedInject constructor(
         if (visibilityState.value.fullScreenMode) {
             onChatSubmitted(prompt)
         } else {
+            saveLastUsedTogglePosition()
             duckChatJSHelper.clearTabContextPromptEvent()
             command.value = Command.SubmitChat(prompt)
             duckChat.openDuckChatWithAutoPrompt(prompt)
@@ -438,6 +497,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onUserSubmittedQuery(query: String) {
+        saveLastUsedTogglePosition()
         command.value = Command.UserSubmittedQuery(query)
         _visibilityState.update {
             it.copy(
@@ -475,6 +535,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSubmitted(query: String) {
+        saveLastUsedTogglePosition()
         val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
         command.value = Command.SubmitSearch(sanitizedQuery)
         val params =
@@ -493,6 +554,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatSubmitted(query: String) {
+        saveLastUsedTogglePosition()
         viewModelScope.launch {
             if (queryUrlPredictor.isUrl(query)) {
                 command.value = Command.SubmitSearch(query)
@@ -726,16 +788,16 @@ class InputScreenViewModel @AssistedInject constructor(
             } else {
                 searchInputTextState.value.isNotBlank()
             }
-        val params =
-            mapOf(
-                "direction" to
-                    if (directionToSearch) {
-                        "to_search"
-                    } else {
-                        "to_duckai"
-                    },
-                "had_text" to hadText.toString(),
+        val params = buildMap {
+            put(
+                "direction",
+                if (directionToSearch) "to_search" else "to_duckai",
             )
+            put("had_text", hadText.toString())
+            if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+                put(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION, defaultTogglePosition.value.pixelValue)
+            }
+        }
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, parameters = params)
     }
 
@@ -784,6 +846,7 @@ class InputScreenViewModel @AssistedInject constructor(
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
     fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
+        saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
             val url = duckChat.getDuckChatUrl("", false)
@@ -914,6 +977,25 @@ class InputScreenViewModel @AssistedInject constructor(
         duckChatJSHelper.storeTabContextPromptEvent(query, enrichedContexts)
 
         return true
+    }
+
+    fun getNewTabTogglePosition(): DefaultTogglePosition {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return DefaultTogglePosition.SEARCH
+
+        val position = defaultTogglePosition.value
+        return if (position == DefaultTogglePosition.LAST_USED) {
+            DefaultTogglePosition.fromName(lastUsedTogglePosition.value)
+        } else {
+            position
+        }
+    }
+
+    private fun saveLastUsedTogglePosition() {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        val position = if (isSearchModeFlow.value) DefaultTogglePosition.SEARCH else DefaultTogglePosition.DUCK_AI
+        appCoroutineScope.launch(dispatchers.io()) {
+            duckChat.saveLastUsedTogglePosition(position.name)
+        }
     }
 
     override fun onCleared() {

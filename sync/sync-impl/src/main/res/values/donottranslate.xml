@@ -43,7 +43,7 @@
     <string name="sync_restore_on_reinstall_description">If you reinstall the DuckDuckGo app, we\'ll ask if you want to restore your data on this device.</string>
 
     <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
-    <string name="sync_internal_block_store_write_recovery_code">Save Recovery Code to Persistent Storage</string>
+    <string name="sync_internal_block_store_write_recovery_code">Save account recovery code &amp; device ID to Block Store</string>
 
     <!-- Block Store -->
     <string name="sync_internal_block_store_header">Persistent Storage / Block Store</string>

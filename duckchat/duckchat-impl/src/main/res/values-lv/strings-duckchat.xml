@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
     <string name="input_screen_chat_hint">Pajautāt privāti</string>
     <string name="input_screen_user_pref_without_ai">Meklēt tikai</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Izmēģini jauno iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Automātiski nosūtīt lapas saturu</string>
     <string name="duckAIContextualAutomaticContextMessage">Automātiski nosūtīt lapas saturu uz Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Pievienot lapas saturu</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Notīrīt datus</string>
+    <string name="duckChatBrowserMenuContentDescription">Citas iespējas</string>
 </resources>

@@ -368,6 +368,8 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
+    implementation project(':content-scope-privacy-features-impl')
+
     implementation project(':network-protection-api')
     implementation project(':network-protection-impl')
     internalImplementation project(':network-protection-internal')

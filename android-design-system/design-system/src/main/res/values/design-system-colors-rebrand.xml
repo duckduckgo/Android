@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!-- Grayscale -->
+    <color name="rb_gray0">#FCFCFC</color>
+    <color name="rb_gray10">#F5F5F5</color>
+    <color name="rb_gray20">#E5E5E5</color>
+    <color name="rb_gray30">#C5C5C5</color>
+    <color name="rb_gray40">#AAAAAA</color>
+    <color name="rb_gray50">#888888</color>
+    <color name="rb_gray60">#686868</color>
+    <color name="rb_gray70">#484848</color>
+    <color name="rb_gray80">#383838</color>
+    <color name="rb_gray90">#222222</color>
+    <color name="rb_gray100">#181818</color>
+    <color name="rb_gray111">#111111</color>
+
+    <!-- Eggshell -->
+    <color name="eggshell0">#FBFAF9</color>
+    <color name="eggshell10">#F7F5F2</color>
+    <color name="eggshell20">#ECEBE7</color>
+    <color name="eggshell30">#D1CECB</color>
+    <color name="eggshell40">#B2B0AD</color>
+    <color name="eggshell50">#8A8886</color>
+    <color name="eggshell60">#6B6968</color>
+    <color name="eggshell70">#454443</color>
+    <color name="eggshell80">#30302F</color>
+    <color name="eggshell90">#242323</color>
+    <color name="eggshell100">#171716</color>
+
+    <!-- Mandarin -->
+    <color name="mandarin0">#FFFAF9</color>
+    <color name="mandarin10">#FFEBE5</color>
+    <color name="mandarin20">#FFDACC</color>
+    <color name="mandarin30">#FFB294</color>
+    <color name="mandarin40">#FF8D5C</color>
+    <color name="mandarin50">#F05F2B</color>
+    <color name="mandarin60">#CC3B0A</color>
+    <color name="mandarin70">#9E2B08</color>
+    <color name="mandarin80">#671907</color>
+    <color name="mandarin90">#47140B</color>
+    <color name="mandarin100">#290E0A</color>
+
+    <!-- Pondwater -->
+    <color name="pondwater0">#F5FBFE</color>
+    <color name="pondwater10">#E6F6FF</color>
+    <color name="pondwater20">#CBEAFF</color>
+    <color name="pondwater30">#A1D0F7</color>
+    <color name="pondwater40">#75B6EB</color>
+    <color name="pondwater50">#4397E0</color>
+    <color name="pondwater60">#1074CC</color>
+    <color name="pondwater70">#045EB2</color>
+    <color name="pondwater80">#034180</color>
+    <color name="pondwater90">#02254D</color>
+    <color name="pondwater100">#01142D</color>
+
+    <!-- Lilypad -->
+    <color name="lilypad0">#F8FCF9</color>
+    <color name="lilypad10">#E2F3E9</color>
+    <color name="lilypad20">#CFEBDA</color>
+    <color name="lilypad30">#AED5C2</color>
+    <color name="lilypad40">#84BBA8</color>
+    <color name="lilypad50">#589D88</color>
+    <color name="lilypad60">#247A64</color>
+    <color name="lilypad70">#11604D</color>
+    <color name="lilypad80">#0A4739</color>
+    <color name="lilypad90">#052F25</color>
+    <color name="lilypad100">#082119</color>
+
+    <!-- Blossom -->
+    <color name="blossom0">#FBF7FF</color>
+    <color name="blossom10">#F5EDFF</color>
+    <color name="blossom20">#EADAFD</color>
+    <color name="blossom30">#D3B9EB</color>
+    <color name="blossom40">#C19EDB</color>
+    <color name="blossom50">#9F6EB8</color>
+    <color name="blossom60">#7D4794</color>
+    <color name="blossom70">#682A7A</color>
+    <color name="blossom80">#521A61</color>
+    <color name="blossom90">#3E0E47</color>
+    <color name="blossom100">#230829</color>
+
+    <!-- Pollen -->
+    <color name="pollen0">#FFFBF0</color>
+    <color name="pollen10">#FEF4DA</color>
+    <color name="pollen20">#FFEAB8</color>
+    <color name="pollen30">#FFD885</color>
+    <color name="pollen40">#FFC95C</color>
+    <color name="pollen50">#FAB341</color>
+    <color name="pollen60">#F5A031</color>
+    <color name="pollen70">#B66A1F</color>
+    <color name="pollen80">#783B13</color>
+    <color name="pollen90">#47210A</color>
+    <color name="pollen100">#240F04</color>
+
+    <!-- Red -->
+    <color name="rb_red0">#FEF9FA</color>
+    <color name="rb_red10">#FCECF0</color>
+    <color name="rb_red20">#FAD8DC</color>
+    <color name="rb_red30">#F7AAAD</color>
+    <color name="rb_red40">#F06565</color>
+    <color name="rb_red50">#EC434F</color>
+    <color name="rb_red60">#CA2B3D</color>
+    <color name="rb_red70">#A02231</color>
+    <color name="rb_red80">#671421</color>
+    <color name="rb_red90">#46111C</color>
+    <color name="rb_red100">#2A0C14</color>
+
+    <!-- Other -->
+    <color name="green40">#39B25E</color>
+</resources>

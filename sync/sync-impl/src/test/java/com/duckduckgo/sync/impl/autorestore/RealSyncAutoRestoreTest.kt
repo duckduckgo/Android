@@ -118,6 +118,29 @@ class RealSyncAutoRestoreTest {
     }
 
     @Test
+    fun whenRestoreSucceedsThenSavesAutoRestoreDataToReaffirmPreferenceAndPayload() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        val deviceId = "device-abc-123"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = deviceId))
+        configureProcessCodeResult(SyncResult.Success(true))
+
+        testee.restoreSyncAccount()
+
+        verify(manager).saveAutoRestoreData(recoveryCodeString, deviceId)
+    }
+
+    @Test
+    fun whenRestoreFailsThenDoesNotSaveAutoRestoreData() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = "device-123"))
+        configureProcessCodeResult(SyncResult.Error(code = 52, reason = "Login failed"))
+
+        testee.restoreSyncAccount()
+
+        verify(manager, never()).saveAutoRestoreData(any(), anyOrNull())
+    }
+
+    @Test
     fun whenRestoreSyncAccountCalledButNoStoredKeyThenDoesNotCallProcessCode() = runTest {
         configureRetrieveSuccess(payload = null)
 

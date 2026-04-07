@@ -296,6 +296,21 @@
                 app:typography="body1" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Recovery Code" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/recoveryCodeTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/connectedDevicesSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

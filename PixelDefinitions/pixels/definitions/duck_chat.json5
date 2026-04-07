@@ -300,7 +300,13 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_enabled",
+                "description": "whether automatic page context collection is enabled or not"
+            }
+        ]
     },
     "m_aichat_settings_chat_suggestions_turned_on_count": {
         "description": "User enabled the Chat Suggestions toggle in General Settings",
@@ -370,6 +376,47 @@
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_settings_default_toggle_position_changed": {
+        "description": "User changed the default toggle position setting in AI Features settings",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "value", "type": "string", "description": "The selected toggle position", "enum": ["search", "duckAI", "lastUsed"] }
+        ]
+    },
+    "m_aichat_experimental_omnibar_mode_switched": {
+        "description": "User switched between Search and Duck.ai toggle in the input screen",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            { "key": "direction", "type": "string", "description": "Direction of the toggle switch", "enum": ["to_search", "to_duckai"] },
+            { "key": "had_text", "type": "string", "description": "Whether the input field had text", "enum": ["true", "false"] },
+            {
+                "key": "default_position",
+                "type": "string",
+                "description": "The user's default toggle position setting",
+                "enum": ["search", "duckAI", "lastUsed"]
+            }
+        ]
+    },
+    "m_aichat_contextual_fire_button_tapped": {
+        "description": "User tapped the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_fire_button_confirmed": {
+        "description": "User confirmed chat deletion via the fire button in the contextual Duck.ai sheet",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     }
 }

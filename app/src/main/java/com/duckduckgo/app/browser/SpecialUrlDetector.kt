@@ -212,7 +212,7 @@ class SpecialUrlDetectorImpl(
                     androidBrowserConfigFeature.validateIntentResolution().isEnabled()
                 ) {
                     // If the intent has a fallback URL, still return NonHttpAppLink so the caller can use the fallback
-                    val fallbackUrl = intent?.getStringExtra(EXTRA_FALLBACK_URL)
+                    val fallbackUrl = sanitizeFallbackUrl(intent?.getStringExtra(EXTRA_FALLBACK_URL))
                     if (fallbackUrl != null && appSchemeInterceptionFeature.self().isEnabled()) {
                         if (externalAppIntentFlagsFeature.self().isEnabled()) {
                             intent.addCategory(Intent.CATEGORY_BROWSABLE)
@@ -234,7 +234,7 @@ class SpecialUrlDetectorImpl(
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
 
-                val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
+                val fallbackUrl = sanitizeFallbackUrl(intent.getStringExtra(EXTRA_FALLBACK_URL))
                 val fallbackIntent = buildFallbackIntent(fallbackUrl)
                 UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
             } catch (e: URISyntaxException) {
@@ -249,6 +249,12 @@ class SpecialUrlDetectorImpl(
         }
 
         return UrlType.SearchQuery(uriString)
+    }
+
+    private fun sanitizeFallbackUrl(fallbackUrl: String?): String? {
+        if (fallbackUrl == null) return null
+        val scheme = Uri.parse(fallbackUrl).scheme?.lowercase() ?: return null
+        return if (scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME) fallbackUrl else null
     }
 
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {

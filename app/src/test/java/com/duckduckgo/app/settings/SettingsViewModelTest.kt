@@ -110,8 +110,6 @@ class SettingsViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
-    private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
-
     private val modalSurfaceStoreMock: ModalSurfaceStore = mock()
 
     @Before
@@ -143,7 +141,6 @@ class SettingsViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
-            postCtaExperienceToggles = fakePostCtaExperienceToggles,
         )
     }
 
@@ -220,26 +217,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserRequestedToAddHomeScreenWidgetAndSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithTrue() = runTest {
-        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
-        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(true))
-
+    fun whenUserRequestedToAddHomeScreenWidgetThenLaunchAddHomeScreenWidgetCommandSent() = runTest {
         testee.userRequestedToAddHomeScreenWidget()
 
         testee.commands().test {
-            assertEquals(LaunchAddHomeScreenWidget(true), awaitItem())
-        }
-    }
-
-    @Test
-    fun whenUserRequestedToAddHomeScreenWidgetAndNotSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithFalse() = runTest {
-        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
-        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(false))
-
-        testee.userRequestedToAddHomeScreenWidget()
-
-        testee.commands().test {
-            assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
+            assertEquals(LaunchAddHomeScreenWidget, awaitItem())
         }
     }
 

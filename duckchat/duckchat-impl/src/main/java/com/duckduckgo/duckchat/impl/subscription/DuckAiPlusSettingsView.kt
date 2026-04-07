@@ -97,11 +97,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
                 is SettingState.Enabled -> {
                     isVisible = true
                     setStatus(isOn = viewState.isDuckAiEnabled)
-                    if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
-                        setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_color_24)
-                    } else {
-                        setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24)
-                    }
+                    setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_color_24)
                     isClickable = true
                     setClickListener { viewModel.onDuckAiClicked() }
                 }
@@ -110,11 +106,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
                     isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    if (viewState.isDuckAiPaidSettingsFeatureEnabled) {
-                        setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_grayscale_color_24)
-                    } else {
-                        setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_grayscale_color_24)
-                    }
+                    setLeadingIconResource(DuckChatR.drawable.ic_duckduckgo_ai_grayscale_color_24)
                 }
                 SettingState.Hidden -> isGone = true
             }

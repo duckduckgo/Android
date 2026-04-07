@@ -78,6 +78,8 @@
             style="@style/Widget.DuckDuckGo.OmnibarCardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             app:cardElevation="0dp"
             app:strokeColor="?attr/daxColorAccentBlue"
             app:strokeWidth="@dimen/omnibarOutlineWidth"
@@ -88,6 +90,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -147,12 +151,49 @@
                 </LinearLayout>
 
                 <FrameLayout
-                    android:id="@+id/inputScreenButtonsContainer"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="8dp"
-                    android:visibility="invisible" />
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
+
+                    <ImageView
+                        android:id="@+id/inputFieldImageButton"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_image_24"
+                        tools:visibility="visible" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.duckduckgo.duckchat.impl.ui.ModelPickerView
+                            android:id="@+id/modelPickerView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@+id/inputScreenButtonsContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -173,6 +214,7 @@
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatFireButtonContentDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
                 app:layout_constraintStart_toStartOf="parent"
@@ -184,6 +226,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
 
@@ -201,6 +244,7 @@
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatBrowserMenuContentDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
@@ -212,6 +256,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>

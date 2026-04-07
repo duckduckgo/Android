@@ -53,6 +53,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -83,6 +84,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
     private val ampLinks: AmpLinks,
     private val inventory: FeatureTogglesInventory,
+    private val sitePermissionsRepository: SitePermissionsRepository,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite, toggle: Boolean) {
@@ -106,6 +108,7 @@ class BrokenSiteSubmitter @Inject constructor(
             val locale = appBuildConfig.deviceLocale.toSanitizedLanguageTag()
 
             val blockListToggle: Toggle? = inventory.activeTdsFlag()
+            val drmEnabled = sitePermissionsRepository.isDrmEnabledForSite(siteUrl).toString()
 
             val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
@@ -137,6 +140,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 USER_REFRESH_COUNT to brokenSite.userRefreshCount.toString(),
                 OPENER_CONTEXT to brokenSite.openerContext.orEmpty(),
                 JS_PERFORMANCE to brokenSite.jsPerformance?.joinToString(",").orEmpty(),
+                DRM_ENABLED to drmEnabled,
             )
 
             brokenSite.reportFlow?.let { reportFlow ->
@@ -249,6 +253,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val CONTENT_SCOPE_EXPERIMENTS = "contentScopeExperiments"
         private const val DEBUG_FLAGS = "debugFlags"
         private const val BREAKAGE_DATA = "breakageData"
+        private const val DRM_ENABLED = "drmEnabled"
     }
 }
 

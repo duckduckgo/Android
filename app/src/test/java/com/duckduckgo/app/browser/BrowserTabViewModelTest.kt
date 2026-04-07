@@ -97,6 +97,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
@@ -125,13 +126,13 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
@@ -604,7 +605,6 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
-    private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val tabManager: TabManager = mock()
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
@@ -646,6 +646,8 @@ class BrowserTabViewModelTest {
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
+    private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
+    private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -767,7 +769,6 @@ class BrowserTabViewModelTest {
                     subscriptions = subscriptions,
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
-                    onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
                     duckChat = mockDuckChat,
                 )
 
@@ -935,6 +936,8 @@ class BrowserTabViewModelTest {
                 pageLoadWideEvent = mockPageLoadWideEvent,
                 queryUrlPredictor = mockQueryUrlPredictor,
                 browserUiLockFeature = fakeBrowserUiLockFeature,
+                progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
+                faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1666,6 +1669,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
 
         testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
@@ -1679,6 +1683,64 @@ class BrowserTabViewModelTest {
         testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
+    }
+
+    // --- hasCompletedPageLoad tests ---
+
+    @Test
+    fun whenProgressReaches100ThenSubsequentProgressEventsAreIgnored() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        assertEquals(true, loadingViewState().isLoading)
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // Simulate iframe progress after main page completed — should be ignored
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPageStartedAfterCompletionThenProgressEventsFlowAgain() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // Verify iframe progress is blocked
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // New navigation starts — resets hasCompletedPageLoad
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+
+        // Progress events should now be accepted
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenProgressBarUpgradeEnabledThenRawProgressPassedThrough() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
+        assertEquals(15, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenProgressBarUpgradeDisabledThenProgressFlooredAtFixedProgress() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
+        setBrowserShowing(true)
+
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
+        assertEquals(50, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
     }
 
     @Test
@@ -1727,6 +1789,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
@@ -3100,7 +3163,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaShownThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             testee.ctaViewState.value = CtaViewState(cta = cta)
 
             testee.onCtaShown()
@@ -3136,18 +3199,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetAuto
+        val cta = HomePanelCta.AddWidgetAutoOnboarding
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidget>()
-    }
-
-    @Test
-    fun whenUserClickedAddWidgetOnboardingExperimentCtaButtonThenLaunchAddWidgetOnboardingExperimentCommand() {
-        val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
+        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
     }
 
     @Test
@@ -3155,7 +3210,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidget>()
+        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
     }
 
     @Test
@@ -3191,14 +3246,14 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchPrivacyPro> {
-            assertEquals("funnel_reinstallmodal_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_skippedonboarding_android", uri.getQueryParameter("origin"))
         }
     }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
@@ -3207,7 +3262,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
@@ -3839,6 +3894,98 @@ class BrowserTabViewModelTest {
             testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
             verify(mockFaviconManager, never()).storeFavicon(any(), any())
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledTwiceForSameDomainThenFaviconFetchedOnce() =
+        runTest {
+            val url = "https://www.example.com/"
+            givenCurrentSite(url)
+
+            testee.prefetchFavicon(url)
+            testee.prefetchFavicon(url)
+
+            verify(mockFaviconManager, times(1)).tryFetchFaviconForUrl("TAB_ID", url)
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledForDifferentDomainsThenFaviconFetchedForEach() =
+        runTest {
+            val url1 = "https://www.example.com/"
+            val url2 = "https://www.other.com/"
+            givenCurrentSite(url1)
+            testee.prefetchFavicon(url1)
+            givenCurrentSite(url2)
+            testee.prefetchFavicon(url2)
+
+            verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url1)
+            verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url2)
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledTwiceForSameDomainAndFixDisabledThenFaviconFetchedTwice() =
+        runTest {
+            fakeFaviconFetchingFixFeature.self().setRawStoredState(Toggle.State(enable = false))
+            val url = "https://www.example.com/"
+            givenCurrentSite(url)
+
+            testee.prefetchFavicon(url)
+            testee.prefetchFavicon(url)
+
+            verify(mockFaviconManager, times(2)).tryFetchFaviconForUrl(any(), any())
+        }
+
+    @Test
+    fun whenIconReceivedAndNoExistingFaviconThenStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
+
+            testee.iconReceived("https://example.com", bitmap)
+
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(bitmap, "https://example.com"))
+        }
+
+    @Test
+    fun whenIconReceivedAndExistingFaviconHasBetterQualityThenSkipStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager, never()).storeFavicon(any(), any())
+        }
+
+    @Test
+    fun whenIconReceivedAndNewFaviconHasBetterQualityThenStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(newBitmap, "https://example.com"))
+        }
+
+    @Test
+    fun whenIconReceivedAndFixDisabledThenSkipQualityCheckAndStoreFavicon() =
+        runTest {
+            fakeFaviconFetchingFixFeature.self().setRawStoredState(Toggle.State(enable = false))
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(newBitmap, "https://example.com"))
         }
 
     @Test

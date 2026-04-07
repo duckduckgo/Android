@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
     <string name="input_screen_chat_hint">Pitaj privatno</string>
     <string name="input_screen_user_pref_without_ai">Samo pretraživanje</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Pretraživanje i Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Isprobaj novu opciju za izravno postavljanje pitanja s adresne trake usluzi Duck.ai. <annotation type="share_feedback">Podijeli povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatski pošalji sadržaj stranice</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatski pošalji sadržaj stranice Duck.ai-ju</string>
     <string name="duckAIContextualAttachPageContent">Priloži sadržaj stranice</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Obriši podatke</string>
+    <string name="duckChatBrowserMenuContentDescription">Dodatne mogućnosti</string>
 </resources>

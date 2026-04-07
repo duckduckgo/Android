@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>
     <string name="input_screen_user_pref_without_ai">Само търсене</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Изпробвайте новата опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Автоматично изпращане на съдържанието на страницата</string>
     <string name="duckAIContextualAutomaticContextMessage">Автоматично изпращане на съдържанието на страницата до Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Прикачи съдържанието на страницата</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Изчистване на данни</string>
+    <string name="duckChatBrowserMenuContentDescription">Още опции</string>
 </resources>
