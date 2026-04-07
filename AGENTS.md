@@ -65,6 +65,10 @@ Note: `jvm_tests` and `jvm_checks` resolve to `testPlayDebugUnitTest` in `:app` 
 ./gradlew :my-feature-impl:testDebugUnitTest --tests "com.duckduckgo.my.feature.RealFooTest"
 ```
 
+### Proprietary Fonts
+
+The app uses a proprietary DuckSans font from a private GitHub Packages repository. The build conditionally swaps between the proprietary `ddg-proprietary-fonts` AAR and a local `:fonts` fallback module (empty `<font-family/>` stubs) based on credential availability. See `build.gradle` for the credential detection logic and `android-design-system/fonts/readme.md` for details.
+
 ### Build Variants
 
 | Dimension | Flavors |
