@@ -264,7 +264,10 @@ class WelcomePageViewModel @Inject constructor(
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     val command = if (inputScreenSelected) {
                         // TODO: experiment enrollment
-                        buildShowInputScreenPreviewCommand()
+                        Command.ShowInputScreenPreviewDialog(
+                            searchSuggestions = onboardingStore.getSearchOptions(),
+                            chatSuggestions = onboardingStore.getChatSuggestions(),
+                        )
                     } else {
                         Finish
                     }
@@ -434,11 +437,6 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
-
-    private fun buildShowInputScreenPreviewCommand() = Command.ShowInputScreenPreviewDialog(
-        searchSuggestions = onboardingStore.getSearchOptions(),
-        chatSuggestions = onboardingStore.getChatSuggestions(),
-    )
 
     private fun isSplitOmnibarEnabled(): Boolean =
         androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
