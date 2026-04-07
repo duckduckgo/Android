@@ -87,6 +87,7 @@ class OnboardingStepIndicatorView @JvmOverloads constructor(
         textLabel = DaxTextView(context).apply {
             setTypography(DaxTextView.Typography.BodyOnboarding)
             textSize = 12f
+            includeFontPadding = false
         }
 
         val gapPx = DOT_TEXT_GAP_DP.toPx(context)
