@@ -263,7 +263,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                assertTrue(command is ShowInputScreenPreviewDialog)
+                assertEquals(Finish, command)
             }
         }
 
@@ -702,14 +702,14 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun givenAddressBarPositionDialogWhenInputScreenDisabledThenShowInputScreenPreviewDialog() = runTest {
+    fun givenAddressBarPositionDialogWhenInputScreenDisabledThenFinishFlow() = runTest {
         mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
         val viewModel = createViewModel()
         viewModel.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
         viewModel.commands.test {
             val command = awaitItem()
-            Assert.assertTrue(command is ShowInputScreenPreviewDialog)
+            assertTrue(command is Finish)
         }
     }
 }

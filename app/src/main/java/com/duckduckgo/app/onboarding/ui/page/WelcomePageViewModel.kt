@@ -247,7 +247,7 @@ class WelcomePageViewModel @Inject constructor(
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                     } else {
-                        _commands.send(buildShowInputScreenPreviewCommand())
+                        _commands.send(Finish)
                     }
                 }
             }
