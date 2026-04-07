@@ -2183,6 +2183,7 @@ class BrowserTabFragment :
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
+        renderer.recreateNewTabPageContent()
         newBrowserTab.newTabLayout.show()
         newBrowserTab.newTabRootLayout.show()
         binding.browserLayout.gone()
@@ -5456,8 +5457,12 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        fun showNewTab() {
-            logcat { "New tab: Show new tab" }
+        fun recreateNewTabPageContent() {
+            newBrowserTab.newTabContainerLayout.removeAllViews()
+            addNewTabPageContent()
+        }
+
+        fun addNewTabPageContent() {
             newTabPageProvider
                 .provideNewTabPageVersion()
                 .onEach { newTabPage ->
@@ -5470,7 +5475,12 @@ class BrowserTabFragment :
                             ),
                         )
                     }
-                }.launchIn(lifecycleScope)
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
+        }
+
+        fun showNewTab() {
+            logcat { "New tab: Show new tab" }
+            addNewTabPageContent()
             newBrowserTab.newTabRootLayout.show()
             newBrowserTab.newTabLayout.show()
 
