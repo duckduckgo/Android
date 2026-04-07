@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_DEFAULT_TOGGLE_POSITION
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_EVER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_LAST_USED_TOGGLE_POSITION
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_NATIVE_INPUT_FIELD_SETTING
@@ -57,6 +58,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.Boolean
 
@@ -102,6 +104,8 @@ interface DuckChatDataStore {
     suspend fun isDuckChatUserEnabled(): Boolean
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
+
+    suspend fun isInputScreenEverEnabled(): Boolean
 
     suspend fun isFullScreenUserSettingEnabled(): Boolean
 
@@ -173,6 +177,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_USER_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_USER_ENABLED")
         val DUCK_AI_INPUT_SCREEN_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_USER_SETTING")
         val DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING")
+        val DUCK_AI_INPUT_SCREEN_EVER_ENABLED = booleanPreferencesKey(name = "DUCK_AI_INPUT_SCREEN_EVER_ENABLED")
         val DUCK_CHAT_SHOW_IN_MENU = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_MENU")
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_SHOW_IN_VOICE_SEARCH = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_VOICE_SEARCH")
@@ -288,6 +293,9 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs ->
             prefs[DUCK_AI_INPUT_SCREEN_USER_SETTING] = enabled
             prefs[DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING] = enabled
+            if (enabled) {
+                prefs[DUCK_AI_INPUT_SCREEN_EVER_ENABLED] = true
+            }
         }
     }
 
@@ -342,6 +350,19 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_AI_INPUT_SCREEN_USER_SETTING]
     } ?: false
+
+    override suspend fun isInputScreenEverEnabled(): Boolean {
+        val prefs = store.data.firstOrNull() ?: return false
+        if (prefs[DUCK_AI_INPUT_SCREEN_EVER_ENABLED] == true) return true
+        // Backfill: if the user setting key is present (true or false), the user explicitly
+        // interacted with the toggle at some point — treat that as "ever enabled".
+        val everInteracted = DUCK_AI_INPUT_SCREEN_USER_SETTING in prefs
+        logcat { "Did user change toggle settings? = $everInteracted" }
+        if (everInteracted) {
+            store.edit { it[DUCK_AI_INPUT_SCREEN_EVER_ENABLED] = true }
+        }
+        return everInteracted
+    }
 
     override suspend fun isFullScreenUserSettingEnabled(): Boolean = store.data.firstOrNull()?.let {
         it[DUCK_CHAT_FULLSCREEN_MODE_SETTING]

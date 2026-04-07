@@ -65,6 +65,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun isInputScreenUserSettingEnabled(): Boolean
 
+    suspend fun isInputScreenEverEnabled(): Boolean
+
     suspend fun isFullScreenModeUserSettingEnabled(): Boolean
 
     suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
@@ -168,6 +170,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
 
     override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
+
+    override suspend fun isInputScreenEverEnabled(): Boolean = duckChatDataStore.isInputScreenEverEnabled()
 
     override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
 
