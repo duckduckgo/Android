@@ -49,7 +49,7 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
         if (!arePrerequisitesMet()) return null
 
         // TODO experiment setup
-        return null
+        return DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
     }
 
     private suspend fun arePrerequisitesMet(): Boolean = withContext(dispatcherProvider.io()) {
