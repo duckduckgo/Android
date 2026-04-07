@@ -41,6 +41,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -135,21 +136,26 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             return@withContext if (autofillEnabled && autofillAvailable()) {
-                logcat(INFO) { "Querying secure store for stored credentials. rawUrl: $rawUrl" }
+                runCatching {
+                    logcat(INFO) { "Querying secure store for stored credentials. rawUrl: $rawUrl" }
 
-                val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)
-                if (visitedSite.eTldPlus1 == null) return@withContext emptyList()
+                    val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)
+                    if (visitedSite.eTldPlus1 == null) return@withContext emptyList()
 
-                // first part of domain matching happens at the DB level
-                val storedCredentials =
-                    secureStorage.websiteLoginDetailsWithCredentialsForDomain(visitedSite.eTldPlus1!!).firstOrNull() ?: emptyList()
+                    // first part of domain matching happens at the DB level
+                    val storedCredentials =
+                        secureStorage.websiteLoginDetailsWithCredentialsForDomain(visitedSite.eTldPlus1!!).firstOrNull() ?: emptyList()
 
-                // second part of domain matching requires filtering at code level
-                storedCredentials.filter {
-                    val storedDomain = it.details.domain ?: return@filter false
-                    val savedSite = autofillUrlMatcher.extractUrlPartsForAutofill(storedDomain)
-                    return@filter autofillUrlMatcher.matchingForAutofill(visitedSite, savedSite)
-                }.map { it.toLoginCredentials() }
+                    // second part of domain matching requires filtering at code level
+                    storedCredentials.filter {
+                        val storedDomain = it.details.domain ?: return@filter false
+                        val savedSite = autofillUrlMatcher.extractUrlPartsForAutofill(storedDomain)
+                        return@filter autofillUrlMatcher.matchingForAutofill(visitedSite, savedSite)
+                    }.map { it.toLoginCredentials() }
+                }.getOrElse {
+                    ensureActive()
+                    emptyList()
+                }
             } else {
                 emptyList()
             }
