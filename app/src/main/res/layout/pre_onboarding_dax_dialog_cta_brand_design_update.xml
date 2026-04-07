@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/daxCtaContainer"
@@ -22,6 +22,7 @@
     android:alpha="0"
     android:clipChildren="false"
     android:clipToPadding="false"
+    android:paddingTop="24dp"
     android:visibility="invisible"
     tools:alpha="1"
     tools:visibility="visible">
@@ -99,13 +100,14 @@
         android:id="@+id/stepIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginTop="4dp"
         android:layout_marginEnd="58dp"
         android:alpha="0"
         android:translationZ="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:alpha="1"
         tools:visibility="visible" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
