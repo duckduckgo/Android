@@ -9838,4 +9838,37 @@ class BrowserTabViewModelTest {
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
     }
+
+    @Test
+    fun whenDuckAiEndCtaShownThenDuckAiButtonHighlighted() = runTest {
+        testee.ctaViewState.value = ctaViewState().copy(
+            cta = DaxBubbleCta.DaxDuckAiEndCta(mockOnboardingStore, mockAppInstallStore),
+        )
+        advanceUntilIdle()
+
+        assertTrue((browserViewState().duckAiButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenDuckAiEndCtaDismissedThenDuckAiButtonNotHighlighted() = runTest {
+        testee.ctaViewState.value = ctaViewState().copy(
+            cta = DaxBubbleCta.DaxDuckAiEndCta(mockOnboardingStore, mockAppInstallStore),
+        )
+        advanceUntilIdle()
+
+        testee.ctaViewState.value = ctaViewState().copy(cta = null)
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().duckAiButton as HighlightableButton.Visible).highlighted)
+    }
+
+    @Test
+    fun whenNonDuckAiEndCtaShownThenDuckAiButtonNotHighlighted() = runTest {
+        testee.ctaViewState.value = ctaViewState().copy(
+            cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
+        )
+        advanceUntilIdle()
+
+        assertFalse((browserViewState().duckAiButton as HighlightableButton.Visible).highlighted)
+    }
 }

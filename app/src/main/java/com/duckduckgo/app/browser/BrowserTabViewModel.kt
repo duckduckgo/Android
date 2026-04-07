@@ -895,6 +895,19 @@ class BrowserTabViewModel @Inject constructor(
                 )
             }
             .launchIn(viewModelScope)
+
+        ctaViewState.asFlow()
+            .map { it.cta is DaxBubbleCta.DaxDuckAiEndCta }
+            .distinctUntilChanged()
+            .onEach { isDuckAiEndCtaShown ->
+                val viewState = currentBrowserViewState()
+                if (viewState.duckAiButton is HighlightableButton.Visible) {
+                    browserViewState.value = viewState.copy(
+                        duckAiButton = HighlightableButton.Visible(highlighted = isDuckAiEndCtaShown),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
