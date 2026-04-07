@@ -111,6 +111,12 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             fieldName = MATCH_ALL,
             errorMessage = "No one remembers what these constants map to. Use the API level integer value directly since it's self-defining."
         ),
+        DenyListedEntry(
+            className = "com.duckduckgo.browser.api.UserBrowserProperties",
+            functionName = "daysSinceInstalled",
+            errorMessage = "Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, " +
+                "or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        ),
     )
 
     override fun getApplicableUastTypes() = config.applicableTypes()

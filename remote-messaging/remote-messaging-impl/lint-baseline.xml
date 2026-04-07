@@ -34,4 +34,26 @@
             column="29"/>
     </issue>
 
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="                matchingAttribute.matches(userBrowserProperties.daysSinceInstalled().toInt())"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/remote/messaging/impl/matchers/UserAttributeMatcher.kt"
+            line="36"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(daysSinceInstalled)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/remote/messaging/impl/matchers/UserAttributeMatcherTest.kt"
+            line="496"
+            column="18"/>
+    </issue>
+
 </issues>

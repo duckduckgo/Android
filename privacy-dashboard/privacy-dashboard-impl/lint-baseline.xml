@@ -14,6 +14,17 @@
 
     <issue
         id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="                parameters = mapOf(&quot;daysSinceInstall&quot; to userBrowserProperties.daysSinceInstalled().toString(), &quot;from_onboarding&quot; to &quot;false&quot;),"
+        errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/privacy/dashboard/impl/ui/PrivacyDashboardHybridViewModel.kt"
+            line="238"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)"
         errorLine2="                                         ~~~~~~~~~~~~~~~">
