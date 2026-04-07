@@ -26,6 +26,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
@@ -103,6 +105,7 @@ class WelcomePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
+    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -159,6 +162,7 @@ class WelcomePageViewModel @Inject constructor(
         data class ShowInputScreenPreviewDialog(
             val searchSuggestions: List<DaxDialogIntroOption>,
             val chatSuggestions: List<DaxDialogIntroOption>,
+            val duckAiDefault: Boolean,
         ) : Command
 
         data object Finish : Command
@@ -263,11 +267,21 @@ class WelcomePageViewModel @Inject constructor(
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
                     val command = if (inputScreenSelected) {
-                        // TODO: experiment enrollment
-                        Command.ShowInputScreenPreviewDialog(
-                            searchSuggestions = onboardingStore.getSearchOptions(),
-                            chatSuggestions = onboardingStore.getChatSuggestions(),
-                        )
+                        when (duckAiOnboardingExperimentManager.enroll()) {
+                            null,
+                            CONTROL,
+                            -> Finish
+                            TREATMENT_WITH_DUCK_AI_DEFAULT -> Command.ShowInputScreenPreviewDialog(
+                                searchSuggestions = onboardingStore.getSearchOptions(),
+                                chatSuggestions = onboardingStore.getChatSuggestions(),
+                                duckAiDefault = true,
+                            )
+                            TREATMENT_WITH_SEARCH_DEFAULT -> Command.ShowInputScreenPreviewDialog(
+                                searchSuggestions = onboardingStore.getSearchOptions(),
+                                chatSuggestions = onboardingStore.getChatSuggestions(),
+                                duckAiDefault = false,
+                            )
+                        }
                     } else {
                         Finish
                     }

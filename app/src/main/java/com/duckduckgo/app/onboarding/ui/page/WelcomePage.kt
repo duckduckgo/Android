@@ -130,6 +130,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     INPUT_SCREEN_PREVIEW,
                     searchSuggestions = it.searchSuggestions,
                     chatSuggestions = it.chatSuggestions,
+                    inputScreenPreviewDefaultInputMode = if (it.duckAiDefault) CHAT else SEARCH,
                 )
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
@@ -230,6 +231,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         showDuckAiCopy: Boolean = false,
         searchSuggestions: List<DaxDialogIntroOption> = emptyList(),
         chatSuggestions: List<DaxDialogIntroOption> = emptyList(),
+        inputScreenPreviewDefaultInputMode: InputMode = SEARCH,
     ) {
         context?.let {
             var afterAnimation: () -> Unit = {}
@@ -510,7 +512,16 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.inputScreenPreview.root.show()
                     binding.daxDialogCta.inputScreenPreview.root.alpha = MIN_ALPHA
 
-                    setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
+                    when (inputScreenPreviewDefaultInputMode) {
+                        CHAT -> {
+                            setInputScreenPreviewInputMode(CHAT, chatSuggestions)
+                            binding.daxDialogCta.inputScreenPreview.inputModeToggle.getTabAt(1)?.select()
+                        }
+                        SEARCH -> {
+                            setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
+                        }
+                    }
+
                     binding.daxDialogCta.inputScreenPreview.inputModeToggle.addOnTabSelectedListener(
                         object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
                             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {

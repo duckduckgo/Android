@@ -22,6 +22,8 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
@@ -91,6 +93,7 @@ class WelcomePageViewModelTest {
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDeviceInfo: DeviceInfo = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
+    private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -107,6 +110,7 @@ class WelcomePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
             mockDeviceInfo,
             mockSyncAutoRestore,
+            mockDuckAiOnboardingExperimentManager,
         )
     }
 
@@ -125,6 +129,7 @@ class WelcomePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
             mockDeviceInfo,
             mockSyncAutoRestore,
+            mockDuckAiOnboardingExperimentManager,
         )
     }
 
@@ -505,6 +510,7 @@ class WelcomePageViewModelTest {
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndShowInputScreenPreview() =
         runTest {
             mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
 
@@ -589,6 +595,7 @@ class WelcomePageViewModelTest {
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndReinstallUserTrueThenCallWideEventWithReinstallUserTrue() =
         runTest {
             mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
             testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
 
             testee.commands.test {
@@ -700,6 +707,62 @@ class WelcomePageViewModelTest {
             Assert.assertTrue(command is Finish)
         }
     }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsNullThenFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                assertEquals(Finish, awaitItem())
+            }
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsControlThenFinish() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                assertEquals(Finish, awaitItem())
+            }
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsTreatmentWithDuckAiDefaultThenShowPreviewWithDuckAiDefault() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is ShowInputScreenPreviewDialog)
+                assertTrue((command as ShowInputScreenPreviewDialog).duckAiDefault)
+            }
+        }
+
+    @Test
+    fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsTreatmentWithSearchDefaultThenShowPreviewWithSearchDefault() =
+        runTest {
+            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+            whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+            testee.onInputScreenOptionSelected(true)
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
+
+            testee.commands.test {
+                val command = awaitItem()
+                assertTrue(command is ShowInputScreenPreviewDialog)
+                Assert.assertFalse((command as ShowInputScreenPreviewDialog).duckAiDefault)
+            }
+        }
 
     @Test
     fun givenAddressBarPositionDialogWhenInputScreenDisabledThenFinishFlow() = runTest {
