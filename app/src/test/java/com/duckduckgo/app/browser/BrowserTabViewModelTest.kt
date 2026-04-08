@@ -4473,6 +4473,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClicksBookmarksMenuItemThenPixelIsSent() {
+        testee.onBookmarksMenuItemClicked()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
+    }
+
+    @Test
     fun whenSubmittedQueryAndNavigationStateIsNullAndNeverPreviouslyLoadedSiteThenResetHistoryCommandNotSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery("nytimes.com")

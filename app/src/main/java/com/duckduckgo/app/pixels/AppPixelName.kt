@@ -269,6 +269,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
     MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
     MENU_ACTION_EDIT_BOOKMARK_PRESSED("m_nav_eb_p"),
+    MENU_ACTION_BOOKMARKS_PRESSED("m_nav_bookmarks_menu_item_pressed"),
     MENU_ACTION_ADD_FAVORITE_PRESSED("m_nav_af_p"),
     MENU_ACTION_REMOVE_FAVORITE_PRESSED("m_nav_rf_p"),
     MENU_ACTION_SHARE_PRESSED("m_nav_sh_p"),

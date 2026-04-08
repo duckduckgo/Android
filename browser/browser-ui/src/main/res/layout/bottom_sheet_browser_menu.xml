@@ -140,6 +140,14 @@
                 layout="@layout/view_menu_item_default_browser_medium" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/refreshMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_reload_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuRefresh" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -178,14 +186,6 @@
                 app:iconDrawable="@drawable/ic_device_desktop_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDesktopSite" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/refreshMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_reload_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuRefresh" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
