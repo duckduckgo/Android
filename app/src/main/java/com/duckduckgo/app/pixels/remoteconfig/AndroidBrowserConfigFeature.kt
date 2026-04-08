@@ -356,4 +356,16 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun serpLogoInMenu(): Toggle
+
+    /**
+     * Controls whether the tab state restoration fix is enabled for swiping tabs.
+     * When enabled, the adapter populates tabs before restoring state to prevent
+     * garbage collection.
+     * @return `true` when the remote config has the global "tabStateRestorationFix" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun tabStateRestorationFix(): Toggle
 }

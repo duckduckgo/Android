@@ -563,8 +563,6 @@ class BrowserTabViewModel @Inject constructor(
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
-    private var isTabRestored = false
-
     private var activeExperiments: List<Toggle>? = null
 
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
@@ -900,7 +898,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
-        isTabRestored = isRestored
+        var isTabRestored = isRestored
+        val isTabRestorationFixEnabled = androidBrowserConfig.tabStateRestorationFix().isEnabled()
         selectedTabObserver?.cancel()
         // auto-launch input screen for new, empty tabs (New Tab Page)
         selectedTabObserver = tabRepository.flowSelectedTab
@@ -917,8 +916,9 @@ class BrowserTabViewModel @Inject constructor(
                 val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
                 val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
                 val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
+                val hasRestoredTabAndFlagIsEnabled = isTabRestored && isTabRestorationFixEnabled
 
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar && !isTabRestored) {
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar && !hasRestoredTabAndFlagIsEnabled) {
                     viewModelScope.launch {
                         // whenever an event fires, so the user switched to a new tab page, launch the input screen
                         // unless an onboarding promo message is displayed
