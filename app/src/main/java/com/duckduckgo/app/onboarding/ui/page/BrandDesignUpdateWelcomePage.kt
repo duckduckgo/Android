@@ -806,9 +806,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val transition = androidx.transition.ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
-                    transition.addListener(object : TransitionListenerAdapter() {
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            if (!isAdded) return
+                            if (view == null) return
                             binding.daxDialogCta.addressBarContent.addressBarTitle.startOnboardingTypingAnimation(
                                 getString(R.string.preOnboardingAddressBarTitle),
                             ) {
@@ -831,7 +832,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 }
                             }
                         }
-                    })
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
 
                     binding.daxDialogCta.root.translationZ = 1f.toPx()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
