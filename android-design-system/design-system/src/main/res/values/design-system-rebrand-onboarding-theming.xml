@@ -162,6 +162,13 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.Onboarding.Label">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">-3sp</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_regular</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="cornerRadius">64dp</item>

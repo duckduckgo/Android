@@ -86,8 +86,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:text="@string/preOnboardingAddressBarPositionTop"
-                app:textType="primary"
-                app:typography="caption" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label" />
 
             <com.duckduckgo.common.ui.view.button.RadioButton
                 android:id="@+id/topOmnibarToggleCheck"
@@ -135,8 +134,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:text="@string/preOnboardingAddressBarPositionBottom"
-                app:textType="primary"
-                app:typography="caption" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label" />
 
             <com.duckduckgo.common.ui.view.button.RadioButton
                 android:id="@+id/bottomOmnibarToggleCheck"
@@ -183,8 +181,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:text="@string/preOnboardingAddressBarPositionSplit"
-                app:textType="primary"
-                app:typography="caption" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label" />
 
             <com.duckduckgo.common.ui.view.button.RadioButton
                 android:id="@+id/splitOmnibarToggleCheck"
