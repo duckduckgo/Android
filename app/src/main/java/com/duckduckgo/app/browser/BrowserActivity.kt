@@ -1340,14 +1340,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         tabPagerAdapter.restore(it)
                     }
                 }
+
+                // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
+                // flows only once, so a separate initialization is necessary
+                configureFlowCollectors()
             }
 
             binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
             tabPager.isVisible = swipingTabsFeature.isEnabled
-
-            // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
-            // flows only once, so a separate initialization is necessary
-            configureFlowCollectors()
         }
     }
 
