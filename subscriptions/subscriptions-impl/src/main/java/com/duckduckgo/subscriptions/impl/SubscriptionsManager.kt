@@ -108,8 +108,6 @@ import logcat.logcat
 import retrofit2.HttpException
 import java.io.IOException
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.NumberFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.Period
@@ -252,12 +250,6 @@ interface SubscriptionsManager {
     suspend fun isFreeTrialEligible(): Boolean
 
     /**
-     * Returns `true` if the user has an active subscription and the switch plan feature is enabled,
-     * `false` otherwise.
-     */
-    suspend fun isSwitchPlanAvailable(): Boolean
-
-    /**
      * Switches the current subscription plan to a new one
      *
      * @param activity The activity context required for launching Google Play billing flow
@@ -274,14 +266,6 @@ interface SubscriptionsManager {
         replacementMode: SubscriptionReplacementMode,
         origin: String? = null,
     )
-
-    /**
-     * Gets pricing information for switching between plans
-     *
-     * @param isUpgrade `true` if upgrading from monthly to yearly, `false` if downgrading from yearly to monthly
-     * @return [SwitchPlanPricingInfo] containing current price, target price, and yearly monthly equivalent, or null if unavailable
-     */
-    suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo?
 
     /**
      * @return `true` if the Black Friday offer is available, `false` otherwise
@@ -432,89 +416,8 @@ class RealSubscriptionsManager @Inject constructor(
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
-    override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        val subscription = authRepository.getSubscription()
-        val hasActiveSubscription = subscription?.isActive() ?: false
-        val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
-        val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
-
-        return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
-    }
-
     override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext privacyProFeature.get().blackFridayOffer2025().isEnabled()
-    }
-
-    override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
-        return@withContext try {
-            val currentSubscription = getSubscription() ?: return@withContext null
-            val basePlans = getSubscriptionOffer().filter { it.offerId == null }
-
-            // Determine current and target plan IDs based on region
-            val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
-            val (currentPlanId, targetPlanId) = if (isUpgrade) {
-                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
-                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
-                monthly to yearly
-            } else {
-                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
-                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
-                yearly to monthly
-            }
-
-            // Get prices from offers
-            val currentPrice = basePlans.find { it.planId == currentPlanId }
-                ?.pricingPhases
-                ?.firstOrNull()
-                ?.formattedPrice ?: return@withContext null
-
-            val targetPrice = basePlans.find { it.planId == targetPlanId }
-                ?.pricingPhases
-                ?.firstOrNull()
-                ?.formattedPrice ?: return@withContext null
-
-            // Get monthly and yearly price amounts for savings calculation
-            val monthlyPriceAmount = basePlans
-                .find { it.planId in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW) }
-                ?.pricingPhases
-                ?.firstOrNull()
-                ?.priceAmount ?: return@withContext null
-
-            val yearlyPriceAmount = basePlans
-                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
-                ?.pricingPhases
-                ?.firstOrNull()
-                ?.priceAmount ?: return@withContext null
-
-            val yearlyPriceCurrency = basePlans
-                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
-                ?.pricingPhases
-                ?.firstOrNull()
-                ?.priceCurrency ?: return@withContext null
-
-            // Calculate monthly equivalent for yearly plan
-            val yearlyMonthlyEquivalent = NumberFormat.getCurrencyInstance()
-                .apply { currency = yearlyPriceCurrency }
-                .format(yearlyPriceAmount / 12.toBigDecimal())
-
-            // Calculate savings percentage: ((monthly * 12 - yearly) / (monthly * 12)) * 100
-            // This represents the percentage saved by choosing yearly over 12 monthly payments
-            val totalMonthlyAnnual = monthlyPriceAmount * 12.toBigDecimal()
-            val savingsAmount = totalMonthlyAnnual - yearlyPriceAmount
-            val savingsPercentage = ((savingsAmount / totalMonthlyAnnual) * 100.toBigDecimal())
-                .setScale(0, RoundingMode.DOWN)
-                .toInt()
-
-            SwitchPlanPricingInfo(
-                currentPrice = currentPrice,
-                targetPrice = targetPrice,
-                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent,
-                savingsPercentage = savingsPercentage,
-            )
-        } catch (e: Exception) {
-            logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
-            null
-        }
     }
 
     override suspend fun switchSubscriptionPlan(
@@ -1569,13 +1472,6 @@ data class PricingPhase(
         }
     }
 }
-
-data class SwitchPlanPricingInfo(
-    val currentPrice: String,
-    val targetPrice: String,
-    val yearlyMonthlyEquivalent: String,
-    val savingsPercentage: Int,
-)
 
 data class ValidatedTokenPair(
     val accessToken: String,
