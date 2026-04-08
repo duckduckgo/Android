@@ -1255,7 +1255,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
-                updateAiChatToggleState(binding, withAi = inputScreenSelected)
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, animate = false)
             }
         }
     }
@@ -1529,6 +1529,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun updateAiChatToggleState(
         binding: ContentOnboardingWelcomePageUpdateBinding,
         withAi: Boolean,
+        animate: Boolean = true,
     ) {
         val withoutAiImageRes = if (!withAi) {
             com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_active
@@ -1542,8 +1543,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         val content = binding.daxDialogCta.inputScreenContent
-        crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
-        crossfadeImage(content.inputScreenWithAiImageFront, content.inputScreenWithAiImageBack, withAiImageRes)
+        if (animate) {
+            crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
+            crossfadeImage(content.inputScreenWithAiImageFront, content.inputScreenWithAiImageBack, withAiImageRes)
+        } else {
+            content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
+            content.inputScreenWithAiImageFront.setImageResource(withAiImageRes)
+        }
 
         content.inputScreenSearchOnlyCheck.quietlySetIsChecked(newCheckedState = !withAi, changeListener = null)
         content.inputScreenWithAiCheck.quietlySetIsChecked(newCheckedState = withAi, changeListener = null)
