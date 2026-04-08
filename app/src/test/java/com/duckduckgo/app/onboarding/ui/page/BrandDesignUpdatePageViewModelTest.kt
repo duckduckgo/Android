@@ -284,6 +284,18 @@ class BrandDesignUpdatePageViewModelTest {
         )
     }
 
+    @Test
+    fun whenPrimaryCtaFromComparisonChartAndDialogIntentNullThenFiresDialogNotShownPixel() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
+        testee.onPrimaryCtaClicked() // COMPARISON_CHART with null intent
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+    }
+
     // endregion
 
     // region onPrimaryCtaClicked - skip onboarding
