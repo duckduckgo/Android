@@ -280,7 +280,7 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tierMessagingEnabled(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun allowProTierPurchase(): Toggle
 
     /**
