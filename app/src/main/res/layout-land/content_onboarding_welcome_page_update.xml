@@ -33,7 +33,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clipChildren="false">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/textGuideline"
@@ -70,17 +71,14 @@
 
             <TextView
                 android:id="@+id/welcomeTitle"
+                style="@style/Typography.DuckDuckGo.Onboarding.WelcomeTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:alpha="0"
                 android:gravity="center"
-                android:lineSpacingExtra="-10sp"
-                android:maxLines="2"
                 android:text="@string/onboardingWelcomeTitle"
                 android:textColor="?attr/onboardingTextPrimary"
-                android:textFontWeight="500"
-                android:textSize="44sp"
                 app:layout_constraintBottom_toTopOf="@id/textGuideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -139,16 +137,33 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/welcomeScreenWalkingDax"
-                android:layout_width="217dp"
-                android:layout_height="275dp"
+                android:layout_width="wrap_content"
+                android:layout_height="274dp"
                 android:layout_marginBottom="104dp"
+                android:adjustViewBounds="true"
                 android:alpha="0"
-                android:translationX="-48dp"
+                android:translationX="-24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@id/daxDialogCta"
                 app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
                 tools:alpha="1"
                 tools:lottie_progress="1" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/bottomWingAnimation"
+                android:layout_width="0dp"
+                android:layout_height="199dp"
+                android:layout_marginTop="40dp"
+                android:alpha="0"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/daxDialogCta"
+                app:lottie_rawRes="@raw/onboarding_wing_bottom"
+                tools:alpha="1"
+                tools:lottie_progress="0.5"
+                tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>
