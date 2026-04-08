@@ -51,7 +51,12 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     override suspend fun handleAppLaunchOption() {
         when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
             LastOpenedTab -> Unit
-            NewTabPage -> tabRepository.add()
+            NewTabPage -> {
+                val selectedTab = tabRepository.getSelectedTab()
+                if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
+                    tabRepository.add()
+                }
+            }
             is SpecificPage -> handleSpecificPageOption(option)
         }
     }
