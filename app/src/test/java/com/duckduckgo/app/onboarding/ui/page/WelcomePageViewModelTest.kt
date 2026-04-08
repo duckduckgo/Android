@@ -262,7 +262,7 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedOnAddressBarPositionThenShowInputScreenPreviewDialog() =
+    fun whenOnPrimaryCtaClickedThenFinishFlow() =
         runTest {
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
