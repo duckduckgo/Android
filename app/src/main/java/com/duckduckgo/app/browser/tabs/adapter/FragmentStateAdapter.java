@@ -579,8 +579,10 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         if (fragment.isAdded() && fragment.isHidden()) {
             mFragmentManager.beginTransaction().show(fragment).commitNow();
         }
-        if (fragment.getView() != null && fragment.getView().getVisibility() != View.VISIBLE) {
-            fragment.getView().setVisibility(View.VISIBLE);
+
+        View fragmentView = fragment.getView();
+        if (fragmentView != null && fragmentView.getVisibility() != View.VISIBLE) {
+            fragmentView.setVisibility(View.VISIBLE);
         }
     }
 
