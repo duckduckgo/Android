@@ -108,4 +108,11 @@
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
+    <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">how to say \"duck\" in 10 languages</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">all mighty ducks movies</string>
+
 </resources>

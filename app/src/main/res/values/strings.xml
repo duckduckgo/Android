@@ -895,13 +895,6 @@
     <string name="preOnboardingInputScreenButton">Next</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
-    <!-- Input Mode Demo Onboarding step -->
-    <string name="preOnboardingInputModeDemoTitle" translatable="false">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
-    <string name="preOnboardingInputModeDemoSearchHint" translatable="false">Search privately</string>
-    <string name="preOnboardingInputModeDemoChatHint" translatable="false">Ask privately</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion1" translatable="false">how to say \"duck\" in 10 languages</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion2" translatable="false">all mighty ducks movies</string>
-
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
     <string name="settingsAddressBarPositionHeaderTitle">Address Bar Position</string>
