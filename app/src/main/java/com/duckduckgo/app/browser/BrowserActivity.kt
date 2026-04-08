@@ -358,9 +358,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         initializeTabs(savedInstanceState)
 
-        // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
-        // flows only once, so a separate initialization is necessary
-        configureFlowCollectors()
         setupFireDialogListener()
 
         viewModel.viewState
@@ -401,27 +398,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureFlowCollectors() {
-        if (swipingTabsFeature.isEnabled) {
-            lifecycleScope.launch {
-                repeatOnLifecycle(STARTED) {
-                    launch {
-                        viewModel.tabsFlow.collectLatest {
-                            tabManager.onTabsChanged(it)
-                        }
-                    }
+    private suspend fun configureFlowCollectors() {
+        repeatOnLifecycle(STARTED) {
+            launch {
+                viewModel.tabsFlow.collectLatest {
+                    tabManager.onTabsChanged(it)
+                }
+            }
 
-                    launch {
-                        viewModel.selectedTabFlow.collectLatest {
-                            tabManager.onSelectedTabChanged(it)
-                        }
-                    }
+            launch {
+                viewModel.selectedTabFlow.collectLatest {
+                    tabManager.onSelectedTabChanged(it)
+                }
+            }
 
-                    launch {
-                        viewModel.selectedTabIndex.collectLatest {
-                            onMoveToTabRequested(it)
-                        }
-                    }
+            launch {
+                viewModel.selectedTabIndex.collectLatest {
+                    onMoveToTabRequested(it)
                 }
             }
         }
@@ -1319,28 +1312,43 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeTabs(savedInstanceState: Bundle?) {
-        if (swipingTabsFeature.isEnabled) {
-            tabManager.registerCallbacks(
-                onTabsUpdated = {
-                    onTabsUpdated(it, savedInstanceState)
-                },
-            )
+        lifecycleScope.launch {
+            val tabRestorationFixEnabled = withContext(dispatcherProvider.io()) {
+                androidBrowserConfigFeature.tabStateRestorationFix().isEnabled()
+            }
+            if (swipingTabsFeature.isEnabled) {
+                tabManager.registerCallbacks(
+                    onTabsUpdated = {
+                        onTabsUpdated(it, savedInstanceState, tabRestorationFixEnabled)
+                    },
+                )
 
-            tabPager.adapter = tabPagerAdapter
-            tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
-            tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
+                tabPager.adapter = tabPagerAdapter
+                tabPager.registerOnPageChangeCallback(onTabPageChangeListener)
+                tabPager.setPageTransformer(
+                    MarginPageTransformer(
+                        resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+                            .toPx()
+                            .toInt(),
+                    ),
+                )
 
-            configureViewPagerForSystemAutofill(tabPager)
+                configureViewPagerForSystemAutofill(tabPager)
 
-            if (!androidBrowserConfigFeature.tabStateRestorationFix().isEnabled()) {
-                savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
-                    tabPagerAdapter.restore(it)
+                if (!tabRestorationFixEnabled) {
+                    savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
+                        tabPagerAdapter.restore(it)
+                    }
                 }
             }
-        }
 
-        binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
-        tabPager.isVisible = swipingTabsFeature.isEnabled
+            binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
+            tabPager.isVisible = swipingTabsFeature.isEnabled
+
+            // LiveData observers are restarted on each showWebContent() call; we want to subscribe to
+            // flows only once, so a separate initialization is necessary
+            configureFlowCollectors()
+        }
     }
 
     private fun configureViewPagerForSystemAutofill(viewPager: ViewPager2) {
@@ -1487,10 +1495,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<TabModel>, savedInstanceState: Bundle?) {
+    private fun onTabsUpdated(
+        updatedTabIds: List<TabModel>,
+        savedInstanceState: Bundle?,
+        tabRestorationFixEnabled: Boolean,
+    ) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
 
-        if (androidBrowserConfigFeature.tabStateRestorationFix().isEnabled()) {
+        if (tabRestorationFixEnabled) {
             savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
                 tabPagerAdapter.restore(it)
             }

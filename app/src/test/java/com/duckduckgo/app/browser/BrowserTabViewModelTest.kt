@@ -8370,28 +8370,15 @@ class BrowserTabViewModelTest {
     @Test
     fun whenInputScreenEnabledAndTabRestoredAndRestorationFixEnabledThenLaunchInputScreenCommandSuppressed() =
         runTest {
-            val initialTabId = "initial-tab"
-            val initialTab =
-                TabEntity(
-                    tabId = initialTabId,
-                    url = "https://example.com",
-                    title = "EX",
-                    skipHome = false,
-                    viewed = true,
-                    position = 0,
-                )
             val ntpTabId = "ntp-tab"
             val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
-            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
             whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
-            flowSelectedTab.emit(initialTab)
+            flowSelectedTab.emit(ntpTab)
 
             fakeAndroidConfigBrowserFeature.tabStateRestorationFix().setRawStoredState(State(enable = true))
+            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             testee.observeSelectedTab(isRestored = true)
-            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-
-            flowSelectedTab.emit(ntpTab)
 
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val commands = commandCaptor.allValues

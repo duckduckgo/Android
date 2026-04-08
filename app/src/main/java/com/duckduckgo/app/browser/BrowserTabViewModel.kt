@@ -898,47 +898,51 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
-        val isTabRestorationFixEnabled = androidBrowserConfig.tabStateRestorationFix().isEnabled()
         selectedTabObserver?.cancel()
-        // auto-launch input screen for new, empty tabs (New Tab Page)
-        selectedTabObserver = tabRepository.flowSelectedTab
-            .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
-            .filter { selectedTab ->
-                // fire event when activating a new, empty tab
-                // (has no URL and wasn't opened from another tab)
-                val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
-                val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
-                showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
-            }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
-            .let {
-                if (isRestored && isTabRestorationFixEnabled) {
-                    // Skip the first matching emission on restore to avoid a loop
-                    // where closing InputScreenActivity would return to a restored NTP,
-                    // which would restart this flow and reopen InputScreenActivity again.
-                    // This happens when memory pressure destroys BrowserActivity while
-                    // InputScreenActivity is in the foreground.
-                    it.drop(1)
-                } else {
-                    it
-                }
+        viewModelScope.launch {
+            val isTabRestorationFixEnabled = withContext(dispatchers.io()) {
+                androidBrowserConfig.tabStateRestorationFix().isEnabled()
             }
-            .onEach {
-                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
-                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
-                val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
-
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar) {
-                    viewModelScope.launch {
-                        // whenever an event fires, so the user switched to a new tab page, launch the input screen
-                        // unless an onboarding promo message is displayed
-                        val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
-                        if (!hasPendingOnboardingPromo) {
-                            command.value = LaunchInputScreen
-                        }
+            // auto-launch input screen for new, empty tabs (New Tab Page)
+            selectedTabObserver = tabRepository.flowSelectedTab
+                .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
+                .let {
+                    if (isRestored && isTabRestorationFixEnabled) {
+                        // Skip the first emission on restore to avoid a loop
+                        // where closing InputScreenActivity would return to a restored NTP,
+                        // which would restart this flow and reopen InputScreenActivity again.
+                        // This happens when memory pressure destroys BrowserActivity while
+                        // InputScreenActivity is in the foreground.
+                        it.drop(1)
+                    } else {
+                        it
                     }
                 }
-            }.launchIn(viewModelScope)
+                .filter { selectedTab ->
+                    // fire event when activating a new, empty tab
+                    // (has no URL and wasn't opened from another tab)
+                    val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
+                    val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
+                    val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
+                    showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
+                }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
+                .onEach {
+                    val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
+                    val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
+                    val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
+
+                    if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar) {
+                        viewModelScope.launch {
+                            // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                            // unless an onboarding promo message is displayed
+                            val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
+                            if (!hasPendingOnboardingPromo) {
+                                command.value = LaunchInputScreen
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+        }
     }
 
     fun observeAccessibilitySettings() {
