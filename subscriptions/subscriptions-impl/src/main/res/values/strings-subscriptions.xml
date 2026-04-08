@@ -188,6 +188,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will upgrade to %1$s on %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="planNamePlusMonthly">Plus Monthly</string>

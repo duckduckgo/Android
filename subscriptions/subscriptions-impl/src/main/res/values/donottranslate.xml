@@ -20,9 +20,6 @@
     <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
     <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">Got It</string>
-
-    <!-- Pending downgrade info panel - move to strings-subscriptions.xml once translations are requested -->
-    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Your plan will downgrade to %1$s on %2$s.</string>
     <string name="planTierNamePlus">Plus</string>
     <string name="planTierNamePro">Pro</string>
 
