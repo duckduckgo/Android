@@ -1576,6 +1576,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun crossfadeImage(frontView: ImageView, backView: ImageView, newRes: Int) {
+        frontView.animate().cancel()
+        backView.animate().cancel()
         backView.setImageDrawable(frontView.drawable)
         backView.alpha = 1f
         frontView.setImageResource(newRes)
