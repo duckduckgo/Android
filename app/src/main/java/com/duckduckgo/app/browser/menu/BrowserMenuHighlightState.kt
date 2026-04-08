@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -45,13 +46,15 @@ interface BrowserMenuHighlightState {
 class RealBrowserMenuHighlightState @Inject constructor(
     additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     downloadMenuStateProvider: DownloadMenuStateProvider,
+    browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : BrowserMenuHighlightState {
     override val shouldHighlight: StateFlow<Boolean> = combine(
         additionalDefaultBrowserPrompts.highlightPopupMenu,
         downloadMenuStateProvider.hasNewDownloadFlow,
-    ) { defaultBrowserHighlight, hasNewDownload ->
-        defaultBrowserHighlight || hasNewDownload
+        browserMenuDisplayRepository.browserMenuState.map { it.isEnabled },
+    ) { defaultBrowserHighlight, hasNewDownload, isBottomSheetMenu ->
+        defaultBrowserHighlight || (hasNewDownload && isBottomSheetMenu)
     }.flowOn(dispatcherProvider.io()).stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 }

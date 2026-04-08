@@ -524,6 +524,6 @@ class BrowserMenuBottomSheet(
     }
 
     companion object {
-        internal const val PEEK_HEIGHT_PERCENT = 80
+        internal const val PEEK_HEIGHT_PERCENT = 90
     }
 }

@@ -139,7 +139,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = shouldHighlightMenu,
+            showBrowserMenuHighlight = shouldHighlightMenu && state.viewMode !is CustomTab,
             viewMode = getViewMode(state),
             isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
         )

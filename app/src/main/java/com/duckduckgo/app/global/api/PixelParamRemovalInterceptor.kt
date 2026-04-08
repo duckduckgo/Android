@@ -228,6 +228,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName to PixelParameter.removeAtb(),
             SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
             SqlCipherPixelName.LIBRARY_LOAD_TIMEOUT_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY.pixelName to PixelParameter.removeAtb(),
