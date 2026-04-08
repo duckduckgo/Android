@@ -25,7 +25,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -55,7 +55,7 @@ class NewAddressBarOptionManagerTest {
     private var duckChatMock: DuckChat = mock()
 
     @Mock
-    private var remoteMessagingRepositoryMock: RemoteMessagingRepository = mock()
+    private var remoteMessageModelMock: RemoteMessageModel = mock()
 
     @Mock
     private var newAddressBarOptionDataStoreMock: NewAddressBarOptionDataStore = mock()
@@ -86,7 +86,7 @@ class NewAddressBarOptionManagerTest {
                     duckAiFeatureStateMock,
                     userStageStoreMock,
                     duckChatMock,
-                    remoteMessagingRepositoryMock,
+                    remoteMessageModelMock,
                     newAddressBarOptionDataStoreMock,
                     settingsDataStoreMock,
                     onboardingStoreMock,
@@ -184,7 +184,7 @@ class NewAddressBarOptionManagerTest {
     fun `when user has interacted with search and duck AI announcement then showChoiceScreen does not show dialog`() =
         runTest {
             setupAllConditionsMet()
-            whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(listOf("search_duck_ai_announcement"))
+            whenever(remoteMessageModelMock.isMessageDismissed("search_duck_ai_announcement")).thenReturn(true)
 
             testee.showChoiceScreen(mock(), isLaunchedFromExternal = false)
 
@@ -328,7 +328,7 @@ class NewAddressBarOptionManagerTest {
         showOmnibarShortcutInAllStatesFlow.value = true
         showInputScreenFlow.value = false
         whenever(newAddressBarOptionDataStoreMock.wasShown()).thenReturn(false)
-        whenever(remoteMessagingRepositoryMock.dismissedMessages()).thenReturn(emptyList())
+        whenever(remoteMessageModelMock.isMessageDismissed("search_duck_ai_announcement")).thenReturn(false)
         whenever(settingsDataStoreMock.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(newAddressBarOptionDataStoreMock.wasValidated()).thenReturn(true)
         whenever(onboardingStoreMock.getInputScreenSelection()).thenReturn(null)

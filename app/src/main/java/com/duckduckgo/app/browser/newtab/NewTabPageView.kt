@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -48,7 +47,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SubmitUrl
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.ViewState
-import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -68,6 +66,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -113,6 +112,9 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
     private val binding: ViewNewTabBinding by viewBinding()
 
@@ -255,12 +257,7 @@ class NewTabPageView @JvmOverloads constructor(
             type = "text/plain"
         }
 
-        val pi = PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(context, SharePromoLinkRMFBroadCastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
+        val pi = sharePromoLinkIntentFactory.pendingIntent(context)
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
