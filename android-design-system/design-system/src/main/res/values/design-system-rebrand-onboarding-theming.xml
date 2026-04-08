@@ -140,11 +140,11 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
-    <!--TODO add ducksans-->
     <style name="Typography.DuckDuckGo.Onboarding.ChartComparison">
         <item name="android:textSize">14sp</item>
         <item name="typography">body1</item>
         <item name="android:lineSpacingExtra">-1sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Onboarding.Button">
