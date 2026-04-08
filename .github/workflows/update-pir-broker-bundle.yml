@@ -77,7 +77,11 @@ jobs:
         if: ${{ steps.broker-check.outputs.has_changes == 'true' && steps.create-pr.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
-        run: gh pr edit ${{ steps.create-pr.outputs.pull-request-number }} --add-label "pir" --add-label "automated pr"
+        run: |
+          gh api repos/${{ github.repository }}/issues/${{ steps.create-pr.outputs.pull-request-number }}/labels \
+            --method POST \
+            -f "labels[]=pir" \
+            -f "labels[]=automated pr"
 
       - name: Create Asana task
         if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
