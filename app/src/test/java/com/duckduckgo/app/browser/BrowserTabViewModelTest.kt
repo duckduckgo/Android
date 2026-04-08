@@ -5744,6 +5744,7 @@ class BrowserTabViewModelTest {
     fun whenPageFinishedAndStorePageContextEnabledThenCollectPageContext() =
         runTest {
             fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            givenCurrentSite("https://example.com")
             val webViewNavState = WebViewNavigationState(mockStack, 100)
 
             testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
@@ -7480,6 +7481,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageFinishedWithNullSiteThenDoNotUpdateState() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = false,
+                maliciousSiteBlocked = false,
+            )
+
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), exampleUrl)
+
+        assertNull(testee.siteLiveData.value)
+        assertFalse(browserViewState().browserShowing)
+    }
+
+    @Test
+    fun whenPageCommitVisibleWithNullSiteThenDoNotUpdateState() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = false,
+                maliciousSiteBlocked = false,
+            )
+
+        testee.onPageCommitVisible(WebViewNavigationState(mockStack, 100), exampleUrl)
+
+        assertNull(testee.siteLiveData.value)
+        assertFalse(browserViewState().browserShowing)
+    }
+
+    @Test
+    fun whenAutoConsentPopupHandledWithNullSiteThenDoNotPostCommand() {
+        testee.browserViewState.value =
+            testee.browserViewState.value?.copy(
+                browserShowing = true,
+                maliciousSiteBlocked = false,
+            )
+
+        testee.onAutoConsentPopUpHandled(true)
+
+        assertCommandNotIssued<ShowAutoconsentAnimation>()
+        assertCommandNotIssued<EnqueueCookiesAnimation>()
+    }
+
+    @Test
     fun whenAutoConsentPopupHandledWithMaliciousSiteBlockedThenDoNotPostCommand() {
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
@@ -7495,6 +7538,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledWithNotMaliciousSiteBlockedThenPostCommand() {
+        givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -7533,6 +7577,7 @@ class BrowserTabViewModelTest {
     fun whenAutoConsentPopupHandledWithFeatureToggleDisabledThenShowAutoconsentAnimation() {
         runBlocking { whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false) }
 
+        givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -7567,6 +7612,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledAndCosmeticTrueThenFireAnimationShownCosmeticPixel() {
+        givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -7581,6 +7627,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAutoConsentPopupHandledAndCosmeticFalseThenFireAnimationShownPixel() {
+        givenCurrentSite("https://example.com")
         testee.browserViewState.value =
             testee.browserViewState.value?.copy(
                 browserShowing = true,
@@ -8447,6 +8494,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlThenExtractSerpLogoCommandIssued() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -8479,6 +8527,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlThenSerpLogoIsCleared() {
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+        givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -8525,6 +8574,7 @@ class BrowserTabViewModelTest {
         val favouriteUrl = "https://example.com/favourite-logo.png"
         favouriteLogoFlow.value = favouriteUrl
 
+        givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -8543,6 +8593,7 @@ class BrowserTabViewModelTest {
         whenever(mockSetFavouriteToggle.isEnabled()).thenReturn(false)
         favouriteLogoFlow.value = "https://example.com/favourite-logo.png"
 
+        givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -8563,6 +8614,7 @@ class BrowserTabViewModelTest {
         setFavouriteEnabledFlow.value = true
         favouriteLogoFlow.value = null
 
+        givenCurrentSite("https://duckduckgo.com/?q=test")
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -9165,6 +9217,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
+        givenCurrentSite("https://example.com/search?q=test")
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -9182,6 +9235,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenModeEnabled)
 
+        givenCurrentSite("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         val nonDdgUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
