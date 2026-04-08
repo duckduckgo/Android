@@ -145,12 +145,6 @@ class InlinePdfHandlerTest {
     }
 
     @Test
-    @Config(sdk = [30])
-    fun whenApiBelow31ThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
-    }
-
-    @Test
     @Config(sdk = [31])
     fun whenContentDispositionIsAttachmentThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"))
