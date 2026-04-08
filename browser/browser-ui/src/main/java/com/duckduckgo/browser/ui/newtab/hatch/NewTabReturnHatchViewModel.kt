@@ -53,7 +53,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val isSerp: Boolean = false,
     )
 
-    val viewState = tabRepository.flowLastAccessedTab
+    val viewState = tabRepository.flowLastAccessedNonSelectedTab
         .map { lastTab ->
             if (lastTab != null) {
                 val url = lastTab.url.orEmpty()

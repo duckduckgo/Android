@@ -52,7 +52,7 @@ class NewTabReturnHatchViewModelTest {
 
     @Before
     fun setup() {
-        whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
+        whenever(mockTabRepository.flowLastAccessedNonSelectedTab).thenReturn(lastAccessedTabFlow)
 
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
