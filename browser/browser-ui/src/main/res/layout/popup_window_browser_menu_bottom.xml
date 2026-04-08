@@ -185,12 +185,11 @@
                 app:iconDrawable="@drawable/ic_key_16"
                 app:primaryText="@string/browserMenuAutofill" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/downloadsMenuItem"
+            <LinearLayout
+                android:id="@+id/menuPluginsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_downloads_16"
-                app:primaryText="@string/browserMenuDownloads" />
+                android:orientation="vertical" />
 
             <include
                 android:id="@+id/includeVpnMenuItem"

@@ -100,12 +100,14 @@ import com.duckduckgo.app.bookmarks.dialog.BookmarkAddedConfirmationDialogFactor
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.downloads.impl.R as DownloadsR
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
@@ -250,6 +252,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
@@ -654,6 +657,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
+    @Inject
+    lateinit var browserMenuPlugins: PluginPoint<BrowserMenuPlugin>
 
     @Inject
     lateinit var systemAutofillEngagement: SystemAutofillEngagement
@@ -1580,6 +1586,7 @@ class BrowserTabFragment :
             context = requireContext(),
             layoutInflater = layoutInflater,
             omnibarType = omnibar.omnibarType,
+            browserMenuPlugins = browserMenuPlugins,
         )
         popupMenu?.apply {
             onMenuItemClicked(forwardMenuItem) {
@@ -1630,10 +1637,6 @@ class BrowserTabFragment :
             onMenuItemClicked(brokenSiteMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
-            }
-            onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                browserActivity?.launchDownloads()
             }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
@@ -1691,6 +1694,7 @@ class BrowserTabFragment :
         bottomSheetMenu = BrowserMenuBottomSheet(
             context = requireContext(),
             faviconManager = faviconManager,
+            browserMenuPlugins = browserMenuPlugins,
             onDismissListener = {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
             },
@@ -1738,10 +1742,6 @@ class BrowserTabFragment :
             onMenuItemClicked(brokenSiteMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
-            }
-            onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                browserActivity?.launchDownloads()
             }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
@@ -2139,13 +2139,13 @@ class BrowserTabFragment :
                     getString(command.messageId, command.fileName),
                     Snackbar.LENGTH_LONG,
                 )?.apply {
-                    this.setAction(R.string.downloadsDownloadFinishedActionName) {
+                    this.setAction(DownloadsR.string.downloadsDownloadFinishedActionName) {
                         activity?.let {
                             val result = downloadsFileActions.openFile(it, File(command.filePath))
                             if (!result) {
                                 view
                                     .makeSnackbarWithNoBottomInset(
-                                        text = getString(R.string.downloadsCannotOpenFileErrorMessage),
+                                        text = getString(DownloadsR.string.downloadsCannotOpenFileErrorMessage),
                                         duration = Snackbar.LENGTH_LONG,
                                     ).show()
                             }

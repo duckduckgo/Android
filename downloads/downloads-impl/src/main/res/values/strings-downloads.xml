@@ -32,6 +32,27 @@
     <string name="notificationDownloadComplete">Download complete.</string>
     <string name="notificationDownloadFailed">Failed to download.</string>
 
+    <string name="downloadsMenuLabel">Downloads</string>
+
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsActivityNoItemsDescription">No files downloaded yet</string>
+    <string name="downloadsShareTitle">Share with…</string>
+    <string name="downloadsDownloadFinishedActionName">Open</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
+    <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
+    <string name="downloadsItemMenuShare">Share</string>
+    <string name="downloadsItemMenuDelete">Delete</string>
+    <string name="downloadsItemMenuCancel">Cancel</string>
+    <string name="downloadsActivityMenuDeleteAll">Delete All</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Deleted %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">All files deleted</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">More options for %1$s</string>
+    <string name="downloadsUndoActionName">Undo</string>
+    <string name="downloadsStateInProgress">In progress…</string>
+    <string name="downloadsNotifyMeTitle">Find out when downloads are ready</string>
+    <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
+    <string name="newTabPageShortcutDownloads" translatable="false">Downloads</string>
+
     <string name="downloadConfirmationContinue">Save to Downloads</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">From: %1$s</string>
 </resources>

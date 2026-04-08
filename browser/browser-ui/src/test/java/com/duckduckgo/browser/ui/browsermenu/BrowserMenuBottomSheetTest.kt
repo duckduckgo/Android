@@ -23,9 +23,11 @@ import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState.Visible
 import com.duckduckgo.common.ui.view.StatusIndicatorView
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,13 +43,16 @@ import com.duckduckgo.mobile.android.R as MobileR
 @Config(sdk = [34])
 class BrowserMenuBottomSheetTest {
     private val mockFaviconManager: FaviconManager = mock()
+    private val emptyPluginPoint = object : PluginPoint<BrowserMenuPlugin> {
+        override fun getPlugins(): Collection<BrowserMenuPlugin> = emptyList()
+    }
     private lateinit var dialog: BrowserMenuBottomSheet
 
     @Before
     fun setUp() {
         val appContext = ApplicationProvider.getApplicationContext<Application>()
         appContext.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
-        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, {}, {})
+        dialog = BrowserMenuBottomSheet(appContext, mockFaviconManager, emptyPluginPoint, {}, {})
         dialog.show()
     }
 
@@ -246,24 +251,6 @@ class BrowserMenuBottomSheetTest {
         assertTrue(dialog.settingsMenuItem.isVisible)
         assertFalse(dialog.refreshMenuItem.isVisible)
         assertFalse(dialog.refreshActionMenuItem.isVisible)
-    }
-
-    @Test
-    fun whenRenderBrowserMenuWithShowDownloadDotTrueThenDownloadDotIndicatorIsVisible() {
-        val viewState = BrowserMenuViewState.Browser(showDownloadDot = true)
-
-        dialog.render(viewState)
-
-        assertTrue(dialog.downloadsMenuItem.showDotIndicator)
-    }
-
-    @Test
-    fun whenRenderBrowserMenuWithShowDownloadDotFalseThenDownloadDotIndicatorIsHidden() {
-        val viewState = BrowserMenuViewState.Browser(showDownloadDot = false)
-
-        dialog.render(viewState)
-
-        assertFalse(dialog.downloadsMenuItem.showDotIndicator)
     }
 
     @Test

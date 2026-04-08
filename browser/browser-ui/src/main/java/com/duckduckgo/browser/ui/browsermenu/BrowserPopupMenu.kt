@@ -23,6 +23,7 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.browser.ui.databinding.PopupWindowBrowserMenuBottomBinding
@@ -30,12 +31,14 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.R.drawable
 
 class BrowserPopupMenu(
     private val context: Context,
     layoutInflater: LayoutInflater,
     private val omnibarType: OmnibarType,
+    private val browserMenuPlugins: PluginPoint<BrowserMenuPlugin>,
 ) : PopupMenu(
     layoutInflater,
     resourceId = if (omnibarType == OmnibarType.SINGLE_BOTTOM) R.layout.popup_window_browser_menu_bottom else R.layout.popup_window_browser_menu,
@@ -122,10 +125,10 @@ class BrowserPopupMenu(
         }
     }
 
-    val downloadsMenuItem: View by lazy {
+    val menuPluginsContainer: LinearLayout by lazy {
         when (omnibarType) {
-            OmnibarType.SINGLE_BOTTOM -> bottomBinding.downloadsMenuItem
-            else -> topBinding.downloadsMenuItem
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.menuPluginsContainer
+            else -> topBinding.menuPluginsContainer
         }
     }
 
@@ -297,7 +300,7 @@ class BrowserPopupMenu(
      */
     private fun showCommonItems() {
         bookmarksMenuItem.isVisible = true
-        downloadsMenuItem.isVisible = true
+        renderMenuPlugins()
         settingsMenuItem.isVisible = true
     }
 
@@ -527,5 +530,15 @@ class BrowserPopupMenu(
 
         val iconRes = if (isVpnEnabled) drawable.ic_vpn_24 else drawable.ic_vpn_unlocked_24
         menuItemView.setIcon(iconRes)
+    }
+
+    private fun renderMenuPlugins() {
+        menuPluginsContainer.removeAllViews()
+        browserMenuPlugins.getPlugins().forEach { plugin ->
+            plugin.getMenuItemView(context)?.let { view ->
+                menuPluginsContainer.addView(view)
+            }
+        }
+        menuPluginsContainer.isVisible = menuPluginsContainer.childCount > 0
     }
 }

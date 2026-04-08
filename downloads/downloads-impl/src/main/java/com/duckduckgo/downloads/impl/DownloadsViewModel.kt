@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
-import com.duckduckgo.app.downloads.DownloadViewItem.Empty
-import com.duckduckgo.app.downloads.DownloadViewItem.Header
-import com.duckduckgo.app.downloads.DownloadViewItem.Item
-import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
@@ -90,8 +79,8 @@ class DownloadsViewModel @Inject constructor(
         flow3 = filterText,
     ) { items, showNotifyMe, filter ->
         val downloadItemsList = when {
-            showNotifyMe -> if (items.isEmpty()) listOf(NotifyMe, Empty) else listOf(NotifyMe).plus(items)
-            else -> items.ifEmpty { listOf(Empty) }
+            showNotifyMe -> if (items.isEmpty()) listOf(DownloadViewItem.NotifyMe, DownloadViewItem.Empty) else listOf(DownloadViewItem.NotifyMe).plus(items)
+            else -> items.ifEmpty { listOf(DownloadViewItem.Empty) }
         }
         val filteredItemsList = if (filter.isEmpty()) downloadItemsList else filtered(items, filter)
         ViewState(enableSearch = items.isNotEmpty(), downloadItems = downloadItemsList, filteredItems = filteredItemsList)
@@ -106,7 +95,7 @@ class DownloadsViewModel @Inject constructor(
             val itemsToDelete = downloadsRepository.getDownloads()
             if (itemsToDelete.isNotEmpty()) {
                 downloadsRepository.deleteAll()
-                command.send(DisplayUndoMessage(messageId = R.string.downloadsAllFilesDeletedMessage, items = itemsToDelete))
+                command.send(Command.DisplayUndoMessage(messageId = R.string.downloadsAllFilesDeletedMessage, items = itemsToDelete))
             }
         }
     }
@@ -114,7 +103,7 @@ class DownloadsViewModel @Inject constructor(
     fun delete(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
-            command.send(DisplayMessage(R.string.downloadsFileNotFoundErrorMessage))
+            command.send(Command.DisplayMessage(R.string.downloadsFileNotFoundErrorMessage))
         }
     }
 
@@ -159,11 +148,11 @@ class DownloadsViewModel @Inject constructor(
     }
 
     private fun filtered(items: List<DownloadViewItem>, newText: String): List<DownloadViewItem> {
-        val filtered = LinkedHashMap<Header, List<Item>>()
+        val filtered = LinkedHashMap<DownloadViewItem.Header, List<DownloadViewItem.Item>>()
         items.forEach { item ->
-            if (item is Header) {
+            if (item is DownloadViewItem.Header) {
                 filtered[item] = mutableListOf()
-            } else if (item is Item) {
+            } else if (item is DownloadViewItem.Item) {
                 if (item.downloadItem.fileName.lowercase().contains(newText.lowercase())) {
                     val list = filtered[filtered.keys.last()]
                     val newList = list?.plus(item) ?: listOf(item)
@@ -181,31 +170,31 @@ class DownloadsViewModel @Inject constructor(
         }
 
         if (list.isEmpty()) {
-            list.add(Empty)
+            list.add(DownloadViewItem.Empty)
         }
 
         return list
     }
 
     override fun onItemClicked(item: DownloadItem) {
-        viewModelScope.launch { command.send(OpenFile(item)) }
+        viewModelScope.launch { command.send(Command.OpenFile(item)) }
     }
 
     override fun onShareItemClicked(item: DownloadItem) {
-        viewModelScope.launch { command.send(ShareFile(item)) }
+        viewModelScope.launch { command.send(Command.ShareFile(item)) }
     }
 
     override fun onDeleteItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
-            command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
+            command.send(Command.DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
         }
     }
 
     override fun onCancelItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
-            command.send(CancelDownload(item))
+            command.send(Command.CancelDownload(item))
         }
     }
 
@@ -215,10 +204,10 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
-    private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = Item(this)
+    private fun DownloadItem.mapToDownloadViewItem(): DownloadViewItem = DownloadViewItem.Item(this)
 
     private fun List<DownloadItem>.mapToDownloadViewItems(): List<DownloadViewItem> {
-        if (this.isEmpty()) return listOf(Empty)
+        if (this.isEmpty()) return listOf(DownloadViewItem.Empty)
 
         val itemViews = mutableListOf<DownloadViewItem>()
         var previousDate = timeDiffFormatter.formatTimePassedInDaysWeeksMonthsYears(
@@ -227,7 +216,7 @@ class DownloadsViewModel @Inject constructor(
 
         this.forEachIndexed { index, downloadItem ->
             if (index == 0) {
-                itemViews.add(Header(previousDate))
+                itemViews.add(DownloadViewItem.Header(previousDate))
                 itemViews.add(downloadItem.mapToDownloadViewItem())
             } else {
                 val thisDate = timeDiffFormatter.formatTimePassedInDaysWeeksMonthsYears(
@@ -236,7 +225,7 @@ class DownloadsViewModel @Inject constructor(
                 if (previousDate == thisDate) {
                     itemViews.add(downloadItem.mapToDownloadViewItem())
                 } else {
-                    itemViews.add(Header(thisDate))
+                    itemViews.add(DownloadViewItem.Header(thisDate))
                     itemViews.add(downloadItem.mapToDownloadViewItem())
                     previousDate = thisDate
                 }

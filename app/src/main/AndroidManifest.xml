@@ -496,11 +496,6 @@
             android:parentActivityName=".BrowserActivity" />
 
         <activity
-            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
-            android:exported="false"
-            android:label="@string/downloadsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
             android:name=".threatprotection.ThreatProtectionSettingsActivity"
             android:exported="false"
             android:label="Threat protection"

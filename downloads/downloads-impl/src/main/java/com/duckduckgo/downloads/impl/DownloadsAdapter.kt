@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -22,20 +22,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.layout
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
-import com.duckduckgo.app.browser.databinding.ViewItemDownloadsNotifyMeBinding
-import com.duckduckgo.app.downloads.DownloadViewItem.Empty
-import com.duckduckgo.app.downloads.DownloadViewItem.Header
-import com.duckduckgo.app.downloads.DownloadViewItem.Item
-import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.formatters.data.DataSizeFormatter
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsEmptyBinding
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsHeaderBinding
+import com.duckduckgo.downloads.impl.databinding.ViewItemDownloadsNotifyMeBinding
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import javax.inject.Inject
@@ -77,18 +71,18 @@ class DownloadsAdapter @Inject constructor(
     ) {
         when (getItemViewType(position)) {
             VIEW_TYPE_EMPTY -> (holder as EmptyViewHolder)
-            VIEW_TYPE_HEADER -> (holder as HeaderViewHolder).bind(items[position] as Header)
-            VIEW_TYPE_ITEM -> (holder as ItemViewHolder).bind(items[position] as Item)
+            VIEW_TYPE_HEADER -> (holder as HeaderViewHolder).bind(items[position] as DownloadViewItem.Header)
+            VIEW_TYPE_ITEM -> (holder as ItemViewHolder).bind(items[position] as DownloadViewItem.Item)
             VIEW_TYPE_NOTIFY_ME -> (holder as NotifyMeViewHolder)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
-            is Empty -> VIEW_TYPE_EMPTY
-            is Header -> VIEW_TYPE_HEADER
-            is Item -> VIEW_TYPE_ITEM
-            is NotifyMe -> VIEW_TYPE_NOTIFY_ME
+            is DownloadViewItem.Empty -> VIEW_TYPE_EMPTY
+            is DownloadViewItem.Header -> VIEW_TYPE_HEADER
+            is DownloadViewItem.Item -> VIEW_TYPE_ITEM
+            is DownloadViewItem.NotifyMe -> VIEW_TYPE_NOTIFY_ME
         }
     }
 
@@ -112,7 +106,7 @@ class DownloadsAdapter @Inject constructor(
     class HeaderViewHolder(val binding: ViewItemDownloadsHeaderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Header) {
+        fun bind(item: DownloadViewItem.Header) {
             binding.downloadsHeaderTextView.primaryText = item.text
         }
     }
@@ -127,7 +121,7 @@ class DownloadsAdapter @Inject constructor(
 
         private val context: Context = binding.root.context
 
-        fun bind(item: Item) {
+        fun bind(item: DownloadViewItem.Item) {
             val twoListItem = binding.root
             twoListItem.setLeadingIconContentDescription(
                 context.getString(
@@ -157,11 +151,11 @@ class DownloadsAdapter @Inject constructor(
 
         private fun showPopupMenu(
             anchor: View,
-            item: Item,
+            item: DownloadViewItem.Item,
         ) {
             val popupMenu = PopupMenu(
                 layoutInflater,
-                layout.popup_window_download_item_menu,
+                R.layout.popup_window_download_item_menu,
             )
             val view = popupMenu.contentView
             val shareItemView = view.findViewById<View>(R.id.share)

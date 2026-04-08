@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
 import com.duckduckgo.common.ui.setRoundCorners
@@ -34,6 +35,8 @@ import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.R.drawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -43,6 +46,7 @@ import kotlinx.coroutines.launch
 class BrowserMenuBottomSheet(
     private val context: Context,
     private val faviconManager: FaviconManager,
+    private val browserMenuPlugins: PluginPoint<BrowserMenuPlugin>,
     private val onDismissListener: () -> Unit,
     private val onMenuItemClickListener: () -> Unit,
 ) : BottomSheetDialog(context) {
@@ -126,8 +130,8 @@ class BrowserMenuBottomSheet(
     val createAliasMenuItem: MenuItemView
         get() = binding.createAliasMenuItem
 
-    val downloadsMenuItem: MenuItemView
-        get() = binding.downloadsMenuItem
+    val menuPluginsContainer: LinearLayout
+        get() = binding.menuPluginsContainer
 
     val duckChatHistoryMenuItem: MenuItemView
         get() = binding.duckChatHistoryMenuItem
@@ -205,7 +209,7 @@ class BrowserMenuBottomSheet(
         settingsMenuItem.isVisible = true
         refreshActionMenuItem.isVisible = false
         bookmarksMenuItem.isVisible = true
-        downloadsMenuItem.isVisible = true
+        renderMenuPlugins()
     }
 
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
@@ -279,7 +283,6 @@ class BrowserMenuBottomSheet(
         renderPageContextHeader(viewState.pageContextHeader)
         renderVpnMenu(viewState.vpnMenuState)
         fireMenuItem.isVisible = viewState.showFireMenuItem
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
@@ -304,9 +307,8 @@ class BrowserMenuBottomSheet(
 
         refreshMenuItem.isVisible = false
         autofillMenuItem.isVisible = viewState.showAutofill
-        downloadsMenuItem.isVisible = true
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
         duckChatHistoryMenuItem.isVisible = false
+        renderMenuPlugins()
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
@@ -344,7 +346,7 @@ class BrowserMenuBottomSheet(
         changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
 
         bookmarksMenuItem.isVisible = false
-        downloadsMenuItem.isVisible = false
+        menuPluginsContainer.isVisible = false
 
         privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
         val privacyProtectionLabel = context.getText(
@@ -381,8 +383,7 @@ class BrowserMenuBottomSheet(
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
-        downloadsMenuItem.isVisible = true
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
+        renderMenuPlugins()
         renderPageContextHeader(viewState.pageContextHeader)
 
         duckChatHistoryMenuItem.isVisible = true
@@ -512,6 +513,16 @@ class BrowserMenuBottomSheet(
 
         val iconRes = if (isVpnEnabled) drawable.ic_vpn_24 else drawable.ic_vpn_unlocked_24
         menuItemView.setIcon(iconRes)
+    }
+
+    private fun renderMenuPlugins() {
+        menuPluginsContainer.removeAllViews()
+        browserMenuPlugins.getPlugins().forEach { plugin ->
+            plugin.getMenuItemView(context)?.let { view ->
+                menuPluginsContainer.addView(view)
+            }
+        }
+        menuPluginsContainer.isVisible = menuPluginsContainer.childCount > 0
     }
 
     internal fun computePeekHeight(): Int {
