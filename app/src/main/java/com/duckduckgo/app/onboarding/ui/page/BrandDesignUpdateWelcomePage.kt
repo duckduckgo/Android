@@ -1188,7 +1188,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     if (!this.isAnimating) playAnimation()
                 }
 
-                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
+                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
             }
 
             INPUT_SCREEN -> {
@@ -1519,22 +1519,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     .start()
                 playAnimation()
             }
-        }
-    }
-
-    private fun dismissLeftWingAnimation() {
-        binding.leftWingAnimation?.apply {
-            if (!isVisible) return
-            setMinProgress(WING_STOP_PROGRESS)
-            setMaxProgress(1f)
-            speed = 1f
-            addAnimatorListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    isGone = true
-                    removeAnimatorListener(this)
-                }
-            })
-            playAnimation()
         }
     }
 
