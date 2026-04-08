@@ -515,6 +515,16 @@ class BrandDesignUpdatePageViewModelTest {
         )
     }
 
+    @Test
+    fun whenDefaultBrowserNotSetThenFiresDefaultBrowserNotSetPixel() {
+        val testee = createViewModel()
+        testee.onDefaultBrowserNotSet()
+        verify(mockPixel).fire(
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
     // endregion
 
     // region Address bar position and input screen selection
