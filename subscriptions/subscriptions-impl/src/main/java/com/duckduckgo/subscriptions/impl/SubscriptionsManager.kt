@@ -405,15 +405,10 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
     override suspend fun isFreeTrialEligible(): Boolean {
-        val userHadFreeTrial = try {
-            subscriptionsService.offerStatus().hadTrial
-        } catch (e: Exception) {
-            false
-        }
         val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
-        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
+        return privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
