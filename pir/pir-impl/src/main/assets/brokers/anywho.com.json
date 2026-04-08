@@ -1,7 +1,7 @@
 {
   "name": "AnyWho",
   "url": "anywho.com",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "parent": "spokeo.com",
   "addedDatetime": 1768780800000,
   "optOutUrl": "https://www.spokeo.com/optout",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "a1b2c3d4-e5f6-4789-0123-456789abcdef",
-          "url": "https://www.anywho.com/people/${firstName}+${lastName}/${state|stateFull|downcase}/${city|downcase}?age_range=${age|ageRange}",
+          "url": "https://www.anywho.com/people/${firstName}+${lastName}/${state|stateFull|downcase|replaceWhitespace:+}/${city|downcase|replaceWhitespace:+}?age_range=${age|ageRange}",
           "ageRange": [
             "0-30",
             "31-60",
