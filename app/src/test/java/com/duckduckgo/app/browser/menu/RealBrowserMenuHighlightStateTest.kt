@@ -38,9 +38,13 @@ class RealBrowserMenuHighlightStateTest {
 
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
 
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
+
     private val highlightPopupMenuFlow = MutableStateFlow(false)
 
     private val hasNewDownloadFlow = MutableStateFlow(false)
+
+    private val browserMenuStateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
 
     private lateinit var testee: RealBrowserMenuHighlightState
 
@@ -48,10 +52,12 @@ class RealBrowserMenuHighlightStateTest {
     fun setUp() {
         whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(highlightPopupMenuFlow)
         whenever(downloadMenuStateProvider.hasNewDownloadFlow).thenReturn(hasNewDownloadFlow)
+        whenever(browserMenuDisplayRepository.browserMenuState).thenReturn(browserMenuStateFlow)
 
         testee = RealBrowserMenuHighlightState(
             additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
             downloadMenuStateProvider = downloadMenuStateProvider,
+            browserMenuDisplayRepository = browserMenuDisplayRepository,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
@@ -78,12 +84,35 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when new download is true then shouldHighlight is true`() = runTest {
+    fun `when new download is true and bottom sheet menu enabled then shouldHighlight is true`() = runTest {
         testee.shouldHighlight.test {
             assertFalse(awaitItem())
 
             hasNewDownloadFlow.value = true
             assertTrue(awaitItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when new download is true but bottom sheet menu disabled then shouldHighlight is false`() = runTest {
+        browserMenuStateFlow.value = BrowserMenuDisplayState(hasOption = false, isEnabled = false)
+
+        testee = RealBrowserMenuHighlightState(
+            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
+            downloadMenuStateProvider = downloadMenuStateProvider,
+            browserMenuDisplayRepository = browserMenuDisplayRepository,
+            appCoroutineScope = coroutineTestRule.testScope,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
+
+        testee.shouldHighlight.test {
+            assertFalse(awaitItem())
+
+            hasNewDownloadFlow.value = true
+            // still false because bottom sheet menu is not enabled
+            expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
         }
