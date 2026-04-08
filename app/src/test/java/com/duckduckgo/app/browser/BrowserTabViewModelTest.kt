@@ -9887,6 +9887,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDuckAiEndCtaDismissedViaCloseButtonThenCtaClearedFromViewState() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+        val cta = DaxBubbleCta.DaxDuckAiEndCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.onUserClickCtaDismissButton(cta)
+        advanceUntilIdle()
+
+        assertCommandIssued<HideOnboardingDaxBubbleCta> {
+            assertEquals(cta, this.daxBubbleCta)
+        }
+        assertNull(ctaViewState().cta)
+        assertEquals(testee.browserViewState.value!!.duckAiButton, HighlightableButton.Visible(highlighted = false))
+    }
+
+    @Test
     fun whenNonDuckAiEndCtaShownThenDuckAiButtonNotHighlighted() = runTest {
         testee.ctaViewState.value = ctaViewState().copy(
             cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),

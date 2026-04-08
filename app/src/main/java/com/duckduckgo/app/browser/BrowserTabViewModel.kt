@@ -3346,6 +3346,10 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
+                if (cta is DaxBubbleCta.DaxDuckAiEndCta) {
+                    // Dismiss duck.ai button highlight (which is linked to this CTA being visible)
+                    ctaViewState.value = ctaViewState.value?.copy(cta = null)
+                }
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
@@ -4640,7 +4644,7 @@ class BrowserTabViewModel @Inject constructor(
                     command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
                 }
             }
-            is DaxBubbleCta.DaxEndCta -> {
+            is DaxBubbleCta.DaxEndCta, is DaxBubbleCta.DaxDuckAiEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
