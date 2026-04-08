@@ -826,6 +826,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
+                                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                         }
                                     })
                                     start()
@@ -843,7 +844,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
                     setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
@@ -1016,9 +1016,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 binding.bottomWingAnimation.isVisible = false
-
-                binding.logoAnimation.alpha = 0f
-                binding.welcomeTitle.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
 
