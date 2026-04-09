@@ -24,6 +24,7 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
@@ -455,10 +456,8 @@ sealed class Command {
 
     class SetBrowserBackground(
         @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetBrowserBackgroundColor(
-        @ColorRes val colorRes: Int,
+        val isBrandDesignUpdate: Boolean = false,
+        @AttrRes val backgroundColorAttr: Int = 0,
     ) : Command()
 
     class SetOnboardingDialogBackground(
