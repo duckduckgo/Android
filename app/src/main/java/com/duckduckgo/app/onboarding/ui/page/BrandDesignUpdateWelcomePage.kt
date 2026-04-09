@@ -506,7 +506,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
         binding.backgroundPrimary.cancelAnimation()
         binding.welcomeScreenWalkingDax.cancelAnimation()
-        binding.bottomWingAnimation?.cancelAnimation()
+        binding.bottomWingAnimation.cancelAnimation()
     }
 
     override fun onActivityResult(
