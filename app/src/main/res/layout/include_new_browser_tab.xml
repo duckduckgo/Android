@@ -33,6 +33,17 @@
         android:scaleType="centerCrop"
         tools:srcCompat="@drawable/onboarding_background_bitmap_light" />
 
+    <ImageView
+        android:id="@+id/rebrandBrowserBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="@dimen/onboardingBackgroundMaxHeight"
+        android:visibility="gone"
+        android:scaleType="fitEnd"
+        android:layout_gravity="bottom"
+        android:adjustViewBounds="true"
+        tools:srcCompat="@drawable/onboarding_background_bitmap_light" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/newTabPage"
         android:layout_width="match_parent"
@@ -88,6 +99,18 @@
         <include
             android:id="@+id/includeOnboardingDaxDialogBubble"
             layout="@layout/include_onboarding_bubble_dax_dialog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="600dp" />
+
+        <include
+            android:id="@+id/includeOnboardingDaxDialogBubbleBrandDesignUpdate"
+            layout="@layout/include_onboarding_bubble_dax_dialog_brand_design_update"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"

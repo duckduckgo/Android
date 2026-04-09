@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/brandDesignOption1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        app:icon="@drawable/ic_find_search_16"
+        tools:text="@string/onboardingSearchDaxDialogOption1" />
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/brandDesignOption2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="start|center_vertical"
+        app:icon="@drawable/ic_find_search_16"
+        tools:text="@string/onboardingSearchDaxDialogOption2" />
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/brandDesignOption3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="start|center_vertical"
+        app:icon="@drawable/ic_find_search_16"
+        tools:text="@string/onboardingSearchDaxDialogOption3" />
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/brandDesignOption4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="start|center_vertical"
+        app:icon="@drawable/ic_wand_16"
+        tools:text="Surprise me!" />
+
+</LinearLayout>
