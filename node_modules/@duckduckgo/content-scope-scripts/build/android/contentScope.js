@@ -4705,7 +4705,6 @@
        *   platform: import('./utils.js').Platform,
        *   desktopModeEnabled?: boolean,
        *   forcedZoomEnabled?: boolean,
-       *   isDdgWebView?: boolean,
        *   featureSettings?: Record<string, unknown>,
        *   assets?: import('./content-feature.js').AssetConfig | undefined,
        *   site: import('./content-feature.js').Site,
@@ -12346,12 +12345,15 @@ ${iframeContent}
       this._notifyIfChanged(shouldLock);
     }
     /**
-     * Determine if UI should be locked based on scrollbar visibility.
-     * Lock if there's no visible vertical scrollbar on the page.
+     * Determine if UI should be locked based on scrollbar visibility or content type.
+     * Lock if the page is a direct image display or has no visible vertical scrollbar.
      * @returns {boolean}
      */
     _detectShouldLock() {
       try {
+        if (this.getFeatureSettingEnabled("lockImagePages", "enabled") && this._isImageDisplayPage()) {
+          return true;
+        }
         const html2 = document.documentElement;
         const body = document.body;
         if (html2 && this._hasExplicitlyVisibleScrollbar(html2)) {
@@ -12365,6 +12367,15 @@ ${iframeContent}
         this.log.warn("Failed to detect scroll state:", e);
         return false;
       }
+    }
+    /**
+     * Detect if the current page is a browser-rendered image display page.
+     * When navigating directly to an image URL, the browser renders a minimal page
+     * with the document's contentType set to an image MIME type (e.g. image/jpeg).
+     * @returns {boolean}
+     */
+    _isImageDisplayPage() {
+      return typeof document.contentType === "string" && document.contentType.startsWith("image/");
     }
     /**
      * Check if an element has a visible vertical scrollbar.
