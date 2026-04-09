@@ -8153,6 +8153,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -8185,6 +8186,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
             flowSelectedTab.emit(ntpTab)
@@ -8225,6 +8227,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = targetTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(targetTab)
@@ -8257,6 +8260,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = initialTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -8289,6 +8293,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
             flowSelectedTab.emit(ntpTab)
@@ -8332,6 +8337,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -8373,6 +8379,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -8405,6 +8412,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
             whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(true)
 
@@ -8438,6 +8446,7 @@ class BrowserTabViewModelTest {
             flowSelectedTab.emit(initialTab)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
             whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(true)
 
@@ -8479,6 +8488,7 @@ class BrowserTabViewModelTest {
             whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
             flowSelectedTab.emit(ntpTab)
@@ -8487,6 +8497,61 @@ class BrowserTabViewModelTest {
             val commands = commandCaptor.allValues
             assertFalse(
                 "LaunchInputScreen command should be suppressed when Privacy Pro skipped-onboarding dialog is showing",
+                commands.any { it is Command.LaunchInputScreen },
+            )
+        }
+
+    @Test
+    fun whenInputScreenEnabledAndTabRestoredAndRestorationFixEnabledThenLaunchInputScreenCommandSuppressed() =
+        runTest {
+            val ntpTabId = "ntp-tab"
+            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+            flowSelectedTab.emit(ntpTab)
+
+            fakeAndroidConfigBrowserFeature.tabStateRestorationFix().setRawStoredState(State(enable = true))
+            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = true)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val commands = commandCaptor.allValues
+            assertFalse(
+                "LaunchInputScreen command should be suppressed when tab is restored from saved state",
+                commands.any { it is Command.LaunchInputScreen },
+            )
+        }
+
+    @Test
+    fun whenInputScreenEnabledAndTabRestoredAndRestorationFixDisabledThenLaunchInputScreenCommandNotSuppressed() =
+        runTest {
+            val initialTabId = "initial-tab"
+            val initialTab =
+                TabEntity(
+                    tabId = initialTabId,
+                    url = "https://example.com",
+                    title = "EX",
+                    skipHome = false,
+                    viewed = true,
+                    position = 0,
+                )
+            val ntpTabId = "ntp-tab"
+            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+            flowSelectedTab.emit(initialTab)
+
+            fakeAndroidConfigBrowserFeature.tabStateRestorationFix().setRawStoredState(State(enable = false))
+            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            testee.observeSelectedTab(isRestored = true)
+            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+
+            flowSelectedTab.emit(ntpTab)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val commands = commandCaptor.allValues
+            assertTrue(
+                "LaunchInputScreen command should not be suppressed when tab restoration fix is disabled",
                 commands.any { it is Command.LaunchInputScreen },
             )
         }
