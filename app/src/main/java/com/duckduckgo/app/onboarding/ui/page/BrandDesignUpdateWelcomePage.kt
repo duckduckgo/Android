@@ -461,6 +461,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             onboardingDialogType = dialog,
                             selectedAddressBarPosition = state.selectedAddressBarPosition,
                             showSplitOption = state.showSplitOption,
+                            inputScreenSelected = state.inputScreenSelected,
                         )
                     }
                 }
@@ -570,6 +571,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         onboardingDialogType: PreOnboardingDialogType,
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
+        inputScreenSelected: Boolean,
     ) {
         context?.let {
             isAnimating = true
@@ -974,7 +976,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
-                    updateAiChatToggleState(binding, withAi = true)
+                    updateAiChatToggleState(binding = binding, withAi = inputScreenSelected)
 
                     // Disable clickability on invisible children so taps reach cardContainer for skip
                     binding.daxDialogCta.primaryCta.isClickable = false
@@ -1197,7 +1199,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             INPUT_SCREEN -> {
                 // If the dialog is already showing, just update the toggle selection without re-running the full setup.
                 if (binding.daxDialogCta.inputScreenContent.root.isVisible) {
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected)
+                    updateAiChatToggleState(binding = binding, withAi = inputScreenSelected)
                     return
                 }
 
@@ -1264,7 +1266,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
-                updateAiChatToggleState(binding, withAi = inputScreenSelected, animate = false)
+                updateAiChatToggleState(binding = binding, withAi = inputScreenSelected, animate = false)
             }
         }
     }
