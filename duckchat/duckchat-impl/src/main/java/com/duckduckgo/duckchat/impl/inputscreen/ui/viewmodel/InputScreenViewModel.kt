@@ -422,7 +422,10 @@ class InputScreenViewModel @AssistedInject constructor(
         voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
-    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion, fromChatUrlSuggestions: Boolean = false) {
+    fun userSelectedAutocomplete(
+        suggestion: AutoCompleteSuggestion,
+        fromChatUrlSuggestions: Boolean = false,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val suggestions = if (duckChatFeature.rememberTogglePosition().isEnabled() && fromChatUrlSuggestions) {
                 chatUrlSuggestions.value.suggestions
@@ -793,6 +796,7 @@ class InputScreenViewModel @AssistedInject constructor(
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
+
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
         val hadText =
             if (directionToSearch) {
@@ -857,7 +861,10 @@ class InputScreenViewModel @AssistedInject constructor(
         inputScreenConfigResolver.mainButtonsEnabled() &&
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
-    fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
+    fun onChatSuggestionSelected(
+        chatId: String,
+        pinned: Boolean,
+    ) {
         saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
@@ -897,7 +904,10 @@ class InputScreenViewModel @AssistedInject constructor(
     // region tab attachments tagging
     // To be revisited once we have the final design
 
-    fun onChatTagTextChanged(text: String, cursorPosition: Int) {
+    fun onChatTagTextChanged(
+        text: String,
+        cursorPosition: Int,
+    ) {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         val tagQuery = TagDetector.detect(text, cursorPosition)
         if (tagQuery == null) {
@@ -965,6 +975,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 val url = duckChat.getDuckChatUrl(query, true)
                 command.value = Command.SubmitSearch(url)
             }
+
             else -> {
                 command.value = Command.SubmitChat(query)
                 duckChat.openDuckChatWithAutoPrompt(query)
@@ -972,7 +983,10 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun buildAndStorePendingPrompt(query: String, attachedTabs: List<TabAttachmentItem>): Boolean {
+    private suspend fun buildAndStorePendingPrompt(
+        query: String,
+        attachedTabs: List<TabAttachmentItem>,
+    ): Boolean {
         if (attachedTabs.isEmpty()) return false
 
         val tabIds = attachedTabs.map { it.tabId }
