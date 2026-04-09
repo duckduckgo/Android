@@ -1192,6 +1192,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             INPUT_SCREEN -> {
+                // If the dialog is already showing, just update the toggle selection without re-running the full setup.
+                if (binding.daxDialogCta.inputScreenContent.root.isVisible) {
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected)
+                    return
+                }
+
                 binding.bottomWingAnimation.isVisible = false
 
                 val leftWingView = binding.leftWingAnimation
