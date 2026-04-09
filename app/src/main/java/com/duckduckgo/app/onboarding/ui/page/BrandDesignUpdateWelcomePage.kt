@@ -426,12 +426,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     state.hasAnimatedCurrentDialog -> {
                         val dialog = state.currentDialog ?: return@onEach
                         binding.root.doOnLayout {
-                            showDialogWithoutAnimation(dialog, state.showSplitOption, state.selectedAddressBarPosition)
+                            showDialogWithoutAnimation(
+                                onboardingDialogType = dialog,
+                                selectedAddressBarPosition = state.selectedAddressBarPosition,
+                                showSplitOption = state.showSplitOption
+                            )
                         }
                     }
                     else -> {
                         val dialog = state.currentDialog ?: return@onEach
-                        configureDaxCta(dialog, state.showSplitOption)
+                        configureDaxCta(
+                            onboardingDialogType = dialog,
+                            selectedAddressBarPosition = state.selectedAddressBarPosition,
+                            showSplitOption = state.showSplitOption
+                        )
                     }
                 }
             }
@@ -529,7 +537,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun configureDaxCta(
         onboardingDialogType: PreOnboardingDialogType,
-        showSplitOption: Boolean = false,
+        selectedAddressBarPosition: OmnibarType,
+        showSplitOption: Boolean,
     ) {
         context?.let {
             isAnimating = true
@@ -842,7 +851,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
-                    setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
+                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
                 }
 
                 INPUT_SCREEN -> {
@@ -854,8 +863,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun showDialogWithoutAnimation(
         onboardingDialogType: PreOnboardingDialogType,
-        showSplitOption: Boolean = false,
-        selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
+        selectedAddressBarPosition: OmnibarType,
+        showSplitOption: Boolean,
     ) {
         snapToIntroEndState()
 
