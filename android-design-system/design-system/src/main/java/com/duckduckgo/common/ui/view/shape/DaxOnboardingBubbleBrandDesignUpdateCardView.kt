@@ -18,9 +18,12 @@ package com.duckduckgo.common.ui.view.shape
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Outline
 import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.core.content.ContextCompat
@@ -75,8 +78,9 @@ constructor(
 
         cornerRadius = resources.getDimension(R.dimen.dax_brand_design_bubble_card_view_corner_radius)
 
-        setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.onboardingSurfaceTertiary)))
-        setStrokeColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.onboardingAccentAltPrimary)))
+        val themedContext = resolveOnboardingTheme(context)
+        setCardBackgroundColor(ColorStateList.valueOf(themedContext.getColorFromAttr(R.attr.onboardingSurfaceTertiary)))
+        setStrokeColor(ColorStateList.valueOf(themedContext.getColorFromAttr(R.attr.onboardingAccentAltPrimary)))
         strokeWidth = resources.getDimensionPixelSize(R.dimen.dax_brand_design_bubble_stroke_width)
 
         val edgeTreatment = DaxBubbleBottomEdgeTreatment()
@@ -209,6 +213,20 @@ constructor(
                 layoutParams = params
             }
         }
+    }
+
+    private fun resolveOnboardingTheme(context: Context): Context {
+        val typedValue = TypedValue()
+        if (context.theme.resolveAttribute(R.attr.onboardingSurfaceTertiary, typedValue, true)) {
+            return context
+        }
+        val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
+            R.style.Theme_DuckDuckGo_Dark_Onboarding
+        } else {
+            R.style.Theme_DuckDuckGo_Light_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
     }
 
     /**

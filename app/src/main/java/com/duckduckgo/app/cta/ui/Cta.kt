@@ -644,14 +644,14 @@ sealed class DaxBubbleCta(
 
         TransitionManager.beginDelayedTransition(view.findViewById(R.id.cardView), AutoTransition())
         view.show()
-        view.findViewById<DaxTypeAnimationTextView>(R.id.dialogTextCta).text = ""
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.daxBubbleDialogTitle).apply {
             alpha = 0f
             text = daxTitle.html(view.context)
         }
         val afterAnimation = {
-            view.findViewById<DaxTypeAnimationTextView>(R.id.dialogTextCta).finishAnimation()
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).finishAnimation()
             view
                 .findViewById<ImageView>(R.id.placeholder)
                 .animate()
@@ -684,7 +684,7 @@ sealed class DaxBubbleCta(
                 .alpha(1f)
                 .setDuration(500)
                 .withEndAction {
-                    view.findViewById<DaxTypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
+                    view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true) {
                         afterAnimation()
                     }
                 }
