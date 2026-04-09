@@ -545,6 +545,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                                 .alpha(MAX_ALPHA)
                                 .setDuration(ANIMATION_DURATION)
                                 .withEndAction {
+                                    if (view == null) return@withEndAction
+
                                     val buttons = listOf(
                                         binding.daxDialogCta.inputScreenPreview.suggestion1,
                                         binding.daxDialogCta.inputScreenPreview.suggestion2,
@@ -552,6 +554,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                                     )
 
                                     fun animateButton(index: Int) {
+                                        if (view == null) return
+
                                         if (index < buttons.size) {
                                             buttons[index].alpha = MIN_ALPHA
                                             buttons[index].isVisible = true
