@@ -27,11 +27,14 @@
         android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:background="@drawable/background_input_screen_button"
+        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+        android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_microphone_24"
-        android:visibility="gone" />
+        android:src="@drawable/ic_ai_chat_voice_24"
+        android:visibility="gone"
+        app:tint="?attr/daxColorWhite" />
 
     <ImageView
         android:id="@+id/actionNewLine"
