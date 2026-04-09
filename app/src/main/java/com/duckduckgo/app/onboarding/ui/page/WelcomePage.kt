@@ -126,11 +126,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
-                is ShowInputScreenPreviewDialog -> configureDaxCta(
-                    INPUT_SCREEN_PREVIEW,
+                is ShowInputScreenPreviewDialog -> configureInputScreenPreviewDialog(
                     searchSuggestions = it.searchSuggestions,
                     chatSuggestions = it.chatSuggestions,
-                    inputScreenPreviewDefaultInputMode = if (it.duckAiDefault) CHAT else SEARCH,
+                    defaultInputMode = if (it.duckAiDefault) CHAT else SEARCH,
                 )
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
@@ -229,9 +228,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         onboardingDialogType: PreOnboardingDialogType,
         showSplitOption: Boolean = false,
         showDuckAiCopy: Boolean = false,
-        searchSuggestions: List<DaxDialogIntroOption> = emptyList(),
-        chatSuggestions: List<DaxDialogIntroOption> = emptyList(),
-        inputScreenPreviewDefaultInputMode: InputMode = SEARCH,
     ) {
         context?.let {
             var afterAnimation: () -> Unit = {}
@@ -488,105 +484,116 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
 
-                INPUT_SCREEN_PREVIEW -> {
-                    TransitionManager.beginDelayedTransition(binding.longDescriptionContainer, AutoTransition())
-                    binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.primaryCta.gone()
-                    binding.daxDialogCta.secondaryCta.gone()
-                    binding.daxDialogCta.dialogTextCta.text = ""
-                    binding.daxDialogCta.comparisonChart.root.gone()
-                    binding.daxDialogCta.comparisonChartWithDuckAi.root.gone()
-                    binding.daxDialogCta.addressBarPosition.root.gone()
-                    binding.daxDialogCta.duckAiInputScreenToggleContainer.gone()
-                    binding.daxDialogCta.duckAiInputScreenToggleDescription.gone()
-                    binding.daxDialogCta.progressBarText.gone()
-                    binding.daxDialogCta.progressBar.gone()
-                    binding.daxDialogCta.logo.gone()
-
-                    binding.daxDialogCta.cardView.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
-                    binding.daxDialogCta.root.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 20.toPx() }
-
-                    val ctaText = it.getString(R.string.preOnboardingInputModeDemoTitle)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.inputScreenPreview.root.show()
-                    binding.daxDialogCta.inputScreenPreview.root.alpha = MIN_ALPHA
-
-                    when (inputScreenPreviewDefaultInputMode) {
-                        CHAT -> {
-                            setInputScreenPreviewInputMode(CHAT, chatSuggestions)
-                            binding.daxDialogCta.inputScreenPreview.inputModeToggle.getTabAt(1)?.select()
-                        }
-                        SEARCH -> {
-                            setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
-                        }
-                    }
-
-                    binding.daxDialogCta.inputScreenPreview.inputModeToggle.addOnTabSelectedListener(
-                        object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
-                            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
-                                TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-
-                                if (tab.position == 0) {
-                                    setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
-                                } else {
-                                    setInputScreenPreviewInputMode(CHAT, chatSuggestions)
-                                }
-                            }
-                            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
-                            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
-                        },
-                    )
-
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        if (binding.daxDialogCta.inputScreenPreview.root.alpha == 0f) {
-                            binding.daxDialogCta.inputScreenPreview.root.animate()
-                                .alpha(MAX_ALPHA)
-                                .setDuration(ANIMATION_DURATION)
-                                .withEndAction {
-                                    if (view == null) return@withEndAction
-
-                                    val buttons = listOf(
-                                        binding.daxDialogCta.inputScreenPreview.suggestion1,
-                                        binding.daxDialogCta.inputScreenPreview.suggestion2,
-                                        binding.daxDialogCta.inputScreenPreview.suggestion3,
-                                    )
-
-                                    fun animateButton(index: Int) {
-                                        if (view == null) return
-
-                                        if (index < buttons.size) {
-                                            buttons[index].alpha = MIN_ALPHA
-                                            buttons[index].isVisible = true
-
-                                            TransitionManager.beginDelayedTransition(
-                                                binding.daxDialogCta.cardView,
-                                                AutoTransition(),
-                                            )
-
-                                            buttons[index].animate()
-                                                .alpha(MAX_ALPHA)
-                                                .setDuration(INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION)
-                                                .withEndAction { animateButton(index + 1) }
-                                                .start()
-                                        }
-                                    }
-
-                                    viewLifecycleOwner.lifecycleScope.launch {
-                                        delay(INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY)
-                                        animateButton(0)
-                                    }
-                                }
-                                .start()
-                        }
-                    }
-                    scheduleTypingAnimation(ctaText) { afterAnimation() }
-                }
+                INPUT_SCREEN_PREVIEW -> return@let // handled by configureInputScreenPreviewDialog()
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
         }
+    }
+
+    private fun configureInputScreenPreviewDialog(
+        searchSuggestions: List<DaxDialogIntroOption>,
+        chatSuggestions: List<DaxDialogIntroOption>,
+        defaultInputMode: InputMode,
+    ) {
+        val ctx = context ?: return
+        viewModel.onDialogShown(INPUT_SCREEN_PREVIEW)
+
+        TransitionManager.beginDelayedTransition(binding.longDescriptionContainer, AutoTransition())
+        binding.daxDialogCta.descriptionCta.gone()
+        binding.daxDialogCta.primaryCta.gone()
+        binding.daxDialogCta.secondaryCta.gone()
+        binding.daxDialogCta.dialogTextCta.text = ""
+        binding.daxDialogCta.comparisonChart.root.gone()
+        binding.daxDialogCta.comparisonChartWithDuckAi.root.gone()
+        binding.daxDialogCta.addressBarPosition.root.gone()
+        binding.daxDialogCta.duckAiInputScreenToggleContainer.gone()
+        binding.daxDialogCta.duckAiInputScreenToggleDescription.gone()
+        binding.daxDialogCta.progressBarText.gone()
+        binding.daxDialogCta.progressBar.gone()
+        binding.daxDialogCta.logo.gone()
+
+        binding.daxDialogCta.cardView.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
+        binding.daxDialogCta.root.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 20.toPx() }
+
+        val ctaText = ctx.getString(R.string.preOnboardingInputModeDemoTitle)
+        binding.daxDialogCta.hiddenTextCta.text = ctaText.html(ctx)
+        binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+        binding.daxDialogCta.inputScreenPreview.root.show()
+        binding.daxDialogCta.inputScreenPreview.root.alpha = MIN_ALPHA
+
+        when (defaultInputMode) {
+            CHAT -> {
+                setInputScreenPreviewInputMode(CHAT, chatSuggestions)
+                binding.daxDialogCta.inputScreenPreview.inputModeToggle.getTabAt(1)?.select()
+            }
+            SEARCH -> {
+                setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
+            }
+        }
+
+        binding.daxDialogCta.inputScreenPreview.inputModeToggle.addOnTabSelectedListener(
+            object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+
+                    if (tab.position == 0) {
+                        setInputScreenPreviewInputMode(SEARCH, searchSuggestions)
+                    } else {
+                        setInputScreenPreviewInputMode(CHAT, chatSuggestions)
+                    }
+                }
+                override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+            },
+        )
+
+        val afterAnimation = {
+            binding.daxDialogCta.dialogTextCta.finishAnimation()
+            if (binding.daxDialogCta.inputScreenPreview.root.alpha == 0f) {
+                binding.daxDialogCta.inputScreenPreview.root.animate()
+                    .alpha(MAX_ALPHA)
+                    .setDuration(ANIMATION_DURATION)
+                    .withEndAction {
+                        if (view == null) return@withEndAction
+
+                        val buttons = listOf(
+                            binding.daxDialogCta.inputScreenPreview.suggestion1,
+                            binding.daxDialogCta.inputScreenPreview.suggestion2,
+                            binding.daxDialogCta.inputScreenPreview.suggestion3,
+                        )
+
+                        fun animateButton(index: Int) {
+                            if (view == null) return
+
+                            if (index < buttons.size) {
+                                buttons[index].alpha = MIN_ALPHA
+                                buttons[index].isVisible = true
+
+                                TransitionManager.beginDelayedTransition(
+                                    binding.daxDialogCta.cardView,
+                                    AutoTransition(),
+                                )
+
+                                buttons[index].animate()
+                                    .alpha(MAX_ALPHA)
+                                    .setDuration(INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION)
+                                    .withEndAction { animateButton(index + 1) }
+                                    .start()
+                            }
+                        }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            delay(INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY)
+                            animateButton(0)
+                        }
+                    }
+                    .start()
+            }
+        }
+        scheduleTypingAnimation(ctaText) { afterAnimation() }
+        binding.sceneBg.setOnClickListener { afterAnimation() }
+        binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
     }
 
     private fun setInputScreenPreviewInputMode(
