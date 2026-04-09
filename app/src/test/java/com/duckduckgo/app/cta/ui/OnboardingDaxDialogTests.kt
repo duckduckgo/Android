@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -84,6 +85,7 @@ class OnboardingDaxDialogTests {
     private val mockSubscriptions: Subscriptions = mock()
     private val mockDuckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -94,6 +96,8 @@ class OnboardingDaxDialogTests {
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
 
         testee = CtaViewModel(
             appInstallStore,
@@ -115,6 +119,7 @@ class OnboardingDaxDialogTests {
             object : PluginPoint<SubscriptionPromoCtaShownPlugin> {
                 override fun getPlugins() = emptyList<SubscriptionPromoCtaShownPlugin>()
             },
+            mockOnboardingBrandDesignUpdateToggles,
         )
     }
 
