@@ -614,15 +614,29 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         viewModel.visibilityState
             .onEach {
+                val isChatTab = inputModeWidget.isChatTabSelected() || !it.searchMode
                 if (useTopBar) {
-                    inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                    if (isChatTab) {
+                        inputScreenButtons.setVoiceChatVisible(it.voiceChatButtonVisible)
+                        inputScreenButtons.setVoiceSearchVisible(false)
+                    } else {
+                        inputScreenButtons.setVoiceSearchVisible(it.voiceSearchButtonVisible)
+                        inputScreenButtons.setVoiceChatVisible(false)
+                    }
                 } else {
                     val inputText = inputModeWidget.text
                     if (inputText.isEmpty()) {
-                        inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
-                        inputScreenButtons.setVoiceButtonVisible(false)
+                        inputModeWidget.setVoiceButtonVisible(it.voiceSearchButtonVisible)
+                        inputScreenButtons.setVoiceChatVisible(false)
+                        inputScreenButtons.setVoiceSearchVisible(false)
                     } else {
-                        inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                        if (isChatTab) {
+                            inputScreenButtons.setVoiceChatVisible(it.voiceChatButtonVisible)
+                            inputScreenButtons.setVoiceSearchVisible(false)
+                        } else {
+                            inputScreenButtons.setVoiceSearchVisible(it.voiceSearchButtonVisible)
+                            inputScreenButtons.setVoiceChatVisible(false)
+                        }
                         inputModeWidget.setVoiceButtonVisible(false)
                     }
                 }
@@ -642,7 +656,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputModeWidget.printNewLine()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
-        inputScreenButtons.onVoiceClick = {
+        inputScreenButtons.onVoiceSearchClick = {
+            val isChatTab = inputModeWidget.isChatTabSelected()
+            if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+                viewModel.onVoiceEntryTapped()
+            } else {
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+            }
+        }
+        inputScreenButtons.onVoiceChatClick = {
             val isChatTab = inputModeWidget.isChatTabSelected()
             if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
                 viewModel.onVoiceEntryTapped()

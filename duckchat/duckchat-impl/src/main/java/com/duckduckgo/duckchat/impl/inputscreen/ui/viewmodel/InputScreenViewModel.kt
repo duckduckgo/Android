@@ -176,7 +176,7 @@ class InputScreenViewModel @AssistedInject constructor(
         MutableStateFlow(
             InputScreenVisibilityState(
                 submitButtonVisible = false,
-                voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
+                voiceSearchButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
                 autoCompleteSuggestionsVisible = false,
                 bottomFadeVisible = false,
                 showChatLogo = true,
@@ -329,11 +329,18 @@ class InputScreenViewModel @AssistedInject constructor(
             chatInputTextState,
         ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText ->
             val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
-            if (newEntryPointActive) chatInputText.isEmpty() else serviceAvailable && inputAllowed
-        }.onEach { voiceInputPossible ->
             _visibilityState.update {
                 it.copy(
-                    voiceInputButtonVisible = voiceInputPossible,
+                    voiceSearchButtonVisible = if (!newEntryPointActive) {
+                        serviceAvailable && inputAllowed
+                    } else {
+                        false
+                    },
+                    voiceChatButtonVisible = if (newEntryPointActive) {
+                        chatInputText.isEmpty()
+                    } else {
+                        false
+                    },
                 )
             }
         }.launchIn(viewModelScope)
