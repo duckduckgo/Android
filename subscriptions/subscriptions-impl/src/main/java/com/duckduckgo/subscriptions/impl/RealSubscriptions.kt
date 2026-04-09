@@ -202,13 +202,9 @@ interface SubscriptionsFeature {
     /**
      * Enables/Disables duckAi for subscribers (advanced models)
      * This flag is used to hide the feature in the native client and FE.
-    /**
-     * Android supports v2 token, but still relies on old v1 subscription messaging.
-     * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
-     * It doesn't control which version of messaging FE uses.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun enableNewSubscriptionMessages(): Toggle
+    fun duckAiPlus(): Toggle
 
     /**
      * When enabled, we signal FE if v2 is available, enabling v2 messaging
