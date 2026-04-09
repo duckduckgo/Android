@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Kısayolları</string>
     <string name="duck_ai_shortcut_settings_description">Hangi Duck.ai kısayollarının gösterileceğini seçin</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Yeni Sekme Buton Konumu</string>
+    <string name="duckAiDefaultTogglePositionSearch">Arama yap</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Son Kullanılan</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Sesli Arama</string>
 

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snelkoppelingen</string>
     <string name="duck_ai_shortcut_settings_description">Kies welke Duck.ai-snelkoppelingen je wilt weergeven</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Positie nieuw tabblad wisselen</string>
+    <string name="duckAiDefaultTogglePositionSearch">Zoeken</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Laatst gebruikt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Zoeken via spraak</string>
 

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Jauna cilnes slēdža pozīcija</string>
+    <string name="duckAiDefaultTogglePositionSearch">Meklēt</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Pēdējo reizi lietots</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Balss meklēšana</string>
 

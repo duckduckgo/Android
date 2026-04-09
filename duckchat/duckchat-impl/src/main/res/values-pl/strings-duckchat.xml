@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Skróty Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Wybierz, które skróty Duck.ai chcesz wyświetlić</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Pozycja przełącznika nowej karty</string>
+    <string name="duckAiDefaultTogglePositionSearch">Szukaj</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Ostatnie użycie</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Wyszukiwanie głosowe</string>
 

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-genveje</string>
     <string name="duck_ai_shortcut_settings_description">Vælg hvilke Duck.ai-genveje der skal vises</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Ny position for faneskift</string>
+    <string name="duckAiDefaultTogglePositionSearch">Søg</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Sidst brugt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Stemmesøgning</string>
 

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai prečaci</string>
     <string name="duck_ai_shortcut_settings_description">Odaberi koje Duck.ai prečace želiš prikazati</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Prebacivanje položaja nove kartice</string>
+    <string name="duckAiDefaultTogglePositionSearch">Pretraga</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Posljednje korišteno</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Glasovno pretraživanje</string>
 

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Zkratky Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Vyber, které zkratky Duck.ai se mají zobrazit</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Umístění přepínače na nové kartě</string>
+    <string name="duckAiDefaultTogglePositionSearch">Vyhledávání</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Naposledy použité</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Hlasové vyhledávání</string>
 

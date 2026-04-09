@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-pikakuvakkeet</string>
     <string name="duck_ai_shortcut_settings_description">Valitse, mitkä Duck.ai-pikakuvakkeet näytetään</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Uuden välilehden vaihtopainikkeen sijainti</string>
+    <string name="duckAiDefaultTogglePositionSearch">Hae</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Viimeksi käytetty</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Äänihaku</string>
 

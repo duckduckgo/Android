@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snarveier</string>
     <string name="duck_ai_shortcut_settings_description">Velg hvilke Duck.ai-snarveier du vil skal vises</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Plassering av Ny fane-bryter</string>
+    <string name="duckAiDefaultTogglePositionSearch">Søk</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Sist brukt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Talesøk</string>
 

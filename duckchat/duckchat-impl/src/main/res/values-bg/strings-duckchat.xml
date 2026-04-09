@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Преки пътища за Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Duck.ai да се показват</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">Позиция на превключвателя за нов раздел</string>
+    <string name="duckAiDefaultTogglePositionSearch">Търсене</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Последно използвано</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Гласово търсене</string>
 
