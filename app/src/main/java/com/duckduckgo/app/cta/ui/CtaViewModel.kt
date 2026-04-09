@@ -48,6 +48,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
@@ -84,6 +86,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
+    private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -149,6 +152,9 @@ class CtaViewModel @Inject constructor(
             }
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
+            }
+            if (cta is DaxBubbleCta.DaxPrivacyProCta || cta is SubscriptionPromoModalCta) {
+                subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
         }
     }
