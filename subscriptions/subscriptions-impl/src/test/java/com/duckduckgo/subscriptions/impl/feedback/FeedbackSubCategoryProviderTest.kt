@@ -19,8 +19,8 @@ package com.duckduckgo.subscriptions.impl.feedback
 import android.annotation.SuppressLint
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -30,17 +30,17 @@ import org.junit.Test
 @SuppressLint("DenyListedApi")
 class FeedbackSubCategoryProviderTest {
 
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
     private lateinit var provider: RealFeedbackSubCategoryProvider
 
     @Before
     fun setUp() {
-        provider = RealFeedbackSubCategoryProvider(privacyProFeature)
+        provider = RealFeedbackSubCategoryProvider(subscriptionsFeature)
     }
 
     @Test
     fun whenAllowProTierPurchaseEnabledThenUnableToAccessFeaturesIsIncluded() {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
 
         val subCategories = provider.getSubCategories(SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS)
 
@@ -50,7 +50,7 @@ class FeedbackSubCategoryProviderTest {
 
     @Test
     fun whenAllowProTierPurchaseDisabledThenUnableToAccessFeaturesIsNotIncluded() {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
 
         val subCategories = provider.getSubCategories(SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS)
 
@@ -60,7 +60,7 @@ class FeedbackSubCategoryProviderTest {
 
     @Test
     fun whenAllowProTierPurchaseEnabledThenSubsSubCategoriesContainsCorrectItems() {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
 
         val subCategories = provider.getSubCategories(SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS)
 
@@ -71,7 +71,7 @@ class FeedbackSubCategoryProviderTest {
 
     @Test
     fun whenAllowProTierPurchaseDisabledThenSubsSubCategoriesContainsOnlyOtpAndOther() {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
 
         val subCategories = provider.getSubCategories(SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS)
 

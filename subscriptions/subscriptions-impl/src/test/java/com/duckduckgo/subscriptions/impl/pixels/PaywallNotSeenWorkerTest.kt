@@ -27,7 +27,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -51,11 +51,11 @@ class PaywallNotSeenWorkerTest {
     private val paywallMetricsManager: PaywallMetricsManager = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val subscriptions: Subscriptions = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     @Before
     fun setup() {
-        privacyProFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = true))
+        subscriptionsFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = true))
     }
 
     private fun buildWorker(dayBucket: String?): PaywallNotSeenWorker {
@@ -72,13 +72,13 @@ class PaywallNotSeenWorkerTest {
                 worker.paywallMetricsManager = paywallMetricsManager
                 worker.appBuildConfig = appBuildConfig
                 worker.subscriptions = subscriptions
-                worker.privacyProFeature = privacyProFeature
+                worker.subscriptionFeature = subscriptionsFeature
             }
     }
 
     @Test
     fun `when feature flag is disabled then pixel is not fired`() = runTest {
-        privacyProFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = false))
+        subscriptionsFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = false))
 
         val result = buildWorker("d0").doWork()
 

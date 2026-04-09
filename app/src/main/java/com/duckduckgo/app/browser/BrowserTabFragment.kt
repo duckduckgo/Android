@@ -2586,9 +2586,9 @@ class BrowserTabFragment :
                 resetWebView()
             }
 
-            is Command.LaunchPrivacyPro -> {
+            is Command.LaunchSubscription -> {
                 activity?.let { context ->
-                    subscriptions.launchPrivacyPro(context, it.uri)
+                    subscriptions.launchSubscription(context, it.uri)
                 }
             }
 

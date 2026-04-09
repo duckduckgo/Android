@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.api
+package com.duckduckgo.subscriptions.impl.feedback
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-sealed class PrivacyProFeedbackScreens {
-    data class PrivacyProFeedbackScreenWithParams(val feedbackSource: PrivacyProFeedbackSource) : ActivityParams
-
-    data object GeneralPrivacyProFeedbackScreenNoParams : ActivityParams
-
-    data class PrivacyProAppFeedbackScreenWithParams(
-        val appName: String,
-        val appPackageName: String,
-    ) : ActivityParams
+@ContributesBinding(AppScope::class)
+class DummySubscriptionUnifiedFeedback @Inject constructor() : SubscriptionUnifiedFeedback {
+    override suspend fun shouldUseUnifiedFeedback(source: SubscriptionFeedbackSource): Boolean {
+        return false
+    }
 }

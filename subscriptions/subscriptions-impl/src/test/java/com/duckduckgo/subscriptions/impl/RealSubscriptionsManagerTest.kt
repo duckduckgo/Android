@@ -125,9 +125,9 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     private val serpPromo = FakeSerpPromo()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
         .apply { authApiV2().setRawStoredState(State(authApiV2Enabled)) }
-    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { privacyProFeature })
+    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
     private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
@@ -161,7 +161,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -609,7 +609,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -644,7 +644,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -683,7 +683,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -736,7 +736,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -785,7 +785,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -828,7 +828,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -864,7 +864,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1222,7 +1222,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1274,7 +1274,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -1597,7 +1597,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     @Test
     fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
         val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
-        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { privacyProFeature })
+        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider, serpPromo, { subscriptionsFeature })
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
@@ -1609,7 +1609,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             pixelSender,
-            { privacyProFeature },
+            { subscriptionsFeature },
             authClient,
             authJwtValidator,
             pkceGenerator,
@@ -2282,7 +2282,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @SuppressLint("DenyListedApi")
     private fun givenBlackFridayFeatureFlagEnabled(value: Boolean) {
-        privacyProFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
+        subscriptionsFeature.blackFridayOffer2025().setRawStoredState(State(remoteEnableState = value))
     }
 
     @Test
@@ -2384,12 +2384,12 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
 
     @SuppressLint("DenyListedApi")
     private fun givenTierMessagingEnabled(value: Boolean) {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(State(remoteEnableState = value))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(State(remoteEnableState = value))
     }
 
     @SuppressLint("DenyListedApi")
     private fun givenAllowProTierPurchase(value: Boolean) {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(State(remoteEnableState = value))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(State(remoteEnableState = value))
     }
 
     private suspend fun givenActiveSubscription() {

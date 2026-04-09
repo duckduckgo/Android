@@ -202,7 +202,7 @@ enum class SubscriptionPixel(
         type = Unique(),
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    SUBSCRIPTION_PRIVACY_PRO_REDIRECT(
+    SUBSCRIPTION_REDIRECT(
         baseName = "m_privacy-pro_app_redirect",
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),

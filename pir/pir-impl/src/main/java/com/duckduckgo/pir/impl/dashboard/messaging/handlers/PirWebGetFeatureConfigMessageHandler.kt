@@ -24,8 +24,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class PirWebGetFeatureConfigMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
 ) : PirWebJsMessageHandler() {
 
     override val message: PirDashboardWebMessages = PirDashboardWebMessages.GET_FEATURE_CONFIG
@@ -55,7 +55,7 @@ class PirWebGetFeatureConfigMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirWebGetFeatureConfigMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val useUnifiedFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)
+            val useUnifiedFeedback = subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(PIR_DASHBOARD)
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.GetFeatureConfigResponse(

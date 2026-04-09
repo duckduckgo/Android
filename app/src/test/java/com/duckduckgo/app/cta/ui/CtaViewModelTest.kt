@@ -829,7 +829,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabThenReturnPrivacyProCta() = runTest {
+    fun givenSubscriptionCtaExperimentWhenRefreshCtaOnHomeTabThenReturnSubscriptionCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
@@ -842,7 +842,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is DaxBubbleCta.DaxPrivacyProCta)
+        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
     @Test
@@ -860,12 +860,12 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is DaxBubbleCta.DaxPrivacyProCta)
-        assertTrue((value as DaxBubbleCta.DaxPrivacyProCta).isFreeTrialCopy)
+        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
+        assertTrue((value as DaxBubbleCta.DaxSubscriptionCta).isFreeTrialCopy)
     }
 
     @Test
-    fun whenSubscriptionIsActiveThenRequiredDaxOnboardingCtasDoesNotIncludePrivacyProCta() = runTest {
+    fun whenSubscriptionIsActiveThenRequiredDaxOnboardingCtasDoesNotIncludeSubscriptionCta() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
@@ -876,7 +876,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenSubscriptionIsNotActiveAndEligibleThenRequiredDaxOnboardingCtasIncludesPrivacyProCta() = runTest {
+    fun whenSubscriptionIsNotActiveAndEligibleThenRequiredDaxOnboardingCtasIncludesSubscriptionCta() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
@@ -887,7 +887,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun givenPrivacyProCtaExperimentDisabledWhenRefreshCtaOnHomeTabThenDontReturnPrivacyProCta() = runTest {
+    fun givenSubscriptionCtaExperimentDisabledWhenRefreshCtaOnHomeTabThenDontReturnSubscriptionCta() = runTest {
         givenDaxOnboardingActive()
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
@@ -896,15 +896,15 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
+        assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
     @Test
-    fun givenPrivacyProSiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
-        val privacyProUrl = "https://duckduckgo.com/pro"
-        whenever(mockSubscriptions.isPrivacyProUrl(privacyProUrl.toUri())).thenReturn(true)
+    fun givenSubscriptionSiteWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
+        val subscriptionUrl = "https://duckduckgo.com/pro"
+        whenever(mockSubscriptions.isSubscriptionUrl(subscriptionUrl.toUri())).thenReturn(true)
         givenDaxOnboardingActive()
-        val site = site(url = privacyProUrl)
+        val site = site(url = subscriptionUrl)
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,

@@ -20,11 +20,11 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
-class RMFPProSubscriptionStatusMatchingAttributeTest {
+class RMFSubscriptionStatusMatchingAttributeTest {
     @Mock
     private lateinit var subscriptionsManager: SubscriptionsManager
 
-    private lateinit var matcher: RMFPProSubscriptionStatusMatchingAttribute
+    private lateinit var matcher: RMFSubscriptionStatusMatchingAttribute
     private val testSubscription = Subscription(
         productId = SubscriptionsConstants.YEARLY_PLAN_US,
         billingPeriod = MONTHLY,
@@ -38,7 +38,7 @@ class RMFPProSubscriptionStatusMatchingAttributeTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        matcher = RMFPProSubscriptionStatusMatchingAttribute(subscriptionsManager)
+        matcher = RMFSubscriptionStatusMatchingAttribute(subscriptionsManager)
     }
 
     @Test

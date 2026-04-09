@@ -56,7 +56,7 @@ class PProUpsellBannerPlugin @Inject constructor(
         vpnState: VpnState,
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
-        val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isPproUpsellBannerDismised() }
+        val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isSubscriptionUpsellBannerDismised() }
         return if (isEligible) {
             val actionText: String
             runBlocking {
@@ -78,17 +78,17 @@ class PProUpsellBannerPlugin @Inject constructor(
                         ),
                     )
                     this.onCloseButtonClicked {
-                        deviceShieldPixels.reportPproUpsellBannerDismissed()
-                        vpnStore.dismissPproUpsellBanner()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerDismissed()
+                        vpnStore.dismissSubscriptionUpsellBanner()
                         this.gone()
                     }
 
                     this.onPrimaryActionClicked {
-                        deviceShieldPixels.reportPproUpsellBannerLinkClicked()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerLinkClicked()
                         context.launchPPro()
                     }
                     this.doOnAttach {
-                        deviceShieldPixels.reportPproUpsellBannerShown()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerShown()
                     }
                 }
         } else {

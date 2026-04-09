@@ -31,7 +31,6 @@ import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
@@ -64,6 +63,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
@@ -100,7 +100,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsChecker: SubscriptionsChecker,
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
 ) : ViewModel() {
 
@@ -296,7 +296,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscription = subscriptionResult.getOrNull()
 
             // Expired/inactive subscriptions can't be switched — route to a new purchase instead
-            val canHandleExpiredState = privacyProFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
+            val canHandleExpiredState = subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
             if (canHandleExpiredState && (subscription == null || subscription.status.isExpired())) {
                 val offerId = runCatching { data?.getString("offerId") }.getOrNull()
                 val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
@@ -402,7 +402,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 features = emptyList(),
             )
 
-            val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
@@ -468,7 +468,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 products = emptyList(),
             )
 
-            val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionTierOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 val isFreeTrialEligible = subscriptionsManager.isFreeTrialEligible()
 
@@ -518,7 +518,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 plusProduct?.let { products.add(it) }
 
                 // Check for Pro tier products (gated by feature flag - acts as kill switch)
-                val proProduct = if (privacyProFeature.allowProTierPurchase().isEnabled()) {
+                val proProduct = if (subscriptionsFeature.allowProTierPurchase().isEnabled()) {
                     when {
                         // Pro Free Trial US
                         subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_FREE_TRIAL_OFFER_US, YEARLY_PRO_FREE_TRIAL_OFFER_US)) &&

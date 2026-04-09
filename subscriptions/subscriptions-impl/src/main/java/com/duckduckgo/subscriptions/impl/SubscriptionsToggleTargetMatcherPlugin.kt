@@ -29,9 +29,9 @@ class SubscriptionsToggleTargetMatcherPlugin @Inject constructor(
     private val subscriptions: Subscriptions,
 ) : TargetMatcherPlugin {
     override fun matchesTargetProperty(target: Target): Boolean {
-        return target.isPrivacyProEligible?.let { isPrivacyProEligible ->
+        return target.isPrivacyProEligible?.let { isEligible ->
             // runBlocking sucks I know :shrug:
-            isPrivacyProEligible == runBlocking { subscriptions.isEligible() }
+            isEligible == runBlocking { subscriptions.isEligible() }
         } ?: true
     }
 }

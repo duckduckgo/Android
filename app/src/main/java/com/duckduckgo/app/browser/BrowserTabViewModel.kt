@@ -57,7 +57,7 @@ import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink
-import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -111,7 +111,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardin
 import com.duckduckgo.app.browser.commands.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
-import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
+import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -1341,11 +1341,11 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
-            is ShouldLaunchPrivacyProLink -> {
+            is ShouldLaunchSubscriptionLink -> {
                 if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
                     closeCurrentTab()
                 }
-                command.value = LaunchPrivacyPro(urlToNavigate.toUri())
+                command.value = LaunchSubscription(urlToNavigate.toUri())
                 return
             }
 
@@ -2952,8 +2952,8 @@ class BrowserTabViewModel @Inject constructor(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
-                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
-                    command.value = LaunchPrivacyPro(requiredAction.url.toUri())
+                if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
+                    command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
                 command.value = GenerateWebViewPreviewImage
@@ -2962,8 +2962,8 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is RequiredAction.OpenInNewBackgroundTab -> {
-                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
-                    command.value = LaunchPrivacyPro(requiredAction.url.toUri())
+                if (subscriptions.shouldLaunchSubscriptionForUrl(requiredAction.url)) {
+                    command.value = LaunchSubscription(requiredAction.url.toUri())
                     return true
                 }
                 command.value = GenerateWebViewPreviewImage
@@ -3283,7 +3283,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
-            cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || cta is SubscriptionPromoModalCta ||
+            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta || cta is SubscriptionPromoModalCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
                 (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -3312,7 +3312,7 @@ class BrowserTabViewModel @Inject constructor(
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
                         val origin = "funnel_skippedonboarding_android"
-                        command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
                     }
                     null
                 }
@@ -4628,10 +4628,10 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
         when (cta) {
-            is DaxBubbleCta.DaxPrivacyProCta -> {
+            is DaxBubbleCta.DaxSubscriptionCta -> {
                 viewModelScope.launch {
                     val origin = "funnel_onboarding_android"
-                    command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
+                    command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
                 }
             }
             is DaxBubbleCta.DaxEndCta -> {
@@ -4905,7 +4905,7 @@ class BrowserTabViewModel @Inject constructor(
         val state = currentBrowserViewState().vpnMenuState
         when (state) {
             VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
-                command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+                command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
             is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
             VpnMenuState.Hidden -> {} // Menu item not visible
         }

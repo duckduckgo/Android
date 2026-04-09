@@ -60,7 +60,7 @@ class NetPWaitlistEndedChecker @Inject constructor(
                 }
                 if (!hasEntitlement) {
                     logcat { "VPN enabled and privacy pro enabled but no entitlements, stopping VPN..." }
-                    networkProtectionPixels.reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+                    networkProtectionPixels.reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled()
                     networkProtectionState.stop()
                 }
             }

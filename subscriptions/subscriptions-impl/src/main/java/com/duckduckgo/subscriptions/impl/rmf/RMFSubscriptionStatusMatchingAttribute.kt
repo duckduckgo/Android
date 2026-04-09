@@ -41,7 +41,7 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProSubscriptionStatusMatchingAttribute @Inject constructor(
+class RMFSubscriptionStatusMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {

@@ -64,8 +64,8 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScr
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -86,8 +86,8 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -124,7 +124,7 @@ class SettingsViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val modalSurfaceStore: ModalSurfaceStore,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -140,7 +140,7 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
-        val isPrivacyProEnabled: Boolean = false,
+        val isSubscriptionEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
@@ -173,7 +173,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
         data object LaunchFeedback : Command()
-        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchSubscriptionUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
         data object LaunchGetDesktopBrowser : Command()
         data class LaunchWhatsNew(
@@ -224,7 +224,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
-                    isPrivacyProEnabled = subscriptions.isEligible(),
+                    isSubscriptionEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
@@ -256,7 +256,7 @@ class SettingsViewModel @Inject constructor(
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = subscriptions.isEligible(),
+                    isSubscriptionEnabled = subscriptions.isEligible(),
                 )
                 delay(1_000)
             }
@@ -424,8 +424,8 @@ class SettingsViewModel @Inject constructor(
 
     fun onShareFeedbackClicked() {
         viewModelScope.launch {
-            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
-                command.send(LaunchPproUnifiedFeedback)
+            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(LaunchSubscriptionUnifiedFeedback)
             } else {
                 command.send(LaunchFeedback)
             }

@@ -29,8 +29,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
@@ -86,9 +86,9 @@ object AuthRepositoryModule {
         dispatcherProvider: DispatcherProvider,
         sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
-        privacyProFeature: dagger.Lazy<PrivacyProFeature>,
+        subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, privacyProFeature)
+        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, subscriptionsFeature)
     }
 }
 
@@ -96,7 +96,7 @@ internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
-    private val privacyProFeature: dagger.Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -292,7 +292,7 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
-        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+        if (subscriptionsFeature.get().tierMessagingEnabled().isEnabled()) {
             // When flag is ON, try v2 first
             val v2Features = getFeaturesV2(basePlanId)
             if (v2Features.isNotEmpty()) {
