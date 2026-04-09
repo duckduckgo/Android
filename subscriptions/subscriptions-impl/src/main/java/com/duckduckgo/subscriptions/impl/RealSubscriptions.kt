@@ -223,8 +223,9 @@ interface SubscriptionsFeature {
     fun authApiV2JwksCache(): Toggle
 
     /**
-     * As part of Duck.ai we are adding new supported JS messages.
-     * This is enabled by default, but can be disabled if necessary.
+     * Controls Duck.ai <> subscription JS messaging.
+     * Enabled by default.
+     * When Disabled, no subscription messaging supported.
      * FF only controls native messaging (enabled/disabled).
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
