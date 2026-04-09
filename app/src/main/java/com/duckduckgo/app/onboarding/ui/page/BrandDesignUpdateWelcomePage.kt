@@ -429,7 +429,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             showDialogWithoutAnimation(
                                 onboardingDialogType = dialog,
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
-                                showSplitOption = state.showSplitOption
+                                showSplitOption = state.showSplitOption,
                             )
                         }
                     }
@@ -438,7 +438,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         configureDaxCta(
                             onboardingDialogType = dialog,
                             selectedAddressBarPosition = state.selectedAddressBarPosition,
-                            showSplitOption = state.showSplitOption
+                            showSplitOption = state.showSplitOption,
                         )
                     }
                 }
