@@ -41,6 +41,12 @@ constructor(
 
     private var animatableEdgeTreatment: AnimatableOffsetEdgeTreatment? = null
     private val cornerRadius: Float
+    private var showArrow: Boolean = true
+    private var bottomEdgeTreatment: EdgeTreatment
+    private var originalBottomMargin: Int? = null
+
+    private val arrowMinMargin: Int
+        get() = DaxBubbleBottomEdgeTreatment.ORIGINAL_BOTTOM_ARROW_HEIGHT_DP.toPx() + strokeWidth
 
     init {
         val attr = context.theme.obtainStyledAttributes(
@@ -57,6 +63,10 @@ constructor(
             R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView_arrowOffsetEnd,
             0,
         )
+        showArrow = attr.getBoolean(
+            R.styleable.DaxOnboardingBubbleBrandDesignUpdateCardView_showArrow,
+            true,
+        )
         attr.recycle()
 
         if (offsetStart != 0 && offsetEnd != 0) {
@@ -70,7 +80,7 @@ constructor(
         strokeWidth = resources.getDimensionPixelSize(R.dimen.dax_brand_design_bubble_stroke_width)
 
         val edgeTreatment = DaxBubbleBottomEdgeTreatment()
-        val offsetEdgeTreatment = if (offsetStart != 0) {
+        bottomEdgeTreatment = if (offsetStart != 0) {
             AnimatableOffsetEdgeTreatment(edgeTreatment, offsetStart.toFloat()).also {
                 animatableEdgeTreatment = it
             }
@@ -78,12 +88,26 @@ constructor(
             applyOffsetEdgeTreatment(offsetStart, offsetEnd, edgeTreatment)
         }
 
-        shapeAppearanceModel = ShapeAppearanceModel.builder()
+        val shapeBuilder = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
-            .setBottomEdge(offsetEdgeTreatment)
-            .build()
 
-        cardElevation = resources.getDimension(R.dimen.dax_brand_design_bubble_card_elevation)
+        if (showArrow) {
+            shapeBuilder.setBottomEdge(bottomEdgeTreatment)
+        }
+
+        shapeAppearanceModel = shapeBuilder.build()
+
+        val cardViewAttr = context.theme.obtainStyledAttributes(
+            attrs,
+            com.google.android.material.R.styleable.CardView,
+            defStyleAttr,
+            0,
+        )
+        cardElevation = cardViewAttr.getDimension(
+            com.google.android.material.R.styleable.CardView_cardElevation,
+            resources.getDimension(R.dimen.dax_brand_design_bubble_card_elevation),
+        )
+        cardViewAttr.recycle()
 
         if (Build.VERSION.SDK_INT >= 28) {
             outlineAmbientShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
@@ -122,9 +146,13 @@ constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         (layoutParams as? MarginLayoutParams)?.let { params ->
-            val minMargin = DaxBubbleBottomEdgeTreatment.ORIGINAL_BOTTOM_ARROW_HEIGHT_DP.toPx() + strokeWidth
-            if (params.bottomMargin < minMargin) {
-                params.bottomMargin = minMargin
+            // Store the original margin before any arrow adjustment
+            if (originalBottomMargin == null) {
+                originalBottomMargin = params.bottomMargin
+            }
+            if (!showArrow) return@let
+            if (params.bottomMargin < arrowMinMargin) {
+                params.bottomMargin = arrowMinMargin
                 layoutParams = params
             }
         }
@@ -136,6 +164,7 @@ constructor(
      * @param offsetFromEndPx visual offset from the right/end edge in pixels.
      */
     fun setArrowAnimationTarget(offsetFromEndPx: Float) {
+        if (!showArrow) return
         animatableEdgeTreatment?.offsetFromEndPx = offsetFromEndPx
     }
 
@@ -146,11 +175,40 @@ constructor(
      *   1 = arrow at target position set via [setArrowAnimationTarget].
      */
     fun setArrowAnimationFraction(fraction: Float) {
+        if (!showArrow) return
         animatableEdgeTreatment?.fraction = fraction
         // Re-assign shapeAppearanceModel to force MaterialShapeDrawable to
         // mark its cached path as dirty. A plain invalidate() only triggers
         // draw(), but the drawable skips getEdgePath() unless pathDirty is set.
         shapeAppearanceModel = shapeAppearanceModel
+    }
+
+    /**
+     * Programmatically show or hide the bottom arrow. When hidden the card renders with plain
+     * rounded corners. The edge treatment is always kept so [setShowArrow](true) can restore it.
+     */
+    fun setShowArrow(show: Boolean) {
+        if (showArrow == show) return
+        showArrow = show
+        val shapeBuilder = ShapeAppearanceModel.builder()
+            .setAllCornerSizes(cornerRadius)
+        if (show) {
+            shapeBuilder.setBottomEdge(bottomEdgeTreatment)
+        }
+        shapeAppearanceModel = shapeBuilder.build()
+        // Recalculate bottom margin for arrow space using stored original
+        if (isAttachedToWindow) {
+            (layoutParams as? MarginLayoutParams)?.let { params ->
+                if (show) {
+                    val baseline = originalBottomMargin ?: params.bottomMargin
+                    params.bottomMargin = maxOf(baseline, arrowMinMargin)
+                } else {
+                    // Restore original margin — no arrow space needed
+                    params.bottomMargin = originalBottomMargin ?: params.bottomMargin
+                }
+                layoutParams = params
+            }
+        }
     }
 
     /**

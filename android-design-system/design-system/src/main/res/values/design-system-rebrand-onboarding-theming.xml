@@ -30,10 +30,14 @@
     <attr name="onboardingAccentPrimary" format="color" />
     <attr name="onboardingAccentSecondary" format="color" />
     <attr name="onboardingAccentGlowPrimary" format="color" />
+    <attr name="onboardingAccentTextPrimary" format="color" />
+    <attr name="onboardingIconsPrimary" format="color" />
     <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
     <attr name="onboardingControlFillTertiary" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
+
+    <attr name="selectionButtonStyle" format="reference"/>
 
     <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
 
@@ -52,7 +56,11 @@
         <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
         <item name="onboardingAccentGlowPrimary">#332F95EE</item> <!--20% Alpha-->
+        <item name="onboardingAccentTextPrimary">@color/pondwater60</item>
         <item name="onboardingControlFillTertiary">@color/black12</item>
+
+        <!--Icons-->
+        <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#99383838</item> <!--60% Alpha-->
         <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
 
@@ -74,6 +82,9 @@
         </item>
         <item name="daxButtonSecondary">
             @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
+        </item>
+        <item name="selectionButtonStyle">
+            @style/Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding.SelectionButton
         </item>
 
         <item name="daxColorButtonPrimaryContainer">?attr/onboardingAccentBrand</item>
@@ -108,7 +119,11 @@
         <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
         <item name="onboardingAccentGlowPrimary">#2975B6EB</item> <!--16% Alpha-->
+        <item name="onboardingAccentTextPrimary">@color/pondwater40</item>
         <item name="onboardingControlFillTertiary">@color/white24</item>
+
+        <!--Icons-->
+        <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->
         <item name="onboardingIconsSecondary">#7AFBFAF9</item> <!--48% Alpha-->
         <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
 
@@ -131,6 +146,9 @@
         </item>
         <item name="daxButtonSecondary">
             @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
+        </item>
+        <item name="selectionButtonStyle">
+            @style/Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding.SelectionButton
         </item>
 
         <item name="daxColorButtonPrimaryContainer">?attr/onboardingAccentBrand</item>
@@ -162,6 +180,11 @@
         <item name="android:lineSpacingExtra">-1sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/ducksansdisplay_bold</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.Title.InContext">
+        <item name="typography">onboarding_title</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Onboarding.Body">
@@ -212,5 +235,24 @@
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.Onboarding.Button</item>
         <item name="strokeColor">?attr/daxColorButtonSecondaryContainer</item>
     </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">64dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="iconPadding">8dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.OutlinedButton.Onboarding.SelectionButton">
+        <item name="strokeColor">?attr/onboardingAccentPrimary</item>
+        <item name="android:textColor">?attr/onboardingAccentTextPrimary</item>
+        <item name="iconTint">?attr/onboardingAccentTextPrimary</item>
+        <item name="rippleColor">?attr/onboardingAccentAltGlowPrimary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
 
 </resources>
