@@ -55,7 +55,6 @@ class SubscriptionFeaturesFetcherTest {
         subscriptionsCachedService = subscriptionsCachedService,
         authRepository = authRepository,
         subscriptionsFeature = subscriptionsFeature,
-        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Before
@@ -64,19 +63,7 @@ class SubscriptionFeaturesFetcherTest {
     }
 
     @Test
-    fun `when FF disabled then does not do anything`() = runTest {
-        givenIsFeaturesApiEnabled(false)
-
-        processLifecycleOwner.currentState = CREATED
-
-        verifyNoInteractions(playBillingManager)
-        verifyNoInteractions(authRepository)
-        verifyNoInteractions(subscriptionsCachedService)
-    }
-
-    @Test
     fun `when products loaded and tierMessagingEnabled OFF then fetches V1 features and stores`() = runTest {
-        givenIsFeaturesApiEnabled(true)
         givenTierMessagingEnabled(false)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -94,7 +81,6 @@ class SubscriptionFeaturesFetcherTest {
 
     @Test
     fun `when products loaded and tierMessagingEnabled ON then fetches V2 features and stores entitlements`() = runTest {
-        givenIsFeaturesApiEnabled(true)
         givenTierMessagingEnabled(true)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -131,7 +117,6 @@ class SubscriptionFeaturesFetcherTest {
 
     @Test
     fun `when there are no products then does not store anything`() = runTest {
-        givenIsFeaturesApiEnabled(true)
         whenever(playBillingManager.productsFlow).thenReturn(flowOf())
 
         processLifecycleOwner.currentState = CREATED
@@ -144,7 +129,6 @@ class SubscriptionFeaturesFetcherTest {
     @Test
     fun `when features already stored and refresh features FF Disabled then does not fetch again`() = runTest {
         givenRefreshSubscriptionPlanFeaturesEnabled(false)
-        givenIsFeaturesApiEnabled(true)
         givenTierMessagingEnabled(false)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -162,7 +146,6 @@ class SubscriptionFeaturesFetcherTest {
     @Test
     fun `when features already stored and refresh features FF enabled then does fetch again`() = runTest {
         givenRefreshSubscriptionPlanFeaturesEnabled(true)
-        givenIsFeaturesApiEnabled(true)
         givenTierMessagingEnabled(false)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -180,7 +163,6 @@ class SubscriptionFeaturesFetcherTest {
 
     @Test
     fun `when tierMessagingEnabled ON and V2 features empty then does not store anything`() = runTest {
-        givenIsFeaturesApiEnabled(true)
         givenTierMessagingEnabled(true)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -194,11 +176,6 @@ class SubscriptionFeaturesFetcherTest {
         verify(subscriptionsCachedService).featuresV2(MONTHLY_PLAN_US)
         verify(subscriptionsCachedService).featuresV2(YEARLY_PLAN_US)
         verify(authRepository, never()).setFeaturesV2(any(), any())
-    }
-
-    @SuppressLint("DenyListedApi")
-    private fun givenIsFeaturesApiEnabled(value: Boolean) {
-        subscriptionsFeature.featuresApi().setRawStoredState(State(value))
     }
 
     @SuppressLint("DenyListedApi")

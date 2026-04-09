@@ -19,7 +19,6 @@ package com.duckduckgo.subscriptions.impl
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -31,7 +30,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
@@ -45,24 +43,17 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     private val subscriptionsCachedService: SubscriptionsCachedService,
     private val authRepository: AuthRepository,
     private val subscriptionsFeature: SubscriptionsFeature,
-    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         appCoroutineScope.launch {
             try {
-                if (isFeaturesApiEnabled()) {
-                    fetchSubscriptionFeatures()
-                }
+                fetchSubscriptionFeatures()
             } catch (e: Exception) {
                 logcat { "Failed to fetch subscription features" }
             }
         }
-    }
-
-    private suspend fun isFeaturesApiEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsFeature.featuresApi().isEnabled()
     }
 
     private suspend fun fetchSubscriptionFeatures() {

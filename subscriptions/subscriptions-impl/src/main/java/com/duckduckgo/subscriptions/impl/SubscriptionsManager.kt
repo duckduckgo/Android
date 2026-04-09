@@ -37,14 +37,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.auth2.AccessTokenClaims
@@ -1102,21 +1097,9 @@ class RealSubscriptionsManager @Inject constructor(
         logcat {
             "Subs: getEntitlementsForPlan fallback to legacy features for planId: $planId"
         }
-        return getLegacyFeatures(planId).map { feature ->
+        return authRepository.getFeatures(planId).map { feature ->
             Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
         }.toSet()
-    }
-
-    private suspend fun getLegacyFeatures(planId: String): Set<String> {
-        return if (subscriptionsFeature.get().featuresApi().isEnabled()) {
-            authRepository.getFeatures(planId)
-        } else {
-            when (planId) {
-                MONTHLY_PLAN_US, YEARLY_PLAN_US -> setOf(LEGACY_FE_NETP, LEGACY_FE_PIR, LEGACY_FE_ITR)
-                MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW -> setOf(NETP, ROW_ITR)
-                else -> throw IllegalStateException()
-            }
-        }
     }
 
     override suspend fun purchase(
