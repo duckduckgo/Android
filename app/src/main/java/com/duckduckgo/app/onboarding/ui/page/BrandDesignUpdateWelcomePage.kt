@@ -906,7 +906,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val transition = AutoTransition().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
-                    transition.addListener(object : TransitionListenerAdapter() {
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
                             if (view == null) return
                             binding.daxDialogCta.inputScreenContent.inputScreenTitle.startOnboardingTypingAnimation(
@@ -939,7 +940,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 }
                             }
                         }
-                    })
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
 
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
