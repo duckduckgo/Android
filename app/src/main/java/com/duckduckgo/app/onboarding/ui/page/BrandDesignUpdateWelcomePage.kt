@@ -49,7 +49,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.AutoTransition
+import androidx.transition.ChangeBounds
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -670,7 +670,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
-                    val transition = androidx.transition.ChangeBounds().apply {
+                    val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
                     changeBoundsTransition = transition
@@ -826,7 +826,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
-                    val transition = androidx.transition.ChangeBounds().apply {
+                    val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
                     changeBoundsTransition = transition
@@ -901,7 +901,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         playLeftWingAnimation()
                     }
 
-                    val transition = AutoTransition().apply {
+                    val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
                     changeBoundsTransition = transition
