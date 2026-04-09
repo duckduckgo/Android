@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Abonements</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nevar piekļūt Plus vai Pro līmeņa funkcijām</string>
     <string name="subscriptionsProUpgradeTitle">Jaunināt uz Pro</string>

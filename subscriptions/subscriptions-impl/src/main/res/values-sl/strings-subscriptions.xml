@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Naročnina</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ne morem dostopati do funkcij naročnine Plus ali Pro</string>
     <string name="subscriptionsProUpgradeTitle">Nadgradi na Pro</string>
