@@ -155,15 +155,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
             splitOmnibarContainer.isVisible = showSplitOption
 
-            topOmnibarToggleImage.setOnClickListener {
+            topOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
                 setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
             }
-            bottomOmnibarToggleImage.setOnClickListener {
+            bottomOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
                 setAddressBarPositionOptions(OmnibarType.SINGLE_BOTTOM, showSplitOption)
             }
-            splitOmnibarToggleImage.setOnClickListener {
+            splitOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
                 setAddressBarPositionOptions(OmnibarType.SPLIT, showSplitOption)
             }
