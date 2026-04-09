@@ -215,6 +215,20 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
                     }
                 }
             """.trimIndent()
+
+            is BrokerAction.GenerateEmail -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "generateEmail"
+                }
+            """.trimIndent()
+
+            is BrokerAction.GetEmailData -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "getEmailData"
+                }
+            """.trimIndent()
         }
 
         return JSONObject(
