@@ -94,7 +94,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:background="@null"
-                android:checked="true"
                 android:clickable="false"
                 android:focusable="false"
                 android:minWidth="0dp"
