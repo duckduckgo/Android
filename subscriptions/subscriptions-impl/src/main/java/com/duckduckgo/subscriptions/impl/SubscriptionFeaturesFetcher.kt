@@ -69,18 +69,6 @@ class SubscriptionFeaturesFetcher @Inject constructor(
             ?.flatMap { it.subscriptionOfferDetails ?: emptyList() }
             ?.map { it.basePlanId }
             ?.distinct()
-            ?.let { basePlanIds ->
-                logcat {
-                    "fetchSubscriptionFeatures: found base plan ids: $basePlanIds"
-                }
-                if (subscriptionsFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
-                    basePlanIds
-                } else {
-                    basePlanIds.filter {
-                        authRepository.getFeatures(it).isEmpty()
-                    }
-                }
-            }
             ?.forEach { basePlanId ->
                 runCatching {
                     if (subscriptionsFeature.tierMessagingEnabled().isEnabled()) {

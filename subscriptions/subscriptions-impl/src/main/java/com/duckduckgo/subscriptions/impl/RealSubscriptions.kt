@@ -232,9 +232,6 @@ interface SubscriptionsFeature {
     fun duckAISubscriptionMessaging(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun refreshSubscriptionPlanFeatures(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
