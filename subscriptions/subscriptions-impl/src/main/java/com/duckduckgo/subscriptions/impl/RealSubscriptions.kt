@@ -211,6 +211,7 @@ interface SubscriptionsFeature {
      * When disabled, FE works with old messaging (v1)
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
+     * Note: best to remove together with v1 clean up.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enableSubscriptionFlowsV2(): Toggle
