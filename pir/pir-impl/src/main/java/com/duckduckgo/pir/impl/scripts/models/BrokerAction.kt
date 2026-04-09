@@ -115,6 +115,16 @@ sealed class BrokerAction(
         val expectations: List<ExpectationSelector>,
         val actions: List<BrokerAction>,
     ) : BrokerAction(id)
+
+    data class GenerateEmail(
+        override val id: String,
+    ) : BrokerAction(id)
+
+    data class GetEmailData(
+        override val id: String,
+        val pollingTime: Int,
+        val extract: List<String>,
+    ) : BrokerAction(id)
 }
 
 data class ExtractProfileSelectors(
@@ -182,5 +192,7 @@ fun BrokerAction.asActionType(): String {
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
         is Condition -> "condition"
+        is BrokerAction.GenerateEmail -> "generateEmail"
+        is BrokerAction.GetEmailData -> "getEmailData"
     }
 }
