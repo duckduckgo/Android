@@ -271,6 +271,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 }
 
             is AwaitCaptchaSolution -> handleAwaitCaptchaSolution(effect)
+            is SideEffect.AwaitEmailData -> handleAwaitEmailData(effect)
         }
     }
 
@@ -357,6 +358,10 @@ class RealPirActionsRunner @AssistedInject constructor(
                     }
             }
         }
+
+    private suspend fun handleAwaitEmailData(effect: SideEffect.AwaitEmailData) {
+        // TODO: Implement in step 5 — poll for email data via EmailDataResolver
+    }
 
     private suspend fun handleGetCaptchaSolution(effect: GetCaptchaSolution) =
         withContext(dispatcherProvider.io()) {
