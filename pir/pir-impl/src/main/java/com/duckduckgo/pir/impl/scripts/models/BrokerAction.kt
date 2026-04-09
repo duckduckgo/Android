@@ -122,7 +122,7 @@ sealed class BrokerAction(
 
     data class GetEmailData(
         override val id: String,
-        val pollingTime: Int,
+        val pollingTime: String,
         val extract: List<String>,
     ) : BrokerAction(id)
 }
