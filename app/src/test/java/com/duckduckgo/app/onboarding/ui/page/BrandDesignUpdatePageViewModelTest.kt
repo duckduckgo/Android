@@ -668,6 +668,20 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
+    // region onDialogTapped
+
+    @Test
+    fun whenOnDialogTappedThenSkipDialogAnimationCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onDialogTapped()
+            val command = awaitItem()
+            assertTrue(command is Command.SkipDialogAnimation)
+        }
+    }
+
+    // endregion
+
     // region Skip onboarding impression pixel
 
     @Test

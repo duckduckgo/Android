@@ -538,7 +538,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.backgroundPrimary.cancelAnimation()
         binding.welcomeScreenWalkingDax.cancelAnimation()
         binding.bottomWingAnimation.cancelAnimation()
-        binding.leftWingAnimation?.cancelAnimation()
+        binding.leftWingAnimation.cancelAnimation()
     }
 
     override fun onActivityResult(
@@ -890,17 +890,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     animateBobbingDaxOut()
 
                     val leftWingView = binding.leftWingAnimation
-                    val showLeftWingAnimation = if (leftWingView != null) {
-                        BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                            rootView = binding.root,
-                            dialogView = binding.daxDialogCta.root,
-                            decorationView = leftWingView,
-                        )
-                    } else {
-                        false
-                    }
+                    val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = leftWingView,
+                    )
                     if (!showLeftWingAnimation) {
-                        binding.leftWingAnimation?.isVisible = false
+                        binding.leftWingAnimation.isVisible = false
                     } else {
                         playLeftWingAnimation()
                     }
@@ -950,9 +946,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
 
-                    val isTablet = resources.configuration.smallestScreenWidthDp >= 600
                     binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        if (isTablet) {
+                        if (deviceInfo.isTablet()) {
                             verticalBias = 0.5f
                             bottomToTop = binding.leftWingAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1223,9 +1218,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
-                val isTablet = resources.configuration.smallestScreenWidthDp >= 600
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    if (isTablet) {
+                    if (deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.leftWingAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1315,7 +1309,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun animateBobbingDaxIn() {
         bobbingDaxAnimator?.cancel()
         val screenWidth = binding.root.rootView.width.toFloat()
-        binding.bobbingDaxAnimation?.also { bobbingDax ->
+        binding.bobbingDaxAnimation.also { bobbingDax ->
             bobbingDax.isVisible = true
             bobbingDax.alpha = 0f
             bobbingDax.translationX = screenWidth
