@@ -1230,6 +1230,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
+                val cardView = binding.daxDialogCta.cardView
+                cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                cardView.setArrowAnimationFraction(1f)
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
                 binding.daxDialogCta.secondaryCta.isVisible = false
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
@@ -1254,6 +1257,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
                 updateAiChatToggleState(binding = binding, withAi = inputScreenSelected, animate = false)
