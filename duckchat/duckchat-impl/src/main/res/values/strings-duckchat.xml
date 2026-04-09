@@ -47,6 +47,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="toggle is the name for the switch component. Not the verb.">New tab toggle position</string>
+    <string name="duckAiDefaultTogglePositionSearch">Search</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Last Used</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Voice Search</string>
 
