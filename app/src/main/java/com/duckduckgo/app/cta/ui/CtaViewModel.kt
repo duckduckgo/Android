@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -87,6 +88,7 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -105,6 +107,10 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+
+    fun isBrandDesignUpdateEnabled(): Boolean =
+        onboardingBrandDesignUpdateToggles.self().isEnabled() &&
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
@@ -252,7 +258,11 @@ class CtaViewModel @Inject constructor(
 
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                }
             }
 
             // Site suggestions
