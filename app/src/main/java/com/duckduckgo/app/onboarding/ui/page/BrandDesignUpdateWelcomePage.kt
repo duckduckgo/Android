@@ -1047,13 +1047,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
                 binding.bobbingDaxAnimation.apply {
                     isVisible = true
                     alpha = 1f
                     translationX = 0f
-                    if (!isAnimating) playAnimation()
+                    if (!this.isAnimating) playAnimation()
                 }
 
                 setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
