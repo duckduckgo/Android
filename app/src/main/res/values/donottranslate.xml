@@ -112,8 +112,9 @@
     <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
     <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
     <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion1">how to say \"duck\" in 10 languages</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion2">all mighty ducks movies</string>
-    <string name="preOnboardingInputModeDemoChatSuggestion3" translatable="false">what are some fascinating facts?</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plan a perfect day in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
 
 </resources>
