@@ -908,7 +908,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     transition.addListener(object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            if (!isAdded) return
+                            if (view == null) return
                             binding.daxDialogCta.inputScreenContent.inputScreenTitle.startOnboardingTypingAnimation(
                                 getString(R.string.preOnboardingInputScreenTitleUpdated),
                             ) {
