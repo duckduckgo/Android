@@ -1038,10 +1038,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun activePlanIds(): List<String> =
         buildList {
-            addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US))
-            if (isLaunchedRow()) {
-                addAll(listOf(YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
-            }
+            addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
             if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
                 addAll(LIST_OF_PRO_PLANS)
             }
@@ -1368,10 +1365,6 @@ class RealSubscriptionsManager @Inject constructor(
             }
             throw e
         }
-    }
-
-    private suspend fun isLaunchedRow(): Boolean = withContext(dispatcherProvider.io()) {
-        privacyProFeature.get().isLaunchedROW().isEnabled()
     }
 
     private fun parseError(e: HttpException): ResponseError? {

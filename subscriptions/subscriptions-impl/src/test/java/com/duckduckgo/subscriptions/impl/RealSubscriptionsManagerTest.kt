@@ -1419,7 +1419,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
         authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
         givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
-        givenIsLaunchedRow(true)
 
         val subscriptionOffers = subscriptionsManager.getSubscriptionOffer()
 
@@ -1430,16 +1429,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertEquals("1$", find { it.planId == YEARLY_PLAN_ROW }?.pricingPhases?.first()?.formattedPrice)
             assertEquals(setOf(NETP), first().features)
         }
-    }
-
-    @Test
-    fun whenGetSubscriptionAndRowPlansAvailableAndFeatureDisabledThenReturnEmptyList() = runTest {
-        authRepository.setFeatures(MONTHLY_PLAN_ROW, setOf(NETP))
-        authRepository.setFeatures(YEARLY_PLAN_ROW, setOf(NETP))
-        givenPlansAvailable(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)
-        givenIsLaunchedRow(false)
-
-        assertEquals(emptyList<SubscriptionOfferDetails>(), subscriptionsManager.getSubscriptionOffer())
     }
 
     @Test
@@ -2391,11 +2380,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             experimentName = experimentName,
             origin = null,
         )
-    }
-
-    @SuppressLint("DenyListedApi")
-    private fun givenIsLaunchedRow(value: Boolean) {
-        privacyProFeature.isLaunchedROW().setRawStoredState(State(remoteEnableState = value))
     }
 
     @SuppressLint("DenyListedApi")
