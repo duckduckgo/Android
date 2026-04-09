@@ -157,15 +157,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
             topOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-                setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
             }
             bottomOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-                setAddressBarPositionOptions(OmnibarType.SINGLE_BOTTOM, showSplitOption)
             }
             splitOmnibarContainer.setOnClickListener {
                 viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-                setAddressBarPositionOptions(OmnibarType.SPLIT, showSplitOption)
             }
         }
     }
@@ -1006,8 +1003,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
-                // If the dialog is already showing, just update the selection without re-running the full setup.
-                // The click handlers already update the UI immediately, so this only needs to sync the options.
+                // Address bar already visible — just update the selected option without re-running full dialog setup.
                 if (binding.daxDialogCta.addressBarContent.root.isVisible) {
                     setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
                     return
