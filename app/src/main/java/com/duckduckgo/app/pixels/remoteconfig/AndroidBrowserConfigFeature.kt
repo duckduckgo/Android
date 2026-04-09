@@ -363,9 +363,8 @@ interface AndroidBrowserConfigFeature {
      * garbage collection.
      * @return `true` when the remote config has the global "tabStateRestorationFix" androidBrowserConfig
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `true`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabStateRestorationFix(): Toggle
 }
