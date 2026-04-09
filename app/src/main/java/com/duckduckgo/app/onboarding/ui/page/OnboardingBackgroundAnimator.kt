@@ -48,6 +48,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_browser_comparison_background,
         maxHeightDp = 216,
     )
+    data object AddressBar : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_address_bar_background,
+        maxHeightDp = 360,
+    )
 }
 
 /**
@@ -63,6 +67,40 @@ class OnboardingBackgroundAnimator(
 ) {
     private var enterExitAnimatorSet: AnimatorSet? = null
     private var activeView: ImageView = backgroundPrimary
+
+    /**
+     * Whether the current layout uses fitCenter scaling for backgrounds.
+     *
+     * Determined from [backgroundSecondary]'s XML scaleType, which is the reliable reference:
+     * - Phone portrait: centerCrop
+     * - Phone landscape: fitCenter
+     * - Tablet: fitCenter
+     *
+     * [backgroundPrimary] is a LottieAnimationView that always starts as centerCrop in XML,
+     * so it cannot be used as the reference. When this is true, [backgroundPrimary]'s scaleType
+     * is overridden to fitCenter before use, and layout params include a dimensionRatio to
+     * eliminate fitCenter gaps.
+     */
+    private val usesFitCenter: Boolean
+        get() = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
+
+    /**
+     * Ensures [view] has the correct scaleType for the current layout and updates its
+     * layout params for the given [step].
+     */
+    private fun configureBackgroundView(view: ImageView, step: OnboardingBackgroundStep) {
+        if (usesFitCenter && view == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
+            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+        val density = view.resources.displayMetrics.density
+        view.setImageResource(step.backgroundRes)
+        view.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = true
+            matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+            verticalBias = 1f
+            dimensionRatio = if (usesFitCenter) imageDimensionRatio(view) else null
+        }
+    }
 
     /**
      * Transitions the background to the given [step].
@@ -90,24 +128,11 @@ class OnboardingBackgroundAnimator(
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
 
-        // Layouts that use fitCenter (tablet, landscape) need dimensionRatio to eliminate gaps
-        val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
-        if (usesFitCenter && inView == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
-            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
-        }
+        configureBackgroundView(inView, step)
 
-        val density = inView.resources.displayMetrics.density
         val screenWidth = inView.rootView.width.toFloat()
 
         with(inView) {
-            setImageResource(step.backgroundRes)
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                constrainedHeight = true
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-                verticalBias = 1f
-                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
-            }
-
             val startX = enterStartX ?: (screenWidth + centerCropOverflow(inView, screenWidth))
             translationX = startX
             alpha = 0f
@@ -142,21 +167,12 @@ class OnboardingBackgroundAnimator(
 
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
-        val density = inView.resources.displayMetrics.density
 
-        with(inView) {
-            setImageResource(step.backgroundRes)
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                constrainedHeight = true
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-                verticalBias = 1f
-                val usesFitCenter = scaleType == ImageView.ScaleType.FIT_CENTER
-                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
-            }
-            translationX = 0f
-            alpha = 1f
-            isVisible = true
-        }
+        configureBackgroundView(inView, step)
+
+        inView.translationX = 0f
+        inView.alpha = 1f
+        inView.isVisible = true
 
         outView.alpha = 0f
         outView.translationX = 0f
@@ -196,7 +212,7 @@ class OnboardingBackgroundAnimator(
                 val progress = animator.animatedValue as Float
                 inView.translationX = startX * (1f - progress)
                 // Fade in during last 25% — inverse of exit's first-25% fade-out
-                inView.alpha = minOf(1f, maxOf(0f, (progress - 0.75f) * 4f))
+                inView.alpha = enterAlpha(progress)
             }
         }
     }
@@ -231,7 +247,14 @@ class OnboardingBackgroundAnimator(
 
     companion object {
         private const val EXIT_DURATION = 1500L
-        private const val ENTER_DURATION = 1000L
-        private val EASE_IN_OUT = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+        const val ENTER_DURATION = 1000L
+        val EASE_IN_OUT = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+
+        /**
+         * Computes the alpha for the entering view given [progress] (a [0,1] animator fraction).
+         * The view is fully transparent for the first 75% of the animation and fades in to fully
+         * opaque during the final 25%.
+         */
+        internal fun enterAlpha(progress: Float): Float = minOf(1f, maxOf(0f, (progress - 0.75f) * 4f))
     }
 }

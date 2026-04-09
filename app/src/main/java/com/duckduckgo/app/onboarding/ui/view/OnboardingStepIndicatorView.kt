@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
+import kotlin.math.ceil
 
 /**
  * A pill-shaped step indicator for the onboarding flow.
@@ -132,6 +133,7 @@ class OnboardingStepIndicatorView @JvmOverloads constructor(
         state.setSteps(totalSteps, currentStep)
         syncDotViewState()
         updateText()
+        pinTextLabelWidth()
     }
 
     /**
@@ -166,6 +168,17 @@ class OnboardingStepIndicatorView @JvmOverloads constructor(
 
     private fun updateText() {
         textLabel.text = context.getString(R.string.onboardingStepIndicatorText, state.currentStep, state.totalSteps)
+    }
+
+    private fun pinTextLabelWidth() {
+        val paint = textLabel.paint
+        var maxWidth = 0f
+        for (step in 1..state.totalSteps) {
+            val text = context.getString(R.string.onboardingStepIndicatorText, step, state.totalSteps)
+            val width = paint.measureText(text)
+            if (width > maxWidth) maxWidth = width
+        }
+        textLabel.minWidth = ceil(maxWidth.toDouble()).toInt()
     }
 
     override fun onAttachedToWindow() {
