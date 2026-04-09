@@ -1023,7 +1023,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
-                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
                     if (deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.bobbingDaxAnimation.id
