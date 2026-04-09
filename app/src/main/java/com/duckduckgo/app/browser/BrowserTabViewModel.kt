@@ -2197,7 +2197,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String?,
     ) {
-        if (!currentBrowserViewState().maliciousSiteBlocked) {
+        if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
 
@@ -2249,7 +2249,7 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         url: String,
     ) {
-        if (!currentBrowserViewState().maliciousSiteBlocked) {
+        if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             navigationStateChanged(webViewNavigationState)
             onPageContentStart(url)
         }
@@ -2259,6 +2259,8 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     ) {
+        if (!currentBrowserViewState().browserShowing) return
+
         this.activeExperiments = activeExperiments
 
         browserViewState.value =
@@ -4892,7 +4894,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAutoConsentPopUpHandled(isCosmetic: Boolean) {
-        if (!currentBrowserViewState().maliciousSiteBlocked) {
+        if (!currentBrowserViewState().maliciousSiteBlocked && site != null) {
             if (isCosmetic) {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY)
             } else {

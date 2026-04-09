@@ -2191,6 +2191,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
+        webView?.stopLoading()
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
