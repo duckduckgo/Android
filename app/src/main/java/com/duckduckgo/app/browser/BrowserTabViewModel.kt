@@ -898,12 +898,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun observeSelectedTab(isRestored: Boolean) {
-        selectedTabObserver?.cancel()
         viewModelScope.launch {
             val isTabRestorationFixEnabled = withContext(dispatchers.io()) {
                 androidBrowserConfig.tabStateRestorationFix().isEnabled()
             }
             // auto-launch input screen for new, empty tabs (New Tab Page)
+            selectedTabObserver?.cancel()
             selectedTabObserver = tabRepository.flowSelectedTab
                 .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
                 .let {
