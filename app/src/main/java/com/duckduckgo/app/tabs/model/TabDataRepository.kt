@@ -447,10 +447,10 @@ class TabDataRepository @Inject constructor(
     override suspend fun getSelectedTab(): TabEntity? =
         withContext(dispatchers.io()) { tabsDao.selectedTab() }
 
-    override suspend fun getLastAccessedTab(): TabEntity? =
-        withContext(dispatchers.io()) { tabsDao.lastAccessedTab() }
+    override suspend fun getLastAccessedNonSelectedTab(): TabEntity? =
+        withContext(dispatchers.io()) { tabsDao.lastAccessedNonSelectedTab() }
 
-    override val flowLastAccessedTab: Flow<TabEntity?> = tabsDao.flowLastAccessedTab()
+    override val flowLastAccessedNonSelectedTab: Flow<TabEntity?> = tabsDao.flowLastAccessedNonSelectedTab()
         .distinctUntilChanged()
 
     override suspend fun select(tabId: String) {

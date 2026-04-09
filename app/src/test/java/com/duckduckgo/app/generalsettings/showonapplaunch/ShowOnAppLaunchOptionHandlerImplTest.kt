@@ -899,11 +899,11 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             return selectedTab
         }
 
-        override suspend fun getLastAccessedTab(): TabEntity? {
+        override suspend fun getLastAccessedNonSelectedTab(): TabEntity? {
             TODO("Not yet implemented")
         }
 
-        override val flowLastAccessedTab: Flow<TabEntity?>
+        override val flowLastAccessedNonSelectedTab: Flow<TabEntity?>
             get() = TODO("Not yet implemented")
 
         override fun updateTabPreviewImage(
