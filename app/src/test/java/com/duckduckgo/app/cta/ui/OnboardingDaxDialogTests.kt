@@ -39,9 +39,11 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
@@ -110,6 +112,9 @@ class OnboardingDaxDialogTests {
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
+            object : PluginPoint<SubscriptionPromoCtaShownPlugin> {
+                override fun getPlugins() = emptyList<SubscriptionPromoCtaShownPlugin>()
+            },
         )
     }
 

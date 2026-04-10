@@ -63,6 +63,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
     private val conflatedJob = ConflatedJob()
+    private val faviconJob = ConflatedJob()
 
     private var hatchHatchListener: HatchListener? = null
 
@@ -86,12 +87,14 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         conflatedJob.cancel()
+        faviconJob.cancel()
     }
 
     val tabId: String
         get() = viewModel.viewState.value.tabId
 
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
+        faviconJob.cancel()
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
             if (state.isDuckChat) {
@@ -99,8 +102,8 @@ class NewTabReturnHatchView @JvmOverloads constructor(
                 binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
             } else {
                 binding.returnHatchSiteURL.text = state.url.extractDomain()
-                viewModel.viewModelScope.launch {
-                    faviconManager.loadToViewFromLocalWithPlaceholder(state.tabId, state.url, binding.returnHatchFavicon)
+                faviconJob += viewModel.viewModelScope.launch {
+                    faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
                 }
             }
             binding.returnHatchRoot.show()

@@ -105,9 +105,9 @@ interface TabRepository {
 
     suspend fun getSelectedTab(): TabEntity?
 
-    suspend fun getLastAccessedNonSelectedTab(): TabEntity?
+    suspend fun getLastAccessedTab(): TabEntity?
 
-    val flowLastAccessedNonSelectedTab: Flow<TabEntity?>
+    val flowLastAccessedTab: Flow<TabEntity?>
 
     suspend fun select(tabId: String)
 
