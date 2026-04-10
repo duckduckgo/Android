@@ -57,11 +57,12 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     private val fileMetaDao: DuckAiBridgeFileMetaDao = mock()
     private val fakePrefs = InMemorySharedPreferences()
     private val migrationPrefs = DuckAiMigrationPrefs(fakePrefsProvider(fakePrefs))
+    private val pixels: DuckAiNativeStoragePixels = mock()
     private val hostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
     private val handlerPlugin by lazy {
-        DuckAiNativeStorageJsMessageHandler(settingsDao, chatsDao, fileMetaDao, Lazy { tempFolder.root }, hostProvider, migrationPrefs)
+        DuckAiNativeStorageJsMessageHandler(settingsDao, chatsDao, fileMetaDao, Lazy { tempFolder.root }, hostProvider, migrationPrefs, pixels)
     }
     private val handler by lazy { handlerPlugin.getJsMessageHandler() }
     private val jsMessaging: JsMessaging = mock()
@@ -333,6 +334,20 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         assertFalse(fakePrefs.getBoolean(DuckAiMigrationPrefs.CHATS_KEY, false))
         verifyNoInteractions(jsMessaging)
+    }
+
+    @Test
+    fun `markMigrationDone fires pixel with the migration key`() {
+        handler.process(jsMessage("markMigrationDone", """{"key":"chats"}"""), jsMessaging, null)
+
+        verify(pixels).reportMigrationDone("chats")
+    }
+
+    @Test
+    fun `markMigrationDone with no key fires blank key pixel`() {
+        handler.process(jsMessage("markMigrationDone", "{}"), jsMessaging, null)
+
+        verify(pixels).reportMigrationDoneBlankKey()
     }
 
     // --- putFile / getFile ---

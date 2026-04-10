@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeFilesDir
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
+import com.duckduckgo.duckchat.store.impl.DuckAiNativeStoragePixels
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
@@ -48,6 +49,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
     @DuckAiBridgeFilesDir private val filesDirLazy: Lazy<File>,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
+    private val pixels: DuckAiNativeStoragePixels,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     private val filesDir: File get() = filesDirLazy.get()
@@ -208,6 +210,9 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         if (key.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: markMigrationDone key=$key" }
                             migrationPrefs.markMigrationDone(key)
+                            pixels.reportMigrationDone(key)
+                        } else {
+                            pixels.reportMigrationDoneBlankKey()
                         }
                     }
 

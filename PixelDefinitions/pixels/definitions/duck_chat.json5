@@ -453,5 +453,54 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_chats_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_chats_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_entries_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_entries_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_files_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_files_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_blank_count": {
+        "description": "Duck.ai markMigrationDone was called with a blank key — indicates a JS-side bug",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
