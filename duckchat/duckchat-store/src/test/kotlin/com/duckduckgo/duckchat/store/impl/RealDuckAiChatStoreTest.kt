@@ -19,10 +19,12 @@ package com.duckduckgo.duckchat.store.impl
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.duckchat.store.impl.bridge.MessageBridge
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import dagger.Lazy
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,6 +47,7 @@ class RealDuckAiChatStoreTest {
 
     private val chatsDao: DuckAiBridgeChatsDao = mock()
     private val fileMetaDao: DuckAiBridgeFileMetaDao = mock()
+    private val messageBridge: MessageBridge = mock()
     private val fakePrefs = InMemorySharedPreferences()
     private val migrationPrefs = DuckAiMigrationPrefs(
         mock<SharedPreferencesProvider>().also { whenever(it.getSharedPreferences(any(), any(), any())).thenReturn(fakePrefs) },
@@ -55,19 +58,32 @@ class RealDuckAiChatStoreTest {
     @Before
     fun setup() {
         filesDir = Files.createTempDirectory("duck_ai_test").toFile()
-        store = RealDuckAiChatStore(chatsDao, fileMetaDao, Lazy { filesDir }, coroutineTestRule.testDispatcherProvider, migrationPrefs)
+        whenever(runBlocking { messageBridge.isDuckAiNativeStorageFeatureEnabled() }).thenReturn(true)
+        store = RealDuckAiChatStore(chatsDao, fileMetaDao, Lazy { filesDir }, coroutineTestRule.testDispatcherProvider, migrationPrefs, messageBridge)
     }
 
     // --- hasMigrated ---
 
     @Test
-    fun `hasMigrated returns true when migration flag is set`() = runTest {
+    fun `hasMigrated returns true when feature enabled and migration flag is set`() = runTest {
         fakePrefs.edit().putBoolean(DuckAiMigrationPrefs.CHATS_KEY, true).commit()
         assertTrue(store.hasMigrated())
     }
 
     @Test
     fun `hasMigrated returns false when migration flag is not set`() = runTest {
+        assertFalse(store.hasMigrated())
+    }
+
+    @Test
+    fun `hasMigrated returns false when feature disabled even if migration flag is set`() = runTest {
+        fakePrefs.edit().putBoolean(DuckAiMigrationPrefs.CHATS_KEY, true).commit()
+        whenever(messageBridge.isDuckAiNativeStorageFeatureEnabled()).thenReturn(false)
+        assertFalse(store.hasMigrated())
+    }
+
+    @Test
+    fun `hasMigrated returns false when feature enabled but migration flag not set`() = runTest {
         assertFalse(store.hasMigrated())
     }
 

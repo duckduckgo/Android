@@ -17,12 +17,14 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.DelegatingChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -43,6 +45,8 @@ class DelegatingChatSuggestionsReaderTest {
     private val nativeReader: ChatSuggestionsNativeReader = mock()
     private val webViewReader: RealChatSuggestionsReader = mock()
     private val store: DuckAiChatStore = mock()
+    private val feature: DuckChatFeature = mock()
+    private val nativeStorageToggle: Toggle = mock()
     private val pixels: DuckChatPixels = mock()
     private lateinit var reader: DelegatingChatSuggestionsReader
 
@@ -50,12 +54,14 @@ class DelegatingChatSuggestionsReaderTest {
 
     @Before
     fun setup() {
-        reader = DelegatingChatSuggestionsReader(nativeReader, webViewReader, store, Lazy { pixels })
+        whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
+        reader = DelegatingChatSuggestionsReader(nativeReader, webViewReader, store, feature, Lazy { pixels })
     }
 
     @Test
-    fun `fetchSuggestions uses native reader when migrated`() = runTest {
+    fun `fetchSuggestions uses native reader when migrated and FF enabled`() = runTest {
         whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(nativeReader.fetchSuggestions("")).thenReturn(listOf(fakeSuggestion))
 
         val result = reader.fetchSuggestions()
@@ -68,6 +74,20 @@ class DelegatingChatSuggestionsReaderTest {
     @Test
     fun `fetchSuggestions uses webView reader when not migrated`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewReader.fetchSuggestions("")).thenReturn(listOf(fakeSuggestion))
+
+        val result = reader.fetchSuggestions()
+
+        assertEquals(listOf(fakeSuggestion), result)
+        verify(webViewReader).fetchSuggestions("")
+        verify(nativeReader, never()).fetchSuggestions("")
+    }
+
+    @Test
+    fun `fetchSuggestions uses webView reader when migrated but FF disabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(false)
         whenever(webViewReader.fetchSuggestions("")).thenReturn(listOf(fakeSuggestion))
 
         val result = reader.fetchSuggestions()
@@ -80,6 +100,7 @@ class DelegatingChatSuggestionsReaderTest {
     @Test
     fun `fetchSuggestions tears down previous reader when switching`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(webViewReader.fetchSuggestions("")).thenReturn(emptyList())
         reader.fetchSuggestions() // sets webViewReader as active
 
@@ -93,6 +114,7 @@ class DelegatingChatSuggestionsReaderTest {
     @Test
     fun `tearDown delegates to active reader`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(webViewReader.fetchSuggestions("")).thenReturn(emptyList())
         reader.fetchSuggestions() // activates webViewReader
 

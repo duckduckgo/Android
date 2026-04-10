@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,15 +34,21 @@ class DelegatingDuckChatDeleter @Inject constructor(
     // from treating this field as a competing binding for the DuckChatDeleter interface.
     private val webViewDeleter: RealDuckChatDeleter,
     private val store: DuckAiChatStore,
+    private val feature: DuckChatFeature,
     // Lazy to break the DI cycle: RealDuckChat → DuckChatDeleter → DuckChatPixels
     //   → DuckChatTermsOfServiceHandler → DuckChatInternal (RealDuckChat)
     private val pixels: Lazy<DuckChatPixels>,
 ) : DuckChatDeleter {
 
     override suspend fun deleteChat(chatId: String): Boolean {
-        val deleter = if (store.hasMigrated()) nativeDeleter else webViewDeleter
+        val hasMigrated = store.hasMigrated()
+        val deleter = if (hasMigrated && feature.useNativeStorageChatData().isEnabled()) nativeDeleter else webViewDeleter
         logcat { "DuckAI chat deletion: using ${if (deleter === nativeDeleter) "native store" else "WebView"} deleter" }
         pixels.get().reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
+        if (hasMigrated && deleter != nativeDeleter) {
+            // if we have migrated but we're using the WV deleter, we keep all data consistent by deleting in both places
+            nativeDeleter.deleteChat(chatId)
+        }
         return deleter.deleteChat(chatId)
     }
 }

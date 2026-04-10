@@ -17,8 +17,10 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -39,17 +41,21 @@ class DelegatingDuckChatDeleterTest {
     private val nativeDeleter: NativeDuckChatDeleter = mock()
     private val webViewDeleter: RealDuckChatDeleter = mock()
     private val store: DuckAiChatStore = mock()
+    private val feature: DuckChatFeature = mock()
+    private val nativeStorageToggle: Toggle = mock()
     private val pixels: DuckChatPixels = mock()
     private lateinit var deleter: DelegatingDuckChatDeleter
 
     @Before
     fun setup() {
-        deleter = DelegatingDuckChatDeleter(nativeDeleter, webViewDeleter, store, Lazy { pixels })
+        whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
+        deleter = DelegatingDuckChatDeleter(nativeDeleter, webViewDeleter, store, feature, Lazy { pixels })
     }
 
     @Test
-    fun `deleteChat uses native deleter when migrated`() = runTest {
+    fun `deleteChat uses native deleter when migrated and FF enabled`() = runTest {
         whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(nativeDeleter.deleteChat("chat-1")).thenReturn(true)
 
         assertTrue(deleter.deleteChat("chat-1"))
@@ -60,6 +66,7 @@ class DelegatingDuckChatDeleterTest {
     @Test
     fun `deleteChat uses WebView deleter when not migrated`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(true)
 
         assertTrue(deleter.deleteChat("chat-1"))
@@ -68,8 +75,41 @@ class DelegatingDuckChatDeleterTest {
     }
 
     @Test
+    fun `deleteChat uses WebView deleter as primary when migrated but FF disabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(false)
+        whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(true)
+
+        assertTrue(deleter.deleteChat("chat-1"))
+        verify(webViewDeleter).deleteChat("chat-1")
+    }
+
+    @Test
+    fun `deleteChat also deletes from native store when migrated but FF disabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(false)
+        whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(true)
+
+        deleter.deleteChat("chat-1")
+
+        verify(nativeDeleter).deleteChat("chat-1")
+    }
+
+    @Test
+    fun `deleteChat does not touch native store when not migrated and FF disabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(false)
+        whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(true)
+
+        deleter.deleteChat("chat-1")
+
+        verify(nativeDeleter, never()).deleteChat("chat-1")
+    }
+
+    @Test
     fun `deleteChat returns false when native deleter reports chat not found`() = runTest {
         whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(nativeDeleter.deleteChat("missing")).thenReturn(false)
 
         assertFalse(deleter.deleteChat("missing"))
@@ -78,6 +118,7 @@ class DelegatingDuckChatDeleterTest {
     @Test
     fun `deleteChat returns false when WebView deleter fails`() = runTest {
         whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
         whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(false)
 
         assertFalse(deleter.deleteChat("chat-1"))

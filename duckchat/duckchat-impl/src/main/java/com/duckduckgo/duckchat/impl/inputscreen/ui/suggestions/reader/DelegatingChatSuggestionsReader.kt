@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -32,6 +33,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     // from treating this field as a competing binding for the ChatSuggestionsReader interface.
     private val webViewReader: RealChatSuggestionsReader,
     private val store: DuckAiChatStore,
+    private val feature: DuckChatFeature,
     // Lazy to break potential DI cycles through DuckChatPixels → DuckChatTermsOfServiceHandler
     //   → DuckChatInternal path.
     private val pixels: Lazy<DuckChatPixels>,
@@ -40,7 +42,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     private var activeReader: ChatSuggestionsReader? = null
 
     override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
-        val reader = if (store.hasMigrated()) nativeReader else webViewReader
+        val reader = if (store.hasMigrated() && feature.useNativeStorageChatData().isEnabled()) nativeReader else webViewReader
         if (activeReader != null && activeReader !== reader) activeReader?.tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }

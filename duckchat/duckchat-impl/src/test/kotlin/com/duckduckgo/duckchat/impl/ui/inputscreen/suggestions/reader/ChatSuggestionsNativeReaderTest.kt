@@ -22,8 +22,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSugges
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -32,6 +30,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class ChatSuggestionsNativeReaderTest {
 
