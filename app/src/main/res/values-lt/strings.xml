@@ -27,6 +27,9 @@
     <string name="cancel">Atšaukti</string>
     <string name="search">Paieška</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Pokalbis ištrintas</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
     <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
