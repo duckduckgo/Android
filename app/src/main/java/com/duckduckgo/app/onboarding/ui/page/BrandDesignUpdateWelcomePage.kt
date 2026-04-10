@@ -433,9 +433,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             backgroundSecondary = binding.backgroundSecondary,
         )
 
-        binding.daxDialogCta.cardContainer.setOnClickListener {
-            viewModel.onDialogTapped()
-        }
+        binding.daxDialogCta.cardContainer.setOnClickListener { viewModel.onDialogTapped() }
+        binding.root.setOnClickListener { viewModel.onBackgroundTapped() }
 
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)

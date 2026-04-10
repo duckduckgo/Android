@@ -668,13 +668,23 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region onDialogTapped
+    // region onScreenTapped
 
     @Test
     fun whenOnDialogTappedThenSkipDialogAnimationCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
             testee.onDialogTapped()
+            val command = awaitItem()
+            assertTrue(command is Command.SkipDialogAnimation)
+        }
+    }
+
+    @Test
+    fun whenOnBackgroundTappedThenSkipDialogAnimationCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onBackgroundTapped()
             val command = awaitItem()
             assertTrue(command is Command.SkipDialogAnimation)
         }

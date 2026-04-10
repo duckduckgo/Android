@@ -125,9 +125,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     fun onDialogTapped() {
-        viewModelScope.launch {
-            _commands.send(Command.SkipDialogAnimation)
-        }
+        skipDialogAnimations()
+    }
+
+    fun onBackgroundTapped() {
+        skipDialogAnimations()
     }
 
     fun onDialogAnimationStarted() {
@@ -339,4 +341,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
                 androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
         }
+
+    private fun skipDialogAnimations() {
+        viewModelScope.launch {
+            _commands.send(Command.SkipDialogAnimation)
+        }
+    }
 }
