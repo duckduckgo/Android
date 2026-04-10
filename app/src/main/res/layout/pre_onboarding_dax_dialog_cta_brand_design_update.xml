@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:fadeScrollbars="false">
 
-            <LinearLayout
+            <com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
                 android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                     tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty"
                     tools:visibility="visible" />
 
-            </LinearLayout>
+            </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
         </ScrollView>
 
