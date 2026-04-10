@@ -73,6 +73,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -557,6 +558,18 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     .withEndAction {
                         if (view == null) return@withEndAction
 
+                        binding.daxDialogCta.inputScreenPreview.inputText.apply {
+                            isFocusable = true
+                            isFocusableInTouchMode = true
+
+                            if (resources.configuration.screenHeightDp >= MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP) {
+                                post {
+                                    if (view == null) return@post
+                                    activity?.showKeyboard(binding.daxDialogCta.inputScreenPreview.inputText)
+                                }
+                            }
+                        }
+
                         val buttons = listOf(
                             binding.daxDialogCta.inputScreenPreview.suggestion1,
                             binding.daxDialogCta.inputScreenPreview.suggestion2,
@@ -781,6 +794,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         private const val ANIMATION_DELAY = 1400L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
+        private const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
         private const val INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION = 500L
         private const val INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
