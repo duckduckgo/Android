@@ -111,5 +111,10 @@
         "key": "privacy_dashboard_opened",
         "type": "boolean",
         "description": "Whether the user has ever opened the Privacy Dashboard"
+    },
+    "subscriptionPromoShown": {
+        "key": "subscription_promo_shown",
+        "type": "boolean",
+        "description": "Whether the subscription promo CTA has been shown to the user"
     }
 }
