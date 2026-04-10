@@ -548,8 +548,8 @@ class RealSecureStorageKeyStore(
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
         val harmonyFlags = harmonyFlags()
         when {
-            harmonyFlags.multiProcess -> getHarmonyEncryptedPreferences() != null
-            harmonyFlags.useHarmony && !harmonyFlags.multiProcess -> getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
+            harmonyFlags.multiProcess -> getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
+            harmonyFlags.useHarmony -> getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
             else -> getEncryptedPreferences() != null
         }
     }
