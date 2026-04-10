@@ -194,6 +194,21 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
+    override suspend fun loadToViewFromLocalWithRetry(tabId: String?, url: String, view: ImageView, placeholder: String?) {
+        var bitmap = loadFromDisk(tabId, url)
+        view.loadFavicon(bitmap, url, placeholder)
+
+        repeat(FAVICON_LOAD_RETRIES) {
+            if (bitmap == null) {
+                delay(FAVICON_LOAD_RETRY_DELAY)
+                bitmap = loadFromDisk(tabId, url)
+                if (bitmap != null) {
+                    view.loadFavicon(bitmap, url, placeholder)
+                }
+            }
+        }
+    }
+
     override suspend fun persistCachedFavicon(
         tabId: String,
         url: String,
