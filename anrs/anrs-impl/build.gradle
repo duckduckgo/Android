@@ -51,7 +51,7 @@ dependencies {
     implementation AndroidX.webkit
 
     testImplementation project(':common-test')
-    implementation project(':data-store-test')
+    testImplementation project(':data-store-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit
