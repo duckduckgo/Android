@@ -1009,8 +1009,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDaxPrivacyProCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
-        testee.onCtaShown(DaxBubbleCta.DaxPrivacyProCta(mockOnboardingStore, mockAppInstallStore, isFreeTrialCopy = false))
+    fun whenDaxSubscriptionCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
+        testee.onCtaShown(DaxBubbleCta.DaxSubscriptionCta(mockOnboardingStore, mockAppInstallStore, isFreeTrialCopy = false))
         verify(mockSubscriptionPromoCtaShownPlugin).onSubscriptionPromoCtaShown()
     }
 
