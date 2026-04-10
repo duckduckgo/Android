@@ -28,10 +28,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
+import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostSecondaryButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructivePrimaryButton
-import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 
-@SuppressLint("NoFragment") // we don't use DI here
+@SuppressLint("NoFragment", "DenyListedApi") // we don't use DI here
 class ComponentButtonsFragment : Fragment() {
 
     private val appComponentsViewModel by appComponentsViewModel()
