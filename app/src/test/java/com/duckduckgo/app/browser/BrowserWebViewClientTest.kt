@@ -1761,6 +1761,41 @@ class BrowserWebViewClientTest {
         }
     }
 
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlDiffersFromOriginalUrlThenNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai/chat-1"
+        whenever(mockWebView.originalUrl).thenReturn("https://duck.ai")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener).onHistoryUrlChanged(duckChatUrl)
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlMatchesOriginalUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai"
+        whenever(mockWebView.originalUrl).thenReturn(duckChatUrl)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnNonDuckChatUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee.doUpdateVisitedHistory(mockWebView, EXAMPLE_URL, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
+    }
+
     companion object {
         const val EXAMPLE_URL = "https://example.com"
         const val DDG_URL = "https://duckduckgo.com"

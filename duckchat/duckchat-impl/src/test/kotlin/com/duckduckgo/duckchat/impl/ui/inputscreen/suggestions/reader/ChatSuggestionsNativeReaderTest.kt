@@ -22,6 +22,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSugges
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -56,7 +58,7 @@ class ChatSuggestionsNativeReaderTest {
 
     @Test
     fun `fetchSuggestions with empty query filters to last 7 days`() = runTest {
-        val recent = chatWithLastEdit("2026-04-01T10:00:00.000Z")
+        val recent = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString())
         val old = chatWithLastEdit("2025-01-01T10:00:00.000Z", chatId = "old")
         whenever(store.getChats()).thenReturn(listOf(recent, old))
 
@@ -101,7 +103,7 @@ class ChatSuggestionsNativeReaderTest {
     @Test
     fun `fetchSuggestions respects maxHistoryCount from feature settings`() = runTest {
         whenever(toggle.getSettings()).thenReturn("""{"maxHistoryCount":2}""")
-        val chats = (1..5).map { chatWithLastEdit("2026-04-01T10:00:00.000Z", chatId = "chat-$it") }
+        val chats = (1..5).map { chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), chatId = "chat-$it") }
         whenever(store.getChats()).thenReturn(chats)
 
         assertEquals(2, reader.fetchSuggestions().size)
@@ -110,7 +112,7 @@ class ChatSuggestionsNativeReaderTest {
     @Test
     fun `fetchSuggestions uses default max of 10 when settings null`() = runTest {
         whenever(toggle.getSettings()).thenReturn(null)
-        val chats = (1..15).map { chatWithLastEdit("2026-04-01T10:00:00.000Z", chatId = "chat-$it") }
+        val chats = (1..15).map { chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), chatId = "chat-$it") }
         whenever(store.getChats()).thenReturn(chats)
 
         assertEquals(10, reader.fetchSuggestions().size)
