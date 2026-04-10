@@ -303,6 +303,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
@@ -757,6 +758,9 @@ class BrowserTabViewModelTest {
                     subscriptions = subscriptions,
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
+                    subscriptionPromoCtaShownPlugins = mock<PluginPoint<SubscriptionPromoCtaShownPlugin>> {
+                        on { getPlugins() } doReturn emptyList()
+                    },
                     duckChat = mockDuckChat,
                 )
 
