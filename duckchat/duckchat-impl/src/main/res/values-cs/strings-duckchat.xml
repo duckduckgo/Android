@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Automaticky odesílat obsah stránky do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Připojit obsah stránky</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Vymazat chat</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Vymazat data</string>
     <string name="duckChatBrowserMenuContentDescription">Další možnosti</string>

@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Send automatisk sideindhold til Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Vedhæft sideindhold</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Ryd chat</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Ryd data</string>
     <string name="duckChatBrowserMenuContentDescription">Flere muligheder</string>

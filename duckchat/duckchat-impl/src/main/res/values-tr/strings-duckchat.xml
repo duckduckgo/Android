@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Sayfa içeriğini otomatik olarak Duck.ai\'a gönder</string>
     <string name="duckAIContextualAttachPageContent">Sayfa İçeriğini Ekle</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Sohbeti temizle</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Verileri Temizle</string>
     <string name="duckChatBrowserMenuContentDescription">Diğer seçenekler</string>
