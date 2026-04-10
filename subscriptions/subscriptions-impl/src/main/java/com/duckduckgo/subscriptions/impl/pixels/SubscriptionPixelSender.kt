@@ -133,7 +133,7 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialStart()
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
-    fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean)
+    fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -326,7 +326,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(FREE_TRIAL_DUCK_AI_PAID_USED, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
     }
 
-    override fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean) {
+    override fun reportPaywallNotSeen(
+        dayBucket: String,
+        returningUser: Boolean,
+        privacyDashboardEverOpened: Boolean,
+        subscriptionPromoShown: Boolean,
+    ) {
         val pixel = when (dayBucket) {
             "d0" -> PAYWALL_NOT_SEEN_D0
             "d3" -> PAYWALL_NOT_SEEN_D3
@@ -340,6 +345,7 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             mapOf(
                 SubscriptionPixelParameter.RETURNING_USER to returningUser.toString(),
                 SubscriptionPixelParameter.PRIVACY_DASHBOARD_EVER_OPENED to privacyDashboardEverOpened.toString(),
+                SubscriptionPixelParameter.SUBSCRIPTION_PROMO_SHOWN to subscriptionPromoShown.toString(),
             ),
         )
     }

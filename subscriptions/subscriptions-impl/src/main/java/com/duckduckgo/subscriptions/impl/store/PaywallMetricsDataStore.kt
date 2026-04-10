@@ -41,6 +41,10 @@ class PaywallMetricsDataStore @Inject constructor(
         get() = preferences.getBoolean(KEY_PRIVACY_DASHBOARD_EVER_OPENED, false)
         set(value) { preferences.edit { putBoolean(KEY_PRIVACY_DASHBOARD_EVER_OPENED, value) } }
 
+    var subscriptionPromoShown: Boolean
+        get() = preferences.getBoolean(KEY_SUBSCRIPTION_PROMO_SHOWN, false)
+        set(value) { preferences.edit { putBoolean(KEY_SUBSCRIPTION_PROMO_SHOWN, value) } }
+
     val firstInstallTimestamp: Long by lazy {
         context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
     }
@@ -59,5 +63,6 @@ class PaywallMetricsDataStore @Inject constructor(
         const val KEY_PAYWALL_EVER_SEEN = "KEY_PAYWALL_EVER_SEEN"
         const val KEY_NOT_SEEN_FIRED_DAYS = "KEY_NOT_SEEN_FIRED_DAYS"
         const val KEY_PRIVACY_DASHBOARD_EVER_OPENED = "KEY_PRIVACY_DASHBOARD_EVER_OPENED"
+        const val KEY_SUBSCRIPTION_PROMO_SHOWN = "KEY_SUBSCRIPTION_PROMO_SHOWN"
     }
 }
