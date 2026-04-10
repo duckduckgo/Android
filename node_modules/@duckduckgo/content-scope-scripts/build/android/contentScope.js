@@ -1484,6 +1484,7 @@
       "webDetection",
       "webEvents",
       "webInterferenceDetection",
+      "webTelemetry",
       "pageObserver",
       "hover",
       "tabSuspension"
