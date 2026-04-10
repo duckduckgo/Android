@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
-import com.duckduckgo.duckchat.store.api.DuckAiChat
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

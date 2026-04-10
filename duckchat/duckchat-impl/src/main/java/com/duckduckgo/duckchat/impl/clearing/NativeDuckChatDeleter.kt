@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clearing
 
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import javax.inject.Inject
 
 class NativeDuckChatDeleter @Inject constructor(

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.store.internal
+package com.duckduckgo.duckchat.internal.store
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
@@ -400,7 +400,7 @@ class RealDuckAiDebugServer @Inject constructor(
 
                 async function loadMigration() {
                   const obj = await fetchJson('/debug/migration');
-                  const keys = ['chats', 'files'];
+                  const keys = Object.keys(obj).sort();
                   const rows = keys.map(k => {
                     const done = obj[k] === true;
                     return '<span class="status ' + (done ? 'done' : 'not-done') + '" style="margin-right:8px">' +

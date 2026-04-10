@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn

@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.duckchat.internal
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.Context
 
-android {
-    namespace 'com.duckduckgo.duckchat.store.api'
-}
-
-dependencies {
-    implementation KotlinX.coroutines.core
+interface DuckAiDevCapabilityPlugin {
+    fun title(): String
+    fun subtitle(): String
+    fun onCapabilityClicked(activityContext: Context)
 }

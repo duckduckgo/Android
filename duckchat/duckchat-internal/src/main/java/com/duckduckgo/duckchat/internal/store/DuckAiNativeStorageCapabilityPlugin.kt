@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.store.internal
+package com.duckduckgo.duckchat.internal.store
 
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.internalapi.DuckAiDevCapabilityPlugin
+import com.duckduckgo.duckchat.internal.DuckAiDevCapabilityPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.net.NetworkInterface
 import javax.inject.Inject

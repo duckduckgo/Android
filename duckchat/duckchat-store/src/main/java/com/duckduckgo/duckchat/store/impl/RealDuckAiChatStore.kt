@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.store.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.store.api.DuckAiChat
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
@@ -31,6 +29,33 @@ import logcat.logcat
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
+
+/**
+ * Stable metadata extracted from FE-owned chat JSON.
+ * Only top-level fields that are unlikely to change are parsed here.
+ * Message content is intentionally excluded — it is complex and FE-owned.
+ */
+data class DuckAiChat(
+    val chatId: String,
+    val title: String,
+    val model: String,
+    /** ISO-8601 string as stored by the FE, e.g. "2026-04-01T21:31:54.260Z" */
+    val lastEdit: String,
+    val pinned: Boolean,
+    /** UUIDs of files referenced by this chat, stored in the native file store */
+    val fileRefs: List<String> = emptyList(),
+)
+
+interface DuckAiChatStore {
+    /** True once the FE has completed migration of localStorage/IDB to native storage. */
+    suspend fun hasMigrated(): Boolean
+
+    /** Returns all chats currently in the native store. Skips entries with malformed JSON or missing chatId. */
+    suspend fun getChats(): List<DuckAiChat>
+
+    /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
+    suspend fun deleteChat(chatId: String): Boolean
+}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

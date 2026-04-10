@@ -191,6 +191,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "isMigrationDone" -> {
                         val key = jsMessage.params.optString("key")
                         val done = if (key.isNotBlank()) migrationPrefs.isMigrationDone(key) else false
+                        logcat { "DuckAiNativeStorage: isMigrationDone key=$key / done=$done" }
                         jsMessage.id?.let { id ->
                             jsMessaging.onResponse(
                                 JsCallbackData(

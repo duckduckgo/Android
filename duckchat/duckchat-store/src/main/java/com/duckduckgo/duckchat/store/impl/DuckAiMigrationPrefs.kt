@@ -47,6 +47,7 @@ class DuckAiMigrationPrefs @Inject constructor(
 
     companion object {
         const val CHATS_KEY = "chats"
+        const val ENTRIES_KEY = "entries"
         private const val PREFS_NAME = "duck_ai_migration_prefs"
     }
 }

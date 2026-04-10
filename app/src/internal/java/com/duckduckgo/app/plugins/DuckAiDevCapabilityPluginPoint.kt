@@ -18,7 +18,7 @@ package com.duckduckgo.app.plugins
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.internalapi.DuckAiDevCapabilityPlugin
+import com.duckduckgo.duckchat.internal.DuckAiDevCapabilityPlugin
 
 @ContributesPluginPoint(
     scope = AppScope::class,

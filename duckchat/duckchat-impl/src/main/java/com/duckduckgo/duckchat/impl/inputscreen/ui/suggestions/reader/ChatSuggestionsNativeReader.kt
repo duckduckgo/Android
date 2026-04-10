@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.store.api.DuckAiChat
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import org.json.JSONObject
 import java.time.Instant
 import java.time.LocalDateTime

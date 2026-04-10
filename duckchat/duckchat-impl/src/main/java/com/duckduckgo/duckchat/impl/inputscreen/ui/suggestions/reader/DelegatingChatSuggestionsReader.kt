@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import logcat.logcat

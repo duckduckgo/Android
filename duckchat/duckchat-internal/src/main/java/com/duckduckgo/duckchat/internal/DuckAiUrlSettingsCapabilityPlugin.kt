@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.internal
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.internalapi.DuckAiDevCapabilityPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

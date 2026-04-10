@@ -24,7 +24,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.internal.databinding.ActivityDuckAiDevBinding
-import com.duckduckgo.duckchat.internalapi.DuckAiDevCapabilityPlugin
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)

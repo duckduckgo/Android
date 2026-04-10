@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

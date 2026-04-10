@@ -28,7 +28,6 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':data-store-api')
     implementation project(':duckchat-api')
-    implementation project(':duck-ai-store-api')
     implementation project(':content-scope-scripts-api')
     implementation project(':js-messaging-api')
     implementation project(':di')

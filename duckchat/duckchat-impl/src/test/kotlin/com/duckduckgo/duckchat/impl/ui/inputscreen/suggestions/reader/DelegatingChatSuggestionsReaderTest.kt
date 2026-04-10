@@ -22,7 +22,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSugges
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.DelegatingChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
-import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

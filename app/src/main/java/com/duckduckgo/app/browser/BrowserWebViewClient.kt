@@ -543,8 +543,12 @@ class BrowserWebViewClient @Inject constructor(
         isReload: Boolean,
     ) {
         super.doUpdateVisitedHistory(view, url, isReload)
-        logcat { "doUpdateVisitedHistory url=$url" }
-        if (url != null && url != view?.originalUrl) webViewClientListener?.onHistoryUrlChanged(url)
+        url?.let {
+            if (duckChat.isDuckChatUrl(it.toUri())) {
+                logcat { "doUpdateVisitedHistory url=$it" }
+                if (it != view?.originalUrl) webViewClientListener?.onHistoryUrlChanged(it)
+            }
+        }
     }
 
     /**
