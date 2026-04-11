@@ -570,6 +570,8 @@ class WebViewRequestInterceptorTest {
         )
 
         verify(webView, never()).loadUrl(any(), any())
+        verify(mockWebViewClientListener, never()).redirectTriggeredByGpc()
+        verify(mockGpc, never()).getHeaders(anyString())
     }
 
     @Test
