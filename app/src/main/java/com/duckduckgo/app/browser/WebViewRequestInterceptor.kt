@@ -154,7 +154,7 @@ class WebViewRequestInterceptor(
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(url.toString(), getReloadHeaders(request, webView.context.packageName))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -165,7 +165,7 @@ class WebViewRequestInterceptor(
             val newUri = url?.let { httpsUpgrader.upgrade(url) }
 
             withContext(dispatchers.main()) {
-                webView.loadUrl(newUri.toString(), getHeaders(request))
+                webView.loadUrl(newUri.toString(), getReloadHeaders(request, webView.context.packageName))
             }
 
             webViewClientListener?.upgradedToHttps()
@@ -188,7 +188,7 @@ class WebViewRequestInterceptor(
         if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(url.toString(), getReloadHeaders(request, webView.context.packageName))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -363,9 +363,13 @@ class WebViewRequestInterceptor(
         return WebResourceResponse(null, null, null)
     }
 
-    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
-        return request.requestHeaders.apply {
+    private fun getReloadHeaders(
+        request: WebResourceRequest,
+        packageName: String,
+    ): Map<String, String> {
+        return request.requestHeaders.toMutableMap().apply {
             putAll(gpc.getHeaders(request.url.toString()))
+            putIfAbsent(X_REQUESTED_WITH_HEADER, packageName)
         }
     }
 
@@ -442,4 +446,8 @@ class WebViewRequestInterceptor(
 
     private fun appUrlPixel(url: Uri?): Boolean =
         url?.toString()?.startsWith(AppUrl.Url.PIXEL) == true
+
+    companion object {
+        private const val X_REQUESTED_WITH_HEADER = "X-Requested-With"
+    }
 }
