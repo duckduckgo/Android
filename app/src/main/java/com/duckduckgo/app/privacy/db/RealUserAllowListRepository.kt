@@ -69,12 +69,16 @@ class RealUserAllowListRepository @Inject constructor(
     override suspend fun addDomainToUserAllowList(domain: String) {
         withContext(dispatcherProvider.io()) {
             userAllowListDao.insert(domain)
+            if (!userAllowList.contains(domain)) {
+                userAllowList.add(domain)
+            }
         }
     }
 
     override suspend fun removeDomainFromUserAllowList(domain: String) {
         withContext(dispatcherProvider.io()) {
             userAllowListDao.delete(domain)
+            userAllowList.remove(domain)
         }
     }
 

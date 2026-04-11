@@ -93,11 +93,34 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
+    fun whenDomainIsAddedToUserAllowListThenImmediateReadsReturnTrue() = runTest {
+        assertFalse(repository.isUrlInUserAllowList("https://example.com"))
+
+        repository.addDomainToUserAllowList("example.com")
+
+        assertTrue(repository.isUrlInUserAllowList("https://example.com"))
+        assertTrue(repository.isDomainInUserAllowList("example.com"))
+        assertEquals(listOf("example.com"), repository.domainsInUserAllowList())
+    }
+
+    @Test
     fun whenDomainIsRemovedFromUserAllowListThenItGetsDeletedFromDb() = runTest {
         dao.insert("example.com")
         assertTrue(dao.contains("example.com"))
         repository.removeDomainFromUserAllowList("example.com")
         assertFalse(dao.contains("example.com"))
+    }
+
+    @Test
+    fun whenDomainIsRemovedFromUserAllowListThenImmediateReadsReturnFalse() = runTest {
+        repository.addDomainToUserAllowList("example.com")
+        assertTrue(repository.isUrlInUserAllowList("https://example.com"))
+
+        repository.removeDomainFromUserAllowList("example.com")
+
+        assertFalse(repository.isUrlInUserAllowList("https://example.com"))
+        assertFalse(repository.isDomainInUserAllowList("example.com"))
+        assertEquals(emptyList<String>(), repository.domainsInUserAllowList())
     }
 
     @Test
