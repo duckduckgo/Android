@@ -23,8 +23,8 @@ tags:
       - assertVisible:
             text: ".*browsing activity with the fire button.*"
       - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-      - tapOn: "Cancel"
+      - runFlow: ../shared/browser_screen/dismiss_fire_dialog.yaml
       - assertNotVisible: ".*browsing activity with the Fire Button.*"
       - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-      - tapOn: "Delete Tabs and Data"
+      - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
       - assertVisible: "You've got this!.*"
