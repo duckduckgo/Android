@@ -367,14 +367,16 @@ class WebViewRequestInterceptor(
         request: WebResourceRequest,
         packageName: String,
     ): Map<String, String> {
-        return request.requestHeaders.toMutableMap().apply {
+        return request.requestHeaders.orEmpty().toMutableMap().apply {
+            if (this[X_REQUESTED_WITH_HEADER] == packageName) {
+                remove(X_REQUESTED_WITH_HEADER)
+            }
             putAll(gpc.getHeaders(request.url.toString()))
-            putIfAbsent(X_REQUESTED_WITH_HEADER, packageName)
         }
     }
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
-        val existingHeaders = request.requestHeaders
+        val existingHeaders = request.requestHeaders.orEmpty()
         return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }
 

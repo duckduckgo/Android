@@ -18,7 +18,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
 import android.net.Uri
 import android.webkit.WebBackForwardList
 import android.webkit.WebHistoryItem
@@ -68,7 +67,6 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -108,15 +106,12 @@ class WebViewRequestInterceptorTest {
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private var webView: WebView = mock()
-    private val mockContext: Context = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
         configureUserAgent()
         configureStack()
-        whenever(webView.context).thenReturn(mockContext)
-        whenever(mockContext.packageName).thenReturn(PACKAGE_NAME)
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
@@ -482,7 +477,6 @@ class WebViewRequestInterceptorTest {
         configureShouldUpgrade()
         configureShouldAddGpcHeader()
         val mockWebViewClientListener: WebViewClientListener = mock()
-        val headersCaptor = argumentCaptor<Map<String, String>>()
 
         testee.shouldIntercept(
             request = mockRequest,
@@ -491,9 +485,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener,
         )
 
-        verify(webView).loadUrl(eq(validHttpsUri().toString()), headersCaptor.capture())
-        assertEquals("test", headersCaptor.firstValue["test"])
-        assertEquals(PACKAGE_NAME, headersCaptor.firstValue[X_REQUESTED_WITH_HEADER])
+        verify(webView).loadUrl(validHttpsUri().toString(), mockGpc.getHeaders(validHttpsUri().toString()))
     }
 
     @Test
@@ -519,7 +511,6 @@ class WebViewRequestInterceptorTest {
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
         val mockWebViewClientListener: WebViewClientListener = mock()
-        val headersCaptor = argumentCaptor<Map<String, String>>()
 
         testee.shouldIntercept(
             request = mockRequest,
@@ -528,9 +519,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener,
         )
 
-        verify(webView).loadUrl(eq(validUri().toString()), headersCaptor.capture())
-        assertEquals("test", headersCaptor.firstValue["test"])
-        assertEquals(PACKAGE_NAME, headersCaptor.firstValue[X_REQUESTED_WITH_HEADER])
+        verify(webView).loadUrl(validUri().toString(), mockGpc.getHeaders(validUri().toString()))
     }
 
     @Test
@@ -587,7 +576,6 @@ class WebViewRequestInterceptorTest {
     fun whenUserAgentShouldChangeThenReloadUrl() = runTest {
         configureUserAgentShouldChange()
         configureUrlDoesNotExistInTheStack()
-        val headersCaptor = argumentCaptor<Map<String, String>>()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -597,8 +585,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener,
         )
 
-        verify(webView).loadUrl(eq("https://m.facebook.com"), headersCaptor.capture())
-        assertEquals(PACKAGE_NAME, headersCaptor.firstValue[X_REQUESTED_WITH_HEADER])
+        verify(webView).loadUrl(eq("https://m.facebook.com"), eq(emptyMap()))
     }
 
     @Test
@@ -909,8 +896,6 @@ class WebViewRequestInterceptorTest {
     }
 
     companion object {
-        private const val PACKAGE_NAME = "com.duckduckgo.mobile.android"
-        private const val X_REQUESTED_WITH_HEADER = "X-Requested-With"
         const val DEFAULT =
             "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"

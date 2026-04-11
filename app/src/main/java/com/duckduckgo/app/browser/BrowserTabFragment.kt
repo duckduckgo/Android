@@ -3634,6 +3634,7 @@ class BrowserTabFragment :
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
                 setAlgorithmicDarkeningAllowed(this)
+                setRequestedWithHeaderOriginAllowList(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -4092,6 +4093,12 @@ class BrowserTabFragment :
         // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, settingsDataStore.experimentalWebsiteDarkMode)
+        }
+    }
+
+    private fun setRequestedWithHeaderOriginAllowList(settings: WebSettings) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
+            WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, emptySet())
         }
     }
 
