@@ -2243,6 +2243,7 @@ class BrowserTabFragment :
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
+        browserNavigationBarIntegration.configureDuckAIViewMode()
         showNativeInput()
     }
 

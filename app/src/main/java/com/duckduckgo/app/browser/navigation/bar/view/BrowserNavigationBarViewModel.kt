@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.DuckAI
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.TabManager
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -134,6 +135,16 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
                         isBrowserMode = true,
+                    )
+                }
+            }
+
+            DuckAI -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        isBrowserMode = false,
                     )
                 }
             }

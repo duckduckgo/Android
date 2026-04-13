@@ -263,4 +263,31 @@ class BrowserNavigationBarViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `when default browser highlight in DuckAI mode then highlight is not shown`() = runTest {
+        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.DuckAI)
+            val updated = awaitItem()
+            Assert.assertFalse(updated.showBrowserMenuHighlight) // DuckAI mode hides default browser highlight
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when setViewMode DuckAI then viewState reflects DuckAI configuration`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.DuckAI)
+            val updated = awaitItem()
+            Assert.assertTrue(updated.newTabButtonVisible)
+            Assert.assertFalse(updated.autofillButtonVisible)
+            Assert.assertFalse(updated.isBrowserMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
