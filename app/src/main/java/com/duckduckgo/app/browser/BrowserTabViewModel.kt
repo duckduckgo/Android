@@ -3213,8 +3213,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarRepository.omnibarType == OmnibarType.SPLIT)
     }
 
-    fun onPopupMenuLaunched() {
-        additionalDefaultBrowserPrompts.onPopupMenuLaunched()
+    fun onBrowserMenuLaunched() {
+        additionalDefaultBrowserPrompts.onClearMenuHighlight()
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {

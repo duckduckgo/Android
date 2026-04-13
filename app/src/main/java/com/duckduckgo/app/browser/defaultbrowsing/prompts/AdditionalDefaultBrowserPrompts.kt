@@ -27,7 +27,7 @@ interface AdditionalDefaultBrowserPrompts {
     val showSetAsDefaultMessage: StateFlow<Boolean>
     val commands: Flow<Command>
 
-    fun onPopupMenuLaunched()
+    fun onClearMenuHighlight()
     fun onSetAsDefaultPopupMenuItemSelected()
 
     fun onMessageDialogShown()

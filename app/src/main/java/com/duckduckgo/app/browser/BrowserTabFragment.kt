@@ -1864,6 +1864,7 @@ class BrowserTabFragment :
                 if (bottomSheetMenu?.isShowing != true) {
                     return@postDelayed
                 }
+                viewModel.onBrowserMenuLaunched()
                 val viewState = viewModel.browserViewState.value
                 if (isActiveCustomTab()) {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
@@ -1904,7 +1905,7 @@ class BrowserTabFragment :
                 } else {
                     popupMenu?.show(binding.rootView, omnibar.toolbar)
                 }
-                viewModel.onPopupMenuLaunched()
+                viewModel.onBrowserMenuLaunched()
                 fireMenuOpenedPixels(isFocusedNtp, currentViewState)
             }
         }

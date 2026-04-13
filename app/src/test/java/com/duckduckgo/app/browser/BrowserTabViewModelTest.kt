@@ -7155,10 +7155,10 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenPopupMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() =
+    fun whenBrowserMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() =
         runTest {
-            testee.onPopupMenuLaunched()
-            verify(mockAdditionalDefaultBrowserPrompts).onPopupMenuLaunched()
+            testee.onBrowserMenuLaunched()
+            verify(mockAdditionalDefaultBrowserPrompts).onClearMenuHighlight()
         }
 
     @Test
