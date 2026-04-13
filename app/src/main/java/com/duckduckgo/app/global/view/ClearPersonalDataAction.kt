@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.annotation.VisibleForTesting
 import androidx.webkit.WebStorageCompat
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
@@ -137,6 +138,15 @@ class ClearPersonalDataAction(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
+    @VisibleForTesting
+    internal val deleteSiteData: suspend (WebStorage, String) -> Unit = { webStorage, domain ->
+        @SuppressLint("RequiresFeature")
+        suspendCancellableCoroutine { continuation ->
+            WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
+                continuation.resume(Unit)
+            }
+        }
+    },
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -228,7 +238,6 @@ class ClearPersonalDataAction(
         }
     }
 
-    @SuppressLint("RequiresFeature")
     override suspend fun clearDataForSpecificDomains(
         domains: Set<String>,
     ): ClearDataResult {
@@ -239,7 +248,9 @@ class ClearPersonalDataAction(
 
         return try {
             val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync().mapNotNull { it.domain.toTldPlusOne() }
+                fireproofWebsiteRepository.fireproofWebsitesSync()
+                    .mapNotNull { it.domain.toTldPlusOne() }
+                    .toSet()
             }
 
             withContext(dispatchers.main()) {
@@ -247,11 +258,7 @@ class ClearPersonalDataAction(
                 domains
                     .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
                     .forEach { domain ->
-                        suspendCancellableCoroutine { continuation ->
-                            WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
-                                continuation.resume(Unit)
-                            }
-                        }
+                        deleteSiteData(webStorage, domain)
                     }
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
