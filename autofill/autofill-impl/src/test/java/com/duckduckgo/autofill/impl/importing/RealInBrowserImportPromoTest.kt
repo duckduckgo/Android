@@ -49,7 +49,7 @@ class RealInBrowserImportPromoParameterizedTest(
     fun setup() = runTest {
         whenever(autofillStore.hasEverImportedPasswords).thenReturn(testCase.hasEverImportedPasswords)
         whenever(autofillStore.hasDeclinedInBrowserPasswordImportPromo).thenReturn(testCase.hasDeclinedPromo)
-        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(testCase.credentialCount))
+        whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(testCase.credentialCount)))
         whenever(autofillStore.inBrowserImportPromoShownCount).thenReturn(testCase.promoShownCount)
         whenever(neverSavedSiteRepository.isInNeverSaveList(EXAMPLE_URL)).thenReturn(false)
         whenever(neverSavedSiteRepository.isInNeverSaveList(NEVER_SAVE_URL)).thenReturn(true)

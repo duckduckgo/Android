@@ -48,7 +48,7 @@ class DisablePromptCredentialsObserver @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             if (internalAutofillStore.autofillAvailable() && autofillDeclineCounter.isDeclineCounterActive()) {
                 observerJob += internalAutofillStore.getCredentialCount().onEach { credentialsCount ->
-                    if (credentialsCount > 0) {
+                    if (credentialsCount.getOrThrow() > 0) {
                         autofillDeclineCounter.disableDeclineCounter()
                         observerJob.cancel()
                     }

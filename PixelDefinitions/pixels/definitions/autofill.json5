@@ -528,5 +528,33 @@
                 "enum": ["true", "false"]
             }
         ]
+    },
+    "autofill_decrypt_failed": {
+        "description": "Decrypting autofill data failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_encrypt_failed": {
+        "description": "Encrypting autofill data failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            }
+        ]
     }
 }

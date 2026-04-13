@@ -493,7 +493,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.clearAllSavedLoginsButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
-                val count = autofillStore.getCredentialCount().first()
+                val count = autofillStore.getCredentialCount().first().getOrThrow()
                 withContext(dispatchers.main()) {
                     confirmLoginDeletion(count)
                 }
@@ -504,7 +504,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatchers.main()) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 autofillStore.getCredentialCount().collect { count ->
-                    binding.clearAllSavedLoginsButton.isEnabled = count > 0
+                    binding.clearAllSavedLoginsButton.isEnabled = count.getOrThrow() > 0
                     binding.clearAllSavedLoginsButton.setSecondaryText(getString(R.string.autofillDevSettingsClearLoginsSubtitle, count))
                 }
             }
