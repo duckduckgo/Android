@@ -1180,9 +1180,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     decorationView = leftWingView,
                 )
                 binding.leftWingAnimation.apply {
+                    cancelAnimation()
                     isVisible = showLeftWing
                     alpha = 1f
+                    setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
                     progress = WING_STOP_PROGRESS
+                }
+                if (showLeftWing) {
+                    (binding.leftWingAnimation.parent as? View)?.requestLayout()
                 }
 
                 binding.logoAnimation.alpha = 0f
