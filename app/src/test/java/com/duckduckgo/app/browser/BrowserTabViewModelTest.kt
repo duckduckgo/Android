@@ -4477,6 +4477,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLinkTextCopiedAndNoNotificationShownThenShowToastCommandIssued() {
+        testee.onLinkTextCopied(wasNotificationShown = false)
+        assertCommandIssued<Command.ShowToast> {
+            assertEquals(R.string.linkTextCopied, textResId)
+        }
+    }
+
+    @Test
+    fun whenLinkTextCopiedAndNotificationAlreadyShownThenShowToastCommandNotIssued() {
+        testee.onLinkTextCopied(wasNotificationShown = true)
+        assertCommandNotIssued<Command.ShowToast>()
+    }
+
+    @Test
     fun whenUserClicksBookmarksMenuItemThenPixelIsSent() {
         testee.onBookmarksMenuItemClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
