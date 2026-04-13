@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-gyorsparancsok</string>
     <string name="duck_ai_shortcut_settings_description">Válaszd ki a megjelenítendő Duck.ai-gyorsparancsokat</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Új lap kapcsolójának pozíciója</string>
+    <string name="duckAiDefaultTogglePositionSearch">Keresés</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Utoljára használt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Beszédhangalapú keresés</string>
 
