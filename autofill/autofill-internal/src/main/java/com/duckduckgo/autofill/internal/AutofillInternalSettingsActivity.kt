@@ -503,9 +503,11 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         // keep the number of saved logins up-to-date
         lifecycleScope.launch(dispatchers.main()) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                autofillStore.getCredentialCount().collect { count ->
-                    binding.clearAllSavedLoginsButton.isEnabled = count.getOrThrow() > 0
-                    binding.clearAllSavedLoginsButton.setSecondaryText(getString(R.string.autofillDevSettingsClearLoginsSubtitle, count))
+                autofillStore.getCredentialCount().collect {
+                    it.getOrThrow().let { count ->
+                        binding.clearAllSavedLoginsButton.isEnabled = count > 0
+                        binding.clearAllSavedLoginsButton.setSecondaryText(getString(R.string.autofillDevSettingsClearLoginsSubtitle, count))
+                    }
                 }
             }
         }
