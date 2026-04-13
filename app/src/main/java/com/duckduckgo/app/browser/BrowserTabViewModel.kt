@@ -2159,7 +2159,7 @@ class BrowserTabViewModel @Inject constructor(
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
-        if (progressBarUpgradeFeature.self().isEnabled() && hasCompletedPageLoad) return
+        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
 
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
@@ -2169,7 +2169,7 @@ class BrowserTabViewModel @Inject constructor(
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        val reportedProgress = if (progressBarUpgradeFeature.self().isEnabled()) {
+        val reportedProgress = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) {
             newProgress
         } else {
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
@@ -2177,7 +2177,7 @@ class BrowserTabViewModel @Inject constructor(
 
         // Track the first time we escape from max progress threshold for Wide Events
         val currentUrl = webViewNavigationState.currentUrl
-        val progressThreshold = if (progressBarUpgradeFeature.self().isEnabled()) UPGRADED_PROGRESS_THRESHOLD else FIXED_PROGRESS
+        val progressThreshold = if (progressBarUpgradeFeature.behaviourUpdate().isEnabled()) UPGRADED_PROGRESS_THRESHOLD else FIXED_PROGRESS
         if (!hasExitedFixedProgress && currentUrl != null && newProgress > progressThreshold) {
             hasExitedFixedProgress = true
             pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
@@ -2274,7 +2274,7 @@ class BrowserTabViewModel @Inject constructor(
         // Reset progress so stale progress=100 from the previous page doesn't
         // trigger tracker animations before the new page's progress events arrive
         val progress = currentLoadingViewState()
-        if (progressBarUpgradeFeature.self().isEnabled() && progress.progress == 100) {
+        if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && progress.progress == 100) {
             loadingViewState.value = progress.copy(progress = 0)
         }
 

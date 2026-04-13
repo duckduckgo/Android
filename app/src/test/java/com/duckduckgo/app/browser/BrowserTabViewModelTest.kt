@@ -1655,7 +1655,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
 
         testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
@@ -1675,7 +1675,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressReaches100ThenSubsequentProgressEventsAreIgnored() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         assertEquals(true, loadingViewState().isLoading)
@@ -1691,7 +1691,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPageStartedAfterCompletionThenProgressEventsFlowAgain() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
         testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
@@ -1711,7 +1711,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressBarUpgradeEnabledThenRawProgressPassedThrough() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = true))
         setBrowserShowing(true)
 
         testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
@@ -1721,7 +1721,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressBarUpgradeDisabledThenProgressFlooredAtFixedProgress() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
 
         testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
@@ -1775,7 +1775,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
-        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
+        fakeProgressBarUpgradeFeature.behaviourUpdate().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
