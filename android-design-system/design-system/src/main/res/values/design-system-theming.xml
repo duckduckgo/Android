@@ -131,6 +131,10 @@
         <item name="preferredNavigationBarColor">?attr/daxColorSurface</item>
         <item name="daxColorToolbar">?attr/daxColorSurface</item>
         <item name="daxColorBrowserOverlay">?attr/daxColorSurface</item>
+        <item name="daxColorOmnibarCard">?attr/daxColorWindow</item>
+        <item name="daxColorOmnibarText">?attr/daxColorPrimaryText</item>
+        <item name="daxColorOmnibarTextHint">?attr/daxColorSecondaryText</item>
+        <item name="daxColorOmnibarIcon">?attr/daxColorPrimaryIcon</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>

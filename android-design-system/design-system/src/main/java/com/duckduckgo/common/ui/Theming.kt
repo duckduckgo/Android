@@ -44,6 +44,15 @@ enum class DuckDuckGoTheme {
     }
 }
 
+/**
+ * Temporary global flag for fire mode theming POC.
+ * When true, [applyTheme] will select the fire variant of the current theme.
+ */
+object FireModeTheme {
+    @Volatile
+    var isFireMode: Boolean = false
+}
+
 object Theming {
     object Constants {
         const val BROADCAST_THEME_CHANGED = "BROADCAST_THEME_CHANGED"
@@ -66,18 +75,19 @@ fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
 }
 
 fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
+    val fire = FireModeTheme.isFireMode
     return when (theme) {
-        SYSTEM_DEFAULT -> getSystemDefaultTheme()
-        DARK -> R.style.Theme_DuckDuckGo_Dark
-        else -> R.style.Theme_DuckDuckGo_Light
+        SYSTEM_DEFAULT -> getSystemDefaultTheme(fire)
+        DARK -> if (fire) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
+        else -> if (fire) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
 }
 
-private fun Context.getSystemDefaultTheme(): Int {
+private fun Context.getSystemDefaultTheme(fire: Boolean = false): Int {
     return if (isInNightMode()) {
-        R.style.Theme_DuckDuckGo_Dark
+        if (fire) R.style.Theme_DuckDuckGo_Dark_Fire else R.style.Theme_DuckDuckGo_Dark
     } else {
-        R.style.Theme_DuckDuckGo_Light
+        if (fire) R.style.Theme_DuckDuckGo_Light_Fire else R.style.Theme_DuckDuckGo_Light
     }
 }
 
@@ -105,4 +115,13 @@ private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiv
 fun AppCompatActivity.sendThemeChangedBroadcast() {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
+}
+
+/**
+ * POC: Toggle fire mode and recreate the activity to apply the fire theme.
+ * This is Approach 2 — test to evaluate the visual disruption of recreate().
+ */
+fun AppCompatActivity.toggleFireModeWithRecreate() {
+    FireModeTheme.isFireMode = !FireModeTheme.isFireMode
+    sendThemeChangedBroadcast()
 }

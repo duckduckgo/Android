@@ -64,6 +64,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.toggleFireModeWithRecreate
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
@@ -560,6 +561,11 @@ class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
             omnibarItemPressedListener?.onFireButtonPressed()
+        }
+        // POC: Long-press fire icon to toggle fire mode theme (Approach 2: recreate)
+        fireIconMenu.setOnLongClickListener {
+            (context as? androidx.appcompat.app.AppCompatActivity)?.toggleFireModeWithRecreate()
+            true
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()

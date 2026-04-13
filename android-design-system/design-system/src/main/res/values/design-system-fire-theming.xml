@@ -1,0 +1,76 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!--
+      Fire Mode theme overlays.
+      These override specific daxColor* attributes to give the browser chrome
+      a fire-mode look (dark address bar, mandarin/orange accents) while
+      keeping everything else unchanged.
+    -->
+
+    <style name="Theme.DuckDuckGo.Light.Fire" parent="Theme.DuckDuckGo.Light">
+        <!-- Accent: blue -> mandarin -->
+        <item name="daxColorAccentBlue">@color/mandarin50</item>
+
+        <!-- Tab switcher: active tab border -> mandarin -->
+        <item name="daxColorTabHighlight">@color/mandarin50</item>
+
+        <!-- Omnibar: dark charcoal card with light text -->
+        <item name="daxColorOmnibarCard">@color/gray90</item>
+        <item name="daxColorOmnibarText">@color/white84</item>
+        <item name="daxColorOmnibarTextHint">@color/white60</item>
+        <item name="daxColorOmnibarIcon">@color/white84</item>
+
+        <!-- Address bar backdrop -->
+        <item name="daxColorBackdrop">@color/gray90</item>
+        <item name="daxColorInputModeIndicator">@color/gray90</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/black</item>
+
+        <!-- Primary button: mandarin -->
+        <item name="daxColorButtonPrimaryContainer">@color/mandarin50</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/mandarin60</item>
+
+        <!-- FAB: mandarin -->
+        <item name="daxColorFabPrimaryContainer">@color/mandarin50</item>
+        <item name="daxColorFabPrimaryContainerPressed">@color/mandarin60</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Dark.Fire" parent="Theme.DuckDuckGo.Dark">
+        <!-- Accent: blue -> mandarin -->
+        <item name="daxColorAccentBlue">@color/mandarin40</item>
+
+        <!-- Tab switcher: active tab border -> mandarin -->
+        <item name="daxColorTabHighlight">@color/mandarin40</item>
+
+        <!-- Omnibar: deeper dark card -->
+        <item name="daxColorOmnibarCard">@color/gray100</item>
+
+        <!-- Address bar backdrop -->
+        <item name="daxColorBackdrop">@color/gray100</item>
+        <item name="daxColorInputModeIndicator">@color/gray100</item>
+
+        <!-- Primary button: mandarin -->
+        <item name="daxColorButtonPrimaryContainer">@color/mandarin40</item>
+        <item name="daxColorButtonPrimaryContainerPressed">@color/mandarin50</item>
+
+        <!-- FAB: mandarin -->
+        <item name="daxColorFabPrimaryContainer">@color/mandarin40</item>
+        <item name="daxColorFabPrimaryContainerPressed">@color/mandarin50</item>
+    </style>
+
+</resources>

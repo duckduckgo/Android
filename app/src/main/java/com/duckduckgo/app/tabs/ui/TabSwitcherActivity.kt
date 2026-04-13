@@ -74,6 +74,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.toggleFireModeWithRecreate
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -584,6 +585,14 @@ class TabSwitcherActivity :
             dynamicMenu = viewState.dynamicInterface,
             navigationBar = binding.navigationBar,
         )
+
+        // POC: Long-press fire button in tab switcher to toggle fire mode
+        toolbar.post {
+            toolbar.findViewById<View>(R.id.fireToolbarButton)?.setOnLongClickListener {
+                toggleFireModeWithRecreate()
+                true
+            }
+        }
 
         return true
     }
