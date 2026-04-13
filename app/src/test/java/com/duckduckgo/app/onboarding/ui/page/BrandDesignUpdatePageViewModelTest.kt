@@ -284,6 +284,18 @@ class BrandDesignUpdatePageViewModelTest {
         )
     }
 
+    @Test
+    fun whenPrimaryCtaFromComparisonChartAndDialogIntentNullThenFiresDialogNotShownPixel() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
+        testee.onPrimaryCtaClicked() // COMPARISON_CHART with null intent
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+    }
+
     // endregion
 
     // region onPrimaryCtaClicked - skip onboarding
@@ -505,6 +517,26 @@ class BrandDesignUpdatePageViewModelTest {
         }
     }
 
+    @Test
+    fun whenDefaultBrowserSetThenFiresDefaultBrowserSetPixel() {
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        verify(mockPixel).fire(
+            AppPixelName.DEFAULT_BROWSER_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    @Test
+    fun whenDefaultBrowserNotSetThenFiresDefaultBrowserNotSetPixel() {
+        val testee = createViewModel()
+        testee.onDefaultBrowserNotSet()
+        verify(mockPixel).fire(
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
+    }
+
     // endregion
 
     // region Address bar position and input screen selection
@@ -631,6 +663,30 @@ class BrandDesignUpdatePageViewModelTest {
             val state = awaitItem()
             assertFalse(state.hasAnimatedCurrentDialog)
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region onScreenTapped
+
+    @Test
+    fun whenOnDialogTappedThenSkipDialogAnimationCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onDialogTapped()
+            val command = awaitItem()
+            assertTrue(command is Command.SkipDialogAnimation)
+        }
+    }
+
+    @Test
+    fun whenOnBackgroundTappedThenSkipDialogAnimationCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onBackgroundTapped()
+            val command = awaitItem()
+            assertTrue(command is Command.SkipDialogAnimation)
         }
     }
 

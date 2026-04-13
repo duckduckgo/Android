@@ -121,6 +121,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
+        data object SkipDialogAnimation : Command
+    }
+
+    fun onDialogTapped() {
+        skipDialogAnimations()
+    }
+
+    fun onBackgroundTapped() {
+        skipDialogAnimations()
     }
 
     fun onDialogAnimationStarted() {
@@ -242,7 +251,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN -> {
-                viewModelScope.launch(dispatchers.io()) {
+                viewModelScope.launch {
                     val inputSelected = _viewState.value.inputScreenSelected
                     val isReinstall = _viewState.value.isReinstallUser
                     if (inputSelected) {
@@ -332,4 +341,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
                 androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
         }
+
+    private fun skipDialogAnimations() {
+        viewModelScope.launch {
+            _commands.send(Command.SkipDialogAnimation)
+        }
+    }
 }

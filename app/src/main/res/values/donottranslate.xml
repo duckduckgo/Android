@@ -59,6 +59,10 @@
     <string name="preOnboardingAddressBarPositionBottom">Bottom</string>
     <string name="preOnboardingAddressBarPositionSplit">Split</string>
 
+    <!-- Pre-onboarding Input Screen (AI Chat Toggle) -->
+    <string name="preOnboardingInputScreenSearchOnly">Search Only</string>
+    <string name="preOnboardingInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
+
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 

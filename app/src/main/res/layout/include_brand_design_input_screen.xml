@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:paddingHorizontal="12dp">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inputScreenTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/preOnboardingInputScreenTitleUpdated"
+            android:visibility="invisible"
+            app:typography="onboarding_title" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/inputScreenTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="?attr/daxColorPrimaryText" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/inputScreenOptionsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:alpha="1">
+
+        <LinearLayout
+            android:id="@+id/inputScreenSearchOnlyContainer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foreground="@drawable/selectable_large_rounded_ripple">
+
+                <ImageView
+                    android:id="@+id/inputScreenSearchOnlyImageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/inputScreenSearchOnlyImageFront"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY"
+                    tools:src="@drawable/searchbox_withoutai_active" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/inputScreenSearchOnlyCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label"
+                android:gravity="center_horizontal"
+                android:text="@string/input_screen_user_pref_without_ai_updated"
+                tools:ignore="NestedWeights" />
+
+            <com.duckduckgo.common.ui.view.button.RadioButton
+                android:id="@+id/inputScreenSearchOnlyCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@null"
+                android:checked="false"
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:buttonTint="@color/onboarding_radio_button_tint"
+                tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/inputScreenWithAiContainer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foreground="@drawable/selectable_large_rounded_ripple">
+
+                <ImageView
+                    android:id="@+id/inputScreenWithAiImageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY" />
+
+                <ImageView
+                    android:id="@+id/inputScreenWithAiImageFront"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitXY"
+                    tools:src="@drawable/searchbox_withai_inactive" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/inputScreenWithAiCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Label"
+                android:text="@string/input_screen_user_pref_with_ai_updated"
+                tools:ignore="NestedWeights" />
+
+            <com.duckduckgo.common.ui.view.button.RadioButton
+                android:id="@+id/inputScreenWithAiCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@null"
+                android:checked="false"
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:buttonTint="@color/onboarding_radio_button_tint"
+                tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/inputScreenDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        android:layout_marginTop="16dp"
+        android:gravity="start"
+        android:fontFamily="@font/ducksansproduct_regular"
+        android:text="@string/preOnboardingInputScreenDescription"
+        app:textType="secondary"
+        app:typography="body1"
+        tools:alpha="1" />
+
+</LinearLayout>
