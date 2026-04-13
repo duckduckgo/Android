@@ -180,6 +180,7 @@ import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.ClipboardImageInjector
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -374,7 +375,6 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
 import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
@@ -623,6 +623,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var addressDisplayFormatter: AddressDisplayFormatter
 
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -717,6 +720,7 @@ class BrowserTabFragment :
     private var isWebViewGestureInProgress = false
     private var lastTouchX: Float = 0f
     private var lastTouchY: Float = 0f
+    private var lastLongPressUrl: String? = null
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -2627,6 +2631,10 @@ class BrowserTabFragment :
                 hideKeyboard()
             }
 
+            is Command.ShowToast -> {
+                Toast.makeText(requireActivity(), it.textResId, Toast.LENGTH_LONG).show()
+            }
+
             is Command.HideKeyboardForChat -> {
                 hideKeyboardForChat()
             }
@@ -4302,6 +4310,7 @@ class BrowserTabFragment :
     ) {
         webView?.safeHitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
+            lastLongPressUrl = target.url
             viewModel.userLongPressedInWebView(target, menu)
         }
     }
@@ -4350,7 +4359,8 @@ class BrowserTabFragment :
                 lifecycleScope.launch {
                     val text = extractLinkTextAtPoint()
                     if (text != null) {
-                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, text))
+                        val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
+                        viewModel.onLinkTextCopied(wasNotificationShown)
                     }
                 }
                 return true
@@ -4372,18 +4382,17 @@ class BrowserTabFragment :
 
     private suspend fun extractLinkTextAtPoint(): String? {
         val wv = webView ?: return null
+        val escapedUrl = lastLongPressUrl
+            ?.replace("\\", "\\\\")
+            ?.replace("'", "\\'")
+            ?.replace("\n", "\\n")
+            ?.replace("\r", "\\r")
+        val urlParam = if (escapedUrl != null) "'$escapedUrl'" else "null"
         return suspendCancellableCoroutine { continuation ->
-            val js = """
-                (function() {
-                    var el = document.elementFromPoint($lastTouchX, $lastTouchY);
-                    while (el && el.tagName !== 'A') { el = el.parentElement; }
-                    if (el && el.innerText) { return el.innerText.trim(); }
-                    return '';
-                })()
-            """.trimIndent()
+            val js = String.format(JS_EXTRACT_LINK_TEXT, lastTouchX, lastTouchY, urlParam)
             wv.evaluateJavascript(js) { result ->
                 val text = result?.trim('"')?.takeIf { it.isNotEmpty() && it != "null" }
-                continuation.resume(text) {}
+                continuation.resume(text) { _, _, _ -> }
             }
         }
     }
@@ -4963,6 +4972,31 @@ class BrowserTabFragment :
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
 
         private const val STORE_PREFIX = "market://details?id="
+
+        private const val JS_EXTRACT_LINK_TEXT = """
+            (function() {
+                var x = %s, y = %s;
+                var el = document.elementFromPoint(x, y);
+                while (el && el.tagName !== 'A') { el = el.parentElement; }
+                if (el && el.innerText) { return el.innerText.trim(); }
+                var targetUrl = %s;
+                if (!targetUrl) return '';
+                var links = document.querySelectorAll('a[href]');
+                var best = null;
+                var bestDist = Infinity;
+                for (var i = 0; i < links.length; i++) {
+                    var a = links[i];
+                    if (a.href !== targetUrl) continue;
+                    var rect = a.getBoundingClientRect();
+                    var dx = Math.max(rect.left - x, 0, x - rect.right);
+                    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < bestDist) { bestDist = dist; best = a; }
+                }
+                if (best && best.innerText && bestDist < 50) { return best.innerText.trim(); }
+                return '';
+            })()
+        """
 
         fun newInstance(
             tabId: String,
