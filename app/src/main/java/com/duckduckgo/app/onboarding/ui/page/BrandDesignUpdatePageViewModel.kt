@@ -251,7 +251,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN -> {
-                viewModelScope.launch(dispatchers.io()) {
+                viewModelScope.launch {
                     val inputSelected = _viewState.value.inputScreenSelected
                     val isReinstall = _viewState.value.isReinstallUser
                     if (inputSelected) {
