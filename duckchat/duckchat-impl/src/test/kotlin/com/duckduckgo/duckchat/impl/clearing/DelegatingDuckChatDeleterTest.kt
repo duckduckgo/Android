@@ -49,7 +49,9 @@ class DelegatingDuckChatDeleterTest {
     @Before
     fun setup() {
         whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
-        deleter = DelegatingDuckChatDeleter(nativeDeleter, webViewDeleter, store, feature, Lazy { pixels })
+        deleter = DelegatingDuckChatDeleter(
+            nativeDeleter, webViewDeleter, store, feature, Lazy { pixels }, coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
@@ -104,6 +106,28 @@ class DelegatingDuckChatDeleterTest {
         deleter.deleteChat("chat-1")
 
         verify(nativeDeleter, never()).deleteChat("chat-1")
+    }
+
+    @Test
+    fun `deleteChat fires native deletion pixel when using native deleter`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeDeleter.deleteChat("chat-1")).thenReturn(true)
+
+        deleter.deleteChat("chat-1")
+
+        verify(pixels).reportNativeStorageDeletionUsed(native = true)
+    }
+
+    @Test
+    fun `deleteChat fires webview deletion pixel when using webview deleter`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewDeleter.deleteChat("chat-1")).thenReturn(true)
+
+        deleter.deleteChat("chat-1")
+
+        verify(pixels).reportNativeStorageDeletionUsed(native = false)
     }
 
     @Test

@@ -114,8 +114,12 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val entities = settingsObj.keys().asSequence()
                             .map { k -> DuckAiBridgeSettingEntity(key = k, value = settingsObj.getString(k)) }
                             .toList()
-                        logcat { "DuckAiNativeStorage: replaceAllEntries count=${entities.size}" }
-                        settingsDao.replaceAll(entities)
+                        if (entities.isNotEmpty()) {
+                            logcat { "DuckAiNativeStorage: replaceAllEntries count=${entities.size}" }
+                            settingsDao.replaceAll(entities)
+                        } else {
+                            logcat { "DuckAiNativeStorage: trying to replaceAllEntries with empty list, no-op" }
+                        }
                     }
                     "deleteEntry" -> {
                         val key = jsMessage.params.optString("key")
@@ -226,12 +230,14 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                             null
                         }
                         jsMessage.id?.let { id ->
+                            val params = json?.let { runCatching { JSONObject(it) }.getOrNull() }
+                                ?: JSONObject().put("value", JSONObject.NULL)
                             jsMessaging.onResponse(
                                 JsCallbackData(
                                     featureName = featureName,
                                     method = jsMessage.method,
                                     id = id,
-                                    params = json?.let { JSONObject(it) } ?: JSONObject().put("value", JSONObject.NULL),
+                                    params = params,
                                 ),
                             )
                         }

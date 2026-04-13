@@ -687,6 +687,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT.pixelName to PixelParameter.removeAtb(),
+            "m_aichat_native_storage_migration_done_" to PixelParameter.removeAtb(),
         )
     }
 }

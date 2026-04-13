@@ -25,4 +25,4 @@ import com.duckduckgo.duckchat.internal.DuckAiDevCapabilityPlugin
     boundType = DuckAiDevCapabilityPlugin::class,
 )
 @Suppress("unused")
-interface UnusedDuckAiDevCapabilityPluginPoint
+private interface UnusedDuckAiDevCapabilityPluginPoint

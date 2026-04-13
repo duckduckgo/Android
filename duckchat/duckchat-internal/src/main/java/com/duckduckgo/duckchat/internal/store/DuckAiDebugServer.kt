@@ -742,7 +742,7 @@ class RealDuckAiDebugServer @Inject constructor(
                 // Close modals on Escape
                 document.addEventListener('keydown', e => {
                   if (e.key === 'Escape') {
-                    ['settingModal','chatModal','previewModal'].forEach(id => closeModal(id));
+                    ['settingModal','chatModal','inspectModal','previewModal'].forEach(id => closeModal(id));
                   }
                 });
 

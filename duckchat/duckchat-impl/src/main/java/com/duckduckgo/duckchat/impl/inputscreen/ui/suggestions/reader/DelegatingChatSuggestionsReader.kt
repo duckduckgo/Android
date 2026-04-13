@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
@@ -23,10 +24,13 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class, replaces = [RealChatSuggestionsReader::class])
+@SingleInstanceIn(AppScope::class)
 class DelegatingChatSuggestionsReader @Inject constructor(
     private val nativeReader: ChatSuggestionsNativeReader,
     // Typed as RealChatSuggestionsReader (not ChatSuggestionsReader) to prevent Anvil
@@ -37,17 +41,18 @@ class DelegatingChatSuggestionsReader @Inject constructor(
     // Lazy to break potential DI cycles through DuckChatPixels → DuckChatTermsOfServiceHandler
     //   → DuckChatInternal path.
     private val pixels: Lazy<DuckChatPixels>,
+    private val dispatchers: DispatcherProvider,
 ) : ChatSuggestionsReader {
 
     private var activeReader: ChatSuggestionsReader? = null
 
-    override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> {
+    override suspend fun fetchSuggestions(query: String): List<ChatSuggestion> = withContext(dispatchers.io()) {
         val reader = if (store.hasMigrated() && feature.useNativeStorageChatData().isEnabled()) nativeReader else webViewReader
         if (activeReader != null && activeReader !== reader) activeReader?.tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
         pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
-        return reader.fetchSuggestions(query)
+        return@withContext reader.fetchSuggestions(query)
     }
 
     override fun tearDown() {

@@ -83,7 +83,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     fun `methods list contains all expected methods`() {
         val expected = listOf(
             "getEntry", "putEntry", "getAllEntries", "replaceAllEntries", "deleteEntry", "deleteAllEntries",
-            "getAllChats", "putChat", "putChats", "deleteChat", "deleteAllChats",
+            "getAllChats", "putChat", "putChats", "migrateChats", "deleteChat", "deleteAllChats",
             "isMigrationDone", "markMigrationDone",
             "getFile", "putFile", "deleteFile", "deleteAllFiles", "listFiles",
         )
@@ -131,6 +131,13 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     @Test
     fun `replaceAllEntries with missing entries field does nothing`() {
         handler.process(jsMessage("replaceAllEntries", "{}"), jsMessaging, null)
+
+        verifyNoInteractions(settingsDao)
+    }
+
+    @Test
+    fun `replaceAllEntries with empty entries object does nothing`() {
+        handler.process(jsMessage("replaceAllEntries", """{"entries":{}}"""), jsMessaging, null)
 
         verifyNoInteractions(settingsDao)
     }
@@ -255,6 +262,29 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     @Test
     fun `putChats with missing chats field does nothing`() {
         handler.process(jsMessage("putChats", """{}"""), jsMessaging, null)
+
+        verifyNoInteractions(chatsDao)
+    }
+
+    // --- migrateChats ---
+
+    @Test
+    fun `migrateChats stores all chats the same as putChats`() {
+        handler.process(
+            jsMessage(
+                "migrateChats",
+                """{"chats":[{"chatId":"chat-1","data":{"chatId":"chat-1","messages":[]}}]}""",
+            ),
+            jsMessaging,
+            null,
+        )
+
+        verify(chatsDao).upsertAll(argThat { size == 1 && this[0].chatId == "chat-1" })
+    }
+
+    @Test
+    fun `migrateChats with empty array does nothing`() {
+        handler.process(jsMessage("migrateChats", """{"chats":[]}"""), jsMessaging, null)
 
         verifyNoInteractions(chatsDao)
     }
@@ -420,6 +450,15 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("getFile", """{"uuid":"abc-123"}""", id = null), jsMessaging, null)
 
         verifyNoInteractions(jsMessaging)
+    }
+
+    @Test
+    fun `getFile replies with null value when file content is corrupted JSON`() {
+        tempFolder.root.resolve("abc-123").writeText("not valid json {{{{")
+
+        handler.process(jsMessage("getFile", """{"uuid":"abc-123"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getFile" && params.isNull("value") })
     }
 
     // --- deleteFile / deleteAllFiles ---

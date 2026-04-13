@@ -55,7 +55,9 @@ class DelegatingChatSuggestionsReaderTest {
     @Before
     fun setup() {
         whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
-        reader = DelegatingChatSuggestionsReader(nativeReader, webViewReader, store, feature, Lazy { pixels })
+        reader = DelegatingChatSuggestionsReader(
+            nativeReader, webViewReader, store, feature, Lazy { pixels }, coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
@@ -95,6 +97,28 @@ class DelegatingChatSuggestionsReaderTest {
         assertEquals(listOf(fakeSuggestion), result)
         verify(webViewReader).fetchSuggestions("")
         verify(nativeReader, never()).fetchSuggestions("")
+    }
+
+    @Test
+    fun `fetchSuggestions fires native reader pixel when using native reader`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeReader.fetchSuggestions("")).thenReturn(emptyList())
+
+        reader.fetchSuggestions()
+
+        verify(pixels).reportNativeStorageReaderUsed(native = true)
+    }
+
+    @Test
+    fun `fetchSuggestions fires webview reader pixel when using webview reader`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewReader.fetchSuggestions("")).thenReturn(emptyList())
+
+        reader.fetchSuggestions()
+
+        verify(pixels).reportNativeStorageReaderUsed(native = false)
     }
 
     @Test
