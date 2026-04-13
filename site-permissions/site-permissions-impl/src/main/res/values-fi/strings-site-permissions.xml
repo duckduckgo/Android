@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" haluaa avata DRM-ohjelmistosi</string>
-    <string name="drmSiteDialogSubtitle">Suojatun mediasisällön toistaminen vaatii Digital Rights Management -ohjelmiston, mutta se antaa lisäksi laitteen tunnisteiden käyttöluvan. Myönnä lupa vain sivustoille, joihin luotat näiden tietojen suhteen. Voit hallita lupia milloin vain asetuksissa. <annotation type="drm_learn_more_link">Lue lisää</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" haluaa avata DRM-ohjelmiston (Digital Rights Management).</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Jos valitset \"Estä\", sivustolla olevia videoita ei ehkä voida toistaa, mutta %1$s ei voi käyttää DRM-ohjelmiston tarjoamia laitetunnisteita. Voit hallita lupia milloin vain asetuksissa. <annotation type="drm_learn_more_link">Lue lisää</annotation></string>
     <string name="drmSiteDialogAllowAlways">Aina</string>
     <string name="drmSiteDialogAllowOnce">Vain tässä istunnossa</string>
     <string name="drmSiteDialogDenyAlways">Kiellä aina</string>
