@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Συνδρομή</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Δεν είναι δυνατή η πρόσβαση στις λειτουργίες επιπέδου Plus ή Pro</string>
     <string name="subscriptionsProUpgradeTitle">Αναβάθμιση σε Pro</string>
