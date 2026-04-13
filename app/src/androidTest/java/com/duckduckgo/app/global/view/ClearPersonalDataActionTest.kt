@@ -391,6 +391,30 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearDataForSpecificDomainsCalledWithMixedDuckDuckGoDomainsThenOnlyNonDdgDomainsAreCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndCleanerThrowsThenReturnsError() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(emptyList())
+        val testeeWithError = createTestee(
+            siteDataCleaner = { _, _ -> throw RuntimeException("WebView error") },
+        )
+        val result = testeeWithError.clearDataForSpecificDomains(domains = setOf("example.com"))
+        assertTrue(result is ClearDataResult.Error)
+    }
+
+    @Test
     fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenFireproofWebsitesNotQueried() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
         testee.clearDataForSpecificDomains(domains = setOf("example.com"))
