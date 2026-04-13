@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s” dorește să-ți deschidă software-ul DRM</string>
-    <string name="drmSiteDialogSubtitle">Software-ul DRM este necesar pentru a reda conținut media protejat, dar oferă, de asemenea, acces la identificatorii dispozitivelor. Acordă permisiunea de a utiliza aceste date numai site-urilor în care ai încredere. Poți gestiona oricând permisiunile din Setări. <annotation type="drm_learn_more_link">Află mai multe</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">„%1$s” dorește să deschidă software-ul tău de management al drepturilor digitale (DRM)</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Dacă alegi „Refuză”, videoclipurile de pe site ar putea deveni de neredat, dar %1$s nu va avea acces la identificatorii de dispozitiv oferiți de software-ul DRM. Poți gestiona oricând permisiunile din Setări. <annotation type="drm_learn_more_link">Află mai multe</annotation></string>
     <string name="drmSiteDialogAllowAlways">Întotdeauna</string>
     <string name="drmSiteDialogAllowOnce">Numai pentru această sesiune</string>
     <string name="drmSiteDialogDenyAlways">Respinge întotdeauna</string>
