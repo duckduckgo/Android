@@ -1886,6 +1886,9 @@
       return false;
     }
     const domainParts = topLevelHostname.split(".");
+    if (domainParts.length === 1) {
+      return featureList.some((entry) => entry.domain === topLevelHostname);
+    }
     while (domainParts.length > 1 && !unprotectedDomain) {
       const partialDomain = domainParts.join(".");
       unprotectedDomain = featureList.filter((domain) => domain.domain === partialDomain).length > 0;
@@ -2009,6 +2012,9 @@
           return false;
         }
       }
+      if (isSelfGatingFeature(featureName)) {
+        return isStateEnabled(feature.state, platform);
+      }
       return isStateEnabled(feature.state, platform) && !isUnprotectedDomain(topLevelHostname, feature.exceptions);
     }).concat(platformSpecificFeaturesNotInRemoteConfig);
     return enabledFeatures;
@@ -2041,10 +2047,19 @@
     "webDetection",
     "webEvents",
     "pageObserver",
-    "hover"
+    "hover",
+    "trackerProtection"
+    // only enabled on apple platforms
   ];
+  var selfGatingFeatures = ["trackerProtection"];
   function isPlatformSpecificFeature(featureName) {
     return platformSpecificFeatures.includes(
+      /** @type {import('./features.js').FeatureName} */
+      featureName
+    );
+  }
+  function isSelfGatingFeature(featureName) {
+    return selfGatingFeatures.includes(
       /** @type {import('./features.js').FeatureName} */
       featureName
     );
