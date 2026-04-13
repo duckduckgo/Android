@@ -26,6 +26,9 @@
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo your default</string>

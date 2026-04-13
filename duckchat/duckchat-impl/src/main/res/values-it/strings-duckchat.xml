@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Invia automaticamente il contenuto della pagina a Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Allega il contenuto della pagina</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Cancella chat</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Elimina dati</string>
     <string name="duckChatBrowserMenuContentDescription">Altre opzioni</string>

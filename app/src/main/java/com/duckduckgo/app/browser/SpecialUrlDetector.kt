@@ -74,8 +74,8 @@ class SpecialUrlDetectorImpl(
             FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
             DUCK_SCHEME -> UrlType.DuckScheme(uriString)
             null -> {
-                if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
-                    UrlType.ShouldLaunchPrivacyProLink
+                if (subscriptions.shouldLaunchSubscriptionForUrl("https://$uriString")) {
+                    UrlType.ShouldLaunchSubscriptionLink
                 } else if (aiChatQueryDetectionFeature.self()
                         .isEnabled() && duckChat.isDuckChatUrl(uri) && !duckAiFeatureState.showFullScreenMode.value
                 ) {
@@ -154,8 +154,8 @@ class SpecialUrlDetectorImpl(
             }
         }
 
-        if (subscriptions.shouldLaunchPrivacyProForUrl(uriString)) {
-            return UrlType.ShouldLaunchPrivacyProLink
+        if (subscriptions.shouldLaunchSubscriptionForUrl(uriString)) {
+            return UrlType.ShouldLaunchSubscriptionLink
         }
 
         return UrlType.Web(uriString)

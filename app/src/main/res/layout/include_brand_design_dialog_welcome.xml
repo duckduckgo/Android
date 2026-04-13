@@ -29,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:includeFontPadding="false"
             android:text="@string/preOnboardingWelcomeDialogTitle"
             android:visibility="invisible"
             app:typography="onboarding_title" />
@@ -38,9 +39,10 @@
             style="@style/Typography.DuckDuckGo.Onboarding.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
+            android:includeFontPadding="false"
             android:textColor="?attr/daxColorPrimaryText" />
 
     </FrameLayout>
@@ -49,11 +51,12 @@
         android:id="@+id/bodyText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:alpha="0"
-        tools:alpha="1"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:text="@string/preOnboardingWelcomeDialogBody"
-        app:typography="onboarding_body" />
+        app:typography="onboarding_body"
+        tools:alpha="1" />
 
 </LinearLayout>

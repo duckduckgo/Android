@@ -387,15 +387,15 @@ interface DeviceShieldPixels {
     // New Tab Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
     fun reportNewTabSectionToggled(enabled: Boolean)
 
-    fun reportPproUpsellBannerShown()
-    fun reportPproUpsellBannerDismissed()
-    fun reportPproUpsellBannerLinkClicked()
+    fun reportSubscriptionUpsellBannerShown()
+    fun reportSubscriptionUpsellBannerDismissed()
+    fun reportSubscriptionUpsellBannerLinkClicked()
 
-    fun reportPproUpsellDisabledInfoShown()
-    fun reportPproUpsellDisabledInfoLinkClicked()
+    fun reportSubscriptionUpsellDisabledInfoShown()
+    fun reportSubscriptionUpsellDisabledInfoLinkClicked()
 
-    fun reportPproUpsellRevokedInfoShown()
-    fun reportPproUpsellRevokedInfoLinkClicked()
+    fun reportSubscriptionUpsellRevokedInfoShown()
+    fun reportSubscriptionUpsellRevokedInfoLinkClicked()
 
     /** Fires when the AppTP experiment blocklist fails to download. */
     fun appTPBlocklistExperimentDownloadFailure(
@@ -905,44 +905,44 @@ class RealDeviceShieldPixels @Inject constructor(
         }
     }
 
-    override fun reportPproUpsellBannerShown() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_SHOWN)
+    override fun reportSubscriptionUpsellBannerShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_SHOWN)
     }
 
-    override fun reportPproUpsellBannerLinkClicked() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_LINK_CLICKED)
+    override fun reportSubscriptionUpsellBannerLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_LINK_CLICKED)
     }
 
-    override fun reportPproUpsellBannerDismissed() {
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_ENABLED_BANNER_DISMISSED)
+    override fun reportSubscriptionUpsellBannerDismissed() {
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_ENABLED_BANNER_DISMISSED)
     }
 
-    override fun reportPproUpsellDisabledInfoShown() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_SHOWN)
+    override fun reportSubscriptionUpsellDisabledInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_SHOWN)
     }
 
-    override fun reportPproUpsellDisabledInfoLinkClicked() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_DISABLED_INFO_LINK_CLICKED)
+    override fun reportSubscriptionUpsellDisabledInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_DISABLED_INFO_LINK_CLICKED)
     }
 
-    override fun reportPproUpsellRevokedInfoShown() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_SHOWN)
+    override fun reportSubscriptionUpsellRevokedInfoShown() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_SHOWN_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_SHOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_SHOWN)
     }
 
-    override fun reportPproUpsellRevokedInfoLinkClicked() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
-        firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
+    override fun reportSubscriptionUpsellRevokedInfoLinkClicked() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
+        firePixel(DeviceShieldPixelNames.APPTP_SUBSCRIPTION_UPSELL_REVOKED_INFO_LINK_CLICKED)
     }
 
     override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int, experimentName: String, experimentCohort: String) {

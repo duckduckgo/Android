@@ -24,7 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -43,9 +43,9 @@ class SubscriptionRestoreWideEventTest {
     private val wideEventClient: WideEventClient = mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEventImpl
@@ -55,7 +55,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent =
             SubscriptionRestoreWideEventImpl(
                 wideEventClient = wideEventClient,
-                privacyProFeature = { privacyProFeature },
+                subscriptionsFeature = { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
                 coroutineScope = coroutineRule.testScope,
             )
@@ -193,7 +193,7 @@ class SubscriptionRestoreWideEventTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
-        privacyProFeature.sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(false))
+        subscriptionsFeature.sendSubscriptionRestoreWideEvent().setRawStoredState(Toggle.State(false))
 
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
         subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb = false)

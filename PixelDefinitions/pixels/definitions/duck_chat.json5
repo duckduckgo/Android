@@ -405,6 +405,13 @@
             }
         ]
     },
+    "m_aichat_duckai_dau_toggle_never_enabled": {
+        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai input screen toggle. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_contextual_fire_button_tapped": {
         "description": "User tapped the fire button in the contextual Duck.ai sheet",
         "owners": ["aitorvs"],

@@ -39,9 +39,11 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
@@ -110,6 +112,9 @@ class OnboardingDaxDialogTests {
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
+            object : PluginPoint<SubscriptionPromoCtaShownPlugin> {
+                override fun getPlugins() = emptyList<SubscriptionPromoCtaShownPlugin>()
+            },
         )
     }
 
@@ -255,7 +260,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysSinceInstallAndPrivacyProNotShownThenRefreshCtaReturnsPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenRefreshCtaReturnsSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -278,7 +283,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 3 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -296,7 +301,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysButPrivacyProAlreadyDismissedThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysButSubscriptionAlreadyDismissedThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
@@ -314,7 +319,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysButSkippedOnboardingToggleOffThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysButSkippedOnboardingToggleOffThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)

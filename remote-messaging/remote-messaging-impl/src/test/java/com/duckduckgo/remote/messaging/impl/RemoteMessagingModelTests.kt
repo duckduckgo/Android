@@ -21,7 +21,6 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import junit.framework.TestCase.assertEquals

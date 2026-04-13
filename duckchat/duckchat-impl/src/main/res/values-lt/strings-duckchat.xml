@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Automatiškai siųsti puslapio turinį į „Duck.ai“</string>
     <string name="duckAIContextualAttachPageContent">Pridėkite puslapio turinį</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Išvalyti pokalbį</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Valyti duomenis</string>
     <string name="duckChatBrowserMenuContentDescription">Daugiau parinkčių</string>

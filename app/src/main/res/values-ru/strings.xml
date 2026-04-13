@@ -27,6 +27,9 @@
     <string name="cancel">Отменить</string>
     <string name="search">Поиск</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Чат удален</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo браузером по умолчанию, перейдите в «Настройки».</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo браузером по умолчанию</string>

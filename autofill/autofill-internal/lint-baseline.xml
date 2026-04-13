@@ -13,6 +13,17 @@
     </issue>
 
     <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="            val formatted = getString(R.string.autofillDevSettingsDaysSinceInstall, userBrowserProperties.daysSinceInstalled())"
+        errorLine2="                                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/internal/AutofillInternalSettingsActivity.kt"
+            line="623"
+            column="85"/>
+    </issue>
+
+    <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;passwords&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;autofillDevSettingsImportGooglePasswordsSuccessMessage&quot; instruction=&quot;Placeholder is the number of passwords we were able to import&quot;>%1$d passwords imported from Google&lt;/string>"

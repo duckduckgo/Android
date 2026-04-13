@@ -17,8 +17,8 @@
 package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
@@ -33,7 +33,7 @@ interface FeedbackSubCategoryProvider {
 
 @ContributesBinding(FragmentScope::class)
 class RealFeedbackSubCategoryProvider @Inject constructor(
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : FeedbackSubCategoryProvider {
     override fun getSubCategories(category: SubscriptionFeedbackCategory): Map<Int, SubscriptionFeedbackSubCategory> {
         return when (category) {
@@ -59,7 +59,7 @@ class RealFeedbackSubCategoryProvider @Inject constructor(
     private fun getSubsSubCategories(): Map<Int, SubscriptionFeedbackSubCategory> {
         return buildMap {
             put(R.string.feedbackSubCategorySubsOtp, SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD)
-            if (privacyProFeature.allowProTierPurchase().isEnabled()) {
+            if (subscriptionsFeature.allowProTierPurchase().isEnabled()) {
                 put(R.string.feedbackSubCategorySubsUnableToAccessProFeatures, SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES)
             }
             put(R.string.feedbackSubCategorySubsOther, SubscriptionFeedbackSubsSubCategory.OTHER)

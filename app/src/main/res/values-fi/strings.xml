@@ -27,6 +27,9 @@
     <string name="cancel">Peruuta</string>
     <string name="search">Hae</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Keskustelu poistettu</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Siirry asetuksiin hakeaksesi ja selaillaksesi aina DuckDuckGolla.</string>
     <string name="onboardingDefaultBrowserTitle">Tee DuckDuckGo:sta oletusarvo</string>

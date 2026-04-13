@@ -56,7 +56,7 @@ tags:
                 id: "omnibarTextInput"
             - action: back
             - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
-            - tapOn: "Delete Tabs and Data"
+            - runFlow: ../shared/browser_screen/confirm_fire_dialog.yaml
             - tapOn:
                 id: "omnibarTextInput"
             - pasteText

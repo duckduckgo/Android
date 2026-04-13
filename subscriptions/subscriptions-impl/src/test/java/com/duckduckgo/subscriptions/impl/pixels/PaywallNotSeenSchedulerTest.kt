@@ -23,7 +23,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -44,16 +44,16 @@ class PaywallNotSeenSchedulerTest {
 
     private val workManager: WorkManager = mock()
     private val paywallMetricsManager: PaywallMetricsManager = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
     private lateinit var scheduler: PaywallNotSeenScheduler
 
     @Before
     fun setup() = runTest {
-        privacyProFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = true))
+        subscriptionFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = true))
         scheduler = PaywallNotSeenScheduler(
             workManager = workManager,
             paywallMetricsManager = paywallMetricsManager,
-            privacyProFeature = privacyProFeature,
+            subscriptionsFeature = subscriptionFeature,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -62,7 +62,7 @@ class PaywallNotSeenSchedulerTest {
 
     @Test
     fun `when feature flag is disabled then no workers are scheduled`() = runTest {
-        privacyProFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = false))
+        subscriptionFeature.schedulePaywallNotSeenPixels().setRawStoredState(State(enable = false))
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired(any())).thenReturn(false)
 

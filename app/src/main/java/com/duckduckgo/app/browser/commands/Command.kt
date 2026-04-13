@@ -74,7 +74,7 @@ sealed class Command {
 
     data object ResetHistory : Command()
 
-    class LaunchPrivacyPro(
+    class LaunchSubscription(
         val uri: Uri,
     ) : Command()
 

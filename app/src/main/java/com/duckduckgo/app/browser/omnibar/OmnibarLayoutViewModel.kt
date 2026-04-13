@@ -116,7 +116,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
-    private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.self().isEnabled()
+    private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(

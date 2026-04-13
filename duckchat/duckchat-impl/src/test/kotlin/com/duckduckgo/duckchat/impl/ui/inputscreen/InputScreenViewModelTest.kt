@@ -2775,6 +2775,7 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel()
             viewModel.onActivityResume()
             viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("")
 
             assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
         }
@@ -2788,7 +2789,7 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel()
             viewModel.onActivityResume()
             viewModel.onChatSelected()
-            viewModel.onVoiceInputAllowedChange(false)
+            viewModel.onChatInputTextChanged("Test")
 
             assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
         }

@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardOpenedPlugin
+import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -34,15 +35,25 @@ import javax.inject.Inject
     AppScope::class,
     boundType = PrivacyDashboardOpenedPlugin::class,
 )
+@ContributesMultibinding(
+    AppScope::class,
+    boundType = SubscriptionPromoCtaShownPlugin::class,
+)
 class PaywallMetricsManager @Inject constructor(
     private val paywallMetricsStore: PaywallMetricsDataStore,
-) : PrivacyDashboardOpenedPlugin {
+) : PrivacyDashboardOpenedPlugin, SubscriptionPromoCtaShownPlugin {
     val paywallEverSeen: Boolean get() = paywallMetricsStore.paywallEverSeen
 
     val privacyDashboardEverOpened: Boolean get() = paywallMetricsStore.privacyDashboardEverOpened
 
+    val subscriptionPromoShown: Boolean get() = paywallMetricsStore.subscriptionPromoShown
+
     override suspend fun onPrivacyDashboardOpened() {
         paywallMetricsStore.privacyDashboardEverOpened = true
+    }
+
+    override suspend fun onSubscriptionPromoCtaShown() {
+        paywallMetricsStore.subscriptionPromoShown = true
     }
 
     fun recordFirstPaywallSeen(): String? {

@@ -37,6 +37,8 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle_flags: '-Psync-disable-auth-requirement'
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+          ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
 
       - name: Run Sync Maestro Tests
         id: maestro-cloud-asana

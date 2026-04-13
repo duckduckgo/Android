@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Skicka sidinnehåll automatiskt till Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Bifoga sidans innehåll</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Rensa chatt</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Rensa data</string>
     <string name="duckChatBrowserMenuContentDescription">Fler alternativ</string>

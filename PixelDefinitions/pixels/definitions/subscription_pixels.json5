@@ -83,35 +83,35 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
     "m_subscription_paywall_not_seen_d3_u": {
         "description": "Fired once (unique) on day 4 if the user has not yet opened the Privacy Pro paywall since install.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
     "m_subscription_paywall_not_seen_d7_u": {
         "description": "Fired once (unique) on day 8 if the user has not yet opened the Privacy Pro paywall since install.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
     "m_subscription_paywall_not_seen_d14_u": {
         "description": "Fired once (unique) on day 15 if the user has not yet opened the Privacy Pro paywall since install.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
     "m_subscription_paywall_not_seen_d30_u": {
         "description": "Fired once (unique) on day 31 if the user has not yet opened the Privacy Pro paywall since install.",
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",

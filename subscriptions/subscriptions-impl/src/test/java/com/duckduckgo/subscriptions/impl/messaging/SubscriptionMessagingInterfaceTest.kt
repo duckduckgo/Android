@@ -10,8 +10,8 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.AuthTokenResult
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -42,7 +42,7 @@ class SubscriptionMessagingInterfaceTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
-    private val privacyProFeature: PrivacyProFeature = mock()
+    private val subscriptionsFeature: SubscriptionsFeature = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
@@ -52,7 +52,7 @@ class SubscriptionMessagingInterfaceTest {
         pixelSender,
         subscriptionsChecker,
         mockDuckAiHostProvider,
-        privacyProFeature,
+        subscriptionsFeature,
     )
 
     private val callback = object : JsMessageCallback() {
@@ -1067,31 +1067,31 @@ class SubscriptionMessagingInterfaceTest {
     private fun givenSubscriptionMessaging(enabled: Boolean) {
         val subscriptionMessagingToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(subscriptionMessagingToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.enableNewSubscriptionMessages()).thenReturn(subscriptionMessagingToggle)
+        whenever(subscriptionsFeature.enableNewSubscriptionMessages()).thenReturn(subscriptionMessagingToggle)
     }
 
     private fun givenAuthV2(enabled: Boolean) {
         val v2SubscriptionFlow = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(v2SubscriptionFlow.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
+        whenever(subscriptionsFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
     }
 
     private fun givenDuckAiPlus(enabled: Boolean) {
         val duckAiPlusToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(duckAiPlusToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
+        whenever(subscriptionsFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
     }
 
     private fun givenStripeSupported(enabled: Boolean) {
         val stripeSupportedToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(stripeSupportedToggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
+        whenever(subscriptionsFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
     }
 
     private fun givenUseGetSubscriptionTierOptions(enabled: Boolean) {
         val toggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(toggle.isEnabled()).thenReturn(enabled)
-        whenever(privacyProFeature.tierMessagingEnabled()).thenReturn(toggle)
+        whenever(subscriptionsFeature.tierMessagingEnabled()).thenReturn(toggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

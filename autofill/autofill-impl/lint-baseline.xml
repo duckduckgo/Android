@@ -1922,6 +1922,17 @@
 
     <issue
         id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        if (userBrowserProperties.daysSinceInstalled() > 0L &amp;&amp; !autofillFeature.onForExistingUsers().isEnabled()) {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/store/feature/AutofillDefaultStateDecider.kt"
+            line="46"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {"
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
@@ -1973,6 +1984,17 @@
             file="src/main/java/com/duckduckgo/autofill/impl/pixel/AutofillPixelSender.kt"
             line="59"
             column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="                .appendQueryParameter(SurveyParams.DAYS_INSTALLED, &quot;${userBrowserProperties.daysSinceInstalled()}&quot;)"
+        errorLine2="                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/survey/AutofillSurvey.kt"
+            line="85"
+            column="71"/>
     </issue>
 
     <issue
@@ -2395,6 +2417,72 @@
 
     <issue
         id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        val daysSinceInstall = userBrowserProperties.daysSinceInstalled()"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/email/incontext/availability/EmailProtectionInContextRecentInstallChecker.kt"
+            line="40"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="            val daysInstalled = userBrowserProperties.daysSinceInstalled()"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/engagement/EngagementPasswordAddedListener.kt"
+            line="52"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(0)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/engagement/EngagementPasswordAddedListenerTest.kt"
+            line="32"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(7)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/engagement/EngagementPasswordAddedListenerTest.kt"
+            line="39"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(10)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/engagement/EngagementPasswordAddedListenerTest.kt"
+            line="46"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(0)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/engagement/EngagementPasswordAddedListenerTest.kt"
+            line="53"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="        autofillFeature.onByDefault().setRawStoredState(State(enable = onByDefaultNewUsers))"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2413,6 +2501,17 @@
             file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
             line="78"
             column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(daysInstalled)"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/store/feature/RealAutofillDefaultStateDeciderTest.kt"
+            line="82"
+            column="18"/>
     </issue>
 
     <issue
@@ -2446,6 +2545,17 @@
             file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextAvailabilityRulesTest.kt"
             line="86"
             column="9"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
+        errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(days.toLong())"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/email/incontext/availability/RealEmailProtectionInContextRecentInstallCheckerTest.kt"
+            line="68"
+            column="18"/>
     </issue>
 
     <issue

@@ -1,0 +1,126 @@
+{
+  "name": "SpyFly",
+  "url": "spyfly.com",
+  "version": "0.4.0",
+  "addedDatetime": 1775214750818,
+  "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spyfly.com/help-center/privacy-requests",
+          "id": "91ea665d-89f1-4f38-942e-d27ea2438ec2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "0527398b-b22a-4d51-b6d6-fa5c46048c90"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "_comment": "This input doesn't follow the same id pattern as the rest",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            }
+          ],
+          "id": "2a124512-7c05-4395-bfde-92e5b6b2c8e3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "_comment": "Ensure the Turnstile captcha is solved before proceeding",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "c83793ff-9b93-4924-ad9c-008e01356bea"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "4824a82a-8009-4c02-82bc-75dc26e5f703"
+        },
+        {
+          "_comment": "Last supported action. If we reach here, Cloudflare did not block us. The scan will fail after this because generateEmail is not yet implemented.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "619924fc-4ad6-47aa-a5e6-44b2c8013273"
+        },
+        {
+          "_comment": "Terminal action. We are on the email page, not results. noResultsSelector matches #email-address so extract returns empty results cleanly.",
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "#email-address",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            }
+          },
+          "id": "bab84c87-785a-427d-b38b-add9dba0aa3d"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spyfly.com/help-center/privacy-requests",
+          "id": "0cb6e2ed-dff5-4dee-b9df-0ca19c9fc6ad"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

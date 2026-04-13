@@ -1,0 +1,86 @@
+{
+  "name": "AnyWho",
+  "url": "anywho.com",
+  "version": "0.4.0",
+  "parent": "spokeo.com",
+  "addedDatetime": 1768780800000,
+  "optOutUrl": "https://www.spokeo.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "8b4204c1-f03d-4f6d-9496-661a42040f0b",
+          "url": "https://www.anywho.com/people/${firstName}+${lastName}/${state|stateFull|downcase|hyphenated}/${city|downcase|hyphenated}?age_range=${age|ageRange}",
+          "ageRange": [
+            "0-30",
+            "31-60",
+            "61-80",
+            "80+"
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "f20c61f2-f15d-4f6d-a370-5a95cd57daf6",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#name-search-results, h1.text-display-md"
+            }
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "f47e9339-5796-40cf-ac64-3cf38d582f85",
+          "selector": "#name-search-results > div.bg-white",
+          "noResultsSelector": "//h1[contains(text(), \"Sorry, we couldn't find results\")]",
+          "profile": {
+            "name": {
+              "selector": "h2.font-bold"
+            },
+            "age": {
+              "selector": ".//span[contains(text(), 'Age')]",
+              "afterText": "Age "
+            },
+            "alternativeNamesList": {
+              "selector": ".//h3[contains(text(), 'AKA')]/following-sibling::div[not(contains(@class, 'h-px'))]",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".//h3[contains(text(), 'Lives in')]/following-sibling::div[@class='text-body-md'][1]",
+              "separator": "/(?:(?:St|Ave|Blvd|Ln|Dr|Rd|Ct|Pl|Way|Pkwy|Hwy|Ter|Trl|Cir|Run)\\b|(?:Ste|Suite|Apt|Apartment|Unit|#|Bldg|Building)\\s*[^,]*)\\s*,\\s*|[•·|\\n]/"
+            },
+            "addressCityStateList": {
+              "selector": ".//h3[contains(text(), 'Used to live in')]/following-sibling::div[@class='text-body-md']",
+              "findElements": true,
+              "separator": "/(?:(?:St|Ave|Blvd|Ln|Dr|Rd|Ct|Pl|Way|Pkwy|Hwy|Ter|Trl|Cir|Run)\\b|(?:Ste|Suite|Apt|Apartment|Unit|#|Bldg|Building)\\s*[^,]*)\\s*,\\s*|[•·|\\n]/"
+            },
+            "relativesList": {
+              "selector": ".//h3[contains(text(), 'May be related to')]/following-sibling::div[@class='text-body-md']/a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a[href*='/people/']",
+              "identifierType": "path",
+              "identifier": "https://www.anywho.com/people/${firstName}+${lastName}/${state|downcase|hyphenated}/${city|downcase|hyphenated}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

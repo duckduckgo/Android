@@ -116,6 +116,8 @@ jobs:
         env:
           NETP_DEBUG_SERVER_TOKEN: ${{ secrets.NETP_DEBUG_SERVER_TOKEN }}
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 

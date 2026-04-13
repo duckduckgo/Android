@@ -36,8 +36,8 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
@@ -60,7 +60,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     pixelSender: SubscriptionPixelSender,
     subscriptionsChecker: SubscriptionsChecker,
     duckAiHostProvider: DuckAiHostProvider,
-    privacyProFeature: PrivacyProFeature,
+    subscriptionsFeature: SubscriptionsFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -75,7 +75,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         InformationalEventsMessage(subscriptionsManager, appCoroutineScope, pixelSender),
         GetAccessTokenMessage(subscriptionsManager),
         GetAuthAccessTokenMessage(subscriptionsManager),
-        GetFeatureConfigMessage(privacyProFeature),
+        GetFeatureConfigMessage(subscriptionsFeature),
     )
 
     @JavascriptInterface
@@ -399,7 +399,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     }
 
     private inner class GetFeatureConfigMessage(
-        private val privacyProFeature: PrivacyProFeature,
+        private val subscriptionsFeature: SubscriptionsFeature,
     ) : JsMessageHandler {
         override fun process(
             jsMessage: JsMessage,
@@ -408,12 +408,12 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            if (privacyProFeature.enableNewSubscriptionMessages().isEnabled().not()) return
+            if (subscriptionsFeature.enableNewSubscriptionMessages().isEnabled().not()) return
 
-            val authV2Enabled = privacyProFeature.enableSubscriptionFlowsV2().isEnabled()
-            val duckAiSubscriberModelsEnabled = privacyProFeature.duckAiPlus().isEnabled()
-            val supportsAlternateStripePaymentFlow = privacyProFeature.supportsAlternateStripePaymentFlow().isEnabled()
-            val useGetSubscriptionTierOptions = privacyProFeature.tierMessagingEnabled().isEnabled()
+            val authV2Enabled = subscriptionsFeature.enableSubscriptionFlowsV2().isEnabled()
+            val duckAiSubscriberModelsEnabled = subscriptionsFeature.duckAiPlus().isEnabled()
+            val supportsAlternateStripePaymentFlow = subscriptionsFeature.supportsAlternateStripePaymentFlow().isEnabled()
+            val useGetSubscriptionTierOptions = subscriptionsFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
                 put("useSubscriptionsAuthV2", authV2Enabled)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)

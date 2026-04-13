@@ -7,13 +7,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -23,10 +23,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
@@ -51,8 +49,8 @@ class SubscriptionSettingsViewModelTest {
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -61,8 +59,8 @@ class SubscriptionSettingsViewModelTest {
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
-            privacyProUnifiedFeedback,
-            privacyProFeature,
+            subscriptionUnifiedFeedback,
+            subscriptionsFeature,
         )
     }
 
@@ -76,8 +74,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenUseUnifiedFeedbackThenViewStateShowFeeedbackTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -106,8 +103,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionThenFormatDateCorrectly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -136,8 +132,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionMonthlyThenReturnMonthly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -166,8 +161,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionYearlyThenReturnYearly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.YEARLY_PLAN_US,
@@ -242,141 +236,9 @@ class SubscriptionSettingsViewModelTest {
     }
 
     @Test
-    fun whenSwitchPlanAvailableThenViewStateIncludesIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                billingPeriod = "Monthly",
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "android",
-                activeOffers = listOf(),
-            ),
-        )
-
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = null, externalId = "external_id"),
-        )
-
-        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
-
-        viewModel.onCreate(mock())
-        flowTest.emit(AUTO_RENEWABLE)
-        viewModel.viewState.test {
-            assertTrue((awaitItem() as Ready).switchPlanAvailable)
-        }
-    }
-
-    @Test
-    fun whenSwitchPlanNotAvailableThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                billingPeriod = "Monthly",
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "android",
-                activeOffers = listOf(),
-            ),
-        )
-
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = null, externalId = "external_id"),
-        )
-
-        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
-
-        viewModel.onCreate(mock())
-        flowTest.emit(AUTO_RENEWABLE)
-        viewModel.viewState.test {
-            assertFalse((awaitItem() as Ready).switchPlanAvailable)
-        }
-    }
-
-    @Test
-    fun whenOnSwitchPlanClickedWithMonthlyThenEmitUpgradeCommand() = runTest {
-        viewModel.commands().test {
-            viewModel.onSwitchPlanClicked(Monthly)
-
-            val command = awaitItem()
-            assertTrue(command is ShowSwitchPlanDialog)
-            assertEquals(SwitchPlanType.UPGRADE_TO_YEARLY, (command as ShowSwitchPlanDialog).switchType)
-        }
-    }
-
-    @Test
-    fun whenOnSwitchPlanClickedWithYearlyThenEmitDowngradeCommand() = runTest {
-        viewModel.commands().test {
-            viewModel.onSwitchPlanClicked(Yearly)
-
-            val command = awaitItem()
-            assertTrue(command is ShowSwitchPlanDialog)
-            assertEquals(SwitchPlanType.DOWNGRADE_TO_MONTHLY, (command as ShowSwitchPlanDialog).switchType)
-        }
-    }
-
-    @Test
-    fun whenOnSwitchPlanSuccessThenRefreshSubscriptionData() = runTest {
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
-                billingPeriod = "Monthly",
-                startedAt = 1234,
-                expiresOrRenewsAt = 1701694623000,
-                status = AUTO_RENEWABLE,
-                platform = "google",
-                activeOffers = listOf(),
-            ),
-        )
-        whenever(subscriptionsManager.getAccount()).thenReturn(
-            Account(email = "test@example.com", externalId = "external_id"),
-        )
-
-        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
-
-        viewModel.onCreate(mock())
-        flowTest.emit(AUTO_RENEWABLE)
-
-        viewModel.viewState.test {
-            val initialState = awaitItem() as Ready
-            assertEquals(Monthly, initialState.duration)
-
-            // Simulate plan switch success - subscription changed to yearly
-            whenever(subscriptionsManager.getSubscription()).thenReturn(
-                Subscription(
-                    productId = SubscriptionsConstants.YEARLY_PLAN_US,
-                    billingPeriod = "Yearly",
-                    startedAt = 1234,
-                    expiresOrRenewsAt = 1701694623000,
-                    status = AUTO_RENEWABLE,
-                    platform = "google",
-                    activeOffers = listOf(),
-                ),
-            )
-
-            viewModel.onSwitchPlanSuccess()
-
-            val updatedState = awaitItem() as Ready
-            assertEquals(Yearly, updatedState.duration)
-        }
-    }
-
-    @Test
     fun whenProTierEnabledThenViewStateReflectsIt() = runTest {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -405,9 +267,8 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenProTierDisabledThenViewStateReflectsIt() = runTest {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -436,8 +297,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionIsPlusTierThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -466,8 +326,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionIsProTierThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
@@ -496,8 +355,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasPendingPlanThenViewStateIncludesPendingPlan() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val pendingPlan = PendingPlan(
             productId = "ddg-privacy-pro-yearly-renews-us",
@@ -539,8 +397,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsTierDowngradeThenIsPendingDowngradeIsTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val pendingPlan = PendingPlan(
             productId = "ddg-privacy-pro-yearly-renews-us",
@@ -582,8 +439,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsTierUpgradeThenIsPendingDowngradeIsFalse() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val pendingPlan = PendingPlan(
             productId = SubscriptionsConstants.MONTHLY_PRO_PLAN_US,
@@ -625,8 +481,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsBillingPeriodDowngradeThenIsPendingDowngradeIsTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val pendingPlan = PendingPlan(
             productId = "ddg-privacy-pro-monthly-renews-us",
@@ -668,8 +523,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsBillingPeriodUpgradeThenIsPendingDowngradeIsFalse() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val pendingPlan = PendingPlan(
             productId = SubscriptionsConstants.YEARLY_PLAN_US,
@@ -711,8 +565,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenNoPendingPlanThenIsPendingDowngradeIsNull() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -745,8 +598,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasNoPendingPlanThenViewStateHasNullPendingPlan() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -779,8 +631,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasMultiplePendingPlansThenViewStateUsesFirst() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
-        whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
 
         val firstPendingPlan = PendingPlan(
             productId = SubscriptionsConstants.YEARLY_PLAN_US,

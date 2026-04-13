@@ -77,7 +77,24 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenOptionIsNewTabPageOpenedThenNewTabPageIsAdded() = runTest {
+    fun whenOptionIsNewTabPageAndSelectedTabHasUrlThenNewTabPageIsAdded() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "https://example.com", position = 0)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+    }
+
+    @Test
+    fun whenOptionIsNewTabPageAndNoSelectedTabThenNewTabPageIsAdded() = runTest {
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
         testee.handleAppLaunchOption()
@@ -88,6 +105,38 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == "")
+        }
+    }
+
+    @Test
+    fun whenOptionIsNewTabPageAndSelectedTabIsAlreadyNtpThenNoTabIsAdded() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = null, position = 0)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenOptionIsNewTabPageAndSelectedTabHasBlankUrlThenNoTabIsAdded() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "", position = 0)
+
+        testee.handleAppLaunchOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.isEmpty())
         }
     }
 
@@ -844,8 +893,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
+        var selectedTab: TabEntity? = null
+
         override suspend fun getSelectedTab(): TabEntity? {
-            return null
+            return selectedTab
         }
 
         override suspend fun getLastAccessedTab(): TabEntity? {

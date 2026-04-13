@@ -39,15 +39,15 @@ class SubscriptionFeedbackGeneralFragment : SubscriptionFeedbackFragment(R.layou
         binding.browserFeedback.setOnClickListener {
             listener.onBrowserFeedbackClicked()
         }
-        binding.pproFeedback.setPrimaryText(getString(R.string.feedbackGeneralSubscription))
-        binding.pproFeedback.setOnClickListener {
-            listener.onPproFeedbackClicked()
+        binding.subscriptionFeedback.setPrimaryText(getString(R.string.feedbackGeneralSubscription))
+        binding.subscriptionFeedback.setOnClickListener {
+            listener.onSubscriptionFeedbackClicked()
         }
     }
 
     interface Listener {
         fun onBrowserFeedbackClicked()
-        fun onPproFeedbackClicked()
+        fun onSubscriptionFeedbackClicked()
     }
 
     companion object {

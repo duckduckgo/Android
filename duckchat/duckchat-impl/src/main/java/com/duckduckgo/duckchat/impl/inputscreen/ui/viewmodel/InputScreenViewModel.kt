@@ -322,9 +322,14 @@ class InputScreenViewModel @AssistedInject constructor(
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
-        combine(voiceServiceAvailable, voiceInputAllowed, isSearchModeFlow) { serviceAvailable, inputAllowed, isSearchMode ->
+        combine(
+            voiceServiceAvailable,
+            voiceInputAllowed,
+            isSearchModeFlow,
+            chatInputTextState,
+        ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText ->
             val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
-            if (newEntryPointActive) inputAllowed else serviceAvailable && inputAllowed
+            if (newEntryPointActive) chatInputText.isEmpty() else serviceAvailable && inputAllowed
         }.onEach { voiceInputPossible ->
             _visibilityState.update {
                 it.copy(

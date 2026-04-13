@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
@@ -461,5 +463,45 @@ class SharedPreferencesDuckChatDataStoreTest {
         val result = testee.getSelectedModel()
         assertEquals("id2", result?.id)
         assertEquals("model2", result?.shortName)
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled returns false when setting was never changed`() = runTest {
+        assertFalse(testee.isInputScreenEverEnabled())
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled returns true after setInputScreenUserSetting enabled`() = runTest {
+        testee.setInputScreenUserSetting(enabled = true)
+        assertTrue(testee.isInputScreenEverEnabled())
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled stays true after setInputScreenUserSetting disabled again`() = runTest {
+        testee.setInputScreenUserSetting(enabled = true)
+        testee.setInputScreenUserSetting(enabled = false)
+        assertTrue(testee.isInputScreenEverEnabled())
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled returns true and backfills when user setting key is present and true (existing user who enabled)`() = runTest {
+        val inputScreenKey = booleanPreferencesKey("DUCK_AI_INPUT_SCREEN_USER_SETTING")
+        testDataStore.edit { it[inputScreenKey] = true }
+        assertTrue(testee.isInputScreenEverEnabled())
+        assertTrue(testee.isInputScreenEverEnabled()) // backfilled — second read also true
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled returns true and backfills when user setting key is present and false`() = runTest {
+        val inputScreenKey = booleanPreferencesKey("DUCK_AI_INPUT_SCREEN_USER_SETTING")
+        testDataStore.edit { it[inputScreenKey] = false }
+        assertTrue(testee.isInputScreenEverEnabled())
+        assertTrue(testee.isInputScreenEverEnabled()) // backfilled — second read also true
+    }
+
+    @Test
+    fun `isInputScreenEverEnabled returns false when user setting key is absent (user never touched the setting)`() = runTest {
+        // No writes at all — DUCK_AI_INPUT_SCREEN_USER_SETTING key is absent
+        assertFalse(testee.isInputScreenEverEnabled())
     }
 }

@@ -38,11 +38,39 @@ plugins {
     id 'com.diffplug.spotless' apply false
 }
 
+// Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
+def gprUser = findProperty("ducksans.gpr.user") ?: providers.environmentVariable("DUCKSANS_PACKAGE_AUTH_USER").getOrNull()
+def gprKey = findProperty("ducksans.gpr.key") ?: providers.environmentVariable("DUCKSANS_PACKAGE_AUTH_TOKEN").getOrNull()
+def hasGprCredentials = gprUser && gprKey
+def useProprietaryFontProp = findProperty("useProprietaryFont")
+ext.proprietaryFontAvailable = hasGprCredentials && useProprietaryFontProp?.toBoolean() != false
+ext.proprietaryFontOptOut = useProprietaryFontProp?.toBoolean() == false
+
+if (proprietaryFontAvailable) {
+    logger.lifecycle("DUCKSANS: Using proprietary font AAR from GitHub Packages")
+} else if (proprietaryFontOptOut) {
+    logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (opted out via -PuseProprietaryFont=false)")
+} else {
+    logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (no credentials found)")
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        if (rootProject.ext.proprietaryFontAvailable) {
+            maven {
+                url = uri("https://maven.pkg.github.com/duckduckgo/native-apps-ducksans")
+                credentials {
+                    username = gprUser
+                    password = gprKey
+                }
+                content {
+                    includeGroup "com.duckduckgo"
+                }
+            }
+        }
     }
     configurations.all {
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'

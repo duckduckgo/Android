@@ -45,7 +45,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -93,7 +93,7 @@ class SettingsViewModelTest {
 
     private val voiceSearchAvailabilityMock: VoiceSearchAvailability = mock()
 
-    private val privacyProUnifiedFeedbackMock: PrivacyProUnifiedFeedback = mock()
+    private val subscriptionUnifiedFeedbackMock: SubscriptionUnifiedFeedback = mock()
 
     private val settingsPixelDispatcherMock: SettingsPixelDispatcher = mock()
 
@@ -135,7 +135,7 @@ class SettingsViewModelTest {
             duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             modalSurfaceStore = modalSurfaceStoreMock,
-            privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
+            subscriptionUnifiedFeedback = subscriptionUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,

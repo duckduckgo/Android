@@ -19,11 +19,14 @@
     <attr name="onboardingTextPrimary" format="color" />
     <attr name="onboardingSurfaceBackdrop" format="color" />
     <attr name="onboardingSurfaceTertiary" format="color" />
+    <attr name="onboardingSurfaceDecorationPrimary" format="color" />
     <attr name="onboardingAccentAltPrimary" format="color" />
+    <attr name="onboardingAccentAltGlowPrimary" format="color" />
     <attr name="onboardingAccentBrand" format="color" />
     <attr name="onboardingAccentContentPrimary" format="color" />
     <attr name="onboardingAccentPrimary" format="color" />
     <attr name="onboardingAccentSecondary" format="color" />
+    <attr name="onboardingIconsTertiary" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
 
     <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
@@ -32,13 +35,21 @@
         <item name="onboardingTextPrimary">#F5242323</item> <!--96%-->
         <item name="onboardingSurfaceBackdrop">@color/white</item>
         <item name="onboardingSurfaceTertiary">@color/white</item>
+        <item name="onboardingSurfaceDecorationPrimary">#17242323</item> <!--9% Alpha-->
         <item name="onboardingAccentAltPrimary">@color/pondwater20</item>
+        <item name="onboardingAccentAltGlowPrimary">#29A1CFF7</item> <!--16% Alpha-->
         <item name="onboardingAccentBrand">@color/mandarin50</item>
         <item name="onboardingAccentContentPrimary">@color/white</item>
+        <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
+        <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
+        <item name="daxColorContainer">?attr/onboardingSurfaceDecorationPrimary</item>
+
+        <!--Accent-->
+        <item name="daxColorAccentBlue">?attr/onboardingAccentPrimary</item>
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
@@ -73,13 +84,21 @@
         <item name="onboardingTextPrimary">@color/white</item>
         <item name="onboardingSurfaceBackdrop">#133E7C</item>
         <item name="onboardingSurfaceTertiary">#011D34</item>
+        <item name="onboardingSurfaceDecorationPrimary">#0FFFFFFF</item> <!--6% Alpha-->
         <item name="onboardingAccentAltPrimary">#133E7C</item>
+        <item name="onboardingAccentAltGlowPrimary">#1FA1CFF7</item> <!--12% Alpha-->
         <item name="onboardingAccentBrand">@color/pollen30</item>
         <item name="onboardingAccentContentPrimary">@color/pollen100</item>
+        <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
+        <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
+        <item name="daxColorContainer">?attr/onboardingSurfaceDecorationPrimary</item>
+
+        <!--Accent-->
+        <item name="daxColorAccentBlue">?attr/onboardingAccentPrimary</item>
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
@@ -110,26 +129,44 @@
 
     <style name="Typography.DuckDuckGo.Onboarding" />
 
-    <!--TODO add ducksans-->
+    <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
+        <item name="android:textSize">44sp</item>
+        <item name="android:textColor">?attr/onboardingTextPrimary</item>
+        <item name="android:lineSpacingExtra">-10sp</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_medium</item>
+    </style>
+
     <style name="Typography.DuckDuckGo.Onboarding.Title">
         <item name="android:textSize">24sp</item>
         <item name="android:lineSpacingExtra">-1sp</item>
-        <item name="fontWeight">700</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_bold</item>
     </style>
 
-    <!--TODO add ducksans-->
     <style name="Typography.DuckDuckGo.Onboarding.Body">
         <item name="android:textSize">18sp</item>
         <item name="android:lineSpacingExtra">0sp</item>
-        <item name="fontWeight">400</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.ChartComparison">
+        <item name="android:textSize">14sp</item>
+        <item name="typography">body1</item>
+        <item name="android:lineSpacingExtra">-1sp</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Onboarding.Button">
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="fontWeight">400</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.Label">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">-3sp</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_regular</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding" parent="Widget.MaterialComponents.Button.TextButton">

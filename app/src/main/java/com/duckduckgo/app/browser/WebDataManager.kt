@@ -179,13 +179,14 @@ class WebViewDataManager @Inject constructor(
      *  app_webview/Default/Cookies
      *  app_webview/Default/Local Storage (when flag enabled)
      *  app_webview/Default/IndexedDB (when flag enabled)
+     *  app_webview/pir (PIR has it's own internal cleanup)
      *
      *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
     private suspend fun clearWebViewDirectories(shouldClearDuckAiData: Boolean) = withContext(dispatcherProvider.io()) {
         val dataDir = context.applicationInfo.dataDir
 
-        fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
+        fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies", "pir"))
             .onSuccess {
                 dataClearingWideEvent.stepSuccess(DataClearingFlowStep.WEBVIEW_APP_WEBVIEW_CLEAR)
             }

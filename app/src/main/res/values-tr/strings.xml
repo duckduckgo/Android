@@ -27,6 +27,9 @@
     <string name="cancel">Vazgeç</string>
     <string name="search">Arama yap</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Sohbet silindi</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu varsayılan yap</string>
