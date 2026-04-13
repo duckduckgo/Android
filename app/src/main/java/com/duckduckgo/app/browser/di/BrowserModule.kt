@@ -36,8 +36,6 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyNotification
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
@@ -71,7 +69,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -180,23 +177,11 @@ class BrowserModule {
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
         pixel: Pixel,
-        defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
-        notificationSender: NotificationSender,
-        defaultBrowserChangedSurveyNotification: DefaultBrowserChangedSurveyNotification,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        workManager: WorkManager,
     ): MainProcessLifecycleObserver {
         return DefaultBrowserObserver(
             defaultBrowserDetector = defaultBrowserDetector,
             appInstallStore = appInstallStore,
             pixel = pixel,
-            defaultBrowserChangedSurveyManager = defaultBrowserChangedSurveyManager,
-            notificationSender = notificationSender,
-            defaultBrowserChangedSurveyNotification = defaultBrowserChangedSurveyNotification,
-            appCoroutineScope = appCoroutineScope,
-            dispatcherProvider = dispatcherProvider,
-            workManager = workManager,
         )
     }
 

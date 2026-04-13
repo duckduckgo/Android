@@ -306,6 +306,7 @@ class WelcomePageViewModel @Inject constructor(
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
+        appInstallStore.wasEverDefaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {

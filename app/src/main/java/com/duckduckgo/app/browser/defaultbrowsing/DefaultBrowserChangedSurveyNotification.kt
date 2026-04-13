@@ -81,6 +81,7 @@ class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -101,7 +102,7 @@ class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
     override fun getLaunchIntent(): PendingIntent? {
         val survey = Survey(
             surveyId = DefaultBrowserChangedSurveyManager.SURVEY_ID_PUSH,
-            url = PUSH_SURVEY_URL,
+            url = defaultBrowserChangedSurveyManager.buildSurveyUrl("push"),
             daysInstalled = null,
             status = Survey.Status.SCHEDULED,
         )
@@ -114,10 +115,5 @@ class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
-    }
-
-    companion object {
-        // TODO replace once survey URL available
-        const val PUSH_SURVEY_URL = "https://example.com/test-survey?channel=push"
     }
 }

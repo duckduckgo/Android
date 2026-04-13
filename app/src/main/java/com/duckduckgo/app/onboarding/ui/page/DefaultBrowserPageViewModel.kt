@@ -154,6 +154,7 @@ class DefaultBrowserPageViewModel @Inject constructor(
         timesPressedJustOnce = 0
         if (defaultBrowserDetector.isDefaultBrowser()) {
             installStore.defaultBrowser = true
+            installStore.wasEverDefaultBrowser = true
             val params = mapOf(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue,
