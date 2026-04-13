@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -38,6 +39,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -50,8 +52,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class ClearPersonalDataActionTest {
-
-    private lateinit var testee: ClearPersonalDataAction
 
     private val mockDataManager: WebDataManager = mock()
     private val mockClearingUnsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
@@ -72,31 +72,38 @@ class ClearPersonalDataActionTest {
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
+    private lateinit var testee: ClearPersonalDataAction
+
     @Before
     fun setup() {
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
-        testee = ClearPersonalDataAction(
-            context = InstrumentationRegistry.getInstrumentation().targetContext,
-            dataManager = mockDataManager,
-            clearingStore = mockClearingUnsentForgetAllPixelStore,
-            tabRepository = mockTabRepository,
-            settingsDataStore = mockSettingsDataStore,
-            cookieManager = mockCookieManager,
-            appCacheClearer = mockAppCacheClearer,
-            thirdPartyCookieManager = mockThirdPartyCookieManager,
-            fireproofWebsiteRepository = mockFireproofWebsiteRepository,
-            deviceSyncState = mockDeviceSyncState,
-            savedSitesRepository = mockSavedSitesRepository,
-            sitePermissionsManager = mockSitePermissionsManager,
-            navigationHistory = mockNavigationHistory,
-            webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
-            tabVisitedSitesRepository = mockTabVisitedSitesRepository,
-            webViewCapabilityChecker = mockWebViewCapabilityChecker,
-            duckAiHostProvider = mockDuckAiHostProvider,
-        )
+        testee = createTestee()
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
     }
+
+    private fun createTestee(
+        siteDataCleaner: SiteDataCleaner = SiteDataCleaner { _, _ -> },
+    ) = ClearPersonalDataAction(
+        context = InstrumentationRegistry.getInstrumentation().targetContext,
+        dataManager = mockDataManager,
+        clearingStore = mockClearingUnsentForgetAllPixelStore,
+        tabRepository = mockTabRepository,
+        settingsDataStore = mockSettingsDataStore,
+        cookieManager = mockCookieManager,
+        appCacheClearer = mockAppCacheClearer,
+        thirdPartyCookieManager = mockThirdPartyCookieManager,
+        fireproofWebsiteRepository = mockFireproofWebsiteRepository,
+        deviceSyncState = mockDeviceSyncState,
+        savedSitesRepository = mockSavedSitesRepository,
+        sitePermissionsManager = mockSitePermissionsManager,
+        navigationHistory = mockNavigationHistory,
+        webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
+        tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+        webViewCapabilityChecker = mockWebViewCapabilityChecker,
+        duckAiHostProvider = mockDuckAiHostProvider,
+        siteDataCleaner = siteDataCleaner,
+    )
 
     @Test
     fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
@@ -366,6 +373,21 @@ class ClearPersonalDataActionTest {
         )
         val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "another-fireproof.com", "duckduckgo.com", "duck.ai"))
         assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithMixedDomainsThenOnlyNonFireproofDomainsAreCleared() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        val clearedDomains = mutableListOf<String>()
+        val testeeWithCapture = createTestee(
+            siteDataCleaner = { _, domain -> clearedDomains.add(domain) },
+        )
+        val result = testeeWithCapture.clearDataForSpecificDomains(domains = setOf("fireproof.com", "clearable.com"))
+        assertTrue(result is ClearDataResult.Success)
+        assertEquals(listOf("clearable.com"), clearedDomains)
     }
 
     @Test
