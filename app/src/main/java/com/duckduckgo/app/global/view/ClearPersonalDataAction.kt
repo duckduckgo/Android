@@ -16,17 +16,16 @@
 
 package com.duckduckgo.app.global.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import androidx.webkit.WebStorageCompat
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.SiteDataCleaner
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
@@ -35,19 +34,18 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
 
 sealed class ClearDataResult {
     data object Success : ClearDataResult()
@@ -136,6 +134,7 @@ class ClearPersonalDataAction(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     duckAiHostProvider: DuckAiHostProvider,
+    private val siteDataCleaner: SiteDataCleaner,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
@@ -227,7 +226,6 @@ class ClearPersonalDataAction(
         }
     }
 
-    @SuppressLint("RequiresFeature")
     override suspend fun clearDataForSpecificDomains(
         domains: Set<String>,
     ): ClearDataResult {
@@ -237,16 +235,18 @@ class ClearPersonalDataAction(
         }
 
         return try {
+            val fireproofDomains = withContext(dispatchers.io()) {
+                fireproofWebsiteRepository.fireproofWebsitesSync()
+                    .mapNotNull { it.domain.toTldPlusOne() }
+                    .toSet()
+            }
+
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
                 domains
-                    .filter { !duckDuckGoDomains.contains(it) }
+                    .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
                     .forEach { domain ->
-                        suspendCancellableCoroutine { continuation ->
-                            WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
-                                continuation.resume(Unit)
-                            }
-                        }
+                        siteDataCleaner.deleteSiteData(webStorage, domain)
                     }
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
