@@ -828,9 +828,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Szia!</string>
+    <string name="preOnboardingDaxDialog1Text">Készen állsz egy gyorsabb böngészőre, amely védelmet nyújt, és lehetővé teszi, hogy eldöntsd, mikor és hogyan használd az AI-t?</string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Kezdjünk hozzá!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
     <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
     <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
@@ -842,7 +843,7 @@
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Használd a ChatGPT-t privát módon a beépített Duck.ai segítségével</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
@@ -895,7 +896,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitle_2">Szeretnél a címsorból könnyen hozzáférni a privát AI-csevegéshez?</string>
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 

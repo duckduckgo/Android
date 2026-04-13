@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
+    <string name="input_screen_user_pref_without_ai_2">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_2">Comută între căutare și Duck.ai</string>
     <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->

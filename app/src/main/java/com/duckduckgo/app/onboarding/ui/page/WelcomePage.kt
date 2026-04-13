@@ -248,14 +248,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
-                    val ctaText = it.getString(titleRes)
+                    val ctaText = if (showDuckAiCopy) {
+                        it.getString(R.string.preOnboardingDaxDialog1Title_2) + "<br/><br/>" + it.getString(R.string.preOnboardingDaxDialog1Text)
+                    } else {
+                        it.getString(R.string.preOnboardingDaxDialog1Title)
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.setText(
-                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1Button_2 else R.string.preOnboardingDaxDialog1Button,
                         )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
@@ -273,14 +276,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
-                    val ctaText = it.getString(titleRes)
+                    val ctaText = if (showDuckAiCopy) {
+                        it.getString(R.string.preOnboardingDaxDialog1Title_2) + "<br/><br/>" + it.getString(R.string.preOnboardingDaxDialog1Text)
+                    } else {
+                        it.getString(R.string.preOnboardingDaxDialog1Title)
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.setText(
-                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1Button_2 else R.string.preOnboardingDaxDialog1Button,
                         )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
@@ -413,13 +419,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 3
                     val ctaText = it.getString(
-                        if (showDuckAiCopy) R.string.preOnboardingInputScreenTitleUpdated else R.string.preOnboardingInputScreenTitle,
+                        if (showDuckAiCopy) R.string.preOnboardingInputScreenTitle_2 else R.string.preOnboardingInputScreenTitle,
                     )
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                            DuckChatR.string.input_screen_user_pref_without_ai_2
                         } else {
                             DuckChatR.string.input_screen_user_pref_without_ai
                         },
@@ -427,7 +433,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
                         if (showDuckAiCopy) {
-                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                            DuckChatR.string.input_screen_user_pref_with_ai_2
                         } else {
                             DuckChatR.string.input_screen_user_pref_with_ai
                         },

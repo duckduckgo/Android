@@ -827,9 +827,10 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that keeps you protected?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Hi there.</string>
+    <string name="preOnboardingDaxDialog1Text">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
     <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\'s get started!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Let\'s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
     <string name="preOnboardingDaxDialog2Title">Protections activated!</string>
     <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
@@ -841,7 +842,7 @@
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
+    <string name="preOnboardingComparisonChartDuckAi">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
     <string name="preOnboardingAddressBarTitle">Where should I put your address bar?</string>
     <string name="preOnboardingAddressBarOkButton">Next</string>
@@ -894,7 +895,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Want easy access to private AI chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenTitle_2">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Next</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
