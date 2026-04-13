@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ soovib avada teie DRM-tarkvara</string>
-    <string name="drmSiteDialogSubtitle">Digitaalsete õiguste haldamise tarkvara on vajalik kaitstud meediasisu esitamiseks, kuid see võimaldab ka juurdepääsu seadme identifikaatoritele. Anna luba ainult saitidele, mida sa usaldad. Saad õigusi igal ajal seadetes hallata. <annotation type="drm_learn_more_link">Lisateave</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ soovib avada sinu digitaalõiguste halduse (DRM) tarkvara</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Kui valid „Keeldu“, võivad saidil videod muutuda mängitamatuks, kuid %1$s -l puudub juurdepääs DRM-tarkvara pakutavatele seadme identifikaatoritele. Saad õigusi igal ajal seadetes hallata. <annotation type="drm_learn_more_link">Lisateave</annotation></string>
     <string name="drmSiteDialogAllowAlways">Alati</string>
     <string name="drmSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="drmSiteDialogDenyAlways">Keela alati</string>
