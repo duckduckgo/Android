@@ -1539,7 +1539,11 @@ class BrowserTabViewModel @Inject constructor(
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
-                    command.value = ShowKeyboard
+                    if (duckAiFeatureState.showInputScreen.value) {
+                        command.value = LaunchInputScreen
+                    } else {
+                        command.value = ShowKeyboard
+                    }
                 } else {
                     command.value = LaunchNewTab
                 }
