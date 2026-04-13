@@ -27,6 +27,9 @@
     <string name="cancel">Отмени</string>
     <string name="search">Търсене</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Чатът е изтрит</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>

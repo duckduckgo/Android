@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Az oldal tartalmának automatikus küldése a Duck.ai részére</string>
     <string name="duckAIContextualAttachPageContent">Oldal tartalmának csatolása</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Csevegés törlése</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Adatok törlése</string>
     <string name="duckChatBrowserMenuContentDescription">További lehetőségek</string>

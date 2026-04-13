@@ -27,6 +27,9 @@
     <string name="cancel">Anulează</string>
     <string name="search">Căutare</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat șters</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesează „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>

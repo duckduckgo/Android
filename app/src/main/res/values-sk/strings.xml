@@ -27,6 +27,9 @@
     <string name="cancel">Zrušiť</string>
     <string name="search">Vyhľadávať</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat bol odstránený</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
     <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>

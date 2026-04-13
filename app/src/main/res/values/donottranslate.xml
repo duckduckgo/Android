@@ -106,7 +106,4 @@
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
-    <!--Duck.ai contextual fire-->
-    <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
-
 </resources>

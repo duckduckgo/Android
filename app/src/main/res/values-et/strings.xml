@@ -27,6 +27,9 @@
     <string name="cancel">Tühista</string>
     <string name="search">Otsing</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Vestlus kustutatud</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
     <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>

@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Lähetä sivun sisältö automaattisesti Duck.ai:lle</string>
     <string name="duckAIContextualAttachPageContent">Liitä sivun sisältö</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Tyhjennä keskustelu</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Poista tiedot</string>
     <string name="duckChatBrowserMenuContentDescription">Lisää vaihtoehtoja</string>

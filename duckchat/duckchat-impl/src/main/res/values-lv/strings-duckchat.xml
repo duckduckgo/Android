@@ -100,6 +100,9 @@
     <string name="duckAIContextualAutomaticContextMessage">Automātiski nosūtīt lapas saturu uz Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Pievienot lapas saturu</string>
 
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Notīrīt tērzēšanas sarunu</string>
+
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Notīrīt datus</string>
     <string name="duckChatBrowserMenuContentDescription">Citas iespējas</string>

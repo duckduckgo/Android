@@ -27,6 +27,9 @@
     <string name="cancel">Avbryt</string>
     <string name="search">Sökning</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chatt raderad</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
