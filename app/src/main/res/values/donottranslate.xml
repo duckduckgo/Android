@@ -110,4 +110,7 @@
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
+    <!-- Sharing options -->
+    <string name="copyText">Copy Link Text</string>
+    <string name="linkTextCopied">Link text copied</string>
 </resources>
