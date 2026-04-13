@@ -64,39 +64,45 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when both sources are false then shouldHighlight is false`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when both sources are false then highlightState has both false`() = runTest {
+        testee.highlightState.test {
+            val state = awaitItem()
+            assertFalse(state.defaultBrowserHighlight)
+            assertFalse(state.downloadHighlight)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when default browser highlight is true then shouldHighlight is true`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when default browser highlight is true then defaultBrowserHighlight is true`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             highlightPopupMenuFlow.value = true
-            assertTrue(awaitItem())
+            val state = awaitItem()
+            assertTrue(state.defaultBrowserHighlight)
+            assertFalse(state.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when new download is true and bottom sheet menu enabled then shouldHighlight is true`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when new download is true and bottom sheet menu enabled then downloadHighlight is true`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             hasNewDownloadFlow.value = true
-            assertTrue(awaitItem())
+            val state = awaitItem()
+            assertFalse(state.defaultBrowserHighlight)
+            assertTrue(state.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when new download is true but bottom sheet menu disabled then shouldHighlight is false`() = runTest {
+    fun `when new download is true but bottom sheet menu disabled then downloadHighlight is false`() = runTest {
         browserMenuStateFlow.value = BrowserMenuDisplayState(hasOption = false, isEnabled = false)
 
         testee = RealBrowserMenuHighlightState(
@@ -107,8 +113,9 @@ class RealBrowserMenuHighlightStateTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
 
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+        testee.highlightState.test {
+            val initial = awaitItem()
+            assertFalse(initial.downloadHighlight)
 
             hasNewDownloadFlow.value = true
             // still false because bottom sheet menu is not enabled
@@ -119,66 +126,87 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when both sources are true then shouldHighlight is true`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when both sources are true then both highlights are true`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             highlightPopupMenuFlow.value = true
-            assertTrue(awaitItem())
+            val afterDefault = awaitItem()
+            assertTrue(afterDefault.defaultBrowserHighlight)
 
             hasNewDownloadFlow.value = true
-            // still true, no new emission expected (same value)
+            val afterBoth = awaitItem()
+            assertTrue(afterBoth.defaultBrowserHighlight)
+            assertTrue(afterBoth.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when default browser clears but download is still active then shouldHighlight remains true`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when default browser clears but download is still active then downloadHighlight remains true`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             highlightPopupMenuFlow.value = true
+            awaitItem() // intermediate: (true, false)
+
             hasNewDownloadFlow.value = true
-            assertTrue(awaitItem())
+            val bothTrue = awaitItem()
+            assertTrue(bothTrue.defaultBrowserHighlight)
+            assertTrue(bothTrue.downloadHighlight)
 
             highlightPopupMenuFlow.value = false
-            // still true because hasNewDownload is true
-            expectNoEvents()
+            val afterClear = awaitItem()
+            assertFalse(afterClear.defaultBrowserHighlight)
+            assertTrue(afterClear.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when download clears but default browser is still active then shouldHighlight remains true`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when download clears but default browser is still active then defaultBrowserHighlight remains true`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             highlightPopupMenuFlow.value = true
+            awaitItem() // intermediate: (true, false)
+
             hasNewDownloadFlow.value = true
-            assertTrue(awaitItem())
+            val bothTrue = awaitItem()
+            assertTrue(bothTrue.defaultBrowserHighlight)
+            assertTrue(bothTrue.downloadHighlight)
 
             hasNewDownloadFlow.value = false
-            // still true because highlightPopupMenu is true
-            expectNoEvents()
+            val afterClear = awaitItem()
+            assertTrue(afterClear.defaultBrowserHighlight)
+            assertFalse(afterClear.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when both sources clear then shouldHighlight becomes false`() = runTest {
-        testee.shouldHighlight.test {
-            assertFalse(awaitItem())
+    fun `when both sources clear then both highlights become false`() = runTest {
+        testee.highlightState.test {
+            awaitItem() // initial
 
             highlightPopupMenuFlow.value = true
+            awaitItem() // intermediate: (true, false)
+
             hasNewDownloadFlow.value = true
-            assertTrue(awaitItem())
+            val bothTrue = awaitItem()
+            assertTrue(bothTrue.defaultBrowserHighlight)
+            assertTrue(bothTrue.downloadHighlight)
 
             highlightPopupMenuFlow.value = false
+            awaitItem() // intermediate: (false, true)
+
             hasNewDownloadFlow.value = false
-            assertFalse(awaitItem())
+            val afterClear = awaitItem()
+            assertFalse(afterClear.defaultBrowserHighlight)
+            assertFalse(afterClear.downloadHighlight)
 
             cancelAndIgnoreRemainingEvents()
         }

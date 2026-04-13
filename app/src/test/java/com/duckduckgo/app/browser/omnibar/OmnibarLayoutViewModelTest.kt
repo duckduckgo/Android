@@ -84,7 +84,7 @@ class OmnibarLayoutViewModelTest {
     private val userBrowserProperties: UserBrowserProperties = mock()
 
     private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
-    private val browserMenuHighlightFlow = MutableStateFlow(false)
+    private val browserMenuHighlightFlow = MutableStateFlow(BrowserMenuHighlightState.HighlightState())
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
@@ -122,7 +122,7 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(browserMenuHighlightFlow)
+        whenever(browserMenuHighlightState.highlightState).thenReturn(browserMenuHighlightFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -1252,12 +1252,45 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun `when browser menu highlight state emits true, then update the view state`() = runTest {
-        browserMenuHighlightFlow.value = true
+    fun `when default browser highlight emits true in Browser mode, then show highlight`() = runTest {
+        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when default browser highlight emits true in non-Browser mode, then highlight is not shown`() = runTest {
+        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when download highlight emits true in non-Browser mode, then show highlight`() = runTest {
+        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when download highlight emits true in CustomTab mode, then highlight is not shown`() = runTest {
+        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        testee.onViewModeChanged(ViewMode.CustomTab(0, null, null, false))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showBrowserMenuHighlight)
         }
     }
 

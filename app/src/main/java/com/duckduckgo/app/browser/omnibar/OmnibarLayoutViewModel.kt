@@ -132,14 +132,16 @@ class OmnibarLayoutViewModel @Inject constructor(
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
-        browserMenuHighlightState.shouldHighlight,
+        browserMenuHighlightState.highlightState,
         flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
-    ) { state, tabs, shouldHighlightMenu, isAddressBarTrackersAnimationEnabled ->
+    ) { state, tabs, highlightState, isAddressBarTrackersAnimationEnabled ->
+        val defaultBrowserHighlight = highlightState.defaultBrowserHighlight && state.viewMode is Browser
+        val downloadHighlight = highlightState.downloadHighlight && state.viewMode !is CustomTab
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = shouldHighlightMenu && state.viewMode !is CustomTab,
+            showBrowserMenuHighlight = defaultBrowserHighlight || downloadHighlight,
             viewMode = getViewMode(state),
             isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
         )

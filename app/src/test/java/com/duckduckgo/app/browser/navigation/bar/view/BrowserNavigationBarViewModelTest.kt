@@ -44,13 +44,13 @@ class BrowserNavigationBarViewModelTest {
 
     private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
 
-    private val highlightPopupMenuFlow = MutableStateFlow(false)
+    private val highlightPopupMenuFlow = MutableStateFlow(BrowserMenuHighlightState.HighlightState())
 
     private lateinit var testee: BrowserNavigationBarViewModel
 
     @Before
     fun setUp() {
-        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(highlightPopupMenuFlow)
+        whenever(browserMenuHighlightState.highlightState).thenReturn(highlightPopupMenuFlow)
         whenever(tabRepositoryMock.flowTabs).thenReturn(flowOf(listOf(TabEntity("abc"))))
 
         testee = BrowserNavigationBarViewModel(
@@ -139,17 +139,17 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when browser menu highlight state emits true, viewState shows browser menu highlight`() = runTest {
+    fun `when default browser highlight emits true in Browser mode, viewState shows highlight`() = runTest {
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertEquals(false, initial.showBrowserMenuHighlight)
 
-            highlightPopupMenuFlow.value = true
+            highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
 
             val updated = awaitItem()
             Assert.assertEquals(true, updated.showBrowserMenuHighlight)
 
-            highlightPopupMenuFlow.value = false
+            highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState()
             val updatedFalse = awaitItem()
             Assert.assertEquals(false, updatedFalse.showBrowserMenuHighlight)
 
@@ -219,6 +219,48 @@ class BrowserNavigationBarViewModelTest {
             testee.setViewMode(BrowserNavigationBarView.ViewMode.CustomTab)
             val hidden = awaitItem()
             Assert.assertFalse(hidden.isVisible)
+        }
+    }
+
+    @Test
+    fun `when default browser highlight in NewTab mode then highlight is not shown`() = runTest {
+        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+            val updated = awaitItem()
+            Assert.assertFalse(updated.showBrowserMenuHighlight) // NewTab mode hides default browser highlight
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when switching from NewTab to Browser then default browser highlight is restored`() = runTest {
+        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        testee.viewState.test {
+            awaitItem() // initial with highlight
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+            awaitItem() // NewTab, highlight hidden
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
+            val browserState = awaitItem()
+            Assert.assertTrue(browserState.showBrowserMenuHighlight)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when download highlight in NewTab mode then highlight is shown`() = runTest {
+        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        testee.viewState.test {
+            val initial = awaitItem()
+            Assert.assertTrue(initial.showBrowserMenuHighlight)
+
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
+            val updated = awaitItem()
+            Assert.assertTrue(updated.showBrowserMenuHighlight) // download highlight shows in all modes
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

@@ -67,12 +67,14 @@ class BrowserNavigationBarViewModel @Inject constructor(
     val viewState = combine(
         _viewState.asStateFlow(),
         tabRepository.flowTabs,
-        browserMenuHighlightState.shouldHighlight,
-    ) { state, tabs, shouldHighlightMenu ->
+        browserMenuHighlightState.highlightState,
+    ) { state, tabs, highlightState ->
+        val defaultBrowserHighlight = highlightState.defaultBrowserHighlight && state.isBrowserMode
+        val downloadHighlight = highlightState.downloadHighlight
         state.copy(
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = shouldHighlightMenu,
+            showBrowserMenuHighlight = defaultBrowserHighlight || downloadHighlight,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -121,6 +123,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = false,
                         autofillButtonVisible = true,
+                        isBrowserMode = false,
                     )
                 }
             }
@@ -130,6 +133,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
+                        isBrowserMode = true,
                     )
                 }
             }
@@ -142,6 +146,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         tabsButtonVisible = false,
                         bookmarksButtonVisible = false,
                         showShadow = false,
+                        isBrowserMode = false,
                     )
                 }
             }
@@ -149,6 +154,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                 _viewState.update {
                     it.copy(
                         isVisible = false,
+                        isBrowserMode = false,
                     )
                 }
             }
@@ -184,6 +190,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
         val showBrowserMenuHighlight: Boolean = false,
+        val isBrowserMode: Boolean = true,
         val showShadow: Boolean = true,
     )
 }

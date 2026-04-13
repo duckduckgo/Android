@@ -36,9 +36,14 @@ import javax.inject.Inject
  */
 interface BrowserMenuHighlightState {
     /**
-     * Reactive flow indicating whether the browser menu should be highlighted to draw the user's attention to it.
+     * Reactive flow with individual highlight sources.
      */
-    val shouldHighlight: StateFlow<Boolean>
+    val highlightState: StateFlow<HighlightState>
+
+    data class HighlightState(
+        val defaultBrowserHighlight: Boolean = false,
+        val downloadHighlight: Boolean = false,
+    )
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -50,11 +55,14 @@ class RealBrowserMenuHighlightState @Inject constructor(
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : BrowserMenuHighlightState {
-    override val shouldHighlight: StateFlow<Boolean> = combine(
+    override val highlightState: StateFlow<BrowserMenuHighlightState.HighlightState> = combine(
         additionalDefaultBrowserPrompts.highlightPopupMenu,
         downloadMenuStateProvider.hasNewDownloadFlow,
         browserMenuDisplayRepository.browserMenuState.map { it.isEnabled },
     ) { defaultBrowserHighlight, hasNewDownload, isBottomSheetMenu ->
-        defaultBrowserHighlight || (hasNewDownload && isBottomSheetMenu)
-    }.flowOn(dispatcherProvider.io()).stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
+        BrowserMenuHighlightState.HighlightState(
+            defaultBrowserHighlight = defaultBrowserHighlight,
+            downloadHighlight = hasNewDownload && isBottomSheetMenu,
+        )
+    }.flowOn(dispatcherProvider.io()).stateIn(appCoroutineScope, SharingStarted.Eagerly, BrowserMenuHighlightState.HighlightState())
 }
