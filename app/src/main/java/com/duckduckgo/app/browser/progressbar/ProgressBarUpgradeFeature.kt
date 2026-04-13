@@ -28,4 +28,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface ProgressBarUpgradeFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun behaviourUpdate(): Toggle
 }
