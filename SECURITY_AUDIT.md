@@ -10,9 +10,9 @@
 | Severity | Count |
 |----------|-------|
 | Critical | 4 |
-| High | 5 |
+| High | 4 |
 | Medium | 8 |
-| Low | 5 |
+| Low | 6 |
 
 ---
 
@@ -104,7 +104,7 @@ The VPN auth token is stored in unencrypted SharedPreferences. Other stores in t
 
 ---
 
-### H2. SQL Injection via String Interpolation in Cookie Modifier
+### ~~H2. SQL String Interpolation in Cookie Modifier~~ (Downgraded to Low — code hygiene only)
 
 **File:** `cookies/cookies-impl/src/main/java/com/duckduckgo/cookies/impl/features/firstparty/FirstPartyCookiesModifier.kt:83-97`
 
@@ -118,9 +118,14 @@ private fun buildSQLWhereClause(..., excludedSites: List<String>): String {
 }
 ```
 
-Host strings from repositories (fireproof sites, allow lists) are interpolated directly into SQL `WHERE` clauses without parameterization. If any entry contains a single quote or SQL metacharacters, the query breaks or becomes exploitable. The sibling class `SQLCookieRemover` correctly uses `?` placeholders.
+Host strings are interpolated directly into SQL `WHERE` clauses without parameterization. However, **this is not realistically exploitable:**
 
-**Recommendation:** Use parameterized queries with `?` placeholders and bind the values as arguments, matching the pattern in `SQLCookieRemover`.
+- **User-driven sources** (fireproof sites, user allowlist) store `Uri.host` or domains validated by `UriString.isValidDomain()` (DOMAIN_NAME regex). Single quotes are not valid in hostnames and won't appear in these values.
+- **Remote config sources** (cookie exceptions, unprotected temporary) are server-controlled JSON. Exploiting this would require a compromised backend, at which point cookie DB manipulation is moot.
+
+The sibling class `SQLCookieRemover` correctly uses `?` placeholders, so this is inconsistent style rather than a vulnerability.
+
+**Recommendation:** Use parameterized queries for consistency and defense-in-depth, but this is a code hygiene issue, not an exploitable vulnerability.
 
 ---
 
