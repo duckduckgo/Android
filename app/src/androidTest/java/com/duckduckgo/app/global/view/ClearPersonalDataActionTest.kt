@@ -349,10 +349,20 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearDataForSpecificDomainsCalledWithSubdomainFireproofDomainThenEtldPlusOneMatchFiltersThem() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("www.facebook.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("facebook.com"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
     fun whenClearDataForSpecificDomainsCalledWithFireproofAndDuckDuckGoDomainsOnlyThenReturnsSuccess() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
         whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
-            listOf(FireproofWebsiteEntity("fireproof.com"), FireproofWebsiteEntity("another-fireproof.com")),
+            listOf(FireproofWebsiteEntity("www.fireproof.com"), FireproofWebsiteEntity("login.another-fireproof.com")),
         )
         val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "another-fireproof.com", "duckduckgo.com", "duck.ai"))
         assertTrue(result is ClearDataResult.Success)

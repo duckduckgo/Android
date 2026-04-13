@@ -35,6 +35,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
@@ -238,7 +239,7 @@ class ClearPersonalDataAction(
 
         return try {
             val fireproofDomains = withContext(dispatchers.io()) {
-                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+                fireproofWebsiteRepository.fireproofWebsitesSync().mapNotNull { it.domain.toTldPlusOne() }
             }
 
             withContext(dispatchers.main()) {
