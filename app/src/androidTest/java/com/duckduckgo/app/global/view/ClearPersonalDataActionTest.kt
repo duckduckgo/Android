@@ -332,6 +332,40 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearDataForSpecificDomainsCalledThenFireproofWebsitesAreQueried() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        testee.clearDataForSpecificDomains(domains = setOf("example.com"))
+        verify(mockFireproofWebsiteRepository).fireproofWebsitesSync()
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithFireproofDomainsOnlyThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithFireproofAndDuckDuckGoDomainsOnlyThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockFireproofWebsiteRepository.fireproofWebsitesSync()).thenReturn(
+            listOf(FireproofWebsiteEntity("fireproof.com"), FireproofWebsiteEntity("another-fireproof.com")),
+        )
+        val result = testee.clearDataForSpecificDomains(domains = setOf("fireproof.com", "another-fireproof.com", "duckduckgo.com", "duck.ai"))
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenFireproofWebsitesNotQueried() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        testee.clearDataForSpecificDomains(domains = setOf("example.com"))
+        verify(mockFireproofWebsiteRepository, never()).fireproofWebsitesSync()
+    }
+
+    @Test
     fun whenSetAppUsedSinceLastClearFlagCalledWithTrueThenFlagSetToTrue() = runTest {
         testee.setAppUsedSinceLastClearFlag(true)
         verify(mockSettingsDataStore).appUsedSinceLastClear = true

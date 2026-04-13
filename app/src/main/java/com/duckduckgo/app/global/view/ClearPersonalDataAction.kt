@@ -237,10 +237,14 @@ class ClearPersonalDataAction(
         }
 
         return try {
+            val fireproofDomains = withContext(dispatchers.io()) {
+                fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
+            }
+
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
                 domains
-                    .filter { !duckDuckGoDomains.contains(it) }
+                    .filter { !duckDuckGoDomains.contains(it) && !fireproofDomains.contains(it) }
                     .forEach { domain ->
                         suspendCancellableCoroutine { continuation ->
                             WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
