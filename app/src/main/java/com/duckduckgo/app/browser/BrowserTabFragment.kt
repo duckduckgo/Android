@@ -370,6 +370,7 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.File
 import java.util.Locale
 import javax.inject.Inject
@@ -4384,8 +4385,6 @@ class BrowserTabFragment :
         val wv = webView ?: return null
         val density = wv.resources.displayMetrics.density.takeIf { it > 0f } ?: 1f
         val pageScale = wv.scale.takeIf { it > 0f } ?: 1f
-        val pointX = lastTouchX / density / pageScale
-        val pointY = lastTouchY / density / pageScale
         val escapedUrl = lastLongPressUrl
             ?.replace("\\", "\\\\")
             ?.replace("'", "\\'")
@@ -4393,11 +4392,26 @@ class BrowserTabFragment :
             ?.replace("\r", "\\r")
         val urlParam = if (escapedUrl != null) "'$escapedUrl'" else "null"
         return suspendCancellableCoroutine { continuation ->
-            val js = String.format(Locale.US, JS_EXTRACT_LINK_TEXT, pointX, pointY, urlParam)
+            val js = String.format(Locale.US, JS_EXTRACT_LINK_TEXT, lastTouchX, lastTouchY, density, pageScale, urlParam)
             wv.evaluateJavascript(js) { result ->
-                val text = result?.trim('"')?.takeIf { it.isNotEmpty() && it != "null" }
+                val text = decodeJavascriptStringResult(result)
                 continuation.resume(text) { _, _, _ -> }
             }
+        }
+    }
+
+    /** Decodes JSON-encoded string from [WebView.evaluateJavascript] (escapes quotes, newlines, etc.). */
+    private fun decodeJavascriptStringResult(encoded: String?): String? {
+        if (encoded == null) return null
+        val trimmed = encoded.trim()
+        if (trimmed.isEmpty() || trimmed == "null") return null
+        return try {
+            when (val value = JSONTokener(trimmed).nextValue()) {
+                is String -> value
+                else -> null
+            }
+        } catch (_: Exception) {
+            trimmed.trim('"').takeIf { it.isNotEmpty() && it != "null" }
         }
     }
 
@@ -4979,10 +4993,11 @@ class BrowserTabFragment :
 
         private const val JS_EXTRACT_LINK_TEXT = """
             (function() {
-                var pointX = %s;
-                var pointY = %s;
+                var rawPointX = %s;
+                var rawPointY = %s;
+                var density = %s;
+                var pageScale = %s;
                 var targetUrl = %s;
-                if (!targetUrl) return '';
 
                 function normalizeWhitespace(value) {
                     return (value || '').replace(/\s+/g, ' ').trim();
@@ -5032,7 +5047,111 @@ class BrowserTabFragment :
                     return normalizeWhitespace(visibleText);
                 }
 
+                function isUrlOrBreadcrumbLine(text) {
+                    var t = normalizeWhitespace(text);
+                    if (!t) return true;
+                    if (/^https?:\/\//i.test(t)) return true;
+                    if (/^www\.[a-z0-9.-]+\.[a-z]{2,}/i.test(t)) return true;
+                    // SERP URL lines: "host › path" or "https://... > wiki > ..."
+                    if ((/\s[›>]\s/.test(t) || /\s>\s/.test(t)) && /(\.[a-z]{2,}\/|wikipedia|\.org|\.com)/i.test(t)) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                function scoreText(text) {
+                    if (!text) return -1;
+                    // Strongly prefer human titles over URL / breadcrumb lines
+                    return (isUrlOrBreadcrumbLine(text) ? 0 : 10000) + text.length;
+                }
+
+                function chooseBetterText(currentBest, candidateText) {
+                    if (!candidateText) return currentBest;
+                    if (!currentBest) return candidateText;
+                    return scoreText(candidateText) > scoreText(currentBest) ? candidateText : currentBest;
+                }
+
+                function distancePointToRect(px, py, rect) {
+                    if (!rect || !rect.width || !rect.height) return Infinity;
+                    var cx = Math.min(Math.max(px, rect.left), rect.right);
+                    var cy = Math.min(Math.max(py, rect.top), rect.bottom);
+                    var dx = px - cx;
+                    var dy = py - cy;
+                    return Math.sqrt(dx * dx + dy * dy);
+                }
+
+                function isRelatedToAnchor(el, anchor) {
+                    if (!el || !anchor) return false;
+                    return el === anchor || el.contains(anchor) || anchor.contains(el);
+                }
+
+                function pickBestTitleInBlock(card, anchor, px, py) {
+                    if (!card) return '';
+                    var selectors = '[data-testid="result-title-a"], h2 a[href], h3 a[href], [class*="result__title"] a[href], [class*="result-title"] a[href]';
+                    var nodes = card.querySelectorAll(selectors);
+                    var bestText = '';
+                    var bestKey = Infinity;
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = nodes[i];
+                        if (!isVisible(node)) continue;
+                        var t = extractVisibleText(node);
+                        if (!t || isUrlOrBreadcrumbLine(t)) continue;
+                        var rect = node.getBoundingClientRect();
+                        var dist = distancePointToRect(px, py, rect);
+                        if (isRelatedToAnchor(node, anchor)) dist -= 0.5;
+                        var key = dist * 1000 - scoreText(t);
+                        if (key < bestKey) {
+                            bestKey = key;
+                            bestText = t;
+                        }
+                    }
+                    return bestText;
+                }
+
+                function pickBestLinkInBlock(card, anchor, px, py, targetUrlForMatch) {
+                    if (!card) return '';
+                    var bestText = '';
+                    var bestKey = Infinity;
+                    var links = card.querySelectorAll('a[href]');
+                    for (var i = 0; i < links.length; i++) {
+                        var link = links[i];
+                        if (!isVisible(link)) continue;
+                        if (targetUrlForMatch && !urlsMatchLongPress(link.href, targetUrlForMatch)) continue;
+                        var t = extractVisibleText(link);
+                        if (!t) continue;
+                        var rect = link.getBoundingClientRect();
+                        var dist = distancePointToRect(px, py, rect);
+                        if (isRelatedToAnchor(link, anchor)) dist -= 0.5;
+                        var st = scoreText(t);
+                        var key = dist * 10000 - st;
+                        if (key < bestKey) {
+                            bestKey = key;
+                            bestText = t;
+                        }
+                    }
+                    return bestText;
+                }
+
                 function findAnchorAtPoint(x, y) {
+                    var topElement = null;
+                    if (document.elementsFromPoint) {
+                        var elements = document.elementsFromPoint(x, y);
+                        for (var i = 0; i < elements.length; i++) {
+                            if (elements[i] && elements[i].tagName === 'A' && elements[i].href) {
+                                topElement = elements[i];
+                                break;
+                            }
+                            if (!topElement && elements[i]) {
+                                var ancestor = elements[i].closest && elements[i].closest('a[href]');
+                                if (ancestor) {
+                                    topElement = ancestor;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (topElement) return topElement;
+
                     var element = document.elementFromPoint(x, y);
                     while (element) {
                         if (element.tagName === 'A' && element.href) return element;
@@ -5041,23 +5160,136 @@ class BrowserTabFragment :
                     return null;
                 }
 
-                var normalizedTargetUrl = normalizeUrl(targetUrl);
-                var anchorAtPoint = findAnchorAtPoint(pointX, pointY);
-                if (anchorAtPoint && isVisible(anchorAtPoint) && normalizeUrl(anchorAtPoint.href) === normalizedTargetUrl) {
-                    var anchorText = extractVisibleText(anchorAtPoint);
-                    if (anchorText) return anchorText;
+                function addCoordinateCandidate(candidates, value) {
+                    if (!isFinite(value) || value <= 0) return;
+                    for (var i = 0; i < candidates.length; i++) {
+                        if (Math.abs(candidates[i] - value) < 0.5) return;
+                    }
+                    candidates.push(value);
+                }
+
+                function buildCoordinateCandidates(raw, densityValue, scaleValue) {
+                    var candidates = [];
+                    addCoordinateCandidate(candidates, raw);
+                    addCoordinateCandidate(candidates, raw / scaleValue);
+                    addCoordinateCandidate(candidates, raw / densityValue);
+                    addCoordinateCandidate(candidates, raw / (densityValue * scaleValue));
+                    return candidates;
+                }
+
+                function findSearchResultCard(startEl) {
+                    var el = startEl;
+                    for (var depth = 0; depth < 8 && el; depth++) {
+                        if (el.querySelectorAll) {
+                            var n = el.querySelectorAll('a[href]').length;
+                            if (n >= 2) return el;
+                        }
+                        el = el.parentElement;
+                    }
+                    return null;
+                }
+
+                function findTightBlock(anchor) {
+                    if (!anchor) return null;
+                    var byTestId = anchor.closest('[data-testid="web-result"], [data-testid*="web-result"], [data-testid*="result"]');
+                    if (byTestId) return byTestId;
+                    return anchor.closest('article, [role="article"], li') || findSearchResultCard(anchor);
+                }
+
+                function getBestTextAroundAnchor(anchor, targetUrlForMatch, px, py) {
+                    if (!anchor || !isVisible(anchor)) return '';
+                    var direct = extractVisibleText(anchor);
+                    if (direct && !isUrlOrBreadcrumbLine(direct)) return direct;
+
+                    var card = findTightBlock(anchor);
+
+                    var titleNear = pickBestTitleInBlock(card, anchor, px, py);
+                    if (titleNear) return titleNear;
+
+                    var linkNear = pickBestLinkInBlock(card, anchor, px, py, targetUrlForMatch);
+                    if (linkNear) return linkNear;
+
+                    return direct;
+                }
+
+                function urlsMatchLongPress(linkHref, longPressUrl) {
+                    if (!longPressUrl) return true;
+                    if (!linkHref) return false;
+                    var want = normalizeUrl(longPressUrl);
+                    var have = normalizeUrl(linkHref);
+                    if (have === want) return true;
+                    try {
+                        var u = new URL(linkHref, document.baseURI);
+                        var raw = u.searchParams.get('uddg') || u.searchParams.get('u');
+                        if (raw) {
+                            try {
+                                var decoded = decodeURIComponent(raw);
+                                if (normalizeUrl(decoded) === want) return true;
+                            } catch (_) {}
+                        }
+                    } catch (_) {}
+                    return false;
+                }
+
+                var normalizedTargetUrl = targetUrl ? normalizeUrl(targetUrl) : '';
+                var xCandidates = buildCoordinateCandidates(rawPointX, density, pageScale);
+                var yCandidates = buildCoordinateCandidates(rawPointY, density, pageScale);
+                var bestPointText = '';
+                var bestPointScore = -1;
+                var refPx = xCandidates.length ? xCandidates[0] : 0;
+                var refPy = yCandidates.length ? yCandidates[0] : 0;
+
+                for (var xIndex = 0; xIndex < xCandidates.length; xIndex++) {
+                    for (var yIndex = 0; yIndex < yCandidates.length; yIndex++) {
+                        var px = xCandidates[xIndex];
+                        var py = yCandidates[yIndex];
+                        var anchorAtPoint = findAnchorAtPoint(px, py);
+                        if (!anchorAtPoint) continue;
+                        if (normalizedTargetUrl && !urlsMatchLongPress(anchorAtPoint.href, targetUrl)) continue;
+
+                        var anchorText = getBestTextAroundAnchor(anchorAtPoint, targetUrl, px, py);
+                        refPx = px;
+                        refPy = py;
+                        var anchorScore = scoreText(anchorText);
+                        if (anchorScore > bestPointScore) {
+                            bestPointText = anchorText;
+                            bestPointScore = anchorScore;
+                        }
+                        if (anchorScore >= 10000) {
+                            return anchorText;
+                        }
+                    }
                 }
 
                 var links = document.querySelectorAll('a[href]');
                 var bestText = '';
+                var bestScore = bestPointScore;
+                var bestDistanceKey = Infinity;
+                if (bestPointText) {
+                    bestText = bestPointText;
+                }
+                if (!normalizedTargetUrl) {
+                    return bestText;
+                }
+                if (bestScore >= 10000 && bestText) {
+                    return bestText;
+                }
+                var maxFallbackDist = 220;
                 for (var i = 0; i < links.length; i++) {
                     var link = links[i];
                     if (!isVisible(link)) continue;
 
-                    if (normalizeUrl(link.href) === normalizedTargetUrl) {
+                    if (urlsMatchLongPress(link.href, targetUrl)) {
                         var visibleText = extractVisibleText(link);
-                        if (visibleText.length > bestText.length) {
+                        var candidateScore = scoreText(visibleText);
+                        var rect = link.getBoundingClientRect();
+                        var dist = distancePointToRect(refPx, refPy, rect);
+                        if (dist > maxFallbackDist) continue;
+                        var distKey = dist * 10000 - candidateScore;
+                        if (distKey < bestDistanceKey || (distKey === bestDistanceKey && candidateScore > bestScore)) {
                             bestText = visibleText;
+                            bestScore = candidateScore;
+                            bestDistanceKey = distKey;
                         }
                     }
                 }
