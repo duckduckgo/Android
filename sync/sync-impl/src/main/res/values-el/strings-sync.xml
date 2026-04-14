@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών, των κωδικών πρόσβασής σας και των συνομιλιών στο Duck.ai στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. \n\n Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
     <string name="sync_intro_enable_footer">Μπορείτε να προβείτε σε συγχρονισμό με τις άλλες συσκευές σας αργότερα.</string>
     <string name="sync_intro_enable_cta">Ενεργοποίηση συγχρονισμού και δημιουργίας αντιγράφων ασφαλείας</string>
-    <string name="sync_intro_recover_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
-    <string name="sync_intro_recover_content">Για να κάνετε επαναφορά των συγχρονισμένων δεδομένων σας, θα χρειαστείτε τον Κωδικό ανάκτησης που αποθηκεύσατε κατά την πρώτη ρύθμιση του Συγχρονισμού. Αυτός ο κωδικός ενδέχεται να έχει αποθηκευτεί ως PDF στη συσκευή που χρησιμοποιήσατε αρχικά για ρύθμιση του Συγχρονισμού.</string>
-    <string name="sync_intro_recover_cta">Ξεκινήστε</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Ανακτήστε τα συγχρονισμένα δεδομένα σας</string>
+    <string name="sync_recover_synced_data_content">Θα χρειαστείτε τον Κωδικό ανάκτησης που λάβατε κατά τη ρύθμιση του Sync &amp; Backup. Ενδέχεται να το έχετε αποθηκεύσει ως PDF στη συσκευή που χρησιμοποιήσατε.</string>
+    <string name="sync_recover_synced_data_cta">Ανάκτηση συγχρονισμένων δεδομένων</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Σάρωση κώδικα QR</string>
