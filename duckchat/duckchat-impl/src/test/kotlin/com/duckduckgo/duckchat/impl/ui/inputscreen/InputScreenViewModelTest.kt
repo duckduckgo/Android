@@ -26,6 +26,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -107,6 +108,7 @@ class InputScreenViewModelTest {
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
     private val fullScreenModeDisabledFlow = MutableStateFlow(false)
     private val fullScreenModeEnabledFlow = MutableStateFlow(true)
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
@@ -129,7 +131,6 @@ class InputScreenViewModelTest {
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
-            whenever(chatSuggestionsReader.getMaxUrlSuggestionsCount()).thenReturn(3)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -150,6 +151,7 @@ class InputScreenViewModelTest {
             omnibarRepository = omnibarRepository,
             duckAiFeatureState = duckAiFeatureState,
             duckChatFeature = duckChatFeature,
+            duckAiChatHistoryFeature = duckAiChatHistoryFeature,
             chatSuggestionsReader = chatSuggestionsReader,
             queryUrlPredictor = queryUrlPredictor,
             tabRepository = tabRepository,

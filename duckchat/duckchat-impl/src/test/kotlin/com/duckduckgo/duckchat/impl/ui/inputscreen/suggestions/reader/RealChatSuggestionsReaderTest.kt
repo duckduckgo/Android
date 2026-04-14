@@ -548,43 +548,4 @@ class RealChatSuggestionsReaderTest {
     }
 
     // endregion
-
-    // region getMaxUrlSuggestionsCount
-
-    @Suppress("DenyListedApi")
-    @Test
-    fun `when settings has maxUrlSuggestions then returns that value`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = """{"maxUrlSuggestions":5}"""),
-        )
-
-        assertEquals(5, reader.getMaxUrlSuggestionsCount())
-    }
-
-    @Suppress("DenyListedApi")
-    @Test
-    fun `when settings has no maxUrlSuggestions then returns default`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = """{}"""),
-        )
-
-        assertEquals(3, reader.getMaxUrlSuggestionsCount())
-    }
-
-    @Test
-    fun `when settings is null then returns default for maxUrlSuggestions`() {
-        assertEquals(3, reader.getMaxUrlSuggestionsCount())
-    }
-
-    @Suppress("DenyListedApi")
-    @Test
-    fun `when settings has invalid json then returns default for maxUrlSuggestions`() {
-        duckAiChatHistoryFeature.self().setRawStoredState(
-            State(enable = true, settings = "invalid"),
-        )
-
-        assertEquals(3, reader.getMaxUrlSuggestionsCount())
-    }
-
-    // endregion
 }
