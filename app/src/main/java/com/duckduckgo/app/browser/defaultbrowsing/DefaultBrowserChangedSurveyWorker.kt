@@ -43,6 +43,11 @@ class DefaultBrowserChangedSurveyWorker(
             return Result.success()
         }
 
+        if (!defaultBrowserChangedSurveyManager.areNotificationsEnabled()) {
+            logcat { "Notifications disabled, skipping. In-app survey will be shown instead" }
+            return Result.success()
+        }
+
         logcat { "Default-browser-changed survey trigger condition met, sending notification" }
         defaultBrowserChangedSurveyManager.markSurveyShown()
         notificationSender.sendNotification(defaultBrowserChangedSurveyNotification)

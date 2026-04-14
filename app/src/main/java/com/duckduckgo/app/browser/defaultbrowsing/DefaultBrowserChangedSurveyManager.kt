@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 interface DefaultBrowserChangedSurveyManager {
     fun shouldTriggerSurvey(): Boolean
+    fun areNotificationsEnabled(): Boolean
     fun markSurveyShown()
     fun buildSurveyUrl(channel: String): String
 
@@ -29,7 +31,12 @@ class RealDefaultBrowserChangedSurveyManager @Inject constructor(
     private val defaultBrowserChangedSurveyFeature: DefaultBrowserChangedSurveyFeature,
     private val appBuildConfig: AppBuildConfig,
     private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val notificationManager: NotificationManagerCompat,
 ) : DefaultBrowserChangedSurveyManager {
+
+    override fun areNotificationsEnabled(): Boolean {
+        return notificationManager.areNotificationsEnabled()
+    }
 
     override fun shouldTriggerSurvey(): Boolean {
         return defaultBrowserChangedSurveyFeature.self().isEnabled() &&
