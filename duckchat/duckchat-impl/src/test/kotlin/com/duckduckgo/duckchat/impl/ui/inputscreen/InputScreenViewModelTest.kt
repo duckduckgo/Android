@@ -2743,19 +2743,20 @@ class InputScreenViewModelTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when search mode and voice available and flag on then voice button visible`() =
+    fun `when search mode and voice available and flag on then voice search button visible`() =
         runTest {
             duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             val viewModel = createViewModel()
             viewModel.onSearchSelected()
 
-            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertTrue(viewModel.visibilityState.value.voiceSearchButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
         }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when search mode and voice unavailable and flag on then voice button hidden`() =
+    fun `when search mode and voice unavailable and flag on then voice search and voice chat button hidden`() =
         runTest {
             duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -2763,12 +2764,13 @@ class InputScreenViewModelTest {
             viewModel.onActivityResume()
             viewModel.onSearchSelected()
 
-            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceSearchButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
         }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when duck ai mode and flag on and no text entered then voice button visible regardless of voice service`() =
+    fun `when duck ai mode and flag on and no text entered then voice chat button visible regardless of voice service`() =
         runTest {
             duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -2777,12 +2779,13 @@ class InputScreenViewModelTest {
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged("")
 
-            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertTrue(viewModel.visibilityState.value.voiceChatButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceSearchButtonVisible)
         }
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when duck ai mode and flag on and text entered then voice button hidden`() =
+    fun `when duck ai mode and flag on and text entered then voice chat and search button hidden`() =
         runTest {
             duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -2791,22 +2794,25 @@ class InputScreenViewModelTest {
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged("Test")
 
-            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceSearchButtonVisible)
         }
 
     @Test
-    fun `when duck ai mode and flag off and voice available then voice button visible`() =
+    fun `when duck ai mode and flag off and voice available then voice search button visible`() =
         runTest {
             // flag is off by default in FakeFeatureToggleFactory (DefaultValue.INTERNAL = disabled in tests)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             val viewModel = createViewModel()
+            viewModel.onActivityResume()
             viewModel.onChatSelected()
 
-            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
+            assertTrue(viewModel.visibilityState.value.voiceSearchButtonVisible)
         }
 
     @Test
-    fun `when duck ai mode and flag off and voice unavailable then voice button hidden`() =
+    fun `when duck ai mode and flag off and voice unavailable then voice chat and search button hidden`() =
         runTest {
             // flag is off by default
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -2814,7 +2820,8 @@ class InputScreenViewModelTest {
             viewModel.onActivityResume()
             viewModel.onChatSelected()
 
-            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
+            assertFalse(viewModel.visibilityState.value.voiceSearchButtonVisible)
         }
 
     @Test
