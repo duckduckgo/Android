@@ -2857,7 +2857,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+    fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenDisabledThenShowKeyboard() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -2877,6 +2877,28 @@ class BrowserTabViewModelTest {
             assertNull(command)
             verify(mockTabRepository).select(emptyTabId)
             assertCommandIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenEnabledThenLaunchInputScreen() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockTabRepository).select(emptyTabId)
+            assertCommandNotIssued<ShowKeyboard>()
+            assertCommandIssued<Command.LaunchInputScreen>()
         }
 
     @Test
