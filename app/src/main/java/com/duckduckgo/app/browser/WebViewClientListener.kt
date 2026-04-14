@@ -185,4 +185,7 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
+
+    /** Called when the URL changes via history.replaceState / history.pushState (no page reload). */
+    fun onHistoryUrlChanged(url: String) {}
 }

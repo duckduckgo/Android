@@ -2086,6 +2086,10 @@ class BrowserTabViewModel @Inject constructor(
         return !duckChat.isDuckChatUrl(domain.toUri()) && !duckDuckGoUrlDetector.isDuckDuckGoUrl(domain)
     }
 
+    override fun onHistoryUrlChanged(url: String) {
+        urlUpdated(url)
+    }
+
     private fun urlUpdated(url: String) {
         logcat(VERBOSE) { "Page url updated: $url" }
         site?.url = url
