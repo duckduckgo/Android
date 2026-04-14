@@ -24,6 +24,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
+import androidx.core.content.withStyledAttributes
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.mobile.android.R
@@ -36,7 +37,6 @@ import kotlinx.coroutines.launch
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
-import androidx.core.content.withStyledAttributes
 
 @Suppress("NoHardcodedCoroutineDispatcher")
 class DaxTypeAnimationTextView @JvmOverloads constructor(
