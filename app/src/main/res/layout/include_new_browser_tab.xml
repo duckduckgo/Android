@@ -108,17 +108,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="600dp" />
 
-        <include
-            android:id="@+id/includeOnboardingDaxDialogBubbleBrandDesignUpdate"
-            layout="@layout/include_onboarding_bubble_dax_dialog_brand_design_update"
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/brandDesignDialogScrollView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_height="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:fillViewport="true"
             android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/includeOnboardingDaxDialogBubbleBrandDesignUpdate"
+                layout="@layout/include_onboarding_bubble_dax_dialog_brand_design_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone" />
+
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
