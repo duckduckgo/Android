@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anr
+package com.duckduckgo.app.anr.internal.feature
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import android.content.Context
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
 
-internal enum class CrashPixel(override val pixelName: String) : PixelName {
-    APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
-    APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL("m_app_crashed_on_verified_play_store_install"),
-    APPLICATION_CRASH_NATIVE("m_app_native_crash"),
-    APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED("m_app_register_native_crash_handler"),
+@ContributesPluginPoint(AppScope::class)
+interface CrashAnrDevCapabilityPlugin {
+    fun title(): String
+    fun subtitle(): String
+    fun onCapabilityClicked(activityContext: Context)
 }

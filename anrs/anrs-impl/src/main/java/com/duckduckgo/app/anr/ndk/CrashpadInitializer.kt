@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anr
+package com.duckduckgo.app.anr.ndk
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-
-internal enum class CrashPixel(override val pixelName: String) : PixelName {
-    APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
-    APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL("m_app_crashed_on_verified_play_store_install"),
-    APPLICATION_CRASH_NATIVE("m_app_native_crash"),
-    APPLICATION_CRASH_NATIVE_HANDLER_REGISTERED("m_app_register_native_crash_handler"),
+interface CrashpadInitializer {
+    /**
+     * Initialises Crashpad for this process.
+     *
+     * @param extraAnnotations key/value pairs embedded in every minidump
+     * @param onCrash invoked on the next launch if the previous session crashed
+     * @return true if Crashpad started successfully
+     */
+    fun initialize(
+        extraAnnotations: Map<String, String>,
+        onCrash: (() -> Unit)?,
+    ): Boolean
 }
