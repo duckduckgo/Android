@@ -176,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Mostra sugestões de pesquisa enquanto escreves, incluindo os teus marcadores. Todas as pesquisas são privadas.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites visitados recentemente</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostrar sites visitados recentemente nas sugestões de pesquisa. Os sites visitados recentemente são privados, guardados apenas no teu dispositivo e podem ser apagados com o Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Agora, as sugestões de preenchimento automático incluem os sites visitados recentemente. Desativa esta funcionalidade nas definições ou limpa os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
-    <string name="openAutoCompleteSettings">Abrir Definições</string>
     <string name="privateSearchChatSuggestionsToggle">Sugestões de chat</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Mostra sugestões do teu histórico, marcadores e (opcionalmente) histórico de conversas Duck.ai enquanto escreves na barra de pesquisa. Todas as pesquisas são privadas.</string>
 

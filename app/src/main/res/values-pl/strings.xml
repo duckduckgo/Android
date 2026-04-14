@@ -178,9 +178,6 @@
     <string name="privateSearchAutocompleteHint">Wyświetlaj sugestie wyszukiwania podczas wpisywania, łącznie z zakładkami. Wszystkie wyszukiwania są prywatne.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Ostatnio odwiedzone witryny</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Pokaż ostatnio odwiedzone witryny w sugestiach wyszukiwania. Ostatnio odwiedzane witryny są prywatne, przechowywane tylko na Twoim urządzeniu i można je wyczyścić za pomocą funkcji Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
-    <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
     <string name="privateSearchChatSuggestionsToggle">Sugestie czatu</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Wyświetlaj sugestie z Twojej historii, zakładek i (opcjonalnie) historii czatu Duck.ai podczas wpisywania w pasku wyszukiwania. Wszystkie wyszukiwania są prywatne.</string>
 

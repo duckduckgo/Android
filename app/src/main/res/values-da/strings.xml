@@ -176,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Vis søgeforslag, mens du skriver, inklusive fra dine bogmærker. Alle søgninger er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nyligt besøgte websteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nyligt besøgte websteder i søgeforslag. Nyligt besøgte sider er private, gemmes kun på din enhed og kan slettes med Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Forslag til autoudfyld inkluderer nu dine senest besøgte websteder. Slå fra i Indstillinger, eller ryd når som helst med 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
-    <string name="openAutoCompleteSettings">Åbn indstillinger</string>
     <string name="privateSearchChatSuggestionsToggle">Chatforslag</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Vis forslag fra din historik, bogmærker og Duck.ai-chathistorik (valgfrit), mens du skriver i søgefeltet. Alle søgninger er private.</string>
 
