@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -148,8 +149,9 @@ object SyncStoreModule {
         faviconFetchingStore: FaviconsFetchingStore,
         syncAccountRepository: SyncAccountRepository,
         syncOnboardingRestoreState: SyncOnboardingRestoreState,
+        currentTimeProvider: CurrentTimeProvider,
     ): FaviconsFetchingPrompt {
-        return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository, syncOnboardingRestoreState)
+        return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository, syncOnboardingRestoreState, currentTimeProvider)
     }
 
     @Provides

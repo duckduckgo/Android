@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.favicons
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
@@ -30,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class FaviconsFetchingPromptTest {
@@ -37,13 +39,19 @@ class FaviconsFetchingPromptTest {
     private var faviconsFetchingStore: FaviconsFetchingStore = mock()
     private var syncAccountRepository: SyncAccountRepository = mock()
     private var syncOnboardingRestoreState: SyncOnboardingRestoreState = mock()
+    private var currentTimeProvider: CurrentTimeProvider = mock()
 
     private lateinit var faviconsFetchingPrompt: FaviconsFetchingPrompt
 
     @Before
     fun setUp() {
         whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(null)
-        faviconsFetchingPrompt = SyncFaviconsFetchingPrompt(faviconsFetchingStore, syncAccountRepository, syncOnboardingRestoreState)
+        faviconsFetchingPrompt = SyncFaviconsFetchingPrompt(
+            faviconsFetchingStore,
+            syncAccountRepository,
+            syncOnboardingRestoreState,
+            currentTimeProvider,
+        )
     }
 
     @Test
@@ -113,7 +121,9 @@ class FaviconsFetchingPromptTest {
 
     @Test
     fun whenQuickRestoreJustCompletedThenShouldNotShow() {
-        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(System.currentTimeMillis())
+        val now = System.currentTimeMillis()
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(now)
+        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(now)
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
@@ -127,8 +137,9 @@ class FaviconsFetchingPromptTest {
 
     @Test
     fun whenQuickRestoreWasLongAgoThenShouldShow() {
-        val twoHoursAgo = System.currentTimeMillis() - (2 * 60 * 60 * 1000L)
-        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(twoHoursAgo)
+        val now = System.currentTimeMillis()
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(now)
+        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(now - TimeUnit.HOURS.toMillis(2))
         whenever(faviconsFetchingStore.promptShown).thenReturn(false)
         whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)

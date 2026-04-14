@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.favicons
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.Result
@@ -30,6 +31,7 @@ class SyncFaviconsFetchingPrompt(
     private val faviconsFetchingStore: FaviconsFetchingStore,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncOnboardingRestoreState: SyncOnboardingRestoreState,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : FaviconsFetchingPrompt {
 
     // should show prompt when
@@ -73,7 +75,7 @@ class SyncFaviconsFetchingPrompt(
     }
 
     private fun Long.wasRecent(): Boolean =
-        System.currentTimeMillis() - this < QUICK_RESTORE_SUPPRESSION_WINDOW_MS
+        currentTimeProvider.currentTimeMillis() - this < QUICK_RESTORE_SUPPRESSION_WINDOW_MS
 
     companion object {
         private const val MIN_CONNECTED_DEVICES_FOR_PROMPT = 2
