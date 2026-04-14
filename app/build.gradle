@@ -207,6 +207,12 @@ android {
     room {
         schemaDirectory("$projectDir/schemas")
     }
+    packagingOptions {
+        jniLibs {
+            // this is required so the handler exists as a real file on disk
+            useLegacyPackaging = true
+        }
+    }
 }
 
 if (!rootProject.ext.proprietaryFontAvailable && !rootProject.ext.proprietaryFontOptOut) {

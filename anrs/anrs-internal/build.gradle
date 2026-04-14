@@ -27,6 +27,7 @@ dependencies {
 	implementation project(":anrs-api")
 	implementation project(":anrs-impl")
 	implementation project(":anrs-store")
+    implementation "com.duckduckgo.crashkit:android-crashkit:_"
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -39,6 +40,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(":app-build-config-api") // needed for feature toggles
     implementation project(':browser-api')
+    implementation project(':data-store-api')
 
     ksp AndroidX.room.compiler
 
@@ -63,6 +65,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':data-store-test')
     testImplementation CashApp.turbine
     testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
