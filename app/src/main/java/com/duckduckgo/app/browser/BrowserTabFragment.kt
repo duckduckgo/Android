@@ -710,6 +710,9 @@ class BrowserTabFragment :
     private val daxDialogIntroBubbleBrandDesign
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
 
+    private val brandDesignDialogScrollView
+        get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
+
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
@@ -4044,6 +4047,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.setBackgroundColor(0)
         daxDialogIntroBubble.root.gone()
         daxDialogIntroBubbleBrandDesign.root.gone()
+        brandDesignDialogScrollView.gone()
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
@@ -5338,9 +5342,11 @@ class BrowserTabFragment :
             hideNewTab()
             val container = if (isBrandDesignUpdate) {
                 daxDialogIntroBubble.root.gone()
+                brandDesignDialogScrollView.show()
                 daxDialogIntroBubbleBrandDesign.daxCtaContainer
             } else {
                 daxDialogIntroBubbleBrandDesign.root.gone()
+                brandDesignDialogScrollView.gone()
                 daxDialogIntroBubble.daxCtaContainer
             }
             configuration.apply {
