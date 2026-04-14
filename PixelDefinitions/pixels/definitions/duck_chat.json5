@@ -365,15 +365,22 @@
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_count": {
-        "description": "User tapped the voice entry point button on the duck.ai tab in the input screen",
-        "owners": ["aitorvs"],
+        "description": "User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_daily": {
-        "description": "(Daily Pixel) User tapped the voice entry point button on the duck.ai tab in the input screen",
-        "owners": ["aitorvs"],
+        "description": "(Daily Pixel) User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_started": {
+        "description": "Fires when the native layer receives a voiceSessionStarted bridge message from the Duck.ai frontend, indicating a voice session has actually begun",
+        "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]

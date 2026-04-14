@@ -2833,8 +2833,8 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel()
             viewModel.onVoiceEntryTapped()
 
-            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT)
-            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
             verify(duckChat).openVoiceDuckChat()
         }
 

@@ -725,8 +725,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onVoiceEntryTapped() {
         pixel.fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT,
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY,
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY,
         )
         duckChat.openVoiceDuckChat()
     }

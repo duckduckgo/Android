@@ -57,9 +57,15 @@ interface DuckChatJSHelper {
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
 
-    suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String
+    suspend fun enrichPageContextIfPossible(
+        tabId: String,
+        pageContext: String,
+    ): String
 
-    fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>)
+    fun storeTabContextPromptEvent(
+        prompt: String,
+        pageContexts: List<JSONObject>,
+    )
 
     fun clearTabContextPromptEvent()
 
@@ -186,6 +192,7 @@ class RealDuckChatJSHelper @Inject constructor(
                                 duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
                                 getPageContextResponse(featureName, method, it, pageContext, tabId)
                             }
+
                             REASON_INIT -> {
                                 if (duckChat.isAutomaticContextAttachmentEnabled()) {
                                     getPageContextResponse(featureName, method, it, pageContext, tabId)
@@ -193,6 +200,7 @@ class RealDuckChatJSHelper @Inject constructor(
                                     null
                                 }
                             }
+
                             else -> {
                                 null
                             }
@@ -211,6 +219,11 @@ class RealDuckChatJSHelper @Inject constructor(
                         duckChatPixels.reportContextualPageContextRemovedFrontend()
                     }
                 }
+                null
+            }
+
+            METHOD_VOICE_SESSION_STARTED -> {
+                duckChatPixels.reportVoiceSessionStarted()
                 null
             }
 
@@ -235,7 +248,10 @@ class RealDuckChatJSHelper @Inject constructor(
         )
     }
 
-    override suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String {
+    override suspend fun enrichPageContextIfPossible(
+        tabId: String,
+        pageContext: String,
+    ): String {
         val json = JSONObject(pageContext)
         val url = json.optString("url").takeIf { it.isNotBlank() }
         if (url != null) {
@@ -256,7 +272,10 @@ class RealDuckChatJSHelper @Inject constructor(
         return json.toString()
     }
 
-    override fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>) {
+    override fun storeTabContextPromptEvent(
+        prompt: String,
+        pageContexts: List<JSONObject>,
+    ) {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         pendingTabContextStore.store(prompt, pageContexts)
     }
@@ -438,6 +457,7 @@ class RealDuckChatJSHelper @Inject constructor(
         const val METHOD_GET_PAGE_CONTEXT = "getAIChatPageContext"
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
+        private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
