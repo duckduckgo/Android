@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.autorestore.SyncOnboardingRestoreState
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -35,12 +36,14 @@ class FaviconsFetchingPromptTest {
 
     private var faviconsFetchingStore: FaviconsFetchingStore = mock()
     private var syncAccountRepository: SyncAccountRepository = mock()
+    private var syncOnboardingRestoreState: SyncOnboardingRestoreState = mock()
 
     private lateinit var faviconsFetchingPrompt: FaviconsFetchingPrompt
 
     @Before
     fun setUp() {
-        faviconsFetchingPrompt = SyncFaviconsFetchingPrompt(faviconsFetchingStore, syncAccountRepository)
+        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(null)
+        faviconsFetchingPrompt = SyncFaviconsFetchingPrompt(faviconsFetchingStore, syncAccountRepository, syncOnboardingRestoreState)
     }
 
     @Test
@@ -106,5 +109,34 @@ class FaviconsFetchingPromptTest {
         val shouldShow = faviconsFetchingPrompt.shouldShow()
 
         assertFalse(shouldShow)
+    }
+
+    @Test
+    fun whenQuickRestoreJustCompletedThenShouldNotShow() {
+        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(System.currentTimeMillis())
+        whenever(faviconsFetchingStore.promptShown).thenReturn(false)
+        whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        val connectedDevices = listOf(TestSyncFixtures.connectedDevice, TestSyncFixtures.connectedDevice)
+        whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
+
+        val shouldShow = faviconsFetchingPrompt.shouldShow()
+
+        assertFalse(shouldShow)
+    }
+
+    @Test
+    fun whenQuickRestoreWasLongAgoThenShouldShow() {
+        val twoHoursAgo = System.currentTimeMillis() - (2 * 60 * 60 * 1000L)
+        whenever(syncOnboardingRestoreState.autoRestoredTimestamp()).thenReturn(twoHoursAgo)
+        whenever(faviconsFetchingStore.promptShown).thenReturn(false)
+        whenever(faviconsFetchingStore.isFaviconsFetchingEnabled).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        val connectedDevices = listOf(TestSyncFixtures.connectedDevice, TestSyncFixtures.connectedDevice)
+        whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
+
+        val shouldShow = faviconsFetchingPrompt.shouldShow()
+
+        assertTrue(shouldShow)
     }
 }

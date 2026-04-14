@@ -22,12 +22,14 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.autorestore.SyncOnboardingRestoreState
 import logcat.logcat
-import java.lang.Error
+import java.util.concurrent.TimeUnit
 
 class SyncFaviconsFetchingPrompt(
     private val faviconsFetchingStore: FaviconsFetchingStore,
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncOnboardingRestoreState: SyncOnboardingRestoreState,
 ) : FaviconsFetchingPrompt {
 
     // should show prompt when
@@ -44,6 +46,11 @@ class SyncFaviconsFetchingPrompt(
         }
 
         if (faviconsFetchingStore.isFaviconsFetchingEnabled) {
+            return false
+        }
+
+        if (syncOnboardingRestoreState.autoRestoredTimestamp()?.wasRecent() == true) {
+            logcat { "Sync-Favicon: Won't show prompt as quick restore just completed" }
             return false
         }
 
@@ -65,7 +72,11 @@ class SyncFaviconsFetchingPrompt(
         faviconsFetchingStore.isFaviconsFetchingEnabled = fetchingEnabled
     }
 
+    private fun Long.wasRecent(): Boolean =
+        System.currentTimeMillis() - this < QUICK_RESTORE_SUPPRESSION_WINDOW_MS
+
     companion object {
         private const val MIN_CONNECTED_DEVICES_FOR_PROMPT = 2
+        private val QUICK_RESTORE_SUPPRESSION_WINDOW_MS = TimeUnit.MINUTES.toMillis(3)
     }
 }

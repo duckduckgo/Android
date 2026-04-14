@@ -34,14 +34,17 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = SyncAutoRestore::class)
+@ContributesBinding(AppScope::class, boundType = SyncOnboardingRestoreState::class)
 class RealSyncAutoRestore @Inject constructor(
     private val manager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : SyncAutoRestore {
+) : SyncAutoRestore, SyncOnboardingRestoreState {
+
+    @Volatile private var restoreTimestamp: Long? = null
 
     override suspend fun canRestore(): Boolean {
         return withContext(dispatcherProvider.io()) {
@@ -71,6 +74,7 @@ class RealSyncAutoRestore @Inject constructor(
                 when (val result = syncAccountRepository.processCode(parsedCode, existingDeviceId = payload.deviceId)) {
                     is Result.Success -> {
                         logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
+                        restoreTimestamp = System.currentTimeMillis()
                         manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
                     }
                     is Result.Error -> logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
@@ -81,4 +85,6 @@ class RealSyncAutoRestore @Inject constructor(
             }
         }
     }
+
+    override fun autoRestoredTimestamp(): Long? = restoreTimestamp
 }

@@ -30,6 +30,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.autorestore.SyncOnboardingRestoreState
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.impl.error.RealSyncApiErrorRepository
@@ -146,8 +147,9 @@ object SyncStoreModule {
     fun provideSyncFaviconsFetchingPrompt(
         faviconFetchingStore: FaviconsFetchingStore,
         syncAccountRepository: SyncAccountRepository,
+        syncOnboardingRestoreState: SyncOnboardingRestoreState,
     ): FaviconsFetchingPrompt {
-        return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository)
+        return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository, syncOnboardingRestoreState)
     }
 
     @Provides
