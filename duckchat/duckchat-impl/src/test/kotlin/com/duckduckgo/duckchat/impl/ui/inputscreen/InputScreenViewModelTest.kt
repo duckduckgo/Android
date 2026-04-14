@@ -129,6 +129,7 @@ class InputScreenViewModelTest {
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
+            whenever(chatSuggestionsReader.getMaxUrlSuggestionsCount()).thenReturn(3)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -3109,12 +3110,10 @@ class InputScreenViewModelTest {
 
     @Suppress("DenyListedApi")
     @Test
-    fun `chatUrlSuggestions is empty when chat suggestions exist`() =
+    fun `chatUrlSuggestions shows alongside chat suggestions when both exist`() =
         runTest {
             duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
-            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
-            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
             whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(
                 listOf(ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false)),
             )
@@ -3127,7 +3126,37 @@ class InputScreenViewModelTest {
             viewModel.onChatInputTextChanged("test")
             advanceUntilIdle()
 
-            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is limited to max configured count`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(
+                    AutoCompleteResult(
+                        "test",
+                        listOf(
+                            AutoCompleteSearchSuggestion("test1.com", isUrl = true, isAllowedInTopHits = false),
+                            AutoCompleteSearchSuggestion("test2.com", isUrl = true, isAllowedInTopHits = false),
+                            AutoCompleteSearchSuggestion("test3.com", isUrl = true, isAllowedInTopHits = false),
+                            AutoCompleteSearchSuggestion("test4.com", isUrl = true, isAllowedInTopHits = false),
+                            AutoCompleteSearchSuggestion("test5.com", isUrl = true, isAllowedInTopHits = false),
+                        ),
+                    ),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("test")
+            advanceUntilIdle()
+
+            assertEquals(3, viewModel.chatUrlSuggestions.value.suggestions.size)
         }
 
     @Suppress("DenyListedApi")
@@ -3171,6 +3200,37 @@ class InputScreenViewModelTest {
             assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty())
             assertTrue(viewModel.visibilityState.value.chatSuggestionsVisible)
             assertFalse(viewModel.visibilityState.value.showChatLogo)
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatSuggestionsVisible is true and logo hidden when typing with no results`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("xyz")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.chatSuggestionsVisible)
+            assertFalse(viewModel.visibilityState.value.showChatLogo)
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatInputText exposes current chat input`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val viewModel = createViewModel()
+            viewModel.onChatInputTextChanged("hello")
+
+            assertEquals("hello", viewModel.chatInputText.value)
         }
 
     // endregion

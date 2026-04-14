@@ -192,6 +192,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val initialSearchInputText = currentOmnibarText.trim()
     private val searchInputTextState = MutableStateFlow(initialSearchInputText)
     private val chatInputTextState = MutableStateFlow("")
+    val chatInputText: StateFlow<String> = chatInputTextState.asStateFlow()
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
@@ -283,10 +284,9 @@ class InputScreenViewModel @AssistedInject constructor(
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             combine(
                 chatInputTextState.debounceExceptFirst(timeoutMillis = 100),
-                _chatSuggestions,
                 autoCompleteSuggestionsEnabled,
-            ) { chatInput, chatSuggestions, autoCompleteEnabled ->
-                if (autoCompleteEnabled && chatInput.isNotEmpty() && chatSuggestions.isEmpty()) chatInput else null
+            ) { chatInput, autoCompleteEnabled ->
+                if (autoCompleteEnabled && chatInput.isNotEmpty()) chatInput else null
             }.distinctUntilChanged()
                 .flatMapLatest { query ->
                     if (query != null) {
@@ -297,7 +297,7 @@ class InputScreenViewModel @AssistedInject constructor(
                                         it is AutoCompleteSwitchToTabSuggestion ||
                                         it is AutoCompleteHistorySuggestion ||
                                         (it is AutoCompleteSearchSuggestion && it.isUrl)
-                                },
+                                }.take(chatSuggestionsReader.getMaxUrlSuggestionsCount()),
                             )
                         }
                     } else {
@@ -376,13 +376,17 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        combine(_chatSuggestions, chatUrlSuggestions) { chatSuggestions, urlSuggestions ->
-            Pair(chatSuggestions, urlSuggestions)
-        }.onEach { (chatSuggestions, urlSuggestions) ->
+        combine(_chatSuggestions, chatUrlSuggestions, chatInputTextState) { chatSuggestions, urlSuggestions, chatInput ->
+            Triple(chatSuggestions, urlSuggestions, chatInput)
+        }.onEach { (chatSuggestions, urlSuggestions, chatInput) ->
             val hasChatSuggestions = chatSuggestions.isNotEmpty()
             val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
+            val hasSearchRow = duckChatFeature.rememberTogglePosition().isEnabled() && chatInput.isNotEmpty()
             _visibilityState.update {
-                it.copy(showChatLogo = !hasChatSuggestions && !hasUrlSuggestions, chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions)
+                it.copy(
+                    showChatLogo = !hasChatSuggestions && !hasUrlSuggestions && !hasSearchRow,
+                    chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions || hasSearchRow,
+                )
             }
         }.launchIn(viewModelScope)
 

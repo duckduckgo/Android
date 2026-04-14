@@ -46,6 +46,7 @@ import javax.inject.Inject
 
 interface ChatSuggestionsReader {
     suspend fun fetchSuggestions(query: String = ""): List<ChatSuggestion>
+    fun getMaxUrlSuggestionsCount(): Int
     fun tearDown()
 }
 
@@ -142,6 +143,14 @@ class RealChatSuggestionsReader @Inject constructor(
                 JSONObject(it).optInt(MAX_HISTORY_COUNT_KEY, DEFAULT_MAX_SUGGESTIONS)
             }
         }.getOrNull() ?: DEFAULT_MAX_SUGGESTIONS
+    }
+
+    override fun getMaxUrlSuggestionsCount(): Int {
+        return runCatching {
+            duckAiChatHistoryFeature.self().getSettings()?.let {
+                JSONObject(it).optInt(MAX_URL_SUGGESTIONS_KEY, DEFAULT_MAX_URL_SUGGESTIONS)
+            }
+        }.getOrNull() ?: DEFAULT_MAX_URL_SUGGESTIONS
     }
 
     private fun getUserPreferencesJson(): String {
@@ -317,6 +326,8 @@ class RealChatSuggestionsReader @Inject constructor(
         private const val METHOD_CHATS_RESULT = "duckAiChatsResult"
         private const val MAX_HISTORY_COUNT_KEY = "maxHistoryCount"
         private const val DEFAULT_MAX_SUGGESTIONS = 10
+        private const val MAX_URL_SUGGESTIONS_KEY = "maxUrlSuggestions"
+        private const val DEFAULT_MAX_URL_SUGGESTIONS = 3
         private const val FETCH_TIMEOUT_MS = 3000L
         private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000
         private const val EMPTY_HTML = "<html></html>"

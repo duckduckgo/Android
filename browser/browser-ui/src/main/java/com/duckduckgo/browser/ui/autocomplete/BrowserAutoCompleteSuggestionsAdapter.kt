@@ -16,6 +16,7 @@
 
 package com.duckduckgo.browser.ui.autocomplete
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.DiffUtil
@@ -32,6 +33,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 
 private sealed interface AutoCompleteItem {
@@ -52,6 +54,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val autoCompleteOpenSettingsClickListener: () -> Unit,
     private val autoCompleteLongPressClickListener: (AutoCompleteSuggestion) -> Unit,
     omnibarType: OmnibarType,
+    private val hideEditQueryArrow: Boolean = false,
+    private val hideSectionDividers: Boolean = false,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
         val suggestions = getSuggestions().filter { suggestion -> suggestion != it }
@@ -156,6 +160,9 @@ class BrowserAutoCompleteSuggestionsAdapter(
                         autoCompleteOpenSettingsClickListener,
                         autoCompleteLongPressClickListener,
                     )
+                if (hideEditQueryArrow) {
+                    holder.itemView.findViewById<View>(R.id.editQueryImage)?.visibility = View.GONE
+                }
             }
         }
     }
@@ -195,8 +202,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private fun needsDivider(
         current: AutoCompleteSuggestion,
         next: AutoCompleteSuggestion,
-    ): Boolean = (current.isSearchItem != next.isSearchItem) ||
-        (current is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) != (next is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion)
+    ): Boolean = !hideSectionDividers && (
+        (current.isSearchItem != next.isSearchItem) ||
+            (current is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) != (next is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion)
+        )
 
     object Type {
         const val EMPTY_TYPE = 1
