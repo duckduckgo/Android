@@ -144,6 +144,7 @@ interface DuckChatPixels {
 
     fun reportNativeStorageReaderUsed(native: Boolean)
     fun reportNativeStorageDeletionUsed(native: Boolean)
+    fun reportVoiceSessionStarted()
 }
 
 @ContributesBinding(AppScope::class)
@@ -391,6 +392,10 @@ class RealDuckChatPixels @Inject constructor(
         }
         pixel.fire(pixelName)
     }
+
+    override fun reportVoiceSessionStarted() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED)
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -550,7 +555,6 @@ object DuckChatPixelParameters {
     const val NEW_ADDRESS_BAR_SELECTION = "selection"
     const val DEFAULT_TOGGLE_POSITION = "default_position"
     const val DEFAULT_TOGGLE_POSITION_VALUE = "value"
-    const val SOURCE = "source"
 }
 
 @ContributesMultibinding(AppScope::class)
