@@ -371,6 +371,7 @@ import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
@@ -3844,8 +3845,8 @@ class BrowserTabFragment :
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         isWebViewGestureInProgress = true
-                        lastTouchX = event.x / it.resources.displayMetrics.density
-                        lastTouchY = event.y / it.resources.displayMetrics.density
+                        lastTouchX = event.x
+                        lastTouchY = event.y
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -4354,10 +4355,9 @@ class BrowserTabFragment :
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
-            // Handle copy link text separately — requires async JS evaluation
             if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
                 lifecycleScope.launch {
-                    val text = extractLinkTextAtPoint()
+                    val text = extractLinkText()
                     if (text != null) {
                         val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
                         viewModel.onLinkTextCopied(wasNotificationShown)
@@ -4380,8 +4380,12 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private suspend fun extractLinkTextAtPoint(): String? {
+    private suspend fun extractLinkText(): String? {
         val wv = webView ?: return null
+        val density = wv.resources.displayMetrics.density.takeIf { it > 0f } ?: 1f
+        val pageScale = wv.scale.takeIf { it > 0f } ?: 1f
+        val pointX = lastTouchX / density / pageScale
+        val pointY = lastTouchY / density / pageScale
         val escapedUrl = lastLongPressUrl
             ?.replace("\\", "\\\\")
             ?.replace("'", "\\'")
@@ -4389,7 +4393,7 @@ class BrowserTabFragment :
             ?.replace("\r", "\\r")
         val urlParam = if (escapedUrl != null) "'$escapedUrl'" else "null"
         return suspendCancellableCoroutine { continuation ->
-            val js = String.format(JS_EXTRACT_LINK_TEXT, lastTouchX, lastTouchY, urlParam)
+            val js = String.format(Locale.US, JS_EXTRACT_LINK_TEXT, pointX, pointY, urlParam)
             wv.evaluateJavascript(js) { result ->
                 val text = result?.trim('"')?.takeIf { it.isNotEmpty() && it != "null" }
                 continuation.resume(text) { _, _, _ -> }
@@ -4975,26 +4979,89 @@ class BrowserTabFragment :
 
         private const val JS_EXTRACT_LINK_TEXT = """
             (function() {
-                var x = %s, y = %s;
-                var el = document.elementFromPoint(x, y);
-                while (el && el.tagName !== 'A') { el = el.parentElement; }
-                if (el && el.innerText) { return el.innerText.trim(); }
+                var pointX = %s;
+                var pointY = %s;
                 var targetUrl = %s;
                 if (!targetUrl) return '';
-                var links = document.querySelectorAll('a[href]');
-                var best = null;
-                var bestDist = Infinity;
-                for (var i = 0; i < links.length; i++) {
-                    var a = links[i];
-                    if (a.href !== targetUrl) continue;
-                    var rect = a.getBoundingClientRect();
-                    var dx = Math.max(rect.left - x, 0, x - rect.right);
-                    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
-                    var dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < bestDist) { bestDist = dist; best = a; }
+
+                function normalizeWhitespace(value) {
+                    return (value || '').replace(/\s+/g, ' ').trim();
                 }
-                if (best && best.innerText && bestDist < 50) { return best.innerText.trim(); }
-                return '';
+
+                function normalizeUrl(url) {
+                    if (!url) return '';
+                    try {
+                        var parsedUrl = new URL(url, document.baseURI);
+                        parsedUrl.hash = '';
+                        var normalizedPath = parsedUrl.pathname.replace(/\/+$/g, '');
+                        parsedUrl.pathname = normalizedPath === '' ? '/' : normalizedPath;
+                        return parsedUrl.toString();
+                    } catch (_) {
+                        return String(url);
+                    }
+                }
+
+                function isVisible(element) {
+                    if (!element) return false;
+                    if (element.getAttribute('aria-hidden') === 'true') return false;
+
+                    var style = window.getComputedStyle(element);
+                    if (!style) return true;
+
+                    if (style.display === 'none') return false;
+                    if (style.visibility === 'hidden') return false;
+                    if (style.opacity === '0') return false;
+                    return element.getClientRects().length > 0;
+                }
+
+                function extractVisibleText(link) {
+                    var text = normalizeWhitespace(link.innerText);
+                    if (text) return text;
+
+                    // Some links render text through nested elements where innerText can be empty.
+                    var visibleText = '';
+                    var walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+                    while (walker.nextNode()) {
+                        var textNode = walker.currentNode;
+                        var parentElement = textNode && textNode.parentElement;
+                        if (!parentElement || !isVisible(parentElement)) continue;
+                        var piece = normalizeWhitespace(textNode.textContent);
+                        if (!piece) continue;
+                        visibleText = visibleText ? visibleText + ' ' + piece : piece;
+                    }
+                    return normalizeWhitespace(visibleText);
+                }
+
+                function findAnchorAtPoint(x, y) {
+                    var element = document.elementFromPoint(x, y);
+                    while (element) {
+                        if (element.tagName === 'A' && element.href) return element;
+                        element = element.parentElement;
+                    }
+                    return null;
+                }
+
+                var normalizedTargetUrl = normalizeUrl(targetUrl);
+                var anchorAtPoint = findAnchorAtPoint(pointX, pointY);
+                if (anchorAtPoint && isVisible(anchorAtPoint) && normalizeUrl(anchorAtPoint.href) === normalizedTargetUrl) {
+                    var anchorText = extractVisibleText(anchorAtPoint);
+                    if (anchorText) return anchorText;
+                }
+
+                var links = document.querySelectorAll('a[href]');
+                var bestText = '';
+                for (var i = 0; i < links.length; i++) {
+                    var link = links[i];
+                    if (!isVisible(link)) continue;
+
+                    if (normalizeUrl(link.href) === normalizedTargetUrl) {
+                        var visibleText = extractVisibleText(link);
+                        if (visibleText.length > bestText.length) {
+                            bestText = visibleText;
+                        }
+                    }
+                }
+                return bestText;
             })()
         """
 
