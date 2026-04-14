@@ -17,6 +17,9 @@
 package com.duckduckgo.browser.ui.autocomplete
 
 import android.content.pm.PackageManager.NameNotFoundException
+import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,6 +53,7 @@ interface SuggestionViewHolderFactory {
     fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
@@ -70,6 +74,7 @@ class SearchSuggestionViewHolderFactory(
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -79,6 +84,7 @@ class SearchSuggestionViewHolderFactory(
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(
             suggestion as AutoCompleteSearchSuggestion,
+            query,
             immediateSearchClickListener,
             editableSearchClickListener,
             omnibarType,
@@ -96,6 +102,7 @@ class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -121,6 +128,7 @@ class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -146,6 +154,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -170,6 +179,7 @@ class SwitchToTabSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -198,6 +208,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -225,6 +236,7 @@ class DefaultSuggestionViewHolderFactory(
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -232,7 +244,7 @@ class DefaultSuggestionViewHolderFactory(
         longPressClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
-        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener, omnibarType)
+        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, query, immediateSearchClickListener, omnibarType)
     }
 }
 
@@ -245,6 +257,7 @@ class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -266,6 +279,7 @@ class DividerViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -286,6 +300,7 @@ class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -310,6 +325,7 @@ class DeviceAppSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     override fun onBindViewHolder(
         holder: AutoCompleteViewHolder,
         suggestion: AutoCompleteSuggestion,
+        query: String,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -324,6 +340,15 @@ class DeviceAppSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
+private fun boldSuggestionSuffix(phrase: String, query: String): CharSequence {
+    if (query.isBlank() || !phrase.startsWith(query, ignoreCase = true)) return phrase
+    val suffixStart = query.length
+    if (suffixStart >= phrase.length) return phrase
+    return SpannableStringBuilder(phrase).apply {
+        setSpan(StyleSpan(Typeface.BOLD), suffixStart, phrase.length, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+}
+
 sealed class AutoCompleteViewHolder(
     itemView: View,
 ) : RecyclerView.ViewHolder(itemView) {
@@ -332,11 +357,12 @@ sealed class AutoCompleteViewHolder(
     ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSearchSuggestion,
+            query: String,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
             omnibarType: OmnibarType,
         ) = with(binding) {
-            phrase.text = item.phrase
+            phrase.text = boldSuggestionSuffix(item.phrase, query)
 
             val phraseOrUrlImage =
                 if (item.isUrl) com.duckduckgo.mobile.android.R.drawable.ic_globe_24 else com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
@@ -430,10 +456,11 @@ sealed class AutoCompleteViewHolder(
     ) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteDefaultSuggestion,
+            query: String,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             omnibarType: OmnibarType,
         ) {
-            binding.phrase.text = item.phrase
+            binding.phrase.text = boldSuggestionSuffix(item.phrase, query)
             binding.root.setOnClickListener { immediateSearchListener(item) }
 
             if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
