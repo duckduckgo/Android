@@ -150,6 +150,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                     .onBindViewHolder(
                         holder,
                         item.value,
+                        phrase,
                         immediateSearchClickListener,
                         editableSearchClickListener,
                         deleteClickListener,
