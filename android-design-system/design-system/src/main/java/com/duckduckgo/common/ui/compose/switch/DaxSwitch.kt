@@ -83,38 +83,6 @@ fun DaxSwitch(
 
 @PreviewLightDark
 @Composable
-private fun DaxSwitchUncheckedPreview() {
-    PreviewBox {
-        DaxSwitch(checked = false, onCheckedChange = {})
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxSwitchCheckedPreview() {
-    PreviewBox {
-        DaxSwitch(checked = true, onCheckedChange = {})
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxSwitchDisabledUncheckedPreview() {
-    PreviewBox {
-        DaxSwitch(checked = false, onCheckedChange = {}, enabled = false)
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxSwitchDisabledCheckedPreview() {
-    PreviewBox {
-        DaxSwitch(checked = true, onCheckedChange = {}, enabled = false)
-    }
-}
-
-@PreviewLightDark
-@Composable
 private fun DaxSwitchAllStatesPreview() {
     PreviewBox {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
