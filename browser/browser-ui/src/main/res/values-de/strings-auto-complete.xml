@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Abbrechen</string>
     <string name="autocompleteRemoveItemRemove">Entfernen</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Zu Tab wechseln · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Autovervollständigungsvorschläge enthalten jetzt deine kürzlich besuchten Seiten. Du kannst sie in den Einstellungen deaktivieren oder jederzeit mit dem 🔥 Fire Button löschen.</string>
-    <string name="improvedAutoCompleteIAMTitle">Gleiche Privatsphäre.\nBessere Suchvorschläge!</string>
-    <string name="openAutoCompleteSettings">Einstellungen öffnen</string>
 </resources>

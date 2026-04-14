@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Avbryt</string>
     <string name="autocompleteRemoveItemRemove">Fjern</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Bytt til fane · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Automatisk forslagsfullføring inkluderer nå nylig besøkte nettsteder. Slå dette av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Samme personvern.\nBedre søkeforslag!</string>
-    <string name="openAutoCompleteSettings">Åpne innstillinger</string>
 </resources>
