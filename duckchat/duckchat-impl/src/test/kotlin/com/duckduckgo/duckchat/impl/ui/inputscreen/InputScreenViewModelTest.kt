@@ -18,7 +18,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
@@ -443,51 +442,6 @@ class InputScreenViewModelTest {
             assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
 
             verify(autoComplete, never()).autoComplete(any())
-        }
-
-    @Test
-    fun `when autocomplete result contains IAM suggestion then hasUserSeenHistoryIAM is tracked`() =
-        runTest {
-            val resultWithIAM =
-                AutoCompleteResult(
-                    "test",
-                    listOf(
-                        AutoCompleteDefaultSuggestion("suggestion"),
-                        AutoCompleteInAppMessageSuggestion,
-                    ),
-                )
-            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithIAM))
-
-            val viewModel = createViewModel("test")
-
-            // Should emit the result with IAM
-            assertEquals(resultWithIAM, viewModel.autoCompleteSuggestionResults.value)
-
-            // When autocomplete suggestions are gone, should submit that user saw IAM
-            viewModel.autoCompleteSuggestionsGone()
-
-            verify(autoComplete).submitUserSeenHistoryIAM()
-        }
-
-    @Test
-    fun `when autocomplete result does not contain IAM suggestion then submitUserSeenHistoryIAM is not called`() =
-        runTest {
-            val resultWithoutIAM =
-                AutoCompleteResult(
-                    "test",
-                    listOf(AutoCompleteDefaultSuggestion("suggestion")),
-                )
-            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithoutIAM))
-
-            val viewModel = createViewModel("test")
-
-            // Should emit the result without IAM
-            assertEquals(resultWithoutIAM, viewModel.autoCompleteSuggestionResults.value)
-
-            // When autocomplete suggestions are gone, should not submit IAM tracking
-            viewModel.autoCompleteSuggestionsGone()
-
-            verify(autoComplete, never()).submitUserSeenHistoryIAM()
         }
 
     @Test

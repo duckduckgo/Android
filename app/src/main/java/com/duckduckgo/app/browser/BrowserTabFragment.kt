@@ -248,7 +248,6 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -3477,13 +3476,6 @@ class BrowserTabFragment :
                 },
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
-                },
-                autoCompleteInAppMessageDismissedListener = {
-                    viewModel.onUserDismissedAutoCompleteInAppMessage()
-                },
-                autoCompleteOpenSettingsClickListener = {
-                    viewModel.onUserDismissedAutoCompleteInAppMessage()
-                    globalActivityStarter.start(context, PrivateSearchScreenNoParams)
                 },
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
