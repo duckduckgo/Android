@@ -37,11 +37,11 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.print.PrintAttributes
-import android.view.ContextThemeWrapper
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
 import android.view.ContextMenu
+import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -58,7 +58,6 @@ import android.webkit.WebView.HitTestResult.IMAGE_TYPE
 import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -5356,7 +5355,6 @@ class BrowserTabFragment :
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
-
 
         private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
             if (privacyProSkippedOnboardingBottomSheet?.isShowing == true) return
