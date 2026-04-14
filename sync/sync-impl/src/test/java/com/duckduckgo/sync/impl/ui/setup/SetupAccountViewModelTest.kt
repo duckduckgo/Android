@@ -168,6 +168,14 @@ class SetupAccountViewModelTest {
         }
     }
 
+    @Test
+    fun whenFlowStartedFromPreviousSessionReadyScreenThenPreviousSessionReadyMode() = runTest {
+        testee.viewState(Screen.PREVIOUS_SESSION_READY).test {
+            val viewState = awaitItem()
+            assertTrue(viewState.viewMode is ViewMode.PreviousSessionReady)
+        }
+    }
+
     @SuppressLint("DenyListedApi")
     private fun setRawFeatureFlagState(state: Boolean) {
         syncFeature.recoverDataEasilySetupScreen().setRawStoredState(State(enable = state))

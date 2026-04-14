@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.sync.api.SyncAutoRestore
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -57,6 +58,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
@@ -92,6 +94,7 @@ class SyncActivityViewModel @Inject constructor(
     private val settingsPageFeature: SettingsPageFeature,
     private val syncPixels: SyncPixels,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
+    private val syncAutoRestore: SyncAutoRestore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
@@ -246,12 +249,23 @@ class SyncActivityViewModel @Inject constructor(
         data object RequestSetupAuthentication : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
+        data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
+    }
+
+    enum class OriginalFlow {
+        SYNC_THIS_DEVICE,
+        SYNC_WITH_ANOTHER,
+        RECOVER_SYNCED_DATA,
     }
 
     fun onSyncWithAnotherDevice() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
-                command.send(Command.SyncWithAnotherDevice)
+                if (syncAutoRestore.canRestore()) {
+                    command.send(ShowPreviousSessionReady(OriginalFlow.SYNC_WITH_ANOTHER))
+                } else {
+                    command.send(Command.SyncWithAnotherDevice)
+                }
             }
         }
     }
@@ -270,15 +284,23 @@ class SyncActivityViewModel @Inject constructor(
             requiresSetupAuthentication(
                 onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
             ) {
-                command.send(IntroCreateAccount)
+                if (syncAutoRestore.canRestore()) {
+                    command.send(ShowPreviousSessionReady(OriginalFlow.SYNC_THIS_DEVICE))
+                } else {
+                    command.send(IntroCreateAccount)
+                }
             }
         }
     }
 
     fun onRecoverYourSyncedData() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             requiresSetupAuthentication {
-                command.send(Command.IntroRecoverSyncData)
+                if (syncAutoRestore.canRestore()) {
+                    command.send(ShowPreviousSessionReady(OriginalFlow.RECOVER_SYNCED_DATA))
+                } else {
+                    command.send(Command.IntroRecoverSyncData)
+                }
             }
         }
     }
