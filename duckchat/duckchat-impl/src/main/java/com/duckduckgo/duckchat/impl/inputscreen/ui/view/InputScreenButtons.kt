@@ -70,8 +70,7 @@ class InputScreenButtons @JvmOverloads constructor(
             // when used in top bar we want to transform the buttons to floating
             transformButtonsToFloating()
         } else {
-            // when in bottom bar mode, the voice icon is shown in the input field
-            binding.actionVoiceChat.gone()
+            // when in bottom bar mode, the voice search icon is shown in the input field
             binding.actionVoiceSearch.gone()
         }
     }
