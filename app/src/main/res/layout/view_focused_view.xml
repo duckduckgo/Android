@@ -14,15 +14,30 @@
   ~ limitations under the License.
   -->
 
-
-<com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/focusedFavourites"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:isExpandable="false"
-    app:showPlaceholders="false"
-    app:favoritesPlacement="focused_state"
-    android:background="?attr/daxColorBrowserOverlay" />
+    android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/focusedLogo"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/duckDuckGoLogoDescription"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full"
+        android:visibility="gone" />
 
+    <com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
+        android:id="@+id/focusedFavourites"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:isExpandable="false"
+        app:showPlaceholders="false"
+        app:favoritesPlacement="focused_state" />
+
+</FrameLayout>

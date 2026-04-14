@@ -1837,7 +1837,7 @@ class BrowserTabViewModelTest {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
-        assertTrue(autoCompleteViewState().showFavorites)
+        assertTrue(autoCompleteViewState().showFocusedView)
     }
 
     @Test

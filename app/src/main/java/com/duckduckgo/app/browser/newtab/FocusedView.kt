@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.newtab
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -36,5 +37,10 @@ class FocusedView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setOnClickListener { }
+    }
+
+    fun showLogo(show: Boolean) {
+        binding.focusedLogo.isVisible = show
+        binding.focusedFavourites.isVisible = !show
     }
 }

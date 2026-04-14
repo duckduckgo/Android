@@ -3716,8 +3716,8 @@ class BrowserTabFragment :
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
-                override fun onBackKeyPressed() {
-                    onOmnibarBackKeyPressed()
+                override fun onBackKeyPressed(): Boolean {
+                    return onOmnibarBackKeyPressed()
                 }
 
                 override fun onEnterPressed() {
@@ -3768,9 +3768,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun onOmnibarBackKeyPressed() {
+    private fun onOmnibarBackKeyPressed(): Boolean {
+        val wasFocusedViewVisible = binding.focusedView.isVisible
         omnibar.omnibarTextInput.hideKeyboard()
         binding.focusDummy.requestFocus()
+        return wasFocusedViewVisible
     }
 
     private fun onFindInPageDismissed() {
@@ -5006,10 +5008,10 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
-                // viewState.showFavourites needs to be moved to FocusedViewModel
-                if (viewState.showSuggestions || viewState.showFavorites) {
-                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        showFocusedView()
+                // viewState.showFocusedView needs to be moved to FocusedViewModel
+                if (viewState.showSuggestions || viewState.showFocusedView) {
+                    if (viewState.showFocusedView) {
+                        showFocusedView(viewState.favorites.isNotEmpty())
                         if (binding.autoCompleteSuggestionsList.isVisible) {
                             viewModel.autoCompleteSuggestionsGone()
                         }
@@ -5029,8 +5031,9 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showFocusedView() {
+        private fun showFocusedView(hasFavorites: Boolean = true) {
             binding.focusedView.show()
+            binding.focusedView.showLogo(!hasFavorites)
         }
 
         private fun hideFocusedView() {
