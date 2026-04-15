@@ -238,6 +238,7 @@ import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
@@ -646,6 +647,7 @@ class BrowserTabViewModelTest {
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteEnabledFlow = MutableStateFlow(false)
+    private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     @Before
     fun before() =
@@ -764,6 +766,7 @@ class BrowserTabViewModelTest {
                     },
                     duckChat = mockDuckChat,
                     onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
+                    appTheme = mockAppTheme,
                 )
 
             accessibilitySettingsDataStore =
@@ -6753,7 +6756,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenBrandDesignUpdateSearchDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(mockOnboardingStore, mockAppInstallStore, true)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
