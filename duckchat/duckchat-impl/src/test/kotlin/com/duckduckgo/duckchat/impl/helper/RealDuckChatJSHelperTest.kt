@@ -33,6 +33,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -72,6 +73,7 @@ class RealDuckChatJSHelperTest {
     private val mockFaviconManager: FaviconManager = mock()
     private val mockDuckChatFeature: DuckChatFeature =
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -82,6 +84,7 @@ class RealDuckChatJSHelperTest {
         pendingNativePromptStore = mockPendingNativePromptStore,
         faviconManager = mockFaviconManager,
         duckChatFeature = mockDuckChatFeature,
+        voiceSessionStateManager = mockVoiceSessionStateManager,
     )
     private val viewModel =
         object {
@@ -1604,5 +1607,35 @@ class RealDuckChatJSHelperTest {
         )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenVoiceSessionStartedThenPixelFiredAndStateUpdated() = runTest {
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "voiceSessionStarted",
+            null,
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+        verify(mockDuckChatPixels).reportVoiceSessionStarted()
+        verify(mockVoiceSessionStateManager).onVoiceSessionStarted()
+    }
+
+    @Test
+    fun whenVoiceSessionEndedThenPixelFiredAndStateUpdated() = runTest {
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "voiceSessionEnded",
+            null,
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+        verify(mockVoiceSessionStateManager).onVoiceSessionEnded()
+        verifyNoInteractions(mockDuckChatPixels)
     }
 }
