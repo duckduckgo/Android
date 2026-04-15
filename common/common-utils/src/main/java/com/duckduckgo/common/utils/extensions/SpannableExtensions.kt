@@ -19,6 +19,7 @@ package com.duckduckgo.common.utils.extensions
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.SpannedString
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 
@@ -45,4 +46,22 @@ fun String.applyUnderscoreSpanTo(textToStyle: List<String>): SpannableStringBuil
         spannable.setSpan(UnderlineSpan(), index, index + it.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
     }
     return spannable
+}
+
+/**
+ * Replaces placeholders in the format of "%1\$s", "%2\$s", etc. with the provided arguments and returns a [SpannedString].
+ *
+ * @param args The arguments to replace the placeholders with.
+ * @return A [SpannedString] with the placeholders replaced by the provided arguments.
+ */
+fun CharSequence.formatWithSpans(vararg args: String): SpannedString {
+    val builder = SpannableStringBuilder(this)
+    args.forEachIndexed { index, replacement ->
+        val placeholder = "%${index + 1}\$s"
+        val start = builder.indexOf(placeholder)
+        if (start >= 0) {
+            builder.replace(start, start + placeholder.length, replacement)
+        }
+    }
+    return SpannedString(builder)
 }

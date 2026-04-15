@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.formatWithSpans
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
@@ -271,15 +272,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         TextAlertDialogBuilder(activity)
             .setTitle(
                 String.format(
-                    activity.getString(R.string.drmSiteDialogTitle),
+                    activity.getString(R.string.drmSitePermissionDialogTitle),
                     title,
                 ),
             )
             .setClickableMessage(
-                activity.getText(R.string.drmSiteDialogSubtitle),
+                activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
-                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)

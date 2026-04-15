@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" quer abrir o teu software DRM</string>
-    <string name="drmSiteDialogSubtitle">O software de gestão de direitos digitais é necessário para reproduzir conteúdo multimédia protegido, mas também fornece acesso a identificadores do dispositivo. Concede permissão apenas a sites de confiança. Podes gerir as permissões em qualquer altura nas Definições. <annotation type="drm_learn_more_link">Sabe mais</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" pretende abrir o teu software de Gestão de Direitos Digitais (DRM)</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Se escolheres \"Recusar\", os vídeos no site podem tornar-se inutilizáveis, mas %1$s não terá acesso aos identificadores de dispositivo fornecidos pelo software de DRM. Podes gerir as permissões em qualquer altura nas Definições. <annotation type="drm_learn_more_link">Sabe mais</annotation></string>
     <string name="drmSiteDialogAllowAlways">Sempre</string>
     <string name="drmSiteDialogAllowOnce">Apenas para esta sessão</string>
     <string name="drmSiteDialogDenyAlways">Negar sempre</string>

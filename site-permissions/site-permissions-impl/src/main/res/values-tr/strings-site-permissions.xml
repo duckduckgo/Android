@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" DRM yazılımınızı açmak istiyor</string>
-    <string name="drmSiteDialogSubtitle">Dijital Haklar Yönetimi yazılımı, korumalı medya içeriğini yürütmek için gereklidir, ancak aynı zamanda cihaz tanımlayıcılara erişim sağlar. Bu veriler için yalnızca güvendiğiniz sitelere izin verin. İzinleri istediğiniz zaman Ayarlar\'dan yönetebilirsiniz. <annotation type="drm_learn_more_link">Daha Fazla Bilgi</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" Dijital Haklar Yönetimi (DRM) yazılımını açmak istiyor.</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">\"Reddet\" seçeneğini seçerseniz sitedeki videolar oynatılamaz duruma gelebilir ancak %1$s, DRM yazılımı tarafından sağlanan cihaz tanımlayıcılarına erişemez. İzinleri istediğiniz zaman Ayarlar\'dan yönetebilirsiniz. <annotation type="drm_learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="drmSiteDialogAllowAlways">Her zaman</string>
     <string name="drmSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
     <string name="drmSiteDialogDenyAlways">Her Zaman Reddet</string>
