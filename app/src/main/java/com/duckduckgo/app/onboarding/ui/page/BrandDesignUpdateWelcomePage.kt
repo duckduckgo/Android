@@ -62,6 +62,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -972,6 +973,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     // set the toggle state without crossfade, and do not start lottie animations yet, we'll start them once the view fully fades in
                     updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
                 }
+
+                INPUT_SCREEN_PREVIEW -> {
+                    // TODO
+                }
             }
         }
     }
@@ -1262,6 +1267,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 // when view is opened without animations, do not crossfade state but start lottie animations
                 updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.ANIMATE)
+            }
+
+            INPUT_SCREEN_PREVIEW -> {
+                // TODO
             }
         }
     }
