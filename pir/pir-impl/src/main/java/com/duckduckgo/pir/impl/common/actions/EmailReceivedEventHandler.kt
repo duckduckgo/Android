@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.common.actions
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageGenerateEmailReceived
@@ -28,6 +29,8 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.common.toParams
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
+import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -47,37 +50,53 @@ class EmailReceivedEventHandler @Inject constructor(
         state: State,
         event: Event,
     ): Next {
-        /**
-         * Once we have received the email address, we update the current extracted profile with the information.
-         * We now re-do the last Broker action passing the updated extracted profile into the [State] and also the
-         * [UserProfile] for the action.
-         */
-        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex] as OptOutStep
-
-        val updatedProfileWithEmail = currentBrokerStep.profileToOptOut.copy(
-            email = (event as EmailReceived).generatedEmailData.emailAddress,
-        )
-
-        val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList().apply {
-            this[state.currentBrokerStepIndex] = currentBrokerStep.copy(
-                profileToOptOut = updatedProfileWithEmail,
-            )
-        }
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val emailReceived = event as EmailReceived
+        val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
 
         attemptFireOptOutStagePixel(currentBrokerStep, state)
 
-        return Next(
-            nextState = state.copy(
-                brokerStepsToExecute = updatedBrokerSteps,
-                generatedEmailData = event.generatedEmailData,
-            ),
-            nextEvent = ExecuteBrokerStepAction(
-                actionRequestData = UserProfile(
-                    userProfile = state.profileQuery,
-                    extractedProfile = updatedProfileWithEmail.toParams(state.profileQuery.fullName),
+        return if (currentAction is GenerateEmail) {
+            // Explicit generateEmail flow: advance to the next action
+            Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                    generatedEmailData = emailReceived.generatedEmailData,
                 ),
-            ),
-        )
+                nextEvent = ExecuteBrokerStepAction(
+                    actionRequestData = UserProfile(
+                        userProfile = state.profileQuery,
+                    ),
+                ),
+            )
+        } else {
+            // Implicit needsEmail flow (FillForm): re-execute the same action with email
+            val extractedProfileParams = when (currentBrokerStep) {
+                is OptOutStep -> currentBrokerStep.profileToOptOut.toParams(state.profileQuery.fullName).copy(
+                    email = emailReceived.generatedEmailData.emailAddress,
+                )
+
+                is EmailConfirmationStep -> currentBrokerStep.profileToOptOut.toParams(state.profileQuery.fullName).copy(
+                    email = emailReceived.generatedEmailData.emailAddress,
+                )
+
+                is BrokerStep.ScanStep -> ExtractedProfileParams(
+                    email = emailReceived.generatedEmailData.emailAddress,
+                )
+            }
+
+            Next(
+                nextState = state.copy(
+                    generatedEmailData = emailReceived.generatedEmailData,
+                ),
+                nextEvent = ExecuteBrokerStepAction(
+                    actionRequestData = UserProfile(
+                        userProfile = state.profileQuery,
+                        extractedProfile = extractedProfileParams,
+                    ),
+                ),
+            )
+        }
     }
 
     private suspend fun attemptFireOptOutStagePixel(
