@@ -528,10 +528,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
+        inputScreenFadeInAnimatorSet?.removeAllListeners()
         inputScreenFadeInAnimatorSet?.cancel()
         inputScreenFadeInAnimatorSet = null
         inputToggleLottieJob?.cancel()
         inputToggleLottieJob = null
+        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront.apply {
+            removeAllAnimatorListeners()
+            cancelAnimation()
+        }
+        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationBack.apply {
+            removeAllAnimatorListeners()
+            cancelAnimation()
+        }
         bobbingDaxAnimator?.cancel()
         bobbingDaxAnimator = null
         binding.bobbingDaxAnimation.cancelAnimation()
@@ -1616,6 +1625,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun crossfadeInputToggleImage(frontView: LottieAnimationView, backView: LottieAnimationView, newRes: Int) {
         val currentProgress = frontView.progress
         frontView.composition?.let { backView.setComposition(it) }
+        backView.removeAllAnimatorListeners()
         backView.progress = currentProgress
         backView.resumeAnimation()
         frontView.setAnimation(newRes)
