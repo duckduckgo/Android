@@ -36,7 +36,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
@@ -64,10 +63,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -181,8 +178,6 @@ class SystemSearchViewModel @Inject constructor(
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
     private val voiceSearchState = MutableSharedFlow<Unit>(replay = 1)
     private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-
-    private var hasUserSeenHistory = false
     private var omnibarType: OmnibarType = appSettingsPreferencesStore.omnibarType
 
     val isOmnibarAtTop: Boolean
@@ -201,11 +196,6 @@ class SystemSearchViewModel @Inject constructor(
                 autoComplete.autoComplete(query)
             }.flowOn(dispatchers.io())
             .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
-            .onEach { results ->
-                if (results.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                    hasUserSeenHistory = true
-                }
-            }
             .map {
                 val result = it.copy(
                     suggestions = if (isSearchOnly.value) {
@@ -500,21 +490,6 @@ class SystemSearchViewModel @Inject constructor(
                     favorites = hiddenIds.value.favorites - savedSite.id,
                 ),
             )
-        }
-    }
-
-    fun onUserDismissedAutoCompleteInAppMessage() {
-        viewModelScope.launch(dispatchers.io()) {
-            autoComplete.userDismissedHistoryInAutoCompleteIAM()
-        }
-    }
-
-    fun autoCompleteSuggestionsGone() {
-        viewModelScope.launch(dispatchers.io()) {
-            if (hasUserSeenHistory) {
-                autoComplete.submitUserSeenHistoryIAM()
-            }
-            hasUserSeenHistory = false
         }
     }
 }

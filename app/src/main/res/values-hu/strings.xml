@@ -176,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Keresési javaslatok megjelenítése gépelés közben, beleértve a könyvjelzőket is. Minden keresés privát.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Legutóbb meglátogatott webhelyek</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. A legutóbb meglátogatott webhelyek privátak, csak az eszközödön tárolódnak, és a Tűz gombbal törölheted őket.</string>
-    <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
-    <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
     <string name="privateSearchChatSuggestionsToggle">Csevegési javaslatok</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Az előzményekből, a könyvjelzőkből és (opcionálisan) a Duck.ai csevegési előzményekből származó javaslatok megjelenítése a keresősávba való gépeléskor. Minden keresés privát.</string>
 

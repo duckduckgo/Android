@@ -178,9 +178,6 @@
     <string name="privateSearchAutocompleteHint">Показывать поисковые рекомендации (включая закладки) по мере ввода текста. Все поисковые запросы конфиденциальны.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Недавно посещенные сайты</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показывать в рекомендациях поиска недавно посещенные сайты. Их список хранится только на вашем устройстве, и его можно удалить с помощью кнопки Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Теперь рекомендации по автозаполнению включают недавно посещенные вами сайты. Их можно отключить в настройках или очистить с помощью кнопки Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Та же конфиденциальность.\nЛучшие поисковые рекомендации!</string>
-    <string name="openAutoCompleteSettings">Открыть Настройки</string>
     <string name="privateSearchChatSuggestionsToggle">Рекомендации в чате</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">При вводе запроса в адресную строку показывать рекомендации из поисковой истории, закладок и (по желанию) журнала чатов Duck.ai. Все поисковые запросы конфиденциальны.</string>
 

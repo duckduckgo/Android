@@ -35,7 +35,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
@@ -161,8 +160,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
     )
-
-    private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
     private var chatSuggestionsFetchJob: Job? = null
     private var tabAttachmentFilterJob: Job? = null
@@ -274,9 +271,6 @@ class InputScreenViewModel @AssistedInject constructor(
             }.flowOn(dispatchers.io())
             .onEach { result ->
                 logcat { "Autocomplete: ${result.suggestions}" }
-                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                    hasUserSeenHistoryIAM = true
-                }
             }.flowOn(dispatchers.main())
             .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
@@ -447,7 +441,6 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url)
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
-                    is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         command.value = Command.LaunchDeviceApplication(suggestion)
@@ -612,21 +605,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()
-        }
-    }
-
-    fun onUserDismissedAutoCompleteInAppMessage() {
-        viewModelScope.launch(dispatchers.io()) {
-            autoComplete.userDismissedHistoryInAutoCompleteIAM()
-        }
-    }
-
-    fun autoCompleteSuggestionsGone() {
-        viewModelScope.launch(dispatchers.io()) {
-            if (hasUserSeenHistoryIAM) {
-                autoComplete.submitUserSeenHistoryIAM()
-            }
-            hasUserSeenHistoryIAM = false
         }
     }
 

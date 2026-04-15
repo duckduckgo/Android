@@ -176,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Visualizza i suggerimenti di ricerca mentre digiti, inclusi i tuoi segnalibri. Tutte le ricerche sono private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Siti visitati di recente</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Mostra i siti visitati di recente nei suggerimenti di ricerca. Questi siti sono privati, vengono memorizzati solo sul tuo dispositivo e possono essere rimossi con il Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">I suggerimenti di completamento automatico ora includono i siti visitati di recente. Disattiva nelle impostazioni o cancella in qualsiasi momento con il 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">La stessa privacy.\nSuggerimenti di ricerca migliori!</string>
-    <string name="openAutoCompleteSettings">Apri Impostazioni</string>
     <string name="privateSearchChatSuggestionsToggle">Suggerimenti per la chat</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Mostra suggerimenti dalla tua cronologia, dai segnalibri e (facoltativamente) dalla cronologia chat di Duck.ai mentre digiti nella barra di ricerca. Tutte le ricerche sono private.</string>
 

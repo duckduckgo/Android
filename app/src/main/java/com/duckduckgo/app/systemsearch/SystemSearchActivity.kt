@@ -71,7 +71,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowAppNotF
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
@@ -352,10 +351,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteInAppMessageDismissedListener = { viewModel.onUserDismissedAutoCompleteInAppMessage() },
-                autoCompleteOpenSettingsClickListener = {
-                    globalActivityStarter.start(this, PrivateSearchScreenNoParams)
-                },
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
@@ -484,10 +479,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
-        if (viewState.autocompleteResults.suggestions.isEmpty()) {
-            viewModel.autoCompleteSuggestionsGone()
-        }
-
         binding.autocompleteSuggestions.isVisible = !viewState.autocompleteResults.suggestions.isEmpty()
     }
 

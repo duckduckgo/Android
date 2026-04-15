@@ -21,11 +21,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
-import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.systemsearch.DeviceApp
@@ -40,7 +37,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
@@ -94,9 +90,7 @@ class AutoCompleteApi constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
-    private val autoCompleteRepository: AutoCompleteRepository,
     private val tabRepository: TabRepository,
-    private val userStageStore: UserStageStore,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -144,11 +138,6 @@ class AutoCompleteApi constructor(
                 searchSuggestions + deviceAppResults
             }
         }.map { suggestions ->
-            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
-            if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
-                inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
-            }
-
             val duckAIPrompt = mutableListOf<AutoCompleteSuggestion>()
             if (duckChat.isEnabled()) {
                 duckAIPrompt.add(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query))
@@ -156,7 +145,7 @@ class AutoCompleteApi constructor(
 
             AutoCompleteResult(
                 query = query,
-                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) } + duckAIPrompt,
+                suggestions = suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) } + duckAIPrompt,
             )
         }
     }
@@ -256,29 +245,6 @@ class AutoCompleteApi constructor(
         }
 
         return uniqueHistorySuggestions + updatedBookmarkSuggestions
-    }
-
-    override suspend fun userDismissedHistoryInAutoCompleteIAM() {
-        autoCompleteRepository.dismissHistoryInAutoCompleteIAM()
-    }
-
-    private suspend fun shouldShowHistoryInAutoCompleteIAM(suggestions: List<AutoCompleteSuggestion>): Boolean {
-        return isExistingUser() && !autoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed() &&
-            autoCompleteRepository.countHistoryInAutoCompleteIAMShown() < 3 &&
-            suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
-    }
-
-    private suspend fun isExistingUser(): Boolean {
-        if (userStageStore.getUserAppStage() == AppStage.NEW || userStageStore.getUserAppStage() == AppStage.DAX_ONBOARDING) {
-            // do not show anymore
-            autoCompleteRepository.dismissHistoryInAutoCompleteIAM()
-            return false
-        }
-        return true
-    }
-
-    override suspend fun submitUserSeenHistoryIAM() {
-        autoCompleteRepository.submitUserSeenHistoryIAM()
     }
 
     override suspend fun fireAutocompletePixel(
