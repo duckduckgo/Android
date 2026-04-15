@@ -13,7 +13,7 @@
 
     <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
         android:id="@+id/brandDesignCardView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
         app:cardElevation="0dp"
