@@ -213,6 +213,7 @@ class SettingsViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        refreshNextStepsDismissals()
         start()
         startPollingAppTPState()
     }
@@ -335,21 +336,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refreshNextStepsDismissals() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            omnibarTypeBeforeNavigation?.let { before ->
-                if (settingsDataStore.omnibarType != before) {
-                    settingsDataStore.nextStepsAddressBarDismissed = true
-                    viewState.update { it.copy(nextStepsAddressBarDismissed = true) }
-                }
-                omnibarTypeBeforeNavigation = null
+        omnibarTypeBeforeNavigation?.let { before ->
+            if (settingsDataStore.omnibarType != before) {
+                settingsDataStore.nextStepsAddressBarDismissed = true
             }
-            voiceSearchAvailableBeforeNavigation?.let { before ->
-                if (voiceSearchAvailability.isVoiceSearchAvailable != before) {
-                    settingsDataStore.nextStepsVoiceSearchDismissed = true
-                    viewState.update { it.copy(nextStepsVoiceSearchDismissed = true) }
-                }
-                voiceSearchAvailableBeforeNavigation = null
+            omnibarTypeBeforeNavigation = null
+        }
+        voiceSearchAvailableBeforeNavigation?.let { before ->
+            if (voiceSearchAvailability.isVoiceSearchAvailable != before) {
+                settingsDataStore.nextStepsVoiceSearchDismissed = true
             }
+            voiceSearchAvailableBeforeNavigation = null
         }
     }
 

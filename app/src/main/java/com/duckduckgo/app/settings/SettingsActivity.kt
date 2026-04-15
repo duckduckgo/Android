@@ -231,7 +231,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshWidgetsInstalledState()
-        viewModel.refreshNextStepsDismissals()
     }
 
     private fun configureUiEventHandlers() {

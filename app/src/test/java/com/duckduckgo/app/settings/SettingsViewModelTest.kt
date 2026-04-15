@@ -450,8 +450,11 @@ class SettingsViewModelTest {
         fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
         testee.refreshNextStepsDismissals()
 
-        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
         assertTrue(fakeSettingsDataStore.nextStepsAddressBarDismissed)
+
+        // start() picks it up from DataStore
+        testee.start()
+        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
     }
 
     @Test
@@ -477,8 +480,11 @@ class SettingsViewModelTest {
         whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(true)
         testee.refreshNextStepsDismissals()
 
-        assertTrue(testee.viewState().first().nextStepsVoiceSearchDismissed)
         assertTrue(fakeSettingsDataStore.nextStepsVoiceSearchDismissed)
+
+        // start() picks it up from DataStore
+        testee.start()
+        assertTrue(testee.viewState().first().nextStepsVoiceSearchDismissed)
     }
 
     @Test
