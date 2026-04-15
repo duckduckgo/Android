@@ -39,6 +39,12 @@ class FocusedView @JvmOverloads constructor(
         setOnClickListener { }
     }
 
+    fun setOnScrollChangeListener(listener: () -> Unit) {
+        binding.focusedScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            listener()
+        }
+    }
+
     fun showLogo(show: Boolean) {
         binding.focusedLogo.isVisible = show
         binding.focusedFavourites.isVisible = !show

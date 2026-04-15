@@ -88,6 +88,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
@@ -3505,6 +3506,15 @@ class BrowserTabFragment :
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        hideKeyboardRetainFocus()
+                    }
+                }
+            },
+        )
     }
 
     private fun configureNewTab() {
@@ -3512,6 +3522,10 @@ class BrowserTabFragment :
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+        }
+
+        binding.focusedView.setOnScrollChangeListener {
+            hideKeyboardRetainFocus()
         }
 
         if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
@@ -3769,10 +3783,10 @@ class BrowserTabFragment :
     }
 
     private fun onOmnibarBackKeyPressed(): Boolean {
-        val wasFocusedViewVisible = binding.focusedView.isVisible
+        val wasOverlayVisible = binding.focusedView.isVisible || binding.autoCompleteSuggestionsList.isVisible
         omnibar.omnibarTextInput.hideKeyboard()
         binding.focusDummy.requestFocus()
-        return wasFocusedViewVisible
+        return wasOverlayVisible
     }
 
     private fun onFindInPageDismissed() {
