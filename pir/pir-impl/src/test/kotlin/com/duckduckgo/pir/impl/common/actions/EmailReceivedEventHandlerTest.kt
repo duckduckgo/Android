@@ -26,6 +26,8 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanSt
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageGenerateEmailReceived
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
@@ -44,6 +46,7 @@ import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -248,6 +251,36 @@ class EmailReceivedEventHandlerTest {
         val nextEvent = result.nextEvent as ExecuteBrokerStepAction
         val userProfile = nextEvent.actionRequestData as UserProfile
         assertEquals("generated@example.com", userProfile.extractedProfile?.email)
+    }
+
+    @Test
+    fun whenEmailReceivedForFillFormOnScanStepThenFailsGracefully() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testFillFormAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.EMAIL_GENERATE,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = EmailReceived(generatedEmailData = testGeneratedEmailData)
+
+        val result = testee.invoke(state, event)
+
+        val nextEvent = result.nextEvent as BrokerStepCompleted
+        assertEquals(false, nextEvent.needsEmailConfirmation)
+        assertTrue(nextEvent.stepStatus is StepStatus.Failure)
     }
 
     // endregion

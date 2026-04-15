@@ -848,4 +848,51 @@ class ExecuteBrokerStepActionEventHandlerTest {
         assertTrue(result.sideEffect is PushJsAction)
         assertNull(result.nextEvent)
     }
+
+    @Test
+    fun whenFillFormRetryWithGeneratedEmailDataThenIncludesEmailInRequestData() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-1",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(action),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile.copy(email = ""),
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = GeneratedEmailData(
+                emailAddress = "generated@example.com",
+                pattern = "pattern-123",
+            ),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.FILL_FORM,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        // Retry dispatches fresh UserProfile without extractedProfile (mimics BrokerActionFailedEventHandler)
+        val event = ExecuteBrokerStepAction(
+            UserProfile(
+                userProfile = testProfileQuery,
+                extractedProfile = null,
+            ),
+        )
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertEquals("generated@example.com", userData.extractedProfile?.email)
+    }
 }
