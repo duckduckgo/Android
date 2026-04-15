@@ -52,6 +52,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
@@ -74,8 +75,11 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -114,6 +118,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
+    private var inputToggleLottieJob: Job? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
@@ -523,8 +528,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
+        inputScreenFadeInAnimatorSet?.removeAllListeners()
         inputScreenFadeInAnimatorSet?.cancel()
         inputScreenFadeInAnimatorSet = null
+        inputToggleLottieJob?.cancel()
+        inputToggleLottieJob = null
+        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront.apply {
+            removeAllAnimatorListeners()
+            cancelAnimation()
+        }
+        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationBack.apply {
+            removeAllAnimatorListeners()
+            cancelAnimation()
+        }
         bobbingDaxAnimator?.cancel()
         bobbingDaxAnimator = null
         binding.bobbingDaxAnimation.cancelAnimation()
@@ -910,6 +926,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
+                                            playInputToggleLottieAnimation(
+                                                binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront,
+                                                delayedStart = true,
+                                            )
                                         }
                                     })
                                     start()
@@ -949,7 +969,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
-                    updateAiChatToggleState(binding = binding, withAi = inputScreenSelected)
+                    // set the toggle state without crossfade, and do not start lottie animations yet, we'll start them once the view fully fades in
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
                 }
             }
         }
@@ -1165,9 +1186,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             INPUT_SCREEN -> {
-                // If the dialog is already showing, just update the toggle selection without re-running the full setup.
                 if (binding.daxDialogCta.inputScreenContent.root.isVisible) {
-                    updateAiChatToggleState(binding = binding, withAi = inputScreenSelected)
+                    // If the dialog is already showing, update toggle selection (crossfade state) without re-running the full setup.
+                    // Also update and resume lottie animations.
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.CROSSFADE_ANIMATE)
                     return
                 }
 
@@ -1238,7 +1260,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
-                updateAiChatToggleState(binding = binding, withAi = inputScreenSelected, animate = false)
+                // when view is opened without animations, do not crossfade state but start lottie animations
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.ANIMATE)
             }
         }
     }
@@ -1509,29 +1532,58 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
+    private enum class InputToggleTransition {
+        /**
+         * Set the state and doesn't start toggle animation.
+         */
+        NONE,
+
+        /**
+         * Set the state and starts/resumes toggle animation.
+         */
+        ANIMATE,
+
+        /**
+         * Crossfades the state and starts/resumes toggle animation.
+         */
+        CROSSFADE_ANIMATE,
+    }
+
     private fun updateAiChatToggleState(
         binding: ContentOnboardingWelcomePageUpdateBinding,
         withAi: Boolean,
-        animate: Boolean = true,
+        transition: InputToggleTransition,
     ) {
-        val withoutAiImageRes = if (!withAi) {
-            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_active
-        } else {
-            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_inactive
+        val isLightMode = appTheme.isLightModeEnabled()
+
+        val withoutAiImageRes = when {
+            withAi && isLightMode -> CommonR.drawable.searchbox_withoutai_inactive_brand_design_update
+            withAi -> CommonR.drawable.searchbox_withoutai_inactive_dark_brand_design_update
+            isLightMode -> CommonR.drawable.searchbox_withoutai_active_brand_design_update
+            else -> CommonR.drawable.searchbox_withoutai_active_dark_brand_design_update
         }
-        val withAiImageRes = if (withAi) {
-            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_active
-        } else {
-            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_inactive
+        val withAiImageRes = when {
+            withAi && isLightMode -> CommonR.raw.searchbox_with_ai_active
+            withAi -> CommonR.raw.searchbox_with_ai_active_dark
+            isLightMode -> CommonR.raw.searchbox_with_ai_inactive
+            else -> CommonR.raw.searchbox_with_ai_inactive_dark
         }
 
         val content = binding.daxDialogCta.inputScreenContent
-        if (animate) {
-            crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
-            crossfadeImage(content.inputScreenWithAiImageFront, content.inputScreenWithAiImageBack, withAiImageRes)
-        } else {
-            content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
-            content.inputScreenWithAiImageFront.setImageResource(withAiImageRes)
+        when (transition) {
+            InputToggleTransition.NONE -> {
+                content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
+                content.inputScreenWithAiAnimationFront.setAnimation(withAiImageRes)
+            }
+            InputToggleTransition.ANIMATE -> {
+                content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
+                content.inputScreenWithAiAnimationFront.setAnimation(withAiImageRes)
+                playInputToggleLottieAnimation(content.inputScreenWithAiAnimationFront)
+            }
+            InputToggleTransition.CROSSFADE_ANIMATE -> {
+                crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
+                crossfadeInputToggleImage(content.inputScreenWithAiAnimationFront, content.inputScreenWithAiAnimationBack, withAiImageRes)
+            }
         }
 
         content.inputScreenSearchOnlyCheck.quietlySetIsChecked(newCheckedState = !withAi, changeListener = null)
@@ -1548,12 +1600,49 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun playInputToggleLottieAnimation(view: LottieAnimationView, fromProgress: Float? = null, delayedStart: Boolean = false) {
+        inputToggleLottieJob?.cancel()
+        view.removeAllAnimatorListeners()
+        view.addAnimatorListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                inputToggleLottieJob = viewLifecycleOwner.lifecycleScope.launch {
+                    delay(INPUT_TOGGLE_LOTTIE_REPEAT_DELAY)
+                    view.playAnimation()
+                }
+            }
+        })
+        if (fromProgress != null) {
+            view.progress = fromProgress
+        }
+        inputToggleLottieJob = viewLifecycleOwner.lifecycleScope.launch {
+            if (delayedStart) {
+                delay(INPUT_TOGGLE_LOTTIE_INITIAL_DELAY)
+            }
+            if (fromProgress != null) view.resumeAnimation() else view.playAnimation()
+        }
+    }
+
+    private fun crossfadeInputToggleImage(frontView: LottieAnimationView, backView: LottieAnimationView, newRes: Int) {
+        val currentProgress = frontView.progress
+        frontView.composition?.let { backView.setComposition(it) }
+        backView.removeAllAnimatorListeners()
+        backView.progress = currentProgress
+        backView.resumeAnimation()
+        frontView.setAnimation(newRes)
+        playInputToggleLottieAnimation(frontView, fromProgress = currentProgress)
+        crossfadeImageTransition(frontView = frontView, backView = backView)
+    }
+
     private fun crossfadeImage(frontView: ImageView, backView: ImageView, newRes: Int) {
+        backView.setImageDrawable(frontView.drawable)
+        frontView.setImageResource(newRes)
+        crossfadeImageTransition(frontView = frontView, backView = backView)
+    }
+
+    private fun crossfadeImageTransition(frontView: ImageView, backView: ImageView) {
         frontView.animate().cancel()
         backView.animate().cancel()
-        backView.setImageDrawable(frontView.drawable)
         backView.alpha = 1f
-        frontView.setImageResource(newRes)
         frontView.alpha = 0f
         frontView.animate()
             .alpha(1f)
@@ -1598,6 +1687,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val CHECK_ICON_AVD_START_DELAY = 180L
 
         private const val DIALOG_TRANSITION_DURATION = 400L
+        private const val INPUT_TOGGLE_LOTTIE_REPEAT_DELAY = 2000L
+        private const val INPUT_TOGGLE_LOTTIE_INITIAL_DELAY = 2000L
         private const val ARROW_TARGET_OFFSET_END_DP = 80
 
         private const val WING_START_DELAY = 300L
