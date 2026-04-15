@@ -187,9 +187,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         setBackgroundRes(
             if (appTheme.isLightModeEnabled()) {
-                R.drawable.onboarding_background_bitmap_light
+                CommonR.drawable.onboarding_background_bitmap_light
             } else {
-                R.drawable.onboarding_background_bitmap_dark
+                CommonR.drawable.onboarding_background_bitmap_dark
             },
         )
 
