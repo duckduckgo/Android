@@ -97,6 +97,7 @@ data class DuckDuckGoInfoPanelColors(
 @Immutable
 data class DuckDuckGoSystemColors(
     val lines: Color,
+    val switchTrackOn: Color,
     val switchTrackOff: Color,
     val switchThumb: Color,
     val sliderTrackInactive: Color,

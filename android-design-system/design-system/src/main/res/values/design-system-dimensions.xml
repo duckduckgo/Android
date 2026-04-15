@@ -142,6 +142,9 @@
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 
+    <!-- Dax Switch -->
+    <dimen name="daxSwitchThumbSize">32dp</dimen>
+
     <!-- Slider -->
     <dimen name="sliderTrackHeight">6dp</dimen>
 
