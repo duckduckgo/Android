@@ -19,12 +19,16 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -40,6 +44,8 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
+    private val duckChat: DuckChat = mock()
+    private val tabRepository: TabRepository = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val testScope = TestScope()
@@ -51,12 +57,16 @@ class FirstScreenHandlerImplTest {
         whenever(androidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(idleReturnToggle)
         whenever(showOnAppLaunchFeature.self()).thenReturn(showOnAppLaunchToggle)
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        whenever(duckChat.isVoiceSessionActive()).thenReturn(false)
+        whenever(tabRepository.getSelectedTab()).thenReturn(null)
 
         testee = FirstScreenHandlerImpl(
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             showOnAppLaunchFeature = showOnAppLaunchFeature,
             settingsDataStore = settingsDataStore,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            duckChat = duckChat,
+            tabRepository = tabRepository,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
@@ -239,6 +249,68 @@ class FirstScreenHandlerImplTest {
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
         verify(showOnAppLaunchToggle, never()).isEnabled()
+    }
+
+    // --- Voice session active (idle return path) ---
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndVoiceSessionActiveOnDuckAiTabThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(duckChat.isVoiceSessionActive()).thenReturn(true)
+        val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
+        whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndNoVoiceSessionActiveThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(duckChat.isVoiceSessionActive()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    // --- Voice session active (legacy fresh launch path) ---
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndVoiceSessionActiveOnDuckAiTabThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(duckChat.isVoiceSessionActive()).thenReturn(true)
+        val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
+        whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndNoVoiceSessionActiveThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(duckChat.isVoiceSessionActive()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
     // --- onClose ---

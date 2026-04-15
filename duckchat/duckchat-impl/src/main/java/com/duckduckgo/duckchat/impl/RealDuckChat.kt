@@ -393,7 +393,6 @@ class RealDuckChat @Inject constructor(
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
-
     init {
         if (isMainProcess) {
             cacheConfig()
@@ -781,8 +780,7 @@ class RealDuckChat @Inject constructor(
     override fun isChatSuggestionsFeatureAvailable(): Boolean =
         duckChatFeature.aiChatSuggestions().isEnabled()
 
-    override fun isVoiceSessionActive(): Boolean =
-        _showVoiceSearchToggle.value && voiceSessionStateManager.isVoiceSessionActive
+    override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)

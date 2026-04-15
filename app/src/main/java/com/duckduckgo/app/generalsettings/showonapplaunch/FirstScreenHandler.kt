@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +43,8 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckChat: DuckChat,
+    private val tabRepository: TabRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -55,12 +60,24 @@ class FirstScreenHandlerImpl @Inject constructor(
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val elapsed = System.currentTimeMillis() - lastBackgrounded
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
-                showOnAppLaunchOptionHandler.handleAfterInactivityOption()
+                if (!isVoiceSessionActiveOnCurrentTab()) {
+                    showOnAppLaunchOptionHandler.handleAppLaunchOption()
+                }
                 return
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
-            showOnAppLaunchOptionHandler.handleAppLaunchOption()
+            if (!isVoiceSessionActiveOnCurrentTab()) {
+                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+            }
         }
+    }
+
+    private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean {
+        if (!duckChat.isVoiceSessionActive()) return false
+        val selectedTab = tabRepository.getSelectedTab()
+        return selectedTab?.url?.toUri()?.let {
+            duckChat.isDuckChatUrl(it)
+        } == true
     }
 
     override fun onClose() {

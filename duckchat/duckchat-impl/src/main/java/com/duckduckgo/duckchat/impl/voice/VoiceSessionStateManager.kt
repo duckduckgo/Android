@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.voice
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface VoiceSessionStateManager {
@@ -26,6 +27,7 @@ interface VoiceSessionStateManager {
     fun onVoiceSessionEnded()
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager {
 

@@ -18,11 +18,17 @@ package com.duckduckgo.duckchat.impl.voice
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class RealVoiceSessionStateManagerTest {
 
-    private val testee = RealVoiceSessionStateManager()
+    private lateinit var testee: RealVoiceSessionStateManager
+
+    @Before
+    fun setup() {
+        testee = RealVoiceSessionStateManager()
+    }
 
     @Test
     fun whenCreatedThenVoiceSessionIsNotActive() {

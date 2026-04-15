@@ -135,7 +135,7 @@ interface DuckChat {
     fun openVoiceDuckChat()
 
     /**
-     * Returns `true` if the voice shortcut feature is available and a voice session is currently active.
+     * Returns `true` if a voice session is currently active.
      */
     fun isVoiceSessionActive(): Boolean
 }
