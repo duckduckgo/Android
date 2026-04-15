@@ -21,11 +21,13 @@ interface CrashpadInitializer {
      * Initialises Crashpad for this process.
      *
      * @param extraAnnotations key/value pairs embedded in every minidump
+                                                                 * @param dynamicAnnotationKeys keys that will be written at runtime via [com.duckduckgo.anrs.api.CrashAnnotations.set]
      * @param onCrash invoked on the next launch if the previous session crashed
      * @return true if Crashpad started successfully
      */
     fun initialize(
         extraAnnotations: Map<String, String>,
+        dynamicAnnotationKeys: Set<String> = emptySet(),
         onCrash: (() -> Unit)?,
     ): Boolean
 }

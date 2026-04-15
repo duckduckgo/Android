@@ -16,31 +16,15 @@
 
 package com.duckduckgo.app.anr.ndk
 
-import android.content.Context
 import com.duckduckgo.android_crashkit.Crashpad
-import com.duckduckgo.android_crashkit.CrashpadConfig
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.anrs.api.CrashAnnotations
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class DefaultCrashpadInitializer @Inject constructor(
-    private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
-) : CrashpadInitializer {
-
-    override fun initialize(
-        extraAnnotations: Map<String, String>,
-        dynamicAnnotationKeys: Set<String>,
-        onCrash: (() -> Unit)?,
-    ): Boolean = Crashpad.init(
-        context,
-        platform = "Android",
-        version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
-        osVersion = "Android SDK ${appBuildConfig.sdkInt}",
-        extraAnnotations = extraAnnotations,
-        dynamicAnnotationKeys = dynamicAnnotationKeys,
-        config = CrashpadConfig(onCrash = onCrash),
-    )
+class RealCrashAnnotations @Inject constructor() : CrashAnnotations {
+    override fun set(key: String, value: String) {
+        Crashpad.setAnnotation(key, value)
+    }
 }

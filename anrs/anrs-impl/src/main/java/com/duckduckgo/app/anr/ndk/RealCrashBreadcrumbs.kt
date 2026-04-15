@@ -16,31 +16,28 @@
 
 package com.duckduckgo.app.anr.ndk
 
-import android.content.Context
 import com.duckduckgo.android_crashkit.Crashpad
-import com.duckduckgo.android_crashkit.CrashpadConfig
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.anrs.api.CrashBreadcrumbs
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class DefaultCrashpadInitializer @Inject constructor(
-    private val context: Context,
-    private val appBuildConfig: AppBuildConfig,
-) : CrashpadInitializer {
+@SingleInstanceIn(AppScope::class)
+class RealCrashBreadcrumbs @Inject constructor() : CrashBreadcrumbs {
 
-    override fun initialize(
-        extraAnnotations: Map<String, String>,
-        dynamicAnnotationKeys: Set<String>,
-        onCrash: (() -> Unit)?,
-    ): Boolean = Crashpad.init(
-        context,
-        platform = "Android",
-        version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
-        osVersion = "Android SDK ${appBuildConfig.sdkInt}",
-        extraAnnotations = extraAnnotations,
-        dynamicAnnotationKeys = dynamicAnnotationKeys,
-        config = CrashpadConfig(onCrash = onCrash),
-    )
+    private val index = AtomicInteger(0)
+    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+
+    override fun add(tag: String, message: String) {
+        val slot = index.getAndUpdate { (it + 1) % BreadcrumbKeys.RING_SIZE }
+        val timestamp = LocalTime.now().format(timeFormatter)
+        val entry = "[$timestamp][$tag] $message".take(255)
+        Crashpad.setAnnotation(BreadcrumbKeys.SLOTS[slot], entry)
+        Crashpad.setAnnotation(BreadcrumbKeys.INDEX, "${(slot + 1) % BreadcrumbKeys.RING_SIZE}")
+    }
 }
