@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.children
@@ -80,6 +81,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -229,6 +231,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshWidgetsInstalledState()
+        viewModel.refreshNextStepsDismissals()
     }
 
     private fun configureUiEventHandlers() {
@@ -334,6 +337,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                     updateWhatsNewVisibility(it.showWhatsNew)
                     updateGetDesktopBrowserItemVisibility(it.showGetDesktopBrowser)
+                    updateNextStepsSection(it)
                     sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
@@ -387,6 +391,53 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
+    }
+
+    private fun updateNextStepsSection(viewState: SettingsViewModel.ViewState) {
+        with(viewsNextSteps) {
+            if (viewState.nextStepsSectionHidden) {
+                settingsSectionOther.gone()
+                return
+            }
+
+            // Apply individual item dismissals
+            if (viewState.nextStepsAddressBarDismissed) {
+                addressBarPositionSetting.gone()
+            }
+            if (viewState.nextStepsVoiceSearchDismissed) {
+                enableVoiceSearchSetting.gone()
+            }
+
+            // Check if all items are gone — hide the entire section
+            val addressBarVisible = addressBarPositionSetting.isVisible
+            val voiceSearchVisible = enableVoiceSearchSetting.isVisible
+            val widgetVisible = addWidgetToHomeScreenSetting.isVisible
+            if (!addressBarVisible && !voiceSearchVisible && !widgetVisible) {
+                settingsSectionOther.gone()
+                return
+            }
+
+            settingsSectionOther.show()
+
+            // Show/hide the overflow menu on the section header
+            settingsNextStepsTitle.showOverflowMenuIcon(viewState.showNextStepsHideButton)
+            if (viewState.showNextStepsHideButton) {
+                settingsNextStepsTitle.setOverflowMenuClickListener { anchorView ->
+                    showNextStepsHidePopupMenu(anchorView)
+                }
+            }
+        }
+    }
+
+    private fun showNextStepsHidePopupMenu(anchorView: View) {
+        val layoutInflater = LayoutInflater.from(this)
+        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_next_steps_menu)
+        val hideButton = popupMenu.contentView.findViewById<View>(R.id.hideNextSteps)
+
+        popupMenu.onMenuItemClicked(hideButton) {
+            viewModel.onNextStepsHideClicked()
+        }
+        popupMenu.show(viewsNextSteps.settingsNextStepsTitle, anchorView)
     }
 
     private fun updateWhatsNewVisibility(isVisible: Boolean) {

@@ -18,7 +18,10 @@ package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
 import app.cash.turbine.test
+import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -27,6 +30,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSetti
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWhatsNew
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -62,6 +66,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 class SettingsViewModelTest {
@@ -112,6 +117,10 @@ class SettingsViewModelTest {
 
     private val modalSurfaceStoreMock: ModalSurfaceStore = mock()
 
+    private val fakeSettingsDataStore: SettingsDataStore = FakeSettingsDataStore()
+
+    private val mockAppInstallStore: AppInstallStore = mock()
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
@@ -119,6 +128,8 @@ class SettingsViewModelTest {
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
         whenever(mockDuckAiFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -141,6 +152,8 @@ class SettingsViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
+            settingsDataStore = fakeSettingsDataStore,
+            appInstallStore = mockAppInstallStore,
         )
     }
 
@@ -425,5 +438,109 @@ class SettingsViewModelTest {
             eq(emptyMap()),
             eq(Count),
         )
+    }
+
+    @Test
+    fun `when address bar position changes after click then next step is dismissed`() = runTest {
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+
+        testee.onChangeAddressBarPositionClicked()
+
+        // Simulate user changed position
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+        testee.refreshNextStepsDismissals()
+
+        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
+        assertTrue(fakeSettingsDataStore.nextStepsAddressBarDismissed)
+    }
+
+    @Test
+    fun `when address bar position does not change after click then next step is not dismissed`() = runTest {
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+
+        testee.onChangeAddressBarPositionClicked()
+
+        // User did not change position
+        testee.refreshNextStepsDismissals()
+
+        assertFalse(testee.viewState().first().nextStepsAddressBarDismissed)
+        assertFalse(fakeSettingsDataStore.nextStepsAddressBarDismissed)
+    }
+
+    @Test
+    fun `when voice search availability changes after click then next step is dismissed`() = runTest {
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(false)
+
+        testee.onEnableVoiceSearchClicked()
+
+        // Simulate user enabled voice search
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(true)
+        testee.refreshNextStepsDismissals()
+
+        assertTrue(testee.viewState().first().nextStepsVoiceSearchDismissed)
+        assertTrue(fakeSettingsDataStore.nextStepsVoiceSearchDismissed)
+    }
+
+    @Test
+    fun `when voice search availability does not change after click then next step is not dismissed`() = runTest {
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(false)
+
+        testee.onEnableVoiceSearchClicked()
+
+        // User did not enable voice search
+        testee.refreshNextStepsDismissals()
+
+        assertFalse(testee.viewState().first().nextStepsVoiceSearchDismissed)
+        assertFalse(fakeSettingsDataStore.nextStepsVoiceSearchDismissed)
+    }
+
+    @Test
+    fun `when hide next steps clicked then section is hidden`() = runTest {
+        testee.onNextStepsHideClicked()
+
+        assertTrue(testee.viewState().first().nextStepsSectionHidden)
+        assertTrue(fakeSettingsDataStore.nextStepsSectionHidden)
+    }
+
+    @Test
+    fun `when app installed for 14 days then show hide button`() = runTest {
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(
+            System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14),
+        )
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showNextStepsHideButton)
+    }
+
+    @Test
+    fun `when app installed for less than 14 days then do not show hide button`() = runTest {
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(
+            System.currentTimeMillis() - TimeUnit.DAYS.toMillis(13),
+        )
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showNextStepsHideButton)
+    }
+
+    @Test
+    fun `when section previously hidden then start returns hidden state`() = runTest {
+        fakeSettingsDataStore.nextStepsSectionHidden = true
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().nextStepsSectionHidden)
+    }
+
+    @Test
+    fun `when address bar previously dismissed then start returns dismissed state`() = runTest {
+        fakeSettingsDataStore.nextStepsAddressBarDismissed = true
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
     }
 }

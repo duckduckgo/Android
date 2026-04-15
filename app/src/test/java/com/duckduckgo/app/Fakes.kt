@@ -260,6 +260,24 @@ class FakeSettingsDataStore :
             store["getDesktopBrowserSettingDismissed"] = value
         }
 
+    override var nextStepsAddressBarDismissed: Boolean
+        get() = store["nextStepsAddressBarDismissed"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsAddressBarDismissed"] = value
+        }
+
+    override var nextStepsVoiceSearchDismissed: Boolean
+        get() = store["nextStepsVoiceSearchDismissed"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsVoiceSearchDismissed"] = value
+        }
+
+    override var nextStepsSectionHidden: Boolean
+        get() = store["nextStepsSectionHidden"] as Boolean? ?: false
+        set(value) {
+            store["nextStepsSectionHidden"] = value
+        }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption
