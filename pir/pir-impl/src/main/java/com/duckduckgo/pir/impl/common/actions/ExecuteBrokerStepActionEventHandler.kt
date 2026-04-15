@@ -96,7 +96,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
 
             if ((currentBrokerStep is OptOutStep || currentBrokerStep is EmailConfirmationStep) &&
                 actionToExecute.needsEmail &&
-                !hasEmail(currentBrokerStep)
+                state.generatedEmailData == null
             ) {
                 Next(
                     nextState = state.copy(
@@ -260,16 +260,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    private fun hasEmail(brokerStep: BrokerStep): Boolean {
-        return if (brokerStep is OptOutStep) {
-            brokerStep.profileToOptOut.email.isNotEmpty()
-        } else if (brokerStep is EmailConfirmationStep) {
-            brokerStep.profileToOptOut.email.isNotEmpty()
-        } else {
-            false
         }
     }
 
