@@ -721,14 +721,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (duckAiFeatureState.showFullScreenMode.value) {
                 val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
-                if (currentTab != null) {
-                    currentTab?.submitQuery(url)
+                if (swipingTabsFeature.isEnabled) {
+                    launchNewTab(query = url, skipHome = true)
                 } else {
-                    if (swipingTabsFeature.isEnabled) {
-                        launchNewTab(query = url, skipHome = true)
-                    } else {
-                        lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
-                    }
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
                 }
             } else {
                 val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
