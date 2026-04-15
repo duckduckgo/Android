@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -56,30 +57,26 @@ fun DaxSwitch(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
 ) {
-    val trackOn = DuckDuckGoTheme.colors.system.switchTrackOn
-    val trackOff = DuckDuckGoTheme.colors.system.switchTrackOff
-    val thumb = DuckDuckGoTheme.colors.system.switchThumb
-
     Switch(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = modifier.alpha(if (enabled) 1f else 0.4f),
+        modifier = modifier.alpha(if (enabled) 1f else DaxSwitchDefaults.disabledAlpha),
         enabled = enabled,
         interactionSource = interactionSource,
         thumbContent = {
-            Spacer(modifier = Modifier.size(dimensionResource(R.dimen.daxSwitchThumbSize)))
+            Spacer(modifier = Modifier.size(DaxSwitchDefaults.thumbSize))
         },
         colors = SwitchDefaults.colors(
-            checkedThumbColor = thumb,
-            checkedTrackColor = trackOn,
-            uncheckedThumbColor = thumb,
-            uncheckedTrackColor = trackOff,
+            checkedThumbColor = DaxSwitchDefaults.colors.thumb,
+            checkedTrackColor = DaxSwitchDefaults.colors.trackOn,
+            uncheckedThumbColor = DaxSwitchDefaults.colors.thumb,
+            uncheckedTrackColor = DaxSwitchDefaults.colors.trackOff,
             uncheckedBorderColor = Color.Transparent,
             uncheckedIconColor = Color.Transparent,
-            disabledCheckedThumbColor = thumb,
-            disabledCheckedTrackColor = trackOn,
-            disabledUncheckedThumbColor = thumb,
-            disabledUncheckedTrackColor = trackOff,
+            disabledCheckedThumbColor = DaxSwitchDefaults.colors.thumb,
+            disabledCheckedTrackColor = DaxSwitchDefaults.colors.trackOn,
+            disabledUncheckedThumbColor = DaxSwitchDefaults.colors.thumb,
+            disabledUncheckedTrackColor = DaxSwitchDefaults.colors.trackOff,
             disabledUncheckedBorderColor = Color.Transparent,
             disabledUncheckedIconColor = Color.Transparent,
             disabledCheckedBorderColor = Color.Transparent,
@@ -87,6 +84,29 @@ fun DaxSwitch(
         ),
     )
 }
+
+private object DaxSwitchDefaults {
+
+    const val disabledAlpha = 0.4f
+
+    val thumbSize: Dp
+        @Composable
+        get() = dimensionResource(R.dimen.daxSwitchThumbSize)
+
+    val colors: DaxSwitchColors
+        @Composable
+        get() = DaxSwitchColors(
+            trackOn = DuckDuckGoTheme.colors.system.switchTrackOn,
+            trackOff = DuckDuckGoTheme.colors.system.switchTrackOff,
+            thumb = DuckDuckGoTheme.colors.system.switchThumb,
+        )
+}
+
+private data class DaxSwitchColors(
+    val trackOn: Color,
+    val trackOff: Color,
+    val thumb: Color,
+)
 
 @PreviewLightDark
 @Composable
