@@ -961,7 +961,11 @@ sealed class DaxBubbleCta(
                 configureContentViews(view)
                 view.show()
                 view.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
-                    .withEndAction { typeAndFadeIn() }
+                    .withEndAction {
+                        if (!animationFinished) {
+                            typeAndFadeIn()
+                        }
+                    }
             }
 
             // Tap-to-skip: end running animations and snap
