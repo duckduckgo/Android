@@ -261,7 +261,7 @@ class CtaViewModel @Inject constructor(
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                    DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
                 } else {
                     DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
                 }

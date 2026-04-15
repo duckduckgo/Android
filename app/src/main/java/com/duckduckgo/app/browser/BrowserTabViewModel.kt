@@ -235,6 +235,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -1294,7 +1295,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
-            is DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta,
+            is DaxTryASearchBrandDesignUpdateBubbleCta,
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
@@ -4794,7 +4795,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         val cta = ctaViewState.value?.cta
-        if (cta is DaxBubbleCta.BrandDesignBubbleCta) {
+        if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
             command.value = SetBrowserBackground(
                 cta.backgroundRes,
                 useRebrandBackground = true,

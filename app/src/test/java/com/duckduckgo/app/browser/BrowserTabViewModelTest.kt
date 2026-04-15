@@ -6756,7 +6756,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenBrandDesignUpdateSearchDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(mockOnboardingStore, mockAppInstallStore, true)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateUpdateCta(mockOnboardingStore, mockAppInstallStore, true)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
