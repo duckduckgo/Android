@@ -18,13 +18,10 @@ package com.duckduckgo.duckchat.impl.voice
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 interface VoiceSessionStateManager {
-    val isVoiceSessionActive: StateFlow<Boolean>
+    val isVoiceSessionActive: Boolean
     fun onVoiceSessionStarted()
     fun onVoiceSessionEnded()
 }
@@ -32,14 +29,14 @@ interface VoiceSessionStateManager {
 @ContributesBinding(AppScope::class)
 class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager {
 
-    private val _isVoiceSessionActive = MutableStateFlow(false)
-    override val isVoiceSessionActive: StateFlow<Boolean> = _isVoiceSessionActive.asStateFlow()
+    override var isVoiceSessionActive: Boolean = false
+        private set
 
     override fun onVoiceSessionStarted() {
-        _isVoiceSessionActive.value = true
+        isVoiceSessionActive = true
     }
 
     override fun onVoiceSessionEnded() {
-        _isVoiceSessionActive.value = false
+        isVoiceSessionActive = false
     }
 }

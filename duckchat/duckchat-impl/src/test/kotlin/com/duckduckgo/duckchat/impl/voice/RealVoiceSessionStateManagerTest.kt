@@ -26,14 +26,14 @@ class RealVoiceSessionStateManagerTest {
 
     @Test
     fun whenCreatedThenVoiceSessionIsNotActive() {
-        assertFalse(testee.isVoiceSessionActive.value)
+        assertFalse(testee.isVoiceSessionActive)
     }
 
     @Test
     fun whenVoiceSessionStartedThenIsVoiceSessionActiveIsTrue() {
         testee.onVoiceSessionStarted()
 
-        assertTrue(testee.isVoiceSessionActive.value)
+        assertTrue(testee.isVoiceSessionActive)
     }
 
     @Test
@@ -41,14 +41,14 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted()
         testee.onVoiceSessionEnded()
 
-        assertFalse(testee.isVoiceSessionActive.value)
+        assertFalse(testee.isVoiceSessionActive)
     }
 
     @Test
     fun whenVoiceSessionEndedWithoutStartThenIsVoiceSessionActiveIsFalse() {
         testee.onVoiceSessionEnded()
 
-        assertFalse(testee.isVoiceSessionActive.value)
+        assertFalse(testee.isVoiceSessionActive)
     }
 
     @Test
@@ -56,6 +56,6 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted()
         testee.onVoiceSessionStarted()
 
-        assertTrue(testee.isVoiceSessionActive.value)
+        assertTrue(testee.isVoiceSessionActive)
     }
 }

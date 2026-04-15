@@ -113,6 +113,7 @@ class FakeDuckChat(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
+    override fun isVoiceSessionActive(): Boolean = false
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

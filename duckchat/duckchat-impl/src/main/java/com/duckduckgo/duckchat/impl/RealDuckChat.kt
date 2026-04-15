@@ -54,6 +54,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BA
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -343,6 +344,7 @@ class RealDuckChat @Inject constructor(
     private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -778,6 +780,9 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSuggestionsFeatureAvailable(): Boolean =
         duckChatFeature.aiChatSuggestions().isEnabled()
+
+    override fun isVoiceSessionActive(): Boolean =
+        _showVoiceSearchToggle.value && voiceSessionStateManager.isVoiceSessionActive
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)

@@ -49,6 +49,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BA
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -110,6 +111,7 @@ class RealDuckChatTest {
     private val mockSyncEngine: SyncEngine = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -152,6 +154,7 @@ class RealDuckChatTest {
                 mockSyncEngine,
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
+                mockVoiceSessionStateManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
