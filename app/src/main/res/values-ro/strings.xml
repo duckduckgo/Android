@@ -140,6 +140,7 @@
     <string name="leaveFeedbackNew">Trimite feedback</string>
     <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
     <string name="settingsHeadingNextSteps">Pașii următori</string>
+    <string name="settingsNextStepsHideItem">Ascunde</string>
     <string name="settingsLightTheme">Luminoasă</string>
     <string name="settingsTheme">Temă</string>
     <string name="settingsDarkTheme">Intunecată</string>

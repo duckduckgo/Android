@@ -141,6 +141,7 @@
     <string name="leaveFeedbackNew">Odoslať spätnú väzbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
     <string name="settingsHeadingNextSteps">Ďalšie kroky</string>
+    <string name="settingsNextStepsHideItem">Skryť</string>
     <string name="settingsLightTheme">Svetlá</string>
     <string name="settingsTheme">Motív</string>
     <string name="settingsDarkTheme">Tmavý</string>

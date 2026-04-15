@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Skicka återkoppling</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsHeadingNextSteps">Nästa steg</string>
+    <string name="settingsNextStepsHideItem">Dölj</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>

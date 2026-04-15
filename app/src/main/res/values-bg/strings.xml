@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Изпратете отзив</string>
     <string name="settingsEmailProtectionTitle">Защита на имейл</string>
     <string name="settingsHeadingNextSteps">Следващи стъпки</string>
+    <string name="settingsNextStepsHideItem">Скрий</string>
     <string name="settingsLightTheme">Светла</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тъмен</string>
