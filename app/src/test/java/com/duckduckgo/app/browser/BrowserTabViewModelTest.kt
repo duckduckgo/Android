@@ -367,6 +367,7 @@ import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
@@ -8096,7 +8097,7 @@ class BrowserTabViewModelTest {
         testee.setBrowserBackground(lightModeEnabled = true)
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_background_bitmap_light, this.backgroundRes)
+            assertEquals(CommonR.drawable.onboarding_background_bitmap_light, this.backgroundRes)
         }
     }
 
@@ -8105,7 +8106,7 @@ class BrowserTabViewModelTest {
         testee.setBrowserBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
+            assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
         }
     }
 
@@ -8114,7 +8115,7 @@ class BrowserTabViewModelTest {
         testee.setOnboardingDialogBackground(lightModeEnabled = true)
 
         assertCommandIssued<Command.SetOnboardingDialogBackground> {
-            assertEquals(R.drawable.onboarding_background_bitmap_light, this.backgroundRes)
+            assertEquals(CommonR.drawable.onboarding_background_bitmap_light, this.backgroundRes)
         }
     }
 
@@ -8123,7 +8124,7 @@ class BrowserTabViewModelTest {
         testee.setOnboardingDialogBackground(lightModeEnabled = false)
 
         assertCommandIssued<Command.SetOnboardingDialogBackground> {
-            assertEquals(R.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
+            assertEquals(CommonR.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
         }
     }
 

@@ -425,6 +425,7 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -4858,9 +4859,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun getBackgroundResource(lightModeEnabled: Boolean): Int =
         if (lightModeEnabled) {
-            R.drawable.onboarding_background_bitmap_light
+            CommonR.drawable.onboarding_background_bitmap_light
         } else {
-            R.drawable.onboarding_background_bitmap_dark
+            CommonR.drawable.onboarding_background_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {
