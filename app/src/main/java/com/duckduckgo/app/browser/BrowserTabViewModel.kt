@@ -236,6 +236,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -1311,6 +1312,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
+            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
