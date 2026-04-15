@@ -804,7 +804,6 @@ class BrowserTabViewModel @Inject constructor(
                         ctaViewState.value =
                             currentCtaViewState().copy(
                                 cta = cta,
-                                isBrandDesignUpdate = ctaViewModel.isBrandDesignUpdateEnabled(),
                             )
                     }
                 }.flowOn(dispatchers.io())
@@ -3283,7 +3282,6 @@ class BrowserTabViewModel @Inject constructor(
                     isOnboardingCompleteInNewTabPage = contextDaxDialogsShown,
                     isBrowserShowing = isBrowserShowing,
                     isErrorShowing = isErrorShowing,
-                    isBrandDesignUpdate = ctaViewModel.isBrandDesignUpdateEnabled(),
                 )
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
@@ -4800,11 +4798,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        if (ctaViewModel.isBrandDesignUpdateEnabled()) {
-            val backgroundRes = (ctaViewState.value?.cta as? DaxBubbleCta)?.backgroundRes ?: 0
+        val cta = ctaViewState.value?.cta
+        if (cta is DaxBubbleCta.BrandDesignBubbleCta) {
             command.value = SetBrowserBackground(
-                backgroundRes,
-                isBrandDesignUpdate = true,
+                cta.backgroundRes,
+                useRebrandBackground = true,
                 backgroundColorAttr = com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop,
             )
         } else {

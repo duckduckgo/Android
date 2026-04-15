@@ -2819,7 +2819,7 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> {
-                setBrowserBackgroundRes(it.backgroundRes, it.isBrandDesignUpdate)
+                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground)
                 if (it.backgroundColorAttr != 0) {
                     setNewTabBackgroundColor(it.backgroundColorAttr)
                 }
@@ -2924,8 +2924,8 @@ class BrowserTabFragment :
         }
     }
 
-    private fun setBrowserBackgroundRes(@DrawableRes backgroundRes: Int, isBrandDesignUpdate: Boolean) {
-        if (isBrandDesignUpdate) {
+    private fun setBrowserBackgroundRes(@DrawableRes backgroundRes: Int, useRebrandBackground: Boolean) {
+        if (useRebrandBackground) {
             newBrowserTab.browserBackground.apply {
                 setImageResource(0)
                 isGone = true
@@ -5293,7 +5293,7 @@ class BrowserTabFragment :
                 when {
                     viewState.cta != null -> {
                         hideNewTab()
-                        showCta(viewState.cta, viewState.isBrandDesignUpdate)
+                        showCta(viewState.cta)
                     }
 
                     viewState.isBrowserShowing -> {
@@ -5308,19 +5308,19 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showCta(configuration: Cta, isBrandDesignUpdate: Boolean = false) {
+        private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
-                is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration, isBrandDesignUpdate)
+                is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
 
-        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta, isBrandDesignUpdate: Boolean) {
+        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
-            val container = if (isBrandDesignUpdate) {
+            val container = if (configuration is DaxBubbleCta.BrandDesignBubbleCta) {
                 daxDialogIntroBubble.root.gone()
                 brandDesignDialogScrollView.show()
                 daxDialogIntroBubbleBrandDesign.daxCtaContainer

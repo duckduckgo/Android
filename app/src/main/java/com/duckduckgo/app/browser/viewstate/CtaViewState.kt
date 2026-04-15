@@ -23,5 +23,4 @@ data class CtaViewState(
     val isOnboardingCompleteInNewTabPage: Boolean = false,
     val isBrowserShowing: Boolean = true,
     val isErrorShowing: Boolean = false,
-    val isBrandDesignUpdate: Boolean = false,
 )
