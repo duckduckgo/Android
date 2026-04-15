@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -53,6 +54,7 @@ class OnboardingViewModelTest {
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
+    private val onboardingStore: OnboardingStore = mock()
 
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
@@ -62,6 +64,7 @@ class OnboardingViewModelTest {
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
             newAddressBarOptionManager = newAddressBarOptionManager,
+            onboardingStore = onboardingStore,
         )
     }
 
