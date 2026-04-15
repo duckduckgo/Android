@@ -236,6 +236,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
@@ -3302,7 +3303,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
-            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta || cta is SubscriptionPromoModalCta ||
+            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta ||
+                cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
                 (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -3348,6 +3350,8 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
+            } else if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                command.value = HideOnboardingDaxBubbleCta(cta)
             }
         }
     }
@@ -4655,7 +4659,9 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
         when (cta) {
-            is DaxBubbleCta.DaxSubscriptionCta -> {
+            is DaxBubbleCta.DaxSubscriptionCta,
+            is DaxSubscriptionBrandDesignUpdateBubbleCta,
+            -> {
                 viewModelScope.launch {
                     val origin = "funnel_onboarding_android"
                     command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
