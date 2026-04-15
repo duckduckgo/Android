@@ -1113,4 +1113,42 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
+
+    @Test
+    fun whenBrandDesignUpdateEnabledAndSubscriptionCtaThenReturnBrandDesignSubscriptionCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxSubscriptionBrandDesignUpdateBubbleCta)
+    }
+
+    @Test
+    fun whenBrandDesignUpdateDisabledAndSubscriptionCtaThenReturnLegacySubscriptionCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
+    }
 }

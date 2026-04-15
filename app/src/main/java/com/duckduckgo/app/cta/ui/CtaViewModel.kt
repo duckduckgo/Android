@@ -161,7 +161,7 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-            if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is SubscriptionPromoModalCta) {
+            if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
         }
@@ -287,11 +287,20 @@ class CtaViewModel @Inject constructor(
 
             // Subscription onboarding
             canShowSubscriptionCta() -> {
-                DaxBubbleCta.DaxSubscriptionCta(
-                    onboardingStore,
-                    appInstallStore,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                )
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxSubscriptionBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        isFreeTrialCopy = freeTrialCopyAvailable(),
+                    )
+                } else {
+                    DaxBubbleCta.DaxSubscriptionCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isFreeTrialCopy = freeTrialCopyAvailable(),
+                    )
+                }
             }
 
             // Subscription onboarding for returning users who skipped onboarding

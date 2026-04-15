@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/brandDesignPlaceholder"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        tools:src="@drawable/ic_privacy_pro_128" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/brandDesignPrimaryCta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        tools:text="@string/onboardingPrivacyProDaxDialogOkButton" />
+
+</LinearLayout>

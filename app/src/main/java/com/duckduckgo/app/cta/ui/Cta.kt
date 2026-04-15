@@ -853,6 +853,7 @@ sealed class DaxBubbleCta(
         private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
             view.findViewById<View>(R.id.optionsContent),
             view.findViewById<View>(R.id.primaryCtaContent),
+            view.findViewById<View>(R.id.primaryCtaWithImageContent),
             // Future: view.findViewById<View>(R.id.dualButtonsContent),
         )
 

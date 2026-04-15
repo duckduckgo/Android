@@ -1175,6 +1175,9 @@ class BrowserTabFragment :
                 daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.primaryCtaContent.brandDesignPrimaryCta.isSaveEnabled = false
 
+                daxDialogIntroBubbleBrandDesign.primaryCtaWithImageContent.brandDesignPlaceholder.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.primaryCtaWithImageContent.brandDesignPrimaryCta.isSaveEnabled = false
+
                 daxDialogInContext.daxDialogOption1.isSaveEnabled = false
                 daxDialogInContext.daxDialogOption2.isSaveEnabled = false
                 daxDialogInContext.daxDialogOption3.isSaveEnabled = false
