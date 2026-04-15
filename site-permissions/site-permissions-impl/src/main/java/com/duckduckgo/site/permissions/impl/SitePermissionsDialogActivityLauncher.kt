@@ -274,7 +274,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
-                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
