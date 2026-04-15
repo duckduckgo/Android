@@ -2599,18 +2599,18 @@ class BrowserTabFragment :
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
+                handleExternalIntent(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
 
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.ShowKeyboard -> {
@@ -2672,7 +2672,7 @@ class BrowserTabFragment :
             }
 
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(
+                handleExternalIntent(
                     intent = it.nonHttpAppLink.intent,
                     fallbackUrl = it.nonHttpAppLink.fallbackUrl,
                     fallbackIntent = it.nonHttpAppLink.fallbackIntent,
@@ -3156,7 +3156,7 @@ class BrowserTabFragment :
         appLinksSnackBar = null
     }
 
-    private fun openExternalDialog(
+    private fun handleExternalIntent(
         intent: Intent,
         fallbackUrl: String? = null,
         fallbackIntent: Intent? = null,
