@@ -405,16 +405,17 @@ class SettingsActivity : DuckDuckGoActivity() {
             if (viewState.nextStepsVoiceSearchDismissed) {
                 enableVoiceSearchSetting.gone()
             }
-            if (viewState.widgetsInstalled) {
+            if (viewState.isAddWidgetInProtectionsVisible || viewState.widgetsInstalled) {
                 viewsNextSteps.addWidgetToHomeScreenSetting.gone()
+            } else {
+                viewsNextSteps.addWidgetToHomeScreenSetting.show()
             }
 
             // Check if all items are gone — hide the entire section
             val addressBarVisible = addressBarPositionSetting.isVisible
             val voiceSearchVisible = enableVoiceSearchSetting.isVisible
-            val addWidgetVisible = addWidgetToHomeScreenSetting.isVisible
             val widgetVisible = addWidgetToHomeScreenSetting.isVisible
-            if (!addressBarVisible && !voiceSearchVisible && !addWidgetVisible && !widgetVisible) {
+            if (!addressBarVisible && !voiceSearchVisible && !widgetVisible) {
                 settingsSectionOther.gone()
                 return
             }
