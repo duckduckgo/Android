@@ -1176,7 +1176,10 @@ class BrowserTabFragment :
                 daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption2.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption3.isSaveEnabled = false
                 daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
-                daxDialogIntroBubbleBrandDesign.primaryCtaContent.brandDesignPrimaryCta.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.stackedCta.brandDesignPrimaryCta.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.stackedCta.brandDesignSecondaryCta.isSaveEnabled = false
+
+                daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
 
                 daxDialogInContext.daxDialogOption1.isSaveEnabled = false
                 daxDialogInContext.daxDialogOption2.isSaveEnabled = false

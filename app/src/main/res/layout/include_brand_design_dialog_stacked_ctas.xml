@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,5 +13,15 @@
         android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
         tools:ignore="InvalidDaxButtonProperty"
         tools:text="High Five!" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/brandDesignSecondaryCta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+        tools:ignore="InvalidDaxButtonProperty"
+        tools:text="No thanks" />
 
 </LinearLayout>

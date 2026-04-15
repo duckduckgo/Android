@@ -41,7 +41,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = R.id.primaryCtaContent
+    override val activeIncludeId: Int = R.id.stackedCta
 
     override fun configureContentViews(view: View) {
         view.findViewById<DaxButtonPrimary>(R.id.brandDesignPrimaryCta)?.setText(R.string.onboardingEndDaxDialogButton)

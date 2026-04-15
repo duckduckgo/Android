@@ -814,6 +814,7 @@ sealed class DaxBubbleCta(
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+            private const val HEADER_IMAGE_FADE_IN_DURATION = 300L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
             private const val DISMISS_BORDER_WIDTH_DP = 1.5f
@@ -848,7 +849,7 @@ sealed class DaxBubbleCta(
 
         private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
             view.findViewById<View>(R.id.optionsContent),
-            view.findViewById<View>(R.id.primaryCtaContent),
+            view.findViewById<View>(R.id.stackedCta),
             // Future: view.findViewById<View>(R.id.dualButtonsContent),
         )
 
@@ -869,7 +870,7 @@ sealed class DaxBubbleCta(
         ) {
             ctaView = container
 
-            var animationFinished = false
+            var animationsSettled = false
             var contentFadeInAnimator: AnimatorSet? = null
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
@@ -880,42 +881,68 @@ sealed class DaxBubbleCta(
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
             val descriptionView = container.findViewById<DaxTextView>(R.id.brandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
+            val headerImage = container.findViewById<ImageView>(BrowserR.id.brandDesignHeaderImage)
             styleDismissButton(dismissButton)
             val cardContainer = container.findViewById<View>(R.id.brandDesignCardContainer)
 
             // The active content include for THIS CTA
             val activeInclude = container.findViewById<View>(activeIncludeId)
 
+            // Hides the header between CTAs; subclasses that use it re-enable
+            // visibility inside configureContentViews().
+            val resetHeaderState = {
+                headerImage?.isVisible = false
+                headerImage?.alpha = 0f
+            }
+
             // Helper: type title then fade in content
             val typeAndFadeIn = {
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = daxDescription.html(container.context)
-                titleView.alpha = 1f
-                titleView.text = ""
 
-                titleView.typingDelayInMs = TYPING_DELAY_MS
-                titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
-                titleView.startTypingAnimation(daxTitle, true) {
-                    val animators = mutableListOf<Animator>(
-                        ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                        ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                        ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
-                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                    )
-                    contentFadeInAnimator = AnimatorSet().apply {
-                        playTogether(animators.toList())
-                        addListener(object : AnimatorListenerAdapter() {
-                            override fun onAnimationEnd(animation: Animator) {
-                                if (!animationFinished) {
-                                    animationFinished = true
-                                    onTypingAnimationFinished()
+                val startTyping = {
+                    titleView.alpha = 1f
+                    titleView.text = ""
+
+                    titleView.typingDelayInMs = TYPING_DELAY_MS
+                    titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
+                    titleView.startTypingAnimation(daxTitle, true) {
+                        val animators = mutableListOf<Animator>(
+                            ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
+                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                            ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
+                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                            ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
+                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                        )
+                        contentFadeInAnimator = AnimatorSet().apply {
+                            playTogether(animators.toList())
+                            addListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    if (!animationsSettled) {
+                                        animationsSettled = true
+                                        onTypingAnimationFinished()
+                                    }
                                 }
-                            }
-                        })
-                        start()
+                            })
+                            start()
+                        }
                     }
+                }
+
+                if (headerImage?.isVisible == true) {
+                    headerImage.animate()
+                        .alpha(1f)
+                        .setDuration(HEADER_IMAGE_FADE_IN_DURATION)
+                        .withEndAction {
+                            // cancel() invokes withEndAction; skip typing when snapToFinished has
+                            // already set the final state.
+                            if (!animationsSettled) {
+                                startTyping()
+                            }
+                        }
+                } else {
+                    startTyping()
                 }
             }
 
@@ -941,7 +968,7 @@ sealed class DaxBubbleCta(
                             // Note: do NOT call clearDialog() here — it would re-zero the dismiss
                             // button alpha causing a flicker. Instead, selectively reset content only.
                             resetAllIncludesExcept(container, activeInclude)
-                            // Configure content views for this CTA
+                            resetHeaderState()
                             configureContentViews(container)
                             typeAndFadeIn()
                         }
@@ -953,11 +980,12 @@ sealed class DaxBubbleCta(
                 resetAllIncludesExcept(container, activeInclude)
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = daxDescription.html(container.context)
+                resetHeaderState()
                 configureContentViews(container)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
-                        if (!animationFinished) {
+                        if (!animationsSettled) {
                             typeAndFadeIn()
                         }
                     }
@@ -965,6 +993,10 @@ sealed class DaxBubbleCta(
 
             // Tap-to-skip: end running animations and snap all content visible
             fun snapToFinished() {
+                // Set the flag before cancelling the header animator;
+                // cancel() fires the pending withEndAction, which respects animationsSettled.
+                val alreadySettled = animationsSettled
+                animationsSettled = true
                 titleView.finishAnimation()
                 // If typing hasn't started yet (tap during initial fade-in), set title directly
                 if (!titleView.hasAnimationStarted()) {
@@ -973,9 +1005,12 @@ sealed class DaxBubbleCta(
                 descriptionView.alpha = 1f
                 dismissButton.alpha = 1f
                 activeInclude.alpha = 1f
+                if (headerImage?.isVisible == true) {
+                    headerImage.animate().cancel()
+                    headerImage.alpha = 1f
+                }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-                if (!animationFinished) {
-                    animationFinished = true
+                if (!alreadySettled) {
                     onTypingAnimationFinished()
                 }
             }
