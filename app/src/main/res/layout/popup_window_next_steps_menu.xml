@@ -26,5 +26,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:leadingIcon="@drawable/ic_eye_closed_24"
-        app:primaryText="@string/getDesktopBrowserHideItem" />
+        app:primaryText="@string/settingsNextStepsHideItem" />
 </LinearLayout>
