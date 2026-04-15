@@ -967,29 +967,23 @@ sealed class DaxBubbleCta(
                     }
             }
 
-            // Tap-to-skip: end running animations and snap
-            cardContainer.setOnClickListener {
+            // Tap-to-skip: end running animations and snap all content visible
+            fun snapToFinished() {
                 titleView.finishAnimation()
-                contentFadeInAnimator?.let {
-                    if (it.isRunning) {
-                        it.end()
-                    } else if (!animationFinished) {
-                        descriptionView.alpha = 1f
-                        dismissButton.alpha = 1f
-                        activeInclude.alpha = 1f
-                        animationFinished = true
-                        onTypingAnimationFinished()
-                    }
-                } ?: run {
-                    descriptionView.alpha = 1f
-                    dismissButton.alpha = 1f
-                    activeInclude.alpha = 1f
-                    if (!animationFinished) {
-                        animationFinished = true
-                        onTypingAnimationFinished()
-                    }
+                // If typing hasn't started yet (tap during initial fade-in), set title directly
+                if (!titleView.hasAnimationStarted()) {
+                    titleView.text = daxTitle.html(view.context)
+                }
+                descriptionView.alpha = 1f
+                dismissButton.alpha = 1f
+                activeInclude.alpha = 1f
+                contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+                if (!animationFinished) {
+                    animationFinished = true
+                    onTypingAnimationFinished()
                 }
             }
+            cardContainer.setOnClickListener { snapToFinished() }
         }
 
         override fun clearDialog() {
