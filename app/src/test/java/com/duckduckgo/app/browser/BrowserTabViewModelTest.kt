@@ -10121,19 +10121,4 @@ class BrowserTabViewModelTest {
 
         verify(mockDismissedCtaDao, never()).insert(any())
     }
-
-    @Test
-    fun whenDuckAiEndCtaDismissedViaCloseButtonThenCtaClearedFromViewState() = runTest {
-        dismissedCtaDaoChannel.send(emptyList())
-        val cta = DaxBubbleCta.DaxDuckAiEndCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
-
-        testee.onUserClickCtaDismissButton(cta)
-        advanceUntilIdle()
-
-        assertCommandIssued<HideOnboardingDaxBubbleCta> {
-            assertEquals(cta, this.daxBubbleCta)
-        }
-        assertNull(ctaViewState().cta)
-    }
 }

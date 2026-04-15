@@ -489,7 +489,7 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data object LaunchInputScreen : Command()
+    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
 
     data class ExtractSerpLogo(
         val currentUrl: String,

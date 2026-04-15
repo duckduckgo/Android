@@ -1117,21 +1117,6 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
-    data class DaxDuckAiEndCta(
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
-    ) : DaxBubbleCta(
-        ctaId = CtaId.DAX_DUCK_AI_END,
-        title = R.string.onboardingDuckAiEndDaxDialogTitle,
-        description = R.string.onboardingDuckAiEndDaxDialogDescription,
-        primaryCta = R.string.onboardingDuckAiEndDaxDialogButton,
-        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        ctaPixelParam = "duck_ai_end_cta",
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore,
-    )
-
     data class DaxSubscriptionCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
@@ -1271,7 +1256,11 @@ class SubscriptionPromoModalCta(
     override fun pixelCancelParameters(): Map<String, String> = pixelParams()
 }
 
-fun DaxCta.addCtaToHistory(newCta: String): String {
+fun addCtaToHistory(
+    onboardingStore: OnboardingStore,
+    appInstallStore: AppInstallStore,
+    newCta: String,
+): String {
     val param =
         onboardingStore.onboardingDialogJourney
             ?.split("-")
@@ -1284,7 +1273,13 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
     return finalParam
 }
 
-fun DaxCta.canSendShownPixel(): Boolean {
+fun DaxCta.addCtaToHistory(newCta: String): String =
+    addCtaToHistory(onboardingStore, appInstallStore, newCta)
+
+fun canSendShownPixel(
+    onboardingStore: OnboardingStore,
+    ctaPixelParam: String,
+): Boolean {
     val param =
         onboardingStore.onboardingDialogJourney
             ?.split("-")
@@ -1292,6 +1287,9 @@ fun DaxCta.canSendShownPixel(): Boolean {
             .toMutableList()
     return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
 }
+
+fun DaxCta.canSendShownPixel(): Boolean =
+    canSendShownPixel(onboardingStore, ctaPixelParam)
 
 fun String.getStringForOmnibarPosition(position: OmnibarType): String =
     when (position) {

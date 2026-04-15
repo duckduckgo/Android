@@ -21,6 +21,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.Html
 import android.transition.ChangeBounds
 import android.transition.TransitionManager
 import android.util.TypedValue
@@ -157,6 +158,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private var autoCompleteTargetVisibility: Boolean = false
     private var chatSuggestionsTargetVisibility: Boolean = false
     private var tabAttachmentPopup: TabAttachmentPopup? = null
+    private var duckAiEndCtaOkClicked: Boolean? = null
+    private var duckAiEndCtaVisible: Boolean = false
 
     private val pageChangeCallback =
         object : OnPageChangeCallback() {
@@ -305,12 +308,17 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         updateMenuIconButton(params?.useBottomSheetMenu ?: false)
 
+        if (params?.showDuckAiEndCta == true) {
+            showDuckAiEndCta()
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val query = inputModeWidget.text
                     val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
+                    appendDuckAiEndCtaResult(data)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
                     exitInputScreen()
                 }
@@ -535,14 +543,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun submitChatQuery(query: String) {
         val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
+        appendDuckAiEndCtaResult(data)
         requireActivity().setResult(Activity.RESULT_CANCELED, data)
         exitInputScreen()
     }
 
     private fun submitSearchQuery(query: String) {
         val data = Intent().putExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM, query)
+        appendDuckAiEndCtaResult(data)
         requireActivity().setResult(InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED, data)
         exitInputScreen()
+    }
+
+    private fun appendDuckAiEndCtaResult(data: Intent) {
+        duckAiEndCtaOkClicked?.let {
+            data.putExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED, it)
+        }
     }
 
     private fun configureHatchView(
@@ -716,6 +732,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun updateLogoVisibility(state: InputScreenVisibilityState) {
+        if (duckAiEndCtaVisible) return
+
         val logoWasVisible = binding.ddgLogoContainer.isVisible && binding.ddgLogoContainer.alpha > 0f
         val shouldBeVisible = if (state.searchMode) state.showSearchLogo else state.showChatLogo
         val wasModeChange = previousSearchMode != null && previousSearchMode != state.searchMode
@@ -904,6 +922,54 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.chatSuggestionsBottomFadeContainer.getChildAt(0)?.invalidate()
     }
 
+    private fun showDuckAiEndCta() {
+        duckAiEndCtaVisible = true
+        binding.ddgLogoContainer.isVisible = false
+        binding.viewPager.isVisible = false
+        binding.newTabContainerScrollView.isVisible = false
+
+        val backgroundRes = if (appTheme.isLightModeEnabled()) {
+            CommonR.drawable.onboarding_background_bitmap_light
+        } else {
+            CommonR.drawable.onboarding_background_bitmap_dark
+        }
+        binding.onboardingBackground.setImageResource(backgroundRes)
+        binding.onboardingBackground.isVisible = true
+
+        binding.duckAiEndCta.duckAiEndCtaDescription.text =
+            Html.fromHtml(getString(R.string.duckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
+
+        val ctaView = binding.duckAiEndCta.root
+        ctaView.alpha = 0f
+        ctaView.isVisible = true
+        ctaView.animate()
+            .alpha(1f)
+            .setDuration(OVERLAY_ANIMATION_DURATION)
+            .setStartDelay(400)
+            .start()
+
+        binding.duckAiEndCta.duckAiEndCtaOkButton.setOnClickListener {
+            duckAiEndCtaOkClicked = true
+            hideDuckAiEndCta()
+        }
+    }
+
+    private fun hideDuckAiEndCta() {
+        duckAiEndCtaVisible = false
+        binding.duckAiEndCta.root.animate()
+            .alpha(0f)
+            .setDuration(OVERLAY_ANIMATION_DURATION)
+            .withEndAction {
+                if (view == null) return@withEndAction
+                binding.duckAiEndCta.root.isVisible = false
+                binding.onboardingBackground.isVisible = false
+                binding.onboardingBackground.setImageResource(0)
+                binding.ddgLogoContainer.isVisible = true
+                binding.viewPager.isVisible = true
+            }
+            .start()
+    }
+
     fun onFavoritesContentChanged(hasContent: Boolean) {
         val state = viewModel.visibilityState.value
         updateFavoritesVisibility(
@@ -918,6 +984,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         hasContent: Boolean,
         state: InputScreenVisibilityState,
     ) {
+        if (duckAiEndCtaVisible) return
+
         if (!hasContent && !state.autoCompleteSuggestionsVisible && !state.chatSuggestionsVisible) {
             binding.ddgLogoContainer.isVisible = true
             binding.ddgLogo.progress = if (state.searchMode) 0f else 1f

@@ -41,6 +41,7 @@ data class InputScreenActivityParams(
     val useBottomSheetMenu: Boolean = false,
     val showReturnHatch: Boolean = false,
     val isNewTab: Boolean = false,
+    val showDuckAiEndCta: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -75,6 +76,9 @@ data object InputScreenActivityResultParams {
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
+
+    /** Key for duck.ai end CTA interaction result (Boolean: true = OK clicked, false = dismissed) */
+    const val DUCK_AI_END_CTA_OK_CLICKED = "duck_ai_end_cta_ok"
 }
 
 /**
