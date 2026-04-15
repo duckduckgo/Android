@@ -549,4 +549,34 @@ class SettingsViewModelTest {
 
         assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
     }
+
+    @Test
+    fun `when widgets installed then widgetsInstalled is true in view state`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().widgetsInstalled)
+    }
+
+    @Test
+    fun `when widgets not installed then widgetsInstalled is false in view state`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().widgetsInstalled)
+    }
+
+    @Test
+    fun `when widget installed after refresh then widgetsInstalled updates to true`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.start()
+        assertFalse(testee.viewState().first().widgetsInstalled)
+
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshWidgetsInstalledState()
+
+        assertTrue(testee.viewState().first().widgetsInstalled)
+    }
 }

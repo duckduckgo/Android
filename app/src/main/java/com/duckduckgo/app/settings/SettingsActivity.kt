@@ -389,7 +389,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsPrivacy.widgetPromptSetting.setStatus(isOn = widgetsInstalled)
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
-        viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
     }
 
     private fun updateNextStepsSection(viewState: SettingsViewModel.ViewState) {
@@ -406,12 +405,16 @@ class SettingsActivity : DuckDuckGoActivity() {
             if (viewState.nextStepsVoiceSearchDismissed) {
                 enableVoiceSearchSetting.gone()
             }
+            if (viewState.widgetsInstalled) {
+                viewsNextSteps.addWidgetToHomeScreenSetting.gone()
+            }
 
             // Check if all items are gone — hide the entire section
             val addressBarVisible = addressBarPositionSetting.isVisible
             val voiceSearchVisible = enableVoiceSearchSetting.isVisible
+            val addWidgetVisible = addWidgetToHomeScreenSetting.isVisible
             val widgetVisible = addWidgetToHomeScreenSetting.isVisible
-            if (!addressBarVisible && !voiceSearchVisible && !widgetVisible) {
+            if (!addressBarVisible && !voiceSearchVisible && !addWidgetVisible && !widgetVisible) {
                 settingsSectionOther.gone()
                 return
             }
