@@ -25,12 +25,14 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageGenerateEmailReceived
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.common.toParams
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
-import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -70,20 +72,24 @@ class EmailReceivedEventHandler @Inject constructor(
                 ),
             )
         } else {
-            // Implicit needsEmail flow (FillForm): re-execute the same action with email
-            val extractedProfileParams = when (currentBrokerStep) {
-                is OptOutStep -> currentBrokerStep.profileToOptOut.toParams(state.profileQuery.fullName).copy(
-                    email = emailReceived.generatedEmailData.emailAddress,
-                )
-
-                is EmailConfirmationStep -> currentBrokerStep.profileToOptOut.toParams(state.profileQuery.fullName).copy(
-                    email = emailReceived.generatedEmailData.emailAddress,
-                )
-
-                is BrokerStep.ScanStep -> ExtractedProfileParams(
-                    email = emailReceived.generatedEmailData.emailAddress,
-                )
+            // Implicit needsEmail flow (FillForm): re-execute the same action with email.
+            // Only OptOutStep and EmailConfirmationStep reach this path; ScanStep uses the explicit GenerateEmail flow above.
+            val profileToOptOut = when (currentBrokerStep) {
+                is OptOutStep -> currentBrokerStep.profileToOptOut
+                is EmailConfirmationStep -> currentBrokerStep.profileToOptOut
+                is BrokerStep.ScanStep -> {
+                    return Next(
+                        nextState = state,
+                        nextEvent = BrokerStepCompleted(
+                            needsEmailConfirmation = false,
+                            stepStatus = StepStatus.Failure(error = PirError.Unknown("Trying to use decoupled email flow in ScanStep!")),
+                        ),
+                    )
+                }
             }
+            val extractedProfileParams = profileToOptOut.toParams(state.profileQuery.fullName).copy(
+                email = emailReceived.generatedEmailData.emailAddress,
+            )
 
             Next(
                 nextState = state.copy(
