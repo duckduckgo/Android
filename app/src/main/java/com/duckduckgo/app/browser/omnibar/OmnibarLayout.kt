@@ -471,8 +471,9 @@ class OmnibarLayout @JvmOverloads constructor(
             object : KeyboardAwareEditText.OnBackKeyListener {
                 override fun onBackKey(): Boolean {
                     if (isAttachedToWindow) {
+                        val consumed = omnibarTextListener?.onBackKeyPressed() ?: false
                         viewModel.onBackKeyPressed()
-                        return omnibarTextListener?.onBackKeyPressed() ?: false
+                        return consumed
                     }
                     return false
                 }
