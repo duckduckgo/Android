@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.compose.switch
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,11 +25,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 
 /**
  * DuckDuckGo design system composable switch component.
@@ -39,6 +43,7 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * @param onCheckedChange callback invoked when the switch is toggled, or null to make the switch non-interactive
  * @param modifier the [Modifier] to apply
  * @param enabled whether the switch is enabled
+ * @param interactionSource the [MutableInteractionSource] representing the stream of interactions for this switch
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213690991241745?focus=true
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=72-14&m=dev
@@ -49,6 +54,7 @@ fun DaxSwitch(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
 ) {
     val trackOn = DuckDuckGoTheme.colors.system.switchTrackOn
     val trackOff = DuckDuckGoTheme.colors.system.switchTrackOff
@@ -57,10 +63,11 @@ fun DaxSwitch(
     Switch(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = modifier,
+        modifier = modifier.alpha(if (enabled) 1f else 0.4f),
         enabled = enabled,
+        interactionSource = interactionSource,
         thumbContent = {
-            Spacer(modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(R.dimen.daxSwitchThumbSize)))
         },
         colors = SwitchDefaults.colors(
             checkedThumbColor = thumb,
@@ -69,10 +76,10 @@ fun DaxSwitch(
             uncheckedTrackColor = trackOff,
             uncheckedBorderColor = Color.Transparent,
             uncheckedIconColor = Color.Transparent,
-            disabledCheckedThumbColor = thumb.copy(alpha = thumb.alpha * 0.4f),
-            disabledCheckedTrackColor = trackOff.copy(alpha = trackOff.alpha * 0.5f),
-            disabledUncheckedThumbColor = thumb.copy(alpha = thumb.alpha * 0.4f),
-            disabledUncheckedTrackColor = trackOff.copy(alpha = trackOff.alpha * 0.5f),
+            disabledCheckedThumbColor = thumb,
+            disabledCheckedTrackColor = trackOn,
+            disabledUncheckedThumbColor = thumb,
+            disabledUncheckedTrackColor = trackOff,
             disabledUncheckedBorderColor = Color.Transparent,
             disabledUncheckedIconColor = Color.Transparent,
             disabledCheckedBorderColor = Color.Transparent,
