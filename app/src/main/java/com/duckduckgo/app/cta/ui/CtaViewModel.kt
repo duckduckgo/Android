@@ -279,7 +279,11 @@ class CtaViewModel @Inject constructor(
 
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
 
             // Subscription onboarding
