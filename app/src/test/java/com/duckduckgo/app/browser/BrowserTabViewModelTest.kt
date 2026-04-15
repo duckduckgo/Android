@@ -157,6 +157,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
@@ -7917,6 +7918,23 @@ class BrowserTabViewModelTest {
                 assertEquals(cta, this.onboardingCta)
             }
             verify(mockPixel).fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_SERP_CTA))
+        }
+
+    @Test
+    fun whenUserClicksSubscriptionBrandDesignUpdateBubbleCtaSecondaryButtonThenHideOnboardingDaxBubbleCtaCommandIssued() =
+        runTest {
+            val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+                onboardingStore = mockOnboardingStore,
+                appInstallStore = mockAppInstallStore,
+                isLightTheme = true,
+                isFreeTrialCopy = false,
+            )
+
+            testee.onUserClickCtaSecondaryButton(cta)
+
+            assertCommandIssued<HideOnboardingDaxBubbleCta> {
+                assertEquals(cta, this.daxBubbleCta)
+            }
         }
 
     @Test

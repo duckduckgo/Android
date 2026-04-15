@@ -31,6 +31,19 @@
             android:paddingTop="@dimen/keyline_6"
             android:paddingBottom="20dp">
 
+            <ImageView
+                android:id="@+id/brandDesignHeaderImage"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:padding="16dp"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_onboarding_subscription_shield"
+                tools:visibility="visible" />
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,19 +92,18 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <include
-                    android:id="@+id/primaryCtaContent"
-                    layout="@layout/include_brand_design_dialog_primary_cta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:visibility="gone"
-                    tools:visibility="gone" />
-
-                <!-- Future content includes added here:
-            <include android:id="@+id/dualButtonsContent" layout="@layout/include_brand_design_dialog_dual_buttons" ... />
-            -->
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/primaryCta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                android:visibility="gone"
+                tools:ignore="InvalidDaxButtonProperty"
+                tools:text="High Five!"
+                tools:visibility="gone" />
 
         </LinearLayout>
 
