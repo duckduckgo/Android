@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -119,7 +120,7 @@ class CtaViewModel @Inject constructor(
     @VisibleForTesting
     suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
         if (onboardingStore.isDuckAiOnboardingFlow()) {
-            return listOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON, CtaId.DAX_DUCK_AI_END)
+            return listOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON)
         }
         return if (isSubscriptionCtaAvailable()) {
             listOf(
@@ -213,6 +214,33 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): Boolean {
+        return withContext(dispatchers.io()) {
+            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+            if (shouldShow) {
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
+                completeStageIfDaxOnboardingCompleted()
+                if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
+                    val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+                    pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
+                }
+            }
+            shouldShow
+        }
+    }
+
+    suspend fun onDuckAiEndCtaInteraction(okClicked: Boolean) {
+        withContext(dispatchers.io()) {
+            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
+            if (okClicked) {
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
+            } else {
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
+            }
+            completeStageIfDaxOnboardingCompleted()
+        }
+    }
+
     suspend fun refreshCta(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
@@ -263,6 +291,12 @@ class CtaViewModel @Inject constructor(
                 null
             }
 
+            // Duck.ai onboarding end
+            canShowDuckAiEndCta() -> {
+                // Suppress home CTAs until duck.ai end CTA is shown on input screen
+                null
+            }
+
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
@@ -279,11 +313,6 @@ class CtaViewModel @Inject constructor(
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
                 }
-            }
-
-            // Duck.ai onboarding end
-            canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxDuckAiEndCta(onboardingStore, appInstallStore)
             }
 
             // End
@@ -344,7 +373,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDuckAiEndCta(): Boolean =
-        daxOnboardingActive() && onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
 
     @WorkerThread
     private suspend fun canShowSubscriptionCta(): Boolean =
@@ -571,5 +600,6 @@ class CtaViewModel @Inject constructor(
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
+        private const val DUCK_AI_END_CTA_PIXEL_PARAM = "duck_ai_end_cta"
     }
 }
