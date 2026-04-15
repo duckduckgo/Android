@@ -109,8 +109,10 @@ class OnboardingActivity : DuckDuckGoActivity() {
         viewModel.viewState.flowWithLifecycle(lifecycle, STARTED)
             .onEach {
                 if (it.canShowSkipOnboardingButton) {
+                    binding.skipPreOnboardingButton.show()
                     binding.skipOnboardingButton.show()
                 } else {
+                    binding.skipPreOnboardingButton.gone()
                     binding.skipOnboardingButton.gone()
                 }
             }
@@ -118,6 +120,13 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSkipButton() {
+        binding.skipPreOnboardingButton.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.devOnlySkipPreOnboarding()
+                startActivity(BrowserActivity.intent(this@OnboardingActivity))
+                finish()
+            }
+        }
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.devOnlyFullyCompleteAllOnboarding()

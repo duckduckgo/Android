@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -29,6 +30,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -39,6 +41,7 @@ class OnboardingViewModel @Inject constructor(
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -82,6 +85,14 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun devOnlyFullyCompleteAllOnboarding() {
         onboardingSkipper.markOnboardingAsCompleted()
+        newAddressBarOptionManager.setAsShown()
+    }
+
+    suspend fun devOnlySkipPreOnboarding() {
+        withContext(dispatchers.io()) {
+            onboardingStore.storeInputScreenSelection(true)
+            userStageStore.stageCompleted(AppStage.NEW)
+        }
         newAddressBarOptionManager.setAsShown()
     }
 
