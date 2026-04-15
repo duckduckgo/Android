@@ -1039,7 +1039,7 @@ class CtaViewModelTest {
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta)
+        assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateUpdateCta)
     }
 
     @Test

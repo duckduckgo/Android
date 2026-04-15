@@ -5320,7 +5320,7 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
-            val container = if (configuration is DaxBubbleCta.BrandDesignBubbleCta) {
+            val container = if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 daxDialogIntroBubble.root.gone()
                 brandDesignDialogScrollView.show()
                 daxDialogIntroBubbleBrandDesign.daxCtaContainer
