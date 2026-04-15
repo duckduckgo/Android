@@ -43,6 +43,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -89,6 +90,7 @@ class CtaViewModel @Inject constructor(
     private val brokenSitePrompt: BrokenSitePrompt,
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val appTheme: AppTheme,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -259,7 +261,7 @@ class CtaViewModel @Inject constructor(
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(onboardingStore, appInstallStore)
+                    DaxBubbleCta.DaxIntroSearchOptionsBrandDesignUpdateCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
                 } else {
                     DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
                 }
