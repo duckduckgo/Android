@@ -31,6 +31,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -39,6 +40,7 @@ interface ShowOnAppLaunchOptionDataStore {
     val specificPageUrlFlow: Flow<String>
     val showOnAppLaunchTabId: String?
 
+    suspend fun hasOptionSelected(): Boolean
     fun setShowOnAppLaunchTabId(tabId: String)
     suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption)
     suspend fun setSpecificPageUrl(url: String)
@@ -57,6 +59,9 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
 
     override var showOnAppLaunchTabId: String? = null
         private set
+
+    override suspend fun hasOptionSelected(): Boolean =
+        store.data.firstOrNull()?.get(intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)) != null
 
     override val optionFlow: Flow<ShowOnAppLaunchOption> = store.data.map { preferences ->
         preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)]?.let { optionId ->
