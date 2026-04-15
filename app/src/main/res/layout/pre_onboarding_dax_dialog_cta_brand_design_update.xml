@@ -67,6 +67,14 @@
                     tools:visibility="gone" />
 
                 <include
+                    android:id="@+id/reinstallQuickSetupContent"
+                    layout="@layout/include_brand_design_reinstall_quick_setup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+                <include
                     android:id="@+id/addressBarContent"
                     layout="@layout/include_brand_design_address_bar_position"
                     android:layout_width="match_parent"

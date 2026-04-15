@@ -110,4 +110,20 @@
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallWelcomeTitle">Welcome back!</string>
+    <string name="preOnboardingReinstallQuickSetupSubtitle">Quick setup options:</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
+    <string name="preOnboardingReinstallAddressBarTop">Top</string>
+    <string name="preOnboardingReinstallAddressBarBottom">Bottom</string>
+    <string name="preOnboardingReinstallDuckAiLabel">Duck.ai option?</string>
+    <string name="preOnboardingReinstallDuckAiOn">On</string>
+    <string name="preOnboardingReinstallDuckAiOff">Off</string>
+    <string name="preOnboardingReinstallAddWidgetLabel">Add private search\nwidget?</string>
+    <string name="preOnboardingReinstallAddWidgetButton">Add widget</string>
+    <string name="preOnboardingReinstallSyncLabel">Sync Passwords?</string>
+    <string name="preOnboardingReinstallSyncButton">Turn on Sync</string>
+    <string name="preOnboardingReinstallDefaultBrowserLabel">Set DuckDuckGo as\ndefault browser?</string>
+    <string name="preOnboardingReinstallDefaultBrowserButton">Set Default</string>
+    <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
 </resources>

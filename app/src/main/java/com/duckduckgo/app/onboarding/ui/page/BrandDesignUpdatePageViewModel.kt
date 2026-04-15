@@ -41,7 +41,6 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_S
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
@@ -212,10 +211,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             SKIP_ONBOARDING_OPTION -> {
-                viewModelScope.launch {
-                    _commands.send(Command.OnboardingSkipped)
-                    pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                    duckChat.setInputScreenUserSetting(true)
+                viewModelScope.launch(dispatchers.io()) {
+                    val selectedPosition = _viewState.value.selectedAddressBarPosition
+                    settingsDataStore.omnibarType = selectedPosition
+
+                    val inputSelected = _viewState.value.inputScreenSelected
+                    duckChat.setCosmeticInputScreenUserSetting(inputSelected)
+                    onboardingStore.storeInputScreenSelection(inputSelected)
+
+                    _commands.send(Command.Finish)
                 }
             }
 
@@ -306,6 +310,27 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
             setCurrentDialog(ADDRESS_BAR_POSITION)
         }
+    }
+
+    fun onQuickSetupDefaultBrowserClicked() {
+        viewModelScope.launch {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
+            if (intent != null) {
+                _commands.send(Command.ShowDefaultBrowserDialog(intent))
+            }
+        }
+    }
+
+    fun onQuickSetupDefaultBrowserSet() {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = true
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+    }
+
+    fun onQuickSetupDefaultBrowserNotSet() {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = false
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
     }
 
     fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {

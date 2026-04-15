@@ -45,7 +45,7 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
+        pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
     }
 
     fun pageCount(): Int {
@@ -70,7 +70,7 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun initializeOnboardingSkipper() {
-        if (!appBuildConfig.canSkipOnboarding) return
+        return
 
         // delay showing skip button until privacy config downloaded
         viewModelScope.launch {
