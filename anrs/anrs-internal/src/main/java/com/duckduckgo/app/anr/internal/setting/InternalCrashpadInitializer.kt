@@ -35,6 +35,7 @@ class InternalCrashpadInitializer @Inject constructor(
 
     override fun initialize(
         extraAnnotations: Map<String, String>,
+        dynamicAnnotationKeys: Set<String>,
         onCrash: (() -> Unit)?,
     ): Boolean = Crashpad.init(
         context,
@@ -42,6 +43,7 @@ class InternalCrashpadInitializer @Inject constructor(
         version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
         osVersion = "Android SDK ${appBuildConfig.sdkInt}",
         extraAnnotations = extraAnnotations,
+        dynamicAnnotationKeys = dynamicAnnotationKeys,
         config = CrashpadConfig(
             uploadUrl = uploadConfig.uploadUrl,
             uploadsEnabled = uploadConfig.uploadUrl.isNotEmpty(),

@@ -32,6 +32,7 @@ class DefaultCrashpadInitializer @Inject constructor(
 
     override fun initialize(
         extraAnnotations: Map<String, String>,
+        dynamicAnnotationKeys: Set<String>,
         onCrash: (() -> Unit)?,
     ): Boolean = Crashpad.init(
         context,
@@ -39,6 +40,7 @@ class DefaultCrashpadInitializer @Inject constructor(
         version = "${appBuildConfig.versionName}-${appBuildConfig.flavor}",
         osVersion = "Android SDK ${appBuildConfig.sdkInt}",
         extraAnnotations = extraAnnotations,
+        dynamicAnnotationKeys = dynamicAnnotationKeys,
         config = CrashpadConfig(onCrash = onCrash),
     )
 }
