@@ -1006,6 +1006,14 @@ class BrowserTabFragment :
                     }
                 }
             }
+
+            // Handle duck.ai end CTA result from InputScreen
+            data?.let { resultData ->
+                if (resultData.hasExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED)) {
+                    val okClicked = resultData.getBooleanExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED, false)
+                    viewModel.onDuckAiEndCtaInputScreenResult(okClicked)
+                }
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1379,7 +1387,7 @@ class BrowserTabFragment :
         )
     }
 
-    private fun launchInputScreen(query: String, isNewTab: Boolean = false) {
+    private fun launchInputScreen(query: String, isNewTab: Boolean = false, showDuckAiEndCta: Boolean = false) {
         logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
@@ -1392,6 +1400,7 @@ class BrowserTabFragment :
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                     isNewTab = isNewTab,
                     showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
+                    showDuckAiEndCta = showDuckAiEndCta,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
@@ -2846,7 +2855,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "", isNewTab = true)
+                    launchInputScreen(query = "", isNewTab = true, showDuckAiEndCta = it.showDuckAiEndCta)
                 }
             }
 

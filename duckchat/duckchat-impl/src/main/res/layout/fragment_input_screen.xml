@@ -21,6 +21,18 @@
     android:layout_height="match_parent"
     android:clipChildren="false">
 
+    <ImageView
+        android:id="@+id/onboardingBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"
@@ -171,5 +183,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <include
+        android:id="@+id/duckAiEndCta"
+        layout="@layout/include_duck_ai_end_cta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="5dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

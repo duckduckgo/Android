@@ -44,4 +44,8 @@
     <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">You can only attach %1$d images at a time.</string>
     <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">You can only attach %1$d images per conversation.</string>
 
+    <!-- duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">You\'ve got this!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="duckAiEndCtaButton">Got it!</string>
 </resources>

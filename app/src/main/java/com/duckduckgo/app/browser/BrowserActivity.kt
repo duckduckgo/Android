@@ -441,10 +441,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     removeObservers()
                 }
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
-                    externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     if (pendingDuckAiOnboardingFire) {
                         currentTab?.dismissDuckAiFireOnboardingCta()
+                    } else {
+                        externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
