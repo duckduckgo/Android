@@ -696,16 +696,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun configureKeyboardDismissOnScroll() {
-        val dismissKeyboard = object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    hideKeyboard(inputModeWidget.inputField)
-                }
-            }
-        }
-        binding.autoCompleteSuggestionsList.addOnScrollListener(dismissKeyboard)
-        binding.chatSuggestionsRecyclerView.addOnScrollListener(dismissKeyboard)
-
         binding.newTabContainerScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             hideKeyboard(inputModeWidget.inputField)
         }
@@ -816,6 +806,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputScreenButtons.setSendButtonVisible(isOnChatTab && state.submitButtonVisible)
         }
         inputModeWidget.setMainButtonsVisible(state.mainButtonsVisible)
+    }
+
+    fun dismissKeyboard() {
+        hideKeyboard(inputModeWidget.inputField)
     }
 
     fun getFavoritesContainer(): FrameLayout = binding.newTabContainerLayout
