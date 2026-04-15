@@ -457,7 +457,7 @@ sealed class Command {
 
     class SetBrowserBackground(
         @DrawableRes val backgroundRes: Int,
-        val isBrandDesignUpdate: Boolean = false,
+        val useRebrandBackground: Boolean = false,
         @AttrRes val backgroundColorAttr: Int = 0,
     ) : Command()
 
