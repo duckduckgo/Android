@@ -19,10 +19,13 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 import android.content.res.Configuration
 import android.os.Build.VERSION
 import android.os.Bundle
+import android.view.View
+import androidx.core.view.ViewCompat
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.utils.ui.InsetsWithKeyboardCallback
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
@@ -65,6 +68,11 @@ class InputScreenActivity : DuckDuckGoActivity() {
             )
         pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
         inputScreenOnboardingWideEvent.onInputScreenShown()
+
+        val rootView = findViewById<View>(android.R.id.content)
+        val insetsWithKeyboardCallback = InsetsWithKeyboardCallback(window)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, insetsWithKeyboardCallback)
+        ViewCompat.setWindowInsetsAnimationCallback(rootView, insetsWithKeyboardCallback)
     }
 
     override fun finish() {
