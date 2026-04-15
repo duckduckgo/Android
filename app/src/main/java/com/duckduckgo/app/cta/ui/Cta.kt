@@ -838,7 +838,7 @@ sealed class DaxBubbleCta(
         }
 
         private fun styleDismissButton(button: ImageView) {
-            val themedContext =resolveOnboardingContext(button.context)
+            val themedContext = resolveOnboardingContext(button.context)
             val bgColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceTertiary)
             val borderColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingAccentAltPrimary)
             val iconColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingIconsPrimary)
