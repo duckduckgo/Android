@@ -252,7 +252,7 @@
         <item name="rippleColor">?attr/onboardingAccentAltGlowPrimary</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
-
 
 </resources>
