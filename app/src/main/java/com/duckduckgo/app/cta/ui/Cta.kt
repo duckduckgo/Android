@@ -22,7 +22,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.ContextThemeWrapper
@@ -792,18 +791,27 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
-    data class DaxIntroSearchOptionsBrandDesignUpdateCta(
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
+    abstract class BrandDesignBubbleCta(
+        ctaId: CtaId,
+        @StringRes title: Int,
+        @StringRes description: Int,
+        options: List<DaxDialogIntroOption>? = null,
+        @DrawableRes backgroundRes: Int = 0,
+        shownPixel: Pixel.PixelName?,
+        okPixel: Pixel.PixelName?,
+        ctaPixelParam: String,
+        onboardingStore: OnboardingStore,
+        appInstallStore: AppInstallStore,
+        open val isLightTheme: Boolean,
     ) : DaxBubbleCta(
-        ctaId = CtaId.DAX_INTRO,
-        title = R.string.onboardingSearchDaxDialogTitle,
-        description = R.string.onboardingSearchDaxDialogDescription,
-        options = onboardingStore.getSearchOptions(),
-        backgroundRes = R.drawable.bg_onboarding_search_options,
-        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
+        ctaId = ctaId,
+        title = title,
+        description = description,
+        options = options,
+        backgroundRes = backgroundRes,
+        shownPixel = shownPixel,
+        okPixel = okPixel,
+        ctaPixelParam = ctaPixelParam,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
     ) {
@@ -816,18 +824,21 @@ sealed class DaxBubbleCta(
             private const val DISMISS_BORDER_WIDTH_DP = 1.5f
         }
 
-        private fun resolveOnboardingContext(context: Context): Context {
-            val nightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-            val themeRes = if (nightMode == Configuration.UI_MODE_NIGHT_YES) {
-                com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
-            } else {
+        abstract val activeIncludeId: Int
+
+        abstract fun configureContentViews(view: View)
+
+        protected fun resolveOnboardingContext(context: Context): Context {
+            val themeRes = if (isLightTheme) {
                 com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
+            } else {
+                com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
             }
             return ContextThemeWrapper(context, themeRes)
         }
 
         private fun styleDismissButton(button: ImageView) {
-            val themedContext = resolveOnboardingContext(button.context)
+            val themedContext =resolveOnboardingContext(button.context)
             val bgColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceTertiary)
             val borderColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingAccentAltPrimary)
             val iconColor = themedContext.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.onboardingIconsPrimary)
@@ -838,6 +849,23 @@ sealed class DaxBubbleCta(
                 setStroke(DISMISS_BORDER_WIDTH_DP.toPx().toInt(), borderColor)
             }
             ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(iconColor))
+        }
+
+        private fun getAllContentIncludes(view: View): List<View> = listOfNotNull(
+            view.findViewById<View>(R.id.optionsContent),
+            // Future: view.findViewById<View>(R.id.primaryCtaContent),
+            // Future: view.findViewById<View>(R.id.dualButtonsContent),
+        )
+
+        private fun resetAllIncludesExcept(view: View, active: View) {
+            getAllContentIncludes(view).forEach { include ->
+                if (include == active) {
+                    include.show()
+                    include.alpha = 0f
+                } else {
+                    include.gone()
+                }
+            }
         }
 
         override fun showCta(
@@ -859,35 +887,9 @@ sealed class DaxBubbleCta(
             val dismissButton = view.findViewById<ImageView>(R.id.brandDesignDismissButton)
             styleDismissButton(dismissButton)
             val cardContainer = view.findViewById<View>(R.id.brandDesignCardContainer)
-            val optionsContent = view.findViewById<View>(R.id.optionsContent)
 
             // The active content include for THIS CTA
-            val activeInclude = optionsContent
-
-            // All content includes — add new ones here as they're created
-            val allContentIncludes = listOf(
-                optionsContent,
-                // Future: view.findViewById<View>(R.id.primaryCtaContent),
-                // Future: view.findViewById<View>(R.id.dualButtonsContent),
-            ).filterNotNull()
-
-            fun resetAllIncludesExcept(active: View) {
-                allContentIncludes.forEach { include ->
-                    if (include == active) {
-                        include.show()
-                        include.alpha = 0f
-                    } else {
-                        include.gone()
-                    }
-                }
-            }
-
-            val optionViews: List<OnboardingSelectionButton> = listOf(
-                view.findViewById(R.id.brandDesignOption1),
-                view.findViewById(R.id.brandDesignOption2),
-                view.findViewById(R.id.brandDesignOption3),
-                view.findViewById(R.id.brandDesignOption4),
-            )
+            val activeInclude = view.findViewById<View>(activeIncludeId)
 
             // Helper: type title then fade in content
             val typeAndFadeIn = {
@@ -924,6 +926,7 @@ sealed class DaxBubbleCta(
 
             if (isContentTransition) {
                 // Content transition: fade out old description + any visible content include, then swap and animate new
+                val allContentIncludes = getAllContentIncludes(view)
                 val fadeOutAnimators = mutableListOf<Animator>(
                     ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -942,18 +945,9 @@ sealed class DaxBubbleCta(
                             // After fade-out: hide old includes, show new one, type and fade in
                             // Note: do NOT call clearDialog() here — it would re-zero the dismiss
                             // button alpha causing a flicker. Instead, selectively reset content only.
-                            resetAllIncludesExcept(activeInclude)
-                            // Configure options for this CTA
-                            options?.let {
-                                optionViews.forEachIndexed { index, buttonView ->
-                                    buttonView.show()
-                                    if (it.size > index) {
-                                        it[index].setOptionView(buttonView)
-                                    } else {
-                                        buttonView.gone()
-                                    }
-                                }
-                            }
+                            resetAllIncludesExcept(view, activeInclude)
+                            // Configure content views for this CTA
+                            configureContentViews(view)
                             typeAndFadeIn()
                         }
                     })
@@ -961,19 +955,10 @@ sealed class DaxBubbleCta(
                 }
             } else {
                 clearDialog()
-                resetAllIncludesExcept(activeInclude)
+                resetAllIncludesExcept(view, activeInclude)
                 hiddenTitle.text = daxTitle.html(view.context)
                 descriptionView.text = daxDescription.html(view.context)
-                options?.let {
-                    optionViews.forEachIndexed { index, buttonView ->
-                        buttonView.show()
-                        if (it.size > index) {
-                            it[index].setOptionView(buttonView)
-                        } else {
-                            buttonView.gone()
-                        }
-                    }
-                }
+                configureContentViews(view)
                 view.show()
                 view.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction { typeAndFadeIn() }
@@ -1015,27 +1000,75 @@ sealed class DaxBubbleCta(
                 // Hide all content includes — include-level alpha/gone is sufficient;
                 // children don't need individual alpha management since the parent
                 // include's alpha controls their composite visibility.
-                view.findViewById<View>(R.id.optionsContent)?.apply {
-                    alpha = 0f
-                    gone()
+                getAllContentIncludes(view).forEach { include ->
+                    include.alpha = 0f
+                    include.gone()
                 }
-                // Future: clear other content includes here
             }
         }
 
         override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
-            // No primary CTA button in options dialog — no-op.
-            // Future CTA subclasses using include_brand_design_dialog_primary_cta.xml will override this.
+            // No-op by default. Subclasses with a primary CTA button override this.
         }
 
         override fun setOnSecondaryCtaClicked(onButtonClicked: () -> Unit) {
-            // No secondary CTA button in options dialog — no-op.
-            // Future CTA subclasses using include_brand_design_dialog_dual_buttons.xml will override this.
+            // No-op by default. Subclasses with a secondary CTA button override this.
         }
 
         override fun setOnDismissCtaClicked(onButtonClicked: () -> Unit) {
             ctaView?.findViewById<View>(R.id.brandDesignDismissButton)?.setOnClickListener {
                 onButtonClicked.invoke()
+            }
+        }
+
+        override fun setOnOptionClicked(
+            onboardingExperimentEnabled: Boolean,
+            configuration: DaxBubbleCta?,
+            onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
+        ) {
+            // No-op by default. Subclasses with option buttons override this.
+        }
+
+        override fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
+            binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate.root.gone()
+        }
+    }
+
+    data class DaxIntroSearchOptionsBrandDesignUpdateCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        override val isLightTheme: Boolean,
+    ) : BrandDesignBubbleCta(
+        ctaId = CtaId.DAX_INTRO,
+        title = R.string.onboardingSearchDaxDialogTitle,
+        description = R.string.onboardingSearchDaxDialogDescription,
+        options = onboardingStore.getSearchOptions(),
+        backgroundRes = R.drawable.bg_onboarding_search_options,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+        isLightTheme = isLightTheme,
+    ) {
+        override val activeIncludeId: Int = R.id.optionsContent
+
+        override fun configureContentViews(view: View) {
+            val optionViews: List<OnboardingSelectionButton> = listOf(
+                view.findViewById(R.id.brandDesignOption1),
+                view.findViewById(R.id.brandDesignOption2),
+                view.findViewById(R.id.brandDesignOption3),
+                view.findViewById(R.id.brandDesignOption4),
+            )
+            options?.let {
+                optionViews.forEachIndexed { index, buttonView ->
+                    buttonView.show()
+                    if (it.size > index) {
+                        it[index].setOptionView(buttonView)
+                    } else {
+                        buttonView.gone()
+                    }
+                }
             }
         }
 
@@ -1055,10 +1088,6 @@ sealed class DaxBubbleCta(
                     onOptionClicked.invoke(option, index)
                 }
             }
-        }
-
-        override fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
-            binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate.root.gone()
         }
     }
 
