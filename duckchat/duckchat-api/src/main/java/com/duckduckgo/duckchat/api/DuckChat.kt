@@ -138,4 +138,11 @@ interface DuckChat {
      * Returns `true` if a voice session is currently active.
      */
     fun isVoiceSessionActive(): Boolean
+
+    /**
+     * Checks whether DuckChat Voice chat is enabled based on remote config flag
+     *
+     * @return true if DuckChat AI voice chat is enabled, false otherwise.
+     */
+    suspend fun isVoiceChatEnabled(): Boolean
 }

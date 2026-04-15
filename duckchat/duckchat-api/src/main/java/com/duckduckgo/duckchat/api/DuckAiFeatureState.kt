@@ -83,4 +83,9 @@ interface DuckAiFeatureState {
      * Indicates whether Duck.ai should be open in Contextual mode
      */
     val showContextualMode: StateFlow<Boolean>
+
+    /**
+     * Indicates whether Duck.ai should be used as digital assistant
+     */
+    val allowDuckAiAsDigitalAssistant: StateFlow<Boolean>
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -166,6 +167,12 @@ class SystemSearchViewModel @Inject constructor(
         data object AutocompleteItemRemoved : Command()
 
         data object ExitSearch : Command()
+
+        data object LaunchDuckAiVoiceChat : Command()
+
+        data object LaunchDuckAi : Command()
+
+        data class LaunchAssistSearch(val intent: Intent) : Command()
     }
 
     private val isSearchOnly = MutableStateFlow(false)
@@ -308,6 +315,16 @@ class SystemSearchViewModel @Inject constructor(
         command.value = Command.ExitSearch
     }
 
+    fun onDigitalAssistOpened(intent: Intent) {
+        viewModelScope.launch {
+            command.value = when {
+                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isVoiceChatEnabled() -> Command.LaunchDuckAiVoiceChat
+                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> Command.LaunchDuckAi
+                else -> Command.LaunchAssistSearch(intent)
+            }
+        }
+    }
+
     fun userUpdatedQuery(query: String) {
         if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             queryFlow.update { query }
@@ -349,13 +366,16 @@ class SystemSearchViewModel @Inject constructor(
                 command.value = Command.LaunchBrowserAndSwitchToTab(suggestion.phrase, suggestion.tabId)
                 pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
             }
+
             is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> {
                 onDuckAiRequested(suggestion.phrase)
             }
+
             is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                 command.value = Command.LaunchDeviceApplication(deviceAppSuggestion = suggestion)
                 pixel.fire(INTERSTITIAL_LAUNCH_DEVICE_APP)
             }
+
             else -> {
                 command.value = Command.LaunchBrowser(suggestion.phrase)
                 pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
@@ -388,9 +408,11 @@ class SystemSearchViewModel @Inject constructor(
                 is AutoCompleteHistorySuggestion -> {
                     history.removeHistoryEntryByUrl(suggestion.url)
                 }
+
                 is AutoCompleteHistorySearchSuggestion -> {
                     history.removeHistoryEntryByQuery(suggestion.phrase)
                 }
+
                 else -> {}
             }
             withContext(dispatchers.main()) {

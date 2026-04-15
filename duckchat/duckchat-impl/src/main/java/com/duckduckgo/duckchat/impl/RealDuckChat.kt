@@ -366,6 +366,7 @@ class RealDuckChat @Inject constructor(
     private val _showFullScreenMode = MutableStateFlow(false)
     private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
+    private val _allowDuckAiVoiceDigitalAssistant = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -566,6 +567,8 @@ class RealDuckChat @Inject constructor(
     override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
+
+    override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiVoiceDigitalAssistant.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -782,6 +785,10 @@ class RealDuckChat @Inject constructor(
 
     override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
 
+    override suspend fun isVoiceChatEnabled(): Boolean = withContext(dispatchers.io()) {
+        isEnabled() && duckChatFeature.duckAiVoiceSearch().isEnabled()
+    }
+
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }
@@ -844,6 +851,7 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isVoiceSearchEntryPointEnabled = duckChatFeature.duckAiVoiceSearch().isEnabled()
+            _allowDuckAiVoiceDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
 

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
  */
 class FakeDuckChat(
     private var enabled: Boolean = true,
+    private var voiceChatEnabled: Boolean = false,
 ) : DuckChat {
 
     private val openDuckChatCalls = mutableListOf<Unit>()
@@ -41,6 +42,8 @@ class FakeDuckChat(
     var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
+
+    override suspend fun isVoiceChatEnabled(): Boolean = voiceChatEnabled
 
     override fun openDuckChat() {
         openDuckChatCalls.add(Unit)
@@ -117,5 +120,9 @@ class FakeDuckChat(
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
+    }
+
+    fun setVoiceChatEnabled(enabled: Boolean) {
+        this.voiceChatEnabled = enabled
     }
 }
