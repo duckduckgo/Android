@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">„Duck.ai“ spartieji klavišai</string>
     <string name="duck_ai_shortcut_settings_description">Pasirinkite, kuriuos „Duck.ai“ sparčiuosius klavišus rodyti</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Naujos kortelės perjungimo vieta</string>
+    <string name="duckAiDefaultTogglePositionSearch">Paieška</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Paskutinį kartą naudota</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Paieška balsu</string>
 

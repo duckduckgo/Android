@@ -51,7 +51,6 @@ import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -184,7 +183,6 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
@@ -569,7 +567,6 @@ class BrowserTabViewModelTest {
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
-    private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -680,9 +677,7 @@ class BrowserTabViewModelTest {
                     mockSavedSitesRepository,
                     mockNavigationHistory,
                     mockAutoCompleteScorer,
-                    mockAutoCompleteRepository,
                     mockTabRepository,
-                    mockUserStageStore,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,
@@ -1846,56 +1841,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun wheneverAutoCompleteIsGoneAndHistoryIAMHasBeenShownThenNotifyUserSeenIAM() {
-        runTest {
-            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(emptyList())
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
-                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
-                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
-            )
-            whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
-            )
-            whenever(mockTabRepository.flowTabs).thenReturn(
-                flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
-            )
-            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
-
-            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
-            whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
-            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
-
-            testee.triggerAutocomplete("title", hasFocus = true, hasQueryChanged = true)
-            delay(500)
-            testee.autoCompleteSuggestionsGone()
-            verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
-            verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
-        }
-    }
-
-    @Test
-    fun wheneverAutoCompleteIsGoneAndHistoryIAMHasNotBeenShownThenDoNotNotifyUserSeenIAM() {
-        runTest {
-            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
-            whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
-                flowOf(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
-            )
-            whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
-                flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
-            )
-            whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
-            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
-            testee.autoCompleteStateFlow.value = "query"
-            testee.autoCompleteSuggestionsGone()
-            verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
-            verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
-        }
-    }
-
-    @Test
     fun wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed() = runTest {
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
@@ -1912,8 +1857,6 @@ class BrowserTabViewModelTest {
         )
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
 
-        whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-        whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
         whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
 
@@ -2857,7 +2800,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+    fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenDisabledThenShowKeyboard() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
@@ -2877,6 +2820,28 @@ class BrowserTabViewModelTest {
             assertNull(command)
             verify(mockTabRepository).select(emptyTabId)
             assertCommandIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndEmptyTabExistsAndInputScreenEnabledThenLaunchInputScreen() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+            mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("1", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockTabRepository).select(emptyTabId)
+            assertCommandNotIssued<ShowKeyboard>()
+            assertCommandIssued<Command.LaunchInputScreen>()
         }
 
     @Test

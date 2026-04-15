@@ -49,7 +49,7 @@ class ChatSuggestionsAdapter(
             binding.chatSuggestionTitle.text = suggestion.title
 
             val iconRes = if (suggestion.pinned) {
-                R.drawable.ic_pin_24
+                R.drawable.ic_chat_pin_24
             } else {
                 R.drawable.ic_chat_24
             }

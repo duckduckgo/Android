@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -39,7 +40,9 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenFragment
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -68,6 +71,10 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private var chatSuggestionsRecyclerView: SwipeableRecyclerView? = null
     private lateinit var chatSuggestionsAdapter: ChatSuggestionsAdapter
     private var chatUrlSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter? = null
+    private var chatSearchSuggestionAdapter: ChatSearchSuggestionAdapter? = null
+    private var chatUrlDividerAdapter: SectionDividerAdapter? = null
+    private var searchDividerAdapter: SectionDividerAdapter? = null
+    private var concatAdapter: ConcatAdapter? = null
     private var bottomBlurView: BottomBlurView? = null
     private var bottomBlurLayoutListener: View.OnLayoutChangeListener? = null
     private var bottomBlurDataObserver: RecyclerView.AdapterDataObserver? = null
@@ -117,27 +124,33 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         combine(
             viewModel.chatSuggestions,
             viewModel.chatUrlSuggestions,
-        ) { chatSuggestions, urlSuggestions ->
-            Pair(chatSuggestions, urlSuggestions)
+            viewModel.chatInputText,
+        ) { chatSuggestions, urlSuggestions, chatInput ->
+            Triple(chatSuggestions, urlSuggestions, chatInput)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { (chatSuggestions, urlSuggestions) ->
+            .onEach { (chatSuggestions, urlSuggestions, chatInput) ->
                 if (viewModel.visibilityState.value.searchMode) return@onEach
+                val isTyping = chatInput.isNotEmpty()
                 val hasChatSuggestions = chatSuggestions.isNotEmpty()
                 val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
 
-                if (hasChatSuggestions) {
-                    chatSuggestionsRecyclerView?.adapter = chatSuggestionsAdapter
-                    chatSuggestionsAdapter.submitList(chatSuggestions)
-                    parentFragment.updateChatSuggestionsVisibility(true)
-                } else if (hasUrlSuggestions) {
-                    chatSuggestionsRecyclerView?.adapter = chatUrlSuggestionsAdapter
+                chatSuggestionsAdapter.submitList(chatSuggestions)
+
+                val showUrlSuggestions = isTyping && hasUrlSuggestions
+                if (showUrlSuggestions) {
                     chatUrlSuggestionsAdapter?.updateData(urlSuggestions.query, urlSuggestions.suggestions)
-                    parentFragment.updateChatSuggestionsVisibility(true)
                 } else {
-                    chatSuggestionsRecyclerView?.adapter = chatSuggestionsAdapter
-                    chatSuggestionsAdapter.submitList(emptyList())
-                    parentFragment.updateChatSuggestionsVisibility(false)
+                    chatUrlSuggestionsAdapter?.updateData("", emptyList())
                 }
+
+                chatSearchSuggestionAdapter?.update(chatInput, visible = isTyping)
+
+                // Dividers show between non-empty adjacent sections
+                chatUrlDividerAdapter?.setVisible(hasChatSuggestions && showUrlSuggestions)
+                searchDividerAdapter?.setVisible((hasChatSuggestions || showUrlSuggestions) && isTyping)
+
+                val hasAnySuggestions = hasChatSuggestions || isTyping
+                parentFragment.updateChatSuggestionsVisibility(hasAnySuggestions)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -155,12 +168,25 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private fun configureChatUrlSuggestions() {
         chatUrlSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = { viewModel.userSelectedAutocomplete(it, fromChatUrlSuggestions = true) },
-            editableSearchClickListener = { viewModel.onUserSelectedToEditQuery(it.phrase) },
-            autoCompleteInAppMessageDismissedListener = { },
-            autoCompleteOpenSettingsClickListener = { },
+            editableSearchClickListener = { },
             autoCompleteLongPressClickListener = { },
             omnibarType = if (inputScreenConfigResolver.useTopBar()) OmnibarType.SINGLE_TOP else OmnibarType.SINGLE_BOTTOM,
+            hideEditQueryArrow = true,
+            hideSectionDividers = true,
         )
+        chatSearchSuggestionAdapter = ChatSearchSuggestionAdapter { query ->
+            viewModel.onSearchSubmitted(query)
+        }
+        chatUrlDividerAdapter = SectionDividerAdapter()
+        searchDividerAdapter = SectionDividerAdapter()
+        concatAdapter = ConcatAdapter(
+            chatSuggestionsAdapter,
+            chatUrlDividerAdapter,
+            chatUrlSuggestionsAdapter,
+            searchDividerAdapter,
+            chatSearchSuggestionAdapter,
+        )
+        chatSuggestionsRecyclerView?.adapter = concatAdapter
     }
 
     private fun configureBottomBlur() {

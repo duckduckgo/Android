@@ -211,4 +211,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualFireButton(): Toggle
+
+    /**
+     * @return `true` when the native storage should be used for chat history
+     * (deletion and suggestions), provided migration is complete.
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun useNativeStorageChatData(): Toggle
 }

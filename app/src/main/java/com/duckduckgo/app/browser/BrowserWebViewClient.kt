@@ -537,6 +537,20 @@ class BrowserWebViewClient @Inject constructor(
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
+    override fun doUpdateVisitedHistory(
+        view: WebView?,
+        url: String?,
+        isReload: Boolean,
+    ) {
+        super.doUpdateVisitedHistory(view, url, isReload)
+        url?.let {
+            if (duckChat.isDuckChatUrl(it.toUri())) {
+                logcat { "doUpdateVisitedHistory url=$it" }
+                if (it != view?.originalUrl) webViewClientListener?.onHistoryUrlChanged(it)
+            }
+        }
+    }
+
     /**
      * Intercepts app-scheme URLs (e.g., intent://, tel://, mailto://) that bypass shouldOverrideUrlLoading().
      * This can happen when window.open() is used with special URLs, as the WebViewTransport mechanism

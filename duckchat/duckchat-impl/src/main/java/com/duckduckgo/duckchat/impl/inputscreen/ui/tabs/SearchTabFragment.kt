@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -182,13 +181,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 editableSearchClickListener = {
                     viewModel.onUserSelectedToEditQuery(it.phrase)
                 },
-                autoCompleteInAppMessageDismissedListener = {
-                    viewModel.onUserDismissedAutoCompleteInAppMessage()
-                },
-                autoCompleteOpenSettingsClickListener = {
-                    viewModel.onUserDismissedAutoCompleteInAppMessage()
-                    globalActivityStarter.start(context, PrivateSearchScreenNoParams)
-                },
                 autoCompleteLongPressClickListener = {
                     viewModel.userLongPressedAutocomplete(it)
                 },
@@ -208,10 +200,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.visibilityState
             .onEach {
                 parentFragment.updateAutoCompleteVisibility(it.autoCompleteSuggestionsVisible)
-
-                if (!it.autoCompleteSuggestionsVisible) {
-                    viewModel.autoCompleteSuggestionsGone()
-                }
             }.launchIn(lifecycleScope)
 
         viewModel.autoCompleteSuggestionResults

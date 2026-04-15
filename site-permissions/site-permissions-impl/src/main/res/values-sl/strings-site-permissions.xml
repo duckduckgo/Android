@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">»%1$s« želi odpreti vašo programsko opremo DRM.</string>
-    <string name="drmSiteDialogSubtitle">Programska oprema za upravljanje digitalnih pravic je potrebna za predvajanje zaščitene medijske vsebine, omogoča pa tudi dostop do identifikatorjev naprave. Dovoljenje za uporabo teh podatkov podelite le spletnim mestom, ki jim zaupate te podatke. Dovoljenja lahko kadar koli upravljate v nastavitvah. <annotation type="drm_learn_more_link">Več o tem</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">»%1$s« želi odpreti vašo programsko opremo za upravljanje digitalnih pravic (DRM)</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Če izberete »Zavrni«, videoposnetkov na spletnem mestu morda ne bo mogoče predvajati, vendar spletno mesto %1$s ne bo imelo dostopa do identifikatorjev naprav, ki jih zagotavlja programska oprema DRM. Dovoljenja lahko kadar koli upravljate v nastavitvah. <annotation type="drm_learn_more_link">Več o tem</annotation></string>
     <string name="drmSiteDialogAllowAlways">Vedno</string>
     <string name="drmSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="drmSiteDialogDenyAlways">Vedno zavrni</string>

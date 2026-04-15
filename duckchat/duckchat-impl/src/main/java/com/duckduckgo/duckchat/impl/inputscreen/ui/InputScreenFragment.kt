@@ -473,10 +473,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.viewPager.setCurrentItem(1, animate)
                 viewModel.onChatSelected()
                 viewModel.onChatInputTextChanged(inputModeWidget.text)
-                if (!useTopBar) {
-                    inputScreenButtons.setSendButtonVisible(true)
-                    inputModeWidget.setInputScreenButtonsVisible(true)
-                }
             }
             onSubmitMessageAvailable = { isAvailable ->
                 viewModel.onSubmitMessageAvailableChange(isAvailable)
@@ -489,11 +485,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             onChatTextChanged = { text ->
                 viewModel.onChatInputTextChanged(text)
-                if (!useTopBar) {
-                    val isOnChatTab = inputModeWidget.isChatTabSelected() || !viewModel.visibilityState.value.searchMode
-                    inputScreenButtons.setSendButtonVisible(isOnChatTab)
-                    inputModeWidget.setInputScreenButtonsVisible(isOnChatTab)
-                }
             }
             onInputFieldClicked = {
                 viewModel.onInputFieldTouched()
@@ -615,14 +606,17 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         viewModel.visibilityState
             .onEach {
                 if (useTopBar) {
-                    inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                    inputScreenButtons.setVoiceChatVisible(it.voiceChatButtonVisible)
+                    inputScreenButtons.setVoiceSearchVisible(it.voiceSearchButtonVisible)
                 } else {
                     val inputText = inputModeWidget.text
                     if (inputText.isEmpty()) {
-                        inputModeWidget.setVoiceButtonVisible(it.voiceInputButtonVisible)
-                        inputScreenButtons.setVoiceButtonVisible(false)
+                        inputModeWidget.setVoiceButtonVisible(it.voiceSearchButtonVisible)
+                        inputScreenButtons.setVoiceChatVisible(it.voiceChatButtonVisible)
+                        inputScreenButtons.setVoiceSearchVisible(false)
                     } else {
-                        inputScreenButtons.setVoiceButtonVisible(it.voiceInputButtonVisible)
+                        inputScreenButtons.setVoiceChatVisible(it.voiceChatButtonVisible)
+                        inputScreenButtons.setVoiceSearchVisible(it.voiceSearchButtonVisible)
                         inputModeWidget.setVoiceButtonVisible(false)
                     }
                 }
@@ -642,7 +636,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputModeWidget.printNewLine()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
-        inputScreenButtons.onVoiceClick = {
+        inputScreenButtons.onVoiceSearchClick = {
+            val isChatTab = inputModeWidget.isChatTabSelected()
+            if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+                viewModel.onVoiceEntryTapped()
+            } else {
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+            }
+        }
+        inputScreenButtons.onVoiceChatClick = {
             val isChatTab = inputModeWidget.isChatTabSelected()
             if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
                 viewModel.onVoiceEntryTapped()
@@ -773,7 +775,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 hideOverlayImmediately(binding.autoCompleteOverlay, ::invalidateAutoCompleteBlurView)
             }
             updateChatSuggestionsVisibility(
-                viewModel.chatSuggestions.value.isNotEmpty() || viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty(),
+                viewModel.visibilityState.value.chatSuggestionsVisible,
             )
         }
     }
@@ -793,8 +795,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputScreenButtons.setSendButtonVisible(state.submitButtonVisible)
         } else {
             val isOnChatTab = inputModeWidget.isChatTabSelected() || !state.searchMode
-            inputScreenButtons.setSendButtonVisible(isOnChatTab)
-            inputModeWidget.setInputScreenButtonsVisible(isOnChatTab)
+            inputScreenButtons.setSendButtonVisible(isOnChatTab && state.submitButtonVisible)
         }
         inputModeWidget.setMainButtonsVisible(state.mainButtonsVisible)
     }

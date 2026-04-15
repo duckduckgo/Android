@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Atajos de Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Elige qué atajos de Duck.ai quieres mostrar</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Nueva pestaña Alternar posición</string>
+    <string name="duckAiDefaultTogglePositionSearch">Buscar</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Último uso</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Búsqueda por voz</string>
 

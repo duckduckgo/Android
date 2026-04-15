@@ -23,14 +23,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -101,6 +105,7 @@ class WelcomePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
+    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -153,6 +158,12 @@ class WelcomePageViewModel @Inject constructor(
         ) : Command
 
         data class ShowInputScreenDialog(val showDuckAiCopy: Boolean) : Command
+
+        data class ShowInputScreenPreviewDialog(
+            val searchSuggestions: List<DaxDialogIntroOption>,
+            val chatSuggestions: List<DaxDialogIntroOption>,
+            val duckAiDefault: Boolean,
+        ) : Command
 
         data object Finish : Command
 
@@ -255,6 +266,31 @@ class WelcomePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
+                    val command = if (inputScreenSelected) {
+                        when (duckAiOnboardingExperimentManager.enroll()) {
+                            null,
+                            CONTROL,
+                            -> Finish
+                            TREATMENT_WITH_DUCK_AI_DEFAULT -> Command.ShowInputScreenPreviewDialog(
+                                searchSuggestions = onboardingStore.getSearchOptions(),
+                                chatSuggestions = onboardingStore.getChatSuggestions(),
+                                duckAiDefault = true,
+                            )
+                            TREATMENT_WITH_SEARCH_DEFAULT -> Command.ShowInputScreenPreviewDialog(
+                                searchSuggestions = onboardingStore.getSearchOptions(),
+                                chatSuggestions = onboardingStore.getChatSuggestions(),
+                                duckAiDefault = false,
+                            )
+                        }
+                    } else {
+                        Finish
+                    }
+                    _commands.send(command)
+                }
+            }
+
+            INPUT_SCREEN_PREVIEW -> {
+                viewModelScope.launch {
                     _commands.send(Finish)
                 }
             }
@@ -298,6 +334,10 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN -> {
+                // no-op
+            }
+
+            INPUT_SCREEN_PREVIEW -> {
                 // no-op
             }
         }
@@ -354,6 +394,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             INPUT_SCREEN -> {
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            }
+            INPUT_SCREEN_PREVIEW -> {
+                // no pixel yet
             }
         }
     }

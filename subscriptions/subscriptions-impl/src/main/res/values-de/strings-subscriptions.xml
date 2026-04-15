@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Abonnement</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Kein Zugriff auf Plus- oder Pro-Funktionen möglich</string>
     <string name="subscriptionsProUpgradeTitle">Upgrade auf Pro</string>

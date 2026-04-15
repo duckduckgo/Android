@@ -141,6 +141,10 @@ interface DuckChatPixels {
     fun reportContextualFireButtonConfirmed()
 
     fun reportChatSyncActive()
+
+    fun reportNativeStorageReaderUsed(native: Boolean)
+    fun reportNativeStorageDeletionUsed(native: Boolean)
+    fun reportVoiceSessionStarted()
 }
 
 @ContributesBinding(AppScope::class)
@@ -370,6 +374,28 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportChatSyncActive() {
         pixel.fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
     }
+
+    override fun reportNativeStorageReaderUsed(native: Boolean) {
+        val pixelName = if (native) {
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY
+        } else {
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY
+        }
+        pixel.fire(pixelName, type = Pixel.PixelType.Daily())
+    }
+
+    override fun reportNativeStorageDeletionUsed(native: Boolean) {
+        val pixelName = if (native) {
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT
+        } else {
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT
+        }
+        pixel.fire(pixelName)
+    }
+
+    override fun reportVoiceSessionStarted() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED)
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -498,8 +524,9 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
-    DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
-    DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
+    DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
+    DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
+    DUCK_CHAT_VOICE_SESSION_STARTED("m_aichat_voice_session_started"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -513,6 +540,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF("m_aichat_terms_accepted_duplicate_sync_off"),
     DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT("m_aichat_settings_default_toggle_position_changed_count"),
     DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY("m_aichat_settings_default_toggle_position_changed_daily"),
+
+    DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY("m_aichat_native_storage_reader_native_daily"),
+    DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY("m_aichat_native_storage_reader_webview_daily"),
+    DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT("m_aichat_native_storage_deletion_native_count"),
+    DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT("m_aichat_native_storage_deletion_webview_count"),
 }
 
 object DuckChatPixelParameters {
@@ -647,8 +679,9 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to PixelParameter.removeAtb(),
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_VOICE_SESSION_STARTED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),
@@ -657,6 +690,11 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_FIRST.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_CONFIRMED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT.pixelName to PixelParameter.removeAtb(),
+            "m_aichat_native_storage_migration_done_" to PixelParameter.removeAtb(),
         )
     }
 }

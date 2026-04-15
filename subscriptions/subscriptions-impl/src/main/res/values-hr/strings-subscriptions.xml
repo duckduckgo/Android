@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Pretplata</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ne možeš pristupiti značajkama Plus ili Pro razine</string>
     <string name="subscriptionsProUpgradeTitle">Nadogradi na Pro</string>

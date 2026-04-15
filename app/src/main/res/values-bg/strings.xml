@@ -176,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Показване на предложения за търсене при въвеждане, включително от отметките. Всички търсения са поверителни.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Наскоро посетени сайтове</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показване на наскоро посетени сайтове в предложенията за търсене. Наскоро посетените сайтове са поверителни, съхраняват се само на вашето устройство и могат да бъдат изтрити с Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
-    <string name="openAutoCompleteSettings">Отвори Настройки</string>
     <string name="privateSearchChatSuggestionsToggle">Предложения за чат</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Показване на предложения от историята, отметките и (по избор) историята на чата с Duck.ai, когато въвеждате в лентата за търсене. Всички търсения са поверителни.</string>
 

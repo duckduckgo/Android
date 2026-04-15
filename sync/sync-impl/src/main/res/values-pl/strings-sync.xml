@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek, haseł i czatów Duck.ai, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
     <string name="sync_intro_enable_footer">Możesz później przeprowadzić synchronizację z innymi urządzeniami.</string>
     <string name="sync_intro_enable_cta">Włącz synchronizację i kopię zapasową</string>
-    <string name="sync_intro_recover_title">Odzyskaj zsynchronizowane dane</string>
-    <string name="sync_intro_recover_content">Aby przywrócić zsynchronizowane dane, będziesz potrzebować kodu odzyskiwania zapisanego podczas pierwszej konfiguracji synchronizacji. Ten kod mógł zostać zapisany jako plik PDF na urządzeniu wykorzystanym do skonfigurowania synchronizacji.</string>
-    <string name="sync_intro_recover_cta">Rozpocznij</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Odzyskaj zsynchronizowane dane</string>
+    <string name="sync_recover_synced_data_content">Będziesz potrzebować kodu odzyskiwania otrzymanego podczas konfigurowania funkcji Sync &amp; Backup. Możliwe, że został on zapisany jako plik PDF na urządzeniu, które było używane.</string>
+    <string name="sync_recover_synced_data_cta">Odzyskaj zsynchronizowane dane</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Zeskanuj kod QR</string>

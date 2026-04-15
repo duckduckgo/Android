@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Abonelik</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus veya Pro seviye özelliklere erişilemiyor</string>
     <string name="subscriptionsProUpgradeTitle">Pro\'ya Yükseltin</string>

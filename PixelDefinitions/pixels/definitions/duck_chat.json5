@@ -365,15 +365,22 @@
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_count": {
-        "description": "User tapped the voice entry point button on the duck.ai tab in the input screen",
-        "owners": ["aitorvs"],
+        "description": "User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_voice_entry_tapped_daily": {
-        "description": "(Daily Pixel) User tapped the voice entry point button on the duck.ai tab in the input screen",
-        "owners": ["aitorvs"],
+        "description": "(Daily Pixel) User tapped the voice entry point button to open Duck.ai voice mode",
+        "owners": ["aitorvs", "karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_session_started": {
+        "description": "Fires when the native layer receives a voiceSessionStarted bridge message from the Duck.ai frontend, indicating a voice session has actually begun",
+        "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
@@ -424,6 +431,83 @@
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_reader_native_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the native store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_reader_webview_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the WebView store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_deletion_native_count": {
+        "description": "A Duck.ai chat was deleted via the native store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_deletion_webview_count": {
+        "description": "A Duck.ai chat was deleted via the WebView store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_chats_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_chats_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the chats key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_entries_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_entries_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the entries key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_files_unique": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (unique per install)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_files_count": {
+        "description": "Duck.ai chat history migration to native storage completed for the files key (count; should match unique)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_migration_done_blank_count": {
+        "description": "Duck.ai markMigrationDone was called with a blank key — indicates a JS-side bug",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     }
 }

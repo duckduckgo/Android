@@ -178,9 +178,6 @@
     <string name="privateSearchAutocompleteHint">Zobrazenie návrhov vyhľadávania pri písaní vrátane záložiek. Všetky vyhľadávania sú súkromné.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené weby</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazte naposledy navštívené lokality v návrhoch vyhľadávania. Naposledy navštívené lokality sú súkromné, ukladajú sa len v zariadení a môžete ich vymazať pomocou tlačidla Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
-    <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
     <string name="privateSearchChatSuggestionsToggle">Návrhy četu</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Pri písaní do vyhľadávacieho panela zobrazuj návrhy z histórie, záložiek a (voliteľne) z histórie chatu Duck.ai. Všetky vyhľadávania sú súkromné.</string>
 

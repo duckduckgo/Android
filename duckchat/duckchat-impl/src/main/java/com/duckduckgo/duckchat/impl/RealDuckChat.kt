@@ -500,6 +500,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override suspend fun deleteChat(url: String): Boolean {
+        logcat { "DuckAI: RealDuckChat.deleteChat url=$url" }
         val chatId = extractChatId(url) ?: return false
         val deleted = duckChatDeleter.deleteChat(chatId)
         if (deleted) {

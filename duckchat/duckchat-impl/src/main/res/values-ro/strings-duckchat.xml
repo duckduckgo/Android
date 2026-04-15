@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Comenzi rapide Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Alege ce comenzi rapide Duck.ai dorești să afișezi</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Poziția de comutare a filei noi</string>
+    <string name="duckAiDefaultTogglePositionSearch">Căutare</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Ultima utilizare</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Căutare vocală</string>
 

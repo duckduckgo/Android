@@ -257,8 +257,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
@@ -299,7 +297,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
@@ -526,7 +523,6 @@ class BrowserTabViewModel @Inject constructor(
     UrlExtractionListener,
     NavigationHistoryListener {
     private var buildingSiteFactoryJob: Job? = null
-    private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
@@ -1096,12 +1092,8 @@ class BrowserTabViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .flatMapLatest { autoComplete.autoComplete(it) }
                 .flowOn(dispatchers.io())
-                .onEach { result ->
-                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                        hasUserSeenHistoryIAM = true
-                    }
-                    onAutoCompleteResultReceived(result)
-                }.flowOn(dispatchers.main())
+                .onEach { result -> onAutoCompleteResultReceived(result) }
+                .flowOn(dispatchers.main())
                 .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
                 .launchIn(viewModelScope)
     }
@@ -1206,7 +1198,6 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
-                    is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         // no-op, installed apps search is disabled in tabs
@@ -1539,7 +1530,11 @@ class BrowserTabViewModel @Inject constructor(
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
-                    command.value = ShowKeyboard
+                    if (duckAiFeatureState.showInputScreen.value) {
+                        command.value = LaunchInputScreen
+                    } else {
+                        command.value = ShowKeyboard
+                    }
                 } else {
                     command.value = LaunchNewTab
                 }
@@ -2080,6 +2075,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(domain: String): Boolean {
         return !duckChat.isDuckChatUrl(domain.toUri()) && !duckDuckGoUrlDetector.isDuckDuckGoUrl(domain)
+    }
+
+    override fun onHistoryUrlChanged(url: String) {
+        urlUpdated(url)
     }
 
     private fun urlUpdated(url: String) {
@@ -4681,20 +4680,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedAutoCompleteInAppMessage() {
-        viewModelScope.launch(dispatchers.io()) {
-            autoComplete.userDismissedHistoryInAutoCompleteIAM()
-            pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
-        }
-    }
-
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
-            if (hasUserSeenHistoryIAM) {
-                autoComplete.submitUserSeenHistoryIAM()
-                pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
-            }
-            hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
                 if (suggestions.isNotEmpty()) {
                     pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)

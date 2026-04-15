@@ -78,4 +78,52 @@
         app:layout_constraintStart_toEndOf="@+id/dax_switch_three"
         app:layout_constraintTop_toTopOf="@+id/dax_switch_three"/>
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/compose_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:primaryText="Compose Switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dax_switch_one"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_dax_switch_one"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:paddingStart="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_2"
+        app:layout_constraintTop_toBottomOf="@+id/compose_label"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_dax_switch_two"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@+id/compose_dax_switch_one"
+        app:layout_constraintStart_toEndOf="@+id/compose_dax_switch_one"
+        app:layout_constraintTop_toTopOf="@+id/compose_dax_switch_one"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_dax_switch_three"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@+id/compose_dax_switch_two"
+        app:layout_constraintStart_toEndOf="@+id/compose_dax_switch_two"
+        app:layout_constraintTop_toTopOf="@+id/compose_dax_switch_two"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_dax_switch_four"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@+id/compose_dax_switch_three"
+        app:layout_constraintStart_toEndOf="@+id/compose_dax_switch_three"
+        app:layout_constraintTop_toTopOf="@+id/compose_dax_switch_three"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Cela crée une sauvegarde cryptée de vos favoris, mots de passe et discussions Duck.ai sur le serveur sécurisé de DuckDuckGo, qui peut être synchronisée avec vos autres appareils. \n\n La clé de cryptage n\'est stockée que sur votre appareil ; DuckDuckGo ne peut pas y accéder.</string>
     <string name="sync_intro_enable_footer">Vous pourrez effectuer une synchronisation avec vos autres appareils ultérieurement.</string>
     <string name="sync_intro_enable_cta">Activer Synchronisation et sauvegarde</string>
-    <string name="sync_intro_recover_title">Récupérer les données synchronisées</string>
-    <string name="sync_intro_recover_content">Pour restaurer vos données synchronisées, il vous faudra le code de récupération que vous aurez enregistré lors de la première configuration de Synchronisation. Ce code peut avoir été enregistré au format PDF sur l\'appareil utilisé initialement pour configurer Synchronisation.</string>
-    <string name="sync_intro_recover_cta">Commencer</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Récupérer vos données synchronisées</string>
+    <string name="sync_recover_synced_data_content">Il vous faudra le code de récupération obtenu lors de la configuration de Sync &amp; Backup. Peut-être l\'avez-vous enregistré au format PDF sur l\'appareil utilisé.</string>
+    <string name="sync_recover_synced_data_cta">Récupérer les données synchronisées</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scanner le code QR</string>

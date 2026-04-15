@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Συντομεύσεις Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Επιλέξτε ποιες συντομεύσεις του Duck.ai θα εμφανίζονται</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Θέση εναλλαγής νέας καρτέλας</string>
+    <string name="duckAiDefaultTogglePositionSearch">Αναζήτηση</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Τελευταία χρήση</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Φωνητική αναζήτηση</string>
 

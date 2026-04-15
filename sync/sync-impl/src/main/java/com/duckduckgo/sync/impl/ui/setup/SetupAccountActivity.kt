@@ -34,8 +34,10 @@ import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.PREVIOUS_SESSION_READY
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RESTORE_IN_PROGRESS
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
@@ -48,6 +50,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveR
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.PreviousSessionReady
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.RestoreInProgress
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
@@ -167,6 +171,20 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
                     replace(id.fragment_container_view, SyncDeviceConnectedFragment.instance(), TAG_DEVICE_CONNECTED)
                 }
             }
+
+            PreviousSessionReady -> {
+                screen = PREVIOUS_SESSION_READY
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SyncPreviousSessionReadyFragment.instance(), TAG_PREVIOUS_SESSION_READY)
+                }
+            }
+
+            RestoreInProgress -> {
+                screen = RESTORE_IN_PROGRESS
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SyncRestoreAccountFragment.instance(), TAG_RESTORE_IN_PROGRESS)
+                }
+            }
         }
     }
 
@@ -190,6 +208,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
         viewModel.onCreateAccount()
     }
 
+    override fun launchRestoreInProgressScreen() {
+        viewModel.onRestoreInProgress()
+    }
+
+    override fun launchContinueSetupSkippingRestoreCheck() {
+        setResult(RESULT_CONTINUE_WITHOUT_RESTORE)
+        finish()
+    }
+
     override fun launchRecoverAccountScreen() {
         viewModel.onRecoverAccount()
     }
@@ -207,9 +234,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
         private const val TAG_SYNC_INTRO = "tag_sync_intro"
         private const val TAG_RECOVER_ACCOUNT = "tag_recover_account"
         private const val TAG_DEVICE_CONNECTED = "tag_device_connected"
+        private const val TAG_PREVIOUS_SESSION_READY = "tag_previous_session_ready"
+        private const val TAG_RESTORE_IN_PROGRESS = "tag_restore_in_progress"
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
         const val LAUNCH_SOURCE_EXTRA = "LAUNCH_SOURCE_EXTRA"
+        const val RESULT_CONTINUE_WITHOUT_RESTORE = 2
 
         enum class Screen {
             SYNC_SETUP,
@@ -217,6 +247,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
             RECOVERY_CODE,
             RECOVERY_INTRO,
             SETUP_COMPLETE,
+            PREVIOUS_SESSION_READY,
+            RESTORE_IN_PROGRESS,
         }
 
         internal fun intent(context: Context, screen: Screen, source: String?): Intent {

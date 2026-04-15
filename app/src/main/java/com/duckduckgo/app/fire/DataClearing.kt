@@ -128,6 +128,7 @@ class DataClearing @Inject constructor(
     }
 
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
+        logcat { "clearDuckAiChatIfNeeded url=$tabUrl" }
         if (tabUrl == null) return
         duckChat.deleteChat(tabUrl)
     }
