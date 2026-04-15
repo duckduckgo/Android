@@ -166,6 +166,9 @@
         <item name="daxColorPrimaryText">?attr/onboardingTextPrimary</item>
     </style>
 
+    <!-- Day/night overlay so views inflated outside the onboarding theme can opt in via android:theme -->
+    <style name="ThemeOverlay.DuckDuckGo.Onboarding" parent="Theme.DuckDuckGo.Light.Onboarding" />
+
     <style name="Typography.DuckDuckGo.Onboarding" />
 
     <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
