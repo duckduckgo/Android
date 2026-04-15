@@ -70,10 +70,11 @@ class NoComposeViewUsageDetector : LayoutDetector(), SourceCodeScanner {
     }
 
     private fun isInDesignSystemModule(projectName: String): Boolean {
-        return projectName.contains("design-system")
+        return projectName in DESIGN_SYSTEM_MODULES
     }
 
     companion object {
+        private val DESIGN_SYSTEM_MODULES = setOf("design-system", "design-system-internal")
         val NO_COMPOSE_VIEW_USAGE = Issue
             .create(
                 id = "NoComposeViewUsage",

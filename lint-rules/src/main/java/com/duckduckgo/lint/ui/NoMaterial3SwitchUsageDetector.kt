@@ -56,12 +56,13 @@ class NoMaterial3SwitchUsageDetector : Detector(), SourceCodeScanner {
         }
 
         private fun isInDesignSystemModule(): Boolean {
-            return context.project.name.contains("design-system")
+            return context.project.name in DESIGN_SYSTEM_MODULES
         }
     }
 
     companion object {
         private const val MATERIAL3_PACKAGE = "androidx.compose.material3"
+        private val DESIGN_SYSTEM_MODULES = setOf("design-system", "design-system-internal")
 
         val NO_MATERIAL3_SWITCH_USAGE = Issue
             .create(
