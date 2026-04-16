@@ -4039,11 +4039,14 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
+        val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
         newBrowserTab.rebrandBrowserBackground.apply {
             setImageResource(0)
             gone()
         }
-        newBrowserTab.newTabLayout.setBackgroundColor(0)
+        if (wasBrandDesign) {
+            newBrowserTab.newTabLayout.setBackgroundColor(0)
+        }
         daxDialogIntroBubble.root.gone()
         daxDialogIntroBubbleBrandDesign.root.gone()
         brandDesignDialogScrollView.gone()
