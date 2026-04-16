@@ -83,9 +83,9 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     fun `methods list contains all expected methods`() {
         val expected = listOf(
             "getEntry", "putEntry", "getAllEntries", "replaceAllEntries", "deleteEntry", "deleteAllEntries",
-            "getAllChats", "putChat", "putChats", "migrateChats", "deleteChat", "deleteAllChats",
+            "getChat", "getAllChats", "putChat", "putChats", "migrateChats", "deleteChat", "deleteAllChats",
             "isMigrationDone", "markMigrationDone",
-            "getFile", "putFile", "deleteFile", "deleteAllFiles", "listFiles",
+            "getFile", "putFile", "deleteFile", "deleteFiles", "deleteAllFiles", "listFiles",
         )
         assertTrue(handler.methods.containsAll(expected))
     }
@@ -154,6 +154,49 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteAllEntries", "{}"), jsMessaging, null)
 
         verify(settingsDao).deleteAll()
+    }
+
+    // --- getChat ---
+
+    @Test
+    fun `getChat replies with chat data when chatId exists`() {
+        val chatJson = """{"chatId":"chat-1","messages":[]}"""
+        whenever(chatsDao.getById("chat-1")).thenReturn(DuckAiBridgeChatEntity("chat-1", chatJson))
+
+        handler.process(jsMessage("getChat", """{"chatId":"chat-1"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(
+            argThat {
+                method == "getChat" && id == "r1" &&
+                    params.getJSONObject("chat").getString("chatId") == "chat-1"
+            },
+        )
+    }
+
+    @Test
+    fun `getChat replies with null chat when chatId not found`() {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        handler.process(jsMessage("getChat", """{"chatId":"missing"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getChat" && params.isNull("chat") })
+    }
+
+    @Test
+    fun `getChat replies with null chat when chatId is blank`() {
+        handler.process(jsMessage("getChat", """{"chatId":""}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { params.isNull("chat") })
+        verifyNoInteractions(chatsDao)
+    }
+
+    @Test
+    fun `getChat with no id sends no reply`() {
+        whenever(chatsDao.getById(any())).thenReturn(null)
+
+        handler.process(jsMessage("getChat", """{"chatId":"chat-1"}""", id = null), jsMessaging, null)
+
+        verifyNoInteractions(jsMessaging)
     }
 
     // --- getAllChats ---
@@ -461,7 +504,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         verify(jsMessaging).onResponse(argThat { method == "getFile" && params.isNull("value") })
     }
 
-    // --- deleteFile / deleteAllFiles ---
+    // --- deleteFile / deleteFiles / deleteAllFiles ---
 
     @Test
     fun `deleteFile removes file`() {
@@ -485,6 +528,40 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         handler.process(jsMessage("deleteFile", """{"uuid":"../evil"}"""), jsMessaging, null)
 
         verifyNoInteractions(fileMetaDao)
+    }
+
+    @Test
+    fun `deleteFiles removes files from disk for the given chatId`() {
+        val fileForChat = tempFolder.root.resolve("file-chat1")
+        val fileForOtherChat = tempFolder.root.resolve("file-chat2")
+        fileForChat.writeText("content")
+        fileForOtherChat.writeText("content")
+        whenever(fileMetaDao.getByChatId("chat-1")).thenReturn(
+            listOf(DuckAiBridgeFileMetaEntity(uuid = "file-chat1", chatId = "chat-1", fileName = "a.jpg", mimeType = "image/jpeg")),
+        )
+
+        handler.process(jsMessage("deleteFiles", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        assertFalse(fileForChat.exists())
+        assertTrue(fileForOtherChat.exists())
+        verifyNoInteractions(jsMessaging)
+    }
+
+    @Test
+    fun `deleteFiles calls deleteByChatId on dao`() {
+        whenever(fileMetaDao.getByChatId("chat-1")).thenReturn(emptyList())
+
+        handler.process(jsMessage("deleteFiles", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verify(fileMetaDao).deleteByChatId("chat-1")
+    }
+
+    @Test
+    fun `deleteFiles with blank chatId does nothing`() {
+        handler.process(jsMessage("deleteFiles", """{"chatId":""}"""), jsMessaging, null)
+
+        verifyNoInteractions(fileMetaDao)
+        verifyNoInteractions(jsMessaging)
     }
 
     @Test

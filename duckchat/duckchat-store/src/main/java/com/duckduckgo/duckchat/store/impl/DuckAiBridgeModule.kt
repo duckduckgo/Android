@@ -37,7 +37,7 @@ object DuckAiBridgeModule {
     @SingleInstanceIn(AppScope::class)
     fun provideDatabase(context: Context): DuckAiBridgeDatabase =
         Room.databaseBuilder(context, DuckAiBridgeDatabase::class.java, "duck_ai_bridge.db")
-            .addMigrations(DuckAiBridgeDatabase.MIGRATION_1_2)
+            .addMigrations(DuckAiBridgeDatabase.MIGRATION_1_2, DuckAiBridgeDatabase.MIGRATION_2_3)
             .build()
 
     @Provides

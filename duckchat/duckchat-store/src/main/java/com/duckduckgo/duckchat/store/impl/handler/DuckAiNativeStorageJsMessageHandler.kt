@@ -62,11 +62,11 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                 "getEntry", "putEntry", "getAllEntries", "replaceAllEntries", "deleteEntry", "deleteAllEntries",
                 // Chats
                 "migrateChats", // will replace putChats
-                "getAllChats", "putChat", "putChats", "deleteChat", "deleteAllChats",
+                "getChat", "getAllChats", "putChat", "putChats", "deleteChat", "deleteAllChats",
                 // Migration
                 "isMigrationDone", "markMigrationDone",
                 // Images
-                "getFile", "putFile", "deleteFile", "deleteAllFiles", "listFiles",
+                "getFile", "putFile", "deleteFile", "deleteFiles", "deleteAllFiles", "listFiles",
             )
 
             // Runs on the JavaBridge thread — DAO/file I/O are safe here.
@@ -134,6 +134,23 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
 
                     // --- Chats ---
+                    "getChat" -> {
+                        val chatId = jsMessage.params.optString("chatId")
+                        val chat = if (chatId.isNotBlank()) chatsDao.getById(chatId) else null
+                        jsMessage.id?.let { id ->
+                            jsMessaging.onResponse(
+                                JsCallbackData(
+                                    featureName = featureName,
+                                    method = jsMessage.method,
+                                    id = id,
+                                    params = JSONObject().put(
+                                        "chat",
+                                        chat?.let { runCatching { JSONObject(it.data) }.getOrNull() } ?: JSONObject.NULL,
+                                    ),
+                                ),
+                            )
+                        }
+                    }
                     "getAllChats" -> {
                         val array = JSONArray()
                         chatsDao.getAll().forEach { array.put(JSONObject(it.data)) }
@@ -265,6 +282,16 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                             logcat { "DuckAiNativeStorage: deleteFile uuid=$uuid" }
                             File(filesDir, uuid).delete()
                             fileMetaDao.delete(uuid)
+                        }
+                    }
+                    "deleteFiles" -> {
+                        val chatId = jsMessage.params.optString("chatId")
+                        if (chatId.isNotBlank()) {
+                            logcat { "DuckAiNativeStorage: deleteFiles chatId=$chatId" }
+                            fileMetaDao.getByChatId(chatId).forEach { meta ->
+                                if (isValidUuid(meta.uuid)) File(filesDir, meta.uuid).delete()
+                            }
+                            fileMetaDao.deleteByChatId(chatId)
                         }
                     }
                     "deleteAllFiles" -> {
