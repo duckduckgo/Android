@@ -292,7 +292,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     if (inputSelected) {
                         when (duckAiOnboardingExperimentManager.enroll()) {
                             null,
-                            CONTROL -> _commands.send(Command.Finish)
+                            CONTROL,
+                            -> _commands.send(Command.Finish)
                             TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
                             TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
                         }
