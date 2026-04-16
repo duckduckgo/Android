@@ -124,6 +124,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
+    private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var inputToggleLottieJob: Job? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
@@ -547,6 +548,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenPreviewFadeInAnimatorSet?.removeAllListeners()
         inputScreenPreviewFadeInAnimatorSet?.cancel()
         inputScreenPreviewFadeInAnimatorSet = null
+        suggestionButtonsAnimatorSet?.cancel()
+        suggestionButtonsAnimatorSet = null
         binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
         inputToggleLottieJob?.cancel()
         inputToggleLottieJob = null
@@ -1050,38 +1053,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                                 }
                                             }
 
-                                            val buttons = listOf(
-                                                previewContent.suggestion1,
-                                                previewContent.suggestion2,
-                                                previewContent.suggestion3,
-                                            )
-
-                                            fun animateButton(index: Int) {
-                                                if (view == null) return
-                                                if (index < buttons.size) {
-                                                    buttons[index].alpha = 0f
-                                                    TransitionManager.beginDelayedTransition(
-                                                        binding.daxDialogCta.cardView,
-                                                        ChangeBounds().apply { duration = INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION },
-                                                    )
-                                                    buttons[index].isVisible = true
-                                                    buttons[index].animate()
-                                                        .alpha(1f)
-                                                        .setDuration(INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION)
-                                                        .withEndAction {
-                                                            if (index == buttons.size - 1) {
-                                                                isAnimating = false
-                                                            }
-                                                            animateButton(index + 1)
-                                                        }
-                                                        .start()
-                                                }
-                                            }
-
-                                            viewLifecycleOwner.lifecycleScope.launch {
-                                                delay(INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY)
-                                                animateButton(0)
-                                            }
+                                            playSuggestionButtonsAnimation()
                                         }
                                     })
                                     start()
@@ -1483,10 +1455,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 val previewContent = binding.daxDialogCta.inputScreenPreviewContent
-                listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3).forEach {
-                    it.alpha = 1f
-                    it.isVisible = true
-                }
 
                 val state = viewModel.viewState.value
                 val defaultMode = if (state.inputScreenPreviewIsSearchSelected) InputMode.SEARCH else InputMode.CHAT
@@ -1520,6 +1488,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
                     },
                 )
+
+                with(binding.daxDialogCta.inputScreenPreviewContent) {
+                    listOf(suggestion1, suggestion2, suggestion3).forEach { button ->
+                        button.alpha = 1f
+                        button.isVisible = true
+                    }
+                }
 
                 binding.daxDialogCta.stepIndicator.isVisible = false
                 binding.daxDialogCta.primaryCta.isVisible = false
@@ -1687,6 +1662,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         addressBarFadeInAnimatorSet?.end()
         inputScreenFadeInAnimatorSet?.end()
         inputScreenPreviewFadeInAnimatorSet?.end()
+        suggestionButtonsAnimatorSet?.end()
 
         // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
         snapCheckIconsToFinalState()
@@ -1796,6 +1772,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun playLeftWingAnimation() {
+        binding.leftWingAnimation?.apply {
+            isVisible = true
+            alpha = 0f
+            setMaxProgress(WING_STOP_PROGRESS)
+            leftWingDelayedRunnable = postDelayed(WING_START_DELAY) {
+                animate()
+                    .alpha(1f)
+                    .setDuration(WING_FADE_IN_DURATION)
+                    .start()
+                playAnimation()
+            }
+        }
+    }
+
     private fun setInputScreenPreviewInputMode(
         inputMode: InputMode,
         suggestions: List<DaxDialogIntroOption>,
@@ -1834,18 +1825,39 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    private fun playLeftWingAnimation() {
-        binding.leftWingAnimation?.apply {
-            isVisible = true
-            alpha = 0f
-            setMaxProgress(WING_STOP_PROGRESS)
-            leftWingDelayedRunnable = postDelayed(WING_START_DELAY) {
-                animate()
-                    .alpha(1f)
-                    .setDuration(WING_FADE_IN_DURATION)
-                    .start()
-                playAnimation()
+    private fun playSuggestionButtonsAnimation() {
+        val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+        val buttons = listOf(
+            previewContent.suggestion1,
+            previewContent.suggestion2,
+            previewContent.suggestion3,
+        )
+
+        TransitionManager.beginDelayedTransition(
+            binding.daxDialogCta.cardView,
+            ChangeBounds().apply { duration = INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION },
+        )
+        buttons.forEach { button ->
+            button.alpha = 0f
+            button.isVisible = true
+        }
+
+        val buttonAnimators = buttons.mapIndexed { index, button ->
+            ObjectAnimator.ofFloat(button, View.ALPHA, 0f, 1f).apply {
+                duration = INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION
+                startDelay = index * INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION
             }
+        }
+
+        suggestionButtonsAnimatorSet = AnimatorSet().apply {
+            playTogether(buttonAnimators)
+            this.startDelay = INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isAnimating = false
+                }
+            })
+            start()
         }
     }
 
