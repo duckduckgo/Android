@@ -110,9 +110,10 @@ class CtaViewModel @Inject constructor(
     private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
-    private fun isBrandDesignUpdateEnabled(): Boolean =
+    private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
         onboardingBrandDesignUpdateToggles.self().isEnabled() &&
             onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+    }
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
