@@ -5170,6 +5170,17 @@ class BrowserTabFragment :
                     return candidates;
                 }
 
+                function minDistancePointToRect(xs, ys, rect) {
+                    var best = Infinity;
+                    for (var xi = 0; xi < xs.length; xi++) {
+                        for (var yi = 0; yi < ys.length; yi++) {
+                            var d = distancePointToRect(xs[xi], ys[yi], rect);
+                            if (d < best) best = d;
+                        }
+                    }
+                    return best;
+                }
+
                 function findSearchResultCard(startEl) {
                     var el = startEl;
                     for (var depth = 0; depth < 8 && el; depth++) {
@@ -5189,9 +5200,58 @@ class BrowserTabFragment :
                     return anchor.closest('article, [role="article"], li') || findSearchResultCard(anchor);
                 }
 
+                function findLargestFontTextNode(anchor) {
+                    if (!anchor || !anchor.querySelectorAll) return null;
+                    var nodes = anchor.querySelectorAll('*');
+                    var best = null;
+                    var bestFs = 0;
+                    var bestLen = 0;
+                    for (var i = 0; i < nodes.length; i++) {
+                        var el = nodes[i];
+                        if (!isVisible(el)) continue;
+                        var directLen = 0;
+                        for (var j = 0; j < el.childNodes.length; j++) {
+                            var n = el.childNodes[j];
+                            if (n.nodeType === 3) {
+                                var piece = normalizeWhitespace(n.textContent);
+                                if (piece) directLen += piece.length;
+                            }
+                        }
+                        if (directLen < 8) continue;
+                        var style = window.getComputedStyle(el);
+                        if (!style) continue;
+                        var fs = parseFloat(style.fontSize);
+                        if (!isFinite(fs) || fs <= 0) continue;
+                        if (fs > bestFs + 0.5 || (Math.abs(fs - bestFs) < 0.5 && directLen > bestLen)) {
+                            bestFs = fs;
+                            bestLen = directLen;
+                            best = el;
+                        }
+                    }
+                    return best;
+                }
+
                 function getBestTextAroundAnchor(anchor, targetUrlForMatch, px, py) {
                     if (!anchor || !isVisible(anchor)) return '';
+
+                    var heading = anchor.querySelector('h1, h2, h3, h4, h5, h6');
+                    if (heading && isVisible(heading)) {
+                        var headingText = extractVisibleText(heading);
+                        if (headingText && !isUrlOrBreadcrumbLine(headingText)) return headingText;
+                    }
+
                     var direct = extractVisibleText(anchor);
+
+                    if (direct && !isUrlOrBreadcrumbLine(direct) && direct.length <= 120) {
+                        return direct;
+                    }
+
+                    var largest = findLargestFontTextNode(anchor);
+                    if (largest) {
+                        var largestText = extractVisibleText(largest);
+                        if (largestText && !isUrlOrBreadcrumbLine(largestText)) return largestText;
+                    }
+
                     if (direct && !isUrlOrBreadcrumbLine(direct)) return direct;
 
                     var card = findTightBlock(anchor);
@@ -5229,8 +5289,6 @@ class BrowserTabFragment :
                 var yCandidates = buildCoordinateCandidates(rawPointY, density, pageScale);
                 var bestPointText = '';
                 var bestPointScore = -1;
-                var refPx = xCandidates.length ? xCandidates[0] : 0;
-                var refPy = yCandidates.length ? yCandidates[0] : 0;
 
                 for (var xIndex = 0; xIndex < xCandidates.length; xIndex++) {
                     for (var yIndex = 0; yIndex < yCandidates.length; yIndex++) {
@@ -5241,8 +5299,6 @@ class BrowserTabFragment :
                         if (normalizedTargetUrl && !urlsMatchLongPress(anchorAtPoint.href, targetUrl)) continue;
 
                         var anchorText = getBestTextAroundAnchor(anchorAtPoint, targetUrl, px, py);
-                        refPx = px;
-                        refPy = py;
                         var anchorScore = scoreText(anchorText);
                         if (anchorScore > bestPointScore) {
                             bestPointText = anchorText;
@@ -5276,7 +5332,7 @@ class BrowserTabFragment :
                         var visibleText = extractVisibleText(link);
                         var candidateScore = scoreText(visibleText);
                         var rect = link.getBoundingClientRect();
-                        var dist = distancePointToRect(refPx, refPy, rect);
+                        var dist = minDistancePointToRect(xCandidates, yCandidates, rect);
                         if (dist > maxFallbackDist) continue;
                         var distKey = dist * 10000 - candidateScore;
                         if (distKey < bestDistanceKey || (distKey === bestDistanceKey && candidateScore > bestScore)) {
