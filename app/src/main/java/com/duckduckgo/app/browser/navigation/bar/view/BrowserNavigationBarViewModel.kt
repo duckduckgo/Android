@@ -135,7 +135,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = false,
                         autofillButtonVisible = true,
-                        isBrowserMode = false,
                         viewMode = viewMode,
                     )
                 }
@@ -146,7 +145,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
-                        isBrowserMode = true,
                         viewMode = viewMode,
                     )
                 }
@@ -157,7 +155,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
-                        isBrowserMode = false,
                         viewMode = viewMode,
                     )
                 }
@@ -171,7 +168,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         tabsButtonVisible = false,
                         bookmarksButtonVisible = false,
                         showShadow = false,
-                        isBrowserMode = false,
                         viewMode = viewMode,
                     )
                 }
@@ -180,7 +176,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                 _viewState.update {
                     it.copy(
                         isVisible = false,
-                        isBrowserMode = false,
                         viewMode = viewMode,
                     )
                 }
@@ -217,7 +212,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
         val showBrowserMenuHighlight: Boolean = false,
-        val isBrowserMode: Boolean = true,
         val viewMode: ViewMode = Browser,
         val showShadow: Boolean = true,
     )

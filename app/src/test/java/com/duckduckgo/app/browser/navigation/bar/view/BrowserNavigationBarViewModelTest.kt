@@ -301,7 +301,6 @@ class BrowserNavigationBarViewModelTest {
             val updated = awaitItem()
             Assert.assertTrue(updated.newTabButtonVisible)
             Assert.assertFalse(updated.autofillButtonVisible)
-            Assert.assertFalse(updated.isBrowserMode)
             cancelAndIgnoreRemainingEvents()
         }
     }
