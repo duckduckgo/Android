@@ -5373,7 +5373,12 @@ class BrowserTabFragment :
                 }
             }
 
-            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+            } else {
+                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            }
             viewModel.onCtaShown()
         }
 
