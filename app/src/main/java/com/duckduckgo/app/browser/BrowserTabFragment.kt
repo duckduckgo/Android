@@ -4349,6 +4349,7 @@ class BrowserTabFragment :
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
             if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
+                pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
                 lifecycleScope.launch {
                     val text = extractLinkText()
                     if (text != null) {
@@ -4399,7 +4400,7 @@ class BrowserTabFragment :
         if (trimmed.isEmpty() || trimmed == "null") return null
         return try {
             when (val value = JSONTokener(trimmed).nextValue()) {
-                is String -> value
+                is String -> value.takeIf { it.isNotEmpty() }
                 else -> null
             }
         } catch (_: Exception) {
