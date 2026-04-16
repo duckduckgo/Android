@@ -871,7 +871,7 @@ sealed class DaxBubbleCta(
 
             var animationFinished = false
             var contentFadeInAnimator: AnimatorSet? = null
-            val isContentTransition = container.alpha > 0f // card already visible from previous CTA
+            val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description)
