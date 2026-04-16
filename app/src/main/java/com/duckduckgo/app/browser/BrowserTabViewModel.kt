@@ -3415,17 +3415,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
-        when {
+        command.value = when {
             // When in custom tab, always open the app link directly, without prompting.
-            isCustomTabScreen -> command.value = OpenAppLink(appLink)
-
-            appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery() -> {
-                command.value = ShowAppLinkPrompt(appLink)
-                appLinksHandler.setUserQueryState(false)
-            }
-
-            else -> command.value = OpenAppLink(appLink)
+            isCustomTabScreen -> OpenAppLink(appLink)
+            appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
+            else -> OpenAppLink(appLink)
         }
+        appLinksHandler.setUserQueryState(false)
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
@@ -3435,7 +3431,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
-            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+            if (!appSettingsPreferencesStore.appLinksEnabled) {
+                appLink.fallbackUrl?.let { fallbackUrl ->
+                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                }
+                return
+            }
+            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl), appSettingsPreferencesStore.showAppLinksPrompt)
         }
     }
 

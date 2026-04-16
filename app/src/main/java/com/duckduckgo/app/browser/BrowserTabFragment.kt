@@ -2598,18 +2598,18 @@ class BrowserTabFragment :
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
+                handleExternalIntent(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
 
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.ShowKeyboard -> {
@@ -2671,12 +2671,13 @@ class BrowserTabFragment :
             }
 
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(
+                handleExternalIntent(
                     intent = it.nonHttpAppLink.intent,
                     fallbackUrl = it.nonHttpAppLink.fallbackUrl,
                     fallbackIntent = it.nonHttpAppLink.fallbackIntent,
                     useFirstActivityFound = false,
                     headers = it.headers,
+                    showConfirmation = it.showConfirmation,
                 )
             }
 
@@ -3154,12 +3155,13 @@ class BrowserTabFragment :
         appLinksSnackBar = null
     }
 
-    private fun openExternalDialog(
+    private fun handleExternalIntent(
         intent: Intent,
         fallbackUrl: String? = null,
         fallbackIntent: Intent? = null,
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap(),
+        showConfirmation: Boolean = true,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3176,7 +3178,15 @@ class BrowserTabFragment :
                                 ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
 
                             if (pm.resolveActivity(playIntent, 0) != null) {
-                                launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                                launchExternalIntent(
+                                    it,
+                                    pm,
+                                    playIntent,
+                                    activities,
+                                    useFirstActivityFound,
+                                    viewModel.linkOpenedInNewTab(),
+                                    showConfirmation,
+                                )
                                 return
                             }
                         }
@@ -3184,7 +3194,15 @@ class BrowserTabFragment :
 
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
-                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                        launchExternalIntent(
+                            it,
+                            pm,
+                            fallbackIntent,
+                            fallbackActivities,
+                            useFirstActivityFound,
+                            viewModel.linkOpenedInNewTab(),
+                            showConfirmation,
+                        )
                     }
 
                     fallbackUrl != null -> {
@@ -3204,34 +3222,38 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                launchExternalIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab(), showConfirmation)
             }
         }
     }
 
-    private fun launchDialogForIntent(
+    private fun launchExternalIntent(
         context: Context,
         pm: PackageManager,
         intent: Intent,
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,
         isOpenedInNewTab: Boolean,
+        showConfirmation: Boolean = true,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
-            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
+            logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
             return
         }
 
         runCatching {
-            if (activities.size == 1 || useFirstActivityFound) {
-                val activity = activities.first()
-                val appTitle = activity.loadLabel(pm)
+            val resolvedIntent = if (activities.size == 1 || useFirstActivityFound) {
+                val appTitle = activities.first().loadLabel(pm)
                 logcat(INFO) { "Exactly one app available for intent: $appTitle" }
-                launchExternalAppDialog(context) { context.startActivity(intent) }
+                intent
             } else {
-                val title = getString(R.string.openExternalApp)
-                val intentChooser = Intent.createChooser(intent, title)
-                launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+                Intent.createChooser(intent, getString(R.string.openExternalApp))
+            }
+
+            if (showConfirmation) {
+                launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
+            } else {
+                context.startActivity(resolvedIntent)
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }

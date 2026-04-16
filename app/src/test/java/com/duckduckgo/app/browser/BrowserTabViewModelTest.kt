@@ -4060,6 +4060,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenExternalAppLinkClickedIfGpcReturnsHeaderThenAddHeaderToUrl() {
         givenCustomHeadersProviderReturnsGpcHeader()
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -4072,6 +4073,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenExternalAppLinkClickedIfGpcReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         givenCustomHeadersProviderReturnsNoHeaders()
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
         testee.nonHttpAppLinkClicked(intentType)
@@ -4334,14 +4336,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
+    fun whenHandleAppLinkCalledAndIsUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        assertCommandIssued<Command.OpenAppLink>()
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
@@ -4354,6 +4356,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
     @Test
@@ -4366,13 +4369,49 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
     @Test
-    fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
+    fun whenHandleNonHttpAppLinkCalledAndAskEveryTimeThenShowConfirmation() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType))
-        assertCommandIssued<Command.HandleNonHttpAppLink>()
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertTrue(this.showConfirmation)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledAndAlwaysThenLaunchDirectly() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink> {
+            assertFalse(this.showConfirmation)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledAndNeverThenNavigateToFallbackUrl() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), exampleUrl)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandNotIssued<Command.HandleNonHttpAppLink>()
+        assertCommandIssued<NavigationCommand.Navigate> {
+            assertEquals(exampleUrl, this.url)
+        }
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledAndNeverAndNoFallbackThenDoNothing() {
+        whenever(ctaViewModelMockSettingsStore.appLinksEnabled).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), null)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandNotIssued<Command.HandleNonHttpAppLink>()
+        assertCommandNotIssued<NavigationCommand.Navigate>()
     }
 
     @Test
