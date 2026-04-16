@@ -193,6 +193,10 @@
         <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.Onboarding.Body.InContext">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="Typography.DuckDuckGo.Onboarding.ChartComparison">
         <item name="android:textSize">14sp</item>
         <item name="typography">body1</item>

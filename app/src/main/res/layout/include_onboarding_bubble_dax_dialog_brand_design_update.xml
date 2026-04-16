@@ -64,7 +64,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_6"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:alpha="0"
-                app:typography="onboarding_body"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body.InContext"
                 tools:alpha="1"
                 tools:text="@string/onboardingSearchDaxDialogDescription" />
 
@@ -98,8 +98,8 @@
         android:alpha="0"
         android:contentDescription="@null"
         android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
         android:outlineProvider="none"
+        android:padding="8dp"
         android:translationZ="8dp"
         app:layout_constraintEnd_toEndOf="@id/brandDesignCardView"
         app:layout_constraintTop_toTopOf="@id/brandDesignCardView"
