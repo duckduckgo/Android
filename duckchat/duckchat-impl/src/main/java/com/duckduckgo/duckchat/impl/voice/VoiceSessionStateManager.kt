@@ -31,6 +31,8 @@ interface VoiceSessionStateManager {
 @ContributesBinding(AppScope::class)
 class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager {
 
+    @Volatile
+    // NOTE: We are unable to detect that voice chat has ended IF the user closes the tab running voice chat.
     override var isVoiceSessionActive: Boolean = false
         private set
 

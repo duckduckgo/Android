@@ -1625,7 +1625,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenVoiceSessionEndedThenPixelFiredAndStateUpdated() = runTest {
+    fun whenVoiceSessionEndedThenNoPixelFiredAndStateUpdated() = runTest {
         val result = testee.processJsCallbackMessage(
             "aiChat",
             "voiceSessionEnded",
