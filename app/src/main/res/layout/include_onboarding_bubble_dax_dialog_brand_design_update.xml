@@ -23,73 +23,68 @@
         app:layout_constraintWidth_max="600dp"
         app:showArrow="false">
 
-        <ScrollView
+        <LinearLayout
+            android:id="@+id/brandDesignCardContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/keyline_6"
+            android:paddingBottom="20dp">
 
-            <LinearLayout
-                android:id="@+id/brandDesignCardContainer"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/keyline_6"
-                android:paddingBottom="20dp">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_6">
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/brandDesignHiddenTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
-                        android:visibility="invisible"
-                        app:typography="h2"
-                        tools:text="@string/onboardingSearchDaxDialogTitle"
-                        tools:visibility="visible" />
-
-                    <com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
-                        android:id="@+id/brandDesignTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
-                        app:typography="h2" />
-
-                </FrameLayout>
+                android:layout_marginHorizontal="@dimen/keyline_6">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/brandDesignDescription"
+                    android:id="@+id/brandDesignHiddenTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_6"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:alpha="0"
-                    app:typography="onboarding_body"
-                    tools:alpha="1"
-                    tools:text="@string/onboardingSearchDaxDialogDescription" />
-
-                <!-- Content include slots — only one visible at a time -->
-                <include
-                    android:id="@+id/optionsContent"
-                    layout="@layout/include_brand_design_dialog_options"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="20dp"
-                    android:visibility="gone"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
+                    android:visibility="invisible"
+                    app:typography="h2"
+                    tools:text="@string/onboardingSearchDaxDialogTitle"
                     tools:visibility="visible" />
 
-                <!-- Future content includes added here:
-                <include android:id="@+id/primaryCtaContent" layout="@layout/include_brand_design_dialog_primary_cta" ... />
-                <include android:id="@+id/dualButtonsContent" layout="@layout/include_brand_design_dialog_dual_buttons" ... />
-                -->
+                <com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
+                    android:id="@+id/brandDesignTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
+                    app:typography="h2" />
 
-            </LinearLayout>
-        </ScrollView>
+            </FrameLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/brandDesignDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:alpha="0"
+                app:typography="onboarding_body"
+                tools:alpha="1"
+                tools:text="@string/onboardingSearchDaxDialogDescription" />
+
+            <!-- Content include slots — only one visible at a time -->
+            <include
+                android:id="@+id/optionsContent"
+                layout="@layout/include_brand_design_dialog_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <!-- Future content includes added here:
+            <include android:id="@+id/primaryCtaContent" layout="@layout/include_brand_design_dialog_primary_cta" ... />
+            <include android:id="@+id/dualButtonsContent" layout="@layout/include_brand_design_dialog_dual_buttons" ... />
+            -->
+
+        </LinearLayout>
 
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
 
