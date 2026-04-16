@@ -44,6 +44,8 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -128,6 +130,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var browserMenuHighlight: BrowserMenuHighlight
 
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
@@ -386,6 +391,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .onEach {
                 inputModeWidget.setInputScreenButtonsVisible(inputScreenConfigResolver.useTopBar() && it)
             }.launchIn(lifecycleScope)
+
+        browserMenuHighlight.shouldShowHighlightForMode(BrowserViewMode.NewTab)
+            .onEach { inputModeWidget.setBrowserMenuHighlightVisible(it) }
+            .launchIn(lifecycleScope)
 
         if (duckChatFeature.chatTabAttachments().isEnabled()) {
             viewModel.tabAttachmentState

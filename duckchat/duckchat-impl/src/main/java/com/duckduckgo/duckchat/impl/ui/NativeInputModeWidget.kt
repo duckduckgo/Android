@@ -84,6 +84,7 @@ interface NativeInputWidget {
     fun submitMessage(message: String?)
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
+    fun setBrowserMenuHighlightVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean

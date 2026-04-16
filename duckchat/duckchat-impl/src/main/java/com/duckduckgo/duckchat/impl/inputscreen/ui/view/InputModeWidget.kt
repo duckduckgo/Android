@@ -86,6 +86,7 @@ open class InputModeWidget @JvmOverloads constructor(
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
     private val menuIconImageView: ImageView
+    private val browserMenuHighlight: View
     private val fireButton: View
     private val voiceInputButton: View
     private var bottomButtonsMode: Boolean = false
@@ -164,6 +165,7 @@ open class InputModeWidget @JvmOverloads constructor(
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
         menuIconImageView = findViewById(R.id.browserMenuImageView)
+        browserMenuHighlight = findViewById(R.id.browserMenuHighlight)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
@@ -515,6 +517,10 @@ open class InputModeWidget @JvmOverloads constructor(
 
     fun setVoiceButtonVisible(visible: Boolean) {
         voiceInputButton.isVisible = visible
+    }
+
+    fun setBrowserMenuHighlightVisible(visible: Boolean) {
+        browserMenuHighlight.isVisible = visible
     }
 
     fun setMenuIcon(@DrawableRes resId: Int) {

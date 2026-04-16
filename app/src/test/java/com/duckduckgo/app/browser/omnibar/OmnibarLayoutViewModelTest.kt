@@ -7,7 +7,8 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
@@ -49,6 +50,7 @@ import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -83,8 +85,21 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
-    private val browserMenuHighlightFlow = MutableStateFlow(BrowserMenuHighlightState.HighlightState())
+    private val defaultBrowserHighlightFlow = MutableStateFlow(false)
+    private val downloadHighlightFlow = MutableStateFlow(false)
+
+    private val browserMenuHighlight: BrowserMenuHighlight = mock {
+        on { shouldShowHighlightForMode(any()) } doAnswer { invocation ->
+            val mode = invocation.getArgument<BrowserViewMode>(0)
+            combine(defaultBrowserHighlightFlow, downloadHighlightFlow) { defaultBrowser, download ->
+                when (mode) {
+                    BrowserViewMode.Browser -> defaultBrowser || download
+                    BrowserViewMode.CustomTab -> false
+                    else -> download
+                }
+            }
+        }
+    }
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
@@ -122,7 +137,6 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(browserMenuHighlightState.highlightState).thenReturn(browserMenuHighlightFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -177,7 +191,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            browserMenuHighlightState = browserMenuHighlightState,
+            browserMenuHighlight = browserMenuHighlight,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -1253,7 +1267,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when default browser highlight emits true in Browser mode, then show highlight`() = runTest {
-        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        defaultBrowserHighlightFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1263,7 +1277,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when default browser highlight emits true in non-Browser mode, then highlight is not shown`() = runTest {
-        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        defaultBrowserHighlightFlow.value = true
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
@@ -1274,7 +1288,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when download highlight emits true in non-Browser mode, then show highlight`() = runTest {
-        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        downloadHighlightFlow.value = true
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
@@ -1285,7 +1299,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun `when download highlight emits true in CustomTab mode, then highlight is not shown`() = runTest {
-        browserMenuHighlightFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        downloadHighlightFlow.value = true
         testee.onViewModeChanged(ViewMode.CustomTab(0, null, null, false))
 
         testee.viewState.test {

@@ -25,7 +25,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -80,6 +81,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -103,7 +105,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
-    private val browserMenuHighlightState: BrowserMenuHighlightState,
+    private val browserMenuHighlight: BrowserMenuHighlight,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -129,23 +131,31 @@ class OmnibarLayoutViewModel @Inject constructor(
         ),
     )
 
-    val viewState = combine(
-        _viewState,
-        tabRepository.flowTabs,
-        browserMenuHighlightState.highlightState,
-        flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
-    ) { state, tabs, highlightState, isAddressBarTrackersAnimationEnabled ->
-        val defaultBrowserHighlight = highlightState.defaultBrowserHighlight && state.viewMode is Browser
-        val downloadHighlight = highlightState.downloadHighlight && state.viewMode !is CustomTab
-        state.copy(
-            shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
-            tabCount = tabs.size,
-            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = defaultBrowserHighlight || downloadHighlight,
-            viewMode = getViewMode(state),
-            isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
-        )
+    val viewState = _viewState.map { it.viewMode.toBrowserViewMode() }.distinctUntilChanged().flatMapLatest { mode ->
+        combine(
+            _viewState,
+            tabRepository.flowTabs,
+            flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
+            browserMenuHighlight.shouldShowHighlightForMode(mode),
+        ) { state, tabs, isAddressBarTrackersAnimationEnabled, showHighlight ->
+            state.copy(
+                shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
+                tabCount = tabs.size,
+                hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+                showBrowserMenuHighlight = showHighlight,
+                viewMode = getViewMode(state),
+                isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
+            )
+        }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+
+    private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
+        is Browser -> BrowserViewMode.Browser
+        is NewTab -> BrowserViewMode.NewTab
+        is CustomTab -> BrowserViewMode.CustomTab
+        is ViewMode.DuckAI -> BrowserViewMode.DuckAi
+        is Error, is SSLWarning, is MaliciousSiteWarning -> BrowserViewMode.Error
+    }
 
     private fun getViewMode(state: ViewState): ViewMode {
         return if (state.viewMode is CustomTab) {

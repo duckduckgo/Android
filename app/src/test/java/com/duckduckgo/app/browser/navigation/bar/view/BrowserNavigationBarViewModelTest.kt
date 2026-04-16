@@ -17,19 +17,23 @@
 package com.duckduckgo.app.browser.navigation.bar.view
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -42,22 +46,33 @@ class BrowserNavigationBarViewModelTest {
 
     private val pixelMock: Pixel = mock()
 
-    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
+    private val defaultBrowserHighlightFlow = MutableStateFlow(false)
+    private val downloadHighlightFlow = MutableStateFlow(false)
 
-    private val highlightPopupMenuFlow = MutableStateFlow(BrowserMenuHighlightState.HighlightState())
+    private val browserMenuHighlight: BrowserMenuHighlight = mock {
+        on { shouldShowHighlightForMode(any()) } doAnswer { invocation ->
+            val mode = invocation.getArgument<BrowserViewMode>(0)
+            combine(defaultBrowserHighlightFlow, downloadHighlightFlow) { defaultBrowser, download ->
+                when (mode) {
+                    BrowserViewMode.Browser -> defaultBrowser || download
+                    BrowserViewMode.CustomTab -> false
+                    else -> download
+                }
+            }
+        }
+    }
 
     private lateinit var testee: BrowserNavigationBarViewModel
 
     @Before
     fun setUp() {
-        whenever(browserMenuHighlightState.highlightState).thenReturn(highlightPopupMenuFlow)
         whenever(tabRepositoryMock.flowTabs).thenReturn(flowOf(listOf(TabEntity("abc"))))
 
         testee = BrowserNavigationBarViewModel(
             pixel = pixelMock,
             tabRepository = tabRepositoryMock,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            browserMenuHighlightState = browserMenuHighlightState,
+            browserMenuHighlight = browserMenuHighlight,
         )
     }
 
@@ -144,12 +159,12 @@ class BrowserNavigationBarViewModelTest {
             val initial = awaitItem()
             Assert.assertEquals(false, initial.showBrowserMenuHighlight)
 
-            highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+            defaultBrowserHighlightFlow.value = true
 
             val updated = awaitItem()
             Assert.assertEquals(true, updated.showBrowserMenuHighlight)
 
-            highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState()
+            defaultBrowserHighlightFlow.value = false
             val updatedFalse = awaitItem()
             Assert.assertEquals(false, updatedFalse.showBrowserMenuHighlight)
 
@@ -224,7 +239,7 @@ class BrowserNavigationBarViewModelTest {
 
     @Test
     fun `when default browser highlight in NewTab mode then highlight is not shown`() = runTest {
-        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        defaultBrowserHighlightFlow.value = true
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
@@ -238,7 +253,7 @@ class BrowserNavigationBarViewModelTest {
 
     @Test
     fun `when switching from NewTab to Browser then default browser highlight is restored`() = runTest {
-        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        defaultBrowserHighlightFlow.value = true
         testee.viewState.test {
             awaitItem() // initial with highlight
             testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
@@ -252,7 +267,7 @@ class BrowserNavigationBarViewModelTest {
 
     @Test
     fun `when download highlight in NewTab mode then highlight is shown`() = runTest {
-        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(downloadHighlight = true)
+        downloadHighlightFlow.value = true
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertTrue(initial.showBrowserMenuHighlight)
@@ -266,7 +281,7 @@ class BrowserNavigationBarViewModelTest {
 
     @Test
     fun `when default browser highlight in DuckAI mode then highlight is not shown`() = runTest {
-        highlightPopupMenuFlow.value = BrowserMenuHighlightState.HighlightState(defaultBrowserHighlight = true)
+        defaultBrowserHighlightFlow.value = true
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
