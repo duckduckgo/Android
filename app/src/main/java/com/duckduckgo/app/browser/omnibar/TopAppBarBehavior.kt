@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -42,6 +43,24 @@ class TopAppBarBehavior(
             R.id.webViewFullScreenContainer,
             R.id.navigationBar,
         )
+    }
+
+    override fun onInterceptTouchEvent(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        ev: MotionEvent,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onInterceptTouchEvent(parent, child, ev)
+    }
+
+    override fun onTouchEvent(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        ev: MotionEvent,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onTouchEvent(parent, child, ev)
     }
 
     @SuppressLint("RestrictedApi")
