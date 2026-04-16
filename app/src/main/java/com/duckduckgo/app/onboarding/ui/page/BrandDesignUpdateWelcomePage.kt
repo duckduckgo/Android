@@ -57,6 +57,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -69,12 +70,15 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -119,12 +123,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
+    private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
     private var inputToggleLottieJob: Job? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
+    private var currentInputMode = InputMode.SEARCH
     private var isAnimating = false
         set(value) {
             field = value
@@ -486,6 +492,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     BrandDesignUpdatePageViewModel.Command.RequestNotificationPermissions -> requestNotificationsPermissions()
                     is BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(command.intent)
                     is BrandDesignUpdatePageViewModel.Command.Finish -> onContinuePressed()
+                    is BrandDesignUpdatePageViewModel.Command.FinishAndSubmitSearchQuery -> {
+                        (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.FinishAndSubmitChatPrompt -> {
+                        (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt)
+                    }
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
                     BrandDesignUpdatePageViewModel.Command.SkipDialogAnimation -> skipCurrentDialogAnimation()
                 }
@@ -532,6 +544,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenFadeInAnimatorSet?.removeAllListeners()
         inputScreenFadeInAnimatorSet?.cancel()
         inputScreenFadeInAnimatorSet = null
+        inputScreenPreviewFadeInAnimatorSet?.removeAllListeners()
+        inputScreenPreviewFadeInAnimatorSet?.cancel()
+        inputScreenPreviewFadeInAnimatorSet = null
+        binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
         inputToggleLottieJob?.cancel()
         inputToggleLottieJob = null
         binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront.apply {
@@ -975,7 +991,153 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 INPUT_SCREEN_PREVIEW -> {
-                    // TODO
+                    dismissLeftWingAnimation()
+
+                    ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f)
+                        .apply {
+                            duration = OUTRO_FADE_DURATION
+                            addListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    binding.daxDialogCta.stepIndicator.isVisible = false
+                                }
+                            })
+                            start()
+                        }
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        if (deviceInfo.isTablet()) {
+                            verticalBias = 0.5f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        } else {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
+
+                    val transition = ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            if (view == null) return
+                            val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+                            previewContent.inputScreenPreviewTitle.startOnboardingTypingAnimation(
+                                getString(R.string.preOnboardingInputModeDemoTitle),
+                            ) {
+                                inputScreenPreviewFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(previewContent.inputModeToggle, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(previewContent.inputModeDemoCard, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            if (view == null) return
+
+                                            previewContent.inputText.apply {
+                                                isFocusable = true
+                                                isFocusableInTouchMode = true
+
+                                                if (resources.configuration.screenHeightDp >= MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP) {
+                                                    post {
+                                                        if (view == null) return@post
+                                                        activity?.showKeyboard(previewContent.inputText)
+                                                    }
+                                                }
+                                            }
+
+                                            val buttons = listOf(
+                                                previewContent.suggestion1,
+                                                previewContent.suggestion2,
+                                                previewContent.suggestion3,
+                                            )
+
+                                            fun animateButton(index: Int) {
+                                                if (view == null) return
+                                                if (index < buttons.size) {
+                                                    buttons[index].alpha = 0f
+                                                    TransitionManager.beginDelayedTransition(
+                                                        binding.daxDialogCta.cardView,
+                                                        ChangeBounds().apply { duration = INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION },
+                                                    )
+                                                    buttons[index].isVisible = true
+                                                    buttons[index].animate()
+                                                        .alpha(1f)
+                                                        .setDuration(INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION)
+                                                        .withEndAction {
+                                                            if (index == buttons.size - 1) {
+                                                                isAnimating = false
+                                                            }
+                                                            animateButton(index + 1)
+                                                        }
+                                                        .start()
+                                                }
+                                            }
+
+                                            viewLifecycleOwner.lifecycleScope.launch {
+                                                delay(INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY)
+                                                animateButton(0)
+                                            }
+                                        }
+                                    })
+                                    start()
+                                }
+                            }
+                        }
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
+
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    binding.daxDialogCta.cardView.setShowArrow(false)
+                    binding.daxDialogCta.inputScreenContent.root.isVisible = false
+                    binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = true
+
+                    if (android.os.Build.VERSION.SDK_INT >= 28) {
+                        binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
+                    }
+
+                    binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.alpha = 0f
+                    binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.alpha = 0f
+                    binding.daxDialogCta.primaryCta.isVisible = false
+
+                    val state = viewModel.viewState.value
+                    val defaultMode = if (state.inputScreenPreviewIsSearchSelected) InputMode.SEARCH else InputMode.CHAT
+                    val suggestions = if (state.inputScreenPreviewIsSearchSelected) {
+                        state.inputScreenPreviewSearchSuggestions
+                    } else {
+                        state.inputScreenPreviewChatSuggestions
+                    }
+                    setInputScreenPreviewInputMode(defaultMode, suggestions)
+
+                    if (!state.inputScreenPreviewIsSearchSelected) {
+                        binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.getTabAt(1)?.select()
+                    }
+
+                    binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.addOnTabSelectedListener(
+                        object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                                val changeBounds = ChangeBounds().apply { duration = DIALOG_TRANSITION_DURATION }
+                                TransitionManager.beginDelayedTransition(
+                                    binding.daxDialogCta.cardView,
+                                    changeBounds,
+                                )
+                                val tabState = viewModel.viewState.value
+                                if (tab.position == 0) {
+                                    setInputScreenPreviewInputMode(InputMode.SEARCH, tabState.inputScreenPreviewSearchSuggestions)
+                                } else {
+                                    setInputScreenPreviewInputMode(InputMode.CHAT, tabState.inputScreenPreviewChatSuggestions)
+                                }
+                            }
+                            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                        },
+                    )
                 }
             }
         }
@@ -1270,7 +1432,101 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             INPUT_SCREEN_PREVIEW -> {
-                // TODO
+                if (binding.daxDialogCta.inputScreenPreviewContent.root.isVisible) {
+                    return
+                }
+
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                binding.leftWingAnimation.isVisible = false
+                binding.bottomWingAnimation.isVisible = false
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    if (deviceInfo.isTablet()) {
+                        verticalBias = 0.5f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    } else {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
+
+                binding.daxDialogCta.cardView.setShowArrow(false)
+
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.addressBarContent.root.isVisible = false
+                binding.daxDialogCta.inputScreenContent.root.isVisible = false
+
+                binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = true
+
+                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
+                }
+
+                binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
+                binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.text =
+                    getString(R.string.preOnboardingInputModeDemoTitle).html(requireContext())
+                binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.alpha = 1f
+                binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.alpha = 1f
+
+                binding.daxDialogCta.inputScreenPreviewContent.inputText.apply {
+                    isFocusable = true
+                    isFocusableInTouchMode = true
+                }
+
+                val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+                listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3).forEach {
+                    it.alpha = 1f
+                    it.isVisible = true
+                }
+
+                val state = viewModel.viewState.value
+                val defaultMode = if (state.inputScreenPreviewIsSearchSelected) InputMode.SEARCH else InputMode.CHAT
+                val suggestions = if (state.inputScreenPreviewIsSearchSelected) {
+                    state.inputScreenPreviewSearchSuggestions
+                } else {
+                    state.inputScreenPreviewChatSuggestions
+                }
+                setInputScreenPreviewInputMode(defaultMode, suggestions)
+
+                if (!state.inputScreenPreviewIsSearchSelected) {
+                    previewContent.inputModeToggle.getTabAt(1)?.select()
+                }
+
+                previewContent.inputModeToggle.addOnTabSelectedListener(
+                    object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                        override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                            val changeBounds = ChangeBounds().apply { duration = DIALOG_TRANSITION_DURATION }
+                            TransitionManager.beginDelayedTransition(
+                                binding.daxDialogCta.cardView,
+                                changeBounds,
+                            )
+                            val tabState = viewModel.viewState.value
+                            if (tab.position == 0) {
+                                setInputScreenPreviewInputMode(InputMode.SEARCH, tabState.inputScreenPreviewSearchSuggestions)
+                            } else {
+                                setInputScreenPreviewInputMode(InputMode.CHAT, tabState.inputScreenPreviewChatSuggestions)
+                            }
+                        }
+                        override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                        override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                    },
+                )
+
+                binding.daxDialogCta.stepIndicator.isVisible = false
+                binding.daxDialogCta.primaryCta.isVisible = false
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.root.translationZ = 1f.toPx()
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
         }
     }
@@ -1419,6 +1675,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 comparisonChartContent.comparisonChartTitle,
                 addressBarContent.addressBarTitle,
                 inputScreenContent.inputScreenTitle,
+                inputScreenPreviewContent.inputScreenPreviewTitle,
             ).filter { it.hasAnimationStarted() }.forEach { it.performClick() }
         }
 
@@ -1429,6 +1686,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         skipOnboardingFadeInAnimatorSet?.end()
         addressBarFadeInAnimatorSet?.end()
         inputScreenFadeInAnimatorSet?.end()
+        inputScreenPreviewFadeInAnimatorSet?.end()
 
         // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
         snapCheckIconsToFinalState()
@@ -1522,6 +1780,60 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun dismissLeftWingAnimation() {
+        binding.leftWingAnimation.apply {
+            if (!isVisible) return
+            setMinProgress(WING_STOP_PROGRESS)
+            setMaxProgress(1f)
+            speed = 1f
+            addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isGone = true
+                    removeAnimatorListener(this)
+                }
+            })
+            playAnimation()
+        }
+    }
+
+    private fun setInputScreenPreviewInputMode(
+        inputMode: InputMode,
+        suggestions: List<DaxDialogIntroOption>,
+    ) {
+        currentInputMode = inputMode
+        val previewContent = binding.daxDialogCta.inputScreenPreviewContent
+
+        listOf(previewContent.suggestion1, previewContent.suggestion2, previewContent.suggestion3)
+            .forEachIndexed { index, button ->
+                suggestions[index].setOptionView(button)
+                button.setOnClickListener {
+                    viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == InputMode.CHAT)
+                }
+            }
+
+        previewContent.inputModeDemoActionIcon.setOnClickListener {
+            val query = previewContent.inputText.text?.toString().orEmpty().trim()
+            if (query.isNotEmpty()) {
+                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == InputMode.CHAT)
+            }
+        }
+
+        when (inputMode) {
+            InputMode.SEARCH -> {
+                previewContent.inputText.minLines = 1
+                previewContent.inputText.maxLines = 1
+                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+            }
+            InputMode.CHAT -> {
+                previewContent.inputText.minLines = 3
+                previewContent.inputText.maxLines = 3
+                previewContent.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
+                previewContent.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+            }
+        }
+    }
+
     private fun playLeftWingAnimation() {
         binding.leftWingAnimation?.apply {
             isVisible = true
@@ -1557,6 +1869,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
          */
         CROSSFADE_ANIMATE,
     }
+
+    private enum class InputMode { SEARCH, CHAT }
 
     private fun updateAiChatToggleState(
         binding: ContentOnboardingWelcomePageUpdateBinding,
@@ -1698,6 +2012,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val DIALOG_TRANSITION_DURATION = 400L
         private const val INPUT_TOGGLE_LOTTIE_REPEAT_DELAY = 2000L
         private const val INPUT_TOGGLE_LOTTIE_INITIAL_DELAY = 2000L
+        private const val INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION = 500L
+        private const val INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY = 500L
+        private const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
         private const val ARROW_TARGET_OFFSET_END_DP = 80
 
         private const val WING_START_DELAY = 300L
