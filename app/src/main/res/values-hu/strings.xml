@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Visszajelzés küldése</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsHeadingNextSteps">Következő lépések</string>
+    <string name="settingsNextStepsHideItem">Elrejtés</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>

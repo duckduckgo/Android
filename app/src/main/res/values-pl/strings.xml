@@ -141,6 +141,7 @@
     <string name="leaveFeedbackNew">Wyślij opinię</string>
     <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
     <string name="settingsHeadingNextSteps">Dalsze kroki</string>
+    <string name="settingsNextStepsHideItem">Ukryj</string>
     <string name="settingsLightTheme">Jasny</string>
     <string name="settingsTheme">Motyw</string>
     <string name="settingsDarkTheme">Ciemny</string>

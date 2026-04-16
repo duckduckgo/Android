@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Saada tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
     <string name="settingsHeadingNextSteps">Järgmised sammud</string>
+    <string name="settingsNextStepsHideItem">Peida</string>
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tume</string>

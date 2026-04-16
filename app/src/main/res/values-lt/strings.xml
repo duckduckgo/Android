@@ -141,6 +141,7 @@
     <string name="leaveFeedbackNew">Siųsti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
     <string name="settingsHeadingNextSteps">Tolesni veiksmai</string>
+    <string name="settingsNextStepsHideItem">Slėpti</string>
     <string name="settingsLightTheme">Šviesi</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamsi</string>

@@ -31,7 +31,8 @@
         android:id="@+id/settingsNextStepsTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingNextSteps" />
+        app:primaryText="@string/settingsHeadingNextSteps"
+        app:showOverflowMenu="false" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/addWidgetToHomeScreenSetting"

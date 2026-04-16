@@ -138,6 +138,7 @@
     <string name="leaveFeedbackNew">Send Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsHeadingNextSteps">Next Steps</string>
+    <string name="settingsNextStepsHideItem">Hide</string>
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>

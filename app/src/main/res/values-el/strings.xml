@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Αποστολή σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
     <string name="settingsHeadingNextSteps">Επόμενα βήματα</string>
+    <string name="settingsNextStepsHideItem">Αποκρυψη</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
     <string name="settingsDarkTheme">Σκοτεινό</string>

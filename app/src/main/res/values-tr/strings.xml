@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Geri Bildirim gönder</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsHeadingNextSteps">Sonraki Adımlar</string>
+    <string name="settingsNextStepsHideItem">Gizle</string>
     <string name="settingsLightTheme">Açık</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Koyu</string>

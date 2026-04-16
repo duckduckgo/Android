@@ -140,6 +140,7 @@
     <string name="leaveFeedbackNew">Sūtīt atsauksmi</string>
     <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
     <string name="settingsHeadingNextSteps">Nākamie soļi</string>
+    <string name="settingsNextStepsHideItem">Paslēpt</string>
     <string name="settingsLightTheme">Gaišs</string>
     <string name="settingsTheme">Fons</string>
     <string name="settingsDarkTheme">Tumšs</string>

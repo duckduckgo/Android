@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Send tilbakemelding</string>
     <string name="settingsEmailProtectionTitle">E-postbeskyttelse</string>
     <string name="settingsHeadingNextSteps">Neste trinn</string>
+    <string name="settingsNextStepsHideItem">Skjul</string>
     <string name="settingsLightTheme">Lyst</string>
     <string name="settingsTheme">Utseende</string>
     <string name="settingsDarkTheme">Mørk</string>

@@ -141,6 +141,7 @@
     <string name="leaveFeedbackNew">Pošljite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
     <string name="settingsHeadingNextSteps">Naslednji koraki</string>
+    <string name="settingsNextStepsHideItem">Skrij se</string>
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
     <string name="settingsDarkTheme">Temna</string>
