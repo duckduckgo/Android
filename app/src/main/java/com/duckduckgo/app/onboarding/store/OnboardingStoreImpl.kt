@@ -43,7 +43,7 @@ class OnboardingStoreImpl @Inject constructor(
 
         return listOf(
             DaxDialogIntroOption(
-                optionText = if(onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+                optionText = if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
                     if (language == "en") {
                         context.getString(R.string.onboardingSearchDaxDialogOption1EnglishQuoted)
                     } else {

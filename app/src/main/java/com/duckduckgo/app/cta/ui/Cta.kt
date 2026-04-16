@@ -36,8 +36,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import com.duckduckgo.app.browser.R as BrowserR
-import com.duckduckgo.mobile.android.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.model.CtaId
@@ -63,11 +61,13 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.mobile.android.R
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import com.duckduckgo.app.browser.R as BrowserR
 
 interface ViewCta {
     fun showCta(
@@ -1062,7 +1062,11 @@ sealed class DaxBubbleCta(
         title = BrowserR.string.onboardingPrivacyProDaxDialogTitle,
         description = BrowserR.string.onboardingPrivacyProDaxDialogDescription,
         placeholder = R.drawable.ic_privacy_pro_128,
-        primaryCta = if (isFreeTrialCopy) BrowserR.string.onboardingPrivacyProDaxDialogFreeTrialOkButton else BrowserR.string.onboardingPrivacyProDaxDialogOkButton,
+        primaryCta = if (isFreeTrialCopy) {
+            BrowserR.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+        } else {
+            BrowserR.string.onboardingPrivacyProDaxDialogOkButton
+        },
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_SUBSCRIPTION,
