@@ -357,11 +357,11 @@ class WebViewLongPressHandlerTest {
     }
 
     private fun verifyCopyLinkTextMenuOptionAdded() {
-        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyText))
+        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyLinkText))
     }
 
     private fun verifyCopyLinkTextMenuOptionNotAdded() {
-        verify(mockMenu, never()).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyText))
+        verify(mockMenu, never()).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyLinkText))
     }
 
     private fun verifyMenuNotAltered() {

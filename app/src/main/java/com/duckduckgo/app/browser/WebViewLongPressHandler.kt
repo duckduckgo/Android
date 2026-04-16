@@ -132,7 +132,7 @@ class WebViewLongPressHandler @Inject constructor(
     }
 
     private fun addLinkMenuCopyLinkTextOptions(menu: ContextMenu) {
-        menu.add(0, CONTEXT_MENU_ID_COPY_TEXT, CONTEXT_MENU_ID_COPY_TEXT, R.string.copyText)
+        menu.add(0, CONTEXT_MENU_ID_COPY_TEXT, CONTEXT_MENU_ID_COPY_TEXT, R.string.copyLinkText)
     }
 
     private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)

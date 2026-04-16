@@ -120,6 +120,6 @@
     <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
 
     <!-- Sharing options -->
-    <string name="copyText">Copy Link Text</string>
+    <string name="copyLinkText">Copy Link Text</string>
     <string name="linkTextCopied">Link text copied</string>
 </resources>
