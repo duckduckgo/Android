@@ -762,11 +762,6 @@ sealed class DaxBubbleCta(
         }
     }
 
-    open fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
-        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root
-            .gone()
-    }
-
     override val markAsReadOnShow: Boolean = true
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -1024,10 +1019,6 @@ sealed class DaxBubbleCta(
             onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
         ) {
             // No-op by default. Subclasses with option buttons override this.
-        }
-
-        override fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
-            binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate.root.gone()
         }
     }
 
