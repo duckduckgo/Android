@@ -868,32 +868,32 @@ sealed class DaxBubbleCta(
         }
 
         override fun showCta(
-            view: View,
+            container: View,
             onTypingAnimationFinished: () -> Unit,
         ) {
-            ctaView = view
+            ctaView = container
 
             var animationFinished = false
             var contentFadeInAnimator: AnimatorSet? = null
-            val isContentTransition = view.alpha > 0f // card already visible from previous CTA
+            val isContentTransition = container.alpha > 0f // card already visible from previous CTA
 
-            val daxTitle = view.context.getString(title)
-            val daxDescription = view.context.getString(description)
+            val daxTitle = container.context.getString(title)
+            val daxDescription = container.context.getString(description)
 
-            val titleView = view.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
-            val hiddenTitle = view.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
-            val descriptionView = view.findViewById<DaxTextView>(R.id.brandDesignDescription)
-            val dismissButton = view.findViewById<ImageView>(R.id.brandDesignDismissButton)
+            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
+            val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
+            val descriptionView = container.findViewById<DaxTextView>(R.id.brandDesignDescription)
+            val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
             styleDismissButton(dismissButton)
-            val cardContainer = view.findViewById<View>(R.id.brandDesignCardContainer)
+            val cardContainer = container.findViewById<View>(R.id.brandDesignCardContainer)
 
             // The active content include for THIS CTA
-            val activeInclude = view.findViewById<View>(activeIncludeId)
+            val activeInclude = container.findViewById<View>(activeIncludeId)
 
             // Helper: type title then fade in content
             val typeAndFadeIn = {
-                hiddenTitle.text = daxTitle.html(view.context)
-                descriptionView.text = daxDescription.html(view.context)
+                hiddenTitle.text = daxTitle.html(container.context)
+                descriptionView.text = daxDescription.html(container.context)
                 titleView.alpha = 1f
                 titleView.text = ""
 
@@ -925,7 +925,7 @@ sealed class DaxBubbleCta(
 
             if (isContentTransition) {
                 // Content transition: fade out old description + any visible content include, then swap and animate new
-                val allContentIncludes = getAllContentIncludes(view)
+                val allContentIncludes = getAllContentIncludes(container)
                 val fadeOutAnimators = mutableListOf<Animator>(
                     ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -944,9 +944,9 @@ sealed class DaxBubbleCta(
                             // After fade-out: hide old includes, show new one, type and fade in
                             // Note: do NOT call clearDialog() here — it would re-zero the dismiss
                             // button alpha causing a flicker. Instead, selectively reset content only.
-                            resetAllIncludesExcept(view, activeInclude)
+                            resetAllIncludesExcept(container, activeInclude)
                             // Configure content views for this CTA
-                            configureContentViews(view)
+                            configureContentViews(container)
                             typeAndFadeIn()
                         }
                     })
@@ -954,12 +954,12 @@ sealed class DaxBubbleCta(
                 }
             } else {
                 clearDialog()
-                resetAllIncludesExcept(view, activeInclude)
-                hiddenTitle.text = daxTitle.html(view.context)
-                descriptionView.text = daxDescription.html(view.context)
-                configureContentViews(view)
-                view.show()
-                view.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
+                resetAllIncludesExcept(container, activeInclude)
+                hiddenTitle.text = daxTitle.html(container.context)
+                descriptionView.text = daxDescription.html(container.context)
+                configureContentViews(container)
+                container.show()
+                container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
                         if (!animationFinished) {
                             typeAndFadeIn()
@@ -972,7 +972,7 @@ sealed class DaxBubbleCta(
                 titleView.finishAnimation()
                 // If typing hasn't started yet (tap during initial fade-in), set title directly
                 if (!titleView.hasAnimationStarted()) {
-                    titleView.text = daxTitle.html(view.context)
+                    titleView.text = daxTitle.html(container.context)
                 }
                 descriptionView.alpha = 1f
                 dismissButton.alpha = 1f
