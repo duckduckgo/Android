@@ -74,6 +74,10 @@
     <string name="duckAiHeaderUpgrade">Upgrade</string>
     <string name="duckAiHeaderPaidTitle">Duck.ai</string>
 
+    <!-- Onboarding search options (need escaped quotes for "duck") -->
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate 'duck' too.">how to say \"duck\" in english</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate 'duck' too. Don't add question mark">how to say \"duck\" in spanish</string>
+
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 
