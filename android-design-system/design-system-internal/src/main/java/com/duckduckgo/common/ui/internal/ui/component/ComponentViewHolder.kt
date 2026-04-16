@@ -22,11 +22,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.common.ui.compose.cards.DaxCard
+import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -56,22 +65,30 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class TopAppBarComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar))
 
-    class SwitchComponentViewHolder(parent: ViewGroup, private val isDarkTheme: Boolean) :
-        ComponentViewHolder(inflate(parent, R.layout.component_switch)) {
+    class SwitchComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_switch)) {
         override fun bind(component: Component) {
             view.setupThemedComposeView(id = R.id.compose_dax_switch_one, isDarkTheme = isDarkTheme) {
                 var isChecked by remember { mutableStateOf(false) }
 
-                DaxSwitch(checked = isChecked, onCheckedChange = { enabled ->
-                    isChecked = enabled
-                })
+                DaxSwitch(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
             }
             view.setupThemedComposeView(id = R.id.compose_dax_switch_two, isDarkTheme = isDarkTheme) {
                 var isChecked by remember { mutableStateOf(true) }
 
-                DaxSwitch(checked = isChecked, onCheckedChange = { enabled ->
-                    isChecked = enabled
-                })
+                DaxSwitch(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
             }
             view.setupThemedComposeView(id = R.id.compose_dax_switch_three, isDarkTheme = isDarkTheme) {
                 DaxSwitch(checked = false, onCheckedChange = {}, enabled = false)
@@ -361,7 +378,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
-    class CardComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
+    class CardComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
         override fun bind(component: Component) {
             view.findViewById<MaterialCardView>(R.id.ticketViewCard).apply {
                 val cornerSize = resources.getDimension(CommonR.dimen.smallShapeCornerRadius)
@@ -374,6 +394,40 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 elevation = 8f
 
                 setOnClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.setupThemedComposeView(R.id.composeCards, isDarkTheme) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    DaxCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxCard(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                }
             }
         }
     }
@@ -410,7 +464,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
-                Component.CARD -> CardComponentViewHolder(parent)
+                Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()
