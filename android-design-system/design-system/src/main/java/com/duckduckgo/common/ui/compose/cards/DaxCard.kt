@@ -39,9 +39,6 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * DaxCard is a thin wrapper around Material3 Card that applies the default styling for Dax cards.
  *
  * @param modifier The [Modifier] to be applied to this card.
- * @param shape The shape of the card container.
- * @param colors The colors used for the card content and background.
- * @param elevation The size of the shadow below this card.
  * @param border Optional border to draw around this card.
  * @param content The content to be displayed inside this card.
  *
@@ -51,17 +48,14 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 @Composable
 fun DaxCard(
     modifier: Modifier = Modifier,
-    shape: Shape = DaxCardDefaults.shape,
-    colors: CardColors = DaxCardDefaults.colors,
-    elevation: CardElevation = DaxCardDefaults.elevation,
     border: BorderStroke? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
         modifier = modifier,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
+        shape = DaxCardDefaults.shape,
+        colors = DaxCardDefaults.colors,
+        elevation = DaxCardDefaults.elevation,
         border = border,
         content = content,
     )
@@ -73,9 +67,6 @@ fun DaxCard(
  * @param onClick Callback invoked when the user clicks on the card.
  * @param modifier The [Modifier] to be applied to this card.
  * @param enabled Controls the enabled state of this card.
- * @param shape The shape of the card container.
- * @param colors The colors used for the card content and background.
- * @param elevation The size of the shadow below this card.
  * @param border Optional border to draw around this card.
  * @param interactionSource The [MutableInteractionSource] representing the stream of interactions for this card.
  * @param content The content to be displayed inside this card.
@@ -88,9 +79,6 @@ fun DaxCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = DaxCardDefaults.shape,
-    colors: CardColors = DaxCardDefaults.colors,
-    elevation: CardElevation = DaxCardDefaults.elevation,
     border: BorderStroke? = null,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -98,9 +86,9 @@ fun DaxCard(
     Card(
         onClick = onClick,
         modifier = modifier,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
+        shape = DaxCardDefaults.shape,
+        colors = DaxCardDefaults.colors,
+        elevation = DaxCardDefaults.elevation,
         border = border,
         content = content,
         enabled = enabled,
@@ -108,7 +96,7 @@ fun DaxCard(
     )
 }
 
-object DaxCardDefaults {
+private object DaxCardDefaults {
     /**
      * The default shape for Dax cards is the medium shape from the DuckDuckGo theme.
      */

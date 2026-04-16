@@ -67,7 +67,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class SwitchComponentViewHolder(
         parent: ViewGroup,
-        private val isDarkTheme: Boolean
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_switch)) {
         override fun bind(component: Component) {
             view.setupThemedComposeView(id = R.id.compose_dax_switch_one, isDarkTheme = isDarkTheme) {

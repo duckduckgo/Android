@@ -37,10 +37,6 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * DaxSurface is a thin wrapper around Material3 Surface that applies the default styling for Dax cards.
  *
  * @param modifier The [Modifier] to be applied to this surface.
- * @param shape The shape of the surface container.
- * @param color The background color of the surface container.
- * @param contentColor The content color of the surface container.
- * @param shadowElevation The size of the shadow below this surface.
  * @param border Optional border to draw around this surface.
  * @param content The content to be displayed inside this surface.
  *
@@ -50,19 +46,15 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 @Composable
 fun DaxSurface(
     modifier: Modifier = Modifier,
-    shape: Shape = DuckDuckGoTheme.shapes.medium,
-    color: Color = DuckDuckGoTheme.colors.backgrounds.window,
-    contentColor: Color = DuckDuckGoTheme.colors.text.primary,
-    shadowElevation: Dp = 1.dp,
     border: BorderStroke? = null,
     content: @Composable () -> Unit,
 ) {
     Surface(
         modifier = modifier,
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        shadowElevation = shadowElevation,
+        shape = DaxSurfaceDefaults.shape,
+        color = DaxSurfaceDefaults.color,
+        contentColor = DaxSurfaceDefaults.contentColor,
+        shadowElevation = DaxSurfaceDefaults.elevation,
         border = border,
         content = content,
     )
@@ -75,10 +67,6 @@ fun DaxSurface(
  * @param onClick Callback invoked when this surface is clicked.
  * @param modifier The [Modifier] to be applied to this surface.
  * @param enabled Controls the enabled state of this surface.
- * @param shape The shape of the surface container.
- * @param color The background color of the surface container.
- * @param contentColor The content color of the surface container.
- * @param shadowElevation The size of the shadow below this surface.
  * @param border Optional border to draw around this surface.
  * @param interactionSource The [MutableInteractionSource] representing the stream of interactions for this surface.
  * @param content The content to be displayed inside this surface.
@@ -91,10 +79,6 @@ fun DaxSurface(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = DuckDuckGoTheme.shapes.medium,
-    color: Color = DuckDuckGoTheme.colors.backgrounds.window,
-    contentColor: Color = DuckDuckGoTheme.colors.text.primary,
-    shadowElevation: Dp = 1.dp,
     border: BorderStroke? = null,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
@@ -103,14 +87,44 @@ fun DaxSurface(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        shape = shape,
-        color = color,
-        contentColor = contentColor,
-        shadowElevation = shadowElevation,
+        shape = DaxSurfaceDefaults.shape,
+        color = DaxSurfaceDefaults.color,
+        contentColor = DaxSurfaceDefaults.contentColor,
+        shadowElevation = DaxSurfaceDefaults.elevation,
         border = border,
         interactionSource = interactionSource,
         content = content,
     )
+}
+
+private object DaxSurfaceDefaults {
+    /**
+     * The default shape for Dax surfaces is the medium shape from the DuckDuckGo theme, which provides a balanced appearance that works well for card-like components.
+     */
+    val shape: Shape
+        @Composable
+        get() = DuckDuckGoTheme.shapes.medium
+
+    /**
+     * The default colors for Dax surfaces are derived from the DuckDuckGo theme.
+     */
+    val color: Color
+        @Composable
+        get() = DuckDuckGoTheme.colors.backgrounds.window
+
+    /**
+     * The default content color for Dax surfaces is the primary text color from the DuckDuckGo theme.
+     */
+    val contentColor: Color
+        @Composable
+        get() = DuckDuckGoTheme.colors.text.primary
+
+    /**
+     * The default elevation for Dax surfaces is 1.dp, which provides a subtle shadow to help the surface stand out from the background without being too prominent.
+     */
+    val elevation: Dp
+        @Composable
+        get() = 1.dp
 }
 
 @Composable
