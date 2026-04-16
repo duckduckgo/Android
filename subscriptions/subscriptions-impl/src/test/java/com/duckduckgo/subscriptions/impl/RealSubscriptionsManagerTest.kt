@@ -1322,7 +1322,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
 
-            verify(pixelSender).reportPurchaseSuccess()
+            verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
             verify(pixelSender).reportSubscriptionActivated()
             verifyNoMoreInteractions(pixelSender)
 
