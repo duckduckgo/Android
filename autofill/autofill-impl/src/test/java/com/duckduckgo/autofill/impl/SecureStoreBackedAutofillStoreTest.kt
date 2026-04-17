@@ -706,6 +706,16 @@ class SecureStoreBackedAutofillStoreTest {
     }
 
     @Test
+    fun whenGetCredentialCountFailsThenResultFailureEmitted() = runTest {
+        setupTesteeWithAutofillAvailable()
+        secureStore.exceptionToThrow = RuntimeException("Storage error")
+
+        val result = testee.getCredentialCount().first()
+
+        assertTrue(result.isFailure)
+    }
+
+    @Test
     fun whenUserHasNeverImportedPasswordThenCallsThroughToStoreCorrectly() = runTest {
         setupTesteeWithAutofillAvailable()
         testee.hasEverImportedPasswords
