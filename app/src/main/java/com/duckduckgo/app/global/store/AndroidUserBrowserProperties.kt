@@ -61,6 +61,10 @@ class AndroidUserBrowserProperties(
         return appInstallStore.defaultBrowser
     }
 
+    override fun wasEverDefaultBrowser(): Boolean {
+        return appInstallStore.wasEverDefaultBrowser
+    }
+
     override fun emailEnabled(): Boolean {
         return emailManager.isSignedIn()
     }

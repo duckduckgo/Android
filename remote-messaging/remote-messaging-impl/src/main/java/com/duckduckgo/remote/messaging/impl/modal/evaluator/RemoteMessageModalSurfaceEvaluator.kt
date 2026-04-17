@@ -61,7 +61,7 @@ class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : RemoteMessageModalSurfaceEvaluator, ModalEvaluator {
 
-    override val priority: Int = 1
+    override val priority: Int = 2
     override val evaluatorId: String = "remote_message_modal"
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult {

@@ -109,7 +109,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
-    override val priority: Int = 2
+    override val priority: Int = 3
     override val evaluatorId: String = "additional_default_browser_prompts"
 
     private val evaluationMutex = Mutex()

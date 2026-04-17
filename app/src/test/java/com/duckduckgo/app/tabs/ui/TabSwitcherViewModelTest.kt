@@ -2018,6 +2018,10 @@ class TabSwitcherViewModelTest {
             TODO("Not yet implemented")
         }
 
+        override fun wasEverDefaultBrowser(): Boolean {
+            TODO("Not yet implemented")
+        }
+
         override fun emailEnabled(): Boolean {
             TODO("Not yet implemented")
         }
