@@ -29,7 +29,7 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -149,7 +149,7 @@ class LastSearchStateSurveyParameterPlugin @Inject constructor(
     override fun matches(paramKey: String): Boolean = paramKey == "last_search_state"
 
     override suspend fun evaluate(paramKey: String): String {
-        val history = navigationHistory.getHistory().first()
+        val history = navigationHistory.getHistory().firstOrNull() ?: return "none"
         val mostRecentSearch = history
             .filterIsInstance<HistoryEntry.VisitedSERP>()
             .flatMap { it.visits }
