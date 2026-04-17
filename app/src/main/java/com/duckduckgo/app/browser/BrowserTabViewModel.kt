@@ -892,7 +892,22 @@ class BrowserTabViewModel @Inject constructor(
                 previousUrl = it
             }
             buildSiteFactory(it, stillExternal = isExternal)
+            // Detect the duck.ai onboarding flow as early as possible so the omnibar is locked
+            enterDuckAiOnboardingFlowIfApplicable(it.toUri())
         }
+    }
+
+    private fun enterDuckAiOnboardingFlowIfApplicable(uri: Uri?) {
+        if (uri == null) return
+        if (currentBrowserViewState().isOmnibarLockedForOnboarding) return
+        if (!duckChat.isDuckChatUrl(uri)) return
+        if (uri.getQueryParameter("flow") != "mobile-app-onboarding") return
+
+        // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
+        // Fallback: if FE doesn't signal within the timeout, unblock the CTA anyway.
+        suppressDuckAiOnboardingCta = true
+        scheduleDuckAiOnboardingCtaUnblock()
+        browserViewState.value = currentBrowserViewState().copy(isOmnibarLockedForOnboarding = true)
     }
 
     fun setIsCustomTab(isCustomTab: Boolean) {
@@ -1879,15 +1894,6 @@ class BrowserTabViewModel @Inject constructor(
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
-
-        val uri = site?.uri
-        if (uri != null && duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("flow") == "mobile-app-onboarding") {
-            // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
-            // Fallback: if FE doesn't signal within the timeout, unblock the CTA anyway.
-            suppressDuckAiOnboardingCta = true
-            browserViewState.value = currentBrowserViewState().copy(isOmnibarLockedForOnboarding = true)
-            scheduleDuckAiOnboardingCtaUnblock()
-        }
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value =
