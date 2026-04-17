@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.securestorage.encryption
 
 import android.security.keystore.KeyProperties
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
@@ -83,6 +84,7 @@ class RealEncryptionHelper @Inject constructor(
                     pixel.fire(
                         pixel = AutofillPixelNames.AUTOFILL_ENCRYPT_DATA_FAILED,
                         parameters = mapOf("error" to it.sanitizeStackTrace()),
+                        type = Daily(),
                     )
                     throw it
                 }
@@ -107,6 +109,7 @@ class RealEncryptionHelper @Inject constructor(
                     pixel.fire(
                         pixel = AutofillPixelNames.AUTOFILL_DECRYPT_DATA_FAILED,
                         parameters = mapOf("error" to it.sanitizeStackTrace()),
+                        type = Daily(),
                     )
                     throw it
                 }
