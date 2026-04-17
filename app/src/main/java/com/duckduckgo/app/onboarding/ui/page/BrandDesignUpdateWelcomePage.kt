@@ -124,6 +124,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
+    private var stepIndicatorFadeOutAnimator: ObjectAnimator? = null
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var inputToggleLottieJob: Job? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
@@ -548,6 +549,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenPreviewFadeInAnimatorSet?.removeAllListeners()
         inputScreenPreviewFadeInAnimatorSet?.cancel()
         inputScreenPreviewFadeInAnimatorSet = null
+        stepIndicatorFadeOutAnimator?.removeAllListeners()
+        stepIndicatorFadeOutAnimator?.cancel()
+        stepIndicatorFadeOutAnimator = null
         suggestionButtonsAnimatorSet?.cancel()
         suggestionButtonsAnimatorSet = null
         binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
@@ -996,11 +1000,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 INPUT_SCREEN_PREVIEW -> {
                     dismissLeftWingAnimation()
 
-                    ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f)
+                    stepIndicatorFadeOutAnimator = ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f)
                         .apply {
                             duration = OUTRO_FADE_DURATION
                             addListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
+                                    if (view == null) return
                                     binding.daxDialogCta.stepIndicator.isVisible = false
                                 }
                             })
