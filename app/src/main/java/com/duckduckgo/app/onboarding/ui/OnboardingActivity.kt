@@ -93,7 +93,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     fun finishAndSubmitChatPrompt(prompt: String) {
         viewModel.onOnboardingDone()
-        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
+        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true)
         startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
         finish()
     }
