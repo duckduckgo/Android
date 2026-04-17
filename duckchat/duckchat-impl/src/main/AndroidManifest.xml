@@ -29,7 +29,8 @@
             android:parentActivityName="com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsActivity" />
         <activity
             android:name="com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".subscription.DuckAiPaidSettingsActivity"
             android:exported="false"
