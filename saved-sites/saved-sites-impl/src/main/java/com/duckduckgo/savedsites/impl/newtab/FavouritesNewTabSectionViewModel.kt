@@ -44,12 +44,15 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -64,6 +67,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val pixel: Pixel,
     private val faviconManager: FaviconManager,
     private val syncEngine: SyncEngine,
+    private val feature: FavouritesNewTabSectionFixFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val favourites: List<Favorite> = emptyList())
@@ -85,8 +89,42 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
+    private val favouritesFlow
+        get() = savedSitesRepository.getFavorites()
+            .combine(hiddenIds) { favorites, hiddenIds ->
+                favorites.filter { it.id !in hiddenIds.favorites }
+            }
+            .flowOn(dispatchers.io())
+            .onEach { favourites -> logcat { "New Tab: Favourites $favourites" } }
+
+    private val _legacyViewState = MutableStateFlow(ViewState())
+
+    val viewState: StateFlow<ViewState> = if (feature.self().isEnabled()) {
+        favouritesFlow
+            .map { favourites -> ViewState(favourites = favourites) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = ViewState(),
+            )
+    } else {
+        _legacyViewState
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        if (feature.self().isEnabled()) return
+        viewModelScope.launch(dispatchers.io()) {
+            favouritesFlow
+                .onEach { favourites ->
+                    withContext(dispatchers.main()) {
+                        _legacyViewState.emit(ViewState(favourites = favourites))
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
+    }
+
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -95,30 +133,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private var initialTouchX = 0f
     private var initialTouchY = 0f
     private var longPressActivated = false
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-
-        viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.getFavorites()
-                .combine(hiddenIds) { favorites, hiddenIds ->
-                    favorites.filter { it.id !in hiddenIds.favorites }
-                }
-                .flowOn(dispatchers.io())
-                .onEach { favourites ->
-                    logcat { "New Tab: Favourites $favourites" }
-                    withContext(dispatchers.main()) {
-                        _viewState.emit(
-                            viewState.value.copy(
-                                favourites = favourites,
-                            ),
-                        )
-                    }
-                }
-                .flowOn(dispatchers.main())
-                .launchIn(viewModelScope)
-        }
-    }
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
