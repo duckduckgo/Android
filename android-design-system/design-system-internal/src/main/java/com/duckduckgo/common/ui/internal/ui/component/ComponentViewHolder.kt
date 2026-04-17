@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.message.BigSingleActionMessage
+import com.duckduckgo.common.ui.compose.message.BigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.MediumMessage
 import com.duckduckgo.common.ui.compose.message.SmallMessage
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
@@ -199,6 +201,49 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     illustration = CommonR.drawable.ic_critical_update,
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
+                    },
+                )
+            }
+
+            view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
+                BigSingleActionMessage(
+                    illustration = CommonR.drawable.ic_announce,
+                    title = "Compose Big Single Message",
+                    body = "Body text goes here. This component has one button",
+                    actionText = "Primary",
+                    onActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.big_single_remote_message_compose).gone()
+                    },
+                )
+            }
+
+            view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
+                BigTwoActionsMessage(
+                    illustration = CommonR.drawable.ic_ddg_announce,
+                    title = "Compose Big Two Actions Message",
+                    body = "Body text goes here. This component has two buttons",
+                    primaryActionText = "Primary",
+                    secondaryActionText = "Secondary",
+                    onPrimaryActionClick = {},
+                    onSecondaryActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.big_two_actions_remote_message_compose).gone()
+                    },
+                )
+            }
+
+            view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
+                BigTwoActionsMessage(
+                    illustration = CommonR.drawable.ic_app_update,
+                    title = "Compose Big Two Actions Message",
+                    body = "Body text goes here. This component has two buttons and showcases and app update",
+                    primaryActionText = "Primary",
+                    secondaryActionText = "Secondary",
+                    onPrimaryActionClick = {},
+                    onSecondaryActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.big_two_actions_update_remote_message_compose).gone()
                     },
                 )
             }
