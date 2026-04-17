@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -104,7 +105,10 @@ fun MediumMessage(
     ) {
         Image(
             painter = painterResource(illustration),
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.keyline_2)),
+            modifier = Modifier
+                .padding(top = dimensionResource(R.dimen.keyline_2))
+                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
+            contentScale = ContentScale.None,
             contentDescription = null,
         )
         DaxText(
@@ -151,7 +155,10 @@ fun BigSingleActionMessage(
     ) {
         Image(
             painter = painterResource(illustration),
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.keyline_2)),
+            modifier = Modifier
+                .padding(top = dimensionResource(R.dimen.keyline_2))
+                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
+            contentScale = ContentScale.None,
             contentDescription = null,
         )
         DaxText(
@@ -206,7 +213,10 @@ fun BigTwoActionsMessage(
     ) {
         Image(
             painter = painterResource(illustration),
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.keyline_2)),
+            modifier = Modifier
+                .padding(top = dimensionResource(R.dimen.keyline_2))
+                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
+            contentScale = ContentScale.None,
             contentDescription = null,
         )
         DaxText(
@@ -247,7 +257,7 @@ fun BigTwoActionsMessage(
                 text = primaryActionText,
                 onClick = onPrimaryActionClick,
                 modifier = Modifier
-                    .padding(start = dimensionResource(R.dimen.keyline_1)),
+                    .padding(start = dimensionResource(R.dimen.keyline_2)),
             )
         }
     }

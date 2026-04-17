@@ -221,7 +221,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
                 BigTwoActionsMessage(
                     illustration = CommonR.drawable.ic_ddg_announce,
-                    title = "Compose Big Two Actions Message",
+                    title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
                     primaryActionText = "Primary",
                     secondaryActionText = "Secondary",
@@ -236,7 +236,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
                 BigTwoActionsMessage(
                     illustration = CommonR.drawable.ic_app_update,
-                    title = "Compose Big Two Actions Message",
+                    title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons and showcases and app update",
                     primaryActionText = "Primary",
                     secondaryActionText = "Secondary",
