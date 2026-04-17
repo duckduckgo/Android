@@ -278,6 +278,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -575,6 +576,7 @@ class BrowserTabViewModelTest {
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockTabStatsBucketing: TabStatsBucketing = mock()
+    private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -925,6 +927,7 @@ class BrowserTabViewModelTest {
                 browserUiLockFeature = fakeBrowserUiLockFeature,
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
+                ntpAfterIdleManager = mockNtpAfterIdleManager,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1185,6 +1188,49 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenQuerySubmittedWhileOnNtpAndFeatureEnabledThenNtpSearchSubmittedNotified() {
+        fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockNtpAfterIdleManager).onNtpSearchSubmitted()
+    }
+
+    @Test
+    fun whenQuerySubmittedWhileOnLoadedPageThenNtpSearchSubmittedNotNotified() {
+        fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = false)
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockNtpAfterIdleManager, never()).onNtpSearchSubmitted()
+    }
+
+    @Test
+    fun whenBlankQuerySubmittedWhileOnNtpThenNtpSearchSubmittedNotNotified() {
+        fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+
+        testee.onUserSubmittedQuery("   ")
+
+        verify(mockNtpAfterIdleManager, never()).onNtpSearchSubmitted()
+    }
+
+    @Test
+    fun whenQuerySubmittedWhileOnNtpAndFeatureDisabledThenNtpSearchSubmittedNotNotified() {
+        fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = false))
+        whenever(mockOmnibarConverter.convertQueryToUrl("cats", null)).thenReturn("https://duckduckgo.com/?q=cats")
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+
+        testee.onUserSubmittedQuery("cats")
+
+        verify(mockNtpAfterIdleManager, never()).onNtpSearchSubmitted()
     }
 
     @Test

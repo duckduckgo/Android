@@ -1,0 +1,205 @@
+{
+    // NTP shown pixels
+    "m_ntp_after_idle_ntp_shown_after_idle": {
+        "description": "NTP was shown because the idle threshold was met (after inactivity feature)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_ntp_shown_after_idle_daily": {
+        "description": "(Daily Pixel) NTP was shown because the idle threshold was met (after inactivity feature)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_ntp_shown_user_initiated": {
+        "description": "NTP was shown because the user opened it (not via idle)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_ntp_shown_user_initiated_daily": {
+        "description": "(Daily Pixel) NTP was shown because the user opened it (not via idle)",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+
+    // Return to page (hatch) tapped pixels
+    "m_ntp_after_idle_return_to_page_tapped_after_idle": {
+        "description": "User tapped the return-to-page hatch card when NTP was shown after idle",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_return_to_page_tapped_after_idle_daily": {
+        "description": "(Daily Pixel) User tapped the return-to-page hatch card when NTP was shown after idle",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_return_to_page_tapped_user_initiated": {
+        "description": "User tapped the return-to-page hatch card when NTP was opened by the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_return_to_page_tapped_user_initiated_daily": {
+        "description": "(Daily Pixel) User tapped the return-to-page hatch card when NTP was opened by the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+
+    // Bar (search) used from NTP pixels
+    "m_ntp_after_idle_bar_used_from_ntp_after_idle": {
+        "description": "User submitted a search from the NTP when NTP was shown after idle",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_bar_used_from_ntp_after_idle_daily": {
+        "description": "(Daily Pixel) User submitted a search from the NTP when NTP was shown after idle",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_bar_used_from_ntp_user_initiated": {
+        "description": "User submitted a search from the NTP when NTP was opened by the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_bar_used_from_ntp_user_initiated_daily": {
+        "description": "(Daily Pixel) User submitted a search from the NTP when NTP was opened by the user",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+
+    // Timeout selected pixels (one per supported value)
+    "m_ntp_after_idle_timeout_selected_always": {
+        "description": "User selected Always as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_always": {
+        "description": "(Daily Pixel) User has Always selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_60": {
+        "description": "User selected 60 seconds (1 minute) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_60": {
+        "description": "(Daily Pixel) User has 60 seconds (1 minute) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_300": {
+        "description": "User selected 300 seconds (5 minutes) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_300": {
+        "description": "(Daily Pixel) User has 300 seconds (5 minutes) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_600": {
+        "description": "User selected 600 seconds (10 minutes) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_600": {
+        "description": "(Daily Pixel) User has 600 seconds (10 minutes) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_1800": {
+        "description": "User selected 1800 seconds (30 minutes) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_1800": {
+        "description": "(Daily Pixel) User has 1800 seconds (30 minutes) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_3600": {
+        "description": "User selected 3600 seconds (1 hour) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_3600": {
+        "description": "(Daily Pixel) User has 3600 seconds (1 hour) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_43200": {
+        "description": "User selected 43200 seconds (12 hours) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_43200": {
+        "description": "(Daily Pixel) User has 43200 seconds (12 hours) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_86400": {
+        "description": "User selected 86400 seconds (24 hours) as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_ntp_after_idle_timeout_selected_daily_86400": {
+        "description": "(Daily Pixel) User has 86400 seconds (24 hours) selected as the idle timeout threshold",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

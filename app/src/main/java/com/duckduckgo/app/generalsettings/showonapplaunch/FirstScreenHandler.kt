@@ -60,9 +60,10 @@ class FirstScreenHandlerImpl @Inject constructor(
             val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val elapsed = System.currentTimeMillis() - lastBackgrounded
-            if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
+            val wasIdle = lastBackgrounded != 0L && elapsed >= timeoutMs
+            if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption()
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
                 }
                 return
             }

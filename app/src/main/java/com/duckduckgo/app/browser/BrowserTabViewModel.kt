@@ -345,6 +345,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -516,6 +517,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserUiLockFeature: BrowserUiLockFeature,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -1274,9 +1276,14 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentGlobalLayoutState() is Invalidated) {
+        val layoutState = currentGlobalLayoutState()
+        if (layoutState is Invalidated) {
             recoverTabWithQuery(query)
             return
+        }
+
+        if (androidBrowserConfig.showNTPAfterIdleReturn().isEnabled() && layoutState is Browser && layoutState.isNewTabState) {
+            ntpAfterIdleManager.onNtpSearchSubmitted()
         }
 
         val cta = currentCtaViewState().cta
