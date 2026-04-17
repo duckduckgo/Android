@@ -51,6 +51,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.appendIconToText
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -936,8 +937,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.onboardingBackground.setImageResource(backgroundRes)
         binding.onboardingBackground.isVisible = true
 
+        val descriptionHtml = Html.fromHtml(getString(R.string.duckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
         binding.duckAiEndCta.duckAiEndCtaDescription.text =
-            Html.fromHtml(getString(R.string.duckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
+            requireContext().appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
 
         val ctaView = binding.duckAiEndCta.root
         ctaView.alpha = 0f

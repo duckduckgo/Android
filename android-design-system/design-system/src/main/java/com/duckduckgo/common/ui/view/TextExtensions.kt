@@ -168,3 +168,40 @@ fun Context.prependIconToText(textResId: Int, iconResId: Int): SpannableStringBu
     }
     return spannableString
 }
+
+fun Context.appendIconToText(text: CharSequence, iconResId: Int): SpannableStringBuilder {
+    val spannableString = SpannableStringBuilder(text)
+
+    ContextCompat.getDrawable(this, iconResId)?.let { icon ->
+        icon.setBounds(0, 0, icon.intrinsicWidth, icon.intrinsicHeight)
+
+        // Centers the icon vertically
+        // ImageSpan.ALIGN_CENTER is API 29+ and doesn't center correctly
+        val imageSpan = object : ImageSpan(icon) {
+            override fun draw(
+                canvas: Canvas,
+                text: CharSequence,
+                start: Int,
+                end: Int,
+                x: Float,
+                top: Int,
+                y: Int,
+                bottom: Int,
+                paint: Paint,
+            ) {
+                canvas.save()
+
+                val fontMetricsInt = paint.fontMetricsInt
+                val translationY = ((y + fontMetricsInt.descent + y + fontMetricsInt.ascent) / 2) - (icon.bounds.height() / 2)
+                canvas.translate(x, translationY.toFloat())
+                icon.draw(canvas)
+
+                canvas.restore()
+            }
+        }
+        // Adds a gap at the end of the string to make space for the icon
+        spannableString.append("  ")
+        spannableString.setSpan(imageSpan, spannableString.length - 1, spannableString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+    return spannableString
+}
