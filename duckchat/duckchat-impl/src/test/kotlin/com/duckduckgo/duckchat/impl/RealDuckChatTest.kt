@@ -1635,4 +1635,61 @@ class RealDuckChatTest {
 
         verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
     }
+
+    @Test
+    fun `when duck chat enabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns true`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when duck chat enabled and duckAiVoiceSearch disabled then isVoiceChatEnabled returns false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when duck chat disabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when global feature flag and digitalAssistantDuckAiVoiceChat both enabled then allowDuckAiAsDigitalAssistant emits true`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.allowDuckAiAsDigitalAssistant.value)
+    }
+
+    @Test
+    fun `when digitalAssistantDuckAiVoiceChat disabled then allowDuckAiAsDigitalAssistant emits false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
+    }
+
+    @Test
+    fun `when global feature flag disabled then allowDuckAiAsDigitalAssistant emits false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
+    }
 }
