@@ -10811,16 +10811,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNavigatingToDuckAiOnboardingUrlThenOmnibarLockedForOnboarding() = runTest {
-        val onboardingUrl = "https://duck.ai/chat?flow=mobile-app-onboarding"
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-
-        loadUrl(onboardingUrl)
-
-        assertTrue(browserViewState().isOmnibarLockedForOnboarding)
-    }
-
-    @Test
     fun whenNavigatingToDuckAiUrlWithoutOnboardingParamThenOmnibarNotLocked() = runTest {
         val regularDuckAiUrl = "https://duck.ai/chat"
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
@@ -10922,12 +10912,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNavigatingToDuckAiOnboardingUrlThenSuppressDuckAiOnboardingCtaIsTrue() = runTest {
+    fun whenLoadDataCalledWithDuckAiOnboardingUrlThenOmnibarIsLockedImmediately() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-        navigateToOnboardingUrl()
+        testee.loadData(tabId = "abc", initialUrl = ONBOARDING_URL, skipHome = true, isExternal = false)
 
         assertTrue(testee.suppressDuckAiOnboardingCta)
+        assertTrue(browserViewState().isOmnibarLockedForOnboarding)
+    }
+
+    @Test
+    fun whenLoadDataCalledWithNonOnboardingUrlThenOmnibarIsNotLocked() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.loadData(tabId = "abc", initialUrl = "https://duck.ai/chat", skipHome = true, isExternal = false)
+
+        assertFalse(testee.suppressDuckAiOnboardingCta)
+        assertFalse(browserViewState().isOmnibarLockedForOnboarding)
     }
 
     @Test
@@ -10974,7 +10975,7 @@ class BrowserTabViewModelTest {
 
     private fun navigateToOnboardingUrl() {
         setBrowserShowing(true)
-        testee.navigationStateChanged(buildWebNavigation(originalUrl = ONBOARDING_URL, currentUrl = ONBOARDING_URL))
+        testee.loadData(tabId = "abc", initialUrl = ONBOARDING_URL, skipHome = true, isExternal = false)
     }
 
     companion object {
