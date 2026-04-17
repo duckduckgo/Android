@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -70,14 +71,22 @@ class DuckChatVoiceMicrophoneService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun buildNotification(): Notification =
-        NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun buildNotification(): Notification {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val pendingIntent = launchIntent?.let {
+            PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE)
+        }
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.duckAiVoiceNotificationTitle))
             .setContentText(getString(R.string.duckAiVoiceNotificationMessage))
-            .setSmallIcon(R.drawable.ic_duckduckgo_ai_grayscale_color_24)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(pendingIntent)
             .build()
+    }
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
