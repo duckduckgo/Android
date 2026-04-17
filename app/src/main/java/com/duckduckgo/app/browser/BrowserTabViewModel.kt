@@ -4929,6 +4929,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onLinkTextCopyFailed() {
+        command.value = Command.ShowToast(R.string.linkTextCopyFailed)
+    }
+
     fun onBookmarksMenuItemClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
         launchBookmarksActivity()

@@ -122,4 +122,5 @@
     <!-- Sharing options -->
     <string name="copyLinkText">Copy Link Text</string>
     <string name="linkTextCopied">Link text copied</string>
+    <string name="linkTextCopyFailed">Couldn\'t copy link text</string>
 </resources>

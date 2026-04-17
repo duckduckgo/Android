@@ -4352,7 +4352,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
                 lifecycleScope.launch {
                     val text = extractLinkText()
-                    if (text != null) {
+                    if (text.isNullOrEmpty()) {
+                        viewModel.onLinkTextCopyFailed()
+                    } else {
                         val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
                         viewModel.onLinkTextCopied(wasNotificationShown)
                     }
@@ -5056,12 +5058,6 @@ class BrowserTabFragment :
                     if (!text) return -1;
                     // Strongly prefer human titles over URL / breadcrumb lines
                     return (isUrlOrBreadcrumbLine(text) ? 0 : 10000) + text.length;
-                }
-
-                function chooseBetterText(currentBest, candidateText) {
-                    if (!candidateText) return currentBest;
-                    if (!currentBest) return candidateText;
-                    return scoreText(candidateText) > scoreText(currentBest) ? candidateText : currentBest;
                 }
 
                 function distancePointToRect(px, py, rect) {
