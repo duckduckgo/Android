@@ -16,40 +16,82 @@
 
 package com.duckduckgo.duckchat.impl.voice
 
+import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.ui.DuckChatVoiceMicrophoneService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface VoiceSessionStateManager {
     val isVoiceSessionActive: Boolean
-    fun onVoiceSessionStarted()
+    fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded()
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = VoiceSessionStateManager::class)
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
-class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager, BrowserLifecycleObserver {
+class RealVoiceSessionStateManager @Inject constructor(
+    private val context: Context,
+    private val tabRepository: TabRepository,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : VoiceSessionStateManager, BrowserLifecycleObserver {
+
+    private val listenJob = ConflatedJob()
 
     @Volatile
-    // NOTE: We are unable to detect that voice chat has ended IF the user closes the tab running voice chat.
+    private var activeSessionTabId: String? = null
+
+    @Volatile
     override var isVoiceSessionActive: Boolean = false
         private set
 
-    override fun onVoiceSessionStarted() {
+    override fun onVoiceSessionStarted(tabId: String) {
         isVoiceSessionActive = true
+        activeSessionTabId = tabId.ifBlank { null }
+        DuckChatVoiceMicrophoneService.start(context)
+        if (activeSessionTabId != null) {
+            listenToTabRemoval()
+        }
     }
 
     override fun onVoiceSessionEnded() {
+        listenJob.cancel()
         isVoiceSessionActive = false
+        activeSessionTabId = null
+        DuckChatVoiceMicrophoneService.stop(context)
     }
 
     override fun onOpen(isFreshLaunch: Boolean) {
         if (isFreshLaunch) {
-            isVoiceSessionActive = false
+            if (isVoiceSessionActive) {
+                onVoiceSessionEnded()
+            }
+        }
+    }
+
+    override fun onExit() {
+        if (isVoiceSessionActive) {
+            onVoiceSessionEnded()
+        }
+    }
+
+    private fun listenToTabRemoval() {
+        listenJob += appCoroutineScope.launch {
+            tabRepository.flowTabs.drop(1).collect { tabs ->
+                if (activeSessionTabId != null && tabs.none { it.tabId == activeSessionTabId }) {
+                    onVoiceSessionEnded()
+                }
+            }
         }
     }
 }
