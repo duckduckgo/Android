@@ -424,6 +424,7 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
@@ -561,7 +562,9 @@ class BrowserTabViewModel @Inject constructor(
     private var returnedHomeAfterSiteLoaded = false
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
-    private var suppressDuckAiOnboardingCta = false
+
+    @VisibleForTesting
+    internal var suppressDuckAiOnboardingCta = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -1880,8 +1883,10 @@ class BrowserTabViewModel @Inject constructor(
         val uri = site?.uri
         if (uri != null && duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("flow") == "mobile-app-onboarding") {
             // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
+            // Fallback: if FE doesn't signal within the timeout, unblock the CTA anyway.
             suppressDuckAiOnboardingCta = true
             browserViewState.value = currentBrowserViewState().copy(isOmnibarLockedForOnboarding = true)
+            scheduleDuckAiOnboardingCtaUnblock()
         }
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -3283,6 +3288,20 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun scheduleDuckAiOnboardingCtaUnblock() {
+        viewModelScope.launch {
+            delay(2.seconds)
+            unblockDuckAiOnboardingCta()
+        }
+    }
+
+    private suspend fun unblockDuckAiOnboardingCta() {
+        if (suppressDuckAiOnboardingCta) {
+            suppressDuckAiOnboardingCta = false
+            refreshCta()
+        }
+    }
+
     suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
@@ -4357,8 +4376,7 @@ class BrowserTabViewModel @Inject constructor(
                             command.value = SendResponseToJs(it)
                         }
                         if (method == "responseReceived") {
-                            suppressDuckAiOnboardingCta = false
-                            refreshCta()
+                            unblockDuckAiOnboardingCta()
                         }
                     }
                     duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->

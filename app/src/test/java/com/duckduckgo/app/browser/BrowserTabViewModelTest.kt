@@ -733,6 +733,7 @@ class BrowserTabViewModelTest {
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
@@ -10143,5 +10144,65 @@ class BrowserTabViewModelTest {
             ONBOARDING_DAX_CTA_DISMISS_BUTTON,
             mapOf(PixelParameter.CTA_SHOWN to "duck_ai_end_cta"),
         )
+    }
+
+    @Test
+    fun whenNavigatingToDuckAiOnboardingUrlThenSuppressDuckAiOnboardingCtaIsTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingUrlLoadedAndTimeoutElapsesThenSuppressDuckAiOnboardingCtaIsCleared() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+
+        advanceTimeBy(2_001)
+
+        assertFalse(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingUrlLoadedAndTimeoutHasNotElapsedThenSuppressDuckAiOnboardingCtaStillTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        advanceTimeBy(1_900)
+
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenResponseReceivedBeforeTimeoutThenSuppressDuckAiOnboardingCtaIsCleared() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseReceived",
+            id = "id",
+            data = JSONObject("{}"),
+            isActiveCustomTab = false,
+            getWebViewUrl = { ONBOARDING_URL },
+        )
+        advanceUntilIdle()
+
+        assertFalse(testee.suppressDuckAiOnboardingCta)
+    }
+
+    private fun navigateToOnboardingUrl() {
+        setBrowserShowing(true)
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = ONBOARDING_URL, currentUrl = ONBOARDING_URL))
+    }
+
+    companion object {
+        private const val ONBOARDING_URL = "https://duck.ai/chat?flow=mobile-app-onboarding"
     }
 }
