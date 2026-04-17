@@ -65,8 +65,11 @@ class KeyboardAwareEditText : AppCompatEditText {
             if (!content.isNullOrEmpty()) {
                 // Always select the full contents on focus — whether it's a URL, a duck:// link,
                 // or a search query — so the user can immediately overwrite by typing.
-                // Post is required for selectAll to take effect during layout.
-                post { Selection.selectAll(content) }
+                // Post is required for selectAll to take effect during layout. Resolve `text`
+                // lazily inside the post: callers like OmnibarLayout may call setText() after
+                // focus (short URL → full URL), which replaces the Editable — a captured
+                // reference would become stale and the selection would be invisible.
+                post { text?.takeIf { it.isNotEmpty() }?.let { Selection.selectAll(it) } }
 
                 val isQuery = !content.isWebUrl() && content.toString().toUri().scheme != "duck"
                 if (isQuery) {

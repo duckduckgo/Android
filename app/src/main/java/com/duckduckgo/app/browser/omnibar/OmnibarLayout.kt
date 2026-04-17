@@ -733,7 +733,18 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderOmnibarText(viewState: ViewState) {
         if (viewState.updateOmnibarText) {
+            // When text is replaced while focused (e.g. short URL → full URL on focus gain, or
+            // navigation change during page load), the setText wipes any selection posted by
+            // KeyboardAwareEditText.onFocusChanged. If the text WAS fully selected beforehand,
+            // re-select so the user can immediately overwrite by typing. If the user had placed
+            // the cursor or made a partial selection, leave it alone.
+            val wasFullySelected = viewState.hasFocus &&
+                omnibarTextInput.selectionStart == 0 &&
+                omnibarTextInput.selectionEnd == omnibarTextInput.length()
             omnibarTextInput.setText(viewState.omnibarText)
+            if (wasFullySelected && viewState.omnibarText.isNotEmpty()) {
+                omnibarTextInput.post { omnibarTextInput.selectAll() }
+            }
         }
     }
 
