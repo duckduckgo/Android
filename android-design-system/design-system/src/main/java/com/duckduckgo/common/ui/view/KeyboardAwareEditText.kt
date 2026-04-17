@@ -61,20 +61,22 @@ class KeyboardAwareEditText : AppCompatEditText {
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
-            if (text != null && (text?.isWebUrl() == false && text?.toString()?.toUri()?.scheme != "duck")) {
-                if (didSelectQueryFirstTime) {
-                    // trigger the text change listener so that we can show autocomplete
-                    showSuggestionsListener?.showSuggestions()
-                    // cursor at the end of the word
-                    setSelection(text!!.length)
-                } else {
-                    didSelectQueryFirstTime = true
-                    post { Selection.selectAll(text) }
+            val content = text
+            if (!content.isNullOrEmpty()) {
+                // Always select the full contents on focus — whether it's a URL, a duck:// link,
+                // or a search query — so the user can immediately overwrite by typing.
+                // Post is required for selectAll to take effect during layout.
+                post { Selection.selectAll(content) }
+
+                val isQuery = !content.isWebUrl() && content.toString().toUri().scheme != "duck"
+                if (isQuery) {
+                    if (didSelectQueryFirstTime) {
+                        // On subsequent focuses of a search query, surface autocomplete suggestions.
+                        showSuggestionsListener?.showSuggestions()
+                    } else {
+                        didSelectQueryFirstTime = true
+                    }
                 }
-            } else if (text?.isWebUrl() == true || text?.toString()?.toUri()?.scheme == "duck") {
-                // We always want URLs to be selected
-                // we need to post for the selectAll to take effect. The wonders of Android layout !
-                post { Selection.selectAll(text) }
             }
             // This is triggering multiple keyboard shows, which is unnecessary
             // showKeyboard()
