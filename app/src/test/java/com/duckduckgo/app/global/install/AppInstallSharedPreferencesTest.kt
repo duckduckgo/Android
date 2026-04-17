@@ -87,4 +87,35 @@ class AppInstallSharedPreferencesTest {
 
         assertEquals(existingTimestamp, testee.installTimestamp)
     }
+
+    @Test
+    fun whenInitializedThenDefaultBrowserAndWasEverDefaultBrowserAreFalse() = runTest {
+        assertFalse(testee.defaultBrowser)
+        assertFalse(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenDefaultBrowserSetToTrueThenWasEverDefaultBrowserIsTrue() = runTest {
+        testee.defaultBrowser = true
+
+        assertTrue(testee.defaultBrowser)
+        assertTrue(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenDefaultBrowserSetToFalseInitiallyThenWasEverDefaultBrowserRemainsFalse() = runTest {
+        testee.defaultBrowser = false
+
+        assertFalse(testee.defaultBrowser)
+        assertFalse(testee.wasEverDefaultBrowser)
+    }
+
+    @Test
+    fun whenDefaultBrowserSetToFalseAfterBeingTrueThenWasEverDefaultBrowserRemainsTrue() = runTest {
+        testee.defaultBrowser = true
+        testee.defaultBrowser = false
+
+        assertFalse(testee.defaultBrowser)
+        assertTrue(testee.wasEverDefaultBrowser)
+    }
 }
