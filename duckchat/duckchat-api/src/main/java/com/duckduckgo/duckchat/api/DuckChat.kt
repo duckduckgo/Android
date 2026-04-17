@@ -133,4 +133,9 @@ interface DuckChat {
      * Opens Duck.ai directly in voice mode (duck.ai/?mode=voice-mode).
      */
     fun openVoiceDuckChat()
+
+    /**
+     * Returns `true` if a voice session is currently active.
+     */
+    fun isVoiceSessionActive(): Boolean
 }

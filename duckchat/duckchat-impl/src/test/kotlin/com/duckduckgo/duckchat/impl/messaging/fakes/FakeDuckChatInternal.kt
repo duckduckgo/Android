@@ -174,6 +174,7 @@ class FakeDuckChatInternal(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
+    override fun isVoiceSessionActive(): Boolean = false
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 
