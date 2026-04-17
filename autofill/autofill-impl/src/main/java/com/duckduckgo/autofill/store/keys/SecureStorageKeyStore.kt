@@ -550,6 +550,7 @@ class RealSecureStorageKeyStore(
         put("useHarmony", harmonyFlags.useHarmony.toString())
         put("initialHarmonyValue", initialUseHarmonyValue.toString())
         put("readFromHarmony", harmonyFlags.readFromHarmony.toString())
+        put("autofillService", harmonyFlags.multiProcess.toString())
         throwable?.error()?.let { put("error", it) }
     }
 
