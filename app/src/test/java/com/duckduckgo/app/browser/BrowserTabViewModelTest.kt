@@ -190,6 +190,7 @@ import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PL
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_NEVER_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
+import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -10120,5 +10121,27 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         verify(mockDismissedCtaDao, never()).insert(any())
+    }
+
+    @Test
+    fun whenOnDuckAiEndCtaInputScreenResultOkThenOkPixelFired() = runTest {
+        testee.onDuckAiEndCtaInputScreenResult(okClicked = true)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            ONBOARDING_DAX_CTA_OK_BUTTON,
+            mapOf(PixelParameter.CTA_SHOWN to "duck_ai_end_cta"),
+        )
+    }
+
+    @Test
+    fun whenOnDuckAiEndCtaInputScreenResultDismissThenDismissPixelFired() = runTest {
+        testee.onDuckAiEndCtaInputScreenResult(okClicked = false)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(
+            ONBOARDING_DAX_CTA_DISMISS_BUTTON,
+            mapOf(PixelParameter.CTA_SHOWN to "duck_ai_end_cta"),
+        )
     }
 }
