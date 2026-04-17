@@ -106,7 +106,7 @@ class AutofillSurveyImplTest {
 
     private suspend fun configureCredentialCount(count: Int?) {
         if (count == null) {
-            whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
+            whenever(autofillStore.getCredentialCount()).thenReturn(null)
         } else {
             whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(count)))
         }
