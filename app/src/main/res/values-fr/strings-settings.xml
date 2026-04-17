@@ -22,8 +22,8 @@
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">Après l\'inactivité</string>
     <string name="afterInactivityTimeoutRowTitle">Choisissez un minuteur d\'inactivité</string>
-    <string name="afterInactivityScreenSectionHeader">Choisissez ce que vous voyez lorsque vous revenez après une période d’inactivité.</string>
-    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Choisissez ce que vous voyez lorsque vous revenez après %1$s minutes d’inactivité.</string>
+    <string name="afterInactivityScreenSectionHeader">Choisissez ce que vous voyez lorsque vous revenez après une période d\'inactivité.</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Choisissez ce que vous voyez lorsque vous revenez après %1$s minutes d\'inactivité.</string>
     <string name="afterInactivityTimeoutAlways">Toujours</string>
     <string name="afterInactivityTimeout1Minute">1 minute</string>
     <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minutes</string>
