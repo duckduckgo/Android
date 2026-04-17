@@ -20,23 +20,16 @@ import android.annotation.SuppressLint
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.favicon.FaviconPersister
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_WIDGET_PLACEHOLDERS_DIR
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -63,7 +56,7 @@ class FavoritesWidgetItemFactory(
     lateinit var widgetPrefs: WidgetPreferences
 
     @Inject
-    lateinit var faviconPersister: FaviconPersister
+    lateinit var widgetFaviconProvider: WidgetFaviconProvider
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -120,54 +113,16 @@ class FavoritesWidgetItemFactory(
         }
     }
 
-    /**
-     * Converts a SavedSite.Favorite to a WidgetFavorite by ensuring we have a bitmap URI for the favicon.
-     */
     private suspend fun SavedSite.Favorite.toWidgetFavorite(): WidgetFavorite {
         val domain = url.extractDomain().orEmpty()
-
-        // step 1: check if any file (real favicon or placeholder) already exists on disk to avoid fetching/generating it again
-        val persistedFile = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
-        if (persistedFile != null) {
-            if (persistedFile.isStaleWidgetPlaceholder()) {
-                persistedFile.delete()
-            } else {
-                val persistedUri = persistedFile.getContentUri()
-                if (persistedUri != null) {
-                    // found existing file on disk (favicon or placeholder) - use it without network call
-                    return WidgetFavorite(title = title, url = url, bitmapUri = persistedUri)
-                }
-            }
-        }
-
-        // step 2: check if there is an existing placeholder cached and use it
-        val existingPlaceholder = faviconPersister.faviconFile(FAVICON_WIDGET_PLACEHOLDERS_DIR, NO_SUBFOLDER, domain)
-        if (existingPlaceholder != null) {
-            val placeholderUri = existingPlaceholder.getContentUri()
-            if (placeholderUri != null) {
-                return WidgetFavorite(title = title, url = url, bitmapUri = placeholderUri)
-            }
-        }
-
-        // step 3: generate and save placeholder
-        val placeholderBitmap = generateDefaultDrawable(
-            context = context,
-            domain = domain,
-            cornerRadius = faviconItemCornerRadius,
-        ).toBitmap(faviconItemSize, faviconItemSize)
-
-        val uri = faviconPersister.store(FAVICON_WIDGET_PLACEHOLDERS_DIR, NO_SUBFOLDER, placeholderBitmap, domain)?.getContentUri()
-
-        return WidgetFavorite(title = title, url = url, bitmapUri = uri)
-    }
-
-    // Detects placeholders written to FAVICON_PERSISTED_DIR by the previous broken version
-    // (https://app.asana.com/1/137249556945/project/414730916066338/task/1214072492090532?focus=true).
-    // Real favicons virtually never match faviconItemSize × faviconItemSize exactly.
-    private fun File.isStaleWidgetPlaceholder(): Boolean {
-        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeFile(absolutePath, options)
-        return options.outWidth == faviconItemSize && options.outHeight == faviconItemSize
+        val bitmapUri = runCatching {
+            widgetFaviconProvider.getOrGenerateWidgetFavicon(
+                domain = domain,
+                placeholderSizePx = faviconItemSize,
+                placeholderCornerRadius = faviconItemCornerRadius,
+            )?.getContentUri()
+        }.getOrNull()
+        return WidgetFavorite(title = title, url = url, bitmapUri = bitmapUri)
     }
 
     override fun onDestroy() {
