@@ -59,7 +59,7 @@ enum class NtpAfterIdlePixelName(override val pixelName: String) : Pixel.PixelNa
 object NtpAfterIdlePixels {
     /** Returns the count and daily pixel pair for the given timeout [seconds], or null if unknown. */
     fun timeoutPixelsForSeconds(seconds: Long): Pair<NtpAfterIdlePixelName, NtpAfterIdlePixelName>? = when (seconds) {
-        1L -> Pair(NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS, NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS_DAILY)
+        0L -> Pair(NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS, NtpAfterIdlePixelName.TIMEOUT_SELECTED_ALWAYS_DAILY)
         60L -> Pair(NtpAfterIdlePixelName.TIMEOUT_SELECTED_60, NtpAfterIdlePixelName.TIMEOUT_SELECTED_60_DAILY)
         300L -> Pair(NtpAfterIdlePixelName.TIMEOUT_SELECTED_300, NtpAfterIdlePixelName.TIMEOUT_SELECTED_300_DAILY)
         600L -> Pair(NtpAfterIdlePixelName.TIMEOUT_SELECTED_600, NtpAfterIdlePixelName.TIMEOUT_SELECTED_600_DAILY)
