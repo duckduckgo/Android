@@ -17,25 +17,21 @@
 package com.duckduckgo.newtabpage.api
 
 /**
- * Tracks whether the most recent NTP display was triggered by an idle timeout or by the user,
- * and fires the appropriate pixels for all NTP after-idle interactions.
+ * Handles events related to the NTP-after-idle feature.
  */
 interface NtpAfterIdleManager {
-    /** Returns true if the last NTP was shown because the idle threshold was met. */
-    fun wasAfterIdle(): Boolean
+    /** Called when an idle-triggered NTP is about to be rendered. Must be invoked before the NTP appears. */
+    fun onIdleReturnTriggered()
 
-    /** Records that the NTP was shown due to an idle timeout and fires the shown pixels. */
-    fun onNtpShownAfterIdle()
+    /** Called when an NTP becomes visible to the user. */
+    fun onNtpShown()
 
-    /** Records that the NTP was shown by user action and fires the shown pixels. */
-    fun onNtpShownUserInitiated()
+    /** Called when the user taps the return-to-page hatch on the NTP. */
+    fun onReturnToPageTapped()
 
-    /** Fires the return-to-page-tapped pixel using the correct after-idle / user-initiated context. */
-    fun fireReturnToPageTapped()
+    /** Called when the user submits a search from the NTP. */
+    fun onNtpSearchSubmitted()
 
-    /** Fires the search-bar-used-from-NTP pixel using the correct after-idle / user-initiated context. */
-    fun fireBarUsedFromNtp()
-
-    /** Fires the timeout-selected pixel for the given [seconds] value. No-op if the value is unknown. */
-    fun fireTimeoutSelected(seconds: Long)
+    /** Called when the user selects an idle timeout value in seconds. */
+    fun onIdleTimeoutSelected(seconds: Long)
 }

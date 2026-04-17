@@ -25,7 +25,6 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +46,6 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
-    private val ntpAfterIdleManager: NtpAfterIdleManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -62,16 +60,15 @@ class FirstScreenHandlerImpl @Inject constructor(
             val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val elapsed = System.currentTimeMillis() - lastBackgrounded
-            if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
+            val wasIdle = lastBackgrounded != 0L && elapsed >= timeoutMs
+            if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab()) {
-                    ntpAfterIdleManager.onNtpShownAfterIdle()
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption()
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
                 }
                 return
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             if (!isVoiceSessionActiveOnCurrentTab()) {
-                ntpAfterIdleManager.onNtpShownUserInitiated()
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
         }

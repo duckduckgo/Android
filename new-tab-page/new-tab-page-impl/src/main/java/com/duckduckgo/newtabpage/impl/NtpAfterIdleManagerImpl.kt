@@ -19,6 +19,7 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
@@ -32,39 +33,51 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixels
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = NtpAfterIdleManager::class)
+@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
 class NtpAfterIdleManagerImpl @Inject constructor(
     private val pixel: Pixel,
     private val hatchPixels: HatchPixels,
-) : NtpAfterIdleManager {
+) : NtpAfterIdleManager, BrowserLifecycleObserver {
 
-    private val afterIdle = AtomicBoolean(false)
+    private val pendingAfterIdle = AtomicBoolean(false)
+    private val currentAfterIdle = AtomicBoolean(false)
 
-    override fun wasAfterIdle(): Boolean = afterIdle.get()
-
-    override fun onNtpShownAfterIdle() {
-        afterIdle.set(true)
-        pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
-        pixel.fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
+    override fun onOpen(isFreshLaunch: Boolean) {
+        // Clear transient state in case it was left over from a prior session; the process may
+        // survive across sessions so the AtomicBooleans can otherwise hold stale classifications.
+        pendingAfterIdle.set(false)
+        currentAfterIdle.set(false)
     }
 
-    override fun onNtpShownUserInitiated() {
-        afterIdle.set(false)
-        pixel.fire(NTP_SHOWN_USER_INITIATED, type = Count)
-        pixel.fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+    override fun onIdleReturnTriggered() {
+        pendingAfterIdle.set(true)
     }
 
-    override fun fireReturnToPageTapped() {
-        hatchPixels.fireReturnToPageTapped(wasAfterIdle())
+    override fun onNtpShown() {
+        val wasAfterIdle = pendingAfterIdle.getAndSet(false)
+        currentAfterIdle.set(wasAfterIdle)
+        if (wasAfterIdle) {
+            pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
+            pixel.fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
+        } else {
+            pixel.fire(NTP_SHOWN_USER_INITIATED, type = Count)
+            pixel.fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+        }
     }
 
-    override fun fireBarUsedFromNtp() {
-        if (wasAfterIdle()) {
+    override fun onReturnToPageTapped() {
+        hatchPixels.fireReturnToPageTapped(currentAfterIdle.get())
+    }
+
+    override fun onNtpSearchSubmitted() {
+        if (currentAfterIdle.get()) {
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE, type = Count)
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE_DAILY, type = Daily())
         } else {
@@ -73,7 +86,7 @@ class NtpAfterIdleManagerImpl @Inject constructor(
         }
     }
 
-    override fun fireTimeoutSelected(seconds: Long) {
+    override fun onIdleTimeoutSelected(seconds: Long) {
         NtpAfterIdlePixels.timeoutPixelsForSeconds(seconds)?.let { (count, daily) ->
             pixel.fire(count, type = Count)
             pixel.fire(daily, type = Daily())

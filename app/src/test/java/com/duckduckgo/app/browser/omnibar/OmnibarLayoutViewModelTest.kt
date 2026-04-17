@@ -43,7 +43,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -94,7 +93,6 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val isFullUrlEnabledFlow = MutableStateFlow(true)
-    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val urlDisplayRepository: UrlDisplayRepository = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -189,7 +187,6 @@ class OmnibarLayoutViewModelTest {
             addressBarTrackersAnimationManager = addressBarTrackersAnimationManager,
             standardizedLeadingIconToggle = fakeStandardizedLeadingIconToggle,
             progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
-            ntpAfterIdleRepository = ntpAfterIdleManager,
         )
     }
 

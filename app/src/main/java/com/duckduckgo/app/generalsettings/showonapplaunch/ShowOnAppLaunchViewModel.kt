@@ -121,7 +121,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             settingsDataStore.userSelectedIdleThresholdSeconds = seconds
             userSelectedThreshold.value = seconds
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
-            ntpAfterIdleManager.fireTimeoutSelected(seconds)
+            ntpAfterIdleManager.onIdleTimeoutSelected(seconds)
         }
     }
 }

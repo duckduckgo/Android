@@ -24,8 +24,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -50,7 +48,6 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
-    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val testScope = coroutineTestRule.testScope
@@ -72,7 +69,6 @@ class FirstScreenHandlerImplTest {
             duckChat = duckChat,
             tabRepository = tabRepository,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            ntpAfterIdleManager = ntpAfterIdleManager,
             appCoroutineScope = testScope,
         )
     }
@@ -80,7 +76,7 @@ class FirstScreenHandlerImplTest {
     // --- Idle return enabled (covers both fresh and non-fresh launches) ---
 
     @Test
-    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutThenDelegates() = runTest {
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
@@ -89,11 +85,11 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
-    fun whenIdleReturnEnabledAndFreshLaunchAndElapsedExceedsTimeoutThenDelegates() = runTest {
+    fun whenIdleReturnEnabledAndFreshLaunchAndElapsedExceedsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
@@ -102,7 +98,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -132,7 +128,7 @@ class FirstScreenHandlerImplTest {
     }
 
     @Test
-    fun whenIdleReturnEnabledAndNoTimestampThenDelegates() = runTest {
+    fun whenIdleReturnEnabledAndNoTimestampThenDelegatesWithWasIdleFalse() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
@@ -140,11 +136,11 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = false)
     }
 
     @Test
-    fun whenIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenDelegates() = runTest {
+    fun whenIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val exactlyFiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
@@ -153,7 +149,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -166,7 +162,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -192,7 +188,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -205,7 +201,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -289,7 +285,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -303,7 +299,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     // --- Voice session active (legacy fresh launch path) ---
@@ -375,7 +371,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test
@@ -411,7 +407,7 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption()
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
     }
 
     @Test

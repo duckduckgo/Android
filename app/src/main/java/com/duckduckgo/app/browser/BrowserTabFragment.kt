@@ -3525,7 +3525,7 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
-                    ntpAfterIdleManager.fireReturnToPageTapped()
+                    ntpAfterIdleManager.onReturnToPageTapped()
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
 

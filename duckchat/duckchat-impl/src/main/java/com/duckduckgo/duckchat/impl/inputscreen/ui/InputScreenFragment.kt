@@ -558,7 +558,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
-                    ntpAfterIdleManager.fireReturnToPageTapped()
+                    ntpAfterIdleManager.onReturnToPageTapped()
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)

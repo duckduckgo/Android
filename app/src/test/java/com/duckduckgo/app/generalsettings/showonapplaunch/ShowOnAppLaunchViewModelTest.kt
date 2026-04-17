@@ -207,6 +207,14 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
+    fun whenTimeoutSelectedThenIdleTimeoutSelectedNotified() = runTest {
+        testee.onTimeoutSelected(300L)
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(ntpAfterIdleManager).onIdleTimeoutSelected(300L)
+    }
+
+    @Test
     fun whenTimeoutSelectedThenViewStateUpdated() = runTest {
         testee.onTimeoutSelected(1L)
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
