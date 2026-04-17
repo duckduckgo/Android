@@ -22,8 +22,6 @@
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
-    aarbExecutable = "AndroidAsanaBridge"
-    asanaBridgeInstallationProblem = "Android Asana Release Bridge not installed or configured correctly - see https://app.asana.com/0/0/1203116937958001/f for instructions"
 
 default_platform(:android)
 
