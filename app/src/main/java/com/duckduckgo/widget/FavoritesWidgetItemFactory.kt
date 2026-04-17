@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -32,11 +33,12 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_WIDGET_PLACEHOLDERS_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.domain
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,38 +127,47 @@ class FavoritesWidgetItemFactory(
         val domain = url.extractDomain().orEmpty()
 
         // step 1: check if any file (real favicon or placeholder) already exists on disk to avoid fetching/generating it again
-        val existingFile = faviconPersister.faviconFile(
-            directory = FAVICON_PERSISTED_DIR,
-            subFolder = NO_SUBFOLDER,
-            domain = domain,
-        )
-        var uri: Uri? = null
-
-        if (existingFile != null) {
-            // found existing file on disk (favicon or placeholder) - use it without network call
-            uri = existingFile.getContentUri()
-        }
-        if (uri != null) {
-            return WidgetFavorite(
-                title = title,
-                url = url,
-                bitmapUri = uri,
-            )
+        val persistedFile = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+        if (persistedFile != null) {
+            if (persistedFile.isStaleWidgetPlaceholder()) {
+                persistedFile.delete()
+            } else {
+                val persistedUri = persistedFile.getContentUri()
+                if (persistedUri != null) {
+                    // found existing file on disk (favicon or placeholder) - use it without network call
+                    return WidgetFavorite(title = title, url = url, bitmapUri = persistedUri)
+                }
+            }
         }
 
-        // step 2: generate and save placeholder
+        // step 2: check if there is an existing placeholder cached and use it
+        val existingPlaceholder = faviconPersister.faviconFile(FAVICON_WIDGET_PLACEHOLDERS_DIR, NO_SUBFOLDER, domain)
+        if (existingPlaceholder != null) {
+            val placeholderUri = existingPlaceholder.getContentUri()
+            if (placeholderUri != null) {
+                return WidgetFavorite(title = title, url = url, bitmapUri = placeholderUri)
+            }
+        }
+
+        // step 3: generate and save placeholder
         val placeholderBitmap = generateDefaultDrawable(
             context = context,
             domain = domain,
             cornerRadius = faviconItemCornerRadius,
         ).toBitmap(faviconItemSize, faviconItemSize)
-        uri = faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, placeholderBitmap, domain)?.getContentUri()
 
-        return WidgetFavorite(
-            title = title,
-            url = url,
-            bitmapUri = uri,
-        )
+        val uri = faviconPersister.store(FAVICON_WIDGET_PLACEHOLDERS_DIR, NO_SUBFOLDER, placeholderBitmap, domain)?.getContentUri()
+
+        return WidgetFavorite(title = title, url = url, bitmapUri = uri)
+    }
+
+    // Detects placeholders written to FAVICON_PERSISTED_DIR by the previous broken version
+    // (https://app.asana.com/1/137249556945/project/414730916066338/task/1214072492090532?focus=true).
+    // Real favicons virtually never match faviconItemSize × faviconItemSize exactly.
+    private fun File.isStaleWidgetPlaceholder(): Boolean {
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(absolutePath, options)
+        return options.outWidth == faviconItemSize && options.outHeight == faviconItemSize
     }
 
     override fun onDestroy() {
@@ -169,7 +180,7 @@ class FavoritesWidgetItemFactory(
 
     private fun String.extractDomain(): String? {
         return if (this.startsWith("http")) {
-            this.toUri().domain()
+            this.toUri().baseHost
         } else {
             "https://$this".extractDomain()
         }
