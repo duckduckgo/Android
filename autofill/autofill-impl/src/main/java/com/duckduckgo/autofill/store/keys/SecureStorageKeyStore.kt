@@ -139,7 +139,7 @@ class RealSecureStorageKeyStore(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
-                    getPixelParams(throwable = e, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                    getPixelParams(throwable = e, harmonyFlags = harmonyFlags),
                     type = Daily(),
                 )
                 null
@@ -175,7 +175,7 @@ class RealSecureStorageKeyStore(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                    getPixelParams(throwable = e, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                    getPixelParams(throwable = e, harmonyFlags = harmonyFlags),
                     type = Daily(),
                 )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
@@ -211,8 +211,7 @@ class RealSecureStorageKeyStore(
                         AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
                         getPixelParams(
                             keyName = keyValues.getKeys(),
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -229,8 +228,7 @@ class RealSecureStorageKeyStore(
                             AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
                             getPixelParams(
                                 keyName = keyValues.getKeys(),
-                                useHarmony = harmonyFlags.useHarmony,
-                                readFromHarmony = harmonyFlags.readFromHarmony,
+                                harmonyFlags = harmonyFlags,
                             ),
                             type = Daily(),
                         )
@@ -249,8 +247,7 @@ class RealSecureStorageKeyStore(
                         AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                         getPixelParams(
                             keyName = keyValue.first,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -277,8 +274,7 @@ class RealSecureStorageKeyStore(
                         getPixelParams(
                             keyValues.getKeys(),
                             throwable = error,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -304,8 +300,7 @@ class RealSecureStorageKeyStore(
                         getPixelParams(
                             keyName = keyValues.getKeys(),
                             throwable = error,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -322,8 +317,7 @@ class RealSecureStorageKeyStore(
                                     AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
                                     getPixelParams(
                                         keyName = keyValues.getKeys(),
-                                        useHarmony = harmonyFlags.useHarmony,
-                                        readFromHarmony = harmonyFlags.readFromHarmony,
+                                        harmonyFlags = harmonyFlags,
                                     ),
                                     type = Daily(),
                                 )
@@ -334,8 +328,7 @@ class RealSecureStorageKeyStore(
                                 getPixelParams(
                                     keyName = keyValues.getKeys(),
                                     throwable = rollbackError,
-                                    useHarmony = harmonyFlags.useHarmony,
-                                    readFromHarmony = harmonyFlags.readFromHarmony,
+                                    harmonyFlags = harmonyFlags,
                                 ),
                                 type = Daily(),
                             )
@@ -399,7 +392,7 @@ class RealSecureStorageKeyStore(
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -418,7 +411,7 @@ class RealSecureStorageKeyStore(
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -438,8 +431,7 @@ class RealSecureStorageKeyStore(
                         getPixelParams(
                             keyName = keyName,
                             throwable = it,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -454,7 +446,7 @@ class RealSecureStorageKeyStore(
                 if (decoded == null) {
                     pixel.fire(
                         AUTOFILL_PREFERENCES_GET_KEY_DECODE_FAILED,
-                        getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                        getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                         type = Daily(),
                     )
                     throw SecureStorageException.InternalSecureStorageException("Legacy preferences key value is present but cannot be decoded")
@@ -472,8 +464,7 @@ class RealSecureStorageKeyStore(
                         getPixelParams(
                             keyName = keyName,
                             throwable = it,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
+                            harmonyFlags = harmonyFlags,
                         ),
                         type = Daily(),
                     )
@@ -487,7 +478,7 @@ class RealSecureStorageKeyStore(
                     if (decoded == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -507,7 +498,7 @@ class RealSecureStorageKeyStore(
                     harmonyPrefs != null && harmonyEncoded == null && legacyValue != null -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -517,7 +508,7 @@ class RealSecureStorageKeyStore(
                     legacyPrefs != null && harmonyValue != null && legacyEncoded == null -> {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_KEY_MISSING,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -527,7 +518,7 @@ class RealSecureStorageKeyStore(
                     harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISMATCH,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            getPixelParams(keyName = keyName, harmonyFlags = harmonyFlags),
                             type = Daily(),
                         )
                         if (harmonyFlags.readFromHarmony) {
@@ -554,11 +545,11 @@ class RealSecureStorageKeyStore(
         }
     }
 
-    private fun getPixelParams(keyName: String? = null, throwable: Throwable? = null, useHarmony: Boolean, readFromHarmony: Boolean) = buildMap {
+    private fun getPixelParams(keyName: String? = null, throwable: Throwable? = null, harmonyFlags: HarmonyFlags) = buildMap {
         keyName?.let { put("key", it) }
-        put("useHarmony", useHarmony.toString())
+        put("useHarmony", harmonyFlags.useHarmony.toString())
         put("initialHarmonyValue", initialUseHarmonyValue.toString())
-        put("readFromHarmony", readFromHarmony.toString())
+        put("readFromHarmony", harmonyFlags.readFromHarmony.toString())
         throwable?.error()?.let { put("error", it) }
     }
 
