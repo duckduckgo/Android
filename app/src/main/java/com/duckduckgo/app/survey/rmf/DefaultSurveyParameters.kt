@@ -29,9 +29,9 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.first
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import kotlinx.coroutines.flow.first
 
 @ContributesMultibinding(AppScope::class)
 class AtbSurveyParameterPlugin @Inject constructor(

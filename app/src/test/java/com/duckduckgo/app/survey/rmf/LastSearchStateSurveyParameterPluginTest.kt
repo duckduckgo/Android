@@ -1,6 +1,7 @@
 package com.duckduckgo.app.survey.rmf
 
 import android.net.Uri
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
@@ -9,11 +10,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
+@RunWith(AndroidJUnit4::class)
 class LastSearchStateSurveyParameterPluginTest {
 
     @Mock private lateinit var navigationHistory: NavigationHistory
