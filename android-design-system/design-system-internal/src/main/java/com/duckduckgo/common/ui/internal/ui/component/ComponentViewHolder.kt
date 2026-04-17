@@ -32,16 +32,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.message.MediumMessage
+import com.duckduckgo.common.ui.compose.message.SmallMessage
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.view.listitem.SettingsListItem
@@ -114,6 +118,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
+        private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
@@ -141,8 +146,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             val mediumMessage = Message(
                 topIllustration = CommonR.drawable.ic_critical_update,
-                title = "Big Single  Message",
-                subtitle = "Body text goes here. This component has one button",
+                title = "Medium Message",
+                subtitle = "Body text goes here. This component doesn't have buttons",
             )
 
             val promoSingleMessage = Message(
@@ -175,6 +180,27 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
                 setMessage(promoSingleMessage)
+            }
+
+            view.setupThemedComposeView(R.id.small_remote_message_compose, isDarkTheme = isDarkTheme) {
+                SmallMessage(
+                    title = "Compose Small Message",
+                    body = "Body text goes here. This component doesn't have buttons",
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.small_remote_message_compose).gone()
+                    },
+                )
+            }
+
+            view.setupThemedComposeView(R.id.medium_remote_message_compose, isDarkTheme = isDarkTheme) {
+                MediumMessage(
+                    title = "Compose Medium Message",
+                    body = "Body text goes here. This component doesn't have buttons",
+                    illustration = CommonR.drawable.ic_critical_update,
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
+                    },
+                )
             }
         }
     }
@@ -456,7 +482,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
-                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
+                Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent, isDarkTheme)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)
