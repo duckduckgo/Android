@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Experimentální nabídka prohlížeče</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">Po nečinnosti</string>
+    <string name="afterInactivityTimeoutRowTitle">Vyber časovač nečinnosti</string>
+    <string name="afterInactivityScreenSectionHeader">Vyber, co se má zobrazit, když se vrátíš po nečinnosti</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Vyber, co se má zobrazit, když se vrátíš po %1$s minutách nečinnosti.</string>
+    <string name="afterInactivityTimeoutAlways">Vždy</string>
+    <string name="afterInactivityTimeout1Minute">1 minuta</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minut(y)</string>
+    <string name="afterInactivityTimeout1Hour">1 hodina</string>
+    <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d hodin(y)</string>
 </resources>
