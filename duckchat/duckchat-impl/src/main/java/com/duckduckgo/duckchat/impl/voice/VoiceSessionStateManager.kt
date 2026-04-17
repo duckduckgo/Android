@@ -16,8 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.voice
 
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -28,8 +30,9 @@ interface VoiceSessionStateManager {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager {
+@ContributesBinding(AppScope::class, boundType = VoiceSessionStateManager::class)
+@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateManager, BrowserLifecycleObserver {
 
     @Volatile
     // NOTE: We are unable to detect that voice chat has ended IF the user closes the tab running voice chat.
@@ -42,5 +45,11 @@ class RealVoiceSessionStateManager @Inject constructor() : VoiceSessionStateMana
 
     override fun onVoiceSessionEnded() {
         isVoiceSessionActive = false
+    }
+
+    override fun onOpen(isFreshLaunch: Boolean) {
+        if (isFreshLaunch) {
+            isVoiceSessionActive = false
+        }
     }
 }

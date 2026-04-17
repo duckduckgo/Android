@@ -64,4 +64,20 @@ class RealVoiceSessionStateManagerTest {
 
         assertTrue(testee.isVoiceSessionActive)
     }
+
+    @Test
+    fun whenFreshLaunchAndVoiceSessionWasActiveThenIsVoiceSessionActiveIsFalse() {
+        testee.onVoiceSessionStarted()
+        testee.onOpen(isFreshLaunch = true)
+
+        assertFalse(testee.isVoiceSessionActive)
+    }
+
+    @Test
+    fun whenNotFreshLaunchAndVoiceSessionWasActiveThenIsVoiceSessionActiveRemainsTrue() {
+        testee.onVoiceSessionStarted()
+        testee.onOpen(isFreshLaunch = false)
+
+        assertTrue(testee.isVoiceSessionActive)
+    }
 }

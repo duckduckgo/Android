@@ -29,6 +29,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -72,10 +73,10 @@ class FirstScreenHandlerImpl @Inject constructor(
         }
     }
 
-    private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean {
-        if (!duckChat.isVoiceSessionActive()) return false
+    private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
+        if (!duckChat.isVoiceSessionActive()) return@withContext false
         val selectedTab = tabRepository.getSelectedTab()
-        return selectedTab?.url?.toUri()?.let {
+        return@withContext selectedTab?.url?.toUri()?.let {
             duckChat.isDuckChatUrl(it)
         } == true
     }
