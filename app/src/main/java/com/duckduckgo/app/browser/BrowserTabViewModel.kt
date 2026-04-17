@@ -2620,9 +2620,16 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         configureAutoComplete()
 
-        // When the omnibar gains focus, it programmatically expands the shortened URL to the full URL.
-        // This text change is not a user-initiated query change, so treat it as unchanged.
-        val effectiveHasQueryChanged = hasQueryChanged && query != url
+        // When the omnibar gains focus, it programmatically expands the shortened URL to the full URL,
+        // and on SERP it pre-fills the search query from the URL. Neither is a user-initiated query
+        // change, so treat the current text as unchanged when it matches the page's prefilled value.
+        val currentUrl = url
+        val prefilledFromPage = if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
+            duckDuckGoUrlDetector.extractQuery(currentUrl) ?: currentUrl
+        } else {
+            currentUrl
+        }
+        val effectiveHasQueryChanged = hasQueryChanged && query != prefilledFromPage
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults =
@@ -2636,8 +2643,12 @@ class BrowserTabViewModel @Inject constructor(
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && effectiveHasQueryChanged && autoCompleteSuggestionsEnabled
         val showFocusedView =
             if (!showAutoCompleteSuggestions) {
+                // On SERP the omnibar is pre-filled with the search term (not a URL), so treat it the same
+                // as a URL-focused page: the user is looking at content they haven't edited yet.
+                val onSerp = currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)
                 val urlFocused =
-                    hasFocus && query.isNotBlank() && !effectiveHasQueryChanged && (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query))
+                    hasFocus && query.isNotBlank() && !effectiveHasQueryChanged &&
+                        (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query) || onSerp)
                 val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
                 hasFocus && (urlFocused || emptyQueryBrowsing)
             } else {

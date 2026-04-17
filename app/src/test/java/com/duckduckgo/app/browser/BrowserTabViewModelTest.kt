@@ -1878,6 +1878,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTriggeringAutocompleteOnSerpWithPrefilledQueryThenFocusedViewShown() = runTest {
+        val serpUrl = "https://duckduckgo.com/?q=cats"
+        loadUrl(serpUrl, title = "cats", isBrowserShowing = true)
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(serpUrl)).thenReturn(true)
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+
+        testee.triggerAutocomplete("cats", true, hasQueryChanged = false)
+
+        assertFalse(autoCompleteViewState().showSuggestions)
+        assertTrue(autoCompleteViewState().showFocusedView)
+    }
+
+    @Test
+    fun whenTriggeringAutocompleteOnSerpOnSecondFocusWithUnchangedQueryThenFocusedViewShown() = runTest {
+        val serpUrl = "https://duckduckgo.com/?q=cats"
+        loadUrl(serpUrl, title = "cats", isBrowserShowing = true)
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(serpUrl)).thenReturn(true)
+        whenever(mockDuckDuckGoUrlDetector.extractQuery(serpUrl)).thenReturn("cats")
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+
+        // Second focus fires showSuggestions with hasQueryChanged=true even though the user hasn't edited
+        // the pre-filled SERP query. It should still show the focused view, not autocomplete.
+        testee.triggerAutocomplete("cats", true, hasQueryChanged = true)
+
+        assertFalse(autoCompleteViewState().showSuggestions)
+        assertTrue(autoCompleteViewState().showFocusedView)
+    }
+
+    @Test
     fun wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed() = runTest {
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
