@@ -108,4 +108,8 @@
     <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
     <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
 
+    <!-- Default browser changed survey -->
+    <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
+    <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
+
 </resources>

@@ -38,6 +38,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.os.postDelayed
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -97,6 +98,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.survey.ui.SurveyActivity
+import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -496,6 +499,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkForDefaultBrowserChangedSurvey()
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
@@ -891,6 +899,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             )
 
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
+            is Command.LaunchSurvey -> {
+                Handler(Looper.getMainLooper()).postDelayed(200L) {
+                    startActivity(SurveyActivity.intent(this, command.survey, SurveySource.IN_APP))
+                }
+            }
         }
     }
 

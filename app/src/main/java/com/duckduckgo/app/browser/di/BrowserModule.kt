@@ -178,7 +178,11 @@ class BrowserModule {
         appInstallStore: AppInstallStore,
         pixel: Pixel,
     ): MainProcessLifecycleObserver {
-        return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
+        return DefaultBrowserObserver(
+            defaultBrowserDetector = defaultBrowserDetector,
+            appInstallStore = appInstallStore,
+            pixel = pixel,
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
