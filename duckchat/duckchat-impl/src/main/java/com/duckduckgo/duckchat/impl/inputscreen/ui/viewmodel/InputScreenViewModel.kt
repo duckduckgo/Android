@@ -225,8 +225,20 @@ class InputScreenViewModel @AssistedInject constructor(
      * This becomes true when either:
      * 1. The user has modified the input text from its initial state, OR
      * 2. The initial text was not a URL (e.g., search query from SERP)
+     *
+     * Drives `canExpand` (multi-line expansion) — search queries should allow expansion
+     * immediately so they can grow across multiple lines, but URLs stay compact until edited.
      */
     private val hasMovedBeyondInitialUrl = MutableStateFlow(checkMovedBeyondInitialUrl(searchInputTextState.value))
+
+    /**
+     * Becomes true only when the user actually modifies the input text.
+     *
+     * Drives autocomplete visibility — we want to suppress autocomplete on initial focus
+     * regardless of whether the initial text is a URL or a SERP search query, and only
+     * surface suggestions once the user starts typing.
+     */
+    private val hasUserModifiedInput = MutableStateFlow(false)
 
     /**
      * Caches the feature flag and user preference state.
@@ -239,21 +251,18 @@ class InputScreenViewModel @AssistedInject constructor(
      * We only want to show auto-complete suggestions if:
      * - The feature is enabled
      * - The search input text is not empty
-     * - Either the user has modified the input OR the initial text wasn't a URL
-     *
-     * The initial text comes from the address bar. If it's a URL that hasn't been modified,
-     * it represents the current webpage, so we suppress autocomplete. If the user is on SERP,
-     * the initial text will be the search query (not URL), so we show autocomplete immediately.
+     * - The user has modified the input (suppresses autocomplete on initial focus,
+     *   whether the pre-filled text is a URL or a SERP search query)
      */
     private val shouldShowAutoComplete =
         combine(
             autoCompleteSuggestionsEnabled,
             searchInputTextState,
-            hasMovedBeyondInitialUrl,
-        ) { autoCompleteEnabled, searchInput, hasMovedBeyondInitialUrl ->
+            hasUserModifiedInput,
+        ) { autoCompleteEnabled, searchInput, hasUserModifiedInput ->
             autoCompleteEnabled &&
                 searchInput.isNotEmpty() &&
-                hasMovedBeyondInitialUrl
+                hasUserModifiedInput
         }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -345,6 +354,9 @@ class InputScreenViewModel @AssistedInject constructor(
             .onEach { searchInput ->
                 if (!hasMovedBeyondInitialUrl.value) {
                     hasMovedBeyondInitialUrl.value = checkMovedBeyondInitialUrl(searchInput)
+                }
+                if (!hasUserModifiedInput.value && searchInput != initialSearchInputText) {
+                    hasUserModifiedInput.value = true
                 }
             }.launchIn(viewModelScope)
 
