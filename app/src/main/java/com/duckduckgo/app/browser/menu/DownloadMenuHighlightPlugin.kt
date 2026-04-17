@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -28,10 +29,11 @@ class DownloadMenuHighlightPlugin @Inject constructor(
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
 ) : BrowserMenuHighlightPlugin {
-    override val compatibleModes = BrowserViewMode.entries.toSet() - BrowserViewMode.CustomTab
-
-    override fun isHighlighted(): Flow<Boolean> = combine(
-        downloadMenuStateProvider.hasNewDownloadFlow,
-        browserMenuDisplayRepository.browserMenuState.map { it.isEnabled },
-    ) { hasNewDownload, isBottomSheetMenu -> hasNewDownload && isBottomSheetMenu }
+    override fun isHighlighted(mode: BrowserViewMode): Flow<Boolean> {
+        if (mode == BrowserViewMode.CustomTab) return flowOf(false)
+        return combine(
+            downloadMenuStateProvider.hasNewDownloadFlow,
+            browserMenuDisplayRepository.browserMenuState.map { it.isEnabled },
+        ) { hasNewDownload, isBottomSheetMenu -> hasNewDownload && isBottomSheetMenu }
+    }
 }

@@ -22,18 +22,12 @@ import kotlinx.coroutines.flow.Flow
  * Plugin that contributes a highlight source for the browser menu icon blue dot.
  *
  * Implementations are collected via [PluginPoint] and aggregated by [BrowserMenuHighlight].
- * Each plugin declares which view modes it applies to via the `showIn*` flags.
  */
 interface BrowserMenuHighlightPlugin {
     /**
      * Flow that emits `true` when this source wants the blue dot shown.
+     *
+     * @param mode the current browser view mode
      */
-    fun isHighlighted(): Flow<Boolean>
-
-    /**
-     * The set of view modes this highlight applies to.
-     * Defaults to all modes.
-     */
-    val compatibleModes: Set<BrowserViewMode>
-        get() = BrowserViewMode.entries.toSet()
+    fun isHighlighted(mode: BrowserViewMode): Flow<Boolean>
 }

@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.Flow
 interface BrowserMenuHighlight {
     /**
      * Emits `true` when any plugin wants to highlight for the given [mode].
+     *
+     * @param mode the current browser view mode
      */
     fun shouldShowHighlightForMode(mode: BrowserViewMode): Flow<Boolean>
 }

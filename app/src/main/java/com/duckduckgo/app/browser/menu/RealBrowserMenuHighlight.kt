@@ -33,11 +33,7 @@ class RealBrowserMenuHighlight @Inject constructor(
     override fun shouldShowHighlightForMode(mode: BrowserViewMode): Flow<Boolean> {
         val pluginList = plugins.getPlugins()
         if (pluginList.isEmpty()) return flowOf(false)
-
-        val applicable = pluginList.filter { mode in it.compatibleModes }
-        if (applicable.isEmpty()) return flowOf(false)
-
-        return combine(applicable.map { it.isHighlighted() }) { highlights ->
+        return combine(pluginList.map { it.isHighlighted(mode) }) { highlights ->
             highlights.any { it }
         }
     }

@@ -20,13 +20,15 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DefaultBrowserMenuHighlightPlugin @Inject constructor(
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
 ) : BrowserMenuHighlightPlugin {
-    override val compatibleModes = setOf(BrowserViewMode.Browser)
-
-    override fun isHighlighted(): Flow<Boolean> = additionalDefaultBrowserPrompts.highlightPopupMenu
+    override fun isHighlighted(mode: BrowserViewMode): Flow<Boolean> {
+        if (mode != BrowserViewMode.Browser) return flowOf(false)
+        return additionalDefaultBrowserPrompts.highlightPopupMenu
+    }
 }

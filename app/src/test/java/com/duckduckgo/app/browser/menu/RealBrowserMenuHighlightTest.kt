@@ -19,26 +19,34 @@ package com.duckduckgo.app.browser.menu
 import app.cash.turbine.test
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class RealBrowserMenuHighlightTest {
 
     private val pluginAFlow = MutableStateFlow(false)
     private val pluginBFlow = MutableStateFlow(false)
 
+    // Browser-only plugin: highlighted only in Browser mode
     private val pluginA: BrowserMenuHighlightPlugin = mock {
-        whenever(mock.compatibleModes).thenReturn(setOf(BrowserViewMode.Browser))
-        whenever(mock.isHighlighted()).thenReturn(pluginAFlow)
+        on { isHighlighted(any()) } doAnswer { invocation ->
+            val mode = invocation.getArgument<BrowserViewMode>(0)
+            if (mode == BrowserViewMode.Browser) pluginAFlow else flowOf(false)
+        }
     }
 
+    // All-modes-except-CustomTab plugin
     private val pluginB: BrowserMenuHighlightPlugin = mock {
-        whenever(mock.compatibleModes).thenReturn(BrowserViewMode.entries.toSet() - BrowserViewMode.CustomTab)
-        whenever(mock.isHighlighted()).thenReturn(pluginBFlow)
+        on { isHighlighted(any()) } doAnswer { invocation ->
+            val mode = invocation.getArgument<BrowserViewMode>(0)
+            if (mode == BrowserViewMode.CustomTab) flowOf(false) else pluginBFlow
+        }
     }
 
     @Test
