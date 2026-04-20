@@ -56,4 +56,15 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="DenyListedApi"
+        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
+        errorLine1="        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/remote/messaging/internal/feature/RmfStagingEnvInterceptorTest.kt"
+            line="69"
+            column="9"/>
+    </issue>
+
 </issues>

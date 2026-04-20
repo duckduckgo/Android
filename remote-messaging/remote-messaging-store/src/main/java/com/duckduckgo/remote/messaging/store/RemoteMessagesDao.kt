@@ -81,4 +81,7 @@ abstract class RemoteMessagesDao {
 
     @Query("update remote_message set message = :content, status = :newState where id = :id AND status != \"DISMISSED\"")
     abstract fun updateMessageContent(id: String, content: String, newState: Status)
+
+    @Query("DELETE FROM remote_message")
+    abstract fun deleteAll()
 }

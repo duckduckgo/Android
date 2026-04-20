@@ -26,6 +26,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":remote-messaging-api")
 	implementation project(":remote-messaging-impl")
+	implementation project(":remote-messaging-store")
+	implementation project(":data-store-api")
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
@@ -39,6 +41,7 @@ dependencies {
     implementation project(':browser-api')
 
     ksp AndroidX.room.compiler
+    implementation AndroidX.room.ktx
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

@@ -28,4 +28,7 @@ interface RemoteMessagingCohortDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: RemoteMessagingCohort)
+
+    @Query("DELETE FROM remote_messaging_cohort")
+    suspend fun deleteAll()
 }

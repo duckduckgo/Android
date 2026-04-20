@@ -14,11 +14,80 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/subs_copy_data"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/currentVersion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:showSwitch="false"
-/>
+        app:primaryText="Installed Version"
+        app:secondaryText="-" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/latestUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Last Loaded URL"
+        app:secondaryText="-" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Last Loaded Date"
+        app:secondaryText="-" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/stagingEndpointToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/customUrlToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="Use Custom URL? (disabled uses real config)"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
+        android:id="@+id/urlInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/keyline_3"
+        android:layout_marginRight="@dimen/keyline_3"
+        android:hint="Add your custom RMF URL here"
+        app:editable="true"
+        app:type="url" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/validation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/keyline_3"
+        android:layout_marginRight="@dimen/keyline_3"
+        android:visibility="gone"
+        app:textType="secondary"
+        app:typography="body2_bold" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/load"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/keyline_3"
+        android:layout_marginRight="@dimen/keyline_3"
+        android:text="Force load config" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+        android:id="@+id/reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/keyline_3"
+        android:layout_marginRight="@dimen/keyline_3"
+        android:text="Reset cache and redownload" />
+
+</LinearLayout>

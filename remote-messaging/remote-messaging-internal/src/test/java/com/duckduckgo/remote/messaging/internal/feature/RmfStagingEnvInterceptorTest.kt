@@ -4,13 +4,15 @@ import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.remote.messaging.internal.setting.RmfInternalSettings
+import com.duckduckgo.remote.messaging.internal.store.DevRmfSettingsDataStore
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RmfStagingEnvInterceptorTest {
 
     private val rmfInternalSettings = FakeFeatureToggleFactory.create(RmfInternalSettings::class.java)
-    private val interceptor = RmfStagingEnvInterceptor(rmfInternalSettings)
+    private val devRmfSettingsDataStore = FakeDevRmfSettingsDataStore()
+    private val interceptor = RmfStagingEnvInterceptor(rmfInternalSettings, devRmfSettingsDataStore)
 
     @Test
     fun interceptEndpointWhenEnabled() {
@@ -61,9 +63,60 @@ class RmfStagingEnvInterceptorTest {
 
         assertEquals(UNKNOWN_URL, response.request.url.toString())
     }
+
+    @Test
+    fun interceptWithCustomUrlOverridesStagingToggle() {
+        rmfInternalSettings.useStatingEndpoint().setRawStoredState(State(enable = true))
+        devRmfSettingsDataStore.useCustomRmfUrl = true
+        devRmfSettingsDataStore.customRmfUrl = CUSTOM_URL
+
+        val chain = FakeChain(RMF_URL_V1)
+        val response = interceptor.intercept(chain)
+
+        assertEquals(CUSTOM_URL, response.request.url.toString())
+    }
+
+    @Test
+    fun interceptIgnoresCustomUrlWhenToggleOff() {
+        devRmfSettingsDataStore.useCustomRmfUrl = false
+        devRmfSettingsDataStore.customRmfUrl = CUSTOM_URL
+
+        val chain = FakeChain(RMF_URL_V1)
+        val response = interceptor.intercept(chain)
+
+        assertEquals(RMF_URL_V1, response.request.url.toString())
+    }
+
+    @Test
+    fun interceptIgnoresCustomUrlWhenUrlInvalid() {
+        devRmfSettingsDataStore.useCustomRmfUrl = true
+        devRmfSettingsDataStore.customRmfUrl = "not-a-url"
+
+        val chain = FakeChain(RMF_URL_V1)
+        val response = interceptor.intercept(chain)
+
+        assertEquals(RMF_URL_V1, response.request.url.toString())
+    }
+
+    @Test
+    fun interceptIgnoresCustomUrlWhenRequestNotRmf() {
+        devRmfSettingsDataStore.useCustomRmfUrl = true
+        devRmfSettingsDataStore.customRmfUrl = CUSTOM_URL
+
+        val chain = FakeChain(UNKNOWN_URL)
+        val response = interceptor.intercept(chain)
+
+        assertEquals(UNKNOWN_URL, response.request.url.toString())
+    }
+}
+
+private class FakeDevRmfSettingsDataStore : DevRmfSettingsDataStore {
+    override var customRmfUrl: String? = null
+    override var useCustomRmfUrl: Boolean = false
 }
 
 private const val RMF_URL_V1 = "https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json"
 private const val RMF_URL_V2 = "https://staticcdn.duckduckgo.com/remotemessaging/config/v2/android-config.json"
 private const val RMF_STAGING_URL = "https://staticcdn.duckduckgo.com/remotemessaging/config/staging/android-config.json"
 private const val UNKNOWN_URL = "https://unknown.com/remotemessaging/config/staging/android-config.json"
+private const val CUSTOM_URL = "https://jsonblob.com/api/abc123"

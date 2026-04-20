@@ -19,12 +19,14 @@ package com.duckduckgo.remote.messaging.internal.feature
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.internal.setting.RmfInternalSettings
+import com.duckduckgo.remote.messaging.internal.store.DevRmfSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
+import java.net.URI
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -33,21 +35,36 @@ import javax.inject.Inject
 )
 class RmfStagingEnvInterceptor @Inject constructor(
     private val rmfInternalSettings: RmfInternalSettings,
+    private val devRmfSettingsDataStore: DevRmfSettingsDataStore,
 ) : ApiInterceptorPlugin, Interceptor {
     override fun getInterceptor(): Interceptor = this
     override fun intercept(chain: Chain): Response {
-        val lastSegment = chain.request().url.encodedPathSegments.last()
+        val request = chain.request()
 
-        if (rmfInternalSettings.useStatingEndpoint().isEnabled() && chain.request().url.isProductionEnvironment()) {
-            val newRequest = chain.request().newBuilder()
-
-            val changedUrl = RMF_STAGING_ENV + lastSegment
-            logcat { "RMF environment changed to $changedUrl" }
-            newRequest.url(changedUrl)
-            return chain.proceed(newRequest.build())
+        if (request.url.isProductionEnvironment() && canUseCustomUrl()) {
+            val customUrl = devRmfSettingsDataStore.customRmfUrl!!
+            logcat { "RMF URL overridden to $customUrl" }
+            return chain.proceed(request.newBuilder().url(customUrl).build())
         }
 
-        return chain.proceed(chain.request())
+        if (rmfInternalSettings.useStatingEndpoint().isEnabled() && request.url.isProductionEnvironment()) {
+            val lastSegment = request.url.encodedPathSegments.last()
+            val changedUrl = RMF_STAGING_ENV + lastSegment
+            logcat { "RMF environment changed to $changedUrl" }
+            return chain.proceed(request.newBuilder().url(changedUrl).build())
+        }
+
+        return chain.proceed(request)
+    }
+
+    private fun canUseCustomUrl(): Boolean {
+        val storedUrl = devRmfSettingsDataStore.customRmfUrl
+        if (!devRmfSettingsDataStore.useCustomRmfUrl) return false
+        if (storedUrl.isNullOrEmpty()) return false
+        val uri = runCatching { URI(storedUrl) }.getOrNull() ?: return false
+        val scheme = uri.scheme ?: return false
+        if (!scheme.equals("http", ignoreCase = true) && !scheme.equals("https", ignoreCase = true)) return false
+        return !uri.host.isNullOrEmpty()
     }
 
     private fun HttpUrl.isProductionEnvironment(): Boolean {
