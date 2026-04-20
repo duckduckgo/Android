@@ -192,6 +192,13 @@ class BrowserPopupMenu(
         }
     }
 
+    val blockSiteMenuItem: MenuItemView by lazy {
+        when (omnibarType) {
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.blockSiteMenuItem
+            else -> topBinding.blockSiteMenuItem
+        }
+    }
+
     val brokenSiteMenuItem: MenuItemView by lazy {
         when (omnibarType) {
             OmnibarType.SINGLE_BOTTOM -> bottomBinding.brokenSiteMenuItem
@@ -366,6 +373,12 @@ class BrowserPopupMenu(
         privacyProtectionMenuItem.setIcon(
             if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_16 else drawable.ic_shield_disabled_16,
         )
+        blockSiteMenuItem.isVisible = viewState.canBlockSite
+        blockSiteMenuItem.label {
+            context.getString(
+                if (viewState.isSiteBlocked) R.string.browserMenuUnblockSite else R.string.browserMenuBlockSite,
+            )
+        }
         brokenSiteMenuItem.isVisible = viewState.canReportSite
 
         siteOptionsMenuDivider.isVisible = true

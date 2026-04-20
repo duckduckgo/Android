@@ -206,6 +206,14 @@
                 app:primaryText="@string/browserMenuEnablePrivacyProtection" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/blockSiteMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:iconDrawable="@drawable/ic_shield_disabled_16"
+                app:primaryText="@string/browserMenuBlockSite" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/brokenSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

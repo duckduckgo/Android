@@ -1908,9 +1908,9 @@ class BrowserTabViewModel @Inject constructor(
                     .drop(count = 1) // skip current state - we're only interested in change events
                     .onEach { isInAllowList ->
                         if (isInAllowList) {
-                            command.value = NavigationCommand.RefreshAndShowPrivacyProtectionDisabledConfirmation(domain)
+                            command.value = RefreshAndShowPrivacyProtectionDisabledConfirmation(domain)
                         } else {
-                            command.value = NavigationCommand.RefreshAndShowPrivacyProtectionEnabledConfirmation(domain)
+                            command.value = RefreshAndShowPrivacyProtectionEnabledConfirmation(domain)
                         }
                     }.launchIn(viewModelScope)
         }
