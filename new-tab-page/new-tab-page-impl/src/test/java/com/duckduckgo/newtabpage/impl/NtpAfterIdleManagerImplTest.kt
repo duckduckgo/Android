@@ -181,7 +181,7 @@ class NtpAfterIdleManagerImplTest {
 
     @Test
     fun whenOnIdleTimeoutSelectedWithAlwaysValueThenFiresAlwaysPixelPair() {
-        testee.onIdleTimeoutSelected(1L)
+        testee.onIdleTimeoutSelected(0L)
 
         verify(pixel).fire(TIMEOUT_SELECTED_ALWAYS, type = Count)
         verify(pixel).fire(TIMEOUT_SELECTED_ALWAYS_DAILY, type = Daily())

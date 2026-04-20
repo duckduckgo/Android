@@ -166,7 +166,7 @@ class ShowOnAppLaunchViewModelTest {
 
     @Test
     fun whenUserPreferenceSetThenSelectedIsUserPreference() = runTest {
-        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(1L)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
             Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300}"""),
         )
@@ -176,7 +176,7 @@ class ShowOnAppLaunchViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(1L, state.selectedIdleThresholdSeconds)
+            assertEquals(0L, state.selectedIdleThresholdSeconds)
         }
     }
 
@@ -216,12 +216,12 @@ class ShowOnAppLaunchViewModelTest {
 
     @Test
     fun whenTimeoutSelectedThenViewStateUpdated() = runTest {
-        testee.onTimeoutSelected(1L)
+        testee.onTimeoutSelected(0L)
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(1L, state.selectedIdleThresholdSeconds)
+            assertEquals(0L, state.selectedIdleThresholdSeconds)
         }
     }
 
