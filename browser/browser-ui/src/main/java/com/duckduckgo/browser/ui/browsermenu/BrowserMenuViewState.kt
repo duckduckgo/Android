@@ -41,6 +41,8 @@ sealed class BrowserMenuViewState {
         val addToHomeEnabled: Boolean = false,
         val canChangePrivacyProtection: Boolean = false,
         val isPrivacyProtectionDisabled: Boolean = false,
+        val canBlockSite: Boolean = false,
+        val isSiteBlocked: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
         val isSSLError: Boolean = false,

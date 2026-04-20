@@ -43,6 +43,8 @@ data class BrowserViewState(
     val canGoForward: Boolean = false,
     val canChangePrivacyProtection: Boolean = false,
     val isPrivacyProtectionDisabled: Boolean = false,
+    val canBlockSite: Boolean = false,
+    val isSiteBlocked: Boolean = false,
     val canReportSite: Boolean = false,
     val addToHomeEnabled: Boolean = false,
     val addToHomeVisible: Boolean = false,

@@ -156,6 +156,8 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             addToHomeEnabled = browserViewState.addToHomeEnabled,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
+            canBlockSite = browserViewState.canBlockSite,
+            isSiteBlocked = browserViewState.isSiteBlocked,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,

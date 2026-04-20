@@ -26,6 +26,8 @@
     <string name="browserMenuDesktopSite">Desktop Site</string>
     <string name="browserMenuEnablePrivacyProtection">Enable Privacy Protection</string>
     <string name="browserMenuDisablePrivacyProtection">Disable Privacy Protection</string>
+    <string name="browserMenuBlockSite">Block this site</string>
+    <string name="browserMenuUnblockSite">Unblock this site</string>
     <string name="browserMenuNewTab">New Tab</string>
     <string name="browserMenuDuckChat">Duck.ai</string>
     <string name="browserMenuShare">Share</string>

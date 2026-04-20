@@ -308,6 +308,15 @@
                 app:primaryText="@string/browserMenuEnablePrivacyProtection" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/blockSiteMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:iconDrawable="@drawable/ic_shield_disabled_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuBlockSite" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/printPageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

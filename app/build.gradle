@@ -344,6 +344,8 @@ dependencies {
     implementation project(':privacy-config-store')
     implementation project(':request-interception-api')
     implementation project(':request-interception-impl')
+    implementation project(':user-website-blocklist-api')
+    implementation project(':user-website-blocklist-impl')
     implementation project(':sqlcipher-loader-api')
     implementation project(':sqlcipher-loader-impl')
     implementation project(':tracker-detection-api')

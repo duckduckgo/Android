@@ -66,6 +66,12 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <com.duckduckgo.user.website.blocklist.impl.ui.UserBlockedSiteWarningLayout
+        android:id="@+id/userBlockedSiteWarningLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"

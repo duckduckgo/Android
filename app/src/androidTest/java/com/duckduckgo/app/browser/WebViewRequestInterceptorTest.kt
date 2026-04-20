@@ -148,6 +148,9 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             webTrackersBlockedDao = mockWebTrackersBlockedDao,
+            requestBlockerPlugins = object : com.duckduckgo.common.utils.plugins.PluginPoint<com.duckduckgo.request.interception.api.RequestBlockerPlugin> {
+                override fun getPlugins(): Collection<com.duckduckgo.request.interception.api.RequestBlockerPlugin> = emptyList()
+            },
         )
     }
 
@@ -219,6 +222,9 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             webTrackersBlockedDao = mockWebTrackersBlockedDao,
+            requestBlockerPlugins = object : com.duckduckgo.common.utils.plugins.PluginPoint<com.duckduckgo.request.interception.api.RequestBlockerPlugin> {
+                override fun getPlugins(): Collection<com.duckduckgo.request.interception.api.RequestBlockerPlugin> = emptyList()
+            },
         )
         testee.shouldIntercept(
             request = mockRequest,

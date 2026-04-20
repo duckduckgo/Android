@@ -147,6 +147,14 @@ interface WebViewClientListener {
         isForMainFrame: Boolean,
     )
 
+    fun onRequestBlockedByPlugin(
+        url: Uri,
+        reason: com.duckduckgo.request.interception.api.RequestBlockerPlugin.BlockReason,
+        isForMainFrame: Boolean,
+    ) {
+        // default no-op; BrowserTabFragment overrides
+    }
+
     fun recordErrorCode(
         error: String,
         url: String,

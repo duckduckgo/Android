@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -53,6 +54,8 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlockerPlugin
+import com.duckduckgo.request.interception.api.RequestBlockerRequest
 import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -111,6 +114,7 @@ class WebViewRequestInterceptor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
+    private val requestBlockerPlugins: PluginPoint<RequestBlockerPlugin>,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -151,6 +155,12 @@ class WebViewRequestInterceptor(
         val url: Uri = request.url
         val documentUrlString = documentUri.toString()
         val urlString = url.toString()
+
+        if (request.isForMainFrame &&
+            evaluateRequestBlockerPlugins(url, documentUri, request.requestHeaders.orEmpty(), webViewClientListener)
+        ) {
+            return WebResourceResponse(null, null, null)
+        }
 
         if (!checkMaliciousAfterHttpsUpgrade) {
             maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
@@ -237,6 +247,12 @@ class WebViewRequestInterceptor(
         documentUrl: Uri?,
         isForMainFrame: Boolean,
     ): Boolean {
+        if (isForMainFrame) {
+            val blocked = kotlinx.coroutines.runBlocking {
+                evaluateRequestBlockerPlugins(url, documentUrl, emptyMap(), webViewClientListener)
+            }
+            if (blocked) return true
+        }
         maliciousSiteBlockerWebViewIntegration.shouldOverrideUrlLoading(
             url,
             isForMainFrame,
@@ -474,4 +490,33 @@ class WebViewRequestInterceptor(
 
     private fun appUrlPixel(url: Uri?): Boolean =
         url?.toString()?.startsWith(AppUrl.Url.PIXEL) == true
+
+    private suspend fun evaluateRequestBlockerPlugins(
+        url: Uri,
+        documentUrl: Uri?,
+        headers: Map<String, String>,
+        webViewClientListener: WebViewClientListener?,
+    ): Boolean {
+        val input = RequestBlockerRequest(
+            url = url,
+            documentUrl = documentUrl,
+            isForMainFrame = true,
+            requestHeaders = headers,
+        )
+        for (plugin in requestBlockerPlugins.getPlugins()) {
+            when (val decision = plugin.evaluate(input)) {
+                RequestBlockerPlugin.Decision.Ignore -> {}
+                is RequestBlockerPlugin.Decision.Block -> {
+                    logcat { "Blocking request $url via RequestBlockerPlugin" }
+                    webViewClientListener?.onRequestBlockedByPlugin(
+                        url = url,
+                        reason = decision.reason,
+                        isForMainFrame = true,
+                    )
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

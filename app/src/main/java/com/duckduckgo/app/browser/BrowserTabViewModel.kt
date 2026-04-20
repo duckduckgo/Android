@@ -432,6 +432,7 @@ class BrowserTabViewModel @Inject constructor(
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
     private val userAllowListRepository: UserAllowListRepository,
+    private val userWebsiteBlocklist: com.duckduckgo.user.website.blocklist.api.UserWebsiteBlocklist,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
@@ -1881,6 +1882,9 @@ class BrowserTabViewModel @Inject constructor(
                 canReportSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
                 canChangePrivacyProtection = domain != null && !duckPlayer.isDuckPlayerUri(url),
                 isPrivacyProtectionDisabled = false,
+                canBlockSite = domain != null && !duckPlayer.isDuckPlayerUri(url),
+                isSiteBlocked = userWebsiteBlocklist.currentDomainOrNull(Uri.parse(url))
+                    ?.let { userWebsiteBlocklist.isBlocked(it) } ?: false,
                 canFindInPage = true,
                 canChangeBrowsingMode = true,
                 canFireproofSite = domain != null,
@@ -1904,9 +1908,9 @@ class BrowserTabViewModel @Inject constructor(
                     .drop(count = 1) // skip current state - we're only interested in change events
                     .onEach { isInAllowList ->
                         if (isInAllowList) {
-                            command.value = RefreshAndShowPrivacyProtectionDisabledConfirmation(domain)
+                            command.value = NavigationCommand.RefreshAndShowPrivacyProtectionDisabledConfirmation(domain)
                         } else {
-                            command.value = RefreshAndShowPrivacyProtectionEnabledConfirmation(domain)
+                            command.value = NavigationCommand.RefreshAndShowPrivacyProtectionEnabledConfirmation(domain)
                         }
                     }.launchIn(viewModelScope)
         }
@@ -2891,6 +2895,77 @@ class BrowserTabViewModel @Inject constructor(
                 addToAllowList(domain, clickedFromCustomTab)
             }
         }
+    }
+
+    fun onUserBlockToggleClicked() {
+        val currentUrl = site?.url ?: return
+        val uri = Uri.parse(currentUrl)
+        val domain = userWebsiteBlocklist.currentDomainOrNull(uri) ?: return
+        appCoroutineScope.launch(dispatchers.io()) {
+            if (userWebsiteBlocklist.isBlocked(domain)) {
+                userWebsiteBlocklist.unblock(domain)
+            } else {
+                userWebsiteBlocklist.block(uri)
+            }
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(
+                    canBlockSite = true,
+                    isSiteBlocked = userWebsiteBlocklist.isBlocked(domain),
+                )
+                command.value = NavigationCommand.Refresh
+            }
+        }
+    }
+
+    fun onUserUnblockFromWarningPage(domain: String) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            userWebsiteBlocklist.unblock(domain)
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(
+                    canBlockSite = true,
+                    isSiteBlocked = false,
+                )
+                command.value = Command.HideUserBlockedWarning(domain)
+                command.value = NavigationCommand.Refresh
+            }
+        }
+    }
+
+    override fun onRequestBlockedByPlugin(
+        url: Uri,
+        reason: com.duckduckgo.request.interception.api.RequestBlockerPlugin.BlockReason,
+        isForMainFrame: Boolean,
+    ) {
+        if (!isForMainFrame) return
+        val domain = when (reason) {
+            is com.duckduckgo.request.interception.api.RequestBlockerPlugin.BlockReason.UserBlocked -> reason.blockedDomain
+        }
+        viewModelScope.launch(dispatchers.main()) {
+            loadingViewState.value = currentLoadingViewState().copy(
+                isLoading = false,
+                progress = 100,
+                url = url.toString(),
+                trackersAnimationEnabled = false,
+            )
+            browserViewState.value = currentBrowserViewState().copy(
+                canBlockSite = true,
+                isSiteBlocked = true,
+            )
+            command.value = Command.ShowUserBlockedWarning(url, domain)
+        }
+    }
+
+    private fun refreshUserBlocklistMenuState(url: String?) {
+        if (url == null) {
+            browserViewState.value = currentBrowserViewState().copy(canBlockSite = false, isSiteBlocked = false)
+            return
+        }
+        val uri = Uri.parse(url)
+        val domain = userWebsiteBlocklist.currentDomainOrNull(uri)
+        browserViewState.value = currentBrowserViewState().copy(
+            canBlockSite = domain != null,
+            isSiteBlocked = domain?.let { userWebsiteBlocklist.isBlocked(it) } ?: false,
+        )
     }
 
     private suspend fun performToggleReportCheck() {

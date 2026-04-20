@@ -696,6 +696,9 @@ class BrowserTabFragment :
     private val maliciousWarningView
         get() = binding.maliciousSiteWarningLayout
 
+    private val userBlockedWarningView
+        get() = binding.userBlockedSiteWarningLayout
+
     private val sslErrorView
         get() = binding.sslErrorWarningLayout
 
@@ -1632,6 +1635,7 @@ class BrowserTabFragment :
                 viewModel.onFindInPageSelected()
             }
             onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
+            onMenuItemClicked(blockSiteMenuItem) { viewModel.onUserBlockToggleClicked() }
             onMenuItemClicked(brokenSiteMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
@@ -2312,6 +2316,44 @@ class BrowserTabFragment :
         maliciousWarningView.gone()
     }
 
+    private fun showUserBlockedWarning(
+        url: Uri,
+        domain: String,
+    ) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
+        sslErrorView.gone()
+        errorView.errorLayout.gone()
+        binding.browserLayout.gone()
+        webView?.onPause()
+        webView?.hide()
+        webView?.stopLoading()
+        userBlockedWarningView.bind(domain) { action ->
+            when (action) {
+                is com.duckduckgo.user.website.blocklist.impl.ui.UserBlockedSiteWarningLayout.Action.UnblockAndReload -> {
+                    viewModel.onUserUnblockFromWarningPage(action.domain)
+                }
+                com.duckduckgo.user.website.blocklist.impl.ui.UserBlockedSiteWarningLayout.Action.GoBack -> {
+                    hideUserBlockedWarning()
+                    if (webView?.canGoBack() == true) {
+                        webView?.goBack()
+                    } else {
+                        renderer.showNewTab()
+                    }
+                }
+            }
+        }
+        userBlockedWarningView.show()
+    }
+
+    private fun hideUserBlockedWarning() {
+        userBlockedWarningView.gone()
+        webViewContainer.show()
+        webView?.show()
+        webView?.onResume()
+    }
+
     private fun closeCustomTab() {
         (activity as? CustomTabActivity)?.finishAndRemoveTask()
     }
@@ -2759,6 +2801,8 @@ class BrowserTabFragment :
 
             is Command.HideWarningMaliciousSite -> hideMaliciousWarning(it.canGoBack)
             is Command.EscapeMaliciousSite -> onEscapeMaliciousSite()
+            is Command.ShowUserBlockedWarning -> showUserBlockedWarning(it.url, it.domain)
+            is Command.HideUserBlockedWarning -> hideUserBlockedWarning()
             is Command.CloseCustomTab -> closeCustomTab()
             is Command.BypassMaliciousSiteWarning -> onBypassMaliciousWarning(it.url, it.feed)
             is OpenBrokenSiteLearnMore -> openBrokenSiteLearnMore(it.url)

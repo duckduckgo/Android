@@ -144,6 +144,9 @@ class BrowserMenuBottomSheet(
     val privacyProtectionMenuItem: MenuItemView
         get() = binding.privacyProtectionMenuItem
 
+    val blockSiteMenuItem: MenuItemView
+        get() = binding.blockSiteMenuItem
+
     val changeBrowserModeMenuItem: MenuItemView
         get() = binding.changeBrowsingModeMenuItem
 
@@ -271,6 +274,12 @@ class BrowserMenuBottomSheet(
         privacyProtectionMenuItem.label(privacyProtectionLabel)
         privacyProtectionMenuItem.setIcon(
             if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_24 else drawable.ic_shield_disabled_24,
+        )
+        blockSiteMenuItem.isVisible = viewState.canBlockSite
+        blockSiteMenuItem.label(
+            context.getString(
+                if (viewState.isSiteBlocked) R.string.browserMenuUnblockSite else R.string.browserMenuBlockSite,
+            ),
         )
         brokenSiteMenuItem.isVisible = viewState.canReportSite
 

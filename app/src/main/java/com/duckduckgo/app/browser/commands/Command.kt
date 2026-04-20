@@ -367,6 +367,15 @@ sealed class Command {
 
     data object EscapeMaliciousSite : Command()
 
+    data class ShowUserBlockedWarning(
+        val url: Uri,
+        val domain: String,
+    ) : Command()
+
+    data class HideUserBlockedWarning(
+        val domainToReload: String,
+    ) : Command()
+
     data class BypassMaliciousSiteWarning(
         val url: Uri,
         val feed: Feed,

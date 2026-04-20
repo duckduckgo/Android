@@ -248,6 +248,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
         webTrackersBlockedDao: WebTrackersBlockedDao,
+        requestBlockerPlugins: com.duckduckgo.common.utils.plugins.PluginPoint<com.duckduckgo.request.interception.api.RequestBlockerPlugin>,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -270,6 +271,7 @@ class BrowserModule {
             appCoroutineScope,
             isMainProcess,
             webTrackersBlockedDao,
+            requestBlockerPlugins,
         )
 
     @Provides
