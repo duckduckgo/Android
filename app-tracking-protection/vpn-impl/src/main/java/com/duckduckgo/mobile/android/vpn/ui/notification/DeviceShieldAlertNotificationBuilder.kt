@@ -56,6 +56,7 @@ interface DeviceShieldAlertNotificationBuilder {
         context: Context,
         deviceShieldNotification: DeviceShieldNotification,
         contentNextIntent: Intent,
+        title: String,
     ): Notification
 }
 
@@ -86,10 +87,17 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         context: Context,
         deviceShieldNotification: DeviceShieldNotification,
         contentNextIntent: Intent,
+        title: String,
     ): Notification {
         registerAlertChannel(context)
 
-        return buildNotification(context, deviceShieldNotification, addReportIssueAction = false, contentNextIntent = contentNextIntent)
+        return buildNotification(
+            context,
+            deviceShieldNotification,
+            addReportIssueAction = false,
+            contentNextIntent = contentNextIntent,
+            title = title,
+        )
     }
 
     private fun buildNotification(
@@ -97,6 +105,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         content: DeviceShieldNotification,
         addReportIssueAction: Boolean,
         contentNextIntent: Intent,
+        title: String? = null,
     ): Notification {
         registerAlertChannel(context)
 
@@ -108,7 +117,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.BigTextStyle().bigText(content.text))
-            .setContentTitle(context.getString(R.string.atp_name))
+            .setContentTitle(title ?: context.getString(R.string.atp_name))
             .setContentIntent(vpnControllerPendingIntent)
             .setSilent(true)
             .setAutoCancel(true)

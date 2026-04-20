@@ -89,12 +89,14 @@ class AlwaysOnLockDownDetector @Inject constructor(
     private suspend fun showNotification() {
         val text = SpannableStringBuilder(getNotificationText())
         val intent = getNotificationIntent()
+        val title = getNotificationTitle()
 
         val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(text = text)
         deviceShieldAlertNotificationBuilder.buildAlwaysOnLockdownNotification(
             context,
             notification,
             intent,
+            title,
         ).also {
             notificationManagerCompat.checkPermissionAndNotify(context, notificationId, it)
         }
@@ -107,6 +109,16 @@ class AlwaysOnLockDownDetector @Inject constructor(
             isAppTPEnabled && isNetPEnabled -> R.string.vpn_LockdownNotificationTextWithNetPAndAppTPEnabled
             isNetPEnabled -> R.string.vpn_LockdownNotificationTextWithNetPOnlyEnabled
             else -> R.string.atp_AlwaysOnLockDownNotificationTitle
+        }.run {
+            resources.getString(this)
+        }
+    }
+
+    private suspend fun getNotificationTitle(): String {
+        val isNetPEnabled = networkProtectionState.isEnabled()
+        return when {
+            isNetPEnabled -> R.string.vpn_LockdownNotificationTitleNetPEnabled
+            else -> R.string.atp_name
         }.run {
             resources.getString(this)
         }
