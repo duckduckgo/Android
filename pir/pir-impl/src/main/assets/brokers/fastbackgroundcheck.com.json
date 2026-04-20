@@ -1,7 +1,7 @@
 {
   "name": "FastBackgroundCheck.com",
   "url": "fastbackgroundcheck.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1706248800000,
   "optOutUrl": "https://www.fastbackgroundcheck.com/opt-out",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "58fdfa90-9b0c-4fda-8961-e73502f68474",
-          "url": "https://www.fastbackgroundcheck.com/people/${firstName}-${lastName}/${city}-${state}"
+          "url": "https://www.fastbackgroundcheck.com/people/${firstName|hyphenated}-${lastName|hyphenated}/${city|hyphenated}-${state|hyphenated}"
         },
         {
           "actionType": "expectation",

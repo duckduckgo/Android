@@ -1,7 +1,7 @@
 {
   "name": "FreePeopleDirectory",
   "url": "freepeopledirectory.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "spokeo.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://freepeopledirectory.com/contact",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "f1510c8b-f010-4e6f-a748-d34c7777edd7",
-          "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city|hyphenated}"
+          "url": "https://www.freepeopledirectory.com/name/${firstName|hyphenated}-${lastName|hyphenated}/${state|upcase}/${city|hyphenated}"
         },
         {
           "actionType": "condition",
