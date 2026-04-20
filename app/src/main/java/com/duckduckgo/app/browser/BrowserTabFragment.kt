@@ -1744,6 +1744,9 @@ class BrowserTabFragment :
             onMenuItemClicked(privacyProtectionMenuItem) {
                 viewModel.onPrivacyProtectionMenuClicked(clickedFromCustomTab = isActiveCustomTab())
             }
+            onMenuItemClicked(blockSiteMenuItem) {
+                viewModel.onUserBlockToggleClicked()
+            }
             onMenuItemClicked(brokenSiteMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()

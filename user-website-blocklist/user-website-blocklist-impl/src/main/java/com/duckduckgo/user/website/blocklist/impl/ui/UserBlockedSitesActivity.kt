@@ -18,7 +18,6 @@ package com.duckduckgo.user.website.blocklist.impl.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,7 +34,7 @@ import kotlinx.coroutines.launch
 @ContributeToActivityStarter(UserBlockedSitesScreenNoParams::class)
 class UserBlockedSitesActivity : DuckDuckGoActivity() {
 
-    private val viewModel: UserBlockedSitesViewModel by viewModels()
+    private val viewModel: UserBlockedSitesViewModel by bindViewModel()
     private val adapter by lazy { UserBlockedSitesAdapter(onUnblock = viewModel::onUnblockClicked) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,5 +57,4 @@ class UserBlockedSitesActivity : DuckDuckGoActivity() {
             }
         }
     }
-
 }
