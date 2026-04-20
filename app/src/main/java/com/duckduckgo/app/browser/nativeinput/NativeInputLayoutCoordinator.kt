@@ -68,24 +68,6 @@ class NativeInputLayoutCoordinator(
         card.layoutParams = params
     }
 
-    fun applyRoundedCardShape(widgetView: View) {
-        if (!isWidgetBottom()) return
-        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
-        val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
-        card.shapeAppearanceModel =
-            card.shapeAppearanceModel
-                .toBuilder()
-                .setAllCornerSizes(radius)
-                .build()
-        val horizontalInset = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        val bottomInset = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        params.marginStart = horizontalInset
-        params.marginEnd = horizontalInset
-        params.bottomMargin = bottomInset
-        card.layoutParams = params
-    }
-
     fun configureAutocompleteLayout(widgetView: View) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)

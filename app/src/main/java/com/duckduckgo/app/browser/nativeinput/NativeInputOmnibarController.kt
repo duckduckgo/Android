@@ -62,7 +62,6 @@ interface NativeInputOmnibarController : OmnibarState {
     fun getText(): String
     fun hideBackground()
     fun showTransparentOmnibar()
-    fun getButtonsWidth(): Int
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
@@ -225,13 +224,6 @@ class RealNativeInputOmnibarController(
     override fun getCardView(): View? {
         val omnibarView = omnibar.omnibarView as? View ?: return null
         return omnibarView.findViewById(R.id.omniBarContainerShadow)
-    }
-
-    override fun getButtonsWidth(): Int {
-        val omnibarView = omnibar.omnibarView as? View ?: return 0
-        val tabsMenu = omnibarView.findViewById<View?>(R.id.tabsMenu)
-        val browserMenu = omnibarView.findViewById<View?>(R.id.browserMenu)
-        return (tabsMenu?.width ?: 0) + (browserMenu?.width ?: 0)
     }
 
     override fun restore() {
