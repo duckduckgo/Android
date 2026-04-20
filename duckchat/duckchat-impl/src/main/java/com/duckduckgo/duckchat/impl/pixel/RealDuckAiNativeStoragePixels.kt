@@ -28,12 +28,12 @@ class RealDuckAiNativeStoragePixels @Inject constructor(
 ) : DuckAiNativeStoragePixels {
 
     override fun reportMigrationDone(key: String) {
-        pixel.fire("m_aichat_native_storage_migration_done_${key}_unique", type = Pixel.PixelType.Unique())
-        pixel.fire("m_aichat_native_storage_migration_done_${key}_count")
+        pixel.fire("m_duck-ai_native-storage_migration_done_${key}_unique", type = Pixel.PixelType.Unique())
+        pixel.fire("m_duck-ai_native-storage_migration_done_${key}_count")
     }
 
     override fun reportMigrationDoneBlankKey() {
-        pixel.fire("m_aichat_native_storage_migration_done_blank_count")
+        pixel.fire("m_duck-ai_native-storage_migration_done_blank_count")
     }
 
     override fun reportMigrationStarted() {
