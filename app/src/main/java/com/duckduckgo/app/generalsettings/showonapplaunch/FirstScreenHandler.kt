@@ -18,6 +18,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -31,6 +32,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -67,6 +69,9 @@ class FirstScreenHandlerImpl @Inject constructor(
                 if (!isVoiceSessionActiveOnCurrentTab()) {
                     showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
                 }
+                if (!isActiveTabCustomTab()){
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
+                }
                 return
             }
         } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
@@ -82,6 +87,12 @@ class FirstScreenHandlerImpl @Inject constructor(
         return@withContext selectedTab?.url?.toUri()?.let {
             duckChat.isDuckChatUrl(it)
         } == true
+    }
+
+    private suspend fun isActiveTabCustomTab(): Boolean = withContext(dispatcherProvider.io()) {
+        val selectedTab = tabRepository.getSelectedTab()
+        logcat { "Hatch: current tab $selectedTab" }
+        return@withContext selectedTab?.tabId?.startsWith(CUSTOM_TAB_NAME_PREFIX) ?: false
     }
 
     override fun onClose() {
