@@ -35,4 +35,56 @@ class RealDuckAiNativeStoragePixels @Inject constructor(
     override fun reportMigrationDoneBlankKey() {
         pixel.fire("m_aichat_native_storage_migration_done_blank_count")
     }
+
+    override fun reportMigrationStarted() {
+        pixel.fire("m_duck-ai_native-storage_migration_started")
+    }
+
+    override fun reportMigrationAlreadyDone() {
+        pixel.fire("m_duck-ai_native-storage_migration_already-done")
+    }
+
+    override fun reportMigrationError() {
+        pixel.fire("m_duck-ai_native-storage_migration_error")
+    }
+
+    override fun reportSettingsPutError() {
+        pixel.fire("m_duck-ai_native-storage_settings-put_error")
+    }
+
+    override fun reportSettingsGetError() {
+        pixel.fire("m_duck-ai_native-storage_settings-get_error")
+    }
+
+    override fun reportSettingsDeleteError() {
+        pixel.fire("m_duck-ai_native-storage_settings-delete_error")
+    }
+
+    override fun reportChatPutError() {
+        pixel.fire("m_duck-ai_native-storage_chat-put_error")
+    }
+
+    override fun reportChatGetError() {
+        pixel.fire("m_duck-ai_native-storage_chat-get_error")
+    }
+
+    override fun reportChatDeleteError() {
+        pixel.fire("m_duck-ai_native-storage_chat-delete_error")
+    }
+
+    override fun reportFilePutError() {
+        pixel.fire("m_duck-ai_native-storage_file-put_error")
+    }
+
+    override fun reportFileGetError() {
+        pixel.fire("m_duck-ai_native-storage_file-get_error")
+    }
+
+    override fun reportFileListError() {
+        pixel.fire("m_duck-ai_native-storage_file-list_error")
+    }
+
+    override fun reportFileDeleteError() {
+        pixel.fire("m_duck-ai_native-storage_file-delete_error")
+    }
 }

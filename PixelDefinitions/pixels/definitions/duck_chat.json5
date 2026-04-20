@@ -509,5 +509,70 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_started": {
+        "description": "Duck.ai native storage: markMigrationDone was called (migration was attempted by the web layer)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_migration_already-done": {
+        "description": "Duck.ai native storage: isMigrationDone returned true (page load found migration already complete)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_migration_error": {
+        "description": "Duck.ai native storage: isMigrationDone or markMigrationDone threw an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-put_error": {
+        "description": "Duck.ai native storage: putEntry or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-get_error": {
+        "description": "Duck.ai native storage: getEntry or getAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-delete_error": {
+        "description": "Duck.ai native storage: deleteEntry, deleteAllEntries, or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-put_error": {
+        "description": "Duck.ai native storage: putChat, putChats, or migrateChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-get_error": {
+        "description": "Duck.ai native storage: getChat or getAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-delete_error": {
+        "description": "Duck.ai native storage: deleteChat or deleteAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-put_error": {
+        "description": "Duck.ai native storage: putFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-get_error": {
+        "description": "Duck.ai native storage: getFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-list_error": {
+        "description": "Duck.ai native storage: listFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-delete_error": {
+        "description": "Duck.ai native storage: deleteFile, deleteFiles, or deleteAllFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
     }
 }

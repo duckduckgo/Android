@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.store.impl
 
+import android.content.SharedPreferences
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -27,6 +28,7 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import dagger.Lazy
 import org.json.JSONObject
@@ -39,6 +41,7 @@ import org.junit.rules.TemporaryFolder
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -626,7 +629,311 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         verifyNoInteractions(jsMessaging)
     }
 
+    // --- getter error responses ---
+
+    @Test
+    fun `getChat sends null chat response when dao throws`() {
+        whenever(chatsDao.getById(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getChat", """{"chatId":"chat-1"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getChat" && id == "r1" && params.isNull("chat") })
+    }
+
+    @Test
+    fun `getAllChats sends empty chats array response when dao throws`() {
+        whenever(chatsDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getAllChats", "{}", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getAllChats" && id == "r1" && params.getJSONArray("chats").length() == 0 })
+    }
+
+    @Test
+    fun `getEntry sends null value response when dao throws`() {
+        whenever(settingsDao.get(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getEntry", """{"key":"theme"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getEntry" && id == "r1" && params.isNull("value") })
+    }
+
+    @Test
+    fun `getAllEntries sends empty entries response when dao throws`() {
+        whenever(settingsDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getAllEntries", "{}", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getAllEntries" && id == "r1" && params.getJSONObject("entries").length() == 0 })
+    }
+
+    @Test
+    fun `getFile sends null value response when file read throws`() {
+        tempFolder.root.resolve("abc-123").mkdir()
+
+        handler.process(jsMessage("getFile", """{"uuid":"abc-123"}""", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "getFile" && id == "r1" && params.isNull("value") })
+    }
+
+    @Test
+    fun `listFiles sends empty files array response when dao throws`() {
+        whenever(fileMetaDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("listFiles", "{}", id = "r1"), jsMessaging, null)
+
+        verify(jsMessaging).onResponse(argThat { method == "listFiles" && id == "r1" && params.getJSONArray("files").length() == 0 })
+    }
+
+    // --- migration new pixels ---
+
+    @Test
+    fun `markMigrationDone fires migration started pixel when key is provided`() {
+        handler.process(jsMessage("markMigrationDone", """{"key":"chats"}"""), jsMessaging, null)
+
+        verify(pixels).reportMigrationStarted()
+    }
+
+    @Test
+    fun `isMigrationDone fires already done pixel when migration is complete`() {
+        fakePrefs.edit().putBoolean(DuckAiMigrationPrefs.CHATS_KEY, true).commit()
+
+        handler.process(jsMessage("isMigrationDone", """{"key":"chats"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportMigrationAlreadyDone()
+    }
+
+    @Test
+    fun `isMigrationDone does not fire already done pixel when migration is not done`() {
+        handler.process(jsMessage("isMigrationDone", """{"key":"chats"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels, never()).reportMigrationAlreadyDone()
+    }
+
+    @Test
+    fun `isMigrationDone fires migration error pixel when prefs throws`() {
+        handlerWithThrowingPrefs().process(jsMessage("isMigrationDone", """{"key":"chats"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportMigrationError()
+    }
+
+    @Test
+    fun `markMigrationDone fires migration error pixel when prefs throws`() {
+        handlerWithThrowingPrefs().process(jsMessage("markMigrationDone", """{"key":"chats"}"""), jsMessaging, null)
+
+        verify(pixels).reportMigrationError()
+    }
+
+    // --- settings error pixels ---
+
+    @Test
+    fun `putEntry fires settings put error pixel when dao throws`() {
+        whenever(settingsDao.upsert(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("putEntry", """{"key":"theme","value":"dark"}"""), jsMessaging, null)
+
+        verify(pixels).reportSettingsPutError()
+    }
+
+    @Test
+    fun `replaceAllEntries fires settings put error pixel when dao throws`() {
+        whenever(settingsDao.replaceAll(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("replaceAllEntries", """{"entries":{"theme":"dark"}}"""), jsMessaging, null)
+
+        verify(pixels).reportSettingsPutError()
+    }
+
+    @Test
+    fun `getEntry fires settings get error pixel when dao throws`() {
+        whenever(settingsDao.get(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getEntry", """{"key":"theme"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportSettingsGetError()
+    }
+
+    @Test
+    fun `getAllEntries fires settings get error pixel when dao throws`() {
+        whenever(settingsDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getAllEntries", "{}", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportSettingsGetError()
+    }
+
+    @Test
+    fun `deleteEntry fires settings delete error pixel when dao throws`() {
+        whenever(settingsDao.delete(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteEntry", """{"key":"theme"}"""), jsMessaging, null)
+
+        verify(pixels).reportSettingsDeleteError()
+    }
+
+    @Test
+    fun `deleteAllEntries fires settings delete error pixel when dao throws`() {
+        whenever(settingsDao.deleteAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteAllEntries", "{}"), jsMessaging, null)
+
+        verify(pixels).reportSettingsDeleteError()
+    }
+
+    // --- chat error pixels ---
+
+    @Test
+    fun `putChat fires chat put error pixel when dao throws`() {
+        whenever(chatsDao.upsert(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("putChat", """{"chatId":"chat-1","data":{"chatId":"chat-1"}}"""), jsMessaging, null)
+
+        verify(pixels).reportChatPutError()
+    }
+
+    @Test
+    fun `putChats fires chat put error pixel when dao throws`() {
+        whenever(chatsDao.upsertAll(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(
+            jsMessage("putChats", """{"chats":[{"chatId":"chat-1","data":{"chatId":"chat-1"}}]}"""),
+            jsMessaging,
+            null,
+        )
+
+        verify(pixels).reportChatPutError()
+    }
+
+    @Test
+    fun `migrateChats fires chat put error pixel when dao throws`() {
+        whenever(chatsDao.upsertAll(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(
+            jsMessage("migrateChats", """{"chats":[{"chatId":"chat-1","data":{"chatId":"chat-1"}}]}"""),
+            jsMessaging,
+            null,
+        )
+
+        verify(pixels).reportChatPutError()
+    }
+
+    @Test
+    fun `getChat fires chat get error pixel when dao throws`() {
+        whenever(chatsDao.getById(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getChat", """{"chatId":"chat-1"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportChatGetError()
+    }
+
+    @Test
+    fun `getAllChats fires chat get error pixel when dao throws`() {
+        whenever(chatsDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("getAllChats", "{}", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportChatGetError()
+    }
+
+    @Test
+    fun `deleteChat fires chat delete error pixel when dao throws`() {
+        whenever(chatsDao.delete(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteChat", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verify(pixels).reportChatDeleteError()
+    }
+
+    @Test
+    fun `deleteAllChats fires chat delete error pixel when dao throws`() {
+        whenever(chatsDao.deleteAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteAllChats", "{}"), jsMessaging, null)
+
+        verify(pixels).reportChatDeleteError()
+    }
+
+    // --- file error pixels ---
+
+    @Test
+    fun `putFile fires file put error pixel when dao throws`() {
+        whenever(fileMetaDao.upsert(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("putFile", sampleParams), jsMessaging, null)
+
+        verify(pixels).reportFilePutError()
+    }
+
+    @Test
+    fun `getFile fires file get error pixel when file read throws`() {
+        // A directory at the uuid path causes readText() to throw IOException
+        tempFolder.root.resolve("abc-123").mkdir()
+
+        handler.process(jsMessage("getFile", """{"uuid":"abc-123"}""", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportFileGetError()
+    }
+
+    @Test
+    fun `listFiles fires file list error pixel when dao throws`() {
+        whenever(fileMetaDao.getAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("listFiles", "{}", id = "r1"), jsMessaging, null)
+
+        verify(pixels).reportFileListError()
+    }
+
+    @Test
+    fun `deleteFile fires file delete error pixel when dao throws`() {
+        whenever(fileMetaDao.delete(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteFile", """{"uuid":"abc-123"}"""), jsMessaging, null)
+
+        verify(pixels).reportFileDeleteError()
+    }
+
+    @Test
+    fun `deleteFiles fires file delete error pixel when dao throws`() {
+        whenever(fileMetaDao.getByChatId(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteFiles", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verify(pixels).reportFileDeleteError()
+    }
+
+    @Test
+    fun `deleteAllFiles fires file delete error pixel when dao throws`() {
+        whenever(fileMetaDao.deleteAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteAllFiles", "{}"), jsMessaging, null)
+
+        verify(pixels).reportFileDeleteError()
+    }
+
     // --- helpers ---
+
+    private fun handlerWithThrowingPrefs(): JsMessageHandler {
+        val editor = mock<SharedPreferences.Editor>().also {
+            whenever(it.putBoolean(any(), any())).thenThrow(RuntimeException("prefs write error"))
+        }
+        val throwingSharedPrefs = mock<SharedPreferences>().also {
+            whenever(it.getBoolean(any(), any())).thenThrow(RuntimeException("prefs read error"))
+            whenever(it.edit()).thenReturn(editor)
+        }
+        val provider = mock<SharedPreferencesProvider>().also {
+            whenever(it.getSharedPreferences(any(), any(), any())).thenReturn(throwingSharedPrefs)
+        }
+        val throwingMigrationPrefs = DuckAiMigrationPrefs(provider)
+        return DuckAiNativeStorageJsMessageHandler(
+            settingsDao,
+            chatsDao,
+            fileMetaDao,
+            Lazy { tempFolder.root },
+            hostProvider,
+            throwingMigrationPrefs,
+            pixels,
+        ).getJsMessageHandler()
+    }
 
     private fun jsMessage(method: String, paramsJson: String, id: String? = null): JsMessage =
         JsMessage("contentScopeScripts", "duckAiNativeStorage", method, JSONObject(paramsJson), id)

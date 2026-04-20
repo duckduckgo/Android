@@ -32,6 +32,7 @@ import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -122,7 +123,7 @@ class GetChatIntegrationTest {
 
         val params = captor.firstValue.params
         assertEquals(1, params.length())
-        assert(params.isNull("chat"))
+        assertTrue(params.isNull("chat"))
     }
 
     // --- helpers ---
