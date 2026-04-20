@@ -22,28 +22,63 @@ Pixels must uphold user privacy. Every pixel must satisfy these invariants:
 
 ## Types of Pixels
 
-### Standard Pixels
+Three types are defined by `Pixel.PixelType` in `statistics-api`:
 
-Sent every time the event occurs. Use for events where per-occurrence volume matters.
+- **Count** (`Pixel.PixelType.Count`) — sent every time the event occurs. Use when per-occurrence volume matters.
+- **Daily** (`Pixel.PixelType.Daily()`) — sent at most once per calendar day (UTC) per event. Use to measure unique users affected by something per day (e.g., how many users hit a particular error per day).
+- **Unique** (`Pixel.PixelType.Unique()`) — sent once per install for the lifetime of the install. Use for one-time lifecycle events (first activation, first use of a feature).
 
-### Daily Pixels
+### Multi-Type Events
 
-Sent at most once per calendar day per event. Use to measure the number of unique users affected by something (e.g., how many users hit a particular error per day). Most daily pixel implementations also support a "count" variant that fires every time.
+A single event often needs more than one type — e.g. a Daily variant for unique-users-per-day alongside a Count for total occurrences. **Each selected type is a separate pixel**: one enum entry per type, one fire call per type. The infrastructure does not auto-generate variants from a single fire call.
 
-### Unique Pixels
+### Type Suffix Convention
 
-Sent once per install for the lifetime of the install. Use for one-time lifecycle events (e.g., first activation, first use of a feature).
+The pixel name literal carries an explicit suffix identifying the variant:
+
+- Count → `_count` suffix (e.g. `autofill_save_prompted_count`)
+- Daily → `_daily` suffix (e.g. `autofill_save_prompted_daily`)
+- Unique → `_unique` suffix (e.g. `autofill_save_prompted_unique`)
+
+The suffix is part of the string literal in `PixelName` — the sender does not append it at fire time. This aligns with the `first_daily_count` dictionary suffix in `pixel-definitions.mdc`, which generates the matching variants in the registry.
+
+## Default Parameters: `appVersion` and `atb`
+
+The sender automatically attaches two parameters to every pixel before it leaves the device:
+
+- **`appVersion`** — the app's version string. Attached to every pixel by default.
+- **`atb`** — a cohort tag identifying the user's install week/day. Attached by default.
+
+**To include a default parameter**: declare it in the JSON5 definition's `parameters` array. No call-site code needed.
+
+**To omit a default parameter**: you must actively strip it via `PixelParamRemovalPlugin` (see "Stripping Default Parameters" below) AND omit it from the definition.
+
+Include `atb` when the pixel feeds cohort/retention analysis, search correlation, or anything install-week-dependent. Strip it for most feature telemetry (error monitoring, UI clicks, toggle changes) — default to stripping when unsure. `appVersion` is almost always kept; only strip it when the pixel is privacy-sensitive and version correlation would narrow the user pool meaningfully.
 
 ## Pixel Naming
 
-- **Use underscores or hyphens** as word separators. Be consistent within a feature area.
+- **Namespace with the feature name.** The first segment of a pixel name is the feature — e.g. `autofill_`, `sync_`, `network-protection_`. A feature prefix may contain a hyphen (`network-protection`, `duck-player`) and is still a single segment. This groups pixels by feature in analysis and keeps ownership clear at the name level.
+- **Use `_` to separate segments.** Shape is `<feature>_<event>` or `<feature>_<sub-area>_<event>` — e.g. `autofill_save_prompted`, `sync_device_added`, `network-protection_connection_failed`. Do not mix dots (`.`) with underscores; underscores are the only segment separator.
+- **Use `_` to separate words within a segment too.** `save_prompted`, not `savePrompted` or `save-prompted`. The only hyphen that belongs in a pixel name is inside a compound feature prefix like `network-protection`.
+- **Do not use the legacy `m_` prefix.** It predates the namespaced convention and is being phased out. New pixels must start with their feature namespace.
 - **Use clear, descriptive names.** Anyone reading the pixel name should understand what it represents without additional context. Avoid cryptic abbreviations.
-- **Group related pixels** with a common prefix (e.g., `burn_started`, `burn_completed`, `burn_error`).
 - **Embed dynamic data in parameters, not pixel names.** Pixel names should be static string literals. Use query parameters for variable data.
 
 ```
-# Good — static name with parameter
+# Good — namespaced, static name with parameter
 pixel: "burn_error", parameters: { "operation": "delete", "exceptionType": "IOException" }
+
+# Good — compound feature prefix
+pixel: "network-protection_connection_failed"
+
+# Bad — legacy m_ prefix
+pixel: "m_burn_error"
+
+# Bad — mixing dots and underscores
+pixel: "autofill.save_prompted"
+
+# Bad — camelCase word separation
+pixel: "autofill_savePrompted"
 
 # Bad — dynamic data in pixel name
 pixel: "burn_error_delete_IOException"
@@ -63,6 +98,113 @@ pixel: "burn_error_delete_IOException"
 # Bad — exact value
 "duration_ms": "237841"
 ```
+
+## Firing Pixels from Kotlin
+
+### `PixelName` Enum Conventions
+
+Each `-impl` module that fires pixels defines a `*PixelName.kt` enum implementing `Pixel.PixelName`:
+
+- File path: `<module>/src/main/java/com/duckduckgo/<feature>/impl/<Feature>PixelName.kt`
+- **Default to `internal enum class`.** Pixel enums are part of a module's implementation, not its public surface. Escalate to a public `enum class` only if the enum is actually referenced from outside the `-impl` module — this is rare and should be a deliberate decision, not a default.
+- Enum constants are `SCREAMING_SNAKE_CASE`; the string value is the pixel name literal
+- One enum constant per variant (Count, Daily, Unique each get their own entry)
+
+```kotlin
+package com.duckduckgo.<feature>.impl
+
+import com.duckduckgo.app.statistics.pixels.Pixel
+
+internal enum class <Feature>PixelName(override val pixelName: String) : Pixel.PixelName {
+    SAVE_PROMPTED_COUNT("autofill_save_prompted_count"),
+    SAVE_PROMPTED_DAILY("autofill_save_prompted_daily"),
+}
+```
+
+### Fire-Call Templates
+
+`Pixel` is injected via DI — `@Inject constructor(private val pixel: Pixel, ...)`.
+
+Single-type:
+
+```kotlin
+pixel.fire(
+    pixel = <Feature>PixelName.SAVE_PROMPTED_COUNT,
+    type = Pixel.PixelType.Count, // or Daily() / Unique()
+)
+```
+
+With parameters:
+
+```kotlin
+pixel.fire(
+    pixel = <Feature>PixelName.SAVE_PROMPTED_DAILY,
+    parameters = mapOf("result" to "success"),
+    type = Pixel.PixelType.Daily(),
+)
+```
+
+Daily + Count — two fire calls, one per variant:
+
+```kotlin
+pixel.fire(<Feature>PixelName.SAVE_PROMPTED_DAILY, type = Pixel.PixelType.Daily())
+pixel.fire(<Feature>PixelName.SAVE_PROMPTED_COUNT, type = Pixel.PixelType.Count)
+```
+
+A real-world example lives at `app/src/main/java/com/duckduckgo/app/browser/BrowserTabFragment.kt` (search for `EXPERIMENTAL_MENU_USED`).
+
+### Stripping Default Parameters
+
+`appVersion` and `atb` are attached automatically by the sender — fire calls don't opt into them, they opt out. The opt-out mechanism is `PixelParamRemovalPlugin`: an `@ContributesMultibinding` that declares `pixelName → Set<PixelParameter>` pairs. `PixelParamRemovalInterceptor` in `:app` reads every registered plugin and strips the listed query parameters from outgoing pixel URLs.
+
+**If the JSON5 definition omits `atb` and/or `appVersion`, the pixel name MUST be registered with a `PixelParamRemovalPlugin` implementation.** Otherwise the sender will still attach the parameter and the pixel will ship with data the definition says it does not carry — a privacy/analytics divergence that CI does not catch.
+
+There are two places the pixel can be registered:
+
+- **Preferred — module-local plugin.** Most `-impl` modules that strip parameters define their own `PixelParamRemovalPlugin` (e.g. `AutofillPixelsRequiringDataCleaning` in `autofill-impl`). When the pixel's `PixelName` enum is `internal` this is the only option, because no module can depend on `:app`. If the module has a local plugin, add the entry there; if it doesn't, create one alongside the `*PixelName.kt`.
+- **Fallback — central plugin in `:app`.** `PixelInterceptorPixelsRequiringDataCleaning` (in `app/src/main/java/com/duckduckgo/app/global/api/PixelParamRemovalInterceptor.kt`) is the catch-all. Use it only when the enum is already public and no module-local plugin exists and creating one would be disproportionate.
+
+Helpers on `PixelParameter` express the common intents:
+
+- `PixelParameter.removeAll()` — strip both `atb` and `appVersion`.
+- `PixelParameter.removeAtb()` — strip `atb` only, keep `appVersion`.
+- Explicit sets for anything else: `setOf(PixelParameter.APP_VERSION)` strips only `appVersion`.
+
+Example — module-local plugin pattern (from `autofill-impl`):
+
+```kotlin
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelParamRemovalPlugin::class,
+)
+object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            AutofillPixelNames.AUTOFILL_DECRYPT_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
+        )
+    }
+}
+```
+
+The entry must match the JSON5 definition: if the definition declares `"parameters": ["appVersion"]` (no `atb`), the removal set must strip `atb` (e.g. `removeAtb()`). If both defaults are omitted, use `removeAll()`.
+
+### Definition / Call-Site Consistency
+
+CI validates the JSON5 definition schema, but it does **not** cross-check the definition against the Kotlin call site. A mismatch ships silently and corrupts the analytics pipeline (parameters get dropped, dashboards miss variants, dedupe fires on the wrong key). Whenever you add or change a pixel — whether writing a new one, editing a fire call, or reviewing a PR — verify all of the following:
+
+- **Pixel type matches the name suffix.** The `PixelType` passed to `pixel.fire(...)` must correspond to the suffix on the `PixelName` literal:
+  - `_count` → `Pixel.PixelType.Count`
+  - `_daily` → `Pixel.PixelType.Daily()`
+  - `_unique` → `Pixel.PixelType.Unique()`
+  Firing `AUTOFILL_DECRYPT_FAILED_COUNT` with `Daily()` is a bug — it dedupes the Count pixel to once-per-day.
+- **Every parameter passed at the call site appears in the definition's `parameters` array.** A parameter present in `mapOf(...)` but missing from the definition fails validation on the next schema run and leaks an undocumented field in the interim.
+- **Every parameter listed in the definition is actually passed at the call site** (or is attached upstream — `appVersion` is added by the sender, `atb` is attached by the sender layer when present in the definition). Declared-but-never-sent parameters are as misleading as the inverse.
+- **ATB presence is consistent.** If the definition lists `"atb"` in `parameters`, the pixel must be fired through a code path that attaches ATB. If ATB is not required, the definition must not declare it.
+- **Default-parameter omissions are enforced by a removal plugin.** If the definition omits `atb` and/or `appVersion`, the pixel name must appear in a `PixelParamRemovalPlugin` implementation with a matching removal set (see "Stripping Default Parameters" above). Omitting from the definition without registering the removal plugin ships the parameter anyway — the definition lies silently.
+- **Parameter values respect their declared type and enum.** If the definition says `"type": "boolean"`, the call site must pass `"true"` / `"false"` (not `"1"` / `"0"` or localised strings). If the definition restricts values via `enum`, the call site must only pass those values.
+- **Multi-type events fire all declared variants.** If both `*_count` and `*_daily` exist as enum entries and JSON5 definitions, the call site must fire both — otherwise one of the registry entries is dead weight.
+
+When reviewing a PR that touches a pixel, walk through this list explicitly. A green CI is necessary but not sufficient.
 
 ## Pixel Definition Files
 

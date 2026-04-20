@@ -108,6 +108,8 @@ interface MyFeature : Feature {
 
 `DefaultFeatureValue.INTERNAL` = enabled only in internal/debug builds.
 
+**Feature flag reads must happen off the main thread.** Calling `.self().isEnabled()` or any toggle evaluator on the main thread (e.g. directly from `onCreate`, `onResume`, a lifecycle observer, a View `onClick`, or a synchronous WebView callback) is a known issue in this codebase — historically these calls have blocked the UI, caused ANRs, and masked failures when the toggle store hits disk. Always dispatch to IO (`withContext(dispatcherProvider.io()) { ... }` or a `@AppCoroutineScope` launch on IO) before reading a toggle. If a main-thread path genuinely needs the value, read it once off the main thread at startup and cache it, or restructure the flow so the UI doesn't block on the toggle evaluation.
+
 ### Activity Context
 
 `@ActivityContext Context` and `AppCompatActivity` are provided at `ActivityScope` via `DaggerActivityScopedModule`. Inject them with:
