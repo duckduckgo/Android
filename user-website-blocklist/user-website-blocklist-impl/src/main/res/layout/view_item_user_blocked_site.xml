@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="60dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/blockedSiteDomain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:typography="body1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/blockedSiteAdded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:textType="secondary"
+            app:typography="body2" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/blockedSiteRemove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_close_24" />
+</LinearLayout>

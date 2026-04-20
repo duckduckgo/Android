@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="userBlockedSiteTitle">You blocked this site</string>
+    <string name="userBlockedSiteBody">You added %1$s to your blocked sites. It won\'t load until you remove it.</string>
+    <string name="userBlockedSiteUnblockAction">Unblock and reload</string>
+    <string name="userBlockedSiteGoBackAction">Go back</string>
+    <string name="userBlockedSitesTitle">Blocked sites</string>
+    <string name="userBlockedSitesEmpty">You haven\'t blocked any sites yet. Block a site from the browser menu.</string>
+    <string name="userBlockedSitesEntry">Blocked sites</string>
+    <string name="userBlockedSitesUnblockContentDescription">Unblock %1$s</string>
+</resources>
