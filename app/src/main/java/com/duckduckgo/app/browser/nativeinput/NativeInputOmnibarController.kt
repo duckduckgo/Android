@@ -98,7 +98,22 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
+            if (isSplitMode()) {
+                showOmnibarButtons(omnibarView)
+            }
         }
+    }
+
+    private fun showOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+    }
+
+    private fun hideOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.gone()
     }
 
     override fun showTransparentOmnibar() {
@@ -253,6 +268,9 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
         omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+        if (isSplitMode()) {
+            hideOmnibarButtons(omnibarView)
+        }
     }
 
     private fun restoreOmnibarColors() {
