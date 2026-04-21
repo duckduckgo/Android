@@ -846,8 +846,8 @@ class BrowserWebViewClient @Inject constructor(
                         }
                         this.start = null
                     }
-                    webViewClientListener?.onReceivedError(parsedError, request.url.toString())
                 }
+                webViewClientListener?.onReceivedError(parsedError, request.url.toString(), webResourceError.errorCode.asStringErrorCode())
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
                     "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}",

@@ -5564,7 +5564,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenWebViewRefreshedWithErrorThenBrowserErrorStateIsLoading() {
-        testee.onReceivedError(BAD_URL, exampleUrl)
+        testee.onReceivedError(BAD_URL, exampleUrl, "ERROR_HOST_LOOKUP")
         testee.onWebViewRefreshed()
 
         assertEquals(LOADING, browserViewState().browserError)
@@ -5572,7 +5572,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenResetBrowserErrorThenBrowserErrorStateIsLoading() {
-        testee.onReceivedError(BAD_URL, exampleUrl)
+        testee.onReceivedError(BAD_URL, exampleUrl, "ERROR_HOST_LOOKUP")
         assertEquals(BAD_URL, browserViewState().browserError)
         testee.resetBrowserError()
         assertEquals(OMITTED, browserViewState().browserError)
@@ -7064,7 +7064,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPageIsChangedWithWebViewErrorResponseThenPixelIsFired() =
         runTest {
-            testee.onReceivedError(BAD_URL, "example2.com")
+            testee.onReceivedError(BAD_URL, "example2.com", "ERROR_HOST_LOOKUP")
 
             updateUrl(
                 originalUrl = "example.com",
@@ -7079,7 +7079,7 @@ class BrowserTabViewModelTest {
     fun givenErrorPageFeatureDisabledWhenPageIsChangedWithWebViewErrorResponseThenPixelIsNotFired() =
         runTest {
             fakeAndroidConfigBrowserFeature.errorPagePixel().setRawStoredState(State(enable = false))
-            testee.onReceivedError(BAD_URL, "example2.com")
+            testee.onReceivedError(BAD_URL, "example2.com", "ERROR_HOST_LOOKUP")
 
             updateUrl(
                 originalUrl = "example.com",
@@ -7088,6 +7088,46 @@ class BrowserTabViewModelTest {
             )
 
             verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+        }
+
+    @Test
+    fun givenErrorCodePixelEnabledWhenErrorReceivedThenErrorCodePixelFiredWithCorrectCode() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = true))
+
+            testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
+
+            verify(mockPixel).enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to "ERROR_HOST_LOOKUP"))
+        }
+
+    @Test
+    fun givenErrorCodePixelDisabledWhenErrorReceivedThenErrorCodePixelNotFired() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = false))
+
+            testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
+
+            verify(mockPixel, never()).enqueueFire(eq(AppPixelName.ERROR_CODE_PIXEL), any(), any(), any())
+        }
+
+    @Test
+    fun givenOmittedErrorAndErrorCodePixelEnabledWhenErrorReceivedThenPixelFiredButNoErrorPageShown() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = true))
+
+            testee.onReceivedError(OMITTED, "example.com", "ERROR_UNKNOWN")
+
+            verify(mockPixel).enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to "ERROR_UNKNOWN"))
+            assertCommandNotIssued<Command.WebViewError>()
+        }
+
+    @Test
+    fun givenErrorReceivedThenBrowserErrorStateAndCommandUpdated() =
+        runTest {
+            testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
+
+            assertEquals(BAD_URL, browserViewState().browserError)
+            assertCommandIssued<Command.WebViewError>()
         }
 
     @Test
