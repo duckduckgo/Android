@@ -22,6 +22,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.DuckChatVoiceMicrophoneService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -45,6 +46,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     private val context: Context,
     private val tabRepository: TabRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val duckChatFeature: DuckChatFeature,
 ) : VoiceSessionStateManager, BrowserLifecycleObserver {
 
     private val listenJob = ConflatedJob()
@@ -59,7 +61,9 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {
         activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
-        DuckChatVoiceMicrophoneService.start(context)
+        if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
+            DuckChatVoiceMicrophoneService.start(context)
+        }
         if (tabId.isNotBlank()) {
             listenToTabRemoval()
         }

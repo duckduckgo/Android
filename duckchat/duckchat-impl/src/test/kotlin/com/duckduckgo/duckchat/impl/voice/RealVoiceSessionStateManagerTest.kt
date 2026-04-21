@@ -22,6 +22,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -46,6 +48,8 @@ class RealVoiceSessionStateManagerTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val tabRepository: TabRepository = mock()
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
+    private val duckChatFeature: DuckChatFeature = mock()
+    private val voiceChatServiceToggle: Toggle = mock()
 
     private lateinit var testee: RealVoiceSessionStateManager
 
@@ -58,10 +62,13 @@ class RealVoiceSessionStateManagerTest {
     @Before
     fun setup() {
         whenever(tabRepository.flowTabs).thenReturn(tabsFlow)
+        whenever(duckChatFeature.duckAiVoiceChatService()).thenReturn(voiceChatServiceToggle)
+        whenever(voiceChatServiceToggle.isEnabled()).thenReturn(true)
         testee = RealVoiceSessionStateManager(
             context = context,
             tabRepository = tabRepository,
             appCoroutineScope = coroutineTestRule.testScope,
+            duckChatFeature = duckChatFeature,
         )
     }
 
@@ -194,6 +201,38 @@ class RealVoiceSessionStateManagerTest {
 
         tabsFlow.value = emptyList()
         advanceUntilIdle()
+
+        assertFalse(testee.isVoiceSessionActive)
+    }
+
+    @Test
+    fun whenVoiceSessionStartedAndServiceFlagDisabledThenSessionIsActive() = coroutineTestRule.testScope.runTest {
+        whenever(voiceChatServiceToggle.isEnabled()).thenReturn(false)
+        testee = RealVoiceSessionStateManager(
+            context = context,
+            tabRepository = tabRepository,
+            appCoroutineScope = coroutineTestRule.testScope,
+            duckChatFeature = duckChatFeature,
+        )
+
+        testee.onVoiceSessionStarted(TAB_ID)
+
+        assertTrue(testee.isVoiceSessionActive)
+        testee.onVoiceSessionEnded() // cancel collect coroutine before runTest checks for leaks
+    }
+
+    @Test
+    fun whenVoiceSessionEndedAndServiceFlagDisabledThenSessionIsInactive() = coroutineTestRule.testScope.runTest {
+        whenever(voiceChatServiceToggle.isEnabled()).thenReturn(false)
+        testee = RealVoiceSessionStateManager(
+            context = context,
+            tabRepository = tabRepository,
+            appCoroutineScope = coroutineTestRule.testScope,
+            duckChatFeature = duckChatFeature,
+        )
+        testee.onVoiceSessionStarted(TAB_ID)
+
+        testee.onVoiceSessionEnded()
 
         assertFalse(testee.isVoiceSessionActive)
     }
