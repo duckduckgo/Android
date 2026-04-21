@@ -18,10 +18,13 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -52,6 +55,8 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val tabRepository: TabRepository,
     private val appBuildConfig: AppBuildConfig,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val settingsDataStore: SettingsDataStore,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
@@ -72,6 +77,11 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
+
+        if (fromInactivity) {
+            maybeSetAutofillIdleReturnFlag(option)
+        }
+
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
@@ -101,6 +111,18 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
                 showOnAppLaunchOptionDataStore.setResolvedPageUrl(currentUrl!!)
             }
         }
+    }
+
+    private fun maybeSetAutofillIdleReturnFlag(option: ShowOnAppLaunchOption) {
+        val threshold = settingsDataStore.userSelectedIdleThresholdSeconds
+        if (threshold != 0L) return
+
+        val optionName = when (option) {
+            is NewTabPage -> "new_tab_page"
+            is SpecificPage -> "specific_page"
+            else -> return
+        }
+        systemAutofillEngagement.setIdleReturnTriggered(optionName)
     }
 
     private suspend fun handleSpecificPageOption(option: SpecificPage) {
