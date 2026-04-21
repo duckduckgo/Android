@@ -40,6 +40,7 @@ import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.Web
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -993,7 +994,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
@@ -1005,7 +1006,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
