@@ -180,6 +180,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     // --- Chats ---
                     "getChat" -> {
                         val chatId = jsMessage.params.optString("chatId")
+                        logcat { "DuckAiNativeStorage: getChat $chatId" }
                         try {
                             val chat = if (chatId.isNotBlank()) chatsDao.getById(chatId) else null
                             jsMessage.id?.let { id ->
@@ -212,6 +213,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "getAllChats" -> {
                         try {
                             val array = JSONArray()
+                            logcat { "DuckAiNativeStorage: getAllChats" }
                             chatsDao.getAll().forEach { array.put(JSONObject(it.data)) }
                             jsMessage.id?.let { id ->
                                 jsMessaging.onResponse(
@@ -240,6 +242,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "putChat" -> {
                         val chatId = jsMessage.params.optString("chatId")
                         val dataObj = jsMessage.params.optJSONObject("data") ?: return
+                        logcat { "DuckAiNativeStorage: putChat $chatId" }
                         if (chatId.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: putChat chatId=$chatId" }
                             try {
@@ -251,6 +254,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "putChats", "migrateChats" -> {
                         val array = jsMessage.params.optJSONArray("chats") ?: return
+                        logcat { "DuckAiNativeStorage: putChats $array" }
                         try {
                             val entities = (0 until array.length()).mapNotNull { i ->
                                 val obj = array.optJSONObject(i) ?: return@mapNotNull null
@@ -339,6 +343,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     // --- Files ---
                     "getFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
+                        logcat { "DuckAiNativeStorage: getFile $uuid" }
                         try {
                             val json = if (isValidUuid(uuid)) {
                                 val file = File(filesDir, uuid)
@@ -395,6 +400,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "deleteFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
+                        logcat { "DuckAiNativeStorage: deleteFile $uuid" }
                         if (isValidUuid(uuid)) {
                             logcat { "DuckAiNativeStorage: deleteFile uuid=$uuid" }
                             try {
@@ -407,6 +413,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     }
                     "deleteFiles" -> {
                         val chatId = jsMessage.params.optString("chatId")
+                        logcat { "DuckAiNativeStorage: deleteFiles for chat $chatId" }
                         if (chatId.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: deleteFiles chatId=$chatId" }
                             try {
@@ -429,6 +436,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         }
                     }
                     "listFiles" -> {
+                        logcat { "DuckAiNativeStorage: listFiles" }
                         try {
                             val array = JSONArray()
                             fileMetaDao.getAll().forEach { meta ->
