@@ -175,6 +175,39 @@ The `lint-rules` module enforces at compile time:
 
 ---
 
+## Pixel Definitions
+
+Every pixel name added to `AppPixelName.kt` (or any other `Pixel.PixelName` enum) **must** have a corresponding entry in `PixelDefinitions/pixels/definitions/`.
+
+**When you add a pixel:**
+1. Find or create a `.json5` file in `PixelDefinitions/pixels/definitions/` that matches the feature area (e.g. `error_page.json5`, `autofill.json5`).
+2. Add an entry using the pixel name string as the key:
+
+```json5
+{
+    "m_your_pixel_name": {
+        "description": "One sentence: what event this records",
+        "owners": ["your-github-handle"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "param_name",
+                "description": "What this parameter represents",
+                "type": "string"   // or "boolean", "integer"
+            }
+        ]
+    }
+}
+```
+
+- `suffixes` and `parameters` are optional — omit if the pixel sends none.
+- Standard params (`appVersion`, `atb`, etc.) are in `PixelDefinitions/pixels/params_dictionary.json` — reference them by key string rather than inlining.
+- See existing files in `PixelDefinitions/pixels/definitions/` for examples.
+
+---
+
 ## Key Dependencies
 
 | Category | Library |
