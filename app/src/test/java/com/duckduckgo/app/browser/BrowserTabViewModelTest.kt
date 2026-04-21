@@ -6913,7 +6913,18 @@ class BrowserTabViewModelTest {
 
             testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
 
-            verify(mockPixel, never()).enqueueFire(AppPixelName.ERROR_CODE_PIXEL)
+            verify(mockPixel, never()).enqueueFire(eq(AppPixelName.ERROR_CODE_PIXEL), any(), any(), any())
+        }
+
+    @Test
+    fun givenOmittedErrorAndErrorCodePixelEnabledWhenErrorReceivedThenPixelFiredButNoErrorPageShown() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = true))
+
+            testee.onReceivedError(OMITTED, "example.com", "ERROR_UNKNOWN")
+
+            verify(mockPixel).enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to "ERROR_UNKNOWN"))
+            assertCommandNotIssued<Command.WebViewError>()
         }
 
     @Test
