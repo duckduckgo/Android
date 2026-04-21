@@ -201,31 +201,19 @@ class RealNativeInputManager @Inject constructor(
         if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
         omnibarController.hide()
         widgetRoot?.translationZ = 0f
-        if (layoutCoordinator.isWidgetBottom() && widgetRoot != null) {
-            expandBottomCardToFull(widgetRoot)
-        } else {
-            setWidgetCardEndMargin(0)
-        }
-    }
-
-    private fun expandBottomCardToFull(widgetRoot: View) {
-        val card = widgetRoot.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
-        val parentWidth = (card.parent as? View)?.width ?: return
-
-        layoutCoordinator.applyBottomCardCorners(widgetRoot)
-
-        animator.animateCardWidth(
-            card = card,
-            widgetView = widgetRoot,
-            target = CardWidthTarget(width = parentWidth, marginStart = 0, marginEnd = 0, bottomMargin = 0),
-        )
     }
 
     private fun onKeyboardHidden(widget: NativeInputWidget, widgetRoot: View?) {
         if (widget.isModelMenuVisible()) return
-        updateWidgetFocus(widget)
-        if (!omnibarController.isDuckAiMode() && !omnibarController.isSplitMode()) {
-            showTabsAndMenuButtons(widgetRoot)
+        if (omnibarController.isDuckAiMode()) {
+            updateWidgetFocus(widget)
+        } else {
+            omnibarController.showTransparentOmnibar()
+            widgetRoot?.let {
+                it.bringToFront()
+                it.translationZ = WIDGET_ELEVATION_DP.toPx()
+            }
+            rootView.post { hideNativeInput() }
         }
     }
 
@@ -239,22 +227,6 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun showTabsAndMenuButtons(widgetRoot: View?) {
-        omnibarController.showTransparentOmnibar()
-        widgetRoot?.let {
-            it.bringToFront()
-            it.translationZ = 8f.toPx()
-        }
-        if (widgetRoot != null) {
-            layoutCoordinator.applyRoundedCardShape(widgetRoot)
-        }
-        rootView.post {
-            if (widgetRoot != null && widgetRoot.translationZ != 0f) {
-                setWidgetCardEndMargin(omnibarController.getButtonsWidth())
-            }
-        }
-    }
-
     private fun isDescendantOf(ancestor: View, view: View): Boolean {
         var current: View? = view
         while (current != null) {
@@ -262,28 +234,6 @@ class RealNativeInputManager @Inject constructor(
             current = current.parent as? View
         }
         return false
-    }
-
-    private fun setWidgetCardEndMargin(endInset: Int) {
-        val card = rootView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
-        val widgetView = rootView.findViewById(R.id.inputModeTopRoot)
-            ?: rootView.findViewById<View?>(R.id.inputModeBottomRoot)
-            ?: return
-        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        val targetMarginEnd = params.marginStart + endInset
-        if (params.marginEnd == targetMarginEnd) return
-        val parentWidth = (card.parent as? View)?.width ?: return
-
-        animator.animateCardWidth(
-            card = card,
-            widgetView = widgetView,
-            target = CardWidthTarget(
-                width = parentWidth - params.marginStart - targetMarginEnd,
-                marginStart = params.marginStart,
-                marginEnd = targetMarginEnd,
-                bottomMargin = params.bottomMargin,
-            ),
-        )
     }
 
     override fun showNativeInput(
