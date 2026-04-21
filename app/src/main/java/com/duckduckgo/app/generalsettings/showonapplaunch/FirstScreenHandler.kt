@@ -18,7 +18,6 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
-import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
