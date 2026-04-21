@@ -29,6 +29,7 @@ import androidx.lifecycle.map
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -77,6 +78,7 @@ class RealNativeInputManager @Inject constructor(
     private val animator: NativeInputAnimator,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val queryUrlPredictor: QueryUrlPredictor,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -287,7 +289,10 @@ class RealNativeInputManager @Inject constructor(
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
-                if (omnibarController.isDuckAiMode()) {
+                if (queryUrlPredictor.isUrl(query)) {
+                    hideNativeInput()
+                    callbacks.onSearchSubmitted(query)
+                } else if (omnibarController.isDuckAiMode()) {
                     widget.text = ""
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
