@@ -242,6 +242,11 @@ interface DuckChatInternal : DuckChat {
     fun isAutomaticContextAttachmentEnabled(): Boolean
 
     /**
+     * Returns whether Duck.ai native storage is available and enabled/ready to use
+     */
+    fun isNativeStorageEnabled(): Boolean
+
+    /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
      */
     fun areMultipleContentAttachmentsEnabled(): Boolean
@@ -393,6 +398,7 @@ class RealDuckChat @Inject constructor(
     private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
+    private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     init {
         if (isMainProcess) {
@@ -463,6 +469,7 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
+    override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
 
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
@@ -818,6 +825,7 @@ class RealDuckChat @Inject constructor(
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             val featureEnabled = duckChatFeature.self().isEnabled()
+            duckAiNativeStorage = duckChatFeature.duckAiNativeStorage().isEnabled()
             isDuckChatFeatureEnabled = featureEnabled
             _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()

@@ -1402,6 +1402,22 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when duckAiNativeStorage enabled, isNativeStorageEnabled returns true`() = runTest {
+        duckChatFeature.duckAiNativeStorage().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isNativeStorageEnabled())
+    }
+
+    @Test
+    fun `when duckAiNativeStorage disabled, isNativeStorageEnabled returns false`() = runTest {
+        duckChatFeature.duckAiNativeStorage().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isNativeStorageEnabled())
+    }
+
+    @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
         whenever(cookiesManager.get()).thenReturn(cookieManager)

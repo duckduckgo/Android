@@ -287,10 +287,20 @@ class RealDuckAiDebugServer @Inject constructor(
                 th.sortable:hover { background: #e0e0e0; }
                 th.sortable .sort-arrow { margin-left: 4px; opacity: 0.35; font-size: 11px; }
                 th.sortable.sorted .sort-arrow { opacity: 1; }
+                /* Collapsible sections */
+                h2.collapsible { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; }
+                h2.collapsible .caret { font-size: 11px; transition: transform 0.2s; display: inline-block; }
+                h2.collapsible.collapsed .caret { transform: rotate(-90deg); }
+                .collapsible-body { display: block; }
+                .collapsible-body.collapsed { display: none; }
               </style>
             </head>
             <body>
               <h1>🦆 Duck.ai Native Storage Debug</h1>
+
+              <div class="actions" style="margin-bottom:16px">
+                <button class="del-all" style="font-size:15px;padding:12px 24px" onclick="nukeAll()">☢️ Nuke Everything</button>
+              </div>
 
               <h2>Migration</h2>
               <div id="migrationStatus"></div>
@@ -298,44 +308,56 @@ class RealDuckAiDebugServer @Inject constructor(
                 <button class="reset" onclick="resetMigration()">Reset All Migration Flags</button>
               </div>
 
-              <h2>Settings</h2>
-              <table>
-                <thead><tr><th>Key</th><th>Value</th><th></th></tr></thead>
-                <tbody id="settingsBody"></tbody>
-              </table>
-              <div class="add-form">
-                <input id="newSettingKey" type="text" placeholder="Key" />
-                <input id="newSettingValue" type="text" placeholder="Value" />
-                <button class="add" onclick="addSetting()">Add / Update</button>
+              <h2 class="collapsible collapsed" id="settingsHeader" onclick="toggleSection('settings')">
+                <span class="caret">▼</span>Settings <span id="settingsCount" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="settingsBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr><th>Key</th><th>Value</th><th></th></tr></thead>
+                  <tbody id="settingsBody"></tbody>
+                </table>
+                <div class="add-form">
+                  <input id="newSettingKey" type="text" placeholder="Key" />
+                  <input id="newSettingValue" type="text" placeholder="Value" />
+                  <button class="add" onclick="addSetting()">Add / Update</button>
+                </div>
               </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('settings')">Delete All Settings</button>
               </div>
 
-              <h2>Chats <span id="chatsCount" style="font-size:13px;font-weight:normal;color:#888"></span></h2>
-              <table>
-                <thead><tr>
-                  <th class="sortable" id="th-title" onclick="sortChats('title')">Title<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-model" onclick="sortChats('model')">Model<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-msgs" onclick="sortChats('msgs')" style="text-align:center">Msgs<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-lastEdit" onclick="sortChats('lastEdit')">Last Edit<span class="sort-arrow">↕</span></th>
-                  <th></th>
-                </tr></thead>
-                <tbody id="chatsBody"></tbody>
-              </table>
-              <div class="add-form">
-                <textarea id="newChatJson" placeholder='{"chatId":"...","messages":[]}'></textarea>
-                <button class="add" onclick="addChat()">Add Chat (JSON)</button>
+              <h2 class="collapsible collapsed" id="chatsHeader" onclick="toggleSection('chats')">
+                <span class="caret">▼</span>Chats <span id="chatsCount" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="chatsBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr>
+                    <th class="sortable" id="th-title" onclick="sortChats('title')">Title<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-model" onclick="sortChats('model')">Model<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-msgs" onclick="sortChats('msgs')" style="text-align:center">Msgs<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-lastEdit" onclick="sortChats('lastEdit')">Last Edit<span class="sort-arrow">↕</span></th>
+                    <th></th>
+                  </tr></thead>
+                  <tbody id="chatsBody"></tbody>
+                </table>
+                <div class="add-form">
+                  <textarea id="newChatJson" placeholder='{"chatId":"...","messages":[]}'></textarea>
+                  <button class="add" onclick="addChat()">Add Chat (JSON)</button>
+                </div>
               </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('chats')">Delete All Chats</button>
               </div>
 
-              <h2>Files <span id="filesStats" style="font-size:13px;font-weight:normal;color:#888"></span></h2>
-              <table>
-                <thead><tr><th>UUID</th><th>Chat ID</th><th>File Name</th><th>MIME Type</th><th>Size</th><th></th></tr></thead>
-                <tbody id="filesBody"></tbody>
-              </table>
+              <h2 class="collapsible collapsed" id="filesHeader" onclick="toggleSection('files')">
+                <span class="caret">▼</span>Files <span id="filesStats" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="filesBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr><th>UUID</th><th>Chat ID</th><th>File Name</th><th>MIME Type</th><th>Size</th><th></th></tr></thead>
+                  <tbody id="filesBody"></tbody>
+                </table>
+              </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('files')">Delete All Files</button>
               </div>
@@ -393,6 +415,14 @@ class RealDuckAiDebugServer @Inject constructor(
                 let editingSettingKey = null;
                 let editingChatId = null;
 
+                // ── Collapsible sections ─────────────────────────────────────────────
+                function toggleSection(name) {
+                  const header = document.getElementById(name + 'Header');
+                  const body = document.getElementById(name + 'Body-section');
+                  const collapsed = header.classList.toggle('collapsed');
+                  body.classList.toggle('collapsed', collapsed);
+                }
+
                 // ── Load ─────────────────────────────────────────────────────────────
                 async function load() {
                   loadSettings(); loadChats(); loadFiles(); loadMigration();
@@ -423,8 +453,10 @@ class RealDuckAiDebugServer @Inject constructor(
 
                 async function loadSettings() {
                   const obj = await fetchJson('/debug/settings');
+                  const entries = Object.entries(obj);
+                  document.getElementById('settingsCount').textContent = '(' + entries.length + ')';
                   const tbody = document.getElementById('settingsBody');
-                  const rows = Object.entries(obj).map(([k, v]) =>
+                  const rows = entries.map(([k, v]) =>
                     '<tr><td class="nowrap">' + esc(k) + '</td><td>' + esc(v) + '</td><td class="btns">' +
                     '<button class="del" data-key="' + esc(k) + '" onclick="deleteSetting(this.dataset.key)">Delete</button>' +
                     '<button class="edit-btn" data-key="' + esc(k) + '" data-val="' + esc(v) + '" onclick="openSettingEdit(this.dataset.key, this.dataset.val)">Edit</button>' +
@@ -581,8 +613,17 @@ class RealDuckAiDebugServer @Inject constructor(
                 }
 
                 async function deleteAll(type) {
-                  if (!confirm('Delete all ' + type + '?')) return;
                   await fetch('/debug/' + type, { method: 'DELETE' });
+                  load();
+                }
+
+                async function nukeAll() {
+                  await Promise.all([
+                    fetch('/debug/settings', { method: 'DELETE' }),
+                    fetch('/debug/chats', { method: 'DELETE' }),
+                    fetch('/debug/files', { method: 'DELETE' }),
+                    fetch('/debug/migration', { method: 'DELETE' }),
+                  ]);
                   load();
                 }
 

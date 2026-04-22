@@ -360,6 +360,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -483,6 +484,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
+        private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
