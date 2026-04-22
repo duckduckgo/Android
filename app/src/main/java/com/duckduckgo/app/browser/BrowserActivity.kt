@@ -63,6 +63,7 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -151,6 +152,9 @@ import javax.inject.Inject
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var browserMenuDisplayRepository: BrowserMenuDisplayRepository
 
     @Inject
     lateinit var clearDataAction: ClearDataAction
@@ -1647,6 +1651,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
+        val mockupBrowserMenuIcon = if (browserMenuDisplayRepository.isBottomSheetMenuEnabled()) {
+            com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
+        } else {
+            com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
+        }
+        binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
+        binding.bottomMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
+        binding.navigationBarMockup.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
+
         when (settingsDataStore.omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
                 if (Build.VERSION.SDK_INT < 28) {

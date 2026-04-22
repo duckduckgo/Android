@@ -649,7 +649,7 @@ class BrowserTabViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = browserMenuDisplayRepository.isBottomSheetMenuEnabled()),
         )
 
     private val fireproofWebsitesObserver =
@@ -3079,7 +3079,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState()
+        browserViewState.value = BrowserViewState(useBottomSheetMenu = browserMenuState.value.isEnabled)
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
