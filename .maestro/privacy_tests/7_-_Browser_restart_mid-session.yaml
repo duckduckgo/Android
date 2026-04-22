@@ -95,9 +95,11 @@ tags:
                 clearState: false
             - runFlow:
                 when:
-                  visible: "Return to"
+                  visible:
+                    id: ".*returnHatchRoot"
                 commands:
-                  - tapOn: "Return to"
+                  - tapOn:
+                      id: ".*returnHatchRoot"
             - assertVisible:
                 text: "Pay"
             - assertVisible:
