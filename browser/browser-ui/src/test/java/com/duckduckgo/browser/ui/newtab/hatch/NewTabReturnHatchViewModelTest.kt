@@ -26,6 +26,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,13 +50,14 @@ class NewTabReturnHatchViewModelTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val afterIdleReturnFlow = MutableStateFlow(true)
 
     private lateinit var testee: NewTabReturnHatchViewModel
 
     @Before
     fun setup() {
         whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
-        whenever(mockNtpAfterIdleManager.isAfterIdleReturn()).thenReturn(true)
+        whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
 
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
@@ -260,7 +262,7 @@ class NewTabReturnHatchViewModelTest {
 
     @Test
     fun whenLastAccessedTabExistsButNotAfterIdleReturnThenViewStateHidesHatch() = runTest {
-        whenever(mockNtpAfterIdleManager.isAfterIdleReturn()).thenReturn(false)
+        afterIdleReturnFlow.value = false
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         lastAccessedTabFlow.emit(tab)
@@ -268,6 +270,19 @@ class NewTabReturnHatchViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.shouldShow)
+        }
+    }
+
+    @Test
+    fun whenAfterIdleReturnChangesToFalseThenViewStateHidesHatch() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            afterIdleReturnFlow.value = false
+            assertFalse(awaitItem().shouldShow)
         }
     }
 

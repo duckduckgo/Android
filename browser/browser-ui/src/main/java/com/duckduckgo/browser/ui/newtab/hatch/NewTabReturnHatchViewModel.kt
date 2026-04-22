@@ -29,8 +29,8 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,23 +55,25 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val isSerp: Boolean = false,
     )
 
-    val viewState = tabRepository.flowLastAccessedTab
-        .map { lastTab ->
-            if (lastTab != null && ntpAfterIdleManager.isAfterIdleReturn()) {
-                val url = lastTab.url.orEmpty()
-                ViewState(
-                    tabTitle = lastTab.title.orEmpty(),
-                    url = url,
-                    tabId = lastTab.tabId,
-                    currentTabId = lastTab.tabId,
-                    shouldShow = true,
-                    isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
-                    isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
-                )
-            } else {
-                ViewState(shouldShow = false)
-            }
+    val viewState = combine(
+        tabRepository.flowLastAccessedTab,
+        ntpAfterIdleManager.isAfterIdleReturn,
+    ) { lastTab, afterIdle ->
+        if (lastTab != null && afterIdle) {
+            val url = lastTab.url.orEmpty()
+            ViewState(
+                tabTitle = lastTab.title.orEmpty(),
+                url = url,
+                tabId = lastTab.tabId,
+                currentTabId = lastTab.tabId,
+                shouldShow = true,
+                isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
+                isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
+            )
+        } else {
+            ViewState(shouldShow = false)
         }
+    }
         .flowOn(dispatchers.io())
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ViewState())
 
