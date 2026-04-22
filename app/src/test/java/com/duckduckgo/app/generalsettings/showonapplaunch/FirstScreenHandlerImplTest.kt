@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -48,6 +49,7 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
+    private val systemAutofillEngagement: SystemAutofillEngagement = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val testScope = coroutineTestRule.testScope
@@ -68,6 +70,7 @@ class FirstScreenHandlerImplTest {
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             duckChat = duckChat,
             tabRepository = tabRepository,
+            systemAutofillEngagement = systemAutofillEngagement,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
@@ -353,6 +356,13 @@ class FirstScreenHandlerImplTest {
         testee.onClose()
 
         verify(settingsDataStore).lastSessionBackgroundTimestamp = org.mockito.kotlin.any()
+    }
+
+    @Test
+    fun whenOnCloseThenClearsAutofillIdleReturnFlag() {
+        testee.onClose()
+
+        verify(systemAutofillEngagement).clearIdleReturnTriggered()
     }
 
     // --- User preference overrides RC default ---

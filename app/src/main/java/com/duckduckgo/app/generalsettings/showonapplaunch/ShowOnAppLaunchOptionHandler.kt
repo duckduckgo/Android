@@ -18,10 +18,12 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -52,6 +54,8 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val tabRepository: TabRepository,
     private val appBuildConfig: AppBuildConfig,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val settingsDataStore: SettingsDataStore,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
@@ -72,6 +76,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
+
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
@@ -79,11 +84,17 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
                     if (fromInactivity) {
                         ntpAfterIdleManager.onIdleReturnTriggered()
+                        notifyAutofillIdleReturn("new_tab_page")
                     }
                     tabRepository.add()
                 }
             }
-            is SpecificPage -> handleSpecificPageOption(option)
+            is SpecificPage -> {
+                if (fromInactivity) {
+                    notifyAutofillIdleReturn("specific_page")
+                }
+                handleSpecificPageOption(option)
+            }
         }
     }
 
@@ -100,6 +111,12 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             if (shouldSaveCurrentUrlForShowOnAppLaunch) {
                 showOnAppLaunchOptionDataStore.setResolvedPageUrl(currentUrl!!)
             }
+        }
+    }
+
+    private fun notifyAutofillIdleReturn(optionName: String) {
+        if (settingsDataStore.userSelectedIdleThresholdSeconds == 0L) {
+            systemAutofillEngagement.setIdleReturnTriggered(optionName)
         }
     }
 

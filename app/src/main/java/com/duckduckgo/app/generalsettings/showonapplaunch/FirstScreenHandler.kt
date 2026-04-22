@@ -17,6 +17,7 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -46,6 +47,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -83,6 +85,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     override fun onClose() {
+        systemAutofillEngagement.clearIdleReturnTriggered()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
         }
