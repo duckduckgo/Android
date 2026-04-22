@@ -96,10 +96,10 @@ tags:
             - runFlow:
                 when:
                   visible:
-                    id: ".*returnHatchRoot"
+                    id: "newTabReturnHatchView"
                 commands:
                   - tapOn:
-                      id: ".*returnHatchRoot"
+                      id: "newTabReturnHatchView"
             - assertVisible:
                 text: "Pay"
             - assertVisible:
