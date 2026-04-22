@@ -86,6 +86,8 @@ class NtpAfterIdleManagerImpl @Inject constructor(
         }
     }
 
+    override fun isAfterIdleReturn(): Boolean = currentAfterIdle.get()
+
     override fun onIdleTimeoutSelected(seconds: Long) {
         NtpAfterIdlePixels.timeoutPixelsForSeconds(seconds)?.let { (count, daily) ->
             pixel.fire(count, type = Count)

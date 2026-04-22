@@ -27,6 +27,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -41,6 +42,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -55,7 +57,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
     val viewState = tabRepository.flowLastAccessedTab
         .map { lastTab ->
-            if (lastTab != null) {
+            if (lastTab != null && ntpAfterIdleManager.isAfterIdleReturn()) {
                 val url = lastTab.url.orEmpty()
                 ViewState(
                     tabTitle = lastTab.title.orEmpty(),

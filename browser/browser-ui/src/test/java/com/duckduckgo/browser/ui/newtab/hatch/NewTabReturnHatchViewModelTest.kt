@@ -24,6 +24,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -46,6 +47,7 @@ class NewTabReturnHatchViewModelTest {
     private val mockTabRepository: TabRepository = mock()
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
+    private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
 
     private lateinit var testee: NewTabReturnHatchViewModel
@@ -53,12 +55,14 @@ class NewTabReturnHatchViewModelTest {
     @Before
     fun setup() {
         whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
+        whenever(mockNtpAfterIdleManager.isAfterIdleReturn()).thenReturn(true)
 
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
+            ntpAfterIdleManager = mockNtpAfterIdleManager,
         )
     }
 
@@ -251,6 +255,19 @@ class NewTabReturnHatchViewModelTest {
             val state = awaitItem()
             assertTrue(state.isSerp)
             assertEquals("", state.tabTitle)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabExistsButNotAfterIdleReturnThenViewStateHidesHatch() = runTest {
+        whenever(mockNtpAfterIdleManager.isAfterIdleReturn()).thenReturn(false)
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.shouldShow)
         }
     }
 

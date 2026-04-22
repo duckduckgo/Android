@@ -34,4 +34,7 @@ interface NtpAfterIdleManager {
 
     /** Called when the user selects an idle timeout value in seconds. */
     fun onIdleTimeoutSelected(seconds: Long)
+
+    /** Returns true if the current NTP was shown as a result of an idle return. */
+    fun isAfterIdleReturn(): Boolean
 }
