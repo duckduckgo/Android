@@ -1034,6 +1034,18 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
+    fun whenInactivityWithThresholdAlwaysAndNewTabPageButAlreadyOnNtpThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    @Test
     fun whenAppLaunchOptionNotFromInactivityThenAutofillFlagNotSet() = runTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
