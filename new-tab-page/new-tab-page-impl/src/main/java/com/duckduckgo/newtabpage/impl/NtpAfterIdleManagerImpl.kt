@@ -50,7 +50,6 @@ class NtpAfterIdleManagerImpl @Inject constructor(
 ) : NtpAfterIdleManager, BrowserLifecycleObserver {
 
     private val pendingAfterIdle = AtomicBoolean(false)
-    private val currentAfterIdle = AtomicBoolean(false)
     private val _isAfterIdleReturn = MutableStateFlow(false)
     override val isAfterIdleReturn: StateFlow<Boolean> = _isAfterIdleReturn.asStateFlow()
 
@@ -58,7 +57,6 @@ class NtpAfterIdleManagerImpl @Inject constructor(
         // Clear transient state in case it was left over from a prior session; the process may
         // survive across sessions so the AtomicBooleans can otherwise hold stale classifications.
         pendingAfterIdle.set(false)
-        currentAfterIdle.set(false)
         _isAfterIdleReturn.value = false
     }
 
@@ -68,7 +66,6 @@ class NtpAfterIdleManagerImpl @Inject constructor(
 
     override fun onNtpShown() {
         val wasAfterIdle = pendingAfterIdle.getAndSet(false)
-        currentAfterIdle.set(wasAfterIdle)
         _isAfterIdleReturn.value = wasAfterIdle
         if (wasAfterIdle) {
             pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
@@ -80,11 +77,11 @@ class NtpAfterIdleManagerImpl @Inject constructor(
     }
 
     override fun onReturnToPageTapped() {
-        hatchPixels.fireReturnToPageTapped(currentAfterIdle.get())
+        hatchPixels.fireReturnToPageTapped(_isAfterIdleReturn.value)
     }
 
     override fun onNtpSearchSubmitted() {
-        if (currentAfterIdle.get()) {
+        if (_isAfterIdleReturn.value) {
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE, type = Count)
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE_DAILY, type = Daily())
         } else {
