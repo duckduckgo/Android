@@ -4312,6 +4312,7 @@ class BrowserTabViewModel @Inject constructor(
                         method,
                         id,
                         data,
+                        tabId = tabId,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {

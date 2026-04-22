@@ -1611,17 +1611,19 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenVoiceSessionStartedThenPixelFiredAndStateUpdated() = runTest {
+        val tabId = "test-tab-id"
         val result = testee.processJsCallbackMessage(
             "aiChat",
             "voiceSessionStarted",
             null,
             null,
             pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
         )
 
         assertNull(result)
         verify(mockDuckChatPixels).reportVoiceSessionStarted()
-        verify(mockVoiceSessionStateManager).onVoiceSessionStarted()
+        verify(mockVoiceSessionStateManager).onVoiceSessionStarted(tabId)
     }
 
     @Test
