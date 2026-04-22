@@ -24,7 +24,6 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +64,7 @@ class RealSystemAutofillEngagement @Inject constructor(
             val option = idleReturnAppLaunchOption
             if (option != null) {
                 pixel.fire(
-                    NtpAfterIdlePixelName.AUTOFILL_AFTER_IDLE_RETURN,
+                    AUTOFILL_AFTER_IDLE_RETURN_PIXEL,
                     mapOf("appLaunchOption" to option),
                     type = Count,
                 )
@@ -76,5 +75,9 @@ class RealSystemAutofillEngagement @Inject constructor(
                 pixel.fire(AutofillPixelNames.AUTOFILL_SYSTEM_AUTOFILL_USED, type = Daily())
             }
         }
+    }
+
+    companion object {
+        const val AUTOFILL_AFTER_IDLE_RETURN_PIXEL = "m_ntp_after_idle_autofill_after_idle_return"
     }
 }
