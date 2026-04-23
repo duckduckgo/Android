@@ -3381,7 +3381,6 @@ class BrowserTabViewModel @Inject constructor(
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
-                    // SENTINEL[DaxTrackersBlockedCta@dismiss-privacy-shield-highlight-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value =
                             currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -3400,7 +3399,6 @@ class BrowserTabViewModel @Inject constructor(
             if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
             ) {
-                // SENTINEL[DaxTrackersBlockedCta@dismissed-privacy-shield-highlight-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
         }
@@ -4653,7 +4651,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is DaxTrackersBlockedBrandDesignUpdateContextualCta,
             -> {
-                // SENTINEL[DaxTrackersBlockedCta@ok-button-transition-to-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
