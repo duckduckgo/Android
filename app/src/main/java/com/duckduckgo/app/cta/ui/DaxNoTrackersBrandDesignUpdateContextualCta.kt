@@ -23,12 +23,9 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxNoTrackersCta]. A Stage 2 agent will
- * replace [activeIncludeId] and populate [configureContentViews] to render the
- * no-trackers-blocked in-context dialog.
- */
 data class DaxNoTrackersBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -46,9 +43,18 @@ data class DaxNoTrackersBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = 0 // STUB: Stage 2 replaces with R.id.<include>.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
-        // STUB: Stage 2 agent implements.
+        val context = view.context
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
+            context.getString(R.string.daxNonSerpCtaText)
+        view.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setText(R.string.daxDialogGotIt)
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }
