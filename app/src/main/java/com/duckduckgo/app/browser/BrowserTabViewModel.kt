@@ -1343,7 +1343,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
             -> {
-                // TODO: replace in stage 2 (DaxSiteSuggestionsCta brand-design migration).
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
