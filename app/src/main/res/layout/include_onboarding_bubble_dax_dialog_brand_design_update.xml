@@ -23,7 +23,7 @@
         app:layout_constraintWidth_max="600dp"
         app:showArrow="false">
 
-        <LinearLayout
+        <com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
             android:id="@+id/brandDesignCardContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                 android:visibility="gone"
                 tools:visibility="gone" />
 
-        </LinearLayout>
+        </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
 
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
 
