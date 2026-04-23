@@ -23,12 +23,9 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxEndCta] (the in-context end-of-journey
- * variant — distinct from [DaxEndBrandDesignUpdateBubbleCta], which is the NTP bubble). A Stage 2
- * agent will replace [activeIncludeId] and populate [configureContentViews].
- */
 data class DaxEndBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -48,9 +45,18 @@ data class DaxEndBrandDesignUpdateContextualCta(
 ) {
     override val markAsReadOnShow: Boolean = true
 
-    override val activeIncludeId: Int = 0 // STUB: Stage 2 replaces with R.id.<include>.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
-        // STUB: Stage 2 agent implements.
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
+            ?.setText(R.string.onboardingEndDaxDialogDescription)
+        view.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)
+            ?.setText(R.string.onboardingEndDaxDialogButton)
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }
