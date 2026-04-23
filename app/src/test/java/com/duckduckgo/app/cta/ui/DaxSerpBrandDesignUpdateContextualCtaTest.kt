@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -68,7 +69,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
@@ -248,6 +252,68 @@ class DaxSerpBrandDesignUpdateContextualCtaTest {
     fun pixelOkParametersCarrySerpCtaToken() {
         val params = newCta().pixelOkParameters()
         assertEquals(Pixel.PixelValues.DAX_SERP_CTA, params[Pixel.PixelParameter.CTA_SHOWN])
+    }
+
+    @Test
+    fun whenCtaShownThenShownPixelFired() = runTest {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+        val cta = newCta()
+
+        testee.onCtaShown(cta)
+
+        verify(mockPixel).fire(
+            eq(AppPixelName.ONBOARDING_DAX_CTA_SHOWN),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenUserClicksOkButtonThenOkPixelFiredWithSerpCtaPixelParam() = runTest {
+        val cta = newCta()
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockPixel).fire(
+            eq(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON),
+            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DAX_SERP_CTA)),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenUserDismissesViaCloseButtonThenClosePixelFiredWithSerpCtaPixelParam() = runTest {
+        val cta = newCta()
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
+
+        verify(mockPixel).fire(
+            eq(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON),
+            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DAX_SERP_CTA)),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenUserDismissesWithoutCloseButtonThenNoCloseOrCancelPixelFired() = runTest {
+        val cta = newCta()
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = false)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), any())
+    }
+
+    @Test
+    fun whenUserDismissesThenDismissalPersisted() = runTest {
+        val cta = newCta()
+
+        testee.onUserDismissedCta(cta)
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
     }
 
     private fun newCta(): DaxSerpBrandDesignUpdateContextualCta =
