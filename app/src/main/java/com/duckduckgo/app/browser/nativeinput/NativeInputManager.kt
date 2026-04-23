@@ -282,8 +282,15 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
     ) {
         val widget = widgetFrom(widgetView) ?: return
+        val onSearchTextChanged: (String) -> Unit = { text ->
+            if (omnibarController.isDuckAiMode() && text.isBlank()) {
+                callbacks.onClearAutocomplete()
+            } else {
+                callbacks.onSearchTextChanged(text)
+            }
+        }
         widget.bindInputEvents(
-            onSearchTextChanged = callbacks.onSearchTextChanged,
+            onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
                 hideNativeInput()
                 callbacks.onSearchSubmitted(query)
@@ -400,9 +407,12 @@ class RealNativeInputManager @Inject constructor(
     ) {
         val widget = widgetFrom(widgetView) ?: return
         val previousOnSearchSelected = widget.onSearchSelected
-        widget.onSearchSelected = { animate ->
+        widget.onSearchSelected = handler@{ animate ->
             if (widget.text.isBlank()) {
                 onClearAutocomplete()
+                if (omnibarController.isDuckAiMode()) {
+                    return@handler
+                }
             }
             previousOnSearchSelected?.invoke(animate)
         }
