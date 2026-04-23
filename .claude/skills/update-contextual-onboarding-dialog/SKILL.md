@@ -29,13 +29,15 @@ Up to 7 agents run this skill in parallel, each in its own worktree on a pre-cre
 
 | CTA | `BrowserTabViewModel` sentinels expected |
 |---|---|
-| `DaxSerpCta` | 1 (touchpoint at `cta-when-branch`) |
-| `DaxTrackersBlockedCta` | 3 (touchpoints at `privacy-shield-highlight-check`, `trackers-blocked-typing-finished`, `cta-when-branch`) |
-| `DaxMainNetworkCta` | 1 (touchpoint at `cta-when-branch`) |
-| `DaxNoTrackersCta` | 1 (touchpoint at `cta-when-branch`) |
-| `DaxFireButtonCta` | 2 (touchpoints at `launch-fire-dialog`, `launch-fire-dialog-check`) |
-| `DaxSiteSuggestionsCta` | 1 (touchpoint at `cta-when-branch`) |
+| `DaxSerpCta` | 1 (`ok-button-transition-to-site-suggestions`) |
+| `DaxTrackersBlockedCta` | 3 (`dismiss-privacy-shield-highlight-check`, `dismissed-privacy-shield-highlight-check`, `ok-button-transition-to-fire-dialog`) |
+| `DaxMainNetworkCta` | 1 (`ok-button-transition-to-fire-dialog`) |
+| `DaxNoTrackersCta` | 1 (`ok-button-transition-to-fire-dialog`) |
+| `DaxFireButtonCta` | 2 (`ok-button-launch-fire-dialog`, `fire-menu-selected-dismiss`) |
+| `DaxSiteSuggestionsCta` | 1 (`query-custom-pixel-check`) |
 | `DaxEndCta` | 0 — skip P5 entirely |
+
+Always locate sentinels by `grep -n "SENTINEL\[<CtaName>@"` rather than hunting by hint name; the table above is for reference.
 
 If any precondition is missing, STOP and report: "Stage 1 has not been run or is incomplete. Run it first." Do NOT bootstrap — that is Stage 1's job.
 

@@ -16,13 +16,8 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -33,146 +28,137 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
-/**
- * Robolectric-backed unit tests for [OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta].
- * Exercises the base-class state machine directly — [snapToFinished], [resetSharedViewState],
- * [getAllContentIncludes] — without booting the full fragment.
- */
-@RunWith(AndroidJUnit4::class)
 class BrandDesignContextualDaxDialogCtaTest {
 
-    private val context: Context = ApplicationProvider.getApplicationContext()
-    private val mockOnboardingStore: OnboardingStore = mock()
-    private val mockAppInstallStore: AppInstallStore = mock()
+    private val container: View = mock()
+    private val titleView: DaxTypeAnimationTextView = mock()
+    private val hiddenTitle: DaxTextView = mock()
+    private val descriptionView: DaxTextView = mock()
+    private val dismissButton: ImageView = mock()
+    private val cardContainer: TouchInterceptingLinearLayout = mock()
+    private val activeInclude: View = mock()
+    private val primaryInclude: View = mock()
+    private val optionsInclude: View = mock()
 
-    private lateinit var container: View
-    private lateinit var titleView: DaxTypeAnimationTextView
-    private lateinit var hiddenTitle: DaxTextView
-    private lateinit var descriptionView: DaxTextView
-    private lateinit var dismissButton: ImageView
-    private lateinit var cardContainer: TouchInterceptingLinearLayout
-    private lateinit var activeInclude: View
+    private val onboardingStore: OnboardingStore = mock()
+    private val appInstallStore: AppInstallStore = mock()
 
     private lateinit var testee: TestableBrandDesignContextualDaxDialogCta
 
     @Before
     fun before() {
-        val themedContext = androidx.appcompat.view.ContextThemeWrapper(
-            context,
-            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light,
-        )
-        container = LayoutInflater.from(themedContext)
-            .inflate(R.layout.include_onboarding_in_context_dax_dialog_brand_design_update, FrameLayout(themedContext), false)
-        titleView = container.findViewById(R.id.contextualBrandDesignTitle)
-        hiddenTitle = container.findViewById(R.id.contextualBrandDesignHiddenTitle)
-        descriptionView = container.findViewById(R.id.contextualBrandDesignDescription)
-        dismissButton = container.findViewById(R.id.contextualBrandDesignDismissButton)
-        cardContainer = container.findViewById(R.id.contextualBrandDesignCardContainer)
-        activeInclude = container.findViewById(R.id.contextualBrandDesignPrimaryCtaContent)
+        whenever(container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle))
+            .thenReturn(titleView)
+        whenever(container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle))
+            .thenReturn(hiddenTitle)
+        whenever(container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription))
+            .thenReturn(descriptionView)
+        whenever(container.findViewById<View>(R.id.contextualBrandDesignDismissButton))
+            .thenReturn(dismissButton)
+        whenever(container.findViewById<View>(R.id.contextualBrandDesignPrimaryCtaContent))
+            .thenReturn(primaryInclude)
+        whenever(container.findViewById<View>(R.id.contextualBrandDesignOptionsContent))
+            .thenReturn(optionsInclude)
 
-        testee = TestableBrandDesignContextualDaxDialogCta(
-            mockOnboardingStore,
-            mockAppInstallStore,
-            isLightTheme = true,
-        )
+        testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore)
     }
 
     @Test
     fun snapToFinished_tapBeforeAnimationStarts_setsTitleDirectly() {
-        hiddenTitle.text = "Dax title"
-        titleView.text = ""
+        whenever(hiddenTitle.text).thenReturn("Dax title")
+        whenever(titleView.hasAnimationStarted()).thenReturn(false)
 
         testee.invokeSnap(alreadySettled = false)
 
-        assertEquals("Dax title", titleView.text.toString())
-        assertEquals(1f, titleView.alpha, 0f)
-        assertEquals(1f, descriptionView.alpha, 0f)
-        assertEquals(1f, dismissButton.alpha, 0f)
-        assertEquals(1f, activeInclude.alpha, 0f)
+        verify(cardContainer).interceptChildTouches = false
+        verify(titleView).finishAnimation()
+        verify(titleView).text = "Dax title"
+        verify(titleView).alpha = 1f
+        verify(descriptionView).alpha = 1f
+        verify(dismissButton).alpha = 1f
+        verify(activeInclude).alpha = 1f
         assertEquals(1, testee.settledInvocations)
     }
 
     @Test
-    fun snapToFinished_tapMidAnimation_finishesWithoutBlankTitle() {
-        hiddenTitle.text = "Full dax text"
-        titleView.text = "Par"
-        titleView.startTypingAnimation("Full dax text", isCancellable = true)
+    fun snapToFinished_tapMidAnimation_finishesAnimationWithoutOverwritingText() {
+        whenever(hiddenTitle.text).thenReturn("Full dax text")
+        whenever(titleView.hasAnimationStarted()).thenReturn(true)
 
         testee.invokeSnap(alreadySettled = false)
 
-        // finishAnimation() on TypeAnimationTextView sets text to the completeText; at minimum
-        // the title must be non-empty so the user never sees a blank dialog after tapping.
-        assertTrue(titleView.text.toString().isNotEmpty())
-        assertEquals(1f, descriptionView.alpha, 0f)
-        assertEquals(1f, dismissButton.alpha, 0f)
-        assertEquals(1f, activeInclude.alpha, 0f)
+        verify(titleView).finishAnimation()
+        // Animation already running — finishAnimation() lands the full text via its end-action.
+        // Setting titleView.text directly here would race with that and risk a partial render.
+        verify(titleView, never()).text = any<CharSequence>()
+        verify(titleView).alpha = 1f
+        verify(descriptionView).alpha = 1f
+        verify(dismissButton).alpha = 1f
+        verify(activeInclude).alpha = 1f
     }
 
     @Test
-    fun snapToFinished_tapAfterAnimationEnds_isNoOp() {
-        hiddenTitle.text = "Dax title"
-        titleView.text = "Dax title"
-
-        testee.invokeSnap(alreadySettled = true)
-
-        assertEquals(0, testee.settledInvocations)
-    }
-
-    @Test
-    fun snapToFinished_rapidDoubleTap_firesCallbackOnlyOnce() {
-        hiddenTitle.text = "Dax title"
+    fun snapToFinished_emptyTitle_keepsTitleAlphaZero() {
+        whenever(hiddenTitle.text).thenReturn("")
+        whenever(titleView.hasAnimationStarted()).thenReturn(false)
 
         testee.invokeSnap(alreadySettled = false)
-        // Simulate the base class flipping animationsSettled after the first call.
+
+        // No-title CTAs must not lift the title alpha — an empty title view at alpha=1 would still
+        // occupy layout space but render nothing. Description + active include must still fade in.
+        verify(titleView, never()).alpha = 1f
+        verify(descriptionView).alpha = 1f
+        verify(activeInclude).alpha = 1f
+        assertEquals(1, testee.settledInvocations)
+    }
+
+    @Test
+    fun snapToFinished_respectsAlreadySettledFlag() {
+        whenever(hiddenTitle.text).thenReturn("Dax title")
+        whenever(titleView.hasAnimationStarted()).thenReturn(false)
+
+        testee.invokeSnap(alreadySettled = false)
+        // Second call with alreadySettled=true (as the outer state machine would pass after the
+        // first settlement) must not re-fire the settled callback.
         testee.invokeSnap(alreadySettled = true)
 
         assertEquals(1, testee.settledInvocations)
     }
 
     @Test
-    fun resetSharedViewState_resetsGravityTextAlphaVisibility() {
-        titleView.alpha = 1f
-        titleView.text = "leftover title"
-        hiddenTitle.text = "leftover hidden"
-        descriptionView.alpha = 1f
-        descriptionView.text = "leftover description"
-        dismissButton.alpha = 1f
-
+    fun resetSharedViewState_zeroesAllSharedViews() {
         testee.invokeResetSharedViewState()
 
-        assertEquals(0f, titleView.alpha, 0f)
-        assertEquals("", titleView.text.toString())
-        assertEquals("", hiddenTitle.text.toString())
-        assertEquals(0f, descriptionView.alpha, 0f)
-        assertEquals("", descriptionView.text.toString())
-        assertEquals(0f, dismissButton.alpha, 0f)
+        verify(titleView).alpha = 0f
+        verify(titleView).text = ""
+        verify(hiddenTitle).text = ""
+        verify(descriptionView).alpha = 0f
+        verify(descriptionView).text = ""
+        verify(dismissButton).alpha = 0f
     }
 
     @Test
-    fun getAllContentIncludes_returnsExpectedIds() {
+    fun getAllContentIncludes_returnsPrimaryAndOptionsIncludes() {
         val includes = testee.invokeGetAllContentIncludes()
 
         assertEquals(2, includes.size)
-        val includeIds = includes.map { it.id }.toSet()
-        assertTrue(includeIds.contains(R.id.contextualBrandDesignPrimaryCtaContent))
-        assertTrue(includeIds.contains(R.id.contextualBrandDesignOptionsContent))
+        assertSame(primaryInclude, includes[0])
+        assertSame(optionsInclude, includes[1])
     }
 
-    /**
-     * Concrete subclass that exposes the base-class `internal` helpers so tests can drive the
-     * state machine without booting a real fragment. Runs with the test layout inflated in
-     * [before]; never mounted in a real FragmentBrowserTabBinding.
-     */
+    /** Concrete subclass that exposes the base-class `internal` helpers for direct test driving. */
     private inner class TestableBrandDesignContextualDaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        override val isLightTheme: Boolean,
     ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_SERP,
         description = null,
@@ -184,7 +170,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         ctaPixelParam = Pixel.PixelValues.DAX_SERP_CTA,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-        isLightTheme = isLightTheme,
+        isLightTheme = true,
     ) {
         var settledInvocations: Int = 0
 

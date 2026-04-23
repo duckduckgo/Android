@@ -31,10 +31,10 @@ import com.duckduckgo.app.trackerdetection.model.Entity
  * will replace [activeIncludeId] and populate [configureContentViews] to render the
  * trackers-blocked in-context dialog.
  *
- * Also overrides [onTypingAnimationSettled] so the ViewModel can highlight the privacy-shield
- * icon after the typing animation finishes — mirroring the legacy wiring that lives in
- * [com.duckduckgo.app.browser.BrowserTabFragment.showOnboardingDialogCta]. Stage 2 agents keep
- * or refine the override as needed.
+ * The Stage 2 agent also overrides [onTypingAnimationSettled] to invoke the callback, triggering
+ * the ViewModel privacy-shield highlight that mirrors the legacy single-CTA gating. The base-class
+ * default is a no-op, so without this override the privacy shield never highlights — which is the
+ * correct behavior for every other contextual CTA.
  */
 data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
