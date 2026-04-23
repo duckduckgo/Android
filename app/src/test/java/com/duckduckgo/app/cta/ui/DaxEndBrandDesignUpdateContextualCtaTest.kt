@@ -36,7 +36,9 @@ import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_SHOWN
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_ONBOARDING_END_CTA
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
@@ -204,21 +206,36 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     fun whenCtaShownThenShownPixelFiredWithEndCtaParam() = runTest {
         testee.onCtaShown(newContextualCta())
 
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any(), any(), eq(Count))
+        verify(mockPixel).fire(
+            eq(ONBOARDING_DAX_CTA_SHOWN),
+            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
+            any(),
+            eq(Count),
+        )
     }
 
     @Test
     fun whenUserClicksOkButtonThenOkPixelFiredWithEndCtaParam() = runTest {
         testee.onUserClickCtaOkButton(newContextualCta())
 
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_OK_BUTTON), any(), any(), eq(Count))
+        verify(mockPixel).fire(
+            eq(ONBOARDING_DAX_CTA_OK_BUTTON),
+            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
+            any(),
+            eq(Count),
+        )
     }
 
     @Test
     fun whenUserDismissesViaCloseButtonThenClosePixelFiredWithEndCtaParam() = runTest {
         testee.onUserDismissedCta(newContextualCta(), viaCloseBtn = true)
 
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), eq(Count))
+        verify(mockPixel).fire(
+            eq(ONBOARDING_DAX_CTA_DISMISS_BUTTON),
+            eq(mapOf(CTA_SHOWN to DAX_ONBOARDING_END_CTA)),
+            any(),
+            eq(Count),
+        )
     }
 
     @Test
