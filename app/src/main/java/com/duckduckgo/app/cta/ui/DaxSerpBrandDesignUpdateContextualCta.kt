@@ -23,13 +23,10 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extensions.html
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxSerpCta]. A Stage 2 agent will replace
- * [activeIncludeId] and populate [configureContentViews] to render the SERP in-context dialog.
- * Until then this class is never constructed at runtime — [CtaViewModel] sentinels still return
- * the legacy CTA.
- */
 data class DaxSerpBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -47,9 +44,19 @@ data class DaxSerpBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = 0 // STUB: Stage 2 replaces with R.id.<include>.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
-        // STUB: Stage 2 agent implements.
+        val context = view.context
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
+            context.getString(R.string.onboardingSerpDaxDialogDescription).html(context)
+        view.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)
+            ?.setText(R.string.onboardingSerpDaxDialogButton)
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }

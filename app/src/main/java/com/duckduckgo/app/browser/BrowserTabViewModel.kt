@@ -4623,7 +4623,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSerpCta,
             is DaxSerpBrandDesignUpdateContextualCta,
             -> {
-                // SENTINEL[DaxSerpCta@ok-button-transition-to-site-suggestions]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {

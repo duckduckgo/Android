@@ -439,8 +439,11 @@ class CtaViewModel @Inject constructor(
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
                 if (isBrandDesignUpdateEnabled()) {
-                    // SENTINEL[DaxSerpCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
-                    return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                    return DaxSerpBrandDesignUpdateContextualCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                    )
                 }
                 return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
