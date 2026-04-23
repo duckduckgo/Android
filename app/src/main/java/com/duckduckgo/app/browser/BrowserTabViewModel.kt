@@ -4698,10 +4698,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is OnboardingDaxDialogCta.DaxFireButtonCta,
             is DaxFireButtonBrandDesignUpdateContextualCta,
-            -> {
-                // SENTINEL[DaxFireButtonCta@ok-button-launch-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
-                LaunchFireDialogFromOnboardingDialog(onboardingCta)
-            }
+            -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
@@ -4742,7 +4739,6 @@ class BrowserTabViewModel @Inject constructor(
         }
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            // SENTINEL[DaxFireButtonCta@fire-menu-selected-dismiss]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
