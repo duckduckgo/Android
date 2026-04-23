@@ -229,8 +229,11 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
-                // TODO: replace in stage 2 (DaxFireButtonCta brand-design migration).
-                return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+                return@withContext DaxFireButtonBrandDesignUpdateContextualCta(
+                    onboardingStore = onboardingStore,
+                    appInstallStore = appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                )
             }
             OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
         }
