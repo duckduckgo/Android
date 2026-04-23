@@ -228,6 +228,10 @@ class CtaViewModel @Inject constructor(
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // SENTINEL[DaxFireButtonCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            }
             OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
         }
     }
@@ -235,6 +239,14 @@ class CtaViewModel @Inject constructor(
     suspend fun getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked: (index: Int) -> Unit): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // SENTINEL[DaxSiteSuggestionsCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onSiteSuggestionOptionClicked,
+                )
+            }
             OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
                 onboardingStore,
                 appInstallStore,
@@ -243,9 +255,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxEndCta? {
+    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // SENTINEL[DaxEndCta@end-static-cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
             return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
         }
     }
@@ -378,6 +394,15 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // SENTINEL[DaxTrackersBlockedCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                    return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                        settingsDataStore,
+                    )
+                }
                 return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
                     onboardingStore,
                     appInstallStore,
@@ -392,6 +417,15 @@ class CtaViewModel @Inject constructor(
                     if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() &&
                         OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
+                        if (isBrandDesignUpdateEnabled()) {
+                            // SENTINEL[DaxMainNetworkCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                            return OnboardingDaxDialogCta.DaxMainNetworkCta(
+                                onboardingStore,
+                                appInstallStore,
+                                entity.displayName,
+                                host,
+                            )
+                        }
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(
                             onboardingStore,
                             appInstallStore,
@@ -404,16 +438,28 @@ class CtaViewModel @Inject constructor(
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // SENTINEL[DaxSerpCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                    return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                }
                 return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
 
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // SENTINEL[DaxNoTrackersCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                    return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                }
                 return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
             }
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // SENTINEL[DaxEndCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
                 return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
