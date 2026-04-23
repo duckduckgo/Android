@@ -4649,36 +4649,8 @@ class BrowserTabViewModel @Inject constructor(
 
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is DaxTrackersBlockedBrandDesignUpdateContextualCta,
-            -> {
-                viewModelScope.launch {
-                    val cta =
-                        withContext(dispatchers.io()) {
-                            if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
-                        }
-                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                    if (cta == null) {
-                        command.value = HideOnboardingDaxDialog(onboardingCta)
-                    }
-                }
-                null
-            }
-
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is DaxNoTrackersBrandDesignUpdateContextualCta,
-            -> {
-                viewModelScope.launch {
-                    val cta =
-                        withContext(dispatchers.io()) {
-                            if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
-                        }
-                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                    if (cta == null) {
-                        command.value = HideOnboardingDaxDialog(onboardingCta)
-                    }
-                }
-                null
-            }
-
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             is DaxMainNetworkBrandDesignUpdateContextualCta,
             -> {
