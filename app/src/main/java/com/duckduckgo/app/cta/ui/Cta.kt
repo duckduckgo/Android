@@ -949,9 +949,11 @@ sealed class DaxBubbleCta(
             }
 
             if (isContentTransition) {
-                // Content transition: fade out old description + any visible content include, then swap and animate new
+                // Content transition: fade out title + description + visible includes, then swap and animate new
                 val allContentIncludes = getAllContentIncludes(container)
                 val fadeOutAnimators = mutableListOf<Animator>(
+                    ObjectAnimator.ofFloat(titleView, View.ALPHA, 0f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                     ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 0f)
                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                 )
@@ -972,6 +974,8 @@ sealed class DaxBubbleCta(
                             resetAllIncludesExcept(container, activeInclude)
                             resetHeaderState()
                             configureContentViews(container)
+                            // Blank the title so typing shows new text, not stale.
+                            titleView.text = ""
                             typeAndFadeIn()
                         }
                     })
