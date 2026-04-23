@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -90,7 +89,6 @@ internal fun DaxButton(
         Button(
             onClick = onClick,
             modifier = modifier
-                .padding(vertical = dimensions.insetVertical)
                 .height(dimensions.surfaceHeight),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colors.containerColor,
@@ -187,7 +185,6 @@ private fun resolveButtonDimensions(size: DaxButtonSize): DaxButtonDimensions {
                 DaxButtonSize.Small -> SmallButtonSurfaceHeight
                 DaxButtonSize.Large -> LargeButtonSurfaceHeight
             },
-            insetVertical = ButtonInsetVertical,
             contentPadding = PaddingValues(horizontal = sidePadding),
         )
     }
@@ -235,7 +232,6 @@ enum class DaxButtonSize {
     Large,
 }
 
-private val ButtonInsetVertical = 6.dp
 private val SmallButtonSurfaceHeight = 36.dp
 private val LargeButtonSurfaceHeight = 48.dp
 private val SmallIconSize = 16.dp
@@ -244,7 +240,6 @@ private val LargeIconSize = 24.dp
 @Immutable
 private data class DaxButtonDimensions(
     val surfaceHeight: Dp,
-    val insetVertical: Dp,
     val contentPadding: PaddingValues,
 )
 
