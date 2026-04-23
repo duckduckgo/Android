@@ -4684,7 +4684,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             is DaxMainNetworkBrandDesignUpdateContextualCta,
             -> {
-                // SENTINEL[DaxMainNetworkCta@ok-button-transition-to-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
