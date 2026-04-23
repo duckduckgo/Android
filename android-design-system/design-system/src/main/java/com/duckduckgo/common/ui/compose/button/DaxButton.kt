@@ -175,21 +175,20 @@ internal fun DaxButton(
 
 @Composable
 private fun resolveButtonDimensions(size: DaxButtonSize): DaxButtonDimensions {
-    return when (size) {
-        DaxButtonSize.Small -> DaxButtonDimensions(
-            surfaceHeight = SmallButtonSurfaceHeight,
+    val sidePadding = dimensionResource(
+        when (size) {
+            DaxButtonSize.Small -> R.dimen.buttonSmallSidePadding
+            DaxButtonSize.Large -> R.dimen.buttonLargeSidePadding
+        },
+    )
+    return remember(size, sidePadding) {
+        DaxButtonDimensions(
+            surfaceHeight = when (size) {
+                DaxButtonSize.Small -> SmallButtonSurfaceHeight
+                DaxButtonSize.Large -> LargeButtonSurfaceHeight
+            },
             insetVertical = ButtonInsetVertical,
-            contentPadding = PaddingValues(
-                horizontal = dimensionResource(R.dimen.buttonSmallSidePadding),
-            ),
-        )
-
-        DaxButtonSize.Large -> DaxButtonDimensions(
-            surfaceHeight = LargeButtonSurfaceHeight,
-            insetVertical = ButtonInsetVertical,
-            contentPadding = PaddingValues(
-                horizontal = dimensionResource(R.dimen.buttonLargeSidePadding),
-            ),
+            contentPadding = PaddingValues(horizontal = sidePadding),
         )
     }
 }
