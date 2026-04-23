@@ -4795,7 +4795,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxNoTrackersCta,
             is DaxNoTrackersBrandDesignUpdateContextualCta,
             -> {
-                // TODO: replace in stage 2 (DaxNoTrackersCta brand-design migration).
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {

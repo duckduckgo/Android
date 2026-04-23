@@ -451,8 +451,11 @@ class CtaViewModel @Inject constructor(
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 if (isBrandDesignUpdateEnabled()) {
-                    // TODO: replace in stage 2 (DaxNoTrackersCta brand-design migration).
-                    return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                    return DaxNoTrackersBrandDesignUpdateContextualCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                    )
                 }
                 return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
             }
