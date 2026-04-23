@@ -262,8 +262,11 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
-                // TODO: replace in stage 2 (DaxEndCta brand-design migration).
-                return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                return@withContext DaxEndBrandDesignUpdateContextualCta(
+                    onboardingStore,
+                    appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                )
             }
             return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
         }
@@ -466,8 +469,11 @@ class CtaViewModel @Inject constructor(
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
                 if (isBrandDesignUpdateEnabled()) {
-                    // TODO: replace in stage 2 (DaxEndCta brand-design migration).
-                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                    return DaxEndBrandDesignUpdateContextualCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                    )
                 }
                 return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
             }
