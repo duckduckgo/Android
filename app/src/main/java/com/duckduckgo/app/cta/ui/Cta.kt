@@ -870,8 +870,11 @@ sealed class DaxBubbleCta(
         ) {
             ctaView = container
 
+            // Assumes one active showCta at a time — the intercept flag gates user advances until settled.
+            // Overlapping calls would let stale closure callbacks clobber shared view state.
             var animationsSettled = false
             var contentFadeInAnimator: AnimatorSet? = null
+            var fadeOutAnimator: AnimatorSet? = null
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val daxTitle = container.context.getString(title)
@@ -948,6 +951,21 @@ sealed class DaxBubbleCta(
                 }
             }
 
+            val applySettledState = {
+                hiddenTitle.text = daxTitle.html(container.context)
+                descriptionView.text = daxDescription.html(container.context)
+                if (!titleView.hasAnimationStarted()) {
+                    titleView.text = daxTitle.html(container.context)
+                }
+                titleView.alpha = 1f
+                descriptionView.alpha = 1f
+                dismissButton.alpha = 1f
+                activeInclude.alpha = 1f
+                if (headerImage?.isVisible == true) {
+                    headerImage.alpha = 1f
+                }
+            }
+
             if (isContentTransition) {
                 // Content transition: fade out title + description + visible includes, then swap and animate new
                 val allContentIncludes = getAllContentIncludes(container)
@@ -964,19 +982,23 @@ sealed class DaxBubbleCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
-                AnimatorSet().apply {
+                fadeOutAnimator = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            // After fade-out: hide old includes, show new one, type and fade in
+                            // After fade-out: hide old includes, show new one.
                             // Note: do NOT call clearDialog() here — it would re-zero the dismiss
                             // button alpha causing a flicker. Instead, selectively reset content only.
                             resetAllIncludesExcept(container, activeInclude)
                             resetHeaderState()
                             configureContentViews(container)
-                            // Blank the title so typing shows new text, not stale.
+                            // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
-                            typeAndFadeIn()
+                            if (animationsSettled) {
+                                applySettledState()
+                            } else {
+                                typeAndFadeIn()
+                            }
                         }
                     })
                     start()
@@ -999,22 +1021,18 @@ sealed class DaxBubbleCta(
 
             // Tap-to-skip: end running animations and snap all content visible
             fun snapToFinished() {
-                // Set the flag before cancelling the header animator;
-                // cancel() fires the pending withEndAction, which respects animationsSettled.
+                // Set the flag before cancelling animators; cancel() fires end callbacks
+                // (fadeOutAnimator.onAnimationEnd / headerImage withEndAction) which read it.
                 val alreadySettled = animationsSettled
                 animationsSettled = true
                 cardContainer.interceptChildTouches = false
                 titleView.finishAnimation()
-                // If typing hasn't started yet (tap during initial fade-in), set title directly
-                if (!titleView.hasAnimationStarted()) {
-                    titleView.text = daxTitle.html(container.context)
-                }
-                descriptionView.alpha = 1f
-                dismissButton.alpha = 1f
-                activeInclude.alpha = 1f
-                if (headerImage?.isVisible == true) {
-                    headerImage.animate().cancel()
-                    headerImage.alpha = 1f
+                headerImage?.animate()?.cancel()
+                if (fadeOutAnimator?.isRunning == true) {
+                    // cancel() fires onAnimationEnd synchronously, which applies settled state via the branch above.
+                    fadeOutAnimator.cancel()
+                } else {
+                    applySettledState()
                 }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
                 if (!alreadySettled) {
