@@ -25,17 +25,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extensions.html
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxTrackersBlockedCta]. A Stage 2 agent
- * will replace [activeIncludeId] and populate [configureContentViews] to render the
- * trackers-blocked in-context dialog.
- *
- * The Stage 2 agent also overrides [onTypingAnimationSettled] to invoke the callback, triggering
- * the ViewModel privacy-shield highlight that mirrors the legacy single-CTA gating. The base-class
- * default is a no-op, so without this override the privacy shield never highlights — which is the
- * correct behavior for every other contextual CTA.
- */
 data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -55,9 +48,27 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = 0 // TODO: replace in stage 2.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
-        // TODO: implement in stage 2.
+        val context = view.context
+        val descriptionHtml = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            trackers = trackers,
+            settingsDataStore = settingsDataStore,
+        ).getTrackersDescription(context, trackers)
+
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text = descriptionHtml.html(context)
+    }
+
+    override fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
+        onTypingAnimationFinished()
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }

@@ -3420,7 +3420,6 @@ class BrowserTabViewModel @Inject constructor(
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
-                    // TODO: replace in stage 2 (DaxTrackersBlockedCta brand-design migration).
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value =
                             currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -3439,7 +3438,6 @@ class BrowserTabViewModel @Inject constructor(
             if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
                 currentBrowserViewState().showPrivacyShield.isHighlighted()
             ) {
-                // TODO: replace in stage 2 (DaxTrackersBlockedCta brand-design migration).
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
         }
@@ -4781,7 +4779,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
             is DaxTrackersBlockedBrandDesignUpdateContextualCta,
             -> {
-                // TODO: replace in stage 2 (DaxTrackersBlockedCta brand-design migration).
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {

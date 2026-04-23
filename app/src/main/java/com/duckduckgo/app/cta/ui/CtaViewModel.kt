@@ -395,12 +395,12 @@ class CtaViewModel @Inject constructor(
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
                 if (isBrandDesignUpdateEnabled()) {
-                    // TODO: replace in stage 2 (DaxTrackersBlockedCta brand-design migration).
-                    return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-                        onboardingStore,
-                        appInstallStore,
-                        it.orderedTrackerBlockedEntities(),
-                        settingsDataStore,
+                    return DaxTrackersBlockedBrandDesignUpdateContextualCta(
+                        onboardingStore = onboardingStore,
+                        appInstallStore = appInstallStore,
+                        trackers = it.orderedTrackerBlockedEntities(),
+                        settingsDataStore = settingsDataStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
                     )
                 }
                 return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
