@@ -26,7 +26,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 
