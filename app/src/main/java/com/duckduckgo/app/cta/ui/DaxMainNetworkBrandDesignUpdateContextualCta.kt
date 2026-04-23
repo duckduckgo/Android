@@ -16,19 +16,20 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
+import android.net.Uri
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.html
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxMainNetworkCta]. A Stage 2 agent will
- * replace [activeIncludeId] and populate [configureContentViews] to render the
- * main-network-detected in-context dialog.
- */
 data class DaxMainNetworkBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -48,9 +49,42 @@ data class DaxMainNetworkBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = 0 // TODO: replace in stage 2.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
-        // TODO: implement in stage 2.
+        val context = view.context
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
+            text = getTrackersDescription(context).html(context)
+        }
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
+    }
+
+    @VisibleForTesting
+    fun getTrackersDescription(context: Context): String =
+        if (isFromSameNetworkDomain()) {
+            context.resources.getString(
+                R.string.daxMainNetworkCtaText,
+                network,
+                Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                network,
+            )
+        } else {
+            context.resources.getString(
+                R.string.daxMainNetworkOwnedCtaText,
+                network,
+                Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                network,
+            )
+        }
+
+    private fun isFromSameNetworkDomain(): Boolean = MAIN_TRACKER_DOMAINS.any { siteHost.contains(it) }
+
+    private companion object {
+        private val MAIN_TRACKER_DOMAINS = listOf("facebook", "google")
     }
 }
