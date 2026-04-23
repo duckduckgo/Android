@@ -108,6 +108,23 @@ class BrandDesignContextualDaxDialogCtaTest {
 
     @Test
     fun snapToFinished_emptyTitle_keepsTitleAlphaZero() {
+        hiddenTitle.text = ""
+        titleView.text = ""
+        titleView.alpha = 0f
+
+        testee.invokeSnap(alreadySettled = false)
+
+        // No-title CTAs must not lift the title alpha — an empty title view at alpha=1 would still
+        // occupy layout space but render nothing. Description + include must still fade in.
+        assertEquals(0f, titleView.alpha, 0f)
+        assertEquals("", titleView.text.toString())
+        assertEquals(1f, descriptionView.alpha, 0f)
+        assertEquals(1f, activeInclude.alpha, 0f)
+        assertEquals(1, testee.settledInvocations)
+    }
+
+    @Test
+    fun snapToFinished_emptyTitle_keepsTitleAlphaZero() {
         whenever(hiddenTitle.text).thenReturn("")
         whenever(titleView.hasAnimationStarted()).thenReturn(false)
 
