@@ -1324,7 +1324,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
             -> {
-                // SENTINEL[DaxSiteSuggestionsCta@query-custom-pixel-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }

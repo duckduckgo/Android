@@ -19,17 +19,16 @@ package com.duckduckgo.app.cta.ui
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
+import com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extensions.html
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxSiteSuggestionsCta]. A Stage 2 agent
- * will replace [activeIncludeId] and populate [configureContentViews] to render the site
- * suggestions in-context dialog. [onSiteSuggestionOptionClicked] is retained so the experiment
- * pixel continues to fire from the Stage 2 implementation.
- */
 data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
@@ -48,9 +47,43 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
 ) {
-    override val activeIncludeId: Int = 0 // STUB: Stage 2 replaces with R.id.<include>.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignOptionsContent
 
     override fun configureContentViews(view: View) {
-        // STUB: Stage 2 agent implements.
+        val context = view.context
+        view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+            .text = context.getString(R.string.onboardingSitesSuggestionsDaxDialogTitle).html(context)
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
+            .text = context.getString(R.string.onboardingSitesDaxDialogDescription).html(context)
+
+        val options = onboardingStore.getSitesOptions()
+        val optionsViews = listOf(
+            view.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption1),
+            view.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption2),
+            view.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption3),
+            view.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption4),
+        )
+        optionsViews.forEachIndexed { index, buttonView ->
+            if (index < options.size) {
+                options[index].setOptionView(buttonView)
+            }
+        }
+    }
+
+    override fun setOnOptionClicked(onOptionClicked: ((DaxDialogIntroOption) -> Unit)?) {
+        val container = ctaView ?: return
+        val options = onboardingStore.getSitesOptions()
+        val optionsViews = listOf(
+            container.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption1),
+            container.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption2),
+            container.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption3),
+            container.findViewById<OnboardingSelectionButton>(R.id.contextualBrandDesignSiteOption4),
+        )
+        optionsViews.forEachIndexed { index, buttonView ->
+            if (index < options.size) {
+                val option = options[index]
+                buttonView.setOnClickListener { onOptionClicked?.invoke(option) }
+            }
+        }
     }
 }

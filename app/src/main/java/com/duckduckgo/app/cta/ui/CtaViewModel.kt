@@ -243,11 +243,11 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
-                // SENTINEL[DaxSiteSuggestionsCta@cta-construction]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
-                return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                return@withContext DaxSiteSuggestionsBrandDesignUpdateContextualCta(
                     onboardingStore,
                     appInstallStore,
                     onSiteSuggestionOptionClicked,
+                    isLightTheme = appTheme.isLightModeEnabled(),
                 )
             }
             OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
