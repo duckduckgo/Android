@@ -46,6 +46,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
+import com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
@@ -881,9 +882,10 @@ sealed class DaxBubbleCta(
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
             val descriptionView = container.findViewById<DaxTextView>(R.id.brandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
-            val headerImage = container.findViewById<ImageView>(BrowserR.id.brandDesignHeaderImage)
+            val headerImage = container.findViewById<ImageView>(R.id.brandDesignHeaderImage)
             styleDismissButton(dismissButton)
-            val cardContainer = container.findViewById<View>(R.id.brandDesignCardContainer)
+            val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
+            cardContainer.interceptChildTouches = true
 
             // The active content include for THIS CTA
             val activeInclude = container.findViewById<View>(activeIncludeId)
@@ -921,6 +923,7 @@ sealed class DaxBubbleCta(
                                 override fun onAnimationEnd(animation: Animator) {
                                     if (!animationsSettled) {
                                         animationsSettled = true
+                                        cardContainer.interceptChildTouches = false
                                         onTypingAnimationFinished()
                                     }
                                 }
@@ -997,6 +1000,7 @@ sealed class DaxBubbleCta(
                 // cancel() fires the pending withEndAction, which respects animationsSettled.
                 val alreadySettled = animationsSettled
                 animationsSettled = true
+                cardContainer.interceptChildTouches = false
                 titleView.finishAnimation()
                 // If typing hasn't started yet (tap during initial fade-in), set title directly
                 if (!titleView.hasAnimationStarted()) {
