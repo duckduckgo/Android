@@ -591,16 +591,18 @@ sealed class OnboardingDaxDialogCta(
 
         /**
          * Hook invoked exactly once after the typing animation has fully settled (natural end or
-         * tap-to-skip). The hook IS the callback delivery mechanism — the default override invokes
-         * [onTypingAnimationFinished]. Subclasses that need to gate or decorate delivery (e.g.
-         * [DaxTrackersBlockedBrandDesignUpdateContextualCta] notifying the ViewModel first) must
-         * invoke [onTypingAnimationFinished] themselves.
+         * tap-to-skip). Default is a no-op — most contextual CTAs don't react to typing-finished.
+         * [DaxTrackersBlockedBrandDesignUpdateContextualCta] overrides this to invoke
+         * [onTypingAnimationFinished] so the ViewModel highlights the privacy shield, matching the
+         * legacy behavior. Other subclasses leave the default; the fragment still passes the
+         * callback but it is never fired, preserving legacy single-CTA-only gating.
          */
         protected open fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
-            onTypingAnimationFinished()
+            // No-op by default. Only DaxTrackersBlockedBrandDesignUpdateContextualCta invokes the callback.
         }
 
         override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+            binding.includeOnboardingInContextDaxDialogBrandDesign.contextualBrandDesignTitle.cancelAnimation()
             binding.includeOnboardingInContextDaxDialogBrandDesign.root.gone()
         }
 

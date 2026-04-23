@@ -102,6 +102,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     fun snapToFinished_tapMidAnimation_finishesWithoutBlankTitle() {
         hiddenTitle.text = "Full dax text"
         titleView.text = "Par"
+        titleView.alpha = 0f
         titleView.startTypingAnimation("Full dax text", isCancellable = true)
 
         testee.invokeSnap(alreadySettled = false)
@@ -109,9 +110,27 @@ class BrandDesignContextualDaxDialogCtaTest {
         // finishAnimation() on TypeAnimationTextView sets text to the completeText; at minimum
         // the title must be non-empty so the user never sees a blank dialog after tapping.
         assertTrue(titleView.text.toString().isNotEmpty())
+        assertEquals(1f, titleView.alpha, 0f)
         assertEquals(1f, descriptionView.alpha, 0f)
         assertEquals(1f, dismissButton.alpha, 0f)
         assertEquals(1f, activeInclude.alpha, 0f)
+    }
+
+    @Test
+    fun snapToFinished_emptyTitle_keepsTitleAlphaZero() {
+        hiddenTitle.text = ""
+        titleView.text = ""
+        titleView.alpha = 0f
+
+        testee.invokeSnap(alreadySettled = false)
+
+        // No-title CTAs must not lift the title alpha — an empty title view at alpha=1 would still
+        // occupy layout space but render nothing. Description + include must still fade in.
+        assertEquals(0f, titleView.alpha, 0f)
+        assertEquals("", titleView.text.toString())
+        assertEquals(1f, descriptionView.alpha, 0f)
+        assertEquals(1f, activeInclude.alpha, 0f)
+        assertEquals(1, testee.settledInvocations)
     }
 
     @Test
@@ -125,11 +144,12 @@ class BrandDesignContextualDaxDialogCtaTest {
     }
 
     @Test
-    fun snapToFinished_rapidDoubleTap_firesCallbackOnlyOnce() {
+    fun snapToFinished_respectsAlreadySettledFlag() {
         hiddenTitle.text = "Dax title"
 
         testee.invokeSnap(alreadySettled = false)
-        // Simulate the base class flipping animationsSettled after the first call.
+        // Second call with alreadySettled=true (as the outer state machine would pass after the
+        // first settlement) must not re-fire the settled callback.
         testee.invokeSnap(alreadySettled = true)
 
         assertEquals(1, testee.settledInvocations)
