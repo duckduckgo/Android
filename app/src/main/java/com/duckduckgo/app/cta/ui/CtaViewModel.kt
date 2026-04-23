@@ -418,12 +418,12 @@ class CtaViewModel @Inject constructor(
                         OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
                         if (isBrandDesignUpdateEnabled()) {
-                            // TODO: replace in stage 2 (DaxMainNetworkCta brand-design migration).
-                            return OnboardingDaxDialogCta.DaxMainNetworkCta(
-                                onboardingStore,
-                                appInstallStore,
-                                entity.displayName,
-                                host,
+                            return DaxMainNetworkBrandDesignUpdateContextualCta(
+                                onboardingStore = onboardingStore,
+                                appInstallStore = appInstallStore,
+                                network = entity.displayName,
+                                siteHost = host,
+                                isLightTheme = appTheme.isLightModeEnabled(),
                             )
                         }
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(
