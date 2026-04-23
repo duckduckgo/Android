@@ -591,11 +591,13 @@ sealed class OnboardingDaxDialogCta(
 
         /**
          * Hook invoked exactly once after the typing animation has fully settled (natural end or
-         * tap-to-skip). Default is no-op; [DaxTrackersBlockedBrandDesignUpdateContextualCta]
-         * overrides to notify the ViewModel.
+         * tap-to-skip). The hook IS the callback delivery mechanism — the default override invokes
+         * [onTypingAnimationFinished]. Subclasses that need to gate or decorate delivery (e.g.
+         * [DaxTrackersBlockedBrandDesignUpdateContextualCta] notifying the ViewModel first) must
+         * invoke [onTypingAnimationFinished] themselves.
          */
         protected open fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
-            // No-op by default.
+            onTypingAnimationFinished()
         }
 
         override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
@@ -631,39 +633,44 @@ sealed class OnboardingDaxDialogCta(
                     animationsSettled = true
                     cardContainer.interceptChildTouches = false
                     onTypingAnimationSettled(onTypingAnimationFinished)
-                    onTypingAnimationFinished()
                 }
             }
 
             val typeAndFadeIn = {
                 val daxTitle = titleView.text?.toString().orEmpty()
-                val startTyping = {
+                val startContentFadeIn = {
+                    val animators = mutableListOf<Animator>(
+                        ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                        ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                        ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                    )
+                    contentFadeInAnimator = AnimatorSet().apply {
+                        playTogether(animators.toList())
+                        addListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                notifySettled()
+                            }
+                        })
+                        start()
+                    }
+                }
+                if (daxTitle.isEmpty()) {
+                    // No-title CTA: skip typing animation to avoid a blank typing pass.
+                    // Title alpha remains 0 per rule 9.
+                    startContentFadeIn()
+                } else {
                     titleView.alpha = 1f
                     titleView.text = ""
 
                     titleView.typingDelayInMs = TYPING_DELAY_MS
                     titleView.delayAfterAnimationInMs = TYPING_POST_DELAY_MS
                     titleView.startTypingAnimation(daxTitle, true) {
-                        val animators = mutableListOf<Animator>(
-                            ObjectAnimator.ofFloat(descriptionView, View.ALPHA, 1f)
-                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                            ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
-                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                            ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
-                                .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                        )
-                        contentFadeInAnimator = AnimatorSet().apply {
-                            playTogether(animators.toList())
-                            addListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    notifySettled()
-                                }
-                            })
-                            start()
-                        }
+                        startContentFadeIn()
                     }
                 }
-                startTyping()
             }
 
             if (isContentTransition) {
@@ -747,10 +754,14 @@ sealed class OnboardingDaxDialogCta(
             cardContainer.interceptChildTouches = false
             titleView.finishAnimation()
             // If typing hasn't started yet (tap during initial fade-in), set title directly
-            // so we don't show an empty title.
+            // so we don't show an empty title. Restore alpha to 1 for CTAs that do have a title;
+            // empty-title CTAs are unaffected visually since there is no text to render.
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
             if (!titleView.hasAnimationStarted()) {
                 titleView.text = hiddenTitle.text
+            }
+            if (!hiddenTitle.text.isNullOrEmpty()) {
+                titleView.alpha = 1f
             }
             descriptionView.alpha = 1f
             dismissButton.alpha = 1f
@@ -764,14 +775,19 @@ sealed class OnboardingDaxDialogCta(
         /**
          * Reset every mutable property shared views may carry over from a previous CTA (rule 14).
          * Called at the start of both first-show and mid-transition flows.
+         *
+         * Title alpha resets to 0 — subclasses that render a title set it to 1 via [typeAndFadeIn]
+         * before the typing animation runs. CTAs with no title leave the title view at alpha=0 so
+         * an empty typing animation never plays (rule 9).
          */
         internal fun resetSharedViewState(container: View) {
             container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)?.apply {
-                alpha = 1f
+                alpha = 0f
                 text = ""
             }
             container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)?.apply {
-                alpha = 1f
+                // Hidden title is android:visibility="invisible" in XML — alpha is not rendered.
+                // It acts as a text cache for snapToFinished before the typing animation starts.
                 text = ""
             }
             container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
