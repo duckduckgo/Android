@@ -24,6 +24,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -31,6 +32,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -48,11 +50,13 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
     private val systemAutofillEngagement: SystemAutofillEngagement,
+    private val customTabDetector: CustomTabDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
         appCoroutineScope.launch {
+            logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
             handleFirstScreen(isFreshLaunch)
         }
     }
@@ -64,7 +68,7 @@ class FirstScreenHandlerImpl @Inject constructor(
             val elapsed = System.currentTimeMillis() - lastBackgrounded
             val wasIdle = lastBackgrounded != 0L && elapsed >= timeoutMs
             if (lastBackgrounded == 0L || wasIdle) {
-                if (!isVoiceSessionActiveOnCurrentTab()) {
+                if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
                     showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
                 }
                 return
@@ -82,6 +86,10 @@ class FirstScreenHandlerImpl @Inject constructor(
         return@withContext selectedTab?.url?.toUri()?.let {
             duckChat.isDuckChatUrl(it)
         } == true
+    }
+
+    private suspend fun isActiveTabCustomTab(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext customTabDetector.isCustomTab()
     }
 
     override fun onClose() {
