@@ -236,7 +236,13 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxFireButtonBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxMainNetworkBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxNoTrackersBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSerpBrandDesignUpdateContextualCta
+import com.duckduckgo.app.cta.ui.DaxSiteSuggestionsBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTrackersBlockedBrandDesignUpdateContextualCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
@@ -1308,7 +1314,9 @@ class BrowserTabViewModel @Inject constructor(
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
             -> {
+                // SENTINEL[DaxSiteSuggestionsCta@query-custom-pixel-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
                 }
@@ -3361,7 +3369,8 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = HideOnboardingDaxBubbleCta(cta)
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
-                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) {
+                    // SENTINEL[DaxTrackersBlockedCta@dismiss-privacy-shield-highlight-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                     if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                         browserViewState.value =
                             currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -3377,7 +3386,10 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 ctaViewModel.onUserDismissedCta(it)
             }
-            if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+            if ((cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta || cta is DaxTrackersBlockedBrandDesignUpdateContextualCta) &&
+                currentBrowserViewState().showPrivacyShield.isHighlighted()
+            ) {
+                // SENTINEL[DaxTrackersBlockedCta@dismissed-privacy-shield-highlight-check]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
         }
@@ -4608,7 +4620,10 @@ class BrowserTabViewModel @Inject constructor(
     private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         onUserDismissedCta(onboardingCta)
         return when (onboardingCta) {
-            is OnboardingDaxDialogCta.DaxSerpCta -> {
+            is OnboardingDaxDialogCta.DaxSerpCta,
+            is DaxSerpBrandDesignUpdateContextualCta,
+            -> {
+                // SENTINEL[DaxSerpCta@ok-button-transition-to-site-suggestions]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
@@ -4627,9 +4642,9 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is OnboardingDaxDialogCta.DaxNoTrackersCta,
-            is OnboardingDaxDialogCta.DaxMainNetworkCta,
+            is DaxTrackersBlockedBrandDesignUpdateContextualCta,
             -> {
+                // SENTINEL[DaxTrackersBlockedCta@ok-button-transition-to-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {
@@ -4643,7 +4658,46 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is OnboardingDaxDialogCta.DaxFireButtonCta -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
+            is OnboardingDaxDialogCta.DaxNoTrackersCta,
+            is DaxNoTrackersBrandDesignUpdateContextualCta,
+            -> {
+                // SENTINEL[DaxNoTrackersCta@ok-button-transition-to-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                viewModelScope.launch {
+                    val cta =
+                        withContext(dispatchers.io()) {
+                            if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
+                        }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
+                    }
+                }
+                null
+            }
+
+            is OnboardingDaxDialogCta.DaxMainNetworkCta,
+            is DaxMainNetworkBrandDesignUpdateContextualCta,
+            -> {
+                // SENTINEL[DaxMainNetworkCta@ok-button-transition-to-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                viewModelScope.launch {
+                    val cta =
+                        withContext(dispatchers.io()) {
+                            if (currentBrowserViewState().maliciousSiteBlocked) null else ctaViewModel.getFireDialogCta()
+                        }
+                    ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                    if (cta == null) {
+                        command.value = HideOnboardingDaxDialog(onboardingCta)
+                    }
+                }
+                null
+            }
+
+            is OnboardingDaxDialogCta.DaxFireButtonCta,
+            is DaxFireButtonBrandDesignUpdateContextualCta,
+            -> {
+                // SENTINEL[DaxFireButtonCta@ok-button-launch-fire-dialog]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
+                LaunchFireDialogFromOnboardingDialog(onboardingCta)
+            }
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
@@ -4683,7 +4737,8 @@ class BrowserTabViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
         }
         val cta = currentCtaViewState().cta
-        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+        if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
+            // SENTINEL[DaxFireButtonCta@fire-menu-selected-dismiss]: Stage 2 replaces this block. Until then, legacy behavior is preserved.
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
