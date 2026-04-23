@@ -25,6 +25,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -73,6 +75,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -230,6 +233,41 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
             any(),
             eq(Count),
         )
+    }
+
+    @Test
+    fun whenBrandDesignDisabledAndBrowsingMajorTrackerSiteThenReturnLegacyMainNetworkCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+
+        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+    }
+
+    @Test
+    fun whenDismissedWithoutCloseButtonThenNoClosePixelFired() = runTest {
+        val cta = newCta()
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = false)
+
+        verify(mockPixel, never()).fire(eq(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON), any(), any(), any())
+    }
+
+    @Test
+    fun whenDismissedThenDismissalPersistedWithNetworkCtaId() = runTest {
+        val cta = newCta()
+
+        testee.onUserDismissedCta(cta)
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_NETWORK))
     }
 
     private fun newCta(): DaxMainNetworkBrandDesignUpdateContextualCta =
