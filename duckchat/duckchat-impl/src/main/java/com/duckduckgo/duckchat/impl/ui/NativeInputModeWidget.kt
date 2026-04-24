@@ -21,12 +21,14 @@ import android.content.Context
 import android.graphics.Color
 import android.text.InputType
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Space
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -274,6 +276,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         toggle.getTabAt(0)?.select()
         toggle.visibility = GONE
+        matchOmnibarHeight()
+    }
+
+    private fun matchOmnibarHeight() {
+        if (floatingSubmitContainer == null) return
+        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
+        getActionBarSize()?.let { minimumHeight = it }
+    }
+
+    private fun getActionBarSize(): Int? {
+        val typedValue = TypedValue()
+        return if (context.theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+            TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
+        } else {
+            null
+        }
     }
 
     private fun setToggleMatchParent() {

@@ -430,6 +430,10 @@ class RealNativeInputManager @Inject constructor(
     private fun attachWidget(widgetView: View) {
         val omnibarCard = omnibarController.getCardView()
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
+        if (!duckChat.isEnabled() && !layoutCoordinator.isWidgetBottom()) {
+            matchOmnibarShape(widgetCard)
+        }
+        addTrailingButtonMargin(widgetView)
         val margins = if (!omnibarController.isDuckAiMode() && omnibarCard != null && widgetCard != null) {
             animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, layoutCoordinator.isWidgetBottom())
         } else {
@@ -501,6 +505,30 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+    }
+
+    private fun matchOmnibarShape(widgetCard: View?) {
+        val card = widgetCard as? MaterialCardView ?: return
+        card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+        val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
+        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        (card.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+            lp.topMargin = targetTopMargin - card.paddingTop
+            lp.marginStart = targetHorizontalMargin - card.paddingLeft
+            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+            card.layoutParams = lp
+        }
+    }
+
+    private fun addTrailingButtonMargin(widgetView: View) {
+        val layout = widgetView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetLayout) ?: return
+        val targetMarginEnd = layout.resources.getDimensionPixelSize(
+            com.duckduckgo.duckchat.impl.R.dimen.inputScreenOmnibarCardMarginHorizontal,
+        )
+        (layout.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+            lp.marginEnd = targetMarginEnd
+            layout.layoutParams = lp
+        }
     }
 
     private fun createFloatingSubmitContainer(): ViewGroup {
