@@ -84,6 +84,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
+    private var isInputScreenUserSettingEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var floatingSubmitContainer: View? = null
 
@@ -102,7 +103,8 @@ class RealNativeInputManager @Inject constructor(
             }
             .launchIn(lifecycleOwner.lifecycleScope)
         duckChat.observeInputScreenUserSettingEnabled()
-            .onEach {
+            .onEach { enabled ->
+                isInputScreenUserSettingEnabled = enabled
                 if (omnibarController.isDuckAiMode()) {
                     rootView.post { widgetFrom(rootView)?.selectChatTab() }
                 }
@@ -450,7 +452,7 @@ class RealNativeInputManager @Inject constructor(
     private fun attachWidget(widgetView: View) {
         val omnibarCard = omnibarController.getCardView()
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
-        if (!duckChat.isEnabled() && !layoutCoordinator.isWidgetBottom()) {
+        if (shouldMatchOmnibarShape() && !layoutCoordinator.isWidgetBottom()) {
             matchOmnibarShape(widgetCard)
         }
         addTrailingButtonMargin(widgetView)
@@ -526,6 +528,8 @@ class RealNativeInputManager @Inject constructor(
             },
         )
     }
+
+    private fun shouldMatchOmnibarShape(): Boolean = !duckChat.isEnabled() || !isInputScreenUserSettingEnabled
 
     private fun matchOmnibarShape(widgetCard: View?) {
         val card = widgetCard as? MaterialCardView ?: return

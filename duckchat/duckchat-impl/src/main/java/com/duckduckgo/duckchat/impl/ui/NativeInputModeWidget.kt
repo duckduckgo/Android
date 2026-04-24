@@ -233,7 +233,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hideBackArrow()
         hideInputFieldBackground()
         removeMargins()
-        applyToggleVisibility()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
@@ -248,10 +247,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         when {
             !duckChatInternal.isEnabled() -> {
                 hideToggle()
+                matchOmnibarHeight()
             }
             !isInputScreenUserSettingEnabled -> {
                 setToggleMatchParent()
                 hideToggle()
+                matchOmnibarHeight()
             }
             else -> {
                 setToggleMatchParent()
@@ -296,7 +297,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         toggle.getTabAt(0)?.select()
         toggle.visibility = GONE
-        matchOmnibarHeight()
     }
 
     private fun matchOmnibarHeight() {
