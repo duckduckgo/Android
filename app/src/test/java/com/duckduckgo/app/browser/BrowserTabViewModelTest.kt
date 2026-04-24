@@ -1234,6 +1234,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenQuerySubmittedWhileUrlAlreadyLoadedAndIsNewTabStateTrueThenNtpSearchSubmittedNotNotified() {
+        // Restoration path (onViewReady / restoreWebViewState) calls onUserSubmittedQuery with
+        // the previous URL while globalLayoutState is still the default Browser(isNewTabState=true)
+        // from ViewModel init. The presence of a loaded URL means it isn't a real NTP search.
+        fakeAndroidConfigBrowserFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com/", null)).thenReturn("https://example.com/")
+        loadUrl("https://example.com/", isBrowserShowing = true)
+        testee.globalLayoutState.value = GlobalLayoutViewState.Browser(isNewTabState = true)
+
+        testee.onUserSubmittedQuery("https://example.com/")
+
+        verify(mockNtpAfterIdleManager, never()).onNtpSearchSubmitted()
+    }
+
+    @Test
     fun whenBrowsingAndUrlPresentThenAddBookmarkButtonEnabled() {
         loadUrl("https://www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canSaveSite)

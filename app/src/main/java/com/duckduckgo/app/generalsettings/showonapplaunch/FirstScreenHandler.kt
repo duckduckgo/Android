@@ -27,6 +27,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -49,24 +50,45 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val customTabDetector: CustomTabDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
+        // Notify the NtpAfterIdleManager synchronously when the currently selected tab is already
+        // an NTP: BrowserViewModel's flowSelectedTab subscription can fire onNtpShown immediately
+        // on activity recreation, and the async handler path below doesn't run in time to classify
+        // it. Gated on "already on NTP" so LastOpenedTab/SpecificPage users on a URL tab don't
+        // leave a stale pendingAfterIdle flag behind for a later user-initiated NTP.
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+            computeWasIdle() &&
+            isCurrentSelectedTabNtp()
+        ) {
+            ntpAfterIdleManager.onIdleReturnTriggered()
+        }
         appCoroutineScope.launch {
             logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
             handleFirstScreen(isFreshLaunch)
         }
     }
 
+    private fun isCurrentSelectedTabNtp(): Boolean {
+        return tabRepository.liveSelectedTab.value?.url.isNullOrBlank()
+    }
+
+    private fun computeWasIdle(): Boolean {
+        val timeoutMs = getTimeoutSeconds() * 1000
+        val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
+        val elapsed = System.currentTimeMillis() - lastBackgrounded
+        return lastBackgrounded != 0L && elapsed >= timeoutMs
+    }
+
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-            val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            val elapsed = System.currentTimeMillis() - lastBackgrounded
-            val wasIdle = lastBackgrounded != 0L && elapsed >= timeoutMs
+            val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
                     showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)

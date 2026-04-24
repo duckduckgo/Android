@@ -118,17 +118,42 @@ class NtpAfterIdleManagerImplTest {
         verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
     }
 
-    // --- onOpen resets transient state across sessions ---
+    // --- onClose resets transient state across sessions ---
 
     @Test
-    fun whenOnOpenThenPendingAfterIdleIsCleared() {
+    fun whenOnCloseThenPendingAfterIdleIsCleared() {
+        testee.onIdleReturnTriggered()
+
+        testee.onClose()
+        testee.onNtpShown()
+
+        verify(pixel).fire(NTP_SHOWN_USER_INITIATED, type = Count)
+        verify(pixel).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenOnCloseThenCurrentAfterIdleIsCleared() {
+        testee.onIdleReturnTriggered()
+        testee.onNtpShown() // currentAfterIdle = true
+
+        testee.onClose()
+        testee.onReturnToPageTapped()
+
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
+    }
+
+    @Test
+    fun whenOnOpenThenPendingAfterIdleIsPreserved() {
+        // onOpen must not clear pendingAfterIdle: FirstScreenHandlerImpl.onOpen may have
+        // already called onIdleReturnTriggered synchronously and the multibinding order of
+        // BrowserLifecycleObservers is not guaranteed.
         testee.onIdleReturnTriggered()
 
         testee.onOpen(isFreshLaunch = false)
         testee.onNtpShown()
 
-        verify(pixel).fire(NTP_SHOWN_USER_INITIATED, type = Count)
-        verify(pixel).fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+        verify(pixel).fire(NTP_SHOWN_AFTER_IDLE, type = Count)
+        verify(pixel).fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
     }
 
     @Test

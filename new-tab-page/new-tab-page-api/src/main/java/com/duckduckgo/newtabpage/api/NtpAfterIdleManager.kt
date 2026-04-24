@@ -16,6 +16,8 @@
 
 package com.duckduckgo.newtabpage.api
 
+import kotlinx.coroutines.flow.StateFlow
+
 /**
  * Handles events related to the NTP-after-idle feature.
  */
@@ -34,4 +36,7 @@ interface NtpAfterIdleManager {
 
     /** Called when the user selects an idle timeout value in seconds. */
     fun onIdleTimeoutSelected(seconds: Long)
+
+    /** Emits true when the current NTP was shown as a result of an idle return, false otherwise. */
+    val isAfterIdleReturn: StateFlow<Boolean>
 }

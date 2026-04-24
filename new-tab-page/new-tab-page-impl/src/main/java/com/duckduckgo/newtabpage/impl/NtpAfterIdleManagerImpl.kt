@@ -35,6 +35,9 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixels
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -47,13 +50,21 @@ class NtpAfterIdleManagerImpl @Inject constructor(
 ) : NtpAfterIdleManager, BrowserLifecycleObserver {
 
     private val pendingAfterIdle = AtomicBoolean(false)
-    private val currentAfterIdle = AtomicBoolean(false)
+    private val _isAfterIdleReturn = MutableStateFlow(false)
+    override val isAfterIdleReturn: StateFlow<Boolean> = _isAfterIdleReturn.asStateFlow()
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        // Clear transient state in case it was left over from a prior session; the process may
-        // survive across sessions so the AtomicBooleans can otherwise hold stale classifications.
+        // pendingAfterIdle is intentionally NOT reset here. FirstScreenHandlerImpl.onOpen
+        // synchronously calls onIdleReturnTriggered() when appropriate, and BrowserLifecycleObserver
+        // callbacks run in a non-deterministic multibinding order — clearing here could wipe a
+        // just-set value. The flag is consumed by onNtpShown() (getAndSet(false)), and any residual
+        // stale state is cleared in onClose() when the app backgrounds.
+        _isAfterIdleReturn.value = false
+    }
+
+    override fun onClose() {
         pendingAfterIdle.set(false)
-        currentAfterIdle.set(false)
+        _isAfterIdleReturn.value = false
     }
 
     override fun onIdleReturnTriggered() {
@@ -62,7 +73,7 @@ class NtpAfterIdleManagerImpl @Inject constructor(
 
     override fun onNtpShown() {
         val wasAfterIdle = pendingAfterIdle.getAndSet(false)
-        currentAfterIdle.set(wasAfterIdle)
+        _isAfterIdleReturn.value = wasAfterIdle
         if (wasAfterIdle) {
             pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
             pixel.fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
@@ -73,11 +84,11 @@ class NtpAfterIdleManagerImpl @Inject constructor(
     }
 
     override fun onReturnToPageTapped() {
-        hatchPixels.fireReturnToPageTapped(currentAfterIdle.get())
+        hatchPixels.fireReturnToPageTapped(_isAfterIdleReturn.value)
     }
 
     override fun onNtpSearchSubmitted() {
-        if (currentAfterIdle.get()) {
+        if (_isAfterIdleReturn.value) {
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE, type = Count)
             pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE_DAILY, type = Daily())
         } else {

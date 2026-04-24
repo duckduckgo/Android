@@ -933,9 +933,11 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     // onIdleReturnTriggered notification tests
 
     @Test
-    fun whenInactivityOptionWasIdleTrueAndResolvesToNewTabPageThenIdleReturnIsNotified() = runTest {
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabHasUrlThenIdleReturnIsNotified() = runTest {
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "https://example.com", position = 0)
 
         testee.handleAfterInactivityOption(wasIdle = true)
 
@@ -943,7 +945,21 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenInactivityOptionWasIdleFalseAndResolvesToNewTabPageThenIdleReturnNotNotified() = runTest {
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnIsNotified() = runTest {
+        // Even when no new tab is added because the user is already on an NTP, the handler should
+        // still notify — the currently-shown NTP counts as an after-idle shown event.
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = null, position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityWasIdleFalseAndOptionNewTabPageThenIdleReturnNotNotified() = runTest {
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
 
@@ -953,7 +969,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenInactivityOptionResolvesToLastOpenedTabThenIdleReturnNotNotified() = runTest {
+    fun whenInactivityOptionLastOpenedTabThenIdleReturnNotNotified() = runTest {
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
         fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
@@ -963,7 +979,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenInactivityOptionResolvesToSpecificPageThenIdleReturnNotNotified() = runTest {
+    fun whenInactivityOptionSpecificPageThenIdleReturnNotNotified() = runTest {
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
         fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
 

@@ -51,6 +51,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':browser-api')
     implementation project(':duckchat-api')
+    implementation project(':new-tab-page-api')
     implementation project(':design-system')
     implementation "androidx.datastore:datastore-preferences:_"
 

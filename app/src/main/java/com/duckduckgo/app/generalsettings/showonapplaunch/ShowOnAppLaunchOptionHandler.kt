@@ -80,10 +80,15 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
+                if (fromInactivity) {
+                    // Fires regardless of whether we add a new tab: when the user is already on
+                    // an NTP, no new tab is added but the current NTP still counts as an after-idle
+                    // shown event. Gating on "new tab added" would leave that case unclassified.
+                    ntpAfterIdleManager.onIdleReturnTriggered()
+                }
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
                     if (fromInactivity) {
-                        ntpAfterIdleManager.onIdleReturnTriggered()
                         notifyAutofillIdleReturn("new_tab_page")
                     }
                     tabRepository.add()

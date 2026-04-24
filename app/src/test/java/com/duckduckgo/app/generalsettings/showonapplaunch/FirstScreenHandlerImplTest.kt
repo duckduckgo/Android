@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -26,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -54,9 +56,12 @@ class FirstScreenHandlerImplTest {
     private val customTabDetector: CustomTabDetector = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val testScope = coroutineTestRule.testScope
 
     private lateinit var testee: FirstScreenHandlerImpl
+
+    private val liveSelectedTab = MutableLiveData<TabEntity>()
 
     @Before
     fun setup() {
@@ -65,6 +70,7 @@ class FirstScreenHandlerImplTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
         whenever(duckChat.isVoiceSessionActive()).thenReturn(false)
         whenever(customTabDetector.isCustomTab()).thenReturn(false)
+        whenever(tabRepository.liveSelectedTab).thenReturn(liveSelectedTab)
 
         testee = FirstScreenHandlerImpl(
             androidBrowserConfigFeature = androidBrowserConfigFeature,
@@ -73,6 +79,7 @@ class FirstScreenHandlerImplTest {
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             duckChat = duckChat,
             tabRepository = tabRepository,
+            ntpAfterIdleManager = ntpAfterIdleManager,
             systemAutofillEngagement = systemAutofillEngagement,
             customTabDetector = customTabDetector,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
@@ -351,6 +358,72 @@ class FirstScreenHandlerImplTest {
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    // --- Synchronous onIdleReturnTriggered (only when current tab is already an NTP) ---
+
+    @Test
+    fun whenIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenNotifiesNtpAfterIdleManagerSynchronously() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        // Called synchronously from onOpen, before any coroutine advances.
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndIdleAndCurrentTabHasUrlThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "web", url = "https://example.com")
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndNoPriorTimestampThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenIdleReturnDisabledThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     // --- onClose ---
