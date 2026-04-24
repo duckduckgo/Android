@@ -331,4 +331,49 @@ class RealBrowserMenuDisplayRepositoryTest {
             cancel()
         }
     }
+
+    @Test
+    fun `isBottomSheetMenuEnabled returns true when rollout flag enabled`() {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        assertTrue(testee.isBottomSheetMenuEnabled())
+    }
+
+    @Test
+    fun `isBottomSheetMenuEnabled returns true when experimental flag enabled and user pref enabled`() {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
+
+        assertTrue(testee.isBottomSheetMenuEnabled())
+    }
+
+    @Test
+    fun `isBottomSheetMenuEnabled returns false when experimental flag enabled but user pref disabled`() {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        assertFalse(testee.isBottomSheetMenuEnabled())
+    }
+
+    @Test
+    fun `isBottomSheetMenuEnabled returns false when both flags disabled even if user pref enabled`() {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
+
+        assertFalse(testee.isBottomSheetMenuEnabled())
+    }
+
+    @Test
+    fun `isBottomSheetMenuEnabled returns false when both flags disabled and user pref disabled`() {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        assertFalse(testee.isBottomSheetMenuEnabled())
+    }
 }
