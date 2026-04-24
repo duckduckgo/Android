@@ -28,7 +28,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -36,7 +35,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
-    suspend fun handleAfterInactivityOption(wasIdle: Boolean)
+    suspend fun handleAfterInactivityOption()
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
@@ -51,10 +50,9 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
     private val appBuildConfig: AppBuildConfig,
-    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ShowOnAppLaunchOptionHandler {
 
-    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
+    override suspend fun handleAfterInactivityOption() {
         // new users see New Tab
         logcat { "FirstScreen: Inactivity Timer passed" }
         if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
@@ -62,14 +60,14 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
         }
         // existing users see whatever they had selected
-        applyShowOnAppLaunchOption(fromInactivity = wasIdle)
+        applyShowOnAppLaunchOption()
     }
 
     override suspend fun handleAppLaunchOption() {
-        applyShowOnAppLaunchOption(fromInactivity = false)
+        applyShowOnAppLaunchOption()
     }
 
-    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
+    private suspend fun applyShowOnAppLaunchOption() {
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
         when (option) {
@@ -77,9 +75,6 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             NewTabPage -> {
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
-                    if (fromInactivity) {
-                        ntpAfterIdleManager.onIdleReturnTriggered()
-                    }
                     tabRepository.add()
                 }
             }

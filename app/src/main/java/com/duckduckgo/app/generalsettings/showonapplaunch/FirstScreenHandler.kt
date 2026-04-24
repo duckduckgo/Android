@@ -25,6 +25,7 @@ import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -46,24 +47,36 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
+        // Notify the NtpAfterIdleManager synchronously so the after-idle classification is
+        // in place before BrowserViewModel's flowSelectedTab subscription can fire onNtpShown
+        // on activity recreation; otherwise the shown pixel gets misclassified as user-initiated.
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() && computeWasIdle()) {
+            ntpAfterIdleManager.onIdleReturnTriggered()
+        }
         appCoroutineScope.launch {
             handleFirstScreen(isFreshLaunch)
         }
     }
 
+    private fun computeWasIdle(): Boolean {
+        val timeoutMs = getTimeoutSeconds() * 1000
+        val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
+        val elapsed = System.currentTimeMillis() - lastBackgrounded
+        return lastBackgrounded != 0L && elapsed >= timeoutMs
+    }
+
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-            val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            val elapsed = System.currentTimeMillis() - lastBackgrounded
-            val wasIdle = lastBackgrounded != 0L && elapsed >= timeoutMs
+            val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
                 if (!isVoiceSessionActiveOnCurrentTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption()
                 }
                 return
             }

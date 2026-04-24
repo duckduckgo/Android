@@ -54,8 +54,15 @@ class NtpAfterIdleManagerImpl @Inject constructor(
     override val isAfterIdleReturn: StateFlow<Boolean> = _isAfterIdleReturn.asStateFlow()
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        // Clear transient state in case it was left over from a prior session; the process may
-        // survive across sessions so the AtomicBooleans can otherwise hold stale classifications.
+        // pendingAfterIdle is intentionally NOT reset here. FirstScreenHandlerImpl.onOpen
+        // synchronously calls onIdleReturnTriggered() when appropriate, and BrowserLifecycleObserver
+        // callbacks run in a non-deterministic multibinding order — clearing here could wipe a
+        // just-set value. The flag is consumed by onNtpShown() (getAndSet(false)), and any residual
+        // stale state is cleared in onClose() when the app backgrounds.
+        _isAfterIdleReturn.value = false
+    }
+
+    override fun onClose() {
         pendingAfterIdle.set(false)
         _isAfterIdleReturn.value = false
     }
