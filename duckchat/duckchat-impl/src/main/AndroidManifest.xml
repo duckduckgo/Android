@@ -16,10 +16,6 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
     <application>
         <activity
             android:name="com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsActivity"
@@ -38,10 +34,5 @@
             android:name=".subscription.DuckAiPaidSettingsActivity"
             android:exported="false"
             android:label="@string/duck_ai_paid_settings_title"/>
-
-        <service
-            android:name=".ui.DuckChatVoiceMicrophoneService"
-            android:exported="false"
-            android:foregroundServiceType="microphone" />
     </application>
 </manifest>

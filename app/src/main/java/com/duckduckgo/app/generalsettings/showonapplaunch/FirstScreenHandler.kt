@@ -17,12 +17,14 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
@@ -31,6 +33,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -48,6 +51,8 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
+    private val customTabDetector: CustomTabDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -59,6 +64,7 @@ class FirstScreenHandlerImpl @Inject constructor(
             ntpAfterIdleManager.onIdleReturnTriggered()
         }
         appCoroutineScope.launch {
+            logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
             handleFirstScreen(isFreshLaunch)
         }
     }
@@ -75,8 +81,8 @@ class FirstScreenHandlerImpl @Inject constructor(
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
             val wasIdle = computeWasIdle()
             if (lastBackgrounded == 0L || wasIdle) {
-                if (!isVoiceSessionActiveOnCurrentTab()) {
-                    showOnAppLaunchOptionHandler.handleAfterInactivityOption()
+                if (!isVoiceSessionActiveOnCurrentTab() && !isActiveTabCustomTab()) {
+                    showOnAppLaunchOptionHandler.handleAfterInactivityOption(wasIdle = wasIdle)
                 }
                 return
             }
@@ -95,7 +101,12 @@ class FirstScreenHandlerImpl @Inject constructor(
         } == true
     }
 
+    private suspend fun isActiveTabCustomTab(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext customTabDetector.isCustomTab()
+    }
+
     override fun onClose() {
+        systemAutofillEngagement.clearIdleReturnTriggered()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
         }

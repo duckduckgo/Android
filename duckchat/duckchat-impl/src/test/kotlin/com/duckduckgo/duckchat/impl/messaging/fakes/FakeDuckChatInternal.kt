@@ -146,6 +146,7 @@ class FakeDuckChatInternal(
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
+    override fun isNativeStorageEnabled(): Boolean = false
 
     override fun keepSessionIntervalInMinutes(): Int = 30
 

@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.store.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.store.impl.bridge.MessageBridge
-import com.duckduckgo.duckchat.store.impl.bridge.MessageBridgeFeatureApi
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
@@ -67,12 +65,11 @@ class RealDuckAiChatStore @Inject constructor(
     @param:DuckAiBridgeFilesDir private val filesDirLazy: Lazy<File>,
     private val dispatchers: DispatcherProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
-    @param:MessageBridgeFeatureApi private val messageBridge: MessageBridge,
 ) : DuckAiChatStore {
 
     override suspend fun hasMigrated(): Boolean =
         withContext(dispatchers.io()) {
-            messageBridge.isDuckAiNativeStorageFeatureEnabled() && migrationPrefs.isMigrationDone(DuckAiMigrationPrefs.CHATS_KEY)
+            migrationPrefs.isMigrationDone(DuckAiMigrationPrefs.CHATS_KEY)
         }
 
     override suspend fun getChats(): List<DuckAiChat> =

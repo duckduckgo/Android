@@ -18,10 +18,12 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -35,7 +37,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
-    suspend fun handleAfterInactivityOption()
+    suspend fun handleAfterInactivityOption(wasIdle: Boolean)
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
@@ -50,9 +52,11 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
     private val appBuildConfig: AppBuildConfig,
+    private val settingsDataStore: SettingsDataStore,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
-    override suspend fun handleAfterInactivityOption() {
+    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
         // new users see New Tab
         logcat { "FirstScreen: Inactivity Timer passed" }
         if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
@@ -60,25 +64,34 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
         }
         // existing users see whatever they had selected
-        applyShowOnAppLaunchOption()
+        applyShowOnAppLaunchOption(fromInactivity = wasIdle)
     }
 
     override suspend fun handleAppLaunchOption() {
-        applyShowOnAppLaunchOption()
+        applyShowOnAppLaunchOption(fromInactivity = false)
     }
 
-    private suspend fun applyShowOnAppLaunchOption() {
+    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
         val option = showOnAppLaunchOptionDataStore.optionFlow.first()
         logcat { "FirstScreen: showing $option on app launch" }
+
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
+                    if (fromInactivity) {
+                        notifyAutofillIdleReturn("new_tab_page")
+                    }
                     tabRepository.add()
                 }
             }
-            is SpecificPage -> handleSpecificPageOption(option)
+            is SpecificPage -> {
+                if (fromInactivity) {
+                    notifyAutofillIdleReturn("specific_page")
+                }
+                handleSpecificPageOption(option)
+            }
         }
     }
 
@@ -95,6 +108,12 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             if (shouldSaveCurrentUrlForShowOnAppLaunch) {
                 showOnAppLaunchOptionDataStore.setResolvedPageUrl(currentUrl!!)
             }
+        }
+    }
+
+    private fun notifyAutofillIdleReturn(optionName: String) {
+        if (settingsDataStore.userSelectedIdleThresholdSeconds == 0L) {
+            systemAutofillEngagement.setIdleReturnTriggered(optionName)
         }
     }
 

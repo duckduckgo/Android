@@ -89,6 +89,21 @@
         "parameters": ["appVersion"]
     },
 
+    // Autofill after idle return pixel
+    "m_ntp_after_idle_autofill_after_idle_return": {
+        "description": "System autofill filled credentials after the idle-return feature navigated the user away from their login page. Only fires when idle threshold is Always (0s) and launch option is NTP or Specific Page.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "appLaunchOption",
+                "description": "The app launch option that was active when idle return triggered (new_tab_page or specific_page)"
+            }
+        ]
+    },
+
     // Timeout selected pixels (one per supported value)
     "m_ntp_after_idle_timeout_selected_always": {
         "description": "User selected Always as the idle timeout threshold",

@@ -37,6 +37,9 @@ enum class NtpAfterIdlePixelName(override val pixelName: String) : Pixel.PixelNa
     BAR_USED_FROM_NTP_USER_INITIATED("m_ntp_after_idle_bar_used_from_ntp_user_initiated"),
     BAR_USED_FROM_NTP_USER_INITIATED_DAILY("m_ntp_after_idle_bar_used_from_ntp_user_initiated_daily"),
 
+    // Autofill after idle return pixel
+    AUTOFILL_AFTER_IDLE_RETURN("m_ntp_after_idle_autofill_after_idle_return"),
+
     // Timeout selected pixels — one enum entry per supported timeout value
     TIMEOUT_SELECTED_ALWAYS("m_ntp_after_idle_timeout_selected_always"),
     TIMEOUT_SELECTED_ALWAYS_DAILY("m_ntp_after_idle_timeout_selected_daily_always"),

@@ -278,6 +278,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -531,6 +532,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -574,6 +576,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -726,6 +729,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -771,6 +775,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", true)
         }
 
@@ -813,6 +818,50 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
+            put("supportsMultipleContexts", false)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndNativeStorageEnabledThenReturnSupportsNativeStorageTrue() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isNativeStorageEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", false)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
+            put("supportsAIChatSync", false)
+            put("supportsPageContext", false)
+            put("supportsNativeStorage", true)
             put("supportsMultipleContexts", false)
         }
 
@@ -1077,6 +1126,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -1115,6 +1165,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -1154,6 +1205,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
+            put("supportsNativeStorage", false)
             put("supportsMultipleContexts", false)
         }
 
@@ -1611,19 +1663,17 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenVoiceSessionStartedThenPixelFiredAndStateUpdated() = runTest {
-        val tabId = "test-tab-id"
         val result = testee.processJsCallbackMessage(
             "aiChat",
             "voiceSessionStarted",
             null,
             null,
             pageContext = viewModel.updatedPageContext,
-            tabId = tabId,
         )
 
         assertNull(result)
         verify(mockDuckChatPixels).reportVoiceSessionStarted()
-        verify(mockVoiceSessionStateManager).onVoiceSessionStarted(tabId)
+        verify(mockVoiceSessionStateManager).onVoiceSessionStarted()
     }
 
     @Test

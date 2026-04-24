@@ -19,4 +19,17 @@ package com.duckduckgo.duckchat.store.impl
 interface DuckAiNativeStoragePixels {
     fun reportMigrationDone(key: String)
     fun reportMigrationDoneBlankKey()
+    fun reportMigrationStarted()
+    fun reportMigrationAlreadyDone()
+    fun reportMigrationError()
+    fun reportSettingsPutError()
+    fun reportSettingsGetError()
+    fun reportSettingsDeleteError()
+    fun reportChatPutError()
+    fun reportChatGetError()
+    fun reportChatDeleteError()
+    fun reportFilePutError()
+    fun reportFileGetError()
+    fun reportFileListError()
+    fun reportFileDeleteError()
 }

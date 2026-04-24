@@ -213,6 +213,12 @@ interface DuckChatFeature {
     fun contextualFireButton(): Toggle
 
     /**
+     * @return `true` when the native storage for duck.ai data is ready to be used
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiNativeStorage(): Toggle
+
+    /**
      * @return `true` when the native storage should be used for chat history
      * (deletion and suggestions), provided migration is complete.
      * If the remote feature is not present defaults to `internal`
@@ -228,11 +234,4 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun digitalAssistantDuckAi(): Toggle
-
-    /**
-     * @return `true` when the Duck.ai voice chat foreground service (microphone) should be started
-     * and stopped during a voice session.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiVoiceChatService(): Toggle
 }
