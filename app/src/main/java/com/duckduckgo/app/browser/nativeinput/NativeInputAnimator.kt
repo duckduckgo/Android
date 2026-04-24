@@ -264,9 +264,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val widgetContent = card.findViewById<View?>(R.id.inputModeWidget)
         widgetContent?.alpha = 0f
 
-        val fullWidth = (card.parent as View).width
-        val fullHeight = measureUnconstrainedHeight(card, fullWidth)
         val params = card.layoutParams as FrameLayout.LayoutParams
+        val fullWidth = (card.parent as View).width - params.leftMargin - params.rightMargin
+        val fullHeight = measureUnconstrainedHeight(card, fullWidth)
 
         runAnimator(
             cleanup = { omnibarCard.alpha = 1f },
