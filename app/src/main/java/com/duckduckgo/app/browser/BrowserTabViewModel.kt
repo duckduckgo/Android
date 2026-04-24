@@ -1282,7 +1282,15 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (androidBrowserConfig.showNTPAfterIdleReturn().isEnabled() && layoutState is Browser && layoutState.isNewTabState) {
+        // url == null guards against restoration paths (onViewReady / restoreWebViewState)
+        // calling onUserSubmittedQuery while globalLayoutState is still the default
+        // Browser(isNewTabState = true) from ViewModel init, which would otherwise misfire the
+        // NTP search-submitted pixel even though the user never typed into the NTP omnibar.
+        if (androidBrowserConfig.showNTPAfterIdleReturn().isEnabled() &&
+            layoutState is Browser &&
+            layoutState.isNewTabState &&
+            url == null
+        ) {
             ntpAfterIdleManager.onNtpSearchSubmitted()
         }
 
