@@ -101,6 +101,13 @@ class RealNativeInputManager @Inject constructor(
                 isNativeInputFieldEnabled = isEnabled
             }
             .launchIn(lifecycleOwner.lifecycleScope)
+        duckChat.observeInputScreenUserSettingEnabled()
+            .onEach {
+                if (omnibarController.isDuckAiMode()) {
+                    rootView.post { widgetFrom(rootView)?.selectChatTab() }
+                }
+            }
+            .launchIn(lifecycleOwner.lifecycleScope)
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
@@ -271,7 +278,10 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView)
         if (omnibarController.isDuckAiMode()) {
-            widgetFrom(widgetView)?.setToggleVisible(false)
+            widgetFrom(widgetView)?.apply {
+                setToggleVisible(false)
+                selectChatTab()
+            }
         } else {
             showNtp()
         }
