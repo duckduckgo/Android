@@ -139,8 +139,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
+    private var inputScreenSettingJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
+    private var isInputScreenUserSettingEnabled: Boolean = false
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
@@ -167,6 +169,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
+        observeInputScreenUserSetting()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -178,6 +181,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob = null
         tierJob?.cancel()
         tierJob = null
+        inputScreenSettingJob?.cancel()
+        inputScreenSettingJob = null
         tearDownChatSuggestions()
     }
 
@@ -228,11 +233,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hideBackArrow()
         hideInputFieldBackground()
         removeMargins()
-        if (duckChatInternal.isEnabled()) {
-            setToggleMatchParent()
-        } else {
-            hideToggle()
-        }
+        applyToggleVisibility()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
@@ -241,6 +242,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
             }
         }
     }
+
+    private fun applyToggleVisibility() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        when {
+            !duckChatInternal.isEnabled() -> {
+                hideToggle()
+            }
+            !isInputScreenUserSettingEnabled -> {
+                setToggleMatchParent()
+                hideToggle()
+            }
+            else -> {
+                setToggleMatchParent()
+                toggle.visibility = VISIBLE
+            }
+        }
+    }
+
+    private fun shouldShowToggle(): Boolean = duckChatInternal.isEnabled() && isInputScreenUserSettingEnabled
 
     private fun removeMargins() {
         findViewById<EditText?>(R.id.inputField)?.updateLayoutParams<MarginLayoutParams> {
@@ -366,8 +386,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setToggleVisible(visible: Boolean) {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        val isVisible = visible && shouldShowToggle()
         suspendLayoutTransitions {
-            toggle.visibility = if (visible) VISIBLE else GONE
+            toggle.visibility = if (isVisible) VISIBLE else GONE
         }
     }
 
@@ -474,6 +495,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun observeInputScreenUserSetting() {
+        inputScreenSettingJob?.cancel()
+        inputScreenSettingJob = duckChatInternal.observeInputScreenUserSettingEnabled()
+            .onEach { enabled ->
+                isInputScreenUserSettingEnabled = enabled
+                applyToggleVisibility()
+            }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
