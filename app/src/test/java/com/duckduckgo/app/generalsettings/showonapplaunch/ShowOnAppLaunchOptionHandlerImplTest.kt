@@ -34,6 +34,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -61,6 +62,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private lateinit var fakeTabRepository: TabRepository
     private val appBuildConfig: AppBuildConfig = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
     private lateinit var testee: ShowOnAppLaunchOptionHandler
@@ -76,6 +78,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             fakeDataStore,
             fakeTabRepository,
             appBuildConfig,
+            ntpAfterIdleManager,
             settingsDataStore,
             systemAutofillEngagement,
         )
@@ -925,6 +928,73 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 2)
             assertTrue(tabs.all { it.url == "" })
         }
+    }
+
+    // onIdleReturnTriggered notification tests
+
+    @Test
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabHasUrlThenIdleReturnIsNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "https://example.com", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnIsNotified() = runTest {
+        // Even when no new tab is added because the user is already on an NTP, the handler should
+        // still notify — the currently-shown NTP counts as an after-idle shown event.
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = null, position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityWasIdleFalseAndOptionNewTabPageThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityOptionLastOpenedTabThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityOptionSpecificPageThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenAppLaunchOptionHandledOutsideInactivityPathThenIdleReturnNotNotified() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAppLaunchOption()
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     // autofill idle return flag tests

@@ -30,6 +30,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -52,6 +53,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
     private val appBuildConfig: AppBuildConfig,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
@@ -78,6 +80,12 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
+                if (fromInactivity) {
+                    // Fires regardless of whether we add a new tab: when the user is already on
+                    // an NTP, no new tab is added but the current NTP still counts as an after-idle
+                    // shown event. Gating on "new tab added" would leave that case unclassified.
+                    ntpAfterIdleManager.onIdleReturnTriggered()
+                }
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
                     if (fromInactivity) {

@@ -57,16 +57,25 @@ class FirstScreenHandlerImpl @Inject constructor(
 ) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        // Notify the NtpAfterIdleManager synchronously so the after-idle classification is
-        // in place before BrowserViewModel's flowSelectedTab subscription can fire onNtpShown
-        // on activity recreation; otherwise the shown pixel gets misclassified as user-initiated.
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() && computeWasIdle()) {
+        // Notify the NtpAfterIdleManager synchronously when the currently selected tab is already
+        // an NTP: BrowserViewModel's flowSelectedTab subscription can fire onNtpShown immediately
+        // on activity recreation, and the async handler path below doesn't run in time to classify
+        // it. Gated on "already on NTP" so LastOpenedTab/SpecificPage users on a URL tab don't
+        // leave a stale pendingAfterIdle flag behind for a later user-initiated NTP.
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+            computeWasIdle() &&
+            isCurrentSelectedTabNtp()
+        ) {
             ntpAfterIdleManager.onIdleReturnTriggered()
         }
         appCoroutineScope.launch {
             logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
             handleFirstScreen(isFreshLaunch)
         }
+    }
+
+    private fun isCurrentSelectedTabNtp(): Boolean {
+        return tabRepository.liveSelectedTab.value?.url.isNullOrBlank()
     }
 
     private fun computeWasIdle(): Boolean {
