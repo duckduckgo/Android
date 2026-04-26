@@ -306,20 +306,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenAiChatSuggestionsFeatureEnabledThenIsChatSuggestionsFeatureAvailableReturnsTrue() {
-        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
-
-        assertTrue(testee.isChatSuggestionsFeatureAvailable())
-    }
-
-    @Test
-    fun whenAiChatSuggestionsFeatureDisabledThenIsChatSuggestionsFeatureAvailableReturnsFalse() {
-        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = false))
-
-        assertFalse(testee.isChatSuggestionsFeatureAvailable())
-    }
-
-    @Test
     fun whenFeatureEnabledThenShowPopupMenuShortcutReturnsValueFromRepository() {
         assertTrue(testee.showPopupMenuShortcut.value)
     }

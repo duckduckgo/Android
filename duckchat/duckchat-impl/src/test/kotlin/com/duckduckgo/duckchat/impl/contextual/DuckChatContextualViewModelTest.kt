@@ -1435,7 +1435,6 @@ class DuckChatContextualViewModelTest {
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
-        override fun isChatSuggestionsFeatureAvailable(): Boolean = true
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
         override fun isVoiceSessionActive(): Boolean = false
