@@ -67,11 +67,12 @@ class RealAutofillServiceFeatureRepository @Inject constructor(
         loadToMemory()
     }
 
+    @Suppress("DEPRECATION")
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess || processName == ":autofill") {
                 exceptions.clear()
-                exceptions.addAll(autofillServiceFeature.canEnableAutofillService().getExceptions().map { it.domain })
+                exceptions.addAll(autofillServiceFeature.self().getExceptions().map { it.domain })
             }
         }
     }
