@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Κάνε μου έκπληξη!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
+    <string name="onboardingSerpDaxDialogTitle">Αυτό είναι το DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.</string>
     <string name="onboardingSerpDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

@@ -884,6 +884,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
+    <string name="onboardingSerpDaxDialogTitle">Acesta este DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Rapid. Mai puține reclame.</string>
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

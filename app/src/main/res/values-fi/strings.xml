@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Yllätä minut!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
+    <string name="onboardingSerpDaxDialogTitle">Tällainen on **DuckDuckGo Search**!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Yksityinen. Nopea. Vähemmän mainoksia.</string>
     <string name="onboardingSerpDaxDialogButton">Selvä!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Siirry seuraavaksi sivustolle!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

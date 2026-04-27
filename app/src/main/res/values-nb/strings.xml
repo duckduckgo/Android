@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Overrask meg!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Det er <b>DuckDuckGo Search</b>! Privat. Raskt. Færre annonser.]]></string>
+    <string name="onboardingSerpDaxDialogTitle">Det er DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Raskt. Færre annonser.</string>
     <string name="onboardingSerpDaxDialogButton">Skjønner!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Nå kan du prøve å besøke et nettsted!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

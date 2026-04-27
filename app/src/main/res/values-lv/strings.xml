@@ -884,6 +884,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Pārsteidz mani!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tas ir <b>DuckDuckGo Search</b>! Privāti. Ātri. Mazāk reklāmu.]]></string>
+    <string name="onboardingSerpDaxDialogTitle">Tas ir DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privāti. Ātri. Mazāk reklāmu.</string>
     <string name="onboardingSerpDaxDialogButton">Sapratu!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Tagad pamēģini atvērt kādu vietni!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
