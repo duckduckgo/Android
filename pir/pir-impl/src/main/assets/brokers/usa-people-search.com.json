@@ -1,7 +1,7 @@
 {
   "name": "USA People Search",
   "url": "usa-people-search.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usa-people-search.com/manage",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "3cb9a2ce-6443-4934-9df3-ec63a181d9bb",
-          "url": "https://usa-people-search.com/name/${firstName|downcase}-${lastName|downcase}/${city|downcase}-${state|stateFull|downcase}"
+          "url": "https://usa-people-search.com/name/${firstName|downcase|hyphenated}-${lastName|downcase|hyphenated}/${city|downcase|hyphenated}-${state|stateFull|downcase|hyphenated}"
         },
         {
           "_comment": "Wait for CF challenge interstitial to complete",

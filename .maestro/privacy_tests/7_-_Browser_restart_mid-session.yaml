@@ -93,6 +93,13 @@ tags:
             - killApp
             - launchApp:
                 clearState: false
+            - runFlow:
+                when:
+                  visible:
+                    id: "newTabReturnHatchView"
+                commands:
+                  - tapOn:
+                      id: "newTabReturnHatchView"
             - assertVisible:
                 text: "Pay"
             - assertVisible:

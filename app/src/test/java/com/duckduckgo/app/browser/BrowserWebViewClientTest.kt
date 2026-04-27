@@ -40,6 +40,7 @@ import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.Web
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -969,7 +970,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(BAD_URL, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(BAD_URL), eq(""), anyString())
     }
 
     @Test
@@ -981,7 +982,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(CONNECTION, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(CONNECTION), eq(""), anyString())
     }
 
     @Test
@@ -993,7 +994,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
@@ -1005,7 +1006,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(1))!!.onReceivedError(eq(OMITTED), anyString(), anyString())
     }
 
     @Test
@@ -1017,7 +1018,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1031,7 +1032,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(SSL_PROTOCOL_ERROR, requestUrl)
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(SSL_PROTOCOL_ERROR), eq(requestUrl), anyString())
     }
 
     @Test
@@ -1759,6 +1760,41 @@ class BrowserWebViewClientTest {
         return mock<SslCertificate>().apply {
             whenever(x509Certificate).thenReturn(certificate)
         }
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlDiffersFromOriginalUrlThenNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai/chat-1"
+        whenever(mockWebView.originalUrl).thenReturn("https://duck.ai")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener).onHistoryUrlChanged(duckChatUrl)
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnDuckChatUrlAndUrlMatchesOriginalUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        val duckChatUrl = "https://duck.ai"
+        whenever(mockWebView.originalUrl).thenReturn(duckChatUrl)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.doUpdateVisitedHistory(mockWebView, duckChatUrl, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
+    }
+
+    @Test
+    fun whenDoUpdateVisitedHistoryOnNonDuckChatUrlThenDoNotNotifyListener() {
+        val mockWebView = mock<WebView>()
+        whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee.doUpdateVisitedHistory(mockWebView, EXAMPLE_URL, false)
+
+        verify(listener, never()).onHistoryUrlChanged(any())
     }
 
     companion object {

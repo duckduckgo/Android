@@ -238,9 +238,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_OFF("m_settings_general_recent_sites_off"),
     AUTOCOMPLETE_RECENT_SITES_GENERAL_SETTINGS_TOGGLED_ON("m_settings_general_recent_sites_on"),
 
-    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
-    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
-
     AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_autocomplete_displayed_bookmark"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_autocomplete_displayed_favorite"),
     AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
@@ -486,6 +483,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DAU_DAILY("m_product_telemetry_surface_usage_dau_daily"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
+    ERROR_CODE_PIXEL("m_errorpageshown_code"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 

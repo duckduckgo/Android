@@ -70,6 +70,26 @@ class OnboardingStoreImpl @Inject constructor(
         )
     }
 
+    override fun getChatSuggestions(): List<DaxDialogIntroOption> {
+        return listOf(
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion1),
+                iconRes = drawable.ic_ai_chat_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion1),
+            ),
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion2),
+                iconRes = drawable.ic_ai_chat_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion2),
+            ),
+            DaxDialogIntroOption(
+                optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3),
+                iconRes = drawable.ic_ai_chat_16,
+                link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3Prompt),
+            ),
+        )
+    }
+
     override fun getSitesOptions(): List<DaxDialogIntroOption> {
         val site1: String
         val site2: String

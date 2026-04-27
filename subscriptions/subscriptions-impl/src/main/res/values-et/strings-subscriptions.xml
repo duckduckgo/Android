@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ei saa Plus või Pro taseme funktsioonidele ligi pääseda</string>
     <string name="subscriptionsProUpgradeTitle">Mine üle Pro-le</string>

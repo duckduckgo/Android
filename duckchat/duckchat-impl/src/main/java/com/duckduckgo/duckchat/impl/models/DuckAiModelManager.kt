@@ -170,6 +170,7 @@ class RealDuckAiModelManager @Inject constructor(
             shortName = remote.shortName ?: remote.name,
             accessTier = accessTier,
             isAccessible = isAccessible,
+            provider = ModelProvider.from(id = remote.id, providerString = remote.provider),
         )
     }
 

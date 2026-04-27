@@ -35,7 +35,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
@@ -47,6 +46,7 @@ import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -143,6 +143,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val duckChat: DuckChatInternal,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatFeature: DuckChatFeature,
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
@@ -159,8 +160,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
     )
-
-    private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
     private var chatSuggestionsFetchJob: Job? = null
     private var tabAttachmentFilterJob: Job? = null
@@ -176,7 +175,7 @@ class InputScreenViewModel @AssistedInject constructor(
         MutableStateFlow(
             InputScreenVisibilityState(
                 submitButtonVisible = false,
-                voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
+                voiceSearchButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
                 autoCompleteSuggestionsVisible = false,
                 bottomFadeVisible = false,
                 showChatLogo = true,
@@ -192,6 +191,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val initialSearchInputText = currentOmnibarText.trim()
     private val searchInputTextState = MutableStateFlow(initialSearchInputText)
     private val chatInputTextState = MutableStateFlow("")
+    val chatInputText: StateFlow<String> = chatInputTextState.asStateFlow()
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
@@ -271,9 +271,6 @@ class InputScreenViewModel @AssistedInject constructor(
             }.flowOn(dispatchers.io())
             .onEach { result ->
                 logcat { "Autocomplete: ${result.suggestions}" }
-                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                    hasUserSeenHistoryIAM = true
-                }
             }.flowOn(dispatchers.main())
             .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
@@ -283,10 +280,9 @@ class InputScreenViewModel @AssistedInject constructor(
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             combine(
                 chatInputTextState.debounceExceptFirst(timeoutMillis = 100),
-                _chatSuggestions,
                 autoCompleteSuggestionsEnabled,
-            ) { chatInput, chatSuggestions, autoCompleteEnabled ->
-                if (autoCompleteEnabled && chatInput.isNotEmpty() && chatSuggestions.isEmpty()) chatInput else null
+            ) { chatInput, autoCompleteEnabled ->
+                if (autoCompleteEnabled && chatInput.isNotEmpty()) chatInput else null
             }.distinctUntilChanged()
                 .flatMapLatest { query ->
                     if (query != null) {
@@ -297,7 +293,7 @@ class InputScreenViewModel @AssistedInject constructor(
                                         it is AutoCompleteSwitchToTabSuggestion ||
                                         it is AutoCompleteHistorySuggestion ||
                                         (it is AutoCompleteSearchSuggestion && it.isUrl)
-                                },
+                                }.take(getMaxUrlSuggestionsCount()),
                             )
                         }
                     } else {
@@ -329,11 +325,18 @@ class InputScreenViewModel @AssistedInject constructor(
             chatInputTextState,
         ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText ->
             val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
-            if (newEntryPointActive) chatInputText.isEmpty() else serviceAvailable && inputAllowed
-        }.onEach { voiceInputPossible ->
             _visibilityState.update {
                 it.copy(
-                    voiceInputButtonVisible = voiceInputPossible,
+                    voiceSearchButtonVisible = if (!newEntryPointActive) {
+                        serviceAvailable && inputAllowed
+                    } else {
+                        false
+                    },
+                    voiceChatButtonVisible = if (newEntryPointActive) {
+                        chatInputText.isEmpty()
+                    } else {
+                        false
+                    },
                 )
             }
         }.launchIn(viewModelScope)
@@ -376,13 +379,17 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        combine(_chatSuggestions, chatUrlSuggestions) { chatSuggestions, urlSuggestions ->
-            Pair(chatSuggestions, urlSuggestions)
-        }.onEach { (chatSuggestions, urlSuggestions) ->
+        combine(_chatSuggestions, chatUrlSuggestions, chatInputTextState) { chatSuggestions, urlSuggestions, chatInput ->
+            Triple(chatSuggestions, urlSuggestions, chatInput)
+        }.onEach { (chatSuggestions, urlSuggestions, chatInput) ->
             val hasChatSuggestions = chatSuggestions.isNotEmpty()
             val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
+            val hasSearchRow = duckChatFeature.rememberTogglePosition().isEnabled() && chatInput.isNotEmpty()
             _visibilityState.update {
-                it.copy(showChatLogo = !hasChatSuggestions && !hasUrlSuggestions, chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions)
+                it.copy(
+                    showChatLogo = !hasChatSuggestions && !hasUrlSuggestions && !hasSearchRow,
+                    chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions || hasSearchRow,
+                )
             }
         }.launchIn(viewModelScope)
 
@@ -415,7 +422,10 @@ class InputScreenViewModel @AssistedInject constructor(
         voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
-    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion, fromChatUrlSuggestions: Boolean = false) {
+    fun userSelectedAutocomplete(
+        suggestion: AutoCompleteSuggestion,
+        fromChatUrlSuggestions: Boolean = false,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val suggestions = if (duckChatFeature.rememberTogglePosition().isEnabled() && fromChatUrlSuggestions) {
                 chatUrlSuggestions.value.suggestions
@@ -431,7 +441,6 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url)
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
-                    is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         command.value = Command.LaunchDeviceApplication(suggestion)
@@ -599,21 +608,6 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun onUserDismissedAutoCompleteInAppMessage() {
-        viewModelScope.launch(dispatchers.io()) {
-            autoComplete.userDismissedHistoryInAutoCompleteIAM()
-        }
-    }
-
-    fun autoCompleteSuggestionsGone() {
-        viewModelScope.launch(dispatchers.io()) {
-            if (hasUserSeenHistoryIAM) {
-                autoComplete.submitUserSeenHistoryIAM()
-            }
-            hasUserSeenHistoryIAM = false
-        }
-    }
-
     fun onChatSelected() {
         isSearchModeFlow.value = false
         viewModelScope.launch {
@@ -709,8 +703,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onVoiceEntryTapped() {
         pixel.fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT,
-            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY,
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_VOICE_ENTRY_TAPPED_DAILY,
         )
         duckChat.openVoiceDuckChat()
     }
@@ -786,6 +780,7 @@ class InputScreenViewModel @AssistedInject constructor(
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
         pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
     }
+
     private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
         val hadText =
             if (directionToSearch) {
@@ -850,7 +845,10 @@ class InputScreenViewModel @AssistedInject constructor(
         inputScreenConfigResolver.mainButtonsEnabled() &&
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
-    fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
+    fun onChatSuggestionSelected(
+        chatId: String,
+        pinned: Boolean,
+    ) {
         saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
@@ -890,7 +888,10 @@ class InputScreenViewModel @AssistedInject constructor(
     // region tab attachments tagging
     // To be revisited once we have the final design
 
-    fun onChatTagTextChanged(text: String, cursorPosition: Int) {
+    fun onChatTagTextChanged(
+        text: String,
+        cursorPosition: Int,
+    ) {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         val tagQuery = TagDetector.detect(text, cursorPosition)
         if (tagQuery == null) {
@@ -958,6 +959,7 @@ class InputScreenViewModel @AssistedInject constructor(
                 val url = duckChat.getDuckChatUrl(query, true)
                 command.value = Command.SubmitSearch(url)
             }
+
             else -> {
                 command.value = Command.SubmitChat(query)
                 duckChat.openDuckChatWithAutoPrompt(query)
@@ -965,7 +967,10 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun buildAndStorePendingPrompt(query: String, attachedTabs: List<TabAttachmentItem>): Boolean {
+    private suspend fun buildAndStorePendingPrompt(
+        query: String,
+        attachedTabs: List<TabAttachmentItem>,
+    ): Boolean {
         if (attachedTabs.isEmpty()) return false
 
         val tabIds = attachedTabs.map { it.tabId }
@@ -1021,10 +1026,20 @@ class InputScreenViewModel @AssistedInject constructor(
         fun create(currentOmnibarText: String): InputScreenViewModel
     }
 
+    private fun getMaxUrlSuggestionsCount(): Int {
+        return runCatching {
+            duckAiChatHistoryFeature.self().getSettings()?.let {
+                JSONObject(it).optInt(MAX_URL_SUGGESTIONS_KEY, DEFAULT_MAX_URL_SUGGESTIONS)
+            }
+        }.getOrNull() ?: DEFAULT_MAX_URL_SUGGESTIONS
+    }
+
     companion object {
         const val DUCK_SCHEME = "duck"
         private const val CHAT_SUGGESTIONS_DEBOUNCE_MS = 150L
         private const val MAX_TAG_TITLE_LENGTH = 20
+        private const val MAX_URL_SUGGESTIONS_KEY = "maxUrlSuggestions"
+        private const val DEFAULT_MAX_URL_SUGGESTIONS = 3
 
         // TODO Read this from the privacy configs once the frontend defines it
         private const val MAX_POPUP_TABS = 5

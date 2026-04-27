@@ -34,6 +34,12 @@
     <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
 
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Restore Sync &amp; Backup data from previous install?</string>
+    <string name="sync_previous_session_ready_body">Restore to get your previous bookmarks, passwords and other data back in DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Restore Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Set Up New Sync</string>
+
     <!-- Recover Data Screen -->
     <string name="sync_recover_data_title">Recover Your Data Easily</string>
     <string name="sync_recover_data_content">Use this code to restore your data if you lose access to this device. Sync &amp; Backup data can\'t be recovered after 18 months of inactivity.</string>

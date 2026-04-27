@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Tilaus</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus- tai Pro-tason ominaisuuksia ei voi käyttää</string>
     <string name="subscriptionsProUpgradeTitle">Päivitä Pro-versioon</string>

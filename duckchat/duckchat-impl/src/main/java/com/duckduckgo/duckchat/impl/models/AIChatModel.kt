@@ -29,6 +29,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "modelShortName") val shortName: String? = null,
     @field:Json(name = "accessTier") val accessTier: List<String>? = null,
     @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
+    @field:Json(name = "provider") val provider: String? = null,
 )
 
 data class AIChatModel(
@@ -38,10 +39,34 @@ data class AIChatModel(
     val shortName: String,
     val accessTier: List<String>,
     val isAccessible: Boolean,
+    val provider: ModelProvider = ModelProvider.UNKNOWN,
 )
 
 enum class UserTier(val rawValue: String) {
     FREE("free"),
     PLUS("plus"),
     PRO("pro"),
+}
+
+enum class ModelProvider {
+    OPENAI,
+    META,
+    ANTHROPIC,
+    MISTRAL,
+    OSS,
+    UNKNOWN,
+    ;
+
+    companion object {
+        fun from(id: String, providerString: String?): ModelProvider {
+            return when {
+                id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") -> MISTRAL
+                id.contains("gpt-oss") -> OSS
+                providerString == "anthropic" -> ANTHROPIC
+                providerString == "openai" -> OPENAI
+                else -> UNKNOWN
+            }
+        }
+    }
 }

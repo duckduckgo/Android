@@ -34,18 +34,10 @@ import javax.inject.Inject
 
 data class Margins(val top: Int, val bottom: Int)
 
-data class CardWidthTarget(
-    val width: Int,
-    val marginStart: Int,
-    val marginEnd: Int,
-    val bottomMargin: Int,
-)
-
 interface NativeInputAnimator {
     fun init(widgetCard: View, omnibarCard: View, omnibarWidth: Int, omnibarHeight: Int, isBottom: Boolean): Margins?
     fun animateEnter(widgetCard: View, omnibarCard: View, widgetView: View, margins: Margins, onComplete: () -> Unit = {})
     fun animateExit(widgetCard: View, widgetView: View, omnibarCard: View, isBottom: Boolean, onComplete: () -> Unit)
-    fun animateCardWidth(card: View, widgetView: View, target: CardWidthTarget, onComplete: () -> Unit = {})
     fun cancelAnimation()
     fun applyLayoutTransitions(widgetView: View)
     fun applyLayoutTransitions(widgetView: View, isBottom: Boolean)
@@ -56,7 +48,6 @@ interface NativeInputAnimator {
 class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private var transitionAnimator: ValueAnimator? = null
-    private var cardWidthAnimator: ValueAnimator? = null
     private var animationCleanup: (() -> Unit)? = null
     private var pendingPreDraw: Pair<View, ViewTreeObserver.OnPreDrawListener>? = null
 
@@ -198,81 +189,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         )
     }
 
-    override fun animateCardWidth(
-        card: View,
-        widgetView: View,
-        target: CardWidthTarget,
-        onComplete: () -> Unit,
-    ) {
-        cardWidthAnimator?.cancel()
-        cardWidthAnimator = null
-        clearLayoutTransitions(widgetView)
-
-        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        val oldWidth = card.width
-
-        applyTargetMargins(params, card, target)
-
-        if (oldWidth <= 0 || oldWidth == target.width) {
-            onCardWidthAnimated(params, card, widgetView, onComplete)
-            return
-        }
-
-        params.width = oldWidth
-        card.layoutParams = params
-
-        startCardWidthAnimation(params, card, widgetView, oldWidth, target.width, onComplete)
-    }
-
-    private fun applyTargetMargins(params: ViewGroup.MarginLayoutParams, card: View, target: CardWidthTarget) {
-        params.marginStart = target.marginStart
-        params.marginEnd = target.marginEnd
-        params.bottomMargin = target.bottomMargin
-        card.layoutParams = params
-    }
-
-    private fun onCardWidthAnimated(
-        params: ViewGroup.MarginLayoutParams,
-        card: View,
-        widgetView: View,
-        onComplete: () -> Unit,
-    ) {
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        card.layoutParams = params
-        applyLayoutTransitions(widgetView)
-        onComplete()
-    }
-
-    private fun startCardWidthAnimation(
-        params: ViewGroup.MarginLayoutParams,
-        card: View,
-        widgetView: View,
-        fromWidth: Int,
-        toWidth: Int,
-        onComplete: () -> Unit,
-    ) {
-        cardWidthAnimator = ValueAnimator.ofInt(fromWidth, toWidth).apply {
-            duration = ANIMATION_DURATION_MS
-            interpolator = FastOutSlowInInterpolator()
-            addUpdateListener { anim ->
-                params.width = anim.animatedValue as Int
-                card.layoutParams = params
-            }
-            addListener(object : AnimatorListenerAdapter() {
-                private var cancelled = false
-                override fun onAnimationCancel(animation: Animator) { cancelled = true }
-                override fun onAnimationEnd(animation: Animator) {
-                    cardWidthAnimator = null
-                    if (!cancelled) onCardWidthAnimated(params, card, widgetView, onComplete)
-                }
-            })
-            start()
-        }
-    }
-
     override fun cancelAnimation() {
-        cardWidthAnimator?.cancel()
-        cardWidthAnimator = null
         pendingPreDraw?.let { (view, listener) -> view.viewTreeObserver.removeOnPreDrawListener(listener) }
         pendingPreDraw = null
         animationCleanup?.invoke()
@@ -347,9 +264,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val widgetContent = card.findViewById<View?>(R.id.inputModeWidget)
         widgetContent?.alpha = 0f
 
-        val fullWidth = (card.parent as View).width
-        val fullHeight = measureUnconstrainedHeight(card, fullWidth)
         val params = card.layoutParams as FrameLayout.LayoutParams
+        val fullWidth = (card.parent as View).width - params.leftMargin - params.rightMargin
+        val fullHeight = measureUnconstrainedHeight(card, fullWidth)
 
         runAnimator(
             cleanup = { omnibarCard.alpha = 1f },

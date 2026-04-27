@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Ярлыки Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Выберите, какие ярлыки Duck.ai нужно показывать в интерфейсе</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Положение переключателя «Новая вкладка»</string>
+    <string name="duckAiDefaultTogglePositionSearch">Поиск</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Последнее использование</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Голосовой поиск</string>
 

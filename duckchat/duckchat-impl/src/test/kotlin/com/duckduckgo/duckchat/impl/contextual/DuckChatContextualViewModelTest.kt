@@ -1438,6 +1438,8 @@ class DuckChatContextualViewModelTest {
         override fun isChatSuggestionsFeatureAvailable(): Boolean = true
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
+        override fun isVoiceSessionActive(): Boolean = false
+        override suspend fun isVoiceChatEnabled(): Boolean = true
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

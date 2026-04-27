@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai otseteed</string>
     <string name="duck_ai_shortcut_settings_description">Vali, milliseid Duck.ai otseteid kuvada</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Uue vahekaardi lüliti asend</string>
+    <string name="duckAiDefaultTogglePositionSearch">Otsing</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Viimati kasutatud</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Häälotsing</string>
 

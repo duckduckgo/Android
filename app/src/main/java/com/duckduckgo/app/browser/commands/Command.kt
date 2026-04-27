@@ -211,6 +211,7 @@ sealed class Command {
     class HandleNonHttpAppLink(
         val nonHttpAppLink: NonHttpAppLink,
         val headers: Map<String, String>,
+        val showConfirmation: Boolean = true,
     ) : Command()
 
     class ShowAppLinkPrompt(

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Peruuta</string>
     <string name="autocompleteRemoveItemRemove">Poista</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Vaihda välilehdelle · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
-    <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
-    <string name="openAutoCompleteSettings">Avaa asetukset</string>
 </resources>

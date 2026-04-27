@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Előfizetés</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nem sikerült hozzáférni a Plusz vagy a Pro szintű funkciókhoz</string>
     <string name="subscriptionsProUpgradeTitle">Váltás Pro előfizetésre</string>

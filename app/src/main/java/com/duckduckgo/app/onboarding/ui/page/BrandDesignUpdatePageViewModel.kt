@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -121,6 +122,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
+        data object SkipDialogAnimation : Command
+    }
+
+    fun onDialogTapped() {
+        skipDialogAnimations()
+    }
+
+    fun onBackgroundTapped() {
+        skipDialogAnimations()
     }
 
     fun onDialogAnimationStarted() {
@@ -141,6 +151,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            INPUT_SCREEN_PREVIEW -> {
+            }
         }
     }
 
@@ -242,7 +254,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN -> {
-                viewModelScope.launch(dispatchers.io()) {
+                viewModelScope.launch {
                     val inputSelected = _viewState.value.inputScreenSelected
                     val isReinstall = _viewState.value.isReinstallUser
                     if (inputSelected) {
@@ -255,6 +267,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     onboardingStore.storeInputScreenSelection(inputSelected)
                     _commands.send(Command.Finish)
                 }
+            }
+
+            INPUT_SCREEN_PREVIEW -> {
+                // no-op
             }
         }
     }
@@ -273,7 +289,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN -> {
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW -> {
                 // no-op
             }
         }
@@ -282,6 +298,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
+        appInstallStore.wasEverDefaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
         viewModelScope.launch {
             _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
@@ -332,4 +349,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
                 androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
         }
+
+    private fun skipDialogAnimations() {
+        viewModelScope.launch {
+            _commands.send(Command.SkipDialogAnimation)
+        }
+    }
 }

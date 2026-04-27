@@ -257,8 +257,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
@@ -299,7 +297,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
@@ -348,6 +345,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -519,6 +517,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserUiLockFeature: BrowserUiLockFeature,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -526,7 +525,6 @@ class BrowserTabViewModel @Inject constructor(
     UrlExtractionListener,
     NavigationHistoryListener {
     private var buildingSiteFactoryJob: Job? = null
-    private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
@@ -651,7 +649,7 @@ class BrowserTabViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = browserMenuDisplayRepository.isBottomSheetMenuEnabled()),
         )
 
     private val fireproofWebsitesObserver =
@@ -1096,12 +1094,8 @@ class BrowserTabViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .flatMapLatest { autoComplete.autoComplete(it) }
                 .flowOn(dispatchers.io())
-                .onEach { result ->
-                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                        hasUserSeenHistoryIAM = true
-                    }
-                    onAutoCompleteResultReceived(result)
-                }.flowOn(dispatchers.main())
+                .onEach { result -> onAutoCompleteResultReceived(result) }
+                .flowOn(dispatchers.main())
                 .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
                 .launchIn(viewModelScope)
     }
@@ -1206,7 +1200,6 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
-                    is AutoCompleteInAppMessageSuggestion -> return@withContext
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                     is AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion -> {
                         // no-op, installed apps search is disabled in tabs
@@ -1283,9 +1276,22 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentGlobalLayoutState() is Invalidated) {
+        val layoutState = currentGlobalLayoutState()
+        if (layoutState is Invalidated) {
             recoverTabWithQuery(query)
             return
+        }
+
+        // url == null guards against restoration paths (onViewReady / restoreWebViewState)
+        // calling onUserSubmittedQuery while globalLayoutState is still the default
+        // Browser(isNewTabState = true) from ViewModel init, which would otherwise misfire the
+        // NTP search-submitted pixel even though the user never typed into the NTP omnibar.
+        if (androidBrowserConfig.showNTPAfterIdleReturn().isEnabled() &&
+            layoutState is Browser &&
+            layoutState.isNewTabState &&
+            url == null
+        ) {
+            ntpAfterIdleManager.onNtpSearchSubmitted()
         }
 
         val cta = currentCtaViewState().cta
@@ -1539,7 +1545,11 @@ class BrowserTabViewModel @Inject constructor(
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
-                    command.value = ShowKeyboard
+                    if (duckAiFeatureState.showInputScreen.value) {
+                        command.value = LaunchInputScreen
+                    } else {
+                        command.value = ShowKeyboard
+                    }
                 } else {
                     command.value = LaunchNewTab
                 }
@@ -2080,6 +2090,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(domain: String): Boolean {
         return !duckChat.isDuckChatUrl(domain.toUri()) && !duckDuckGoUrlDetector.isDuckDuckGoUrl(domain)
+    }
+
+    override fun onHistoryUrlChanged(url: String) {
+        urlUpdated(url)
     }
 
     private fun urlUpdated(url: String) {
@@ -3073,7 +3087,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState()
+        browserViewState.value = BrowserViewState(useBottomSheetMenu = browserMenuState.value.isEnabled)
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
@@ -3416,17 +3430,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
-        when {
+        command.value = when {
             // When in custom tab, always open the app link directly, without prompting.
-            isCustomTabScreen -> command.value = OpenAppLink(appLink)
-
-            appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery() -> {
-                command.value = ShowAppLinkPrompt(appLink)
-                appLinksHandler.setUserQueryState(false)
-            }
-
-            else -> command.value = OpenAppLink(appLink)
+            isCustomTabScreen -> OpenAppLink(appLink)
+            appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
+            else -> OpenAppLink(appLink)
         }
+        appLinksHandler.setUserQueryState(false)
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
@@ -3436,7 +3446,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
-            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+            if (!appSettingsPreferencesStore.appLinksEnabled) {
+                appLink.fallbackUrl?.let { fallbackUrl ->
+                    command.value = NavigationCommand.Navigate(fallbackUrl, getUrlHeaders(fallbackUrl))
+                }
+                return
+            }
+            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl), appSettingsPreferencesStore.showAppLinksPrompt)
         }
     }
 
@@ -3859,16 +3875,22 @@ class BrowserTabViewModel @Inject constructor(
     override fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,
+        errorCode: String,
     ) {
-        browserViewState.value =
-            currentBrowserViewState().copy(
-                browserError = errorType,
-                showPrivacyShield = HighlightableButton.Visible(enabled = false),
-            )
-        if (androidBrowserConfig.errorPagePixel().isEnabled()) {
-            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+        if (errorType != OMITTED) {
+            browserViewState.value =
+                currentBrowserViewState().copy(
+                    browserError = errorType,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                )
+            if (androidBrowserConfig.errorPagePixel().isEnabled()) {
+                pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+            }
+            command.value = WebViewError(errorType, url)
         }
-        command.value = WebViewError(errorType, url)
+        if (androidBrowserConfig.errorCodePixel().isEnabled()) {
+            pixel.enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to errorCode))
+        }
     }
 
     override fun onReceivedMaliciousSiteWarning(
@@ -4681,20 +4703,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onUserDismissedAutoCompleteInAppMessage() {
-        viewModelScope.launch(dispatchers.io()) {
-            autoComplete.userDismissedHistoryInAutoCompleteIAM()
-            pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
-        }
-    }
-
     fun autoCompleteSuggestionsGone() {
         viewModelScope.launch(dispatchers.io()) {
-            if (hasUserSeenHistoryIAM) {
-                autoComplete.submitUserSeenHistoryIAM()
-                pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
-            }
-            hasUserSeenHistoryIAM = false
             lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
                 if (suggestions.isNotEmpty()) {
                     pixel.fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)

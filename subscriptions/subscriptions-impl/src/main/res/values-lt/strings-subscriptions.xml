@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Prenumerata</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nepavyksta pasiekti „Plus“ arba „Pro“ lygio funkcijų</string>
     <string name="subscriptionsProUpgradeTitle">Atnaujinkite į „Pro“</string>

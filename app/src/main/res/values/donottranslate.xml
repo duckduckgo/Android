@@ -59,6 +59,10 @@
     <string name="preOnboardingAddressBarPositionBottom">Bottom</string>
     <string name="preOnboardingAddressBarPositionSplit">Split</string>
 
+    <!-- Pre-onboarding Input Screen (AI Chat Toggle) -->
+    <string name="preOnboardingInputScreenSearchOnly">Search Only</string>
+    <string name="preOnboardingInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
+
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 
@@ -90,20 +94,22 @@
     <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
-    <!-- Inactivity timeout -->
-    <string name="afterInactivityOptionTitle">After Inactivity</string>
-    <string name="afterInactivityTimeoutRowTitle">Choose an inactivity timer</string>
-    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return after inactivity</string>
-    <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
-    <string name="afterInactivityTimeoutAlways" translatable="false">Always</string>
-    <string name="afterInactivityTimeout1Minute" translatable="false">1 minute</string>
-    <string name="afterInactivityTimeoutXMinutes" translatable="false">%1$d minutes</string>
-    <string name="afterInactivityTimeout1Hour" translatable="false">1 hour</string>
-    <string name="afterInactivityTimeoutXHours" translatable="false">%1$d hours</string>
-
     <!--Onboarding Rebrand Design Update-->
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
+
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
+    <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion2">Plan a perfect day in London</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
+
+    <!-- Default browser changed survey -->
+    <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
+    <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
 </resources>

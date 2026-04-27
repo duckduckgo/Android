@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Bližnjice do Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Izberite, katere bližnjice do Duck.ai naj bodo prikazane</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Preklop položaja za nov zavihek</string>
+    <string name="duckAiDefaultTogglePositionSearch">Iskanje</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Nazadnje uporabljeno</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Glasovno iskanje</string>
 

@@ -1,7 +1,7 @@
 {
   "name": "FastPeopleSearch",
   "url": "fastpeoplesearch.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1675317600000,
   "optOutUrl": "https://www.fastpeoplesearch.com/removal",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "040e0a0a-095a-490e-8c55-ee7b66732030",
-          "url": "https://www.fastpeoplesearch.com/name/${firstName}-${lastName}_${city}-${state}"
+          "url": "https://www.fastpeoplesearch.com/name/${firstName|hyphenated}-${lastName|hyphenated}_${city|hyphenated}-${state|hyphenated}"
         },
         {
           "actionType": "expectation",

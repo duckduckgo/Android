@@ -24,6 +24,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY
@@ -68,6 +71,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -130,6 +134,8 @@ class SettingsViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
+    private val settingsDataStore: SettingsDataStore,
+    private val appInstallStore: AppInstallStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -149,6 +155,10 @@ class SettingsViewModel @Inject constructor(
         val widgetsInstalled: Boolean = false,
         val showWhatsNew: Boolean = false,
         val showGetDesktopBrowser: Boolean = false,
+        val nextStepsAddressBarDismissed: Boolean = false,
+        val nextStepsVoiceSearchDismissed: Boolean = false,
+        val nextStepsSectionHidden: Boolean = false,
+        val showNextStepsHideButton: Boolean = false,
     )
 
     sealed class Command {
@@ -188,6 +198,8 @@ class SettingsViewModel @Inject constructor(
     private val appTPPollJob = ConflatedJob()
 
     private var widgetPromptShown = false
+    private var omnibarTypeBeforeNavigation: OmnibarType? = null
+    private var voiceSearchAvailableBeforeNavigation: Boolean? = null
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -201,6 +213,7 @@ class SettingsViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        refreshNextStepsDismissals()
         start()
         startPollingAppTPState()
     }
@@ -239,6 +252,18 @@ class SettingsViewModel @Inject constructor(
                     },
                     showGetDesktopBrowser = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
+                    },
+                    nextStepsAddressBarDismissed = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsAddressBarDismissed
+                    },
+                    nextStepsVoiceSearchDismissed = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsVoiceSearchDismissed
+                    },
+                    nextStepsSectionHidden = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsSectionHidden
+                    },
+                    showNextStepsHideButton = withContext(dispatcherProvider.io()) {
+                        appInstallStore.hasInstallTimestampRecorded() && appInstallStore.daysInstalled() >= NEXT_STEPS_HIDE_BUTTON_DAYS_THRESHOLD
                     },
                 ),
             )
@@ -292,13 +317,37 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onChangeAddressBarPositionClicked() {
+        omnibarTypeBeforeNavigation = settingsDataStore.omnibarType
         viewModelScope.launch { command.send(LaunchAppearanceScreen) }
         pixel.fire(SETTINGS_NEXT_STEPS_ADDRESS_BAR)
     }
 
     fun onEnableVoiceSearchClicked() {
+        voiceSearchAvailableBeforeNavigation = voiceSearchAvailability.isVoiceSearchAvailable
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
+    }
+
+    fun onNextStepsHideClicked() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.nextStepsSectionHidden = true
+            viewState.update { it.copy(nextStepsSectionHidden = true) }
+        }
+    }
+
+    fun refreshNextStepsDismissals() {
+        omnibarTypeBeforeNavigation?.let { before ->
+            if (settingsDataStore.omnibarType != before) {
+                settingsDataStore.nextStepsAddressBarDismissed = true
+            }
+            omnibarTypeBeforeNavigation = null
+        }
+        voiceSearchAvailableBeforeNavigation?.let { before ->
+            if (voiceSearchAvailability.isVoiceSearchAvailable != before) {
+                settingsDataStore.nextStepsVoiceSearchDismissed = true
+            }
+            voiceSearchAvailableBeforeNavigation = null
+        }
     }
 
     fun onDefaultBrowserSettingClicked() {
@@ -449,5 +498,6 @@ class SettingsViewModel @Inject constructor(
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
 
         private const val GET_DESKTOP_BROWSER_SOURCE_SETTINGS = "settings"
+        private const val NEXT_STEPS_HIDE_BUTTON_DAYS_THRESHOLD = 14L
     }
 }

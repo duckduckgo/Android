@@ -180,8 +180,6 @@
 
     <string name="feedbackGeneralSubscription">Předplatné</string>
 
-    <!-- Switch plan-->
-
     <!-- Pro tier changes -->
     <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nemám přístup k funkcím úrovně Plus nebo Pro</string>
     <string name="subscriptionsProUpgradeTitle">Přejít na verzi Pro</string>

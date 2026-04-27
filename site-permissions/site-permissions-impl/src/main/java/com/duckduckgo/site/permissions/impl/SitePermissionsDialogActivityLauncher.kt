@@ -34,9 +34,11 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.formatWithSpans
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
@@ -63,6 +65,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -116,15 +119,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
-                showSitePermissionsRationaleDialog(
-                    R.string.sitePermissionsMicDialogTitle,
-                    R.string.sitePermissionsMicDialogSubtitle,
-                    url,
-                    SitePermissionsPixelValues.MICROPHONE,
-                    { rememberChoice ->
-                        askForMicPermissions(rememberChoice)
-                    },
-                )
+                if (request.origin.host == duckAiHostProvider.getHost()) {
+                    handleDuckAiAudioCapture()
+                } else {
+                    showSitePermissionsRationaleDialog(
+                        R.string.sitePermissionsMicDialogTitle,
+                        R.string.sitePermissionsMicDialogSubtitle,
+                        url,
+                        SitePermissionsPixelValues.MICROPHONE,
+                        { rememberChoice ->
+                            askForMicPermissions(rememberChoice)
+                        },
+                    )
+                }
             }
 
             permissionsHandledByUser.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
@@ -265,15 +272,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         TextAlertDialogBuilder(activity)
             .setTitle(
                 String.format(
-                    activity.getString(R.string.drmSiteDialogTitle),
+                    activity.getString(R.string.drmSitePermissionDialogTitle),
                     title,
                 ),
             )
             .setClickableMessage(
-                activity.getText(R.string.drmSiteDialogSubtitle),
+                activity.getText(R.string.drmSitePermissionDialogSubtitle).formatWithSpans(title),
                 DRM_LEARN_MORE_ANNOTATION,
             ) {
-                denyPermissions()
                 activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
             }
             .setPositiveButton(R.string.sitePermissionsDialogAllowButton, GHOST)
@@ -407,6 +413,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun handleDuckAiAudioCapture() {
+        // Grant mic access for this request only — never persist the site permission
+        askForMicPermissions(rememberChoice = false)
     }
 
     private fun askForMicPermissions(rememberChoice: Boolean = false) {

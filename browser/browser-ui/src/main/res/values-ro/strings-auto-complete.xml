@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Anulare</string>
     <string name="autocompleteRemoveItemRemove">Elimină</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Comută la fila %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
-    <string name="openAutoCompleteSettings">Deschide Setări</string>
 </resources>

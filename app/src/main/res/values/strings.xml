@@ -138,6 +138,7 @@
     <string name="leaveFeedbackNew">Send Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsHeadingNextSteps">Next Steps</string>
+    <string name="settingsNextStepsHideItem">Hide</string>
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
@@ -175,9 +176,6 @@
     <string name="privateSearchAutocompleteHint">Show search suggestions as you type, including your bookmarks. All searches are private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Show recently visited sites in search suggestions. Recently visited sites are private, only stored on your device, and can be cleared with the Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
-    <string name="openAutoCompleteSettings">Open Settings</string>
     <string name="privateSearchChatSuggestionsToggle">Chat Suggestions</string>
     <string name="privateSearchAutocompleteHintWithChatSuggestions">Show suggestions from your history, bookmarks, and (optionally) Duck.ai chat history as you type in the search bar. All searches are private.</string>
 

@@ -49,6 +49,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BA
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -110,6 +111,7 @@ class RealDuckChatTest {
     private val mockSyncEngine: SyncEngine = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -152,6 +154,7 @@ class RealDuckChatTest {
                 mockSyncEngine,
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
+                mockVoiceSessionStateManager,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1399,6 +1402,22 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when duckAiNativeStorage enabled, isNativeStorageEnabled returns true`() = runTest {
+        duckChatFeature.duckAiNativeStorage().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isNativeStorageEnabled())
+    }
+
+    @Test
+    fun `when duckAiNativeStorage disabled, isNativeStorageEnabled returns false`() = runTest {
+        duckChatFeature.duckAiNativeStorage().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isNativeStorageEnabled())
+    }
+
+    @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
         whenever(cookiesManager.get()).thenReturn(cookieManager)
@@ -1631,5 +1650,62 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
+    }
+
+    @Test
+    fun `when duck chat enabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns true`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when duck chat enabled and duckAiVoiceSearch disabled then isVoiceChatEnabled returns false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when duck chat disabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isVoiceChatEnabled())
+    }
+
+    @Test
+    fun `when global feature flag and digitalAssistantDuckAiVoiceChat both enabled then allowDuckAiAsDigitalAssistant emits true`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.allowDuckAiAsDigitalAssistant.value)
+    }
+
+    @Test
+    fun `when digitalAssistantDuckAiVoiceChat disabled then allowDuckAiAsDigitalAssistant emits false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
+    }
+
+    @Test
+    fun `when global feature flag disabled then allowDuckAiAsDigitalAssistant emits false`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        duckChatFeature.digitalAssistantDuckAi().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
     }
 }

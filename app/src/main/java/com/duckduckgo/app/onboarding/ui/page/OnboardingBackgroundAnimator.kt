@@ -52,6 +52,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_address_bar_background,
         maxHeightDp = 360,
     )
+    data object InputType : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_input_type_background,
+        maxHeightDp = 166,
+    )
 }
 
 /**
@@ -198,8 +202,7 @@ class OnboardingBackgroundAnimator(
             addUpdateListener { animator ->
                 val progress = animator.animatedValue as Float
                 outView.translationX = -maxSlideDistance * progress
-                // Fade out at 4x speed: fully transparent at 25% of the slide
-                outView.alpha = maxOf(0f, 1f - progress * 4f)
+                outView.alpha = exitAlpha(progress)
             }
         }
     }
@@ -246,9 +249,15 @@ class OnboardingBackgroundAnimator(
     }
 
     companion object {
-        private const val EXIT_DURATION = 1500L
+        const val EXIT_DURATION = 1500L
         const val ENTER_DURATION = 1000L
         val EASE_IN_OUT = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+
+        /**
+         * Computes the alpha for the exiting view given [progress] (a [0,1] animator fraction).
+         * The view fades out at 4x speed: fully transparent at 25% of the slide.
+         */
+        fun exitAlpha(progress: Float): Float = maxOf(0f, 1f - progress * 4f)
 
         /**
          * Computes the alpha for the entering view given [progress] (a [0,1] animator fraction).
