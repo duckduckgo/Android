@@ -3350,8 +3350,6 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta)
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
-            } else if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
-                command.value = HideOnboardingDaxBubbleCta(cta)
             }
         }
     }
