@@ -1,7 +1,7 @@
 {
   "name": "PeopleSearchUSA",
   "url": "peoplesearchusa.org",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.peoplesearchusa.org/optOut/name/landing",
   "steps": [
@@ -57,6 +57,17 @@
             }
           ],
           "id": "0349bd42-b9c3-4852-a347-0c986296e44d"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-13a30d0b-6d7f-40e1-8f6d-71a063090463"
         },
         {
           "actionType": "expectation",

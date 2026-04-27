@@ -1,7 +1,7 @@
 {
   "name": "PeopleFinders",
   "url": "peoplefinders.com",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "addedDatetime": 1677132000000,
   "optOutUrl": "https://www.peoplefinders.com/opt-out",
   "steps": [
@@ -15,15 +15,25 @@
           "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all"
         },
         {
-          "_comment": "Wait for CF challenge interstitial to complete",
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "body.peoplesearch"
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "aaaab20b-aaaa-45b6-8c53-36e9bed2612b"
+          "id": "cft-9a7d5035-a78e-4fda-93d4-01cbfb46cf74"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".body-content"
+            }
+          ],
+          "id": "e9baf855-5a5a-41e4-93cb-4ab6215c18b1"
         },
         {
           "actionType": "extract",
@@ -68,13 +78,23 @@
           "url": "https://www.peoplefinders.com/opt-out"
         },
         {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-29020501-0911-42c4-be7e-58e3b7ddd75a"
+        },
+        {
           "_comment": "Wait for CF challenge interstitial to complete",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": ".opt-out-body",
-              "failSilently": true
+              "selector": ".v-opt-out-wrapper"
             }
           ],
           "id": "623b0022-8c67-4cef-8a11-4481c34229b7"

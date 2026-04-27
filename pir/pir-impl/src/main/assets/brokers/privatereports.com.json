@@ -1,7 +1,7 @@
 {
   "name": "PrivateReports",
   "url": "privatereports.com",
-  "version": "0.995.0",
+  "version": "0.996.0",
   "optOutUrl": "https://www.privatereports.com/api/helper/optOutLight/search",
   "steps": [
     {
@@ -56,6 +56,17 @@
             }
           ],
           "id": "e803ba82-782e-4f19-a2ac-f25ef1a654f2"
+        },
+        {
+          "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-6a9ba7e2-2d6b-42f1-85bb-51d132eeba32"
         },
         {
           "actionType": "expectation",
@@ -196,6 +207,17 @@
             }
           ],
           "id": "c91a389d-3079-4537-9d39-f7b8a49ebec4"
+        },
+        {
+          "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-44601f5a-1243-434b-b1ef-974254ccb679"
         },
         {
           "actionType": "expectation",

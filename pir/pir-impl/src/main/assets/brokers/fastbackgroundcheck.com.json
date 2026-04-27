@@ -1,7 +1,7 @@
 {
   "name": "FastBackgroundCheck.com",
   "url": "fastbackgroundcheck.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1706248800000,
   "optOutUrl": "https://www.fastbackgroundcheck.com/opt-out",
@@ -16,16 +16,15 @@
           "url": "https://www.fastbackgroundcheck.com/people/${firstName|hyphenated}-${lastName|hyphenated}/${city|hyphenated}-${state|hyphenated}"
         },
         {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
           "actionType": "expectation",
-          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector because CF challenge page has class 'page-manage-challenge' on the html element",
           "expectations": [
             {
               "type": "element",
-              "selector": "//html[not(contains(@class, 'page-manage-challenge'))]",
-              "failSilently": true
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "faa2a63e-1d47-45e9-a1f3-c1780b29cd1f"
+          "id": "cft-a7852fd3-51ee-4a77-85d6-d448ce00516a"
         },
         {
           "actionType": "condition",
@@ -60,6 +59,16 @@
             }
           ],
           "id": "7927f058-9aa9-477b-9671-b3ad06ca9100"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".site-message-header-box"
+            }
+          ],
+          "id": "926af483-bf8a-4bfc-9145-3d4f39373049"
         },
         {
           "actionType": "extract",

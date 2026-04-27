@@ -1,7 +1,7 @@
 {
   "name": "PeopleLooker",
   "url": "peoplelooker.com",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "parent": "beenverified.com",
   "optOutUrl": "https://www.peoplelooker.com/svc/optout/search/optouts",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "url": "https://www.peoplelooker.com/svc/optout/search/optouts",
           "id": "fffdf3ca-c08b-4261-9d19-6b6463865677"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-5255bb2d-2ff5-485d-8201-2265c2ae2312"
         },
         {
           "actionType": "expectation",
@@ -43,6 +54,17 @@
             }
           ],
           "id": "fffa01d9-630f-42e4-a8b8-4c87ddab91e3"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-b895ae57-ba31-4a76-9210-aac2c04e9c7f"
         },
         {
           "actionType": "click",
@@ -133,7 +155,7 @@
                   "parent": "//*[@id='comprehensive-form']"
                 }
               ],
-              "id": "10fcca38-bd1d-4fd5-a38a-678d4d6aadcd"
+              "id": "cft-10fcca38-bd1d-4fd5-a38a-678d4d6aadcd"
             },
             {
               "actionType": "click",
