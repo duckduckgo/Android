@@ -598,15 +598,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
         </receiver>
-
-        <!-- Override the AndroidX PDF service to disable isolatedProcess.
-             The isolated process triggers DuckDuckGoApplication init which calls
-             bindService (forbidden in isolated processes). Disabling it is safe
-             because we already render the same URLs in WebView with full app permissions. -->
-        <service
-            android:name="androidx.pdf.service.PdfDocumentServiceImpl"
-            android:isolatedProcess="false"
-            tools:replace="android:isolatedProcess" />
     </application>
 
 </manifest>
