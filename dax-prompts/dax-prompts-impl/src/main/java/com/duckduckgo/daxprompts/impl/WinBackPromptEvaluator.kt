@@ -29,6 +29,7 @@ import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ interface WinBackPromptEvaluator
     scope = AppScope::class,
     boundType = WinBackPromptEvaluator::class,
 )
+@SingleInstanceIn(scope = AppScope::class)
 class WinBackPromptEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val applicationContext: Context,
