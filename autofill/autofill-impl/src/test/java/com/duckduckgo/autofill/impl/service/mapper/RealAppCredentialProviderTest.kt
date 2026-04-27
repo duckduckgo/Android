@@ -47,7 +47,7 @@ class RealAppCredentialProviderTest {
 
     @Before
     fun setUp() {
-        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = true))
         autofillServiceFeature.canMapAppToDomain().setRawStoredState(State(enable = true))
         MockitoAnnotations.openMocks(this)
         toTest = RealAppCredentialProvider(

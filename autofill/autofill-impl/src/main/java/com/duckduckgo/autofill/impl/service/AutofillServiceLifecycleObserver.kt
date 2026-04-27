@@ -53,7 +53,7 @@ class AutofillServiceLifecycleObserver @Inject constructor(
             runCatching {
                 val currentState = getAutofillServiceState(context).toBoolean() ?: return@launch
 
-                autofillServiceFeature.self().isEnabled().let { remoteState ->
+                autofillServiceFeature.canEnableAutofillService().isEnabled().let { remoteState ->
                     if (currentState != remoteState) {
                         logcat { "DDGAutofillService: Updating state to $remoteState" }
                         newState(context, remoteState)

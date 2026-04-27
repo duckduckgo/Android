@@ -71,7 +71,7 @@ class RealAutofillServiceFeatureRepository @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess || processName == ":autofill") {
                 exceptions.clear()
-                exceptions.addAll(autofillServiceFeature.self().getExceptions().map { it.domain })
+                exceptions.addAll(autofillServiceFeature.canEnableAutofillService().getExceptions().map { it.domain })
             }
         }
     }

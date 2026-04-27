@@ -28,9 +28,17 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 )
 interface AutofillServiceFeature {
 
+    @Deprecated("Use [canEnableAutofillService] instead")
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
     fun self(): Toggle
+
+    /**
+     * Whether autofill service can be enabled. Allows us to hae a staged rollout
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @InternalAlwaysEnabled
+    fun canEnableAutofillService(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled

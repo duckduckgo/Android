@@ -85,7 +85,7 @@ class RemoteDomainTargetAppDataDownloaderTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = true))
         autofillServiceFeature.canUpdateAppToDomainDataset().setRawStoredState(State(enable = true))
 
         toTest = RemoteDomainTargetAppDataDownloader(

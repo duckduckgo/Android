@@ -895,13 +895,13 @@ class RealSecureStorageKeyStoreTest {
     private fun configureHarmonyDisabled() {
         autofillFeature.useHarmony().setRawStoredState(State(enable = false))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = false))
-        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = false))
     }
 
     private fun configureHarmonyEnabled(harmonyPrefsReturnsNull: Boolean = false) {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = false))
-        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = false))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
@@ -910,14 +910,14 @@ class RealSecureStorageKeyStoreTest {
     private fun configureReadFromHarmonyEnabled(harmonyPrefsReturnsNull: Boolean = false) {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = true))
-        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = false))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
     }
 
     private fun configureMultiProcessMode(harmonyPrefsReturnsNull: Boolean = false) {
-        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = true))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
@@ -934,7 +934,7 @@ class RealSecureStorageKeyStoreTest {
         testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Disable the flag mid-session
-        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = false))
 
         // Key now exists in harmony
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
@@ -962,7 +962,7 @@ class RealSecureStorageKeyStoreTest {
         assertArrayEquals(TEST_VALUE, firstRead)
 
         // Disable the flag mid-session
-        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(State(enable = false))
 
         // Legacy has different/no value (simulating stale cache from another process writing)
         whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)

@@ -110,7 +110,7 @@ class RealSecureStorageKeyStore(
 
     private suspend fun harmonyFlags(): HarmonyFlags {
         return withContext(dispatcherProvider.io()) {
-            val autofillServiceFlag = autofillServiceFeature.self().isEnabled()
+            val autofillServiceFlag = autofillServiceFeature.canEnableAutofillService().isEnabled()
             val useHarmonyFlag = autofillFeature.useHarmony().isEnabled()
 
             // Latch: once multiProcess is true, it stays true for this session to prevent

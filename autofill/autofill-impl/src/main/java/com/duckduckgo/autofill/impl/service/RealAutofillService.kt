@@ -171,7 +171,7 @@ class RealAutofillService : AutofillService() {
     }
 
     private fun isAutofillServiceEnabled(): Boolean {
-        return autofillServiceFeature.self().isEnabled() && autofillServiceFeature.canProcessSystemFillRequests().isEnabled()
+        return autofillServiceFeature.canEnableAutofillService().isEnabled() && autofillServiceFeature.canProcessSystemFillRequests().isEnabled()
     }
 
     companion object {

@@ -38,7 +38,7 @@ class RealAutofillServiceFeatureRepositoryTest {
 
     @Before
     fun setup() {
-        autofillServiceFeature.self().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
     }
 
     @Test
@@ -65,7 +65,7 @@ class RealAutofillServiceFeatureRepositoryTest {
         )
 
         assertEquals(listOf(exception.domain), repository.exceptions)
-        autofillServiceFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
+        autofillServiceFeature.canEnableAutofillService().setRawStoredState(Toggle.State(exceptions = emptyList()))
         repository.onPrivacyConfigDownloaded()
         assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }
