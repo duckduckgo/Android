@@ -374,11 +374,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 updateLogoVisibility(state)
                 beginRootTransition()
                 updateFavoritesVisibility(state.searchMode, !state.autoCompleteSuggestionsVisible)
-                if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    updateOverlaysForModeChange(state)
-                } else {
-                    hideAutoCompleteIfOnChatTab(state)
-                }
+                updateOverlaysForModeChange(state)
                 previousSearchMode = state.searchMode
                 updateButtonVisibility(state)
                 inputScreenButtons.setNewLineButtonVisible(state.newLineButtonVisible)
@@ -760,14 +756,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.ddgLogoContainer.isVisible = shouldBeVisible
     }
 
-    private fun hideAutoCompleteIfOnChatTab(state: InputScreenVisibilityState) {
-        if (!state.searchMode && autoCompleteTargetVisibility) {
-            autoCompleteTargetVisibility = false
-            binding.autoCompleteOverlay.animate().cancel()
-            hideOverlay(binding.autoCompleteOverlay, ::invalidateAutoCompleteBlurView)
-        }
-    }
-
     private fun updateOverlaysForModeChange(state: InputScreenVisibilityState) {
         if (state.searchMode) {
             if (chatSuggestionsTargetVisibility) {
@@ -885,11 +873,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 overlay.isVisible = false
                 overlay.alpha = 1f
                 overlay.elevation = 0f
-                if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    enableViewPagerInputIfNoOverlays()
-                } else {
-                    enableViewPagerInputIfNoFavorites()
-                }
+                enableViewPagerInputIfNoOverlays()
             }
             .start()
     }
@@ -993,12 +977,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             !autoCompleteTargetVisibility &&
             !chatSuggestionsTargetVisibility
         ) {
-            enableViewPagerInput()
-        }
-    }
-
-    private fun enableViewPagerInputIfNoFavorites() {
-        if (!binding.newTabContainerScrollView.isVisible) {
             enableViewPagerInput()
         }
     }

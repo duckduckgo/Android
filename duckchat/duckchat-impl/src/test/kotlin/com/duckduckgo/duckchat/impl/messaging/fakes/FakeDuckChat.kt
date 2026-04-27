@@ -111,8 +111,6 @@ class FakeDuckChat(
         chatSuggestionsUserSettingEnabled.value = enabled
     }
 
-    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
-
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }

@@ -496,7 +496,6 @@ class RealNativeInputManager @Inject constructor(
         onChatSuggestionSelected: (String) -> Unit,
     ) {
         if (omnibarController.isDuckAiMode()) return
-        if (!duckChat.isChatSuggestionsFeatureAvailable()) return
         val widget = widgetFrom(widgetView) ?: return
         val autoCompleteList =
             rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList) ?: return
