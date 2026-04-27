@@ -34,7 +34,7 @@ interface AutofillServiceFeature {
     fun self(): Toggle
 
     /**
-     * Whether autofill service can be enabled. Allows us to hae a staged rollout
+     * Whether autofill service can be enabled. Allows us to have a staged rollout
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
