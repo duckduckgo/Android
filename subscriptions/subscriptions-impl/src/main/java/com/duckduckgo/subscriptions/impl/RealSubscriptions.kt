@@ -196,10 +196,6 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2(): Toggle
 
-    // Kill switch
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun featuresApi(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
