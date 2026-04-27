@@ -69,7 +69,8 @@ interface NativeInputWidget {
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
-    var onVoiceClick: (() -> Unit)?
+    var onVoiceSearchClick: (() -> Unit)?
+    var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
 
@@ -82,7 +83,8 @@ interface NativeInputWidget {
     fun selectChatTab()
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
-    fun setVoiceButtonVisible(visible: Boolean)
+    fun setVoiceSearchAvailable(available: Boolean)
+    fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
@@ -146,8 +148,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+    private var voiceSearchAvailable: Boolean = false
+    private var voiceChatAvailable: Boolean = false
     override var onStopTapped: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
+    override var onVoiceSearchClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceSearchClick = value
+            onVoiceClick = value
+        }
+    override var onVoiceChatClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceChatClick = value
+        }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -239,7 +254,31 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
             }
+            updateSendButtonVisibility()
+            updateVoiceButtonVisibility()
         }
+    }
+
+    override fun setVoiceSearchAvailable(available: Boolean) {
+        voiceSearchAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    override fun setVoiceChatAvailable(available: Boolean) {
+        voiceChatAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    private fun updateVoiceButtonVisibility() {
+        val isBlank = inputField.text.isNullOrBlank()
+        setVoiceButtonVisible(voiceSearchAvailable && isBlank)
+        submitButtons?.setVoiceSearchVisible(false)
+        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank)
+    }
+
+    private fun updateSendButtonVisibility() {
+        val visible = isChatTabSelected() && (isStreaming || inputField.text.isNotBlank())
+        submitButtons?.setSendButtonVisible(visible)
     }
 
     private fun applyToggleVisibility() {
@@ -561,6 +600,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showSendButton()
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
+        updateSendButtonVisibility()
     }
 
     private fun updateDuckAiSubmitButton() {
@@ -569,7 +609,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setImageButtonVisible(isChatTab)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
-            submitButtons?.setSendButtonVisible(true)
             if (!isStreaming) {
                 submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
             }
@@ -577,8 +616,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             inputField.maxLines = MAX_LINES
         } else {
             submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
-            submitButtons?.setSendButtonVisible(false)
         }
+        updateSendButtonVisibility()
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
@@ -600,12 +639,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
             onSendClick = { submitMessage() }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+            onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
+            onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
             setSendButtonVisible(false)
             setNewLineButtonVisible(false)
-            setVoiceButtonVisible(false)
         }
         container.addView(buttons)
         submitButtons = buttons
+        updateVoiceButtonVisibility()
     }
 
     companion object {
