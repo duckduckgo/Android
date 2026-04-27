@@ -180,16 +180,12 @@ Body (follow the template exactly — replace the placeholder sections):
     | ------ | ----- |
     | No UI changes | No UI changes |
 
-After opening the PR:
-- Update memory: in_progress_pr → PR number and branch
-
 ### Step 7: If stuck
 
 If at any point you cannot proceed (the task is ambiguous, the approach does not work,
 verification fails in a way you cannot resolve):
 1. Do NOT open a partial PR
-2. Update memory: clear in_progress_task and in_progress_pr
-3. Stop and explain what blocked you in the workflow output
+2. Stop and explain what blocked you in the workflow output
 
 ## Guidelines
 
