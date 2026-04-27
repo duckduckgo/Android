@@ -36,9 +36,10 @@ class RealAutofillServiceFeatureRepositoryTest {
 
     private val autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
 
+    @Suppress("DEPRECATION")
     @Before
     fun setup() {
-        autofillServiceFeature.canEnableAutofillService().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
+        autofillServiceFeature.self().setRawStoredState(Toggle.State(exceptions = listOf(exception)))
     }
 
     @Test
