@@ -193,6 +193,4 @@ class FakeDuckChatInternal(
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled
     }
-
-    override suspend fun isVoiceChatEnabled(): Boolean = true
 }

@@ -792,10 +792,6 @@ class RealDuckChat @Inject constructor(
 
     override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
 
-    override suspend fun isVoiceChatEnabled(): Boolean = withContext(dispatchers.io()) {
-        isEnabled() && duckChatFeature.duckAiVoiceSearch().isEnabled()
-    }
-
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }

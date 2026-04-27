@@ -852,9 +852,9 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun `when onDigitalAssistOpened and digital assist and voice search enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
+    fun `when onDigitalAssistOpened and digital assist enabled and duck chat enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
 
         testee.onDigitalAssistOpened(mock())
 
@@ -862,20 +862,8 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun `when onDigitalAssistOpened and digital assist enabled and voice search disabled then LaunchDuckAi command sent`() = runTest {
-        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(false)
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-
-        testee.onDigitalAssistOpened(mock())
-
-        verify(commandObserver).onChanged(Command.LaunchDuckAi)
-    }
-
-    @Test
     fun `when onDigitalAssistOpened and duck chat disabled then LaunchAssistSearch command sent`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(false)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
         val intent = mock<Intent>()
 
