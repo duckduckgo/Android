@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Üllata mind!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[See on <b>DuckDuckGo Search</b>! Privaatne. Kiire. Vähem reklaame.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">See on DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privaatne. Kiire. Vähem reklaame.</string>
     <string name="onboardingSerpDaxDialogButton">Sain aru!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Järgmisena proovi mõnda saiti külastada!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
