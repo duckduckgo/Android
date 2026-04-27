@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Stiahnuť kód na obnovenie ako PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Použi tento kód na obnovu svojich údajov, keď stratíš prístup k tomuto zariadeniu – udržiavaj ho v bezpečí.</string>
     <string name="sync_settings_data_expiration">Údaje zo služby Sync &amp; Backup nie je možné obnoviť po 18 mesiacoch nečinnosti. <annotation type="learn_more_link">Zisti viac</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Obnoviť údaje Sync &amp; Backup z predchádzajúcej inštalácie?</string>
+    <string name="sync_previous_session_ready_body">Obnov pre získanie predchádzajúcich záložiek, hesiel a ďalších údajov v DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Obnoviť Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Nastavenie novej synchronizácie</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Jednoducho obnov svoje údaje</string>
+    <string name="sync_recover_data_content">Použi tento kód na obnovenie údajov, ak stratíš prístup k tomuto zariadeniu. Údaje zo služby Sync &amp; Backup nie je možné obnoviť po 18 mesiacoch nečinnosti.</string>
+    <string name="sync_recover_data_recovery_code_label">Kód obnovy</string>
+    <string name="sync_recover_data_download_pdf">Stiahnuť ako PDF</string>
+    <string name="sync_restore_on_reinstall_title">Obnoviť pri preinštalovaní aplikácie</string>
+    <string name="sync_restore_on_reinstall_description">Ak preinštaluješ aplikáciu DuckDuckGo, opýtame sa ťa, či chceš obnoviť svoje údaje na tomto zariadení.</string>
 </resources>
