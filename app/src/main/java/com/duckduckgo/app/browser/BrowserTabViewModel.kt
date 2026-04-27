@@ -2190,15 +2190,18 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
+        // Always run navigation-state bookkeeping: this updates webNavigationState (consulted by
+        // onUserPressedBack) and persists the resolved URL. Skipping it leaves canGoBack stale and
+        // back press exits the browser instead of returning to the previous page.
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+        }
+
         if (!currentBrowserViewState().browserShowing) return
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
         if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
-
-        if (!currentBrowserViewState().maliciousSiteBlocked) {
-            navigationStateChanged(webViewNavigationState)
-        }
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()

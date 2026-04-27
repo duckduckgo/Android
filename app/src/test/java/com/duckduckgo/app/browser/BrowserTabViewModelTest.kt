@@ -1790,6 +1790,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProgressChangedFiresWhileBrowserNotShowingThenWebNavigationStateStillUpdatedSoBackPressNavigatesBack() {
+        // Regression: the browserShowing early-return in progressChanged once skipped
+        // navigationStateChanged, leaving webNavigationState stale. A subsequent back press
+        // saw canGoBack=false and exited the browser instead of navigating to the previous page.
+        whenever(mockStack.currentIndex).thenReturn(1)
+        setBrowserShowing(false)
+
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+
+        setBrowserShowing(true)
+        val handled = testee.onUserPressedBack()
+
+        assertTrue(handled)
+        assertCommandIssued<NavigationCommand.NavigateBack>()
+    }
+
+    @Test
     fun whentrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = privacyShieldState().privacyShield
         loadUrl("https://example.com")
