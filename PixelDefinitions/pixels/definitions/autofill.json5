@@ -28,6 +28,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -58,6 +64,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -98,6 +110,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -134,6 +152,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -174,6 +198,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -212,6 +242,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -243,6 +279,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -278,6 +320,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -309,6 +357,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -344,6 +398,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -377,6 +437,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -408,6 +474,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -446,6 +518,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
