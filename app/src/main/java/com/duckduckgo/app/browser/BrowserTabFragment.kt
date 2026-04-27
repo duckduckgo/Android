@@ -41,6 +41,7 @@ import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
 import android.view.ContextMenu
+import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -61,7 +62,9 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -71,6 +74,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -702,6 +706,12 @@ class BrowserTabFragment :
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
+    private val daxDialogIntroBubbleBrandDesign
+        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
+
+    private val brandDesignDialogScrollView
+        get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
+
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
@@ -1157,6 +1167,15 @@ class BrowserTabFragment :
                 daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
                 daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
                 daxDialogIntroBubble.logo.isSaveEnabled = false
+
+                daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignDescription.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignDismissButton.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption1.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption2.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption3.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
 
                 daxDialogInContext.daxDialogOption1.isSaveEnabled = false
                 daxDialogInContext.daxDialogOption2.isSaveEnabled = false
@@ -2782,7 +2801,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
-            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta()
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -2803,8 +2822,12 @@ class BrowserTabFragment :
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
 
-            is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
-            is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
+            is Command.SetBrowserBackground -> {
+                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground)
+                if (it.backgroundColorAttr != 0) {
+                    setNewTabBackgroundColor(it.backgroundColorAttr)
+                }
+            }
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2905,14 +2928,36 @@ class BrowserTabFragment :
         }
     }
 
-    private fun setBrowserBackgroundRes(backgroundRes: Int) {
-        newBrowserTab.browserBackground.setImageResource(backgroundRes)
+    private fun setBrowserBackgroundRes(@DrawableRes backgroundRes: Int, useRebrandBackground: Boolean) {
+        if (useRebrandBackground) {
+            newBrowserTab.browserBackground.apply {
+                setImageResource(0)
+                isGone = true
+            }
+            newBrowserTab.rebrandBrowserBackground.apply {
+                setImageResource(backgroundRes)
+                isVisible = true
+            }
+        } else {
+            newBrowserTab.rebrandBrowserBackground.gone()
+            newBrowserTab.browserBackground.setImageResource(backgroundRes)
+        }
     }
 
     private fun setNewTabBackgroundColor(
-        @ColorRes colorRes: Int,
+        @AttrRes colorAttr: Int,
     ) {
-        newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
+        val onboardingContext = resolveOnboardingContext(requireContext())
+        newBrowserTab.newTabLayout.setBackgroundColor(onboardingContext.getColorFromAttr(colorAttr))
+    }
+
+    private fun resolveOnboardingContext(context: Context): Context {
+        val themeRes = if (appTheme.isLightModeEnabled()) {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
@@ -3985,8 +4030,7 @@ class BrowserTabFragment :
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
     }
 
-    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
-        daxBubbleCta.hideDaxBubbleCta(binding)
+    private fun hideOnboardingDaxBubbleCta() {
         hideDaxBubbleCta()
         renderer.showNewTab()
         showKeyboard()
@@ -3994,7 +4038,17 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
+        val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
+        newBrowserTab.rebrandBrowserBackground.apply {
+            setImageResource(0)
+            gone()
+        }
+        if (wasBrandDesign) {
+            newBrowserTab.newTabLayout.setBackgroundColor(0)
+        }
         daxDialogIntroBubble.root.gone()
+        daxDialogIntroBubbleBrandDesign.root.gone()
+        brandDesignDialogScrollView.gone()
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
@@ -5287,8 +5341,17 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
+            val container = if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                daxDialogIntroBubble.root.gone()
+                brandDesignDialogScrollView.show()
+                daxDialogIntroBubbleBrandDesign.daxCtaContainer
+            } else {
+                daxDialogIntroBubbleBrandDesign.root.gone()
+                brandDesignDialogScrollView.gone()
+                daxDialogIntroBubble.daxCtaContainer
+            }
             configuration.apply {
-                showCta(daxDialogIntroBubble.daxCtaContainer) {
+                showCta(container) {
                     setOnOptionClicked(
                         onboardingExperimentEnabled = false,
                         configuration = configuration,
@@ -5310,7 +5373,12 @@ class BrowserTabFragment :
                 }
             }
 
-            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+            } else {
+                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            }
             viewModel.onCtaShown()
         }
 
