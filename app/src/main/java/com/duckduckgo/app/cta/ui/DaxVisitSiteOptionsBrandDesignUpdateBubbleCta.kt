@@ -22,17 +22,17 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-data class DaxTryASearchBrandDesignUpdateBubbleCta(
+data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
 ) : OptionsBubbleCta(
-    ctaId = CtaId.DAX_INTRO,
-    title = R.string.onboardingSearchDaxDialogTitle,
-    description = R.string.onboardingSearchDaxDialogDescription,
-    options = onboardingStore.getSearchOptions(),
-    backgroundRes = R.drawable.bg_onboarding_search_options,
-    ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
+    ctaId = CtaId.DAX_INTRO_VISIT_SITE,
+    title = R.string.onboardingSitesDaxDialogTitle,
+    description = R.string.onboardingSitesDaxDialogDescription,
+    options = onboardingStore.getSitesOptions(),
+    backgroundRes = R.drawable.bg_onboarding_site_options,
+    ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
