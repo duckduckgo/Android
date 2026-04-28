@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -25,18 +29,19 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.google.android.material.button.MaterialButton
 
-data class DaxEndBrandDesignUpdateBubbleCta(
+data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    val isFreeTrialCopy: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
-    ctaId = CtaId.DAX_END,
-    title = R.string.onboardingEndDaxDialogTitle,
-    description = R.string.onboardingEndDaxDialogDescription,
-    backgroundRes = R.drawable.bg_onboarding_end,
+    ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
+    title = R.string.onboardingPrivacyProDaxDialogTitle,
+    description = R.string.onboardingPrivacyProDaxDialogDescription,
+    backgroundRes = R.drawable.bg_onboarding_subscription,
     shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
     okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-    ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+    ctaPixelParam = Pixel.PixelValues.DAX_SUBSCRIPTION,
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
@@ -44,6 +49,19 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     override val activeIncludeId: Int = R.id.primaryCta
 
     override fun configureContentViews(view: View) {
-        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
+        view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
+
+        val buttonTextRes = if (isFreeTrialCopy) {
+            R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+        } else {
+            R.string.onboardingPrivacyProDaxDialogOkButton
+        }
+
+        view.findViewById<TextView>(R.id.brandDesignHiddenTitle)?.gravity = Gravity.CENTER
+        view.findViewById<TextView>(R.id.brandDesignTitle)?.gravity = Gravity.CENTER
+
+        view.findViewById<TextView>(R.id.brandDesignDescription)?.gravity = Gravity.CENTER
+
+        view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(buttonTextRes)
     }
 }
