@@ -19,6 +19,14 @@ package com.duckduckgo.daxprompts.api
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
- * Use this model to launch the Dax Prompt Browser Comparison screen
+ * Use this model to launch the Dax Prompt Browser Comparison screen.
+ *
+ * @param launchSource identifies which flow triggered the prompt so the screen can differentiate
+ *                     analytics and behavior between scenarios.
  */
-object DaxPromptBrowserComparisonNoParams : GlobalActivityStarter.ActivityParams
+data class DaxPromptBrowserComparisonParams(val launchSource: LaunchSource) : GlobalActivityStarter.ActivityParams
+
+enum class LaunchSource {
+    REACTIVATE_USERS,
+    WIN_BACK,
+}

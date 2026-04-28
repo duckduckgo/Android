@@ -26,7 +26,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
+import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity.Companion.DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -105,7 +106,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private fun showDaxPromptBrowserComparison() {
         val intentDaxPromptComparisonChart =
-            globalActivityStarter.startIntent(this, DaxPromptBrowserComparisonNoParams)
+            globalActivityStarter.startIntent(this, DaxPromptBrowserComparisonParams(LaunchSource.REACTIVATE_USERS))
         intentDaxPromptComparisonChart?.let {
             startDaxPromptBrowserComparisonActivityForResult.launch(it)
         }
