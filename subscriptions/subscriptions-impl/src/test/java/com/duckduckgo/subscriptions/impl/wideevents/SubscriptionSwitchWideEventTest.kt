@@ -36,6 +36,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.minutes
 
 class SubscriptionSwitchWideEventTest {
 
@@ -311,7 +312,7 @@ class SubscriptionSwitchWideEventTest {
         verify(wideEventClient).intervalStart(
             wideEventId = eq(444L),
             key = eq("activation_latency_ms_bucketed"),
-            timeout = any(),
+            timeout = eq(10.minutes),
         )
         verify(wideEventClient).flowStep(
             wideEventId = eq(444L),

@@ -30,9 +30,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
 
 interface FreeTrialConversionWideEvent {
     suspend fun onFreeTrialStarted(productId: String)
@@ -89,7 +89,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                     KEY_FREE_TRIAL_PLAN to productId,
                 ),
                 cleanupPolicy = OnTimeout(
-                    duration = Duration.ofDays(FREE_TRIAL_TIMEOUT_DAYS),
+                    duration = FREE_TRIAL_TIMEOUT_DAYS.days,
                     flowStatus = FlowStatus.Failure(FAILURE_REASON_TIMEOUT),
                 ),
             )

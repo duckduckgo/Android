@@ -17,7 +17,8 @@
 package com.duckduckgo.app.statistics.wideevents
 
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnTimeout
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 interface WideEventClient {
     /**
@@ -33,7 +34,7 @@ interface WideEventClient {
         name: String,
         flowEntryPoint: String? = null,
         metadata: Map<String, String> = emptyMap(),
-        cleanupPolicy: CleanupPolicy = OnTimeout(duration = Duration.ofDays(7)),
+        cleanupPolicy: CleanupPolicy = OnTimeout(duration = 7.days),
     ): Result<Long>
 
     /**

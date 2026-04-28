@@ -22,9 +22,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
 import kotlin.runCatching
+import kotlin.time.Duration
+import kotlin.time.toJavaDuration
+import kotlin.time.toKotlinDuration
 
 @ContributesBinding(AppScope::class)
 class WideEventClientImpl @Inject constructor(
@@ -113,7 +115,7 @@ class WideEventClientImpl @Inject constructor(
             wideEventRepository.startInterval(
                 eventId = wideEventId,
                 name = key,
-                timeout = timeout,
+                timeout = timeout?.toJavaDuration(),
             )
         }
     }
@@ -128,7 +130,7 @@ class WideEventClientImpl @Inject constructor(
             wideEventRepository.endInterval(
                 eventId = wideEventId,
                 name = key,
-            )
+            ).toKotlinDuration()
         }
     }
 
@@ -160,7 +162,7 @@ private fun CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepository.Cl
 
         is CleanupPolicy.OnTimeout -> {
             WideEventRepository.CleanupPolicy.OnTimeout(
-                duration = duration,
+                duration = duration.toJavaDuration(),
                 status = wideEventStatus,
                 metadata = metadata,
             )
