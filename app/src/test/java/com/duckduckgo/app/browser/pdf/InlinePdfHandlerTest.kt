@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.pdf
 
+import android.os.Build
 import android.webkit.CookieManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -46,6 +47,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import org.robolectric.util.ReflectionHelpers
 import java.io.File
 import java.net.UnknownHostException
 
@@ -181,6 +183,20 @@ class InlinePdfHandlerTest {
     @Test
     fun whenContentDispositionHasLeadingWhitespaceAttachmentThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"))
+    }
+
+    @Test
+    fun whenApiBelow31ThenShouldNotRenderInlineRegardlessOfInputs() {
+        // Mock SDK_INT instead of using @Config(sdk = [30]) — keeps the JVM on a single
+        // Robolectric SDK runtime so we don't memory-map an extra Android resource APK.
+        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 30)
+        try {
+            assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
+            assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
+            assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
+        } finally {
+            ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", 31)
+        }
     }
 
     // endregion
