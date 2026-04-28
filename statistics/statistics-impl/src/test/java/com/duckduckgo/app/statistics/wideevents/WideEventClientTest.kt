@@ -34,6 +34,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -336,6 +337,33 @@ class WideEventClientTest {
                 eventId = wideEventId,
                 name = key,
                 timeout = Duration.ofSeconds(5),
+            )
+        }
+
+    @Test
+    fun `intervalStart accepts custom buckets and null without throwing`() =
+        runTest {
+            assertTrue(
+                wideEventClient.intervalStart(
+                    wideEventId = 1L,
+                    key = "k1",
+                    timeout = null,
+                    buckets = setOf(100.milliseconds, 1.seconds),
+                ).isSuccess,
+            )
+            assertTrue(
+                wideEventClient.intervalStart(
+                    wideEventId = 1L,
+                    key = "k2",
+                    timeout = null,
+                    buckets = null,
+                ).isSuccess,
+            )
+            assertTrue(
+                wideEventClient.intervalStart(
+                    wideEventId = 1L,
+                    key = "k3",
+                ).isSuccess,
             )
         }
 

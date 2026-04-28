@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics.wideevents
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnTimeout
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface WideEventClient {
     /**
@@ -89,14 +91,21 @@ interface WideEventClient {
      * If [timeout] elapses before [intervalEnd], [flowFinish] or [flowAbort], the flow auto-finishes with
      * [FlowStatus.Unknown] and is sent. Explicit finish/abort cancels any pending timeouts.
      *
+     * The measured duration is bucketed according to [buckets]. The recorded duration is rounded down to
+     * the nearest bucket. Values below the smallest bucket are recorded as 0. A null value disables
+     * bucketing and records the raw duration.
+     *
      * @param wideEventId ID of the wide event.
      * @param key Interval key (e.g., "token_refresh_duration").
      * @param timeout Optional duration for auto-finish.
+     * @param buckets Bucket boundaries for the measured duration, or null to disable bucketing.
+     *   Defaults to [DEFAULT_INTERVAL_BUCKETS].
      */
     suspend fun intervalStart(
         wideEventId: Long,
         key: String,
         timeout: Duration? = null,
+        buckets: Set<Duration>? = DEFAULT_INTERVAL_BUCKETS,
     ): Result<Unit>
 
     /**
@@ -112,6 +121,18 @@ interface WideEventClient {
         wideEventId: Long,
         key: String,
     ): Result<Duration>
+
+    companion object {
+        val DEFAULT_INTERVAL_BUCKETS: Set<Duration> = setOf(
+            1.seconds,
+            5.seconds,
+            10.seconds,
+            30.seconds,
+            1.minutes,
+            5.minutes,
+            10.minutes,
+        )
+    }
 }
 
 /** Represents the final outcome status of a wide event. */

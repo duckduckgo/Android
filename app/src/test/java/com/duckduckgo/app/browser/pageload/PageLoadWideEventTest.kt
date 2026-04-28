@@ -68,7 +68,7 @@ class PageLoadWideEventTest {
         // Mock all WideEventClient methods to return successful Results
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalStart(any(), any(), any())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
 
@@ -321,7 +321,7 @@ class PageLoadWideEventTest {
 
         // Should not crash and should not call flowStep
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
     }
 
     @Test
