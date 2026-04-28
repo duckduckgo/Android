@@ -50,7 +50,7 @@ import java.io.File
 import java.net.UnknownHostException
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [31])
+@Config(sdk = [34])
 class InlinePdfHandlerTest {
 
     @get:Rule
