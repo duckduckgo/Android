@@ -184,6 +184,11 @@ class RealInlinePdfHandler @Inject constructor(
                 override fun onResponse(call: Call, response: Response) {
                     if (continuation.isActive) {
                         continuation.resumeWith(Result.success(response))
+                    } else {
+                        // Coroutine was cancelled in the narrow window between the response
+                        // landing and this callback firing — close the body so OkHttp can
+                        // return the underlying connection to the pool.
+                        response.close()
                     }
                 }
             })
