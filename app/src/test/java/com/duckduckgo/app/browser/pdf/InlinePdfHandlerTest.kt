@@ -50,7 +50,7 @@ import java.io.File
 import java.net.UnknownHostException
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [34])
+@Config(sdk = [31])
 class InlinePdfHandlerTest {
 
     @get:Rule
@@ -144,49 +144,41 @@ class InlinePdfHandlerTest {
     // region shouldRenderPdfInline tests
 
     @Test
-    @Config(sdk = [31])
     fun whenPdfMimeTypeThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenContentDispositionIsAttachmentThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenMimeTypeIsNotPdfAndUrlNotPdfThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.txt", null, "text/plain"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenMimeTypeIsNotPdfButUrlEndsPdfThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenUrlEndsInPdfWithQueryParamsThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenUrlEndsInPdfWithFragmentThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf#page=5", null, "application/octet-stream"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenContentDispositionIsExplicitInlineThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
     }
 
     @Test
-    @Config(sdk = [31])
     fun whenContentDispositionHasLeadingWhitespaceAttachmentThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"))
     }
@@ -196,7 +188,6 @@ class InlinePdfHandlerTest {
     // region feature flag tests
 
     @Test
-    @Config(sdk = [31])
     fun whenFeatureDisabledThenShouldRenderPdfInlineReturnsFalse() {
         androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = false))
 
