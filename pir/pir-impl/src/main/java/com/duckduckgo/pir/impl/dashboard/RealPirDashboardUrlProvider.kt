@@ -18,18 +18,13 @@ package com.duckduckgo.pir.impl.dashboard
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-@Module
-@ContributesTo(AppScope::class)
-class PirDashboardUrlProviderModule {
-    @Provides
-    fun providePirDashboardUrlProvider(): PirDashboardUrlProvider {
-        return object : PirDashboardUrlProvider {
-            override fun getUrl(): String = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
-            override fun getAllowedDomains(): List<String> = listOf(PirDashboardWebConstants.ALLOWED_DOMAIN)
-        }
-    }
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class RealPirDashboardUrlProvider @Inject constructor() : PirDashboardUrlProvider {
+    override fun getUrl(): String = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
+    override fun getAllowedDomains(): List<String> = listOf(PirDashboardWebConstants.ALLOWED_DOMAIN)
 }

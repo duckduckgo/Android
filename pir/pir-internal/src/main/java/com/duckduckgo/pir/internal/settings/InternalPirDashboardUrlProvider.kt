@@ -20,37 +20,28 @@ import androidx.core.net.toUri
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
-import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProviderModule
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-@Module
-@ContributesTo(
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(
     scope = AppScope::class,
-    replaces = [PirDashboardUrlProviderModule::class],
+    rank = ContributesBinding.RANK_HIGHEST,
 )
-class InternalPirDashboardUrlProviderModule {
+class InternalPirDashboardUrlProvider @Inject constructor(
+    private val store: PirInternalSettingsDataStore,
+) : PirDashboardUrlProvider {
+    override fun getUrl(): String {
+        return store.customDashboardUrl ?: PirDashboardWebConstants.DEFAULT_WEB_UI_URL
+    }
 
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePirDashboardUrlProvider(
-        store: PirInternalSettingsDataStore,
-    ): PirDashboardUrlProvider {
-        return object : PirDashboardUrlProvider {
-            override fun getUrl(): String {
-                return store.customDashboardUrl ?: PirDashboardWebConstants.DEFAULT_WEB_UI_URL
-            }
-
-            override fun getAllowedDomains(): List<String> {
-                return buildList {
-                    add(PirDashboardWebConstants.ALLOWED_DOMAIN)
-                    store.customDashboardUrl?.let { url ->
-                        url.toUri().host?.toTldPlusOne()?.let { add(it) }
-                    }
-                }
+    override fun getAllowedDomains(): List<String> {
+        return buildList {
+            add(PirDashboardWebConstants.ALLOWED_DOMAIN)
+            store.customDashboardUrl?.let { url ->
+                url.toUri().host?.toTldPlusOne()?.let { add(it) }
             }
         }
     }
