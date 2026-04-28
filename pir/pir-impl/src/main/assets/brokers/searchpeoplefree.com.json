@@ -1,7 +1,7 @@
 {
   "name": "Search People FREE",
   "url": "searchpeoplefree.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703052000000,
   "optOutUrl": "https://www.searchpeoplefree.com/opt-out",
@@ -14,6 +14,17 @@
           "actionType": "navigate",
           "id": "a85625a6-4607-4fea-9fa4-38294a7de727",
           "url": "https://searchpeoplefree.com/find/${firstName|hyphenated}-${lastName|hyphenated}/${state|hyphenated}/${city|hyphenated}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-d4f5286d-55d8-405b-a3ec-f3e9741a3da5"
         },
         {
           "actionType": "expectation",

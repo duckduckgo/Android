@@ -1,7 +1,7 @@
 {
   "name": "AdvancedBackgroundChecks",
   "url": "advancedbackgroundchecks.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678060800000,
   "optOutUrl": "https://www.advancedbackgroundchecks.com/removal",
@@ -14,6 +14,17 @@
           "actionType": "navigate",
           "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
           "url": "https://www.advancedbackgroundchecks.com/names/${firstName|hyphenated}-${lastName|hyphenated}_${city|hyphenated}-${state|hyphenated}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-2030df08-d913-4294-9406-c3086fc54ca7"
         },
         {
           "actionType": "expectation",

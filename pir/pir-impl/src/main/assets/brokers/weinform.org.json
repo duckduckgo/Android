@@ -1,9 +1,9 @@
 {
-  "name": "PeopleSearcher",
-  "url": "peoplesearcher.com",
-  "version": "0.7.0",
+  "name": "WeInform",
+  "url": "weinform.org",
+  "version": "0.1.0",
   "parent": "privatereports.com",
-  "optOutUrl": "https://www.peoplesearcher.com/api/helper/optOutLight/search",
+  "optOutUrl": "https://www.weinform.org/api/helper/optOutLight/search",
   "steps": [
     {
       "stepType": "scan",
@@ -11,8 +11,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://www.peoplesearcher.com/api/helper/optOutLight/search",
-          "id": "5a163537-6f89-4652-9a87-0b8054e72bbf"
+          "url": "https://www.weinform.org/api/helper/optOutLight/search",
+          "id": "c89890c9-0b0b-49d5-b72a-152afebea3aa"
         },
         {
           "actionType": "expectation",
@@ -22,7 +22,7 @@
               "selector": "#pageForm"
             }
           ],
-          "id": "6a0060da-1616-40b2-a307-1315490b5b2c"
+          "id": "65c4efa6-5543-4827-85ac-9beda826f3e9"
         },
         {
           "actionType": "fillForm",
@@ -46,7 +46,7 @@
               "selector": "select[name='state']"
             }
           ],
-          "id": "5aa3746a-ff05-4c2e-bf33-90b6af8dc9c6"
+          "id": "9c021278-27a7-4711-8a1a-24d39ac88924"
         },
         {
           "actionType": "click",
@@ -56,7 +56,7 @@
               "selector": "#pageFormSubmitBtn"
             }
           ],
-          "id": "c21237ee-6988-4278-9c32-350f82424f35"
+          "id": "20c9a47d-c2a0-4e33-a1a0-2bfe6f3efe46"
         },
         {
           "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
@@ -67,7 +67,7 @@
               "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "cft-69d7e91e-9c5d-4523-b625-2decd2b697a0"
+          "id": "cft-b371ee5f-8818-44f4-b36d-77b97fc4c69e"
         },
         {
           "actionType": "expectation",
@@ -77,7 +77,7 @@
               "selector": ".header"
             }
           ],
-          "id": "5ae1dce2-5e4e-4b1f-8649-878071d915c4"
+          "id": "840e1115-7bab-4b9c-862c-311ba49a383f"
         },
         {
           "actionType": "expectation",
@@ -87,7 +87,7 @@
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
             }
           ],
-          "id": "f39d9b96-09a5-4e3d-a33f-bfaa191aa2c9"
+          "id": "f8751aac-4d41-4aa9-89d2-35c80eaf2a6a"
         },
         {
           "actionType": "condition",
@@ -103,13 +103,13 @@
               "actionType": "getCaptchaInfo",
               "captchaType": "image",
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
-              "id": "21b3db05-32f2-4089-b6f7-83854ea4e6b2"
+              "id": "79a765f3-c1bb-4c2d-af18-071725f0ddee"
             },
             {
               "actionType": "solveCaptcha",
               "captchaType": "image",
               "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
-              "id": "8b257457-aa7e-4883-9019-13a1eaf72dc6"
+              "id": "4a2a35f3-3526-43fa-a24e-d519b8a000d6"
             },
             {
               "actionType": "click",
@@ -120,10 +120,10 @@
                   "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
                 }
               ],
-              "id": "ec410930-89bd-4f4d-93fa-73276decfa98"
+              "id": "e5b42120-6dcf-4413-9139-523cbc71cc5a"
             }
           ],
-          "id": "3534def6-b37a-45ce-a3e5-5095757952f0"
+          "id": "ebe52f0a-0176-4853-8f9b-447868a05cd4"
         },
         {
           "actionType": "expectation",
@@ -133,7 +133,7 @@
               "selector": ".header"
             }
           ],
-          "id": "a8de391d-c7cb-4d89-9ac2-f47368c6f347"
+          "id": "766ccef8-c27f-4dc7-9691-ba6377fd6fe6"
         },
         {
           "actionType": "extract",
@@ -151,7 +151,7 @@
               "separator": "/(?<=, [A-Z]{2}), /"
             }
           },
-          "id": "b235a497-3ceb-4dee-9704-dcda0349bd3a"
+          "id": "fd69267b-59ce-4b1a-ba94-e1fd3dd99474"
         }
       ]
     },
@@ -167,6 +167,6 @@
     "maintenanceScan": 120,
     "maxAttempts": -1
   },
-  "addedDatetime": 1738341001174,
+  "addedDatetime": 1777063664947,
   "removedAt": null
 }
