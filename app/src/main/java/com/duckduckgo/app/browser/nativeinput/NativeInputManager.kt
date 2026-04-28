@@ -293,6 +293,8 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView, isBottom)
+        val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
+        applyInitialTabSelection(widgetView, isNewTab)
         if (omnibarController.isDuckAiMode()) {
             widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
@@ -315,10 +317,12 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
+                widget.saveLastUsedTogglePosition(isChat = false)
                 hideNativeInput()
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
+                widget.saveLastUsedTogglePosition(isChat = true)
                 if (queryUrlPredictor.isUrl(query)) {
                     hideNativeInput()
                     callbacks.onSearchSubmitted(query)
@@ -474,6 +478,15 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun applyInitialTabSelection(widgetView: View, isNewTab: Boolean) {
+        val widget = widgetFrom(widgetView) ?: return
+        if (omnibarController.isDuckAiMode()) {
+            widget.selectChatTab()
+        } else if (isNewTab) {
+            widget.applyDefaultTogglePosition()
+        }
+    }
+
     private fun bindAutocompleteVisibility(widgetView: View) {
         if (!omnibarController.isDuckAiMode()) return
         val widget = widgetFrom(widgetView) ?: return
@@ -549,6 +562,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindChatSuggestions(
             lifecycleOwner = lifecycleOwner,
             onChatSuggestionSelected = { query ->
+                widget.saveLastUsedTogglePosition(isChat = true)
                 hideNativeInput(animate = false)
                 onChatSuggestionSelected(query)
             },
