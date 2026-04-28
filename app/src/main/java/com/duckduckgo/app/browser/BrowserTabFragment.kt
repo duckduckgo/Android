@@ -364,6 +364,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -1799,6 +1800,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
             }
+            onMenuItemClicked(downloadPdfMenuItem) {
+                viewModel.onDownloadPdfMenuItemClicked()
+            }
             onMenuItemClicked(addToHomeMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                 viewModel.onPinPageToHomeSelected()
@@ -2291,6 +2295,7 @@ class BrowserTabFragment :
         }
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
+        viewModel.onPdfHidden()
     }
 
     private fun isPdfVisible(): Boolean {
@@ -4748,9 +4753,12 @@ class BrowserTabFragment :
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob +=
             lifecycleScope.launch {
-                viewModel.downloadCommands().cancellable().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).collectLatest {
-                    processFileDownloadedCommand(it)
-                }
+                merge(viewModel.downloadCommands(), viewModel.pdfDownloadCommands())
+                    .cancellable()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                    .collectLatest {
+                        processFileDownloadedCommand(it)
+                    }
             }
     }
 

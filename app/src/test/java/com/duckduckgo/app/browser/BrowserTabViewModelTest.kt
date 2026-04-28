@@ -111,6 +111,7 @@ import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -125,6 +126,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -249,9 +251,13 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
+import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
+import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
@@ -322,6 +328,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -645,6 +653,9 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
+    private val mockCachedFileDownloader: CachedFileDownloader = mock()
+    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -941,6 +952,9 @@ class BrowserTabViewModelTest {
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 inlinePdfHandler = mockInlinePdfHandler,
+                cachedFileDownloader = mockCachedFileDownloader,
+                downloadMenuStateProvider = mockDownloadMenuStateProvider,
+                downloadsRepository = mockDownloadsRepository,
             )
 
         testee.loadData("abc", null, false, false)
@@ -10233,6 +10247,219 @@ class BrowserTabViewModelTest {
             assertEquals(urlB, this.url)
             assertEquals(uriB, this.cachedFileUri)
         }
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfShownThenCurrentPdfStatePopulated() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val url = "https://example.com/doc.pdf"
+        val cachedUri = Uri.parse("file:///cache/doc.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(cachedUri)
+        whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, url, null, "application/pdf", true, false)
+
+        assertEquals(cachedUri, browserViewState().currentPdfCachedUri)
+        assertEquals("doc.pdf", browserViewState().currentPdfFileName)
+    }
+
+    @Test
+    fun whenOnPdfHiddenThenCurrentPdfStateClears() {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+
+        testee.onPdfHidden()
+
+        assertNull(browserViewState().currentPdfCachedUri)
+        assertNull(browserViewState().currentPdfFileName)
+    }
+
+    @Test
+    fun whenDownloadPdfClickedAndPdfShownThenCachedFileDownloaderInvoked() = runTest {
+        val cachedUri = Uri.parse("file:///cache/doc.pdf")
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = cachedUri,
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(
+            "/storage/emulated/0/Download/doc.pdf",
+        )
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        verify(mockCachedFileDownloader).saveToDownloads(cachedUri, "doc.pdf", "application/pdf")
+    }
+
+    @Test
+    fun whenDownloadPdfClickedWithoutPdfShownThenNoOp() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = null,
+            currentPdfFileName = null,
+        )
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        verify(mockCachedFileDownloader, never()).saveToDownloads(any(), any(), any())
+        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+    }
+
+    @Test
+    fun whenPdfDownloadSucceedsThenOnDownloadCompleteCalled() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(
+            "/storage/emulated/0/Download/doc.pdf",
+        )
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        verify(mockDownloadMenuStateProvider).onDownloadComplete()
+    }
+
+    @Test
+    fun whenPdfDownloadFailsThenOnDownloadCompleteNotCalled() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(null)
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        verify(mockDownloadMenuStateProvider, never()).onDownloadComplete()
+    }
+
+    @Test
+    fun whenPdfDownloadStartsThenStartedCommandEmittedFirst() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(
+            "/storage/emulated/0/Download/doc.pdf",
+        )
+        val emitted = mutableListOf<DownloadCommand>()
+        val collectJob = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            testee.pdfDownloadCommands().toList(emitted)
+        }
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+        collectJob.cancel()
+
+        assertTrue("first emission should be Started", emitted.first() is DownloadCommand.ShowDownloadStartedMessage)
+        assertEquals("doc.pdf", (emitted.first() as DownloadCommand.ShowDownloadStartedMessage).fileName)
+    }
+
+    @Test
+    fun whenPdfDownloadSucceedsThenSuccessCommandEmitted() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        val savedFilePath = "/storage/emulated/0/Download/doc.pdf"
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(savedFilePath)
+        val emitted = mutableListOf<DownloadCommand>()
+        val collectJob = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            testee.pdfDownloadCommands().toList(emitted)
+        }
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+        collectJob.cancel()
+
+        val success = emitted.filterIsInstance<DownloadCommand.ShowDownloadSuccessMessage>().single()
+        assertEquals("doc.pdf", success.fileName)
+        assertEquals(savedFilePath, success.filePath)
+        assertEquals("application/pdf", success.mimeType)
+    }
+
+    @Test
+    fun whenPdfDownloadSucceedsThenDownloadItemInsertedInRepository() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        val savedFilePath = "/storage/emulated/0/Download/doc.pdf"
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(savedFilePath)
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        val captor = argumentCaptor<DownloadItem>()
+        verify(mockDownloadsRepository).insert(captor.capture())
+        val item = captor.firstValue
+        assertEquals("doc.pdf", item.fileName)
+        assertEquals(DownloadStatus.FINISHED, item.downloadStatus)
+        assertEquals(savedFilePath, item.filePath)
+    }
+
+    @Test
+    fun whenPdfDownloadSucceedsThenInsertedFilePathIsFileSystemPathNotContentUri() = runTest {
+        // Regression: storing a content:// uri caused DownloadsViewModel.syncDownloads to
+        // delete the row on each open because File("content://...").exists() returns false.
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        val savedFilePath = "/storage/emulated/0/Download/doc.pdf"
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(savedFilePath)
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        val captor = argumentCaptor<DownloadItem>()
+        verify(mockDownloadsRepository).insert(captor.capture())
+        val storedPath = captor.firstValue.filePath
+        assertFalse(
+            "filePath must NOT be a content:// uri — Downloads screen scrub deletes those",
+            storedPath.startsWith("content://"),
+        )
+        assertEquals(savedFilePath, storedPath)
+    }
+
+    @Test
+    fun whenPdfDownloadFailsThenDownloadItemNotInsertedInRepository() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(null)
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+
+        verify(mockDownloadsRepository, never()).insert(any())
+    }
+
+    @Test
+    fun whenPdfDownloadFailsThenFailedCommandEmitted() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(null)
+        val emitted = mutableListOf<DownloadCommand>()
+        val collectJob = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            testee.pdfDownloadCommands().toList(emitted)
+        }
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+        collectJob.cancel()
+
+        assertTrue(emitted.any { it is DownloadCommand.ShowDownloadFailedMessage })
+        assertFalse(emitted.any { it is DownloadCommand.ShowDownloadSuccessMessage })
     }
 
     // endregion
