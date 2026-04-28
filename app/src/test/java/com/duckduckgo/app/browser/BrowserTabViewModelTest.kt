@@ -367,6 +367,7 @@ import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 @SuppressLint("DenyListedApi")
 @FlowPreview
@@ -10193,7 +10194,7 @@ class BrowserTabViewModelTest {
         whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
         // Return COROUTINE_SUSPENDED to simulate a long-running download that never completes
         whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenAnswer {
-            kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+            COROUTINE_SUSPENDED
         }
         val webView: WebView = mock()
 
@@ -10206,6 +10207,32 @@ class BrowserTabViewModelTest {
         advanceUntilIdle()
 
         assertCommandNotIssued<Command.ShowPdfInTab>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenSecondPdfRequestedDuringFirstThenSecondShows() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val urlA = "https://example.com/a.pdf"
+        val urlB = "https://example.com/b.pdf"
+        val uriB = Uri.parse("file:///cache/b.pdf")
+
+        // First download hangs forever; second resolves immediately. ConflatedJob should
+        // ensure only the second one's command is emitted.
+        whenever(mockInlinePdfHandler.downloadToCache(urlA)).thenAnswer {
+            COROUTINE_SUSPENDED
+        }
+        whenever(mockInlinePdfHandler.downloadToCache(urlB)).thenReturn(uriB)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, urlA, null, "application/pdf", true, false)
+        testee.requestFileDownload(webView, urlB, null, "application/pdf", true, false)
+        advanceUntilIdle()
+
+        assertCommandIssued<Command.ShowPdfInTab> {
+            assertEquals(urlB, this.url)
+            assertEquals(uriB, this.cachedFileUri)
+        }
     }
 
     // endregion

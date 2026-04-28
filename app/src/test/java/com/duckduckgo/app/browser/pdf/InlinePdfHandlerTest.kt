@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
 import okio.Buffer
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -41,8 +42,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
+import java.net.UnknownHostException
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -162,6 +167,18 @@ class InlinePdfHandlerTest {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
     }
 
+    @Test
+    @Config(sdk = [31])
+    fun whenContentDispositionIsExplicitInlineThenShouldRenderInline() {
+        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenContentDispositionHasLeadingWhitespaceAttachmentThenShouldNotRenderInline() {
+        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"))
+    }
+
     // endregion
 
     // region feature flag tests
@@ -225,6 +242,109 @@ class InlinePdfHandlerTest {
         )
         val partialFile = File(cacheDir, "cancelled.pdf")
         assertFalse("Partial file should be deleted after cancellation", partialFile.exists())
+    }
+
+    // endregion
+
+    // region additional download path tests
+
+    @Test
+    fun whenCookieAvailableThenForwardedAsHeader() = runTest {
+        val mockCookieManager: CookieManager = mock()
+        whenever(mockCookieManager.getCookie(any())).thenReturn("session=abc123")
+        val cookieAwareProvider = object : CookieManagerProvider {
+            override fun get(): CookieManager = mockCookieManager
+        }
+        val handlerWithCookies = RealInlinePdfHandler(
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            okHttpClient = OkHttpClient(),
+            cookieManagerProvider = cookieAwareProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val pdfBytes = "%PDF-1.4 test content".toByteArray()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(pdfBytes)),
+        )
+        val url = server.url("/auth.pdf").toString()
+
+        val uri = handlerWithCookies.downloadToCache(url)
+
+        assertNotNull(uri)
+        val recordedRequest = server.takeRequest()
+        assertEquals("session=abc123", recordedRequest.getHeader("Cookie"))
+    }
+
+    @Test
+    fun whenUrlPathContainsSpecialCharactersThenFilenameIsSanitized() {
+        val name = inlinePdfHandler.extractFileName("https://example.com/path/file%20name%21.pdf")
+        assertEquals("file_name_.pdf", name)
+    }
+
+    @Test
+    fun whenServerReturnsEmptyBodyThenReturnsNull() = runTest {
+        server.enqueue(MockResponse().setResponseCode(200).setBody(""))
+
+        val uri = inlinePdfHandler.downloadToCache(server.url("/empty.pdf").toString())
+
+        assertNull(uri)
+    }
+
+    @Test
+    fun whenServerReturnsBodyShorterThanMagicBytesThenReturnsNullAndDeletesFile() = runTest {
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write("abc".toByteArray())),
+        )
+        val url = server.url("/short.pdf").toString()
+
+        val uri = inlinePdfHandler.downloadToCache(url)
+
+        assertNull(uri)
+        val cacheDir = File(
+            InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
+            "pdf_cache",
+        )
+        val partialFile = File(cacheDir, "short.pdf")
+        assertFalse("Magic-byte mismatch should delete the cached file", partialFile.exists())
+    }
+
+    @Test
+    fun whenDnsFailsThenReturnsNull() = runTest {
+        val throwingClient = OkHttpClient.Builder()
+            .addInterceptor { throw UnknownHostException("test DNS failure") }
+            .build()
+        val handlerWithFailingDns = RealInlinePdfHandler(
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            okHttpClient = throwingClient,
+            cookieManagerProvider = cookieManagerProvider,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+        )
+
+        val uri = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf")
+
+        assertNull(uri)
+    }
+
+    @Test
+    fun whenConnectionResetMidBodyThenReturnsNull() = runTest {
+        val partialBody = ("%PDF-1.4 " + "x".repeat(8192)).toByteArray()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(partialBody))
+                .setSocketPolicy(SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY),
+        )
+        val url = server.url("/reset.pdf").toString()
+
+        val uri = inlinePdfHandler.downloadToCache(url)
+
+        assertNull(uri)
     }
 
     // endregion

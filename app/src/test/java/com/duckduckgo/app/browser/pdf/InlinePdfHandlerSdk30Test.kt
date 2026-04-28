@@ -60,7 +60,17 @@ class InlinePdfHandlerSdk30Test {
     }
 
     @Test
-    fun whenApiBelow31ThenShouldNotRenderInline() {
+    fun whenApiBelow31AndPdfMimeTypeThenShouldNotRenderInline() {
         assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
+    }
+
+    @Test
+    fun whenApiBelow31AndContentDispositionInlineThenShouldNotRenderInline() {
+        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
+    }
+
+    @Test
+    fun whenApiBelow31AndUrlEndsInPdfWithOctetMimeThenShouldNotRenderInline() {
+        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
     }
 }
