@@ -2245,6 +2245,7 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
 
         browserNavigationBarIntegration.configureNewTabViewMode()
     }
