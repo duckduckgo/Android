@@ -79,8 +79,17 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <!-- Future content includes added here:
-            <include android:id="@+id/primaryCtaContent" layout="@layout/include_brand_design_dialog_primary_cta" ... />
+            <include
+                    android:id="@+id/primaryCtaContent"
+                    layout="@layout/include_brand_design_dialog_primary_cta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+                <!-- Future content includes added here:
             <include android:id="@+id/dualButtonsContent" layout="@layout/include_brand_design_dialog_dual_buttons" ... />
             -->
 
