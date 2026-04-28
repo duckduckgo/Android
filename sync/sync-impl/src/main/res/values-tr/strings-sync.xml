@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Kurtarma Kodunu PDF Olarak İndir</string>
     <string name="sync_settings_download_recovery_code_item_hint">Bu kodu kaydedin ve güvenli bir yerde tutun. Böylece bu cihaza erişiminizi kaybederseniz verilerinizi kurtarabilirsiniz.</string>
     <string name="sync_settings_data_expiration">Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Önceki kurulumdan Sync &amp; Backup verileri geri yüklensin mi?</string>
+    <string name="sync_previous_session_ready_body">DuckDuckGo\'ya önceki yer işaretleri, şifreleri ve diğer verileri almak için geri yükleyin.</string>
+    <string name="sync_previous_session_ready_resume_cta">Sync &amp; Backup\'ı geri yükleyin</string>
+    <string name="sync_previous_session_ready_continue_cta">Yeni Senkronizasyon Ayarlayın</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Verilerinizi Kolayca Kurtarın</string>
+    <string name="sync_recover_data_content">Bu cihaza erişiminizi kaybettiğinizde verilerinizi kurtarmak için bu kodu kullanın. Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz.</string>
+    <string name="sync_recover_data_recovery_code_label">Kurtarma Kodu</string>
+    <string name="sync_recover_data_download_pdf">PDF olarak indir</string>
+    <string name="sync_restore_on_reinstall_title">Uygulama Yeniden Yüklendiğinde Geri Yükle</string>
+    <string name="sync_restore_on_reinstall_description">DuckDuckGo uygulamasını yeniden yüklerseniz, verilerinizi bu cihazda geri yüklemek isteyip istemediğinizi sorarız.</string>
 </resources>
