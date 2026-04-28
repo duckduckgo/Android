@@ -39,7 +39,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.common.toParams
-import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
@@ -99,18 +98,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                 actionToExecute.needsEmail &&
                 !hasEmail(currentBrokerStep)
             ) {
-                val extractedProfile = when (currentBrokerStep) {
-                    is OptOutStep -> {
-                        currentBrokerStep.profileToOptOut
-                    }
-
-                    is EmailConfirmationStep -> {
-                        currentBrokerStep.profileToOptOut
-                    }
-
-                    else -> null // Invalid state
-                }
-
                 Next(
                     nextState = state.copy(
                         stageStatus = PirStageStatus(
@@ -122,20 +109,10 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
-                        extractedProfile = extractedProfile!!,
                         profileQuery = state.profileQuery,
                     ),
                 )
             } else if (actionToExecute is GenerateEmail) {
-                val extractedProfile = when (currentBrokerStep) {
-                    is OptOutStep -> currentBrokerStep.profileToOptOut
-                    is EmailConfirmationStep -> currentBrokerStep.profileToOptOut
-                    is ScanStep -> ExtractedProfile(
-                        profileQueryId = state.profileQuery.id,
-                        brokerName = currentBrokerStep.broker.name,
-                    )
-                }
-
                 Next(
                     nextState = state.copy(
                         stageStatus = PirStageStatus(
@@ -146,7 +123,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     sideEffect = GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
-                        extractedProfile = extractedProfile,
                         profileQuery = state.profileQuery,
                     ),
                 )

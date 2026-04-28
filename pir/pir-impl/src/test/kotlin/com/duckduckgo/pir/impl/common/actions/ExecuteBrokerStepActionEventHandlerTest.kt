@@ -224,7 +224,6 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as GetEmailForProfile
         assertEquals("action-1", sideEffect.actionId)
         assertEquals(testBrokerName, sideEffect.brokerName)
-        assertEquals(testExtractedProfile.copy(email = ""), sideEffect.extractedProfile)
         assertEquals(testProfileQuery, sideEffect.profileQuery)
         assertNull(result.nextEvent)
     }
@@ -722,7 +721,6 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as GetEmailForProfile
         assertEquals("action-gen-email", sideEffect.actionId)
         assertEquals(testBrokerName, sideEffect.brokerName)
-        assertEquals(testExtractedProfile, sideEffect.extractedProfile)
         assertEquals(testProfileQuery, sideEffect.profileQuery)
         assertNull(result.nextEvent)
     }
@@ -758,8 +756,6 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as GetEmailForProfile
         assertEquals("action-gen-email", sideEffect.actionId)
         assertEquals(testBrokerName, sideEffect.brokerName)
-        assertEquals(testProfileQueryId, sideEffect.extractedProfile.profileQueryId)
-        assertEquals(testBrokerName, sideEffect.extractedProfile.brokerName)
         assertEquals(testProfileQuery, sideEffect.profileQuery)
         assertNull(result.nextEvent)
     }
@@ -797,7 +793,6 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as GetEmailForProfile
         assertEquals("action-gen-email", sideEffect.actionId)
         assertEquals(testBrokerName, sideEffect.brokerName)
-        assertEquals(testExtractedProfile, sideEffect.extractedProfile)
         assertEquals(testProfileQuery, sideEffect.profileQuery)
         assertNull(result.nextEvent)
     }
