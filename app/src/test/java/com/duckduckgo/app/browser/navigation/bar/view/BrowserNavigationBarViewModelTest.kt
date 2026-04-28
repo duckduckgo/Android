@@ -25,7 +25,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -33,8 +32,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class BrowserNavigationBarViewModelTest {
@@ -46,27 +46,16 @@ class BrowserNavigationBarViewModelTest {
 
     private val pixelMock: Pixel = mock()
 
-    private val defaultBrowserHighlightFlow = MutableStateFlow(false)
-    private val downloadHighlightFlow = MutableStateFlow(false)
+    private val highlightFlow = MutableStateFlow(false)
 
-    private val browserMenuHighlight: BrowserMenuHighlight = mock {
-        on { shouldShowHighlightForMode(any()) } doAnswer { invocation ->
-            val mode = invocation.getArgument<BrowserViewMode>(0)
-            combine(defaultBrowserHighlightFlow, downloadHighlightFlow) { defaultBrowser, download ->
-                when (mode) {
-                    BrowserViewMode.Browser -> defaultBrowser || download
-                    BrowserViewMode.CustomTab -> false
-                    else -> download
-                }
-            }
-        }
-    }
+    private val browserMenuHighlight: BrowserMenuHighlight = mock()
 
     private lateinit var testee: BrowserNavigationBarViewModel
 
     @Before
     fun setUp() {
         whenever(tabRepositoryMock.flowTabs).thenReturn(flowOf(listOf(TabEntity("abc"))))
+        whenever(browserMenuHighlight.shouldShowHighlightForMode(any())).thenReturn(highlightFlow)
 
         testee = BrowserNavigationBarViewModel(
             pixel = pixelMock,
@@ -154,17 +143,17 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when default browser highlight emits true in Browser mode, viewState shows highlight`() = runTest {
+    fun `when highlight flow emits, viewState reflects the value`() = runTest {
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertEquals(false, initial.showBrowserMenuHighlight)
 
-            defaultBrowserHighlightFlow.value = true
+            highlightFlow.value = true
 
             val updated = awaitItem()
             Assert.assertEquals(true, updated.showBrowserMenuHighlight)
 
-            defaultBrowserHighlightFlow.value = false
+            highlightFlow.value = false
             val updatedFalse = awaitItem()
             Assert.assertEquals(false, updatedFalse.showBrowserMenuHighlight)
 
@@ -238,57 +227,43 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when default browser highlight in NewTab mode then highlight is not shown`() = runTest {
-        defaultBrowserHighlightFlow.value = true
+    fun `when initialized then highlight is queried for Browser mode`() = runTest {
         testee.viewState.test {
-            val initial = awaitItem()
-            Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
-
-            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
-            val updated = awaitItem()
-            Assert.assertFalse(updated.showBrowserMenuHighlight) // NewTab mode hides default browser highlight
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.Browser))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when switching from NewTab to Browser then default browser highlight is restored`() = runTest {
-        defaultBrowserHighlightFlow.value = true
+    fun `when setViewMode NewTab then highlight is queried for NewTab mode`() = runTest {
         testee.viewState.test {
-            awaitItem() // initial with highlight
+            awaitItem() // initial
             testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
-            awaitItem() // NewTab, highlight hidden
-            testee.setViewMode(BrowserNavigationBarView.ViewMode.Browser)
-            val browserState = awaitItem()
-            Assert.assertTrue(browserState.showBrowserMenuHighlight)
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.NewTab))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when download highlight in NewTab mode then highlight is shown`() = runTest {
-        downloadHighlightFlow.value = true
+    fun `when setViewMode CustomTab then highlight is queried for CustomTab mode`() = runTest {
         testee.viewState.test {
-            val initial = awaitItem()
-            Assert.assertTrue(initial.showBrowserMenuHighlight)
-
-            testee.setViewMode(BrowserNavigationBarView.ViewMode.NewTab)
-            val updated = awaitItem()
-            Assert.assertTrue(updated.showBrowserMenuHighlight) // download highlight shows in all modes
+            awaitItem() // initial
+            testee.setViewMode(BrowserNavigationBarView.ViewMode.CustomTab)
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.CustomTab))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when default browser highlight in DuckAI mode then highlight is not shown`() = runTest {
-        defaultBrowserHighlightFlow.value = true
+    fun `when setViewMode DuckAI then highlight is queried for DuckAi mode`() = runTest {
         testee.viewState.test {
-            val initial = awaitItem()
-            Assert.assertTrue(initial.showBrowserMenuHighlight) // Browser mode + highlight true
-
+            awaitItem() // initial
             testee.setViewMode(BrowserNavigationBarView.ViewMode.DuckAI)
-            val updated = awaitItem()
-            Assert.assertFalse(updated.showBrowserMenuHighlight) // DuckAI mode hides default browser highlight
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.DuckAi))
             cancelAndIgnoreRemainingEvents()
         }
     }
