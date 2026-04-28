@@ -6,11 +6,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            },
+            "error",
             {
                 "key": "useHarmony",
                 "description": "Whether the useHarmony feature flag is enabled",
@@ -44,11 +40,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            },
+            "error",
             {
                 "key": "useHarmony",
                 "description": "Whether the useHarmony feature flag is enabled",
@@ -82,16 +74,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to update",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -126,16 +114,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to update in Harmony",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -170,16 +154,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from Harmony",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -214,16 +194,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from legacy",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -492,16 +468,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to rollback",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the rollback error, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -534,27 +506,13 @@
         "owners": ["CrisBarreiro"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            }
-        ]
+        "parameters": ["appVersion", "error"]
     },
     "autofill_encrypt_failed": {
         "description": "Encrypting autofill data failed (daily unique)",
         "owners": ["CrisBarreiro"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            }
-        ]
+        "parameters": ["appVersion", "error"]
     }
 }
