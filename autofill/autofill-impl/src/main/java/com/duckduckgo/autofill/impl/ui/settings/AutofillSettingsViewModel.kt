@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -52,6 +53,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -107,21 +109,30 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
         viewModelScope.launch {
-            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
-            pixel.fire(
-                AUTOFILL_SETTINGS_OPENED,
-                parameters = mapOf(
-                    "source" to autofillScreenLaunchSource.asString(),
-                    "has_credentials_saved" to hasCredentialsSaved.toBinaryString(),
-                ),
-            )
+            runCatching {
+                val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+                pixel.fire(
+                    AUTOFILL_SETTINGS_OPENED,
+                    parameters = mapOf(
+                        "source" to autofillScreenLaunchSource.asString(),
+                        "has_credentials_saved" to hasCredentialsSaved.toBinaryString(),
+                    ),
+                )
+            }.getOrElse {
+                ensureActive()
+                logcat { "Autofill-settings: Can't get credential count" }
+            }
         }
     }
 
     private fun onViewStateFlowStart() {
         viewModelScope.launch(dispatchers.io()) {
-            autofillStore.getCredentialCount().collect { count ->
-                _viewState.value = _viewState.value.copy(loginsCount = count)
+            runCatching {
+                autofillStore.getCredentialCount().collect { count ->
+                    _viewState.value = _viewState.value.copy(loginsCount = count)
+                }
+            }.getOrElse {
+                _viewState.value = _viewState.value.copy(autofillUnsupported = true)
             }
         }
 
