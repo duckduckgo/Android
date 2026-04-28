@@ -110,6 +110,7 @@ class WideEventRepositoryImpl @Inject constructor(
         eventId: Long,
         name: String,
         timeout: Duration?,
+        buckets: Set<Duration>?,
     ) {
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
@@ -123,6 +124,7 @@ class WideEventRepositoryImpl @Inject constructor(
                     name = name,
                     startedAt = timeProvider.getCurrentTime(),
                     timeout = timeout,
+                    buckets = buckets,
                 )
 
             event.copy(activeIntervals = event.activeIntervals + interval)
@@ -144,10 +146,14 @@ class WideEventRepositoryImpl @Inject constructor(
                 }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
-            val bucketValue = if (duration.isNegative) {
-                NEGATIVE_INTERVAL_BUCKET_VALUE
-            } else {
-                INTERVAL_BUCKETS.last { it <= duration }.toMillis().toString()
+            val intervalBuckets = interval.buckets
+            val bucketValue = when {
+                duration.isNegative -> NEGATIVE_INTERVAL_BUCKET_VALUE
+                intervalBuckets == null -> duration.toMillis().toString()
+                else -> {
+                    val matched = intervalBuckets.sorted().lastOrNull { it <= duration }
+                    (matched?.toMillis() ?: 0L).toString()
+                }
             }
 
             event.copy(
@@ -183,18 +189,6 @@ class WideEventRepositoryImpl @Inject constructor(
 
     private companion object {
         const val NEGATIVE_INTERVAL_BUCKET_VALUE = "-1"
-
-        val INTERVAL_BUCKETS =
-            listOf(
-                Duration.ZERO,
-                Duration.ofSeconds(1),
-                Duration.ofSeconds(5),
-                Duration.ofSeconds(10),
-                Duration.ofSeconds(30),
-                Duration.ofMinutes(1),
-                Duration.ofMinutes(5),
-                Duration.ofMinutes(10),
-            )
     }
 }
 

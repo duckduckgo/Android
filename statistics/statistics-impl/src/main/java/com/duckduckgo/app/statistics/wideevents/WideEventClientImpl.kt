@@ -108,9 +108,7 @@ class WideEventClientImpl @Inject constructor(
         wideEventId: Long,
         key: String,
         timeout: Duration?,
-        // TODO buckets are accepted here but ignored until the repository plumbing
-        //  is added in a follow-up commit.
-        @Suppress("UNUSED_PARAMETER") buckets: Set<Duration>?,
+        buckets: Set<Duration>?,
     ): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
 
@@ -119,6 +117,7 @@ class WideEventClientImpl @Inject constructor(
                 eventId = wideEventId,
                 name = key,
                 timeout = timeout?.toJavaDuration(),
+                buckets = buckets?.mapTo(mutableSetOf()) { it.toJavaDuration() },
             )
         }
     }

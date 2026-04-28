@@ -350,6 +350,7 @@ class WideEventRepositoryTest {
                 eventId = eventId,
                 name = "interval_1",
                 timeout = Duration.ofSeconds(10),
+                buckets = DEFAULT_BUCKETS,
             )
 
             val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
@@ -371,6 +372,7 @@ class WideEventRepositoryTest {
                 eventId = eventId,
                 name = "interval_1",
                 timeout = Duration.ofSeconds(10),
+                buckets = DEFAULT_BUCKETS,
             )
 
             val expectedDuration = Duration.ofSeconds(15)
@@ -396,6 +398,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
+            buckets = DEFAULT_BUCKETS,
         )
 
         timeProvider.currentTime += Duration.ofMillis(500)
@@ -418,6 +421,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
+            buckets = DEFAULT_BUCKETS,
         )
 
         timeProvider.currentTime += Duration.ofSeconds(5)
@@ -440,6 +444,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
+            buckets = DEFAULT_BUCKETS,
         )
 
         // 7 seconds is between 5s and 10s buckets, should map to 5s (lower end)
@@ -463,6 +468,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
+            buckets = DEFAULT_BUCKETS,
         )
 
         // 15 minutes is greater than largest bucket (10 minutes)
@@ -471,6 +477,120 @@ class WideEventRepositoryTest {
         val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
 
         assertEquals(Duration.ofMinutes(10).toMillis().toString(), event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with custom buckets, duration is mapped to nearest lower bucket`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = setOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2)),
+        )
+
+        timeProvider.currentTime += Duration.ofMillis(750)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("500", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with custom buckets and duration above largest, maps to largest`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(2)),
+        )
+
+        timeProvider.currentTime += Duration.ofSeconds(10)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("2000", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with custom buckets and duration below smallest, records zero`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+        )
+
+        timeProvider.currentTime += Duration.ofMillis(50)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("0", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending an interval with null buckets, records raw duration in milliseconds`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = null,
+        )
+
+        timeProvider.currentTime += Duration.ofMillis(1234)
+        wideEventRepository.endInterval(eventId, "interval_1")
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+
+        assertEquals("1234", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `interval buckets survive a persistence round-trip`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+        val customBuckets = setOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2))
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = customBuckets,
+        )
+
+        val readBack = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        val interval = readBack.activeIntervals.single { it.name == "interval_1" }
+        assertEquals(customBuckets, interval.buckets)
     }
 
     @Test
@@ -486,6 +606,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
+            buckets = DEFAULT_BUCKETS,
         )
 
         timeProvider.currentTime -= Duration.ofMillis(5)
@@ -503,5 +624,15 @@ class WideEventRepositoryTest {
                 status = WideEventRepository.WideEventStatus.UNKNOWN,
                 metadata = emptyMap(),
             )
+
+        val DEFAULT_BUCKETS: Set<Duration> = setOf(
+            Duration.ofSeconds(1),
+            Duration.ofSeconds(5),
+            Duration.ofSeconds(10),
+            Duration.ofSeconds(30),
+            Duration.ofMinutes(1),
+            Duration.ofMinutes(5),
+            Duration.ofMinutes(10),
+        )
     }
 }

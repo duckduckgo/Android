@@ -37,6 +37,7 @@ import java.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @RunWith(AndroidJUnit4::class)
 class WideEventClientTest {
@@ -325,7 +326,7 @@ class WideEventClientTest {
         }
 
     @Test
-    fun `when intervalStart called then starts interval in repository`() =
+    fun `when intervalStart called with default buckets then forwards default set as java duration`() =
         runTest {
             val wideEventId = 101L
             val key = "network_call"
@@ -337,33 +338,46 @@ class WideEventClientTest {
                 eventId = wideEventId,
                 name = key,
                 timeout = Duration.ofSeconds(5),
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS
+                    .mapTo(mutableSetOf()) { it.toJavaDuration() },
             )
         }
 
     @Test
-    fun `intervalStart accepts custom buckets and null without throwing`() =
+    fun `when intervalStart called with custom buckets then forwards them as java durations`() =
         runTest {
-            assertTrue(
-                wideEventClient.intervalStart(
-                    wideEventId = 1L,
-                    key = "k1",
-                    timeout = null,
-                    buckets = setOf(100.milliseconds, 1.seconds),
-                ).isSuccess,
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                timeout = null,
+                buckets = setOf(100.milliseconds, 1.seconds),
             )
-            assertTrue(
-                wideEventClient.intervalStart(
-                    wideEventId = 1L,
-                    key = "k2",
-                    timeout = null,
-                    buckets = null,
-                ).isSuccess,
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
             )
-            assertTrue(
-                wideEventClient.intervalStart(
-                    wideEventId = 1L,
-                    key = "k3",
-                ).isSuccess,
+        }
+
+    @Test
+    fun `when intervalStart called with null buckets then forwards null`() =
+        runTest {
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                timeout = null,
+                buckets = null,
+            )
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = null,
             )
         }
 
@@ -388,7 +402,7 @@ class WideEventClientTest {
             val wideEventId = 303L
             val key = "network_call"
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull())).thenThrow(exception)
+            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull())).thenThrow(exception)
 
             val result = wideEventClient.intervalStart(wideEventId, key, 5.seconds)
 
