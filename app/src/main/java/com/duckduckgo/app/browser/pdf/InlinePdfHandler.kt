@@ -67,8 +67,9 @@ interface InlinePdfHandler {
      * Forwards WebView cookies for authenticated downloads, validates the file
      * starts with `%PDF-` magic bytes, and returns a `file://` URI on success.
      *
-     * Returns `null` if the feature flag is disabled, the server returns an error,
-     * or the downloaded file is not a valid PDF.
+     * Returns `null` if the server returns an error or the downloaded file is not a
+     * valid PDF. The feature flag and SDK gate live in [shouldRenderPdfInline] so
+     * callers shouldn't reach this method when the feature is off.
      *
      * Cancellation-safe: if the calling coroutine is cancelled (e.g. the user
      * navigates away), the in-flight HTTP request is aborted and any partial
@@ -97,6 +98,7 @@ class RealInlinePdfHandler @Inject constructor(
 ) : InlinePdfHandler {
 
     override fun shouldRenderPdfInline(url: String, contentDisposition: String?, mimeType: String): Boolean {
+        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return false
         if (Build.VERSION.SDK_INT < 31) return false
         if (mimeType != "application/pdf" && !url.endsWith(".pdf", ignoreCase = true)) return false
         if (contentDisposition != null && contentDisposition.trim().startsWith("attachment", ignoreCase = true)) return false
@@ -107,9 +109,6 @@ class RealInlinePdfHandler @Inject constructor(
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
     override suspend fun downloadToCache(url: String): Uri? = withContext(dispatcherProvider.io()) {
-        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) {
-            return@withContext null
-        }
         val fileName = extractFileName(url)
         val targetFile = File(cacheDir, fileName)
         try {
@@ -124,25 +123,25 @@ class RealInlinePdfHandler @Inject constructor(
                 requestBuilder.addHeader("Cookie", cookie)
             }
 
-            val response = executeRequestCancellably(okHttpClient.newCall(requestBuilder.build()))
-
-            if (!response.isSuccessful) {
-                logcat { "PDF download failed: HTTP ${response.code}" }
-                return@withContext null
-            }
-
-            response.body?.byteStream()?.use { input ->
-                targetFile.outputStream().use { output ->
-                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                    var bytesRead: Int
-                    while (input.read(buffer).also { bytesRead = it } >= 0) {
-                        coroutineContext.ensureActive()
-                        output.write(buffer, 0, bytesRead)
-                    }
+            executeRequestCancellably(okHttpClient.newCall(requestBuilder.build())).use { response ->
+                if (!response.isSuccessful) {
+                    logcat { "PDF download failed: HTTP ${response.code}" }
+                    return@withContext null
                 }
-            } ?: run {
-                logcat { "PDF download failed: empty response body" }
-                return@withContext null
+
+                response.body?.byteStream()?.use { input ->
+                    targetFile.outputStream().use { output ->
+                        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                        var bytesRead: Int
+                        while (input.read(buffer).also { bytesRead = it } >= 0) {
+                            coroutineContext.ensureActive()
+                            output.write(buffer, 0, bytesRead)
+                        }
+                    }
+                } ?: run {
+                    logcat { "PDF download failed: empty response body" }
+                    return@withContext null
+                }
             }
 
             coroutineContext.ensureActive()

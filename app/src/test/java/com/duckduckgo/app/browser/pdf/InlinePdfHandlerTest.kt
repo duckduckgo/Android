@@ -184,18 +184,11 @@ class InlinePdfHandlerTest {
     // region feature flag tests
 
     @Test
-    fun whenFeatureDisabledThenDownloadToCacheReturnsNull() = runTest {
+    @Config(sdk = [31])
+    fun whenFeatureDisabledThenShouldRenderPdfInlineReturnsFalse() {
         androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = false))
-        val pdfBytes = "%PDF-1.4 test content".toByteArray()
-        server.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setBody(Buffer().write(pdfBytes)),
-        )
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
-
-        assertNull(uri)
+        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
     }
 
     @Test
