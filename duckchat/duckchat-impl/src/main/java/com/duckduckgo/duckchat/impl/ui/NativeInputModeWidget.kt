@@ -60,7 +60,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -435,9 +435,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun applyDefaultTogglePosition() {
         if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            val position = duckChatInternal.observeDefaultTogglePosition().first()
+            val position = duckChatInternal.observeDefaultTogglePosition().firstOrNull() ?: return@launch
             val resolved = if (position == DefaultTogglePosition.LAST_USED) {
-                DefaultTogglePosition.fromName(duckChatInternal.observeLastUsedTogglePosition().first())
+                DefaultTogglePosition.fromName(duckChatInternal.observeLastUsedTogglePosition().firstOrNull())
             } else {
                 position
             }

@@ -74,8 +74,7 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
-
-    fun hideNativeInput(animate: Boolean = true): Boolean
+    fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
 }
@@ -132,12 +131,18 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    override fun hideNativeInput(animate: Boolean): Boolean {
+    override fun hideNativeInput(animate: Boolean, isNavigation: Boolean): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
         val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
             ?: rootView.findViewById(R.id.inputModeBottomRoot)
             ?: return false
+
+        if (isNavigation) {
+            widgetFrom(widgetView)?.let { widget ->
+                widget.saveLastUsedTogglePosition(isChat = widget.isChatTabSelected())
+            }
+        }
 
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
@@ -317,20 +322,20 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
-                widget.saveLastUsedTogglePosition(isChat = false)
-                hideNativeInput()
+                hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
-                widget.saveLastUsedTogglePosition(isChat = true)
                 if (queryUrlPredictor.isUrl(query)) {
-                    hideNativeInput()
+                    hideNativeInput(isNavigation = true)
                     callbacks.onSearchSubmitted(query)
                 } else if (omnibarController.isDuckAiMode()) {
+                    widget.saveLastUsedTogglePosition(isChat = true)
                     widget.text = ""
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
                 } else {
+                    widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
@@ -562,8 +567,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindChatSuggestions(
             lifecycleOwner = lifecycleOwner,
             onChatSuggestionSelected = { query ->
-                widget.saveLastUsedTogglePosition(isChat = true)
-                hideNativeInput(animate = false)
+                hideNativeInput(animate = false, isNavigation = true)
                 onChatSuggestionSelected(query)
             },
             onShowSuggestions = { chatAdapter ->

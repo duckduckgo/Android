@@ -81,12 +81,14 @@ class NativeInputLayoutCoordinator(
             }
         fun applyPadding(deltaTop: Int, deltaBottom: Int) {
             targets.forEach { (view, padding) ->
-                view.setPadding(
-                    padding.left,
-                    padding.top + deltaTop,
-                    padding.right,
-                    padding.bottom + deltaBottom,
-                )
+                val newTop = padding.top + deltaTop
+                val newBottom = padding.bottom + deltaBottom
+                // Only post requestLayout when padding actually changed to avoid extra layout passes in steady state
+                if (view.paddingTop != newTop || view.paddingBottom != newBottom) {
+                    view.setPadding(padding.left, newTop, padding.right, newBottom)
+                    // Force RecyclerView to reposition items after padding changes during widget enter animation
+                    view.post { view.requestLayout() }
+                }
             }
         }
 
