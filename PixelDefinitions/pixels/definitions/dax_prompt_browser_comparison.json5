@@ -1,0 +1,73 @@
+// Dax Prompt Browser Comparison pixels
+{
+    "m_reactivate_users_browser_comparison_prompt_shown": {
+        "description": "Fires when the reactivate-users browser comparison prompt is shown on app launch.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "m_reactivate_users_browser_comparison_prompt_closed": {
+        "description": "Fires when the user dismisses the reactivate-users browser comparison prompt without setting DuckDuckGo as default. The interaction_type parameter identifies how the prompt was dismissed.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "interaction_type",
+                "description": "How the user dismissed the prompt.",
+                "type": "string",
+                "enum": ["x_button_tapped", "maybe_later_button_tapped", "navigation_button_or_gesture_used", "system_dialog_dismissed"]
+            }
+        ]
+    },
+    "m_reactivate_users_browser_comparison_prompt_primary_button_clicked": {
+        "description": "Fires when the user taps the primary CTA on the reactivate-users browser comparison prompt to start the default-browser flow.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "m_reactivate_users_browser_comparison_prompt_default_browser_set": {
+        "description": "Fires after the user sets DuckDuckGo as default following the reactivate-users browser comparison prompt.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "win_back_prompt_shown": {
+        "description": "Fires when the win-back browser comparison prompt is shown to a user who previously had DuckDuckGo set as their default browser.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "win_back_prompt_dismissed": {
+        "description": "Fires when the user dismisses the win-back browser comparison prompt without engaging with it. Covers all dismiss paths (close button, 'maybe later' button, system back navigation/gesture).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "win_back_prompt_primary_button_clicked": {
+        "description": "Fires when the user taps the primary CTA on the win-back browser comparison prompt to start the default-browser flow.",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "win_back_prompt_default_browser_set": {
+        "description": "Fires after the user sets DuckDuckGo as default following the win-back browser comparison prompt (via either the system role-request dialog or the system default-apps settings page).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    },
+    "win_back_prompt_default_browser_not_set": {
+        "description": "Fires when the user does not set DuckDuckGo as default after the win-back browser comparison prompt's default-browser flow (system role-request dialog dismissed, or returned from the system default-apps settings without changing the default).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": []
+    }
+}
