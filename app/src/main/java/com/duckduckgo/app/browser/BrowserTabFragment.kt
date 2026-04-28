@@ -1890,6 +1890,7 @@ class BrowserTabFragment :
                 if (bottomSheetMenu?.isShowing != true) {
                     return@postDelayed
                 }
+                viewModel.onBrowserMenuLaunched(omnibar.viewMode)
                 val viewState = viewModel.browserViewState.value
                 if (isActiveCustomTab()) {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
@@ -1930,7 +1931,7 @@ class BrowserTabFragment :
                 } else {
                     popupMenu?.show(binding.rootView, omnibar.toolbar)
                 }
-                viewModel.onPopupMenuLaunched()
+                viewModel.onBrowserMenuLaunched(omnibar.viewMode)
                 fireMenuOpenedPixels(isFocusedNtp, currentViewState)
             }
         }
@@ -2268,6 +2269,7 @@ class BrowserTabFragment :
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
+        browserNavigationBarIntegration.configureDuckAIViewMode()
         showNativeInput()
     }
 
