@@ -24,4 +24,7 @@
     <!-- Model Picker -->
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
     <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" translatable="false">Voice Chat</string>
 </resources>
