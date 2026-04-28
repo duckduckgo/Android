@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Prenesite kodo za obnovitev kot PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Uporabite to kodo za obnovitev podatkov, če izgubite dostop do te naprave – hranite jo na varnem.</string>
     <string name="sync_settings_data_expiration">Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti. <annotation type="learn_more_link">Več o tem</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Želite obnoviti podatke funkcije Sync &amp; Backup iz prejšnje namestitve?</string>
+    <string name="sync_previous_session_ready_body">Z obnovitvijo dobite svoje prejšnje zaznamke, gesla in druge podatke nazaj v DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Obnovi podatke Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Nastavitev nove sinhronizacije</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Preprosto obnovite svoje podatke</string>
+    <string name="sync_recover_data_content">S to kodo obnovite podatke, če izgubite dostop do te naprave. Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti.</string>
+    <string name="sync_recover_data_recovery_code_label">Obnovitvena koda</string>
+    <string name="sync_recover_data_download_pdf">Prenesi kot PDF</string>
+    <string name="sync_restore_on_reinstall_title">Obnovi ob ponovni namestitvi aplikacije</string>
+    <string name="sync_restore_on_reinstall_description">Če ponovno namestite aplikacijo DuckDuckGo, vas bomo vprašali, ali želite obnoviti podatke v tej napravi.</string>
 </resources>
