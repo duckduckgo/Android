@@ -2313,6 +2313,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
