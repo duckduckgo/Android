@@ -22,6 +22,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -64,7 +65,7 @@ class RealCachedFileDownloader @Inject constructor(
     override suspend fun saveToDownloads(cachedFileUri: Uri, fileName: String, mimeType: String): String? =
         withContext(dispatcherProvider.io()) {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (Build.VERSION.SDK_INT >= 29) {
                     saveViaMediaStore(cachedFileUri, fileName, mimeType)
                 } else {
                     saveDirectly(cachedFileUri, fileName)
@@ -78,6 +79,7 @@ class RealCachedFileDownloader @Inject constructor(
             }
         }
 
+    @RequiresApi(29)
     private fun saveViaMediaStore(cachedFileUri: Uri, fileName: String, mimeType: String): String? {
         val resolver = context.contentResolver
         val values = ContentValues().apply {
