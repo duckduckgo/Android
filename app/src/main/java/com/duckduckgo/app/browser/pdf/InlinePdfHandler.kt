@@ -100,7 +100,10 @@ class RealInlinePdfHandler @Inject constructor(
     override fun shouldRenderPdfInline(url: String, contentDisposition: String?, mimeType: String): Boolean {
         if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return false
         if (Build.VERSION.SDK_INT < 31) return false
-        if (mimeType != "application/pdf" && !url.endsWith(".pdf", ignoreCase = true)) return false
+        // Use lastPathSegment so query strings and fragments don't break the .pdf check
+        // (e.g. signed URLs like https://cdn.example.com/report.pdf?auth=token).
+        val pathEndsInPdf = url.toUri().lastPathSegment?.endsWith(".pdf", ignoreCase = true) == true
+        if (mimeType != "application/pdf" && !pathEndsInPdf) return false
         if (contentDisposition != null && contentDisposition.trim().startsWith("attachment", ignoreCase = true)) return false
         return true
     }

@@ -169,6 +169,18 @@ class InlinePdfHandlerTest {
 
     @Test
     @Config(sdk = [31])
+    fun whenUrlEndsInPdfWithQueryParamsThenShouldRenderInline() {
+        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"))
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenUrlEndsInPdfWithFragmentThenShouldRenderInline() {
+        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf#page=5", null, "application/octet-stream"))
+    }
+
+    @Test
+    @Config(sdk = [31])
     fun whenContentDispositionIsExplicitInlineThenShouldRenderInline() {
         assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
     }
