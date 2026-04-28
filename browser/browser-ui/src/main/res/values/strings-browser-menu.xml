@@ -33,7 +33,6 @@
     <string name="browserMenuFindInPage">Find in Page</string>
     <string name="browserMenuPrint">Print Page</string>
     <string name="browserMenuPrintSite">Print</string>
-    <string name="browserMenuDownloadPdf">Download PDF</string>
     <string name="browserMenuOpenAppLink">Open in App</string>
     <string name="browserMenuAddToHome">Add to Home Screen</string>
     <string name="browserMenuReportBrokenSite">Report Broken Site</string>
