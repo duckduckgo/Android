@@ -57,10 +57,10 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
             R.string.onboardingPrivacyProDaxDialogOkButton
         }
 
-        ctaView?.findViewById<TextView>(R.id.brandDesignHiddenTitle)?.gravity = Gravity.CENTER
-        ctaView?.findViewById<TextView>(R.id.brandDesignTitle)?.gravity = Gravity.CENTER
+        view.findViewById<TextView>(R.id.brandDesignHiddenTitle)?.gravity = Gravity.CENTER
+        view.findViewById<TextView>(R.id.brandDesignTitle)?.gravity = Gravity.CENTER
 
-        ctaView?.findViewById<TextView>(R.id.brandDesignDescription)?.gravity = Gravity.CENTER
+        view.findViewById<TextView>(R.id.brandDesignDescription)?.gravity = Gravity.CENTER
 
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(buttonTextRes)
     }
