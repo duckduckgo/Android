@@ -66,7 +66,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchAssis
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowser
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowserAndSwitchToTab
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDeviceApplication
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckAi
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckAiVoiceChat
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchEditDialog
@@ -579,11 +578,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
             LaunchDuckAiVoiceChat -> {
                 duckChat.openVoiceDuckChat()
-                finish()
-            }
-
-            LaunchDuckAi -> {
-                duckChat.openDuckChat()
                 finish()
             }
 
