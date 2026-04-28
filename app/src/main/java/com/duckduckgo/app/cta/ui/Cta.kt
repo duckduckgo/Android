@@ -825,6 +825,14 @@ sealed class DaxBubbleCta(
 
         abstract fun configureContentViews(view: View)
 
+        private var cardContainer: TouchInterceptingLinearLayout? = null
+
+        private var isAnimating: Boolean = false
+            set(value) {
+                field = value
+                cardContainer?.interceptChildTouches = value
+            }
+
         protected fun resolveOnboardingContext(context: Context): Context {
             val themeRes = if (isLightTheme) {
                 DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
@@ -872,7 +880,6 @@ sealed class DaxBubbleCta(
 
             // Assumes one active showCta at a time — the intercept flag gates user advances until settled.
             // Overlapping calls would let stale closure callbacks clobber shared view state.
-            var animationsSettled = false
             var contentFadeInAnimator: AnimatorSet? = null
             var fadeOutAnimator: AnimatorSet? = null
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
@@ -886,8 +893,8 @@ sealed class DaxBubbleCta(
             val dismissButton = container.findViewById<ImageView>(R.id.brandDesignDismissButton)
             val headerImage = container.findViewById<ImageView>(R.id.brandDesignHeaderImage)
             styleDismissButton(dismissButton)
-            val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
-            cardContainer.interceptChildTouches = true
+            cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.brandDesignCardContainer)
+            isAnimating = true
 
             // The active content include for THIS CTA
             val activeInclude = container.findViewById<View>(activeIncludeId)
@@ -923,9 +930,8 @@ sealed class DaxBubbleCta(
                             playTogether(animators.toList())
                             addListener(object : AnimatorListenerAdapter() {
                                 override fun onAnimationEnd(animation: Animator) {
-                                    if (!animationsSettled) {
-                                        animationsSettled = true
-                                        cardContainer.interceptChildTouches = false
+                                    if (isAnimating) {
+                                        isAnimating = false
                                         onTypingAnimationFinished()
                                     }
                                 }
@@ -942,7 +948,7 @@ sealed class DaxBubbleCta(
                         .withEndAction {
                             // cancel() invokes withEndAction; skip typing when snapToFinished has
                             // already set the final state.
-                            if (!animationsSettled) {
+                            if (isAnimating) {
                                 startTyping()
                             }
                         }
@@ -994,7 +1000,7 @@ sealed class DaxBubbleCta(
                             configureContentViews(container)
                             // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
-                            if (animationsSettled) {
+                            if (!isAnimating) {
                                 applySettledState()
                             } else {
                                 typeAndFadeIn()
@@ -1013,7 +1019,7 @@ sealed class DaxBubbleCta(
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
-                        if (!animationsSettled) {
+                        if (isAnimating) {
                             typeAndFadeIn()
                         }
                     }
@@ -1023,9 +1029,8 @@ sealed class DaxBubbleCta(
             fun snapToFinished() {
                 // Set the flag before cancelling animators; cancel() fires end callbacks
                 // (fadeOutAnimator.onAnimationEnd / headerImage withEndAction) which read it.
-                val alreadySettled = animationsSettled
-                animationsSettled = true
-                cardContainer.interceptChildTouches = false
+                val wasAnimating = isAnimating
+                isAnimating = false
                 titleView.finishAnimation()
                 headerImage?.animate()?.cancel()
                 if (fadeOutAnimator?.isRunning == true) {
@@ -1035,11 +1040,11 @@ sealed class DaxBubbleCta(
                     applySettledState()
                 }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
-                if (!alreadySettled) {
+                if (wasAnimating) {
                     onTypingAnimationFinished()
                 }
             }
-            cardContainer.setOnClickListener { snapToFinished() }
+            cardContainer?.setOnClickListener { snapToFinished() }
         }
 
         override fun clearDialog() {
