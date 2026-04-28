@@ -394,7 +394,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         browserMenuHighlight.shouldShowHighlightForMode(BrowserViewMode.NewTab)
             .onEach { inputModeWidget.setBrowserMenuHighlightVisible(it) }
-            .launchIn(lifecycleScope)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         if (duckChatFeature.chatTabAttachments().isEnabled()) {
             viewModel.tabAttachmentState
