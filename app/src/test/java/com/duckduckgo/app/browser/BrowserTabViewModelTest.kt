@@ -11060,7 +11060,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
         finishPageLoad()
 
         advanceTimeBy(2_001)
@@ -11073,7 +11073,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
         finishPageLoad()
         advanceTimeBy(2_001)
         assertTrue(testee.suppressDuckAiOnboardingCta)
@@ -11091,7 +11091,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
 
         testee.processJsCallbackMessage(
             featureName = "aiChat",
@@ -11124,7 +11124,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
         finishPageLoad()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -11137,7 +11137,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
         testee.refreshBrowserError()
 
         testee.processJsCallbackMessage(
@@ -11158,7 +11158,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
-        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL, "ERROR_HOST_LOOKUP")
         testee.refreshBrowserError()
         finishPageLoad()
         advanceTimeBy(2_001)
