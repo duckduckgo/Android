@@ -7158,14 +7158,14 @@ class BrowserTabViewModelTest {
     fun whenBrowserMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() =
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.Browser("https://example.com"))
-            verify(mockAdditionalDefaultBrowserPrompts).onClearMenuHighlight()
+            verify(mockAdditionalDefaultBrowserPrompts).onBrowserMenuLaunched()
         }
 
     @Test
     fun whenBrowserMenuLaunchedInNonBrowserModeThenDoNotClearHighlight() =
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.NewTab)
-            verify(mockAdditionalDefaultBrowserPrompts, never()).onClearMenuHighlight()
+            verify(mockAdditionalDefaultBrowserPrompts, never()).onBrowserMenuLaunched()
         }
 
     @Test

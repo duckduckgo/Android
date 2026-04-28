@@ -297,7 +297,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         return@withLock ModalEvaluator.EvaluationResult.Skipped
     }
 
-    override fun onClearMenuHighlight() {
+    override fun onBrowserMenuLaunched() {
         appCoroutineScope.launch {
             defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(highlight = false)
         }

@@ -3215,7 +3215,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onBrowserMenuLaunched(viewMode: ViewMode) {
         if (viewMode is ViewMode.Browser) {
-            additionalDefaultBrowserPrompts.onClearMenuHighlight()
+            additionalDefaultBrowserPrompts.onBrowserMenuLaunched()
         }
     }
 

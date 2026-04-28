@@ -160,7 +160,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         }
         assertEquals(2, actualUpdates.size) // initial values expected immediately
 
-        testee.onClearMenuHighlight()
+        testee.onBrowserMenuLaunched()
 
         assertEquals(expectedUpdates, actualUpdates)
     }
