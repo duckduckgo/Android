@@ -51,8 +51,8 @@ jobs:
           maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
           maestro_include_tags: duckplayer
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana_project_id: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}
+          asana_section_id: ${{ secrets.DUCK_PLAYER_AOR_INCOMING_ID }}
           test_suite_name: Duck Player
 
       - name: Create Asana task when workflow failed
@@ -60,8 +60,8 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.DUCK_PLAYER_AOR_PROJECT_ID }}
-          asana-section: ${{ vars.DUCK_PLAYER_AOR_INCOMING_ID }}
+          asana-project: ${{ secrets.DUCK_PLAYER_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.DUCK_PLAYER_AOR_INCOMING_ID }}
           asana-task-name: GH Workflow Failure - Duck Player End to End Tests
           asana-task-description: The Duck Player workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
