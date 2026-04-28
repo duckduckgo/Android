@@ -26,8 +26,11 @@ import com.duckduckgo.app.browser.R
 
 /**
  * Thin subclass of [PdfViewerFragmentV2] that applies a DDG-flavored Material3 theme overlay
- * and exposes a public method to set the document URI, which is required to be set before the
- * fragment is attached.
+ * and exposes a public method to set the document URI.
+ *
+ * The URI must be set AFTER the fragment is attached — `PdfViewerFragmentV2.setDocumentUri`
+ * internally resolves a `viewModels()` delegate, which throws `IllegalStateException` if the
+ * fragment is detached.
  */
 @SuppressLint("RestrictedApi")
 class DdgPdfViewerFragment : PdfViewerFragmentV2() {
