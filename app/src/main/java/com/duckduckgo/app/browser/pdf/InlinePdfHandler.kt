@@ -110,7 +110,9 @@ class RealInlinePdfHandler @Inject constructor(
 
     override suspend fun downloadToCache(url: String): Uri? = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
-        val targetFile = File(cacheDir, fileName)
+        // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
+        // (e.g. report.pdf at site A and site B) don't collide and serve stale content.
+        val targetFile = File(cacheDir, "${url.hashCode()}-$fileName")
         try {
             if (targetFile.exists() && hasPdfMagicBytes(targetFile)) {
                 return@withContext Uri.fromFile(targetFile)

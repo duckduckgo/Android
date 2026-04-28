@@ -2276,11 +2276,11 @@ class BrowserTabFragment :
         maliciousWarningView.gone()
 
         binding.pdfViewerContainer.show()
-        val pdfFragment = DdgPdfViewerFragment()
+        // documentUri must be set before the fragment is attached (see DdgPdfViewerFragment).
+        val pdfFragment = DdgPdfViewerFragment().apply { documentUri(cachedFileUri) }
         childFragmentManager.beginTransaction()
             .replace(R.id.pdfViewerContainer, pdfFragment, PDF_VIEWER_FRAGMENT_TAG)
             .commitNowAllowingStateLoss()
-        pdfFragment.documentUri(cachedFileUri)
 
         binding.swipeRefreshContainer.isEnabled = false
         omnibar.setViewMode(ViewMode.Pdf(url))

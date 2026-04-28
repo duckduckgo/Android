@@ -212,6 +212,24 @@ class InlinePdfHandlerTest {
     }
 
     @Test
+    fun whenTwoUrlsShareLastPathSegmentThenCacheFilesDontCollide() = runTest {
+        val pdfBytesA = "%PDF-1.4 content A".toByteArray()
+        val pdfBytesB = "%PDF-1.4 content B".toByteArray()
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytesA)))
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytesB)))
+        val urlA = server.url("/site-a/report.pdf").toString()
+        val urlB = server.url("/site-b/report.pdf").toString()
+
+        val uriA = inlinePdfHandler.downloadToCache(urlA)
+        val uriB = inlinePdfHandler.downloadToCache(urlB)
+
+        assertNotNull(uriA)
+        assertNotNull(uriB)
+        assertFalse("Cache files for distinct URLs sharing last path segment must differ", uriA == uriB)
+        assertEquals(2, server.requestCount)
+    }
+
+    @Test
     fun whenDownloadCancelledThenPartialFileIsDeleted() = runTest {
         val pdfBytes = "%PDF-1.4 test content".toByteArray()
         server.enqueue(
