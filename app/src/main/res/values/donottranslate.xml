@@ -104,7 +104,7 @@
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
     <!-- Input Mode Demo Onboarding step -->
-    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try a search or AI chat!</string>
     <string name="preOnboardingInputModeDemoSearchHint">Search privately</string>
     <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
     <string name="preOnboardingInputModeDemoChatSuggestion1">Explain the stock market like I\'m 10</string>
@@ -113,8 +113,8 @@
     <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
 
     <!-- Duck.ai onboarding CTAs (do not translate) -->
-    <string name="onboardingDuckAiFireButtonDaxDialogTitle">And that\'s Duck.ai!</string>
-    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>.<br/><br/>Give it a try! 🔥]]></string>
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">That\'s Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>. Give it a try! 🔥]]></string>
 
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>

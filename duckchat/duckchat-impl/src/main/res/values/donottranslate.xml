@@ -29,5 +29,5 @@
     <!-- duck.ai onboarding end CTA -->
     <string name="duckAiEndCtaTitle">You\'ve got this!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
-    <string name="duckAiEndCtaButton">Got it!</string>
+    <string name="duckAiEndCtaButton">High five!</string>
 </resources>
