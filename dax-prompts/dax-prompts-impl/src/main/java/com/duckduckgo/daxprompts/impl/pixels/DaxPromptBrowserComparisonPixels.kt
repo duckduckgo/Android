@@ -23,6 +23,11 @@ import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName
 import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_DEFAULT_BROWSER_SET
 import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED
 import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_SHOWN
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_DEFAULT_BROWSER_NOT_SET
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_DEFAULT_BROWSER_SET
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_DISMISSED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_PRIMARY_BUTTON_CLICKED
+import com.duckduckgo.daxprompts.impl.pixels.DaxPromptBrowserComparisonPixelName.WIN_BACK_PROMPT_SHOWN
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 
@@ -31,6 +36,11 @@ enum class DaxPromptBrowserComparisonPixelName(override val pixelName: String) :
     REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED("m_reactivate_users_browser_comparison_prompt_closed"),
     REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED("m_reactivate_users_browser_comparison_prompt_primary_button_clicked"),
     REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_DEFAULT_BROWSER_SET("m_reactivate_users_browser_comparison_prompt_default_browser_set"),
+    WIN_BACK_PROMPT_SHOWN("win_back_prompt_shown"),
+    WIN_BACK_PROMPT_DISMISSED("win_back_prompt_dismissed"),
+    WIN_BACK_PROMPT_PRIMARY_BUTTON_CLICKED("win_back_prompt_primary_button_clicked"),
+    WIN_BACK_PROMPT_DEFAULT_BROWSER_SET("win_back_prompt_default_browser_set"),
+    WIN_BACK_PROMPT_DEFAULT_BROWSER_NOT_SET("win_back_prompt_default_browser_not_set"),
 }
 
 object DaxPromptBrowserComparisonPixelParameter {
@@ -53,6 +63,11 @@ object DaxPromptBrowserComparisonPixelParamRemoval : PixelParamRemovalPlugin {
             REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_CLOSED.pixelName to PixelParameter.removeAll(),
             REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_PRIMARY_BUTTON_CLICKED.pixelName to PixelParameter.removeAll(),
             REACTIVATE_USERS_BROWSER_COMPARISON_PROMPT_DEFAULT_BROWSER_SET.pixelName to PixelParameter.removeAll(),
+            WIN_BACK_PROMPT_SHOWN.pixelName to PixelParameter.removeAll(),
+            WIN_BACK_PROMPT_DISMISSED.pixelName to PixelParameter.removeAll(),
+            WIN_BACK_PROMPT_PRIMARY_BUTTON_CLICKED.pixelName to PixelParameter.removeAll(),
+            WIN_BACK_PROMPT_DEFAULT_BROWSER_SET.pixelName to PixelParameter.removeAll(),
+            WIN_BACK_PROMPT_DEFAULT_BROWSER_NOT_SET.pixelName to PixelParameter.removeAll(),
         )
     }
 }
