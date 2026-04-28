@@ -17,6 +17,13 @@
 package com.duckduckgo.duckchat.internal.store
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
@@ -25,8 +32,12 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import fi.iki.elonen.NanoHTTPD
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -48,22 +59,44 @@ class RealDuckAiDebugServer @Inject constructor(
     private val fileMetaDao: DuckAiBridgeFileMetaDao,
     private val context: Context,
     private val migrationPrefs: DuckAiMigrationPrefs,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiDebugServer {
 
     override val port = 8765
     private var server: InternalNanoServer? = null
     override val isRunning get() = server?.isAlive == true
 
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = false, migrate = false)
+    }
+
     override fun start() {
         if (isRunning) return
         server = InternalNanoServer().also { it.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false) }
+        appCoroutineScope.launch(dispatchers.io()) {
+            preferences.edit { putBoolean(KEY_SERVER_ENABLED, true) }
+        }
         logcat { "DuckAiDebugServer started on port $port" }
     }
 
     override fun stop() {
         server?.stop()
         server = null
+        appCoroutineScope.launch(dispatchers.io()) {
+            preferences.edit { putBoolean(KEY_SERVER_ENABLED, false) }
+        }
         logcat { "DuckAiDebugServer stopped" }
+    }
+
+    internal suspend fun startIfPreviouslyEnabled() {
+        val enabled = withContext(dispatchers.io()) {
+            preferences.getBoolean(KEY_SERVER_ENABLED, false)
+        }
+        if (enabled) {
+            withContext(dispatchers.main()) { start() }
+        }
     }
 
     private val filesDir: File get() = File(context.filesDir, "duck_ai_bridge_files")
@@ -233,6 +266,9 @@ class RealDuckAiDebugServer @Inject constructor(
     }
 
     companion object {
+        private const val PREFS_FILENAME = "com.duckduckgo.duckchat.debug.server"
+        private const val KEY_SERVER_ENABLED = "server_enabled"
+
         @Suppress("LongMethod")
         private val DEBUG_HTML = """
             <!DOCTYPE html>
@@ -792,5 +828,21 @@ class RealDuckAiDebugServer @Inject constructor(
             </body>
             </html>
         """.trimIndent()
+    }
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
+class DuckAiDebugServerLifecycleObserver @Inject constructor(
+    private val server: RealDuckAiDebugServer,
+    @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : MainProcessLifecycleObserver {
+
+    override fun onCreate(owner: LifecycleOwner) {
+        appCoroutineScope.launch {
+            server.startIfPreviouslyEnabled()
+        }
     }
 }
