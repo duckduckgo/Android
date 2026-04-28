@@ -60,8 +60,8 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-project: ${{ vars.DUCK_PLAYER_AOR_PROJECT_ID }}
+          asana-section: ${{ vars.DUCK_PLAYER_AOR_INCOMING_ID }}
           asana-task-name: GH Workflow Failure - Duck Player End to End Tests
           asana-task-description: The Duck Player workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
