@@ -417,6 +417,8 @@ sealed class Command {
 
     data class UiLockChanged(val locked: Boolean) : Command()
 
+    data class SetContentAllowsSwipeToRefresh(val allowed: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(

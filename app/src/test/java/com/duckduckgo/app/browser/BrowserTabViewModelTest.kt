@@ -10161,6 +10161,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
+        finishPageLoad()
         assertTrue(testee.suppressDuckAiOnboardingCta)
 
         advanceTimeBy(2_001)
@@ -10173,6 +10174,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
+        finishPageLoad()
         advanceTimeBy(1_900)
 
         assertTrue(testee.suppressDuckAiOnboardingCta)
@@ -10183,6 +10185,7 @@ class BrowserTabViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         navigateToOnboardingUrl()
+        finishPageLoad()
         assertTrue(testee.suppressDuckAiOnboardingCta)
 
         testee.processJsCallbackMessage(
@@ -10198,9 +10201,128 @@ class BrowserTabViewModelTest {
         assertFalse(testee.suppressDuckAiOnboardingCta)
     }
 
+    @Test
+    fun whenDuckAiOnboardingUrlErrorsAndPageFinishesThenFallbackTimerIsNotArmed() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        finishPageLoad()
+
+        advanceTimeBy(2_001)
+
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingFailsThenRefreshesSuccessfullyThenSuppressDuckAiOnboardingCtaIsCleared() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        finishPageLoad()
+        advanceTimeBy(2_001)
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+
+        testee.onWebViewRefreshed()
+        testee.resetBrowserError()
+        finishPageLoad()
+        advanceTimeBy(2_001)
+
+        assertFalse(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingPageInErrorAndResponseReceivedFiresThenSuppressDuckAiOnboardingCtaStaysTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseReceived",
+            id = "id",
+            data = JSONObject("{}"),
+            isActiveCustomTab = false,
+            getWebViewUrl = { ONBOARDING_URL },
+        )
+        advanceUntilIdle()
+
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingPageFinishesSuccessfullyThenSwipeToRefreshIsDisabled() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        finishPageLoad()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val swipeCommand = commandCaptor.allValues.filterIsInstance<Command.SetContentAllowsSwipeToRefresh>().lastOrNull()
+        assertNotNull(swipeCommand)
+        assertFalse(swipeCommand!!.allowed)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingPageFinishesInErrorThenSwipeToRefreshIsNotDisabled() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        finishPageLoad()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val swipeCommand = commandCaptor.allValues.filterIsInstance<Command.SetContentAllowsSwipeToRefresh>().lastOrNull()
+        assertNull(swipeCommand)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingResponseReceivedDuringLoadingStateThenSuppressDuckAiOnboardingCtaStaysTrue() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.refreshBrowserError()
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseReceived",
+            id = "id",
+            data = JSONObject("{}"),
+            isActiveCustomTab = false,
+            getWebViewUrl = { ONBOARDING_URL },
+        )
+        advanceUntilIdle()
+
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+    }
+
+    @Test
+    fun whenDuckAiOnboardingPageFinishesDuringLoadingThenResetBrowserErrorArmsTheUnblockTimer() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        navigateToOnboardingUrl()
+        testee.onReceivedError(BAD_URL, ONBOARDING_URL)
+        testee.refreshBrowserError()
+        finishPageLoad()
+        advanceTimeBy(2_001)
+        assertTrue(testee.suppressDuckAiOnboardingCta)
+
+        testee.resetBrowserError()
+        advanceTimeBy(2_001)
+
+        assertFalse(testee.suppressDuckAiOnboardingCta)
+    }
+
     private fun navigateToOnboardingUrl() {
         setBrowserShowing(true)
         testee.loadData(tabId = "abc", initialUrl = ONBOARDING_URL, skipHome = true, isExternal = false)
+    }
+
+    private fun finishPageLoad() {
+        testee.pageFinished(mockWebView, WebViewNavigationState(mockStack, 100), ONBOARDING_URL)
     }
 
     companion object {

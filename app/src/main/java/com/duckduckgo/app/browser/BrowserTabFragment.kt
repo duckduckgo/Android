@@ -2809,6 +2809,7 @@ class BrowserTabFragment :
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.UiLockChanged -> uiLockChanged(it.locked)
+            is Command.SetContentAllowsSwipeToRefresh -> webView?.setContentAllowsSwipeToRefresh(it.allowed)
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)

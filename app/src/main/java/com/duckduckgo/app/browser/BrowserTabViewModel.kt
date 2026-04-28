@@ -136,6 +136,7 @@ import com.duckduckgo.app.browser.commands.Command.SendEmail
 import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSms
 import com.duckduckgo.app.browser.commands.Command.SetBrowserBackground
+import com.duckduckgo.app.browser.commands.Command.SetContentAllowsSwipeToRefresh
 import com.duckduckgo.app.browser.commands.Command.SetOnboardingDialogBackground
 import com.duckduckgo.app.browser.commands.Command.ShareLink
 import com.duckduckgo.app.browser.commands.Command.ShowAppLinkPrompt
@@ -565,6 +566,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @VisibleForTesting
     internal var suppressDuckAiOnboardingCta = false
+    private var duckAiOnboardingCtaUnblockJob: Job? = null
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -904,9 +906,8 @@ class BrowserTabViewModel @Inject constructor(
         if (uri.getQueryParameter("flow") != "mobile-app-onboarding") return
 
         // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
-        // Fallback: if FE doesn't signal within the timeout, unblock the CTA anyway.
+        // Fallback timer is armed from pageFinished once duck.ai actually loads.
         suppressDuckAiOnboardingCta = true
-        scheduleDuckAiOnboardingCtaUnblock()
         browserViewState.value = currentBrowserViewState().copy(isOmnibarLockedForOnboarding = true)
     }
 
@@ -2273,6 +2274,8 @@ class BrowserTabViewModel @Inject constructor(
                 evaluateSerpLogoState(url)
             }
 
+            onDuckAiOnboardingPageFinishedIfApplicable()
+
             if (androidBrowserConfig.storePageContext().isEnabled()) {
                 collectPageContext()
             }
@@ -3294,18 +3297,26 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun scheduleDuckAiOnboardingCtaUnblock() {
-        viewModelScope.launch {
-            delay(2.seconds)
-            unblockDuckAiOnboardingCta()
+    private fun onDuckAiOnboardingPageFinishedIfApplicable() {
+        with(currentBrowserViewState()) {
+            if (!isOmnibarLockedForOnboarding || browserError != OMITTED) return
+        }
+
+        command.value = SetContentAllowsSwipeToRefresh(allowed = false)
+
+        if (suppressDuckAiOnboardingCta) {
+            duckAiOnboardingCtaUnblockJob?.cancel()
+            duckAiOnboardingCtaUnblockJob = viewModelScope.launch {
+                delay(2.seconds)
+                unblockDuckAiOnboardingCta()
+            }
         }
     }
 
     private suspend fun unblockDuckAiOnboardingCta() {
-        if (suppressDuckAiOnboardingCta) {
-            suppressDuckAiOnboardingCta = false
-            refreshCta()
-        }
+        if (!suppressDuckAiOnboardingCta || currentBrowserViewState().browserError != OMITTED) return
+        suppressDuckAiOnboardingCta = false
+        refreshCta()
     }
 
     suspend fun refreshCta(): Cta? {
@@ -3850,6 +3861,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun resetBrowserError() {
         browserViewState.value = currentBrowserViewState().copy(browserError = OMITTED)
+        // Catches the race where pageFinished fired while browserError was still LOADING.
+        onDuckAiOnboardingPageFinishedIfApplicable()
     }
 
     fun refreshBrowserError() {
