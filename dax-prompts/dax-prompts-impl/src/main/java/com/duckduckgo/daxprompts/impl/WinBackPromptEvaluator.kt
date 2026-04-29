@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
@@ -56,6 +57,7 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val reactivateUsersToggles: ReactivateUsersToggles,
+    private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ModalEvaluator, WinBackPromptEvaluator {
 
     override val priority: Int = 1
@@ -81,7 +83,8 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
 
     private fun isEnabled() = reactivateUsersToggles.self().isEnabled() && reactivateUsersToggles.defaultBrowserWinBackPrompt().isEnabled()
 
-    private suspend fun isEligible() = userBrowserProperties.wasEverDefaultBrowser() &&
+    private suspend fun isEligible() = onboardingFlowChecker.isOnboardingComplete() &&
+        userBrowserProperties.wasEverDefaultBrowser() &&
         !daxPromptsRepository.getDaxPromptsBrowserComparisonShown() &&
         !defaultBrowserDetector.isDefaultBrowser()
 
