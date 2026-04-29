@@ -1,0 +1,419 @@
+name: NativeInput docs automation
+
+# Single workflow that handles two concerns based on which files changed:
+#   • Source files  → analyse the diff with Claude and post to Asana if significant
+#   • HTML diagrams → render PNGs, commit them, sync Asana attachments + description
+#
+# Secrets required:
+#   ANTHROPIC_API_KEY   – for the diff-analysis job
+#   ASANA_ACCESS_TOKEN  – for both jobs
+#   GT_DAXMOBILE        – push token used by the render job to commit PNGs
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      # Source files
+      - 'duckchat/duckchat-api/**'
+      - 'duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputModeWidget.kt'
+      - 'duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputModeWidgetViewModel.kt'
+      - 'duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputState.kt'
+      - 'duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/contextual/ContextualNativeInputManager.kt'
+      - 'duckchat/duckchat-impl/build.gradle'
+      # Diagram sources
+      - 'docs/architecture/native-input/*.html'
+  workflow_dispatch:
+
+concurrency:
+  group: native-input-docs
+  cancel-in-progress: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 1: detect which categories changed
+# ─────────────────────────────────────────────────────────────────────────────
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      source_changed: ${{ steps.check.outputs.source_changed }}
+      html_changed:   ${{ steps.check.outputs.html_changed }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed categories
+        id: check
+        run: |
+          # workflow_dispatch: always re-render diagrams; skip analysis (no meaningful diff)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "source_changed=false" >> "$GITHUB_OUTPUT"
+            echo "html_changed=true"   >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$changed"
+
+          if echo "$changed" | grep -qE \
+            '^duckchat/(duckchat-api/|duckchat-impl/.*(NativeInputModeWidget|NativeInputModeWidgetViewModel|NativeInputState|ContextualNativeInputManager|build\.gradle))'; then
+            echo "source_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "source_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if echo "$changed" | grep -q 'docs/architecture/native-input/.*\.html'; then
+            echo "html_changed=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "html_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 2: analyse source changes with Claude → post to Asana if significant
+# ─────────────────────────────────────────────────────────────────────────────
+  analyze-architecture:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.source_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Analyse diff and post to Asana if significant
+        env:
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          ASANA_ACCESS_TOKEN:  ${{ secrets.ASANA_ACCESS_TOKEN }}
+          TASK_GID:            "1214251791869701"
+        run: |
+          node - <<'JSEOF'
+          const { execSync } = require('child_process');
+
+          // ── Commit info ──────────────────────────────────────────────────
+          const [sha, shortSha, subject, author] = execSync(
+            'git log -1 --format="%H|%h|%s|%an" HEAD'
+          ).toString().trim().split('|');
+
+          // ── Diff ─────────────────────────────────────────────────────────
+          let diff;
+          try {
+            diff = execSync(`git show HEAD -- \
+              duckchat/duckchat-api/ \
+              duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputModeWidget.kt \
+              duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputModeWidgetViewModel.kt \
+              duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/ui/NativeInputState.kt \
+              duckchat/duckchat-impl/src/main/java/com/duckduckgo/duckchat/impl/contextual/ContextualNativeInputManager.kt \
+              duckchat/duckchat-impl/build.gradle`
+            ).toString();
+          } catch (e) {
+            console.error('Could not retrieve diff:', e.message);
+            process.exit(0);
+          }
+
+          // ── Prompt ───────────────────────────────────────────────────────
+          const prompt = `You are an architecture documentation assistant for the DuckDuckGo Android browser.
+
+A commit was pushed to develop that touched NativeInputWidget-related files.
+Commit: ${shortSha} — ${subject}
+Author: ${author}
+
+Diff (truncated to 40 000 chars):
+${diff.slice(0, 40000)}
+
+Determine if this change is architecturally significant.
+
+SIGNIFICANT if it touches:
+- NativeInputState.kt: fields added/removed/renamed, enum or derived-property changes
+- NativeInputModeWidgetViewModel.kt: Flow inputs to combine(), widgetConfig structure, public methods, NativeInputState computation
+- NativeInputModeWidget.kt: new observers, applyState/observeChatState/observeTier logic, public callback interface, plugin points
+- duckchat-api (any file): all changes are significant — public contract
+- duckchat-impl/build.gradle: project dependency added or removed
+
+NOT significant: formatting only, comments/KDoc only, local variable renames, logging changes.
+
+If significant, respond with EXACTLY this format and nothing else:
+SIGNIFICANT
+<2–4 sentences. Name the specific class, method, and field. State before/after where it helps.>
+DIAGRAMS: <comma-separated stems from: 00-module-dependencies, 01-native-input-dataflow, 02-plugin-dataflow, 03-current-module-deps, 04-state-management — or "none">
+
+If not significant, respond with exactly: NOT_SIGNIFICANT`;
+
+          // ── Call Claude ──────────────────────────────────────────────────
+          const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'claude-opus-4-5',
+              max_tokens: 1024,
+              messages: [{ role: 'user', content: prompt }],
+            }),
+          });
+
+          if (!apiRes.ok) {
+            console.error('Claude API error:', apiRes.status, await apiRes.text());
+            process.exit(0);
+          }
+          const result = (await apiRes.json()).content[0].text.trim();
+          console.log('Claude response:\n', result);
+
+          if (result.startsWith('NOT_SIGNIFICANT')) {
+            console.log('Not architecturally significant — no comment posted.');
+            process.exit(0);
+          }
+          if (!result.startsWith('SIGNIFICANT')) {
+            console.error('Unexpected response format — aborting.');
+            process.exit(0);
+          }
+
+          // ── Parse ────────────────────────────────────────────────────────
+          const lines = result.split('\n');
+          const diagramsIdx = lines.findIndex(l => l.startsWith('DIAGRAMS:'));
+          const description = lines.slice(1, diagramsIdx).join('\n').trim();
+          const diagramsRaw = diagramsIdx >= 0
+            ? lines[diagramsIdx].replace('DIAGRAMS:', '').trim()
+            : '';
+
+          const LABELS = {
+            '00-module-dependencies': '00-module-dependencies — BEFORE/AFTER plugin refactor comparison',
+            '01-native-input-dataflow': '01-native-input-dataflow — widget data flow and callbacks',
+            '02-plugin-dataflow': '02-plugin-dataflow — plugin system setup/tap/send phases',
+            '03-current-module-deps': '03-current-module-deps — current :duckchat-* module graph',
+            '04-state-management': '04-state-management — ViewModel flows → NativeInputState → widget reactions',
+          };
+          const diagramsList = diagramsRaw === 'none'
+            ? 'None — change does not affect documented structure.'
+            : diagramsRaw.split(',').map(d => `• ${LABELS[d.trim()] ?? d.trim()}`).join('\n');
+
+          const comment = [
+            '🤖 NativeInput Docs Watcher — architecture change detected',
+            '',
+            `Commit: ${shortSha} — ${subject}`,
+            `Author: ${author}`,
+            '',
+            'What changed:',
+            description,
+            '',
+            'Diagrams that may need updating:',
+            diagramsList,
+          ].join('\n');
+
+          // ── Post to Asana ────────────────────────────────────────────────
+          const asanaRes = await fetch(
+            `https://app.asana.com/api/1.0/tasks/${process.env.TASK_GID}/stories`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${process.env.ASANA_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ data: { text: comment } }),
+            }
+          );
+          if (!asanaRes.ok) {
+            console.error('Asana error:', asanaRes.status, await asanaRes.text());
+            process.exit(1);
+          }
+          console.log('✓ Asana comment posted');
+          JSEOF
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 3: render HTML diagrams → PNG → commit → sync Asana
+# ─────────────────────────────────────────────────────────────────────────────
+  render-diagrams:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.html_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GT_DAXMOBILE }}
+          fetch-depth: 1
+
+      - name: Install ffmpeg
+        run: sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Render diagrams
+        run: |
+          set -euo pipefail
+          DIAGRAM_DIR="docs/architecture/native-input"
+
+          for html_file in "$DIAGRAM_DIR"/*.html; do
+            name=$(basename "$html_file" .html)
+
+            # Read SVG viewport dimensions from the first <svg> tag
+            svg_line=$(grep -m1 '<svg ' "$html_file")
+            width=$(echo "$svg_line"  | grep -oP 'width="\K[0-9]+')
+            height=$(echo "$svg_line" | grep -oP 'height="\K[0-9]+')
+
+            if [[ -z "$width" || -z "$height" ]]; then
+              echo "⚠  Could not parse dimensions for $name — skipping"
+              continue
+            fi
+
+            # Viewport = SVG size + 40px body padding on each side
+            vw=$((width  + 80))
+            vh=$((height + 80))
+
+            echo "→ Rendering $name (SVG ${width}×${height}, viewport ${vw}×${vh})"
+
+            google-chrome-stable --headless --disable-gpu --no-sandbox \
+              --screenshot="/tmp/raw_${name}.png" \
+              --window-size="${vw},${vh}" \
+              "file://${GITHUB_WORKSPACE}/${html_file}" 2>/dev/null
+
+            # Crop: full width, SVG height only, skip top padding (y=40)
+            ffmpeg -y -i "/tmp/raw_${name}.png" \
+              -vf "crop=${vw}:${height}:0:40" \
+              -update 1 "${DIAGRAM_DIR}/${name}.png" \
+              -loglevel error
+
+            echo "   ✓ ${DIAGRAM_DIR}/${name}.png"
+          done
+
+      - name: Commit rendered PNGs
+        id: commit
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add docs/architecture/native-input/*.png
+
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No PNG changes to commit"
+          else
+            git commit -m "Update NativeInput architecture diagrams [skip ci]"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sync Asana task
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          ASANA_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          TASK_GID:    "1214251791869701"
+          REPO:        ${{ github.repository }}
+          SHA:         ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          DIAGRAM_DIR="docs/architecture/native-input"
+          RAW_BASE="https://raw.githubusercontent.com/${REPO}/develop/${DIAGRAM_DIR}"
+          DATE=$(date -u '+%Y-%m-%d')
+
+          # ── 1. Delete existing PNG attachments ─────────────────────────────
+          echo "Fetching existing attachments…"
+          existing=$(curl -sf \
+            "https://app.asana.com/api/1.0/tasks/${TASK_GID}/attachments?opt_fields=gid,name" \
+            -H "Authorization: Bearer $ASANA_TOKEN")
+
+          echo "$existing" | python3 - <<'PYEOF'
+          import sys, json, os, subprocess
+          data = json.loads(sys.stdin.read())["data"]
+          token = os.environ["ASANA_TOKEN"]
+          deleted = 0
+          for a in data:
+              if a.get("name", "").endswith(".png"):
+                  r = subprocess.run(
+                      ["curl", "-sf", "-X", "DELETE",
+                       f"https://app.asana.com/api/1.0/attachments/{a['gid']}",
+                       "-H", f"Authorization: Bearer {token}"],
+                      capture_output=True)
+                  if r.returncode == 0:
+                      print(f"  Deleted {a['name']} ({a['gid']})")
+                      deleted += 1
+          print(f"Removed {deleted} old diagram attachment(s)")
+          PYEOF
+
+          # ── 2. Upload new PNGs ─────────────────────────────────────────────
+          echo "Uploading new diagrams…"
+          for png in "$DIAGRAM_DIR"/*.png; do
+            label=$(basename "$png")
+            curl -sf -X POST "https://app.asana.com/api/1.0/attachments" \
+              -H "Authorization: Bearer $ASANA_TOKEN" \
+              -F "parent=${TASK_GID}" \
+              -F "file=@${png};type=image/png" \
+              -F "name=${label}" > /dev/null
+            echo "  ✓ $label"
+          done
+
+          # ── 3. Update task html_notes ──────────────────────────────────────
+          declare -A LABELS=(
+            ["00-module-dependencies"]="Module Dependencies (before/after refactor)"
+            ["01-native-input-dataflow"]="Widget Data Flow"
+            ["02-plugin-dataflow"]="Plugin System (setup · tap · send)"
+            ["03-current-module-deps"]="Current Module Graph (develop)"
+            ["04-state-management"]="State Management (ViewModel → Widget)"
+          )
+
+          diagram_links=""
+          for stem in 00-module-dependencies 01-native-input-dataflow 02-plugin-dataflow 03-current-module-deps 04-state-management; do
+            label="${LABELS[$stem]}"
+            url="${RAW_BASE}/${stem}.png"
+            diagram_links+="<li><a href=\"${url}\">${label}</a></li>"
+          done
+
+          current_notes=$(curl -sf \
+            "https://app.asana.com/api/1.0/tasks/${TASK_GID}?opt_fields=html_notes" \
+            -H "Authorization: Bearer $ASANA_TOKEN" | \
+            python3 -c "import sys,json; print(json.load(sys.stdin)['data'].get('html_notes',''))")
+
+          OPEN_MARKER="<!-- diagrams-section -->"
+          CLOSE_MARKER="<!-- /diagrams-section -->"
+          diagram_section="${OPEN_MARKER}<h2>Architecture Diagrams</h2><p>Last rendered: ${DATE} · commit <code>${SHA}</code> · see attachments below for full-resolution images.</p><ul>${diagram_links}</ul>${CLOSE_MARKER}"
+
+          updated_notes=$(python3 <<PYEOF2
+          import re, sys
+
+          current = """${current_notes}"""
+          section = """${diagram_section}"""
+          open_m  = "<!-- diagrams-section -->"
+          close_m = "<!-- /diagrams-section -->"
+
+          if open_m in current and close_m in current:
+              pattern = re.escape(open_m) + ".*?" + re.escape(close_m)
+              result = re.sub(pattern, section, current, flags=re.DOTALL)
+          elif current.strip():
+              result = current.rstrip("</body>").rstrip() + section + "</body>"
+          else:
+              result = "<body>" + section + "</body>"
+
+          print(result)
+          PYEOF2
+          )
+
+          payload=$(python3 -c "
+          import json, sys
+          notes = sys.stdin.read()
+          print(json.dumps({'data': {'html_notes': notes}}))
+          " <<< "$updated_notes")
+
+          curl -sf -X PUT \
+            "https://app.asana.com/api/1.0/tasks/${TASK_GID}" \
+            -H "Authorization: Bearer $ASANA_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload" > /dev/null
+          echo "✓ Asana task updated"
+
+          # ── 4. Post summary comment ────────────────────────────────────────
+          curl -sf -X POST \
+            "https://app.asana.com/api/1.0/tasks/${TASK_GID}/stories" \
+            -H "Authorization: Bearer $ASANA_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"data\": {\"text\": \"📐 Architecture diagrams re-rendered (${DATE}, commit ${SHA}). Attachments and description updated.\"}}" \
+            > /dev/null
+          echo "✓ Posted Asana comment"
