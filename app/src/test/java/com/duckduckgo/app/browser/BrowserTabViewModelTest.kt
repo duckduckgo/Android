@@ -4075,7 +4075,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() =
+    fun whenOnPinPageToHomeSelectedThenShowAddHomeShortcutDialogCommandIssuedWithFavicon() =
         runTest {
             val url = exampleUrl
             val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
@@ -4084,15 +4084,15 @@ class BrowserTabViewModelTest {
 
             testee.onPinPageToHomeSelected()
 
-            assertCommandIssued<Command.AddHomeShortcut> {
+            assertCommandIssued<Command.ShowAddHomeShortcutDialog> {
                 assertEquals(bitmap, this.icon)
                 assertEquals(url, this.url)
-                assertEquals("example.com", this.title)
+                assertEquals("A title", this.title)
             }
         }
 
     @Test
-    fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() =
+    fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenShowAddHomeShortcutDialogCommandIssuedWithoutFavicon() =
         runTest {
             val url = exampleUrl
             whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
@@ -4100,10 +4100,10 @@ class BrowserTabViewModelTest {
 
             testee.onPinPageToHomeSelected()
 
-            assertCommandIssued<Command.AddHomeShortcut> {
+            assertCommandIssued<Command.ShowAddHomeShortcutDialog> {
                 assertNull(this.icon)
                 assertEquals(url, this.url)
-                assertEquals("example.com", this.title)
+                assertEquals("A title", this.title)
             }
         }
 
