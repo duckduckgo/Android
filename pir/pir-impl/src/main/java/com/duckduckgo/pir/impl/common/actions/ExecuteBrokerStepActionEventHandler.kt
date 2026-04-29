@@ -109,7 +109,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
-                        profileQuery = state.profileQuery,
                     ),
                 )
             } else if (actionToExecute is GenerateEmail) {
@@ -123,7 +122,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     sideEffect = GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
-                        profileQuery = state.profileQuery,
                     ),
                 )
             } else {

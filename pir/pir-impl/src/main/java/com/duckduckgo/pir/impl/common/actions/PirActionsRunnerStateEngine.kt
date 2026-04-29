@@ -174,7 +174,6 @@ interface PirActionsRunnerStateEngine {
         data class GetEmailForProfile(
             override val actionId: String,
             val brokerName: String,
-            val profileQuery: ProfileQuery?,
         ) : SideEffect(),
             BrokerActionSideEffect
 
