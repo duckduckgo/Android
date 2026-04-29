@@ -164,6 +164,13 @@ git log -1 --format="%H|%h|%s|%an" HEAD
 
 Then use `mcp__github__get_commit` with that SHA to retrieve the full diff. If unavailable,
 fall back to:
+
+Also find the pull request number that introduced this commit. Use the GitHub tool to search
+for merged PRs whose merge commit matches the SHA, or search with:
+`mcp__github__search_pull_requests` query `repo:${{ github.repository }} is:pr is:merged sha:<SHA>`.
+Store this as `TRIGGER_PR_NUMBER`. If no PR is found (e.g. direct push), use the short SHA instead.
+
+
 ```bash
 git show HEAD -- \
   duckchat/duckchat-api/ \
@@ -284,7 +291,7 @@ are a preview of how the diagrams will look once the PR is merged.
 
 Call `safe-outputs.create-pull-request` with:
 
-**Branch:** `feature/david/native_input_docs`
+**Branch:** `docs/native_input_<TRIGGER_PR_NUMBER>` (e.g. `docs/native_input_1234`, or `docs/native_input_<shortSha>` if no PR was found)
 
 **Title:** `[docs] Update NativeInput diagrams — <short subject of the triggering commit>`
 
