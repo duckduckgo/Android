@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.view.View
 import androidx.core.view.drawToBitmap
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R
@@ -48,7 +47,7 @@ class FileBasedPdfPreviewGenerator @Inject constructor(
     override suspend fun generatePreview(view: View): Bitmap {
         return withContext(dispatchers.computation()) {
             val fullBitmap = view.drawToBitmap()
-            val scaledHeight = view.context.resources.getDimension(R.dimen.gridItemPreviewHeight).toPx()
+            val scaledHeight = view.context.resources.getDimension(R.dimen.gridItemPreviewHeight)
             val scaledWidth = scaledHeight / fullBitmap.height * fullBitmap.width
             Bitmap.createScaledBitmap(fullBitmap, scaledWidth.roundToInt(), scaledHeight.roundToInt(), false)
         }
