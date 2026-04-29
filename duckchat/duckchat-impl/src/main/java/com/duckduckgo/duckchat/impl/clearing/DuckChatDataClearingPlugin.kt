@@ -17,11 +17,13 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import androidx.core.net.toUri
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -34,6 +36,8 @@ class DuckChatDataClearingPlugin @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val duckChat: DuckChat,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val duckChatFeatureRepository: DuckChatFeatureRepository,
 ) : DataClearingPlugin {
 
     override suspend fun onClearData(types: Set<ClearableData>) {
@@ -50,7 +54,16 @@ class DuckChatDataClearingPlugin @Inject constructor(
         logcat { "DuckChatDataClearingPlugin: deleting all chats" }
         val deleted = duckChatDeleter.deleteAllChats()
         if (deleted) {
-            duckChatSyncRepository.recordDuckAiChatsDeleted(System.currentTimeMillis())
+            // FIXME: This duplicates the background-aware timestamp logic from DuckAiChatDeletionListenerImpl.
+            //  When the fire button triggers an automatic clear (e.g. clear-on-exit via DataClearingWorker), the
+            //  sync timestamp should reflect when the user backgrounded the app, not when the clearing actually
+            //  executed (which could be significantly later). The background timestamp is persisted to disk by
+            //  DuckAiChatDeletionListenerImpl.onStop() and survives process restarts.
+            //  Ideally, the timestamp recording should live in a single place, but clearDuckAiChatsOnly() in
+            //  ClearPersonalDataAction already records via the DuckAiChatDeletionListener, so this plugin must
+            //  also be background-aware to avoid overwriting the correct timestamp with a stale one.
+            val timestamp = duckChatFeatureRepository.getAppBackgroundTimestamp() ?: currentTimeProvider.currentTimeMillis()
+            duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp)
             duckChatSyncRepository.clearPendingChatDeletions()
             syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
         }

@@ -19,8 +19,10 @@ package com.duckduckgo.duckchat.impl.clearing
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.test.runTest
@@ -44,11 +46,16 @@ class DuckChatDataClearingPluginTest {
     private val duckChatSyncRepository: DuckChatSyncRepository = mock()
     private val syncEngine: SyncEngine = mock()
     private val duckChat: DuckChat = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val duckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private lateinit var plugin: DuckChatDataClearingPlugin
 
     @Before
     fun setup() {
-        plugin = DuckChatDataClearingPlugin(duckChatDeleter, duckChatSyncRepository, syncEngine, duckChat)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1234567890L)
+        plugin = DuckChatDataClearingPlugin(
+            duckChatDeleter, duckChatSyncRepository, syncEngine, duckChat, currentTimeProvider, duckChatFeatureRepository,
+        )
     }
 
     @Test
@@ -61,6 +68,27 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository).clearPendingChatDeletions()
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `deleteAllChats uses background timestamp when available`() = runTest {
+        val backgroundTimestamp = 9999999999L
+        whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
+        whenever(duckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(backgroundTimestamp)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(backgroundTimestamp)
+    }
+
+    @Test
+    fun `deleteAllChats falls back to current time when no background timestamp`() = runTest {
+        whenever(duckChatDeleter.deleteAllChats()).thenReturn(true)
+        whenever(duckChatFeatureRepository.getAppBackgroundTimestamp()).thenReturn(null)
+
+        plugin.onClearData(setOf(ClearableData.DuckChats.All))
+
+        verify(duckChatSyncRepository).recordDuckAiChatsDeleted(1234567890L)
     }
 
     @Test
