@@ -878,8 +878,6 @@ sealed class DaxBubbleCta(
         ) {
             ctaView = container
 
-            // Assumes one active showCta at a time — the intercept flag gates user advances until settled.
-            // Overlapping calls would let stale closure callbacks clobber shared view state.
             var contentFadeInAnimator: AnimatorSet? = null
             var fadeOutAnimator: AnimatorSet? = null
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
