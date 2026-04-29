@@ -82,7 +82,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!duckChatFeature.aiChatSuggestions().isEnabled()) return
         configureChatSuggestions()
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             configureChatUrlSuggestions()

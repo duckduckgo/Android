@@ -44,6 +44,8 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -88,6 +90,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
@@ -115,6 +118,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     lateinit var pixel: Pixel
 
     @Inject
+    lateinit var ntpAfterIdleManager: NtpAfterIdleManager
+
+    @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
 
     @Inject
@@ -128,6 +134,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var browserMenuHighlight: BrowserMenuHighlight
 
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
@@ -372,11 +381,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 updateLogoVisibility(state)
                 beginRootTransition()
                 updateFavoritesVisibility(state.searchMode, !state.autoCompleteSuggestionsVisible)
-                if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    updateOverlaysForModeChange(state)
-                } else {
-                    hideAutoCompleteIfOnChatTab(state)
-                }
+                updateOverlaysForModeChange(state)
                 previousSearchMode = state.searchMode
                 updateButtonVisibility(state)
                 inputScreenButtons.setNewLineButtonVisible(state.newLineButtonVisible)
@@ -388,6 +393,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .onEach {
                 inputModeWidget.setInputScreenButtonsVisible(inputScreenConfigResolver.useTopBar() && it)
             }.launchIn(lifecycleScope)
+
+        browserMenuHighlight.shouldShowHighlightForMode(BrowserViewMode.NewTab)
+            .onEach { inputModeWidget.setBrowserMenuHighlightVisible(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         if (duckChatFeature.chatTabAttachments().isEnabled()) {
             viewModel.tabAttachmentState
@@ -556,6 +565,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    ntpAfterIdleManager.onReturnToPageTapped()
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
@@ -763,14 +773,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.ddgLogoContainer.isVisible = shouldBeVisible
     }
 
-    private fun hideAutoCompleteIfOnChatTab(state: InputScreenVisibilityState) {
-        if (!state.searchMode && autoCompleteTargetVisibility) {
-            autoCompleteTargetVisibility = false
-            binding.autoCompleteOverlay.animate().cancel()
-            hideOverlay(binding.autoCompleteOverlay, ::invalidateAutoCompleteBlurView)
-        }
-    }
-
     private fun updateOverlaysForModeChange(state: InputScreenVisibilityState) {
         if (state.searchMode) {
             if (chatSuggestionsTargetVisibility) {
@@ -892,11 +894,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 overlay.isVisible = false
                 overlay.alpha = 1f
                 overlay.elevation = 0f
-                if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-                    enableViewPagerInputIfNoOverlays()
-                } else {
-                    enableViewPagerInputIfNoFavorites()
-                }
+                enableViewPagerInputIfNoOverlays()
             }
             .start()
     }
@@ -1000,12 +998,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             !autoCompleteTargetVisibility &&
             !chatSuggestionsTargetVisibility
         ) {
-            enableViewPagerInput()
-        }
-    }
-
-    private fun enableViewPagerInputIfNoFavorites() {
-        if (!binding.newTabContainerScrollView.isVisible) {
             enableViewPagerInput()
         }
     }

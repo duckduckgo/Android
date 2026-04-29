@@ -63,12 +63,16 @@ fun ImageView.loadFavicon(
     runCatching {
         val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
         Glide.with(context).clear(this)
-        Glide.with(context)
-            .load(bitmap)
-            .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
-            .placeholder(defaultDrawable)
-            .error(defaultDrawable)
-            .into(this)
+        if (bitmap != null) {
+            Glide.with(context)
+                .load(bitmap)
+                .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
+                .placeholder(defaultDrawable)
+                .error(defaultDrawable)
+                .into(this)
+        } else {
+            setImageDrawable(defaultDrawable)
+        }
     }.onFailure {
         logcat(ERROR) { "Error loading favicon: ${it.asLog()}" }
     }

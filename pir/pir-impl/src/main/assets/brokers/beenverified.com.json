@@ -1,7 +1,7 @@
 {
   "name": "BeenVerified",
   "url": "beenverified.com",
-  "version": "0.8.0",
+  "version": "0.10.0",
   "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts",
   "mirrorSites": [
     {
@@ -75,8 +75,164 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://www.beenverified.com/svc/optout/search/optouts/search_person_result",
+          "url": "https://www.beenverified.com/svc/optout/search/optouts",
           "id": "000df3ca-c08b-4261-9d19-6b6463865677"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-31402247-3777-4887-8958-5e5fbe1fa227"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#optout-form"
+            }
+          ],
+          "id": "888d175a-9c31-46c8-8a37-eab78c3c37e5"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#optout-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "//input[@name='fname']"
+            },
+            {
+              "type": "lastName",
+              "selector": "//input[@name='ln']"
+            },
+            {
+              "type": "state",
+              "selector": "//input[@name='state']"
+            }
+          ],
+          "id": "444a01d9-630f-42e4-a8b8-4c87ddab91e3"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-ede2413a-f55e-417a-a1e0-871b6a37dc61"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@aria-label='search-optout-button' and @type='submit']"
+            }
+          ],
+          "id": "111eb5ef-b469-41a6-af92-da9056c00781"
+        },
+        {
+          "_comment": "Wait for either form to appear before branching. The condition below runs once without retries.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='comprehensive-form'] | //*[@id='result-filter']"
+            }
+          ],
+          "id": "ba896158-77d6-4769-b373-2b5226c6d870"
+        },
+        {
+          "_comment": "Highly populated states show a different form.",
+          "actionType": "condition",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#comprehensive-form",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "dataSource": "userProfile",
+              "elements": [
+                {
+                  "type": "firstName",
+                  "selector": "#fname"
+                },
+                {
+                  "type": "middleName",
+                  "selector": "#mn"
+                },
+                {
+                  "type": "lastName",
+                  "selector": "#ln"
+                },
+                {
+                  "type": "age",
+                  "selector": "#age"
+                },
+                {
+                  "type": "city",
+                  "selector": "#city"
+                }
+              ],
+              "id": "37326759-daef-46e8-9aad-95a3ce26b2c2"
+            },
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "elements": [
+                {
+                  "type": "email",
+                  "selector": "#requestor_email"
+                },
+                {
+                  "type": "$generated_street_address$",
+                  "selector": "#street"
+                },
+                {
+                  "type": "$generated_zip_code$",
+                  "selector": "#zip"
+                }
+              ],
+              "id": "84550c23-55d6-4bd4-9e3f-f588d5635a41"
+            },
+            {
+              "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+              "actionType": "expectation",
+              "expectations": [
+                {
+                  "type": "element",
+                  "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+                  "parent": "//*[@id='comprehensive-form']"
+                }
+              ],
+              "id": "cft-fb884f1a-49d5-4f69-ba48-170347aa3f2d"
+            },
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[aria-label='continue-button']"
+                }
+              ],
+              "id": "15d01baf-8ef1-4d23-b110-c01ce978069d"
+            }
+          ],
+          "id": "6087c415-005d-4bca-91d9-bcd22b48c6ba"
         },
         {
           "actionType": "expectation",
@@ -86,57 +242,7 @@
               "selector": "#result-filter"
             }
           ],
-          "id": "888d175a-9c31-46c8-8a37-eab78c3c37e5"
-        },
-        {
-          "_comment": "Filter menu is hidden on mobile, so we need to click the button to show it",
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "#filters-toggle",
-              "failSilently": true
-            }
-          ],
-          "id": "a1c2e3f4-5678-9abc-def0-123456789abc"
-        },
-        {
-          "actionType": "fillForm",
-          "selector": "#result-filter",
-          "dataSource": "userProfile",
-          "elements": [
-            {
-              "type": "firstName",
-              "selector": "//input[@name='fName']"
-            },
-            {
-              "type": "middleName",
-              "selector": "//input[@name='mName']"
-            },
-            {
-              "type": "lastName",
-              "selector": "//input[@name='lName']"
-            },
-            {
-              "type": "state",
-              "selector": "#stateSelect"
-            },
-            {
-              "type": "city",
-              "selector": "//input[@name='city']"
-            }
-          ],
-          "id": "444a01d9-630f-42e4-a8b8-4c87ddab91e3"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "//button[@name='search' and @type='submit']"
-            }
-          ],
-          "id": "111eb5ef-b469-41a6-af92-da9056c00781"
+          "id": "e773731e-f9c7-40d6-b996-21c1e6ac617a"
         },
         {
           "actionType": "extract",
@@ -152,10 +258,10 @@
               "afterText": ", "
             },
             "addressCityState": {
-              "selector": ".MuiGrid-item:nth-child(3) .MuiTypography-body1"
+              "selector": ".MuiGrid-item.MuiGrid-grid-xs-12 > p.MuiTypography-body1"
             }
           },
-          "id": "4285ef9d-aebf-4176-80e6-2959fc9f5c8a"
+          "id": "94f0c65d-cac1-4724-ba3a-4da7fd59ab2c"
         }
       ]
     },
@@ -221,71 +327,109 @@
           "id": "018eb6ef-b469-41a6-af92-da9056c00781"
         },
         {
+          "_comment": "Wait for either form to appear before branching. The condition below runs once without retries.",
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "selector": "#comprehensive-form"
+              "selector": "//*[@id='comprehensive-form'] | //*[@id='result-filter']"
             }
           ],
-          "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+          "id": "d275c4c7-cd31-44c3-93e4-f94ffbea600e"
         },
         {
-          "actionType": "fillForm",
-          "selector": "#comprehensive-form",
-          "elements": [
+          "_comment": "Highly populated states show a different form.",
+          "actionType": "condition",
+          "expectations": [
             {
-              "type": "email",
-              "selector": "#requestor_email"
-            },
-            {
-              "type": "$generated_street_address$",
-              "selector": "#street"
-            },
-            {
-              "type": "$generated_zip_code$",
-              "selector": "#zip"
+              "type": "element",
+              "selector": "#comprehensive-form",
+              "failSilently": true
             }
           ],
-          "id": "b2c34e54-f67a-4bc8-9d0e-1f2a3bc5d6e2"
+          "actions": [
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "dataSource": "userProfile",
+              "elements": [
+                {
+                  "type": "firstName",
+                  "selector": "#fname"
+                },
+                {
+                  "type": "middleName",
+                  "selector": "#mn"
+                },
+                {
+                  "type": "lastName",
+                  "selector": "#ln"
+                },
+                {
+                  "type": "age",
+                  "selector": "#age"
+                },
+                {
+                  "type": "city",
+                  "selector": "#city"
+                }
+              ],
+              "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"
+            },
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "elements": [
+                {
+                  "type": "email",
+                  "selector": "#requestor_email"
+                },
+                {
+                  "type": "$generated_street_address$",
+                  "selector": "#street"
+                },
+                {
+                  "type": "$generated_zip_code$",
+                  "selector": "#zip"
+                }
+              ],
+              "id": "b2c34e54-f67a-4bc8-9d0e-1f2a3bc5d6e2"
+            },
+            {
+              "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+              "actionType": "expectation",
+              "expectations": [
+                {
+                  "type": "element",
+                  "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+                  "parent": "//*[@id='comprehensive-form']"
+                }
+              ],
+              "id": "e5d37b9a-d7ae-42aa-80a8-cafc5dd5defd"
+            },
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[aria-label='continue-button']"
+                }
+              ],
+              "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f"
+            }
+          ],
+          "id": "68b1567f-abbe-4fb4-9c4d-3105db8dd709"
         },
         {
-          "actionType": "fillForm",
-          "selector": "#comprehensive-form",
-          "dataSource": "userProfile",
-          "elements": [
+          "_comment": "Results page. Low-pop lands here directly, high-pop after the comprehensive form.",
+          "actionType": "expectation",
+          "expectations": [
             {
-              "type": "firstName",
-              "selector": "#fname"
-            },
-            {
-              "type": "middleName",
-              "selector": "#mn"
-            },
-            {
-              "type": "lastName",
-              "selector": "#ln"
-            },
-            {
-              "type": "age",
-              "selector": "#age"
-            },
-            {
-              "type": "city",
-              "selector": "#city"
+              "type": "element",
+              "selector": "#result-filter"
             }
           ],
-          "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"
-        },
-        {
-          "actionType": "click",
-          "elements": [
-            {
-              "type": "button",
-              "selector": "button[aria-label='continue-button']"
-            }
-          ],
-          "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f"
+          "id": "088d8233-ce87-4a49-bfe2-38d386764f1b"
         },
         {
           "actionType": "click",

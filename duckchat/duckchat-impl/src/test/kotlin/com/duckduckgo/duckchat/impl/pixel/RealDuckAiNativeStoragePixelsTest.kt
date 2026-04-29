@@ -36,28 +36,28 @@ class RealDuckAiNativeStoragePixelsTest {
     fun `reportMigrationDone fires unique pixel for given key`() {
         pixels.reportMigrationDone("chats")
 
-        verify(pixel).fire("m_aichat_native_storage_migration_done_chats_unique", type = Pixel.PixelType.Unique())
+        verify(pixel).fire("m_duck-ai_native-storage_migration_done_chats_unique", type = Pixel.PixelType.Unique())
     }
 
     @Test
     fun `reportMigrationDone fires count pixel for given key`() {
         pixels.reportMigrationDone("chats")
 
-        verify(pixel).fire("m_aichat_native_storage_migration_done_chats_count")
+        verify(pixel).fire("m_duck-ai_native-storage_migration_done_chats_count")
     }
 
     @Test
     fun `reportMigrationDone uses the provided key in pixel name`() {
         pixels.reportMigrationDone("entries")
 
-        verify(pixel).fire("m_aichat_native_storage_migration_done_entries_unique", type = Pixel.PixelType.Unique())
-        verify(pixel).fire("m_aichat_native_storage_migration_done_entries_count")
+        verify(pixel).fire("m_duck-ai_native-storage_migration_done_entries_unique", type = Pixel.PixelType.Unique())
+        verify(pixel).fire("m_duck-ai_native-storage_migration_done_entries_count")
     }
 
     @Test
     fun `reportMigrationDoneBlankKey fires blank count pixel`() {
         pixels.reportMigrationDoneBlankKey()
 
-        verify(pixel).fire("m_aichat_native_storage_migration_done_blank_count")
+        verify(pixel).fire("m_duck-ai_native-storage_migration_done_blank_count")
     }
 }

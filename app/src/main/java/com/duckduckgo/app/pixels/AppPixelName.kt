@@ -483,6 +483,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DAU_DAILY("m_product_telemetry_surface_usage_dau_daily"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
+    ERROR_CODE_PIXEL("m_errorpageshown_code"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 

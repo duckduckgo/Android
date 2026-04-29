@@ -235,6 +235,10 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxEndBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -345,6 +349,7 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -516,6 +521,7 @@ class BrowserTabViewModel @Inject constructor(
     private val browserUiLockFeature: BrowserUiLockFeature,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -647,7 +653,7 @@ class BrowserTabViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = false),
+            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = browserMenuDisplayRepository.isBottomSheetMenuEnabled()),
         )
 
     private val fireproofWebsitesObserver =
@@ -1274,9 +1280,22 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentGlobalLayoutState() is Invalidated) {
+        val layoutState = currentGlobalLayoutState()
+        if (layoutState is Invalidated) {
             recoverTabWithQuery(query)
             return
+        }
+
+        // url == null guards against restoration paths (onViewReady / restoreWebViewState)
+        // calling onUserSubmittedQuery while globalLayoutState is still the default
+        // Browser(isNewTabState = true) from ViewModel init, which would otherwise misfire the
+        // NTP search-submitted pixel even though the user never typed into the NTP omnibar.
+        if (androidBrowserConfig.showNTPAfterIdleReturn().isEnabled() &&
+            layoutState is Browser &&
+            layoutState.isNewTabState &&
+            url == null
+        ) {
+            ntpAfterIdleManager.onNtpSearchSubmitted()
         }
 
         val cta = currentCtaViewState().cta
@@ -1287,6 +1306,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta,
+            is DaxTryASearchBrandDesignUpdateBubbleCta,
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
@@ -1294,6 +1314,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
+            is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!ctaViewModel.isSuggestedSiteOption(query)) {
@@ -2175,15 +2196,18 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
+        // Always run navigation-state bookkeeping: this updates webNavigationState (consulted by
+        // onUserPressedBack) and persists the resolved URL. Skipping it leaves canGoBack stale and
+        // back press exits the browser instead of returning to the previous page.
+        if (!currentBrowserViewState().maliciousSiteBlocked) {
+            navigationStateChanged(webViewNavigationState)
+        }
+
         if (!currentBrowserViewState().browserShowing) return
 
         // Once a page load completes, ignore subsequent progress events (iframes, subresources)
         // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
         if (progressBarUpgradeFeature.behaviourUpdate().isEnabled() && hasCompletedPageLoad) return
-
-        if (!currentBrowserViewState().maliciousSiteBlocked) {
-            navigationStateChanged(webViewNavigationState)
-        }
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
@@ -3086,7 +3110,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState()
+        browserViewState.value = BrowserViewState(useBottomSheetMenu = browserMenuState.value.isEnabled)
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
@@ -3227,8 +3251,10 @@ class BrowserTabViewModel @Inject constructor(
         command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && omnibarRepository.omnibarType == OmnibarType.SPLIT)
     }
 
-    fun onPopupMenuLaunched() {
-        additionalDefaultBrowserPrompts.onPopupMenuLaunched()
+    fun onBrowserMenuLaunched(viewMode: ViewMode) {
+        if (viewMode is ViewMode.Browser) {
+            additionalDefaultBrowserPrompts.onBrowserMenuLaunched()
+        }
     }
 
     fun onNewTabMenuItemClicked(longPress: Boolean = false) {
@@ -3296,7 +3322,8 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
-            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta || cta is SubscriptionPromoModalCta ||
+            cta is HomePanelCta || cta is DaxBubbleCta.DaxSubscriptionCta ||
+                cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta ||
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
                 (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
@@ -3874,16 +3901,22 @@ class BrowserTabViewModel @Inject constructor(
     override fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,
+        errorCode: String,
     ) {
-        browserViewState.value =
-            currentBrowserViewState().copy(
-                browserError = errorType,
-                showPrivacyShield = HighlightableButton.Visible(enabled = false),
-            )
-        if (androidBrowserConfig.errorPagePixel().isEnabled()) {
-            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+        if (errorType != OMITTED) {
+            browserViewState.value =
+                currentBrowserViewState().copy(
+                    browserError = errorType,
+                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                )
+            if (androidBrowserConfig.errorPagePixel().isEnabled()) {
+                pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+            }
+            command.value = WebViewError(errorType, url)
         }
-        command.value = WebViewError(errorType, url)
+        if (androidBrowserConfig.errorCodePixel().isEnabled()) {
+            pixel.enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to errorCode))
+        }
     }
 
     override fun onReceivedMaliciousSiteWarning(
@@ -4643,13 +4676,17 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
         when (cta) {
-            is DaxBubbleCta.DaxSubscriptionCta -> {
+            is DaxBubbleCta.DaxSubscriptionCta,
+            is DaxSubscriptionBrandDesignUpdateBubbleCta,
+            -> {
                 viewModelScope.launch {
                     val origin = "funnel_onboarding_android"
                     command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
                 }
             }
-            is DaxBubbleCta.DaxEndCta -> {
+            is DaxBubbleCta.DaxEndCta,
+            is DaxEndBrandDesignUpdateBubbleCta,
+            -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
@@ -4792,7 +4829,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+        val cta = ctaViewState.value?.cta
+        if (cta is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+            command.value = SetBrowserBackground(
+                cta.backgroundRes,
+                useRebrandBackground = true,
+                backgroundColorAttr = com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop,
+            )
+        } else {
+            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+        }
     }
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {

@@ -62,7 +62,6 @@ interface NativeInputOmnibarController : OmnibarState {
     fun getText(): String
     fun hideBackground()
     fun showTransparentOmnibar()
-    fun getButtonsWidth(): Int
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
@@ -98,7 +97,22 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
+            if (isSplitMode()) {
+                showOmnibarButtons(omnibarView)
+            }
         }
+    }
+
+    private fun showOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+    }
+
+    private fun hideOmnibarButtons(omnibarView: View) {
+        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.tabsMenu)?.gone()
+        omnibarView.findViewById<View?>(R.id.browserMenu)?.gone()
     }
 
     override fun showTransparentOmnibar() {
@@ -227,13 +241,6 @@ class RealNativeInputOmnibarController(
         return omnibarView.findViewById(R.id.omniBarContainerShadow)
     }
 
-    override fun getButtonsWidth(): Int {
-        val omnibarView = omnibar.omnibarView as? View ?: return 0
-        val tabsMenu = omnibarView.findViewById<View?>(R.id.tabsMenu)
-        val browserMenu = omnibarView.findViewById<View?>(R.id.browserMenu)
-        return (tabsMenu?.width ?: 0) + (browserMenu?.width ?: 0)
-    }
-
     override fun restore() {
         currentTier = DuckAiTier.Unknown
         currentUpgradeClick = null
@@ -253,6 +260,9 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
         omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+        if (isSplitMode()) {
+            hideOmnibarButtons(omnibarView)
+        }
     }
 
     private fun restoreOmnibarColors() {

@@ -78,6 +78,14 @@
                 app:primaryText="@string/sync_internal_block_store_header" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/blockStoreApiInUse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/blockStoreFeatureFlag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,7 +102,23 @@
                 app:typography="body1" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/blockStoreDeviceLockStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/blockStoreE2eStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/blockStoreInferredBackupStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_4"

@@ -16,9 +16,13 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.annotation.SuppressLint
+import android.app.KeyguardManager
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
@@ -68,6 +72,8 @@ constructor(
     private val persistentStorage: PersistentStorage,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
+    private val appBuildConfig: AppBuildConfig,
+    @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -93,6 +99,13 @@ constructor(
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
         val blockStoreCurrentValue: BlockStoreValue = BlockStoreValue.Loading,
+        val blockStoreFeatureFlagText: String = "",
+        val blockStoreAvailabilityText: String = "",
+        val blockStoreApiLevelText: String = "",
+        val blockStoreDeviceLockText: String = "",
+        val blockStoreE2eText: String = "",
+        val blockStoreInferredBackupText: String = "",
+        val blockStoreCurrentValueText: String = "Loading...",
     )
 
     sealed class BlockStoreValue {
@@ -121,6 +134,8 @@ constructor(
 
     fun onResume() {
         viewModelScope.launch(dispatchers.io()) {
+            checkSyncAutoRestoreFlag()
+            checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
     }
@@ -371,16 +386,37 @@ constructor(
 
     private fun checkSyncAutoRestoreFlag() {
         val enabled = syncFeature.syncAutoRestore().isEnabled()
-        viewState.update { it.copy(syncAutoRestoreEnabled = enabled) }
+        viewState.update { state ->
+            state.copy(syncAutoRestoreEnabled = enabled).withBlockStoreChecklistText(
+                apiLevel = appBuildConfig.sdkInt,
+                hasSecureLock = isDeviceSecureLockEnabled(),
+            )
+        }
     }
 
     private suspend fun checkBlockStoreAvailability() {
         when (val availability = persistentStorage.checkAvailability()) {
             is PersistentStorageAvailability.Unavailable -> {
-                viewState.update { it.copy(blockStoreAvailable = false, blockStoreE2ESupported = false) }
+                viewState.update { state ->
+                    state.copy(
+                        blockStoreAvailable = false,
+                        blockStoreE2ESupported = false,
+                    ).withBlockStoreChecklistText(
+                        apiLevel = appBuildConfig.sdkInt,
+                        hasSecureLock = isDeviceSecureLockEnabled(),
+                    )
+                }
             }
             is PersistentStorageAvailability.Available -> {
-                viewState.update { it.copy(blockStoreAvailable = true, blockStoreE2ESupported = availability.isEndToEndEncryptionSupported) }
+                viewState.update { state ->
+                    state.copy(
+                        blockStoreAvailable = true,
+                        blockStoreE2ESupported = availability.isEndToEndEncryptionSupported,
+                    ).withBlockStoreChecklistText(
+                        apiLevel = appBuildConfig.sdkInt,
+                        hasSecureLock = isDeviceSecureLockEnabled(),
+                    )
+                }
             }
         }
     }
@@ -391,7 +427,12 @@ constructor(
             bytes == null -> BlockStoreValue.NotSet
             else -> BlockStoreValue.HasValue(String(bytes, Charsets.UTF_8))
         }
-        viewState.update { it.copy(blockStoreCurrentValue = blockStoreValue) }
+        viewState.update { state ->
+            state.copy(blockStoreCurrentValue = blockStoreValue).withBlockStoreChecklistText(
+                apiLevel = appBuildConfig.sdkInt,
+                hasSecureLock = isDeviceSecureLockEnabled(),
+            )
+        }
     }
 
     fun onBlockStoreWriteRecoveryCode() {
@@ -451,5 +492,69 @@ constructor(
             refreshBlockStoreValue()
             command.send(ShowMessage("Cleared successfully"))
         }
+    }
+
+    private fun ViewState.withBlockStoreChecklistText(
+        apiLevel: Int,
+        hasSecureLock: Boolean,
+    ): ViewState {
+        val apiSupportsE2e = apiLevel >= 28
+        val featureFlagText = if (syncAutoRestoreEnabled) {
+            "✅ syncAutoRestore flag: enabled"
+        } else {
+            "❌ syncAutoRestore flag: disabled"
+        }
+        val availabilityText = when (blockStoreAvailable) {
+            null -> "Checking..."
+            true -> "✅ Block Store API: Available"
+            false -> "❌ Block Store API: Unavailable (Play Services missing)"
+        }
+        val apiLevelText = if (blockStoreAvailable == null) {
+            ""
+        } else {
+            val e2eApiLevelStatus = if (apiSupportsE2e) {
+                "(supports E2E encryption)"
+            } else {
+                "(no E2E encryption support)"
+            }
+            "Android API level: $apiLevel $e2eApiLevelStatus"
+        }
+        val deviceLockText = when (blockStoreAvailable) {
+            null -> ""
+            true -> if (hasSecureLock) "✅ Device screen lock: Enabled" else "❌ Device screen lock: Disabled"
+            false -> ""
+        }
+        val e2eText = when {
+            blockStoreAvailable == null -> ""
+            !blockStoreAvailable -> ""
+            blockStoreE2ESupported == true -> "✅ E2E encryption: Available"
+            else -> "❌ E2E encryption: Unavailable"
+        }
+        val inferredBackupText = when {
+            blockStoreAvailable == null -> ""
+            blockStoreE2ESupported == true -> "✅ Backup setting (inferred): Enabled"
+            blockStoreAvailable && apiSupportsE2e && hasSecureLock ->
+                "❌ Backup setting (inferred): Disabled\n(E2E unavailable despite meeting prerequisites)"
+            else -> "❓ Backup setting (inferred): Unknown"
+        }
+        val currentValueText = when (val value = blockStoreCurrentValue) {
+            is BlockStoreValue.Loading -> "Loading..."
+            is BlockStoreValue.NotSet -> "(key not set)"
+            is BlockStoreValue.HasValue -> value.value
+        }
+        return copy(
+            blockStoreFeatureFlagText = featureFlagText,
+            blockStoreAvailabilityText = availabilityText,
+            blockStoreApiLevelText = apiLevelText,
+            blockStoreDeviceLockText = deviceLockText,
+            blockStoreE2eText = e2eText,
+            blockStoreInferredBackupText = inferredBackupText,
+            blockStoreCurrentValueText = currentValueText,
+        )
+    }
+
+    private fun isDeviceSecureLockEnabled(): Boolean {
+        val keyguardManager = context.getSystemService(KeyguardManager::class.java)
+        return keyguardManager?.isDeviceSecure == true
     }
 }

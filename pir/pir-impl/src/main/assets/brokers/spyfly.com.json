@@ -1,7 +1,7 @@
 {
   "name": "SpyFly",
   "url": "spyfly.com",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "addedDatetime": 1775214750818,
   "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "url": "https://www.spyfly.com/help-center/privacy-requests",
           "id": "91ea665d-89f1-4f38-942e-d27ea2438ec2"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-f5bc721e-cc51-4404-9a34-465af869a243"
         },
         {
           "actionType": "expectation",
@@ -67,7 +78,7 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "c83793ff-9b93-4924-ad9c-008e01356bea"
+          "id": "cft-c83793ff-9b93-4924-ad9c-008e01356bea"
         },
         {
           "actionType": "click",
@@ -89,6 +100,18 @@
             }
           ],
           "id": "619924fc-4ad6-47aa-a5e6-44b2c8013273"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "_comment": "Ensure the Turnstile captcha is solved before proceeding",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "cft-3e0d35a5-6548-4387-982a-563b05674a70"
         },
         {
           "_comment": "Terminal action. We are on the email page, not results. noResultsSelector matches #email-address so extract returns empty results cleanly.",

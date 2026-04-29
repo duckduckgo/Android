@@ -384,6 +384,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             ?.alpha(0f)
             ?.setDuration(300)
             ?.withEndAction {
+                if (!isAdded) return@withEndAction
                 isCancelable = true
                 dismissAllowingStateLoss()
             }

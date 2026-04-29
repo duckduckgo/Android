@@ -45,7 +45,11 @@ class DefaultBrowserObserverTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel)
+        testee = DefaultBrowserObserver(
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            appInstallStore = mockAppInstallStore,
+            pixel = mockPixel,
+        )
     }
 
     @Test
@@ -59,6 +63,36 @@ class DefaultBrowserObserverTest {
         testee.onResume(mockOwner)
 
         verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
+    }
+
+    @Test
+    fun whenDDGBecomesDefaultBrowserThenWasEverDefaultSetToTrue() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
+
+        testee.onResume(mockOwner)
+
+        verify(mockAppInstallStore).wasEverDefaultBrowser = true
+    }
+
+    @Test
+    fun whenDDGIsNotDefaultBrowserThenWasEverDefaultNotChanged() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
+
+        testee.onResume(mockOwner)
+
+        verify(mockAppInstallStore, never()).wasEverDefaultBrowser = any()
+    }
+
+    @Test
+    fun whenDDGRemainsDefaultBrowserThenWasEverDefaultNotChanged() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockAppInstallStore.defaultBrowser).thenReturn(true)
+
+        testee.onResume(mockOwner)
+
+        verify(mockAppInstallStore, never()).wasEverDefaultBrowser = any()
     }
 
     @Test
