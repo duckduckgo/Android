@@ -419,7 +419,6 @@ class RealNativeInputManager @Inject constructor(
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks.onChatSuggestionSelected)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
-        applyInitialTabSelection(widgetView)
         bindVoiceButtons(widgetView, callbacks)
         layoutCoordinator.applyBottomCardShape(widgetView)
     }
