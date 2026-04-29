@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 data class NativeInputState(
     val inputMode: InputMode,
     val inputContext: InputContext,
+    val inputPosition: InputPosition = InputPosition.TOP,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
@@ -29,7 +30,11 @@ data class NativeInputState(
 
     enum class ToggleSelection { SEARCH, DUCK_AI }
 
+    enum class InputPosition { TOP, BOTTOM }
+
     val toggleVisible: Boolean get() = inputMode == InputMode.SEARCH_AND_DUCK_AI
+
+    val isBottom: Boolean get() = inputPosition == InputPosition.BOTTOM
 
     val defaultToggleSelection: ToggleSelection get() =
         if (inputContext == InputContext.DUCK_AI) ToggleSelection.DUCK_AI else ToggleSelection.SEARCH

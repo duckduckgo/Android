@@ -204,6 +204,49 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenInitialPositionThenTop() = runTest {
+        assertEquals(NativeInputState.InputPosition.TOP, testee.state.firstOrNull()!!.inputPosition)
+    }
+
+    @Test
+    fun whenSetInputPositionBottomThenPositionIsBottom() = runTest {
+        testee.setWidgetPosition(isBottom = true)
+
+        assertEquals(NativeInputState.InputPosition.BOTTOM, testee.state.firstOrNull()!!.inputPosition)
+    }
+
+    @Test
+    fun whenSetInputPositionTopThenPositionIsTop() = runTest {
+        testee.setWidgetPosition(isBottom = true)
+        testee.setWidgetPosition(isBottom = false)
+
+        assertEquals(NativeInputState.InputPosition.TOP, testee.state.firstOrNull()!!.inputPosition)
+    }
+
+    @Test
+    fun whenPositionIsBottomThenIsBottomTrue() = runTest {
+        testee.setWidgetPosition(isBottom = true)
+
+        assertTrue(testee.state.firstOrNull()!!.isBottom)
+    }
+
+    @Test
+    fun whenPositionIsTopThenIsBottomFalse() = runTest {
+        assertFalse(testee.state.firstOrNull()!!.isBottom)
+    }
+
+    @Test
+    fun whenSetInputPositionThenInputModeUnchanged() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        val initialMode = testee.state.firstOrNull()!!.inputMode
+
+        testee.setWidgetPosition(isBottom = true)
+
+        assertEquals(initialMode, testee.state.firstOrNull()!!.inputMode)
+    }
+
+    @Test
     fun whenStorePendingPromptThenDelegatesToStore() {
         testee.storePendingPrompt("hello", "model-1")
 

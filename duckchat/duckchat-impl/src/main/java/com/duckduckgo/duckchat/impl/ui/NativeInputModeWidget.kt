@@ -84,14 +84,15 @@ interface NativeInputWidget {
     fun submitMessage(message: String?)
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
-    fun setBrowserMenuHighlightVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean
     fun storePendingPrompt(query: String)
     fun setDuckAiMode(isDuckAiMode: Boolean)
+    fun isWidgetBottom(): Boolean
+    fun setWidgetPosition(isBottom: Boolean)
     fun setNativeInputState(toggleVisible: Boolean)
-    fun applyOmnibarShape(isBottom: Boolean)
+    fun applyOmnibarShape()
     fun setWidgetRootView(view: View)
 
     fun bindInputEvents(
@@ -469,8 +470,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (isDuckAiMode) selectChatTab()
     }
 
-    override fun applyOmnibarShape(isBottom: Boolean) {
-        if (isBottom) return
+    override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
+
+    override fun setWidgetPosition(isBottom: Boolean) {
+        val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
+        nativeInputState = nativeInputState.copy(inputPosition = position)
+        viewModel.setWidgetPosition(isBottom)
+    }
+
+    override fun applyOmnibarShape() {
+        if (nativeInputState.isBottom) return
         if (nativeInputState.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)

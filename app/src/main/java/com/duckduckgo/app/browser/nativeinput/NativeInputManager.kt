@@ -161,9 +161,10 @@ class RealNativeInputManager @Inject constructor(
         val card = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
         val omnibarCard = omnibarController.getCardView()
 
+        val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            animator.animateExit(card, widgetView, omnibarCard, layoutCoordinator.isWidgetBottom()) {
+            animator.animateExit(card, widgetView, omnibarCard, isBottom) {
                 isExiting = false
                 onHide()
             }
@@ -284,9 +285,10 @@ class RealNativeInputManager @Inject constructor(
             omnibarController.show()
             omnibarController.hideBackground()
         }
-        val widgetView = createWidgetView(layoutInflater)
+        val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
+        val widgetView = createWidgetView(layoutInflater, isBottom)
         val prefillText = query.ifEmpty { omnibarController.getText() }
-        bindWidget(widgetView, lifecycleOwner, tabs, callbacks)
+        bindWidget(widgetView, lifecycleOwner, tabs, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             callbacks.onClearAutocomplete()
             widgetFrom(widgetView)?.apply {
@@ -294,7 +296,7 @@ class RealNativeInputManager @Inject constructor(
                 selectAllText()
             }
         }
-        attachWidget(widgetView)
+        attachWidget(widgetView, isBottom)
         if (omnibarController.isDuckAiMode()) {
             widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
@@ -386,9 +388,9 @@ class RealNativeInputManager @Inject constructor(
         return removed
     }
 
-    private fun createWidgetView(layoutInflater: LayoutInflater): View {
+    private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
         val layoutRes =
-            if (layoutCoordinator.isWidgetBottom()) {
+            if (isBottom) {
                 R.layout.input_mode_widget_card_view_bottom
             } else {
                 R.layout.input_mode_widget_card_view
@@ -401,6 +403,7 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
         callbacks: NativeInputCallbacks,
+        isBottom: Boolean,
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
@@ -411,7 +414,7 @@ class RealNativeInputManager @Inject constructor(
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }
             }
-            if (!layoutCoordinator.isWidgetBottom()) {
+            if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
         }
@@ -420,7 +423,7 @@ class RealNativeInputManager @Inject constructor(
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks.onChatSuggestionSelected)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
-        layoutCoordinator.applyBottomCardShape(widgetView)
+        layoutCoordinator.applyBottomCardShape(widgetView, isBottom)
     }
 
     private fun bindVoiceButtons(
@@ -489,46 +492,47 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View) {
+    private fun attachWidget(widgetView: View, isBottom: Boolean) {
         widgetFrom(widgetView)?.setNativeInputState(
             toggleVisible = duckChat.isEnabled() && isInputScreenUserSettingEnabled,
         )
 
-        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams())
+        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
             setDuckAiMode(omnibarController.isDuckAiMode())
-            applyOmnibarShape(layoutCoordinator.isWidgetBottom())
+            setWidgetPosition(isBottom)
+            applyOmnibarShape()
         }
 
-        applyWindowChrome(widgetView)
+        applyWindowChrome(widgetView, isBottom)
 
-        if (!startEnterAnimation(widgetView)) {
-            animator.applyLayoutTransitions(widgetView, layoutCoordinator.isWidgetBottom())
+        if (!startEnterAnimation(widgetView, isBottom)) {
+            animator.applyLayoutTransitions(widgetView, isBottom)
             onEnterComplete(widgetView)
         }
     }
 
-    private fun applyWindowChrome(widgetView: View) {
+    private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
-        if (layoutCoordinator.isWidgetBottom()) {
+        if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
         }
-        layoutCoordinator.configureAutocompleteLayout(widgetView)
-        layoutCoordinator.configureContentOffset(widgetView)
-        widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView) }
+        layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
+        layoutCoordinator.configureContentOffset(widgetView, isBottom)
+        widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
     }
 
-    private fun startEnterAnimation(widgetView: View): Boolean {
+    private fun startEnterAnimation(widgetView: View, isBottom: Boolean): Boolean {
         if (omnibarController.isDuckAiMode()) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
-        val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, layoutCoordinator.isWidgetBottom())
+        val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
         animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) { onEnterComplete(widgetView) }

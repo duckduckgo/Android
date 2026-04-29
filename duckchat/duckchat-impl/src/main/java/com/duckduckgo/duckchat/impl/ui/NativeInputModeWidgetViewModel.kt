@@ -49,16 +49,19 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val inputContext = MutableStateFlow(NativeInputState.InputContext.BROWSER)
+    private val inputPosition = MutableStateFlow(NativeInputState.InputPosition.TOP)
 
     val state: SharedFlow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
         inputContext,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, context ->
+        inputPosition,
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, context, position ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
             inputContext = context,
+            inputPosition = position,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -75,6 +78,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
         inputContext.value = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
+    }
+
+    fun setWidgetPosition(isBottom: Boolean) {
+        inputPosition.value = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
     }
 
     fun storePendingPrompt(query: String, modelId: String?) {
