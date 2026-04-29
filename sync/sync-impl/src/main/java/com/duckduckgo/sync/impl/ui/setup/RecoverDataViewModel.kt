@@ -86,6 +86,7 @@ class RecoverDataViewModel @Inject constructor(
                     showRestoreOnReinstall = showRestore,
                 ),
             )
+            if (showRestore) syncPixels.fireAutoRestoreSetupToggleShown()
         } ?: run {
             syncSetupWideEvent.onRecoveryCodeGenerationFailed()
             command.send(Command.FinishWithError)
@@ -138,6 +139,9 @@ class RecoverDataViewModel @Inject constructor(
     fun onNextClicked() {
         viewModelScope.launch(dispatchers.io()) {
             if (viewState.value.showRestoreOnReinstall) {
+                if (!viewState.value.restoreOnReinstallEnabled) {
+                    syncPixels.fireAutoRestoreSetupToggleOptedOut()
+                }
                 persistRecoveryPayload()
             }
             command.send(Next)

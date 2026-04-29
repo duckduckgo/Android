@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
@@ -205,6 +206,7 @@ class SyncActivityViewModel @Inject constructor(
         }
 
         val enabled = syncAutoRestoreManager.isRestoreOnReinstallEnabled().also { initialAutoRestoreEnabled = it }
+        syncPixels.fireAutoRestoreSettingsPageShown()
         return AutoRestoreState(showToggle = true, enabled = enabled)
     }
 
@@ -250,6 +252,7 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data class ShowPreviousSessionReady(val originalFlow: OriginalFlow) : Command()
+        data class LaunchOriginalFlow(val originalFlow: OriginalFlow) : Command()
     }
 
     enum class OriginalFlow {
@@ -299,7 +302,33 @@ class SyncActivityViewModel @Inject constructor(
                 if (syncAutoRestore.canRestore()) {
                     command.send(ShowPreviousSessionReady(OriginalFlow.RECOVER_SYNCED_DATA))
                 } else {
+                    syncPixels.fireAutoRestoreSettingsManualRecoveryShown()
                     command.send(Command.IntroRecoverSyncData)
+                }
+            }
+        }
+    }
+
+    fun onContinueSetupAfterSkipRestore(originalFlow: OriginalFlow?) {
+        if (originalFlow == null) return
+        viewModelScope.launch(dispatchers.io()) {
+            val source = when (originalFlow) {
+                OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
+                OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
+                OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
+            }
+            when (val result = syncAutoRestoreManager.clearAutoRestoreData()) {
+                is Success -> {
+                    syncPixels.fireAutoRestorePreservedAccountCleared(source)
+                    command.send(Command.LaunchOriginalFlow(originalFlow))
+                }
+                is Error -> {
+                    syncPixels.fireAutoRestorePreservedAccountClearFailed(
+                        source = source,
+                        errorCode = result.code.toString(),
+                        errorMessage = result.reason,
+                    )
+                    command.send(ShowError(R.string.sync_general_error, result.reason))
                 }
             }
         }
@@ -419,6 +448,7 @@ class SyncActivityViewModel @Inject constructor(
         // appCoroutineScope as we don't want this cancelled even if the activity / view model lifecycle ends
         appCoroutineScope.launch(dispatchers.io()) {
             if (current.autoRestoreEnabled) {
+                syncPixels.fireAutoRestoreSettingsPageToggleEnabled()
                 syncAccountRepository.getRecoveryCode()
                     .onSuccess { authCode ->
                         val deviceId = syncAccountRepository.getThisConnectedDevice()?.deviceId
@@ -429,6 +459,7 @@ class SyncActivityViewModel @Inject constructor(
                         logcat(LogPriority.ERROR) { "Sync-Recovery: failed to get recovery code, preference not written - ${error.reason}" }
                     }
             } else {
+                syncPixels.fireAutoRestoreSettingsPageToggleDisabled()
                 logcat { "Sync-Recovery: clearing recovery payload from Block Store" }
                 syncAutoRestoreManager.clearAutoRestoreData()
                 initialAutoRestoreEnabled = false

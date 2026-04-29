@@ -34,5 +34,26 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_onboarding_prompt_shown_unique": {
+        "description": "Restore prompt shown during onboarding for a returning user eligible for sync auto-restore",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_onboarding_restore_tapped_unique": {
+        "description": "User taps to restore their data from the onboarding sync restore prompt",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync-auto-restore_onboarding_skip_tapped_unique": {
+        "description": "User taps taps not to restore their data from the onboarding sync restore prompt",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

@@ -26,6 +26,8 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.RestorationComplete
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.ShowError
@@ -42,6 +44,7 @@ import javax.inject.Inject
 class SyncRestoreAccountViewModel @Inject constructor(
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -69,8 +72,18 @@ class SyncRestoreAccountViewModel @Inject constructor(
             }
             val parsedCode = syncAccountRepository.parseSyncAuthCode(payload.recoveryCode)
             when (val result = syncAccountRepository.processCode(parsedCode, existingDeviceId = payload.deviceId)) {
-                is Result.Success -> command.send(RestorationComplete)
-                is Result.Error -> command.send(ShowError(R.string.sync_general_error, result.reason))
+                is Result.Success -> {
+                    syncPixels.fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_SETTINGS)
+                    command.send(RestorationComplete)
+                }
+                is Result.Error -> {
+                    syncPixels.fireAutoRestoreFailure(
+                        source = SyncPixelParameters.AUTO_RESTORE_SOURCE_SETTINGS,
+                        errorCode = result.code.toString(),
+                        errorMessage = result.reason,
+                    )
+                    command.send(ShowError(R.string.sync_general_error, result.reason))
+                }
             }
         }
     }

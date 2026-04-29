@@ -175,7 +175,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
             PreviousSessionReady -> {
                 screen = PREVIOUS_SESSION_READY
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncPreviousSessionReadyFragment.instance(), TAG_PREVIOUS_SESSION_READY)
+                    replace(id.fragment_container_view, SyncPreviousSessionReadyFragment.instance(extractSource()), TAG_PREVIOUS_SESSION_READY)
                 }
             }
 
