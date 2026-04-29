@@ -254,8 +254,10 @@ class InlinePdfHandlerTest {
             InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
             "pdf_cache",
         )
-        val partialFile = File(cacheDir, "cancelled.pdf")
-        assertFalse("Partial file should be deleted after cancellation", partialFile.exists())
+        assertTrue(
+            "Cache directory should contain no leftover files after cancellation",
+            cacheDir.listFiles().isNullOrEmpty(),
+        )
     }
 
     // endregion
@@ -323,8 +325,10 @@ class InlinePdfHandlerTest {
             InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
             "pdf_cache",
         )
-        val partialFile = File(cacheDir, "short.pdf")
-        assertFalse("Magic-byte mismatch should delete the cached file", partialFile.exists())
+        assertTrue(
+            "Cache directory should be empty when the response failed the magic-bytes check",
+            cacheDir.listFiles().isNullOrEmpty(),
+        )
     }
 
     @Test
