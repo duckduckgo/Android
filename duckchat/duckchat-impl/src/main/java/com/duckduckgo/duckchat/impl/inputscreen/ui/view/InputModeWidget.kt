@@ -78,6 +78,7 @@ open class InputModeWidget @JvmOverloads constructor(
     val inputField: EditText
     private val inputFieldClearText: View
     private val inputModeWidgetBack: View
+    private val inputModeWidgetUnifiedBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
@@ -161,6 +162,7 @@ open class InputModeWidget @JvmOverloads constructor(
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
+        inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
@@ -235,6 +237,14 @@ open class InputModeWidget @JvmOverloads constructor(
             val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
         }
+
+        inputModeWidgetUnifiedBack.setOnClickListener {
+            onBack?.invoke()
+
+            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
+        }
+
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
         }

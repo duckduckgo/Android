@@ -29,6 +29,8 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Space
+import androidx.core.content.res.use
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
@@ -239,6 +241,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
         hideBackArrow()
+        showUnifiedBackArrow()
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()
@@ -330,6 +333,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun hideBackArrow() {
         findViewById<View?>(R.id.InputModeWidgetBack)?.visibility = GONE
+    }
+
+    private fun showUnifiedBackArrow() {
+        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility = VISIBLE
     }
 
     private fun hideInputFieldBackground() {
