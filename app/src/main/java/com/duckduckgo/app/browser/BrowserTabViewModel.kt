@@ -3691,7 +3691,7 @@ class BrowserTabViewModel @Inject constructor(
                 loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
                 if (cachedUri != null) {
                     val pdfTitle = inlinePdfHandler.extractFileName(url)
-                    buildSiteFactory(url, title = pdfTitle)
+                    pageChanged(url, pdfTitle)
                     browserViewState.value = currentBrowserViewState().copy(
                         currentPdfCachedUri = cachedUri,
                         currentPdfFileName = pdfTitle,

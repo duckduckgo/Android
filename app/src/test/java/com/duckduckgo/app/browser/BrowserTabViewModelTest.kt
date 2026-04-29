@@ -10256,6 +10256,35 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPdfShownAfterFreshViewModelThenPerPageMenuFlagsArePopulated() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val url = "https://example.com/doc.pdf"
+        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(Uri.parse("file:///cache/doc.pdf"))
+        whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
+        testee.browserViewState.value = browserViewState().copy(
+            canSaveSite = false,
+            canSharePage = false,
+            canFireproofSite = false,
+            canFindInPage = false,
+            canChangeBrowsingMode = false,
+            canPrintPage = false,
+            canChangePrivacyProtection = false,
+            canReportSite = false,
+        )
+
+        testee.requestFileDownload(mock(), url, null, "application/pdf", true, false)
+
+        assertTrue(browserViewState().canSaveSite)
+        assertTrue(browserViewState().canSharePage)
+        assertTrue(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().canFindInPage)
+        assertTrue(browserViewState().canChangeBrowsingMode)
+        assertTrue(browserViewState().canPrintPage)
+        assertTrue(browserViewState().canChangePrivacyProtection)
+        assertTrue(browserViewState().canReportSite)
+    }
+
+    @Test
     fun whenOnPdfHiddenThenCurrentPdfStateClears() {
         testee.browserViewState.value = browserViewState().copy(
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
