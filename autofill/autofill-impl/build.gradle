@@ -30,6 +30,7 @@ ext {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')

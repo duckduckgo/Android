@@ -276,6 +276,7 @@ fladle {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")

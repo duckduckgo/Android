@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
     id 'kotlin-parcelize'
 }
 
@@ -44,6 +45,7 @@ android {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     anvil project(':anvil-compiler')
     implementation project(':navigation-api')
     implementation project(':anrs-api')
