@@ -26,21 +26,14 @@ Fill in the template sections as follows:
 - **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
 - **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
-Use `gh api repos/duckduckgo/Android/pulls --method POST` to open PRs — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
+## Creating PRs
 
-## Stacked PRs (Graphite)
+Use Graphite (`gt`) to create and submit pull requests. Prefer the GT MCP when it is available; otherwise run `gt` from the terminal:
 
-We use Graphite for stacked pull requests. When asked to build a complete feature, plan a stack of PRs following the ordering below before writing any code. For any other task, follow the engineer's instructions on how to structure the work. Each PR in the stack must build and pass `./gradlew jvm_checks` independently.
+- `gt create` to start a new branch in the stack
+- `gt submit` to open a PR for the first time
+- `gt submit --stack --update-only` to push subsequent updates — `--update-only` ensures Graphite only updates existing PRs and never opens a new one by accident
 
-### Stack ordering
+Only fall back to manual `gh` commands when Graphite is not available in the environment. In that case, open the PR with `gh api repos/duckduckgo/Android/pulls --method POST` — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
 
-Structure the stack around the evolution of the work, not the module layout:
-
-1. **Feature flag** (if needed) — remote feature toggle gating the new behaviour
-2. **Implementation** (one or more PRs) — the feature itself, including UI, logic, and unit tests; split into multiple PRs if the feature is large enough to benefit from independent review
-3. **Pixels** — analytics events for the feature
-4. **Translations** — any new strings added for the feature
-
-### Creating stacked PRs
-
-If the GT MCP is available, use it to create and submit stacked PRs. Otherwise, create branches and PRs manually using `gh`. In both cases, each PR body must follow the template in the **PR body** section above.
+Each PR body must follow the template in the **PR body** section above.
