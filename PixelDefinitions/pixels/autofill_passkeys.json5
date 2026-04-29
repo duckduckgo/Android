@@ -1,0 +1,60 @@
+{
+    "autofill_passkey_auth_started": {
+        "description": "Fired when authentication using a passkey is started",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_auth_succeeded": {
+        "description": "Fired when authentication using a passkey is completed successfully",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_auth_failed": {
+        "description": "Fired when authentication using a passkey fails",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "error name provided by navigator.credentials.get. See https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get#exceptions",
+                "type": "string",
+                "enum": ["AbortError", "IdentityCredentialError", "NetworkError", "NotAllowedError", "SecurityError"]
+            }
+        ]
+    },
+    "autofill_passkey_registration_started": {
+        "description": "Fired when a passkey creation is started",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_registration_succeeded": {
+        "description": "Fired when passkey creation is completed successfully",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "autofill_passkey_registration_failed": {
+        "description": "Fired when passkey creation fails",
+        "owners": ["CrisBarreiro", "CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "error name provided by navigator.credentials.create. See https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create#exceptions",
+                "type": "string",
+                "enum": ["NotAllowedError", "AbortError"]
+            }
+        ]
+    }
+}
