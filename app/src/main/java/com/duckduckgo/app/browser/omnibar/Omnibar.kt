@@ -107,7 +107,7 @@ class Omnibar(
             query: String,
         )
 
-        fun onBackKeyPressed()
+        fun onBackKeyPressed(): Boolean
 
         fun onEnterPressed()
 

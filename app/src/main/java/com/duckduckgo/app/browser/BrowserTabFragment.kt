@@ -92,6 +92,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
@@ -651,6 +652,14 @@ class BrowserTabFragment :
     private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+    private val autoCompleteKeyboardDismissScrollListener =
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    hideKeyboardRetainFocus()
+                }
+            }
+        }
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
@@ -2028,6 +2037,7 @@ class BrowserTabFragment :
 
     override fun onDestroyView() {
         binding.swipeRefreshContainer.removeCanChildScrollUpCallback()
+        binding.autoCompleteSuggestionsList.removeOnScrollListener(autoCompleteKeyboardDismissScrollListener)
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
@@ -3559,6 +3569,10 @@ class BrowserTabFragment :
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.removeOnScrollListener(autoCompleteKeyboardDismissScrollListener)
+        binding.autoCompleteSuggestionsList.addOnScrollListener(
+            autoCompleteKeyboardDismissScrollListener,
+        )
     }
 
     private fun configureNewTab() {
@@ -3566,6 +3580,10 @@ class BrowserTabFragment :
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+        }
+
+        binding.focusedView.setOnScrollChangeListener {
+            hideKeyboardRetainFocus()
         }
 
         if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
@@ -3771,8 +3789,8 @@ class BrowserTabFragment :
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
-                override fun onBackKeyPressed() {
-                    onOmnibarBackKeyPressed()
+                override fun onBackKeyPressed(): Boolean {
+                    return onOmnibarBackKeyPressed()
                 }
 
                 override fun onEnterPressed() {
@@ -3823,9 +3841,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun onOmnibarBackKeyPressed() {
+    private fun onOmnibarBackKeyPressed(): Boolean {
+        val wasOverlayVisible = binding.focusedView.isVisible || binding.autoCompleteSuggestionsList.isVisible
         omnibar.omnibarTextInput.hideKeyboard()
         binding.focusDummy.requestFocus()
+        return wasOverlayVisible
     }
 
     private fun onFindInPageDismissed() {
@@ -5070,10 +5090,10 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
-                // viewState.showFavourites needs to be moved to FocusedViewModel
-                if (viewState.showSuggestions || viewState.showFavorites) {
-                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        showFocusedView()
+                // viewState.showFocusedView needs to be moved to FocusedViewModel
+                if (viewState.showSuggestions || viewState.showFocusedView) {
+                    if (viewState.showFocusedView) {
+                        showFocusedView(viewState.favorites.isNotEmpty())
                         if (binding.autoCompleteSuggestionsList.isVisible) {
                             viewModel.autoCompleteSuggestionsGone()
                         }
@@ -5093,8 +5113,9 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showFocusedView() {
+        private fun showFocusedView(hasFavorites: Boolean = true) {
             binding.focusedView.show()
+            binding.focusedView.showLogo(!hasFavorites)
         }
 
         private fun hideFocusedView() {

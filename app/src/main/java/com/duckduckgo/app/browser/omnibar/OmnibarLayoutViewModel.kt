@@ -1091,7 +1091,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun setDraftTextIfNtpOrSerp(query: String) {
         val isNtp = _viewState.value.viewMode is NewTab
         val isSerp = _viewState.value.viewMode is Browser && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(_viewState.value.url)
-        if (isNtp || isSerp) {
+        if ((isNtp || isSerp) && query.isNotEmpty()) {
             _viewState.update {
                 it.copy(
                     omnibarText = query,

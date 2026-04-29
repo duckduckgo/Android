@@ -1803,6 +1803,33 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun `when set empty draft and current state is SERP, then omnibar text not overwritten`() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val originalQuery = "cats"
+        testee.onInputStateChanged(query = originalQuery, hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.setDraftTextIfNtpOrSerp("")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(originalQuery, viewState.omnibarText)
+        }
+    }
+
+    @Test
+    fun `when set empty draft and current state is NTP, then omnibar text not overwritten`() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onInputStateChanged(query = "partial", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.setDraftTextIfNtpOrSerp("")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("partial", viewState.omnibarText)
+        }
+    }
+
+    @Test
     fun `when set draft and current state is a web page, then draft text not applied`() = runTest {
         val omnibarState = OmnibarViewState(
             navigationChange = false,

@@ -275,6 +275,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         binding.newTabContainerScrollView.setViewPager(binding.viewPager)
 
+        configureKeyboardDismissOnScroll()
+
         if (!useTopBar) {
             binding.autoCompleteBottomFadeContainer.isVisible = false
             binding.chatSuggestionsBottomFadeContainer.isVisible = false
@@ -703,6 +705,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         viewModel.onActivityResume()
     }
 
+    private fun configureKeyboardDismissOnScroll() {
+        binding.newTabContainerScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            hideKeyboard(inputModeWidget.inputField)
+        }
+    }
+
     private fun configureKeyboardListener() {
         binding.root.rootView.keyboardVisibilityFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
@@ -800,6 +808,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputScreenButtons.setSendButtonVisible(isOnChatTab && state.submitButtonVisible)
         }
         inputModeWidget.setMainButtonsVisible(state.mainButtonsVisible)
+    }
+
+    fun dismissKeyboard() {
+        hideKeyboard(inputModeWidget.inputField)
     }
 
     fun getFavoritesContainer(): FrameLayout = binding.newTabContainerLayout
