@@ -2644,14 +2644,15 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         configureAutoComplete()
 
-        // When the omnibar gains focus, it programmatically expands the shortened URL to the full URL,
-        // and on SERP it pre-fills the search query from the URL. Neither is a user-initiated query
-        // change, so treat the current text as unchanged when it matches the page's prefilled value.
+        // When the omnibar gains focus on a non-SERP page, it programmatically expands the shortened URL
+        // to the full URL. That isn't a user-initiated change, so treat the text as unchanged when it
+        // matches the page URL.
         val currentUrl = url
-        val prefilledFromPage = if (currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)) {
-            duckDuckGoUrlDetector.extractQuery(currentUrl) ?: currentUrl
-        } else {
+        val onSerp = currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)
+        val prefilledFromPage = if (currentUrl != null && !onSerp) {
             currentUrl
+        } else {
+            null
         }
         val effectiveHasQueryChanged = hasQueryChanged && query != prefilledFromPage
 
@@ -2664,15 +2665,15 @@ class BrowserTabViewModel @Inject constructor(
             }
 
         val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && effectiveHasQueryChanged && autoCompleteSuggestionsEnabled
+        // On SERP, autocomplete should appear immediately on focus — the user almost always wants to
+        // refine the pre-filled query, so suggestions are useful even before any text change.
+        val showAutoCompleteSuggestions =
+            hasFocus && query.isNotBlank() && (effectiveHasQueryChanged || onSerp) && autoCompleteSuggestionsEnabled
         val showFocusedView =
             if (!showAutoCompleteSuggestions) {
-                // On SERP the omnibar is pre-filled with the search term (not a URL), so treat it the same
-                // as a URL-focused page: the user is looking at content they haven't edited yet.
-                val onSerp = currentUrl != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(currentUrl)
                 val urlFocused =
                     hasFocus && query.isNotBlank() && !effectiveHasQueryChanged &&
-                        (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query) || onSerp)
+                        (UriString.isWebUrl(query) || duckPlayer.isDuckPlayerUri(query))
                 val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
                 hasFocus && (urlFocused || emptyQueryBrowsing)
             } else {
