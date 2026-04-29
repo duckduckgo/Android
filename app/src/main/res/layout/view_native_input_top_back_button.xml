@@ -4,7 +4,7 @@
     android:layout_width="@dimen/inputModeSwitchHeight"
     android:layout_height="@dimen/inputModeSwitchHeight"
     android:layout_gravity="top|start"
-    android:layout_marginStart="@dimen/keyline_2"
+    android:layout_marginStart="@dimen/keyline_4"
     android:layout_marginTop="@dimen/keyline_2"
     android:background="@drawable/selectable_circular_container_ripple"
     android:elevation="4dp"
