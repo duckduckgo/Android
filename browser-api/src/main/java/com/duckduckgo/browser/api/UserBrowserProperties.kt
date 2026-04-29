@@ -31,6 +31,12 @@ interface UserBrowserProperties {
     fun daysSinceInstalled(): Long
     suspend fun daysUsedSince(since: Date): Long
     fun defaultBrowser(): Boolean
+
+    /**
+     * Returns true if this app has ever been set as the user's default browser.
+     * Once true, this value is permanent — it does not revert if the user later
+     * changes their default browser to something else.
+     */
     fun wasEverDefaultBrowser(): Boolean
     fun emailEnabled(): Boolean
     fun searchCount(): Long
