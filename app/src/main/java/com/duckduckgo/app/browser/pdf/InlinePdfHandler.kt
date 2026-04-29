@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.pdf
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -118,6 +119,9 @@ class RealInlinePdfHandler @Inject constructor(
         val targetFile = File(cacheDir, "${url.hashCode()}-$fileName")
         try {
             if (targetFile.exists() && hasPdfMagicBytes(targetFile)) {
+                // Bump mtime so LRU eviction treats this file as recently *used*,
+                // not just recently *written*.
+                targetFile.setLastModified(System.currentTimeMillis())
                 return@withContext Uri.fromFile(targetFile)
             }
 
@@ -156,6 +160,8 @@ class RealInlinePdfHandler @Inject constructor(
                 targetFile.delete()
                 return@withContext null
             }
+
+            enforceCacheBudget(keepFile = targetFile, maxBytes = MAX_CACHE_BYTES)
 
             Uri.fromFile(targetFile)
         } catch (e: CancellationException) {
@@ -202,6 +208,31 @@ class RealInlinePdfHandler @Inject constructor(
         return header.contentEquals(PDF_MAGIC_BYTES)
     }
 
+    /**
+     * Keep the PDF cache directory under [maxBytes] using LRU eviction.
+     *
+     * Walks the directory's files (excluding [keepFile]) sorted by `lastModified`
+     * ascending and deletes oldest until the total is within budget. [keepFile]
+     * is never evicted, so a single PDF larger than [maxBytes] is still served —
+     * the budget is best-effort, not a hard cap on individual files.
+     */
+    @VisibleForTesting
+    internal fun enforceCacheBudget(keepFile: File, maxBytes: Long) {
+        val dir = cacheDir
+        val keepName = keepFile.name
+        val candidates = dir.listFiles()?.filter { it.isFile && it.name != keepName } ?: return
+        var totalBytes = candidates.sumOf { it.length() } + keepFile.length()
+        if (totalBytes <= maxBytes) return
+
+        candidates.sortedBy { it.lastModified() }.forEach { file ->
+            if (totalBytes <= maxBytes) return
+            val size = file.length()
+            if (file.delete()) {
+                totalBytes -= size
+            }
+        }
+    }
+
     override fun extractFileName(url: String): String {
         val path = url.toUri().lastPathSegment ?: "document.pdf"
         val sanitized = path.replace(Regex("[^a-zA-Z0-9._-]"), "_")
@@ -215,5 +246,6 @@ class RealInlinePdfHandler @Inject constructor(
     companion object {
         private const val PDF_CACHE_DIR = "pdf_cache"
         private val PDF_MAGIC_BYTES = "%PDF-".toByteArray()
+        private const val MAX_CACHE_BYTES = 50L * 1024L * 1024L // 50 MB
     }
 }

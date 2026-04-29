@@ -366,4 +366,74 @@ class InlinePdfHandlerTest {
     }
 
     // endregion
+
+    // region cache eviction tests
+
+    @Test
+    fun whenCacheBudgetExceededThenOldestFilesEvictedFirst() {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val oldest = File(cacheDir, "1-old.pdf").apply { writeBytes(ByteArray(40)); setLastModified(1_000L) }
+        val middle = File(cacheDir, "2-middle.pdf").apply { writeBytes(ByteArray(40)); setLastModified(2_000L) }
+        val newest = File(cacheDir, "3-newest.pdf").apply { writeBytes(ByteArray(40)); setLastModified(3_000L) }
+        val keep = File(cacheDir, "4-keep.pdf").apply { writeBytes(ByteArray(40)); setLastModified(4_000L) }
+
+        // Total = 160 bytes; cap at 100 forces eviction of the two oldest (oldest + middle).
+        inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxBytes = 100L)
+
+        assertFalse("Oldest file should have been evicted", oldest.exists())
+        assertFalse("Middle file should have been evicted", middle.exists())
+        assertTrue("Newest non-keep file should remain", newest.exists())
+        assertTrue("keepFile must never be evicted", keep.exists())
+    }
+
+    @Test
+    fun whenKeepFileAloneExceedsBudgetThenStillNotEvicted() {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val older = File(cacheDir, "1-old.pdf").apply { writeBytes(ByteArray(20)); setLastModified(1_000L) }
+        val keep = File(cacheDir, "2-keep.pdf").apply { writeBytes(ByteArray(200)); setLastModified(2_000L) }
+
+        // keep.length() (200) alone is over budget (50). All non-keep files get evicted but
+        // keep itself survives — better to serve a single oversize PDF than refuse it.
+        inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxBytes = 50L)
+
+        assertFalse("Non-keep file should be evicted to free space", older.exists())
+        assertTrue("keepFile must survive even when its size exceeds the cap", keep.exists())
+    }
+
+    @Test
+    fun whenCacheUnderBudgetThenNoFilesEvicted() {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val a = File(cacheDir, "1-a.pdf").apply { writeBytes(ByteArray(10)) }
+        val b = File(cacheDir, "2-b.pdf").apply { writeBytes(ByteArray(10)) }
+        val keep = File(cacheDir, "3-keep.pdf").apply { writeBytes(ByteArray(10)) }
+
+        inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxBytes = 1_000L)
+
+        assertTrue(a.exists())
+        assertTrue(b.exists())
+        assertTrue(keep.exists())
+    }
+
+    @Test
+    fun whenCacheHitThenLastModifiedIsUpdated() = runTest {
+        val pdfBytes = "%PDF-1.4 cached content".toByteArray()
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytes)))
+        val url = server.url("/touch.pdf").toString()
+
+        val firstUri = inlinePdfHandler.downloadToCache(url)
+        assertNotNull(firstUri)
+        val cachedFile = File(firstUri!!.path!!)
+
+        // Backdate the file so we can detect that the cache-hit path bumps it forward.
+        val backdated = System.currentTimeMillis() - 60_000L
+        cachedFile.setLastModified(backdated)
+
+        val before = cachedFile.lastModified()
+        inlinePdfHandler.downloadToCache(url)
+        val after = cachedFile.lastModified()
+
+        assertTrue("Cache hit should bump lastModified to keep LRU semantics accurate", after > before)
+    }
+
+    // endregion
 }
