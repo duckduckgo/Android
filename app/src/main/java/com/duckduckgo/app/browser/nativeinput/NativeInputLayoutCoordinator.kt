@@ -69,6 +69,7 @@ class NativeInputLayoutCoordinator(
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
+        val topBackButton = rootView.findViewById<View?>(R.id.nativeInputTopBackButton)
         val baseElevation = maxOf(autoCompleteList.elevation, focusedView?.elevation ?: 0f)
         val targetElevation = baseElevation + widgetView.resources.displayMetrics.density
         widgetView.elevation = maxOf(widgetView.elevation, targetElevation)
@@ -91,7 +92,11 @@ class NativeInputLayoutCoordinator(
         }
 
         fun applyForWidgetPosition() {
-            val topOffset = if (isBottom) 0 else maxOf(0, widgetView.bottom - autoCompleteList.top)
+            val topOffset = when {
+                !isBottom -> maxOf(0, widgetView.bottom - autoCompleteList.top)
+                topBackButton != null -> maxOf(0, topBackButton.bottom - autoCompleteList.top)
+                else -> 0
+            }
             val bottomOffset = if (isBottom) maxOf(0, autoCompleteList.bottom - widgetView.top) else 0
             applyPadding(deltaTop = topOffset, deltaBottom = bottomOffset)
         }
@@ -104,6 +109,7 @@ class NativeInputLayoutCoordinator(
         widgetView.addOnLayoutChangeListener(layoutListener)
         autoCompleteList.addOnLayoutChangeListener(layoutListener)
         focusedView?.addOnLayoutChangeListener(layoutListener)
+        topBackButton?.addOnLayoutChangeListener(layoutListener)
         widgetView.addOnAttachStateChangeListener(
             object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -113,6 +119,7 @@ class NativeInputLayoutCoordinator(
                     v.removeOnLayoutChangeListener(layoutListener)
                     autoCompleteList.removeOnLayoutChangeListener(layoutListener)
                     focusedView?.removeOnLayoutChangeListener(layoutListener)
+                    topBackButton?.removeOnLayoutChangeListener(layoutListener)
                     v.removeOnAttachStateChangeListener(this)
                 }
             },

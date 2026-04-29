@@ -96,6 +96,7 @@ class RealNativeInputManager @Inject constructor(
     private var isExiting: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+    private var topBackButton: View? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -300,6 +301,20 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun attachTopBackButton(widgetView: View) {
+        val widget = widgetFrom(widgetView) ?: return
+        val backButton = LayoutInflater.from(rootView.context)
+            .inflate(R.layout.view_native_input_top_back_button, rootView, false)
+            .apply {
+                setOnClickListener {
+                    widget.hideKeyboard()
+                    hideNativeInput()
+                }
+            }
+        rootView.addView(backButton)
+        topBackButton = backButton
+    }
+
     private fun bindSearchCallbacks(
         widgetView: View,
         callbacks: NativeInputCallbacks,
@@ -383,6 +398,10 @@ class RealNativeInputManager @Inject constructor(
         floatingSubmitContainer?.let {
             (it.parent as? ViewGroup)?.removeView(it)
             floatingSubmitContainer = null
+        }
+        topBackButton?.let {
+            rootView.removeView(it)
+            topBackButton = null
         }
         if (removed) widgetRoot = null
         return removed
@@ -495,6 +514,10 @@ class RealNativeInputManager @Inject constructor(
     private fun attachWidget(widgetView: View, isBottom: Boolean) {
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
+
+        if (isBottom) {
+            attachTopBackButton(widgetView)
+        }
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
