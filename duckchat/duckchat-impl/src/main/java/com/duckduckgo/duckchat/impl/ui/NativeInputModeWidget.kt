@@ -450,6 +450,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setDuckAiMode(isDuckAiMode: Boolean) {
         viewModel.setDuckAiMode(isDuckAiMode)
+        viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
         if (isDuckAiMode) selectChatTab()
     }
 
