@@ -928,7 +928,6 @@ class RealPirActionsRunnerStateEngineTest {
         val testSideEffect = SideEffect.GetEmailForProfile(
             actionId = "action-1",
             brokerName = testBrokerName,
-            profileQuery = testProfileQuery,
         )
 
         whenever(mockEventHandler.event).thenReturn(Event.Started::class)
