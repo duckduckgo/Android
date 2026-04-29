@@ -13,6 +13,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/inputModeBack"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_arrow_left_24" />
+
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeSwitch"
         style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
@@ -21,7 +32,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/inputModeBack"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
