@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -91,6 +92,9 @@ dependencies {
 }
 
 android {
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
@@ -104,5 +108,13 @@ android {
     }
     buildFeatures {
         buildConfig = true
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
