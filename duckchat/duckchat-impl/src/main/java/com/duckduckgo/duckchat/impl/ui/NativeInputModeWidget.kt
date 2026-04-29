@@ -91,7 +91,6 @@ interface NativeInputWidget {
     fun setDuckAiMode(isDuckAiMode: Boolean)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
-    fun setNativeInputState(toggleVisible: Boolean)
     fun applyOmnibarShape()
     fun setWidgetRootView(view: View)
 
@@ -278,27 +277,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyState(state: NativeInputState) {
-        val previousState = nativeInputState
         nativeInputState = state
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         setToggleMatchParent()
-        if (state.toggleVisible != previousState.toggleVisible) {
-            updateToggleVisibility(toggle, state)
-        }
+        updateToggleVisibility(toggle, state)
         if (!state.toggleVisible) {
-            minimize()
-        }
-    }
-
-    override fun setNativeInputState(toggleVisible: Boolean) {
-        val initialMode = if (toggleVisible) {
-            NativeInputState.InputMode.SEARCH_AND_DUCK_AI
-        } else {
-            NativeInputState.InputMode.SEARCH_ONLY
-        }
-        nativeInputState = nativeInputState.copy(inputMode = initialMode)
-        findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { updateToggleVisibility(it, nativeInputState) }
-        if (!toggleVisible) {
             minimize()
         }
     }

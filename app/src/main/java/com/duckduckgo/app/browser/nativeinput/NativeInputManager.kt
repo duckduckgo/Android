@@ -93,7 +93,6 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
-    private var isInputScreenUserSettingEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
@@ -116,9 +115,6 @@ class RealNativeInputManager @Inject constructor(
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
                 isNativeInputFieldEnabled = isEnabled
             }
-            .launchIn(lifecycleOwner.lifecycleScope)
-        duckChat.observeInputScreenUserSettingEnabled()
-            .onEach { isInputScreenUserSettingEnabled = it }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
@@ -493,10 +489,6 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun attachWidget(widgetView: View, isBottom: Boolean) {
-        widgetFrom(widgetView)?.setNativeInputState(
-            toggleVisible = duckChat.isEnabled() && isInputScreenUserSettingEnabled,
-        )
-
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
 
