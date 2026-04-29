@@ -372,10 +372,22 @@ class InlinePdfHandlerTest {
     @Test
     fun whenCacheBudgetExceededThenOldestFilesEvictedFirst() {
         val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
-        val oldest = File(cacheDir, "1-old.pdf").apply { writeBytes(ByteArray(40)); setLastModified(1_000L) }
-        val middle = File(cacheDir, "2-middle.pdf").apply { writeBytes(ByteArray(40)); setLastModified(2_000L) }
-        val newest = File(cacheDir, "3-newest.pdf").apply { writeBytes(ByteArray(40)); setLastModified(3_000L) }
-        val keep = File(cacheDir, "4-keep.pdf").apply { writeBytes(ByteArray(40)); setLastModified(4_000L) }
+        val oldest = File(cacheDir, "1-old.pdf").apply {
+            writeBytes(ByteArray(40))
+            setLastModified(1_000L)
+        }
+        val middle = File(cacheDir, "2-middle.pdf").apply {
+            writeBytes(ByteArray(40))
+            setLastModified(2_000L)
+        }
+        val newest = File(cacheDir, "3-newest.pdf").apply {
+            writeBytes(ByteArray(40))
+            setLastModified(3_000L)
+        }
+        val keep = File(cacheDir, "4-keep.pdf").apply {
+            writeBytes(ByteArray(40))
+            setLastModified(4_000L)
+        }
 
         // Total = 160 bytes; cap at 100 forces eviction of the two oldest (oldest + middle).
         inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxBytes = 100L)
@@ -389,8 +401,14 @@ class InlinePdfHandlerTest {
     @Test
     fun whenKeepFileAloneExceedsBudgetThenStillNotEvicted() {
         val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
-        val older = File(cacheDir, "1-old.pdf").apply { writeBytes(ByteArray(20)); setLastModified(1_000L) }
-        val keep = File(cacheDir, "2-keep.pdf").apply { writeBytes(ByteArray(200)); setLastModified(2_000L) }
+        val older = File(cacheDir, "1-old.pdf").apply {
+            writeBytes(ByteArray(20))
+            setLastModified(1_000L)
+        }
+        val keep = File(cacheDir, "2-keep.pdf").apply {
+            writeBytes(ByteArray(200))
+            setLastModified(2_000L)
+        }
 
         // keep.length() (200) alone is over budget (50). All non-keep files get evicted but
         // keep itself survives — better to serve a single oversize PDF than refuse it.
