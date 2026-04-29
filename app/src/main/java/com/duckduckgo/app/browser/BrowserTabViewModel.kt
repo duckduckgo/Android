@@ -429,6 +429,7 @@ import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
@@ -3738,12 +3739,13 @@ class BrowserTabViewModel @Inject constructor(
             )
             val savedFilePath = cachedFileDownloader.saveToDownloads(cachedUri, fileName, "application/pdf")
             if (savedFilePath != null) {
-                val contentLength = cachedUri.path?.let { java.io.File(it) }?.takeIf { it.exists() }?.length() ?: 0L
+                val savedFileName = File(savedFilePath).name
+                val contentLength = cachedUri.path?.let { File(it) }?.takeIf { it.exists() }?.length() ?: 0L
                 downloadsRepository.insert(
                     DownloadItem(
                         downloadId = Random.nextLong(),
                         downloadStatus = DownloadStatus.FINISHED,
-                        fileName = fileName,
+                        fileName = savedFileName,
                         contentLength = contentLength,
                         createdAt = DatabaseDateFormatter.timestamp(),
                         filePath = savedFilePath,
@@ -3753,7 +3755,7 @@ class BrowserTabViewModel @Inject constructor(
                 pdfDownloadCommandFlow.emit(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadFinishedMessage,
-                        fileName = fileName,
+                        fileName = savedFileName,
                         filePath = savedFilePath,
                         mimeType = "application/pdf",
                     ),

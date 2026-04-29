@@ -10424,6 +10424,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSavedFileNameDiffersFromInputThenDownloadItemAndSnackbarUseSavedName() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/protected.pdf"),
+            currentPdfFileName = "protected.pdf",
+        )
+        val dedupedPath = "/storage/emulated/0/Download/protected-1.pdf"
+        whenever(mockCachedFileDownloader.saveToDownloads(any(), any(), any())).thenReturn(dedupedPath)
+        val emitted = mutableListOf<DownloadCommand>()
+        val collectJob = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            testee.pdfDownloadCommands().toList(emitted)
+        }
+
+        testee.onDownloadPdfMenuItemClicked()
+        advanceUntilIdle()
+        collectJob.cancel()
+
+        val success = emitted.filterIsInstance<DownloadCommand.ShowDownloadSuccessMessage>().single()
+        assertEquals("protected-1.pdf", success.fileName)
+        assertEquals(dedupedPath, success.filePath)
+
+        val captor = argumentCaptor<DownloadItem>()
+        verify(mockDownloadsRepository).insert(captor.capture())
+        assertEquals("protected-1.pdf", captor.firstValue.fileName)
+        assertEquals(dedupedPath, captor.firstValue.filePath)
+    }
+
+    @Test
     fun whenPdfDownloadSucceedsThenInsertedFilePathIsFileSystemPathNotContentUri() = runTest {
         // Regression: storing a content:// uri caused DownloadsViewModel.syncDownloads to
         // delete the row on each open because File("content://...").exists() returns false.

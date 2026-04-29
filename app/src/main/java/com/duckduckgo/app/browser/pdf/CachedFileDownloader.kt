@@ -82,8 +82,9 @@ class RealCachedFileDownloader @Inject constructor(
     @RequiresApi(29)
     private fun saveViaMediaStore(cachedFileUri: Uri, fileName: String, mimeType: String): String? {
         val resolver = context.contentResolver
+        val uniqueName = resolveUniqueName(fileName) { isDisplayNameTaken(resolver, it) }
         val values = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+            put(MediaStore.Downloads.DISPLAY_NAME, uniqueName)
             put(MediaStore.Downloads.MIME_TYPE, mimeType)
             put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             put(MediaStore.Downloads.IS_PENDING, 1)
@@ -103,11 +104,40 @@ class RealCachedFileDownloader @Inject constructor(
     private fun saveDirectly(cachedFileUri: Uri, fileName: String): String? {
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (!downloadsDir.exists()) downloadsDir.mkdirs()
-        val targetFile = uniqueFile(downloadsDir, fileName)
+        val uniqueName = resolveUniqueName(fileName) { File(downloadsDir, it).exists() }
+        val targetFile = File(downloadsDir, uniqueName)
         openCachedInput(cachedFileUri)?.use { input ->
             targetFile.outputStream().use { input.copyTo(it) }
         } ?: return null
         return targetFile.absolutePath
+    }
+
+    /**
+     * Returns the first available `name-N.ext` variant of [fileName] for which [isTaken]
+     * is false (or [fileName] itself if it isn't taken). Format matches FilenameExtractor
+     * so DDG's Downloads screen shows the same suffix shape regardless of which path
+     * (MediaStore on API 29+, direct File I/O on pre-Q) wrote the file.
+     */
+    private fun resolveUniqueName(fileName: String, isTaken: (String) -> Boolean): String {
+        if (!isTaken(fileName)) return fileName
+        val (base, ext) = fileName.splitFileNameAndExtension()
+        var i = 1
+        while (true) {
+            val candidate = "$base-$i$ext"
+            if (!isTaken(candidate)) return candidate
+            i++
+        }
+    }
+
+    @RequiresApi(29)
+    private fun isDisplayNameTaken(resolver: android.content.ContentResolver, displayName: String): Boolean {
+        return resolver.query(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            arrayOf(MediaStore.Downloads.DISPLAY_NAME),
+            "${MediaStore.Downloads.DISPLAY_NAME} = ?",
+            arrayOf(displayName),
+            null,
+        )?.use { it.count > 0 } ?: false
     }
 
     private fun openCachedInput(cachedFileUri: Uri): InputStream? {
@@ -130,17 +160,8 @@ class RealCachedFileDownloader @Inject constructor(
         }
     }
 
-    private fun uniqueFile(parentDir: File, fileName: String): File {
-        val target = File(parentDir, fileName)
-        if (!target.exists()) return target
-        val dot = fileName.lastIndexOf('.')
-        val base = if (dot >= 0) fileName.substring(0, dot) else fileName
-        val ext = if (dot >= 0) fileName.substring(dot) else ""
-        var i = 1
-        while (true) {
-            val candidate = File(parentDir, "$base ($i)$ext")
-            if (!candidate.exists()) return candidate
-            i++
-        }
+    private fun String.splitFileNameAndExtension(): Pair<String, String> {
+        val dot = lastIndexOf('.')
+        return if (dot >= 0) substring(0, dot) to substring(dot) else this to ""
     }
 }
