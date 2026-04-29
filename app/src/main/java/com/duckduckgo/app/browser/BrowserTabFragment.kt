@@ -2298,7 +2298,7 @@ class BrowserTabFragment :
         }
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
-        viewModel.onPdfHidden()
+        viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
     }
 
     private fun isPdfVisible(): Boolean {

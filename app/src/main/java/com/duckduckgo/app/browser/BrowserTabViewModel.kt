@@ -3708,14 +3708,20 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * Called by the fragment when the inline PDF is hidden (back press, navigation).
-     * Clears the cached PDF state so the "Download PDF" menu item disappears.
+     * Clears the cached PDF state so the "Download PDF" menu item disappears, and
+     * re-runs [pageChanged] for the WebView's actual URL/title so the omnibar,
+     * page header, and tab title revert from the PDF entry to the underlying page —
+     * the same path that fires when the WebView itself navigates back.
      */
-    fun onPdfHidden() {
+    fun onPdfHidden(currentWebViewUrl: String?, currentWebViewTitle: String?) {
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
             currentPdfFileName = null,
         )
+        if (!currentWebViewUrl.isNullOrBlank() && currentWebViewUrl != ABOUT_BLANK) {
+            pageChanged(currentWebViewUrl, currentWebViewTitle)
+        }
     }
 
     fun onDownloadPdfMenuItemClicked() {

@@ -10262,7 +10262,7 @@ class BrowserTabViewModelTest {
             currentPdfFileName = "doc.pdf",
         )
 
-        testee.onPdfHidden()
+        testee.onPdfHidden(currentWebViewUrl = null, currentWebViewTitle = null)
 
         assertNull(browserViewState().currentPdfCachedUri)
         assertNull(browserViewState().currentPdfFileName)
