@@ -64,7 +64,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onStart starts a new flow and total interval`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
@@ -86,12 +86,12 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onStart ends previous flow if one is active`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         authWideEvent.onStart(SubscriptionStatus.WAITING)
 
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(2L))
 
         authWideEvent.onStart(SubscriptionStatus.AUTO_RENEWABLE)
@@ -102,7 +102,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onTokenRead sends step and starts jwks interval`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(10L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -114,7 +114,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onJwksFetched ends jwks interval and starts tokens interval`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(11L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -127,7 +127,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onTokensFetched ends tokens interval and sends step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(12L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -139,7 +139,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onTokensValidated sends validation step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(13L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -150,7 +150,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onBackendErrorResponse sends token_request failure with metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(14L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -166,7 +166,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onPlayLoginSuccess sends step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(15L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -177,7 +177,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onPlayLoginFailure sends failure step, finishes flow and clears id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(16L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -202,7 +202,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onUnknownAccountError cancels flow and clears id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(17L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -218,7 +218,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onSuccess finishes with Success and clears id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(18L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 
@@ -234,7 +234,7 @@ class AuthTokenRefreshWideEventTest {
 
     @Test
     fun `onFailure finishes with Failure and clears id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(19L))
         authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
 

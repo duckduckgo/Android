@@ -66,7 +66,7 @@ class PageLoadWideEventTest {
         androidBrowserConfigFeature.sendPageLoadWideEvent().setRawStoredState(Toggle.State(true))
 
         // Mock all WideEventClient methods to return successful Results
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalStart(any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(java.time.Duration.ofMillis(100)))
@@ -86,7 +86,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageStarted called then starts flow records step and starts interval timers`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com")
@@ -111,7 +111,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageVisible called then ends time_to_visible interval and records step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(456L))
 
         pageLoadWideEvent.onPageStarted("tab_2", "https://twitter.com")
@@ -139,7 +139,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onProgressChanged called then ends time_to_escaped_fixed_progress interval and records step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(789L))
 
         pageLoadWideEvent.onPageStarted("tab_3", "https://reddit.com")
@@ -165,7 +165,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageLoadFinished called with success then ends interval and records step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(999L))
 
         pageLoadWideEvent.onPageStarted("tab_4", "https://espn.com")
@@ -203,7 +203,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageLoadFinished called with error then includes error code in step metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(888L))
 
         pageLoadWideEvent.onPageStarted("tab_5", "https://wikipedia.org")
@@ -283,7 +283,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when multiple tabs load then have independent flows`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
             .thenReturn(Result.success(200L))
 
@@ -313,7 +313,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when flowStart fails then handled gracefully`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.failure(Exception("Flow start failed")))
 
         pageLoadWideEvent.onPageStarted("tab_fail", "https://reddit.com")
@@ -326,7 +326,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when complete page load lifecycle then tracks all phases`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(500L))
 
         // Start page load
@@ -377,7 +377,7 @@ class PageLoadWideEventTest {
 
     @Test
     fun `when onPageStarted called with different url then aborts previous flow`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(800L))
             .thenReturn(Result.success(900L))
 
@@ -393,12 +393,12 @@ class PageLoadWideEventTest {
         verify(wideEventClient).flowAbort(800L)
 
         // Verify second flow was started
-        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any())
+        verify(wideEventClient, times(2)).flowStart(any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
     fun `when onPageStarted called with same url then does not start duplicate flow`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(1000L))
 
         // Start page load twice with same URL
@@ -408,7 +408,7 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Verify flowStart was only called once and flowAbort was never called
-        verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any())
+        verify(wideEventClient, times(1)).flowStart(any(), anyOrNull(), any(), any(), any())
         verify(wideEventClient, never()).flowAbort(any())
     }
 
@@ -418,7 +418,7 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Verify flowStart was never called
-        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any())
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
@@ -428,13 +428,13 @@ class PageLoadWideEventTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         // Verify flowStart was never called
-        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any())
+        verify(wideEventClient, never()).flowStart(any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
     fun `when onPageStarted called with subdomain of tracked site then starts flow`() = runTest {
         // mobile.twitter.com should be tracked since twitter.com is in perfSites
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         pageLoadWideEvent.onPageStarted("tab_1", "https://mobile.twitter.com/duckduckgo")
@@ -452,7 +452,7 @@ class PageLoadWideEventTest {
     @Test
     fun `when onPageVisible called with untracked url then does nothing`() = runTest {
         // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
         pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com")
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -472,7 +472,7 @@ class PageLoadWideEventTest {
     @Test
     fun `when onProgressChanged called with untracked url then does nothing`() = runTest {
         // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
         pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com")
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -492,7 +492,7 @@ class PageLoadWideEventTest {
     @Test
     fun `when onPageLoadFinished called with success and untracked url then does nothing`() = runTest {
         // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
         pageLoadWideEvent.onPageStarted("tab_1", "https://reddit.com")
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -520,7 +520,7 @@ class PageLoadWideEventTest {
     @Test
     fun `when onPageLoadFinished called with error and untracked url then does nothing`() = runTest {
         // Start with a tracked URL
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
         pageLoadWideEvent.onPageStarted("tab_1", "https://espn.com")
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
