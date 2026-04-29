@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
@@ -51,6 +52,7 @@ class WinBackPromptEvaluatorImplTest {
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val fakeReactivateUsersToggles = FakeFeatureToggleFactory.create(ReactivateUsersToggles::class.java)
+    private val mockOnboardingFlowChecker: OnboardingFlowChecker = mock()
     private val mockIntent: Intent = mock()
 
     private val testee = WinBackPromptEvaluatorImpl(
@@ -62,6 +64,7 @@ class WinBackPromptEvaluatorImplTest {
         globalActivityStarter = mockGlobalActivityStarter,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
         reactivateUsersToggles = fakeReactivateUsersToggles,
+        onboardingFlowChecker = mockOnboardingFlowChecker,
     )
 
     @Test
@@ -87,8 +90,23 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     @Test
+    fun whenOnboardingIsNotCompleteThenEvaluationIsSkipped() = runTest {
+        givenTogglesEnabled()
+        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
+        whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
+        whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(mockGlobalActivityStarter, never()).startIntent(any(), any<GlobalActivityStarter.ActivityParams>())
+    }
+
+    @Test
     fun whenUserWasNeverDefaultBrowserThenEvaluationIsSkipped() = runTest {
         givenTogglesEnabled()
+        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
@@ -101,6 +119,7 @@ class WinBackPromptEvaluatorImplTest {
     @Test
     fun whenUserIsCurrentlyDefaultBrowserThenEvaluationIsSkipped() = runTest {
         givenTogglesEnabled()
+        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
         whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
@@ -169,6 +188,7 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     private suspend fun givenUserIsEligible() {
+        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
         whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
     }
