@@ -27,11 +27,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface ReactivateUsersToggles {
 
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun browserComparisonPrompt(): Toggle
 
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun defaultBrowserWinBackPrompt(): Toggle
 }
