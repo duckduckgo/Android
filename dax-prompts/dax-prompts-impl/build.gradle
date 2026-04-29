@@ -24,6 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(':dax-prompts-api')
     implementation project(':browser-api')
     implementation project(':common-utils')

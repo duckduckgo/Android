@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -36,6 +37,7 @@ android {
 
 
 dependencies {
+    ksp project(':anvil-ksp')
     anvil project(path: ':anvil-compiler')
     implementation project(':anvil-annotations')
 

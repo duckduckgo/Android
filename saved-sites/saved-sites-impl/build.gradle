@@ -25,6 +25,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')

@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
