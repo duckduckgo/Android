@@ -872,7 +872,6 @@ class BrowserTabViewModelTest {
                 trackingParameters = mockTrackingParameters,
                 settingsDataStore = mockSettingsDataStore,
                 urlDisplayRepository = mockUrlDisplayRepository,
-                browserMenuDisplayRepository = mockBrowserMenuDisplayRepository,
                 adClickManager = mockAdClickManager,
                 autofillCapabilityChecker = autofillCapabilityChecker,
                 autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
@@ -7304,54 +7303,6 @@ class BrowserTabViewModelTest {
         runTest {
             testee.onBrowserMenuLaunched(ViewMode.NewTab)
             verify(mockAdditionalDefaultBrowserPrompts, never()).onBrowserMenuLaunched()
-        }
-
-    @Test
-    fun whenBrowserMenuHasOptionButNotEnabledThenUseBottomSheetMenuFalse() =
-        runTest {
-            // Given - repository returns hasOption=true but isEnabled=false
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
-
-            // Then
-            assertFalse(browserViewState().useBottomSheetMenu)
-        }
-
-    @Test
-    fun whenBrowserMenuHasOptionAndEnabledThenUseBottomSheetMenuTrue() =
-        runTest {
-            // Given - repository returns hasOption=true and isEnabled=true
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
-
-            // Then
-            assertTrue(browserViewState().useBottomSheetMenu)
-        }
-
-    @Test
-    fun whenBrowserMenuStateChangesThenUseBottomSheetMenuUpdates() =
-        runTest {
-            // Given - Start with enabled=false
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
-
-            // Initial state
-            assertFalse(browserViewState().useBottomSheetMenu)
-
-            // When enabled
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = true))
-            assertTrue(browserViewState().useBottomSheetMenu)
-
-            // When disabled again
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
-            assertFalse(browserViewState().useBottomSheetMenu)
-        }
-
-    @Test
-    fun whenBrowserMenuIsEnabledThenUseBottomSheetMenuTrueRegardlessOfHasOption() =
-        runTest {
-            // Given - hasOption only controls the Settings toggle visibility, not menu activation
-            browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
-
-            // Then - isEnabled alone drives useBottomSheetMenu
-            assertTrue(browserViewState().useBottomSheetMenu)
         }
 
     private fun givenTabManagerData() =

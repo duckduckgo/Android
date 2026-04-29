@@ -1540,12 +1540,7 @@ class BrowserTabFragment :
     }
 
     private fun createBrowserMenu() {
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
-            createBottomSheetMenu()
-        } else {
-            createPopupMenuClassic()
-        }
+        createBottomSheetMenu()
     }
 
     private fun renderBrowserMenu(
@@ -1571,32 +1566,20 @@ class BrowserTabFragment :
             serpLogoUrl = serpLogoUrl,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
-            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-            omnibar.configureBrowserMenuIcon(resId)
-            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
-            bottomSheetMenu?.render(viewState = browseMenuState)
-        } else {
-            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
-            omnibar.configureBrowserMenuIcon(resId)
-            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
-            popupMenu?.render(viewState = browseMenuState)
-        }
+        val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
+        omnibar.configureBrowserMenuIcon(resId)
+        browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
+        bottomSheetMenu?.render(viewState = browseMenuState)
     }
 
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
         val viewState = viewModel.browserViewState.value
-        val useBottomSheetMenu = viewState?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu && bottomSheetMenu != null) {
+        if (bottomSheetMenu != null) {
             recreateBrowserMenu()
             viewState?.let {
                 renderBrowserMenu(viewState = viewState, omnibarViewMode = omnibar.viewMode)
             }
             launchBottomSheetMenu(addExtraDelay)
-        } else if (!useBottomSheetMenu && popupMenu != null) {
-            val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
-            launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
         } else {
             logcat { "Want to show browser menu without any view initialized" }
         }
@@ -2486,12 +2469,7 @@ class BrowserTabFragment :
         viewModel.resetErrors()
     }
 
-    /**
-     * Dismisses any open browser menu, whether it's a popup menu or a bottom sheet menu.
-     * This is used to ensure that only one menu is open at a time and to clean up the UI when necessary.
-     */
     fun dismissBrowserMenu() {
-        popupMenu?.dismiss()
         bottomSheetMenu?.dismiss()
     }
 
