@@ -111,3 +111,4 @@ PixelDefinitions/node_modules/
 .claude/settings.local.json
 /.claude/worktrees/*
 docs/*
+!docs/architecture/

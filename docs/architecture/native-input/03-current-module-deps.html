@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NativeInputWidget — Module Dependencies (current develop)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    background: #F5F5F7;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+<svg width="740" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowB" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#CBD5E1"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="370" y="14" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#1E293B">NativeInputWidget — Module Dependencies (current develop)</text>
+
+  <!-- ─── :app ─── -->
+  <rect x="295" y="22" width="150" height="26" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="370" y="39" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="12" font-weight="600" fill="#3730A3">:app</text>
+
+  <!-- :app → :duckchat-impl -->
+  <line x1="330" y1="48" x2="190" y2="65" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- :app → :duckchat-store (dashed: store is also in app directly) -->
+  <line x1="295" y1="38" x2="100" y2="326" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowB)"/>
+
+  <!-- ─── :duckchat-impl ─── -->
+  <rect x="10" y="68" width="290" height="92" rx="8" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="155" y="86" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="12" font-weight="600" fill="#6B21A8">:duckchat-impl</text>
+  <text x="155" y="100" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#7E22CE">NativeInputModeWidget · NativeInputModeWidgetViewModel</text>
+  <text x="155" y="113" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#7E22CE">NativeInputState · NativeInputManager</text>
+  <text x="155" y="126" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#7E22CE">DuckChatWebViewFragment · ModelPickerView</text>
+  <text x="155" y="149" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#A78BFA">21 project dependencies (see below)</text>
+
+  <!-- :duckchat-impl → :duckchat-api -->
+  <line x1="155" y1="160" x2="210" y2="196" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- :duckchat-impl → :browser-ui (impl depends on browser-ui for BrowserFragment) -->
+  <line x1="300" y1="100" x2="390" y2="90" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="345" y="96" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">depends on</text>
+
+  <!-- ─── :browser-ui ─── (BOTH dep of impl AND consumer of api) -->
+  <rect x="393" y="68" width="337" height="54" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="562" y="86" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="12" font-weight="600" fill="#3730A3">:browser-ui</text>
+  <text x="562" y="100" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#4338CA">BrowserFragment — hosts NativeInputModeWidget</text>
+  <text x="562" y="112" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#818CF8">dep of :duckchat-impl  ·  consumer of :duckchat-api</text>
+
+  <!-- :browser-ui → :duckchat-api -->
+  <line x1="480" y1="122" x2="365" y2="195" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ─── :duckchat-api (the hub) ─── -->
+  <rect x="90" y="198" width="330" height="80" rx="8" fill="#DCFCE7" stroke="#6EE7B7" stroke-width="2"/>
+  <text x="255" y="216" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="12" font-weight="700" fill="#065F46">:duckchat-api</text>
+  <text x="255" y="230" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">DuckAiFeatureState · DuckChat (interface)</text>
+  <text x="255" y="243" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">NativeInputWidget (interface) · NativeInputManager (interface)</text>
+  <text x="255" y="256" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">BrowserAndInputScreenTransitionProvider · InputScreenActivityParams</text>
+  <text x="255" y="269" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#6EE7B7">deps: :navigation-api · :common-utils only</text>
+
+  <!-- ─── Consumer bus on the right ─── -->
+  <!-- Vertical bus line at x=462 from y=200 to y=370 -->
+  <line x1="462" y1="202" x2="462" y2="360" stroke="#CBD5E1" stroke-width="1.5"/>
+  <!-- Bus → duckchat-api right edge -->
+  <line x1="462" y1="238" x2="422" y2="238" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- :settings-impl -->
+  <rect x="474" y="140" width="256" height="24" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="602" y="156" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" fill="#9A3412">:settings-impl</text>
+  <line x1="474" y1="152" x2="462" y2="202" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <!-- :voice-search-impl -->
+  <rect x="474" y="200" width="256" height="24" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="602" y="216" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" fill="#9A3412">:voice-search-impl</text>
+  <line x1="474" y1="212" x2="462" y2="238" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <!-- :subscriptions-impl -->
+  <rect x="474" y="236" width="256" height="24" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="602" y="252" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" fill="#9A3412">:subscriptions-impl</text>
+  <line x1="474" y1="248" x2="462" y2="248" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <!-- :sync-impl -->
+  <rect x="474" y="272" width="118" height="24" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="533" y="288" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#64748B">:sync-impl</text>
+  <line x1="474" y1="284" x2="462" y2="284" stroke="#CBD5E1" stroke-width="1" marker-end="url(#arrowB)"/>
+
+  <!-- :cookies-impl -->
+  <rect x="474" y="308" width="118" height="24" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="533" y="324" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#64748B">:cookies-impl</text>
+  <line x1="474" y1="320" x2="462" y2="320" stroke="#CBD5E1" stroke-width="1" marker-end="url(#arrowB)"/>
+
+  <!-- :site-permissions-impl -->
+  <rect x="604" y="272" width="126" height="24" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="667" y="288" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#64748B">:site-permissions-impl</text>
+  <line x1="604" y1="284" x2="462" y2="284" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- ─── :duckchat-store ─── -->
+  <rect x="10" y="322" width="210" height="44" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="115" y="340" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="12" font-weight="600" fill="#9A3412">:duckchat-store</text>
+  <text x="115" y="354" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">conversation + model + settings persistence</text>
+
+  <!-- :duckchat-impl → :duckchat-store (dashed) -->
+  <line x1="100" y1="160" x2="80" y2="320" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowB)"/>
+  <!-- :duckchat-store → :duckchat-api -->
+  <line x1="210" y1="344" x2="180" y2="280" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ─── :duckchat-internal (note only) ─── -->
+  <rect x="238" y="322" width="210" height="44" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="343" y="340" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="600" fill="#94A3B8">:duckchat-internal</text>
+  <text x="343" y="354" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#CBD5E1">internalImpl — deps: api + impl + store</text>
+
+  <!-- ─── Key duckchat-impl deps (bottom) ─── -->
+  <!-- Fan arrows from impl bottom to three key deps -->
+  <!-- Bus: vertical drop from (155,160) down to y=398, horizontal bar x=55 to x=430 -->
+  <line x1="155" y1="160" x2="155" y2="395" stroke="#CBD5E1" stroke-width="1"/>
+  <line x1="55" y1="395" x2="430" y2="395" stroke="#CBD5E1" stroke-width="1"/>
+
+  <line x1="65" y1="395" x2="65" y2="406" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <line x1="175" y1="395" x2="175" y2="406" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <line x1="295" y1="395" x2="295" y2="406" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <line x1="415" y1="395" x2="415" y2="406" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <rect x="10" y="408" width="115" height="20" rx="6" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="68" y="422" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#9A3412">:voice-search-api</text>
+
+  <rect x="130" y="408" width="120" height="20" rx="6" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="190" y="422" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#9A3412">:subscriptions-api</text>
+
+  <rect x="255" y="408" width="120" height="20" rx="6" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="315" y="422" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#9A3412">:js-messaging-api</text>
+
+  <rect x="380" y="408" width="100" height="20" rx="6" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="430" y="422" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#9A3412">:design-system</text>
+
+  <!-- Footnote -->
+  <text x="370" y="446" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">:duckchat-impl also depends on: :browser-api · :settings-api · :navigation-api · :history-api · :sync-api · :cookies-api · :downloads-api · :data-store-api · :new-tab-page-api · :remote-messaging-api · :attributed-metrics-api · :saved-sites-api · :statistics-api · :content-scope-scripts-api</text>
+
+  <!-- Legend -->
+  <line x1="10" y1="464" x2="30" y2="464" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="35" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">depends on</text>
+  <line x1="105" y1="464" x2="125" y2="464" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowB)"/>
+  <text x="130" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">indirect / secondary dep</text>
+  <rect x="240" y="457" width="10" height="10" rx="2" fill="#DCFCE7" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="255" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">stable API module</text>
+  <rect x="340" y="457" width="10" height="10" rx="2" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="355" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">impl module</text>
+  <rect x="420" y="457" width="10" height="10" rx="2" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="435" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">internal-only</text>
+  <rect x="520" y="457" width="10" height="10" rx="2" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="535" y="468" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">external dep / consumer</text>
+
+</svg>
+</body>
+</html>
