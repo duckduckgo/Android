@@ -323,12 +323,17 @@ class InputScreenViewModel @AssistedInject constructor(
             voiceInputAllowed,
             isSearchModeFlow,
             chatInputTextState,
-        ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText ->
+            duckAiFeatureState.showVoiceSearchToggle,
+        ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText, showVoiceSearch ->
             val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
             _visibilityState.update {
                 it.copy(
                     voiceSearchButtonVisible = if (!newEntryPointActive) {
-                        serviceAvailable && inputAllowed
+                        if (isSearchMode) {
+                            serviceAvailable && inputAllowed
+                        } else {
+                            serviceAvailable && inputAllowed && showVoiceSearch
+                        }
                     } else {
                         false
                     },

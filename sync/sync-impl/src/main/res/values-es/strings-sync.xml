@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Descarga el código de recuperación como PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Usa este código para recuperar tus datos si pierdes el acceso a este dispositivo — guárdalo de forma segura.</string>
     <string name="sync_settings_data_expiration">Los datos de Sync &amp; Backup no se pueden recuperar después de 18 meses de inactividad. <annotation type="learn_more_link">Más información</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">¿Restaurar los datos de Sync &amp; Backup de la instalación anterior?</string>
+    <string name="sync_previous_session_ready_body">Restaura para recuperar tus marcadores, contraseñas y otros datos en DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Restaurar Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Configurar nueva sincronización</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Recupera tus datos fácilmente</string>
+    <string name="sync_recover_data_content">Usa este código para restaurar tus datos si pierdes el acceso a este dispositivo. Los datos de Sync &amp; Backup no se pueden recuperar después de 18 meses de inactividad.</string>
+    <string name="sync_recover_data_recovery_code_label">Código de recuperación</string>
+    <string name="sync_recover_data_download_pdf">Descargar como PDF</string>
+    <string name="sync_restore_on_reinstall_title">Restaurar al reinstalar la aplicación</string>
+    <string name="sync_restore_on_reinstall_description">Si vuelves a instalar la aplicación DuckDuckGo, te preguntaremos si quieres restaurar los datos en este dispositivo.</string>
 </resources>

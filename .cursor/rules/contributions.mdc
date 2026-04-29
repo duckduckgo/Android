@@ -18,12 +18,21 @@ Use the imperative mood in the subject line (e.g. "Add feature X", not "Added fe
 
 ## PR body
 
-PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
+Read @.github/PULL_REQUEST_TEMPLATE.md and use it as the PR body exactly — do not skip or reorder sections, do not add content above the first line of the template.
 
-**Task/Issue URL** — Link to the Asana task for this change.
+Fill in the template sections as follows:
+- **Task/Issue URL**: the Asana task URL
+- **Description**: summarise what was changed and why
+- **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
+- **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
-**Description** — A short summary of what changed and why.
+## Creating PRs
 
-**Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
+Use Graphite (`gt`) to create and submit pull requests. Prefer the GT MCP when it is available; otherwise run `gt` from the terminal:
 
-**UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
+- `gt create` to start a new branch in the stack
+- `gt submit` to open a PR for the first time
+- `gt submit --stack --update-only` to push subsequent updates — `--update-only` ensures Graphite only updates existing PRs and never opens a new one by accident
+
+Only fall back to manual `gh` commands when Graphite is not available in the environment. In that case, open the PR with `gh api repos/duckduckgo/Android/pulls --method POST` — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
+

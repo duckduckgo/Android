@@ -38,8 +38,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
-import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -53,12 +51,10 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -344,9 +340,6 @@ class RealDuckChat @Inject constructor(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
-    private val duckChatDeleter: DuckChatDeleter,
-    private val duckChatSyncRepository: DuckChatSyncRepository,
-    private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
@@ -368,6 +361,7 @@ class RealDuckChat @Inject constructor(
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
+    private val _showVoiceChatEntry = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
     private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
@@ -400,6 +394,7 @@ class RealDuckChat @Inject constructor(
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
+
     init {
         if (isMainProcess) {
             cacheConfig()
@@ -508,17 +503,6 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override suspend fun deleteChat(url: String): Boolean {
-        logcat { "DuckAI: RealDuckChat.deleteChat url=$url" }
-        val chatId = extractChatId(url) ?: return false
-        val deleted = duckChatDeleter.deleteChat(chatId)
-        if (deleted) {
-            duckChatSyncRepository.recordSingleChatDeletion(chatId)
-            syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-        }
-        return deleted
-    }
-
     override fun observeCloseEvent(
         lifecycleOwner: LifecycleOwner,
         onClose: () -> Unit,
@@ -568,6 +552,8 @@ class RealDuckChat @Inject constructor(
     override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
+
+    override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
 
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
 
@@ -724,12 +710,6 @@ class RealDuckChat @Inject constructor(
             val queryParameters = uri.queryParameterNames
             queryParameters.contains(CHAT_QUERY_NAME) && uri.getQueryParameter(CHAT_QUERY_NAME) == CHAT_QUERY_VALUE
         }.getOrDefault(false)
-    }
-
-    private fun extractChatId(url: String): String? {
-        val uri = url.toUri()
-        if (!isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
     }
 
     private fun isDuckChatBang(uri: Uri): Boolean = bangRegex?.containsMatchIn(uri.toString()) == true
@@ -900,6 +880,10 @@ class RealDuckChat @Inject constructor(
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
+
+            val showVoiceChatEntry =
+                isDuckChatFeatureEnabled && isDuckChatUserEnabled && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
+            _showVoiceChatEntry.emit(showVoiceChatEntry)
 
             val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())

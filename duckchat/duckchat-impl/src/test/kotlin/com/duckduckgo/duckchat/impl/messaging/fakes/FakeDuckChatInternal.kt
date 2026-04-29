@@ -64,8 +64,6 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
-    override suspend fun deleteChat(url: String): Boolean = false
-
     override suspend fun wasOpenedBefore(): Boolean = false
 
     override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) { }

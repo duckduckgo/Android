@@ -70,6 +70,12 @@ interface DuckAiFeatureState {
     val showVoiceSearchToggle: StateFlow<Boolean>
 
     /**
+     * Indicates whether the voice chat entry point (e.g. the voice chat button on the chat tab of the input screen)
+     * should be shown.
+     */
+    val showVoiceChatEntry: StateFlow<Boolean>
+
+    /**
      * Indicates whether Duck.ai should be open in FullScreen mode
      */
     val showFullScreenMode: StateFlow<Boolean>

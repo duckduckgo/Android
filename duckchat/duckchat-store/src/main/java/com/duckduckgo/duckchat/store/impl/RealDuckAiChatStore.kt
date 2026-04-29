@@ -55,6 +55,9 @@ interface DuckAiChatStore {
 
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
+
+    /** Deletes all chats and their associated files. */
+    suspend fun deleteAllChats()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -101,6 +104,22 @@ class RealDuckAiChatStore @Inject constructor(
 
             true
         }
+
+    override suspend fun deleteAllChats() {
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.deleteAllChats()...deleting all chats" }
+            chatsDao.deleteAll()
+            val filesDir = filesDirLazy.get()
+            fileMetaDao.getAll().forEach { meta ->
+                val file = File(filesDir, meta.uuid)
+                if (file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
+                    logcat { "DuckAI: deleting chat file $file" }
+                    file.delete()
+                }
+            }
+            fileMetaDao.deleteAll()
+        }
+    }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)

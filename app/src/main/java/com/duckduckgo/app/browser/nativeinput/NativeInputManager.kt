@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -58,7 +59,13 @@ class NativeInputCallbacks(
 )
 
 interface NativeInputManager {
-    fun init(omnibar: Omnibar, rootView: ViewGroup, lifecycleOwner: LifecycleOwner, onDisabled: () -> Unit = {})
+    fun init(
+        omnibar: Omnibar,
+        rootView: ViewGroup,
+        lifecycleOwner: LifecycleOwner,
+        onDisabled: () -> Unit = {},
+    )
+
     fun isNativeInputEnabled(): Boolean
     fun showNativeInput(
         layoutInflater: LayoutInflater,
@@ -67,6 +74,7 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
+
     fun hideNativeInput(animate: Boolean = true): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
@@ -79,20 +87,26 @@ class RealNativeInputManager @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val globalActivityStarter: GlobalActivityStarter,
     private val queryUrlPredictor: QueryUrlPredictor,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
-    private var isInputScreenUserSettingEnabled: Boolean = false
     private var isExiting: Boolean = false
     private var floatingSubmitContainer: View? = null
+    private var widgetRoot: View? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
     }
 
-    override fun init(omnibar: Omnibar, rootView: ViewGroup, lifecycleOwner: LifecycleOwner, onDisabled: () -> Unit) {
+    override fun init(
+        omnibar: Omnibar,
+        rootView: ViewGroup,
+        lifecycleOwner: LifecycleOwner,
+        onDisabled: () -> Unit,
+    ) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
@@ -100,14 +114,6 @@ class RealNativeInputManager @Inject constructor(
             .onEach { isEnabled ->
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
                 isNativeInputFieldEnabled = isEnabled
-            }
-            .launchIn(lifecycleOwner.lifecycleScope)
-        duckChat.observeInputScreenUserSettingEnabled()
-            .onEach { enabled ->
-                isInputScreenUserSettingEnabled = enabled
-                if (omnibarController.isDuckAiMode()) {
-                    rootView.post { widgetFrom(rootView)?.selectChatTab() }
-                }
             }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -151,9 +157,10 @@ class RealNativeInputManager @Inject constructor(
         val card = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
         val omnibarCard = omnibarController.getCardView()
 
+        val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            animator.animateExit(card, widgetView, omnibarCard, layoutCoordinator.isWidgetBottom()) {
+            animator.animateExit(card, widgetView, omnibarCard, isBottom) {
                 isExiting = false
                 onHide()
             }
@@ -195,7 +202,7 @@ class RealNativeInputManager @Inject constructor(
         if (!isNativeInputFieldEnabled) return
         if (isExiting) return
         val widget = widgetFrom(rootView) ?: return
-        val widgetRoot = widget.asView().parent?.parent as? View
+        val widgetRoot = widgetRoot
 
         if (omnibarController.isDuckAiMode()) {
             widget.setToggleVisible(isVisible)
@@ -214,7 +221,10 @@ class RealNativeInputManager @Inject constructor(
         widgetRoot?.translationZ = 0f
     }
 
-    private fun onKeyboardHidden(widget: NativeInputWidget, widgetRoot: View?) {
+    private fun onKeyboardHidden(
+        widget: NativeInputWidget,
+        widgetRoot: View?,
+    ) {
         if (widget.isModelMenuVisible()) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
@@ -238,7 +248,10 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun isDescendantOf(ancestor: View, view: View): Boolean {
+    private fun isDescendantOf(
+        ancestor: View,
+        view: View,
+    ): Boolean {
         var current: View? = view
         while (current != null) {
             if (current === ancestor) return true
@@ -268,9 +281,10 @@ class RealNativeInputManager @Inject constructor(
             omnibarController.show()
             omnibarController.hideBackground()
         }
-        val widgetView = createWidgetView(layoutInflater)
+        val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
+        val widgetView = createWidgetView(layoutInflater, isBottom)
         val prefillText = query.ifEmpty { omnibarController.getText() }
-        bindWidget(widgetView, lifecycleOwner, tabs, callbacks)
+        bindWidget(widgetView, lifecycleOwner, tabs, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             callbacks.onClearAutocomplete()
             widgetFrom(widgetView)?.apply {
@@ -278,12 +292,9 @@ class RealNativeInputManager @Inject constructor(
                 selectAllText()
             }
         }
-        attachWidget(widgetView)
+        attachWidget(widgetView, isBottom)
         if (omnibarController.isDuckAiMode()) {
-            widgetFrom(widgetView)?.apply {
-                setToggleVisible(false)
-                selectChatTab()
-            }
+            widgetFrom(widgetView)?.setToggleVisible(false)
         } else {
             showNtp()
         }
@@ -369,12 +380,13 @@ class RealNativeInputManager @Inject constructor(
             (it.parent as? ViewGroup)?.removeView(it)
             floatingSubmitContainer = null
         }
+        if (removed) widgetRoot = null
         return removed
     }
 
-    private fun createWidgetView(layoutInflater: LayoutInflater): View {
+    private fun createWidgetView(layoutInflater: LayoutInflater, isBottom: Boolean): View {
         val layoutRes =
-            if (layoutCoordinator.isWidgetBottom()) {
+            if (isBottom) {
                 R.layout.input_mode_widget_card_view_bottom
             } else {
                 R.layout.input_mode_widget_card_view
@@ -387,21 +399,18 @@ class RealNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
         callbacks: NativeInputCallbacks,
+        isBottom: Boolean,
     ) {
         widgetFrom(widgetView)?.apply {
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
-            if (voiceSearchAvailability.isVoiceSearchAvailable) {
-                setVoiceButtonVisible(true)
-                onVoiceClick = { callbacks.onVoiceSearchPressed(isChatTabSelected()) }
-            }
             onImageClick = { callbacks.onImageButtonPressed() }
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }
             }
-            if (!layoutCoordinator.isWidgetBottom()) {
+            if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
         }
@@ -409,8 +418,43 @@ class RealNativeInputManager @Inject constructor(
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks.onChatSuggestionSelected)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
-        applyInitialTabSelection(widgetView)
-        layoutCoordinator.applyBottomCardShape(widgetView)
+        bindVoiceButtons(widgetView, callbacks)
+        layoutCoordinator.applyBottomCardShape(widgetView, isBottom)
+    }
+
+    private fun bindVoiceButtons(
+        widgetView: View,
+        callbacks: NativeInputCallbacks,
+    ) {
+        val widget = widgetFrom(widgetView) ?: return
+        updateVoiceButtons(widget)
+        val previousOnSearchSelected = widget.onSearchSelected
+        widget.onSearchSelected = { animate ->
+            updateVoiceButtons(widget)
+            previousOnSearchSelected?.invoke(animate)
+        }
+        val previousOnChatSelected = widget.onChatSelected
+        widget.onChatSelected = { animate ->
+            updateVoiceButtons(widget)
+            previousOnChatSelected?.invoke(animate)
+        }
+        widget.onVoiceSearchClick = {
+            callbacks.onVoiceSearchPressed(widget.isChatTabSelected())
+        }
+        widget.onVoiceChatClick = {
+            hideNativeInput(animate = false)
+            duckChat.openVoiceDuckChat()
+        }
+    }
+
+    private fun updateVoiceButtons(widget: NativeInputWidget) {
+        val isDuckAiTabSelected = widget.isChatTabSelected()
+        val voiceSearchAvailable = voiceSearchAvailability.isVoiceSearchAvailable
+        val voiceSearchDuckAiAvailable = duckAiFeatureState.showVoiceSearchToggle.value
+        val voiceChatEntryAvailable = duckAiFeatureState.showVoiceChatEntry.value
+        val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
+        widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
+        widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)
     }
 
     private fun bindSearchTabAutocompleteClearing(
@@ -430,11 +474,6 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyInitialTabSelection(widgetView: View) {
-        if (!omnibarController.isDuckAiMode()) return
-        widgetFrom(widgetView)?.selectChatTab()
-    }
-
     private fun bindAutocompleteVisibility(widgetView: View) {
         if (!omnibarController.isDuckAiMode()) return
         val widget = widgetFrom(widgetView) ?: return
@@ -449,45 +488,51 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View) {
-        val omnibarCard = omnibarController.getCardView()
-        val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
-        if (shouldMatchOmnibarShape() && !layoutCoordinator.isWidgetBottom()) {
-            matchOmnibarShape(widgetCard)
-        }
-        addTrailingButtonMargin(widgetView)
-        val margins = if (!omnibarController.isDuckAiMode() && omnibarCard != null && widgetCard != null) {
-            animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, layoutCoordinator.isWidgetBottom())
-        } else {
-            null
+    private fun attachWidget(widgetView: View, isBottom: Boolean) {
+        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
+        widgetRoot = widgetView
+
+        widgetFrom(widgetView)?.apply {
+            setWidgetRootView(widgetView)
+            configure(isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
-        rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams())
+        applyWindowChrome(widgetView, isBottom)
+
+        if (!startEnterAnimation(widgetView, isBottom)) {
+            animator.applyLayoutTransitions(widgetView, isBottom)
+            onEnterComplete(widgetView)
+        }
+    }
+
+    private fun applyWindowChrome(widgetView: View, isBottom: Boolean) {
         widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
-        if (layoutCoordinator.isWidgetBottom()) {
+        if (isBottom) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
                 it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
             }
         }
-        layoutCoordinator.configureAutocompleteLayout(widgetView)
-        layoutCoordinator.configureContentOffset(widgetView)
-        widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView) }
+        layoutCoordinator.configureAutocompleteLayout(widgetView, isBottom)
+        layoutCoordinator.configureContentOffset(widgetView, isBottom)
+        widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView, isBottom) }
+    }
 
-        if (widgetCard != null && omnibarCard != null && margins != null) {
-            animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) {
-                if (!omnibarController.isDuckAiMode()) {
-                    omnibarController.hide()
-                    widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
-                }
-            }
-        } else {
-            animator.applyLayoutTransitions(widgetView, layoutCoordinator.isWidgetBottom())
-            if (!omnibarController.isDuckAiMode()) {
-                omnibarController.hide()
-                widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
-            }
-        }
+    private fun startEnterAnimation(widgetView: View, isBottom: Boolean): Boolean {
+        if (omnibarController.isDuckAiMode()) return false
+        val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
+        val omnibarCard = omnibarController.getCardView() ?: return false
+        val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
+            ?: return false
+
+        animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) { onEnterComplete(widgetView) }
+        return true
+    }
+
+    private fun onEnterComplete(widgetView: View) {
+        if (omnibarController.isDuckAiMode()) return
+        omnibarController.hide()
+        widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
     }
 
     private fun bindChatSuggestions(
@@ -526,32 +571,6 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
-    }
-
-    private fun shouldMatchOmnibarShape(): Boolean = !duckChat.isEnabled() || !isInputScreenUserSettingEnabled
-
-    private fun matchOmnibarShape(widgetCard: View?) {
-        val card = widgetCard as? MaterialCardView ?: return
-        card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
-        val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
-        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
-        (card.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
-            lp.topMargin = targetTopMargin - card.paddingTop
-            lp.marginStart = targetHorizontalMargin - card.paddingLeft
-            lp.marginEnd = targetHorizontalMargin - card.paddingRight
-            card.layoutParams = lp
-        }
-    }
-
-    private fun addTrailingButtonMargin(widgetView: View) {
-        val layout = widgetView.findViewById<View?>(com.duckduckgo.duckchat.impl.R.id.inputModeWidgetLayout) ?: return
-        val targetMarginEnd = layout.resources.getDimensionPixelSize(
-            com.duckduckgo.duckchat.impl.R.dimen.inputScreenOmnibarCardMarginHorizontal,
-        )
-        (layout.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
-            lp.marginEnd = targetMarginEnd
-            layout.layoutParams = lp
-        }
     }
 
     private fun createFloatingSubmitContainer(): ViewGroup {
