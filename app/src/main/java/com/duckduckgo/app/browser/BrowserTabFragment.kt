@@ -4436,7 +4436,7 @@ class BrowserTabFragment :
         if (this.isResumed) {
             if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
                 pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     val text = extractLinkText()
                     if (text.isNullOrEmpty()) {
                         viewModel.onLinkTextCopyFailed()
