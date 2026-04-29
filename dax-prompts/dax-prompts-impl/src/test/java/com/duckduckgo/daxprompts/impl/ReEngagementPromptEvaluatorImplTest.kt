@@ -22,7 +22,6 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
@@ -54,7 +53,6 @@ class ReEngagementPromptEvaluatorImplTest {
     private val mockPackageManager: PackageManager = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val fakeReactivateUsersToggles = FakeFeatureToggleFactory.create(ReactivateUsersToggles::class.java)
@@ -72,7 +70,6 @@ class ReEngagementPromptEvaluatorImplTest {
         applicationContext = mockApplicationContext,
         userBrowserProperties = mockUserBrowserProperties,
         defaultBrowserDetector = mockDefaultBrowserDetector,
-        defaultRoleBrowserDialog = mockDefaultRoleBrowserDialog,
         daxPromptsRepository = mockDaxPromptsRepository,
         globalActivityStarter = mockGlobalActivityStarter,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -129,19 +126,6 @@ class ReEngagementPromptEvaluatorImplTest {
         givenTogglesEnabled()
         givenLapsedUser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-
-        val result = testee.evaluate()
-
-        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
-        verify(mockGlobalActivityStarter, never()).startIntent(any(), any<GlobalActivityStarter.ActivityParams>())
-    }
-
-    @Test
-    fun whenDefaultRoleBrowserDialogShouldNotShowThenEvaluationIsSkipped() = runTest {
-        givenTogglesEnabled()
-        givenLapsedUser()
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
         val result = testee.evaluate()
 
@@ -216,7 +200,6 @@ class ReEngagementPromptEvaluatorImplTest {
     private suspend fun givenUserIsEligible() {
         givenLapsedUser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
     }
 
     private fun givenInstalledDaysAgo(days: Long) {

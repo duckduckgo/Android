@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
@@ -56,7 +55,6 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     private val applicationContext: Context,
     private val userBrowserProperties: UserBrowserProperties,
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val daxPromptsRepository: DaxPromptsRepository,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
@@ -97,9 +95,6 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
             return false
         }
         if (defaultBrowserDetector.isDefaultBrowser()) {
-            return false
-        }
-        if (!defaultRoleBrowserDialog.shouldShowDialog()) {
             return false
         }
         return !daxPromptsRepository.getDaxPromptsBrowserComparisonShown()
