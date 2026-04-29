@@ -2291,11 +2291,13 @@ class BrowserTabFragment :
     }
 
     private fun hidePdf() {
-        childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG)?.let {
-            childFragmentManager.beginTransaction()
-                .remove(it)
-                .commitAllowingStateLoss()
-        }
+        // Most callers (showHome / showBrowser / showError / NewTab navigation) invoke this
+        // defensively even when no PDF is showing. Skip the inset re-dispatch and other work
+        // unless there's actually a PDF fragment to remove.
+        val pdfFragment = childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) ?: return
+        childFragmentManager.beginTransaction()
+            .remove(pdfFragment)
+            .commitAllowingStateLoss()
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
         viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
