@@ -109,7 +109,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 return@launch
             }
 
-            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, PirExecutionType.MANUAL)
+            val executionType = intent?.getStringExtra(EXTRA_EXECUTION_TYPE)?.let { PirExecutionType.valueOf(it) }
+                ?: PirExecutionType.MANUAL_INITIAL
+            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType)
             if (result.isSuccess) {
                 pirNotificationManager.showScanStatusNotification(
                     title = getString(R.string.pirNotificationTitleComplete),
@@ -139,6 +141,14 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     companion object {
         private const val PIR_SCAN_NOTIFICATION_ID = 8791
+        private const val EXTRA_EXECUTION_TYPE = "extra_execution_type"
+
+        fun intentFor(
+            context: Context,
+            executionType: PirExecutionType,
+        ): Intent = Intent(context, PirForegroundScanService::class.java).apply {
+            putExtra(EXTRA_EXECUTION_TYPE, executionType.name)
+        }
 
         // This method was deprecated in API level 26. As of Build.VERSION_CODES.O,
         // this method is no longer available to third party applications.

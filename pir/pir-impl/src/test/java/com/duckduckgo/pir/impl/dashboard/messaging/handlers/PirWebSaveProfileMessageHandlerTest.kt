@@ -33,6 +33,7 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -166,7 +167,7 @@ class PirWebSaveProfileMessageHandlerTest {
                 profileQueryIdsToDelete = emptyList(),
             )
             verifyResponse(jsMessage, true, mockJsMessaging)
-            verifyStartAndScheduleInitialScan()
+            verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
             verify(mockPirWebProfileStateHolder).clear()
         }
 
@@ -200,7 +201,7 @@ class PirWebSaveProfileMessageHandlerTest {
             profileQueryIdsToDelete = emptyList(),
         )
         verifyResponse(jsMessage, true, mockJsMessaging)
-        verifyStartAndScheduleInitialScan()
+        verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
         verify(mockPirWebProfileStateHolder).clear()
     }
 
@@ -231,7 +232,7 @@ class PirWebSaveProfileMessageHandlerTest {
             profileQueryIdsToDelete = emptyList(),
         )
         verifyResponse(jsMessage, true, mockJsMessaging)
-        verifyStartAndScheduleInitialScan()
+        verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
         verify(mockPirWebProfileStateHolder).clear()
     }
 
@@ -263,7 +264,7 @@ class PirWebSaveProfileMessageHandlerTest {
             profileQueryIdsToDelete = emptyList(),
         )
         verifyResponse(jsMessage, true, mockJsMessaging)
-        verifyStartAndScheduleInitialScan()
+        verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_INITIAL)
         verify(mockPirWebProfileStateHolder).clear()
     }
 
@@ -580,6 +581,31 @@ class PirWebSaveProfileMessageHandlerTest {
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
+    @Test
+    fun whenExistingProfilesPresentThenScanIntentMarkedAsEditProfile() = runTest {
+        // Given - user already has a saved profile, so this save is an edit
+        val jsMessage = createJsMessage("""""", SAVE_PROFILE)
+        val currentYear = 2025
+        val currentDateTime = LocalDateTime.of(currentYear, 1, 1, 0, 0)
+        val existingProfileQuery = createProfileQuery(id = 1, firstName = "Existing", lastName = "User")
+        val newProfileQuery = createProfileQuery(id = 0, firstName = "New", lastName = "User")
+
+        whenever(mockPirWebProfileStateHolder.isProfileComplete).thenReturn(true)
+        whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(currentDateTime)
+        whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
+            listOf(existingProfileQuery.copy(id = 0), newProfileQuery),
+        )
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
+        whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
+
+        // Then
+        verifyStartAndScheduleInitialScan(PirExecutionType.MANUAL_EDIT_PROFILE)
+    }
+
     private fun createProfileQuery(
         id: Long = 1,
         firstName: String = "Test",
@@ -600,12 +626,13 @@ class PirWebSaveProfileMessageHandlerTest {
         )
     }
 
-    private fun verifyStartAndScheduleInitialScan() {
+    private fun verifyStartAndScheduleInitialScan(expectedExecutionType: PirExecutionType) {
         val intentCaptor = argumentCaptor<Intent>()
         verify(mockContext).startForegroundService(intentCaptor.capture())
 
         val capturedIntent = intentCaptor.firstValue
         assertEquals(PirForegroundScanService::class.java.name, capturedIntent.component?.className)
+        assertEquals(expectedExecutionType.name, capturedIntent.getStringExtra("extra_execution_type"))
 
         verify(mockScanScheduler).scheduleScans()
     }

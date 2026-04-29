@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +47,12 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
-        testee.reportManualScanStarted(isPowerSavingEnabled = true, profileQueryCount = 3, brokerCount = 10)
+        testee.reportManualScanStarted(
+            isPowerSavingEnabled = true,
+            profileQueryCount = 3,
+            brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender, times(2)).fire(
@@ -62,6 +68,27 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
         assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+    }
+
+    @Test
+    fun whenReportManualScanStartedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        testee.reportManualScanStarted(
+            isPowerSavingEnabled = false,
+            profileQueryCount = 1,
+            brokerCount = 5,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
     }
 
     @Test
@@ -76,6 +103,7 @@ class RealPirPixelSenderTest {
             profileQueryCount = 3,
             brokerCount = 10,
             isPowerSavingEnabled = true,
+            executionType = PirExecutionType.MANUAL_INITIAL,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -100,6 +128,31 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["broker_count"] == "10")
         assert(paramsCaptor.firstValue.containsKey("power_saving"))
         assert(paramsCaptor.firstValue["power_saving"] == "true")
+        assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+    }
+
+    @Test
+    fun whenReportManualScanCompletedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        testee.reportManualScanCompleted(
+            totalTimeInMillis = 1L,
+            batteryOptimizationsEnabled = false,
+            totalScanJobs = 0,
+            totalOptOutJobs = 0,
+            profileQueryCount = 0,
+            brokerCount = 0,
+            isPowerSavingEnabled = false,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
     }
 
     @Test
@@ -1013,6 +1066,7 @@ class RealPirPixelSenderTest {
             isPowerSavingEnabled = true,
             batteryOptimizationsEnabled = false,
             brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1030,5 +1084,28 @@ class RealPirPixelSenderTest {
         assert(params["power_saving"] == "true")
         assert(params["battery-optimizations"] == "false")
         assert(params["broker_count"] == "10")
+        assert(params["scan_trigger"] == "onboarding")
+    }
+
+    @Test
+    fun whenReportInitialScanDurationWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        testee.reportInitialScanDuration(
+            durationMs = 1L,
+            profileQueryCount = 0,
+            isPowerSavingEnabled = false,
+            batteryOptimizationsEnabled = true,
+            brokerCount = 0,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
     }
 }
