@@ -761,14 +761,12 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when initialized with search query then SelectAll command should be sent`() =
+    fun `when initialized with search query then SelectAll command should NOT be sent`() =
         runTest {
             val viewModel = createViewModel("search query")
 
             viewModel.inputFieldCommand.test {
-                val receivedCommand = awaitItem()
-                assertEquals(InputFieldCommand.SelectAll, receivedCommand)
-                cancelAndIgnoreRemainingEvents()
+                expectNoEvents()
             }
         }
 
@@ -2079,15 +2077,11 @@ class InputScreenViewModelTest {
                 launchIntent = Intent(),
             )
             val suggestions = listOf(AutoCompleteDefaultSuggestion("suggestion")) + deviceAppSuggestion
-            val expectedResult = AutoCompleteResult("tested", suggestions)
-            whenever(autoComplete.autoComplete("tested")).thenReturn(flowOf(expectedResult))
+            val expectedResult = AutoCompleteResult("test", suggestions)
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
             whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
 
             val viewModel = createViewModel("test")
-
-            // User modification required to trigger autocomplete (suppressed on initial focus)
-            viewModel.onSearchInputTextChanged("tested")
-            advanceTimeBy(301)
 
             viewModel.userSelectedAutocomplete(deviceAppSuggestion)
 

@@ -367,9 +367,8 @@ class InputScreenViewModel @AssistedInject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        if (initialSearchInputText.isNotEmpty()) {
-            // Select all pre-filled text (URL or SERP search query) so the user can quickly
-            // replace it by typing. Matches the browser tab omnibar's focus behavior.
+        if (!hasMovedBeyondInitialUrl.value) {
+            // If the initial text is a URL, we select all text in the input box
             _inputFieldCommand.trySend(InputFieldCommand.SelectAll)
         }
 
