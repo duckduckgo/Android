@@ -204,20 +204,35 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
+    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
         testee.setDuckAiMode(true)
+
+        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
+    }
+
+    @Test
+    fun whenConfigureContextualThenContextIsDuckAiContextual() = runTest {
+        testee.configureContextual()
+
+        assertEquals(NativeInputState.InputContext.DUCK_AI_CONTEXTUAL, testee.state.firstOrNull()!!.inputContext)
+    }
+
+    @Test
+    fun whenContextIsDuckAiContextualAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        testee.configureContextual()
 
         assertFalse(testee.state.firstOrNull()!!.toggleVisible)
     }
 
     @Test
-    fun whenContextIsBrowserAndModeIsSearchAndDuckAiThenToggleVisible() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
+    fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
+        testee.configureContextual()
 
-        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
     }
 
     @Test

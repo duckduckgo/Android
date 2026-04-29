@@ -148,6 +148,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         pendingNativePromptStore.store(query, getSelectedModelId())
     }
 
+    fun configureContextual() {
+        widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
+    }
+
     suspend fun fetchChatSuggestions(query: String): List<ChatSuggestion> =
         runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
 
