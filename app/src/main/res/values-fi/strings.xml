@@ -977,4 +977,9 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Tee yksityisiä hakuja DuckDuckGo:n avulla tai kysy Duck.ai:lta. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tee hakuja ja käy lempisivustoillasi yhdellä napautuksella. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopioi linkin teksti</string>
+    <string name="linkTextCopied">Linkin teksti kopioitu</string>
+    <string name="linkTextCopyFailed">Linkin tekstin kopiointi epäonnistui</string>
 </resources>
