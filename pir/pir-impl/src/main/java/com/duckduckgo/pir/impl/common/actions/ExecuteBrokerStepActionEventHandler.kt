@@ -53,6 +53,7 @@ import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
+import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -96,7 +97,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
 
             if ((currentBrokerStep is OptOutStep || currentBrokerStep is EmailConfirmationStep) &&
                 actionToExecute.needsEmail &&
-                !hasEmail(currentBrokerStep)
+                state.generatedEmailData == null
             ) {
                 Next(
                     nextState = state.copy(
@@ -223,29 +224,37 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                         )
                     }
 
-                    val nextState = if (actionToExecute is GetCaptchaInfo) {
-                        state.copy(
-                            stageStatus = PirStageStatus(
-                                currentStage = PirStage.CAPTCHA_PARSE,
-                                stageStartMs = currentTimeProvider.currentTimeMillis(),
-                            ),
-                        )
-                    } else if (actionToExecute is Expectation) {
-                        state.copy(
-                            stageStatus = PirStageStatus(
-                                currentStage = PirStage.SUBMIT,
-                                stageStartMs = currentTimeProvider.currentTimeMillis(),
-                            ),
-                        )
-                    } else if (actionToExecute is FillForm || actionToExecute is Click) {
-                        state.copy(
-                            stageStatus = PirStageStatus(
-                                currentStage = PirStage.FILL_FORM,
-                                stageStartMs = currentTimeProvider.currentTimeMillis(),
-                            ),
-                        )
-                    } else {
-                        state
+                    val nextState = when (actionToExecute) {
+                        is GetCaptchaInfo -> {
+                            state.copy(
+                                stageStatus = PirStageStatus(
+                                    currentStage = PirStage.CAPTCHA_PARSE,
+                                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                                ),
+                            )
+                        }
+
+                        is Expectation -> {
+                            state.copy(
+                                stageStatus = PirStageStatus(
+                                    currentStage = PirStage.SUBMIT,
+                                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                                ),
+                            )
+                        }
+
+                        is FillForm, is Click -> {
+                            state.copy(
+                                stageStatus = PirStageStatus(
+                                    currentStage = PirStage.FILL_FORM,
+                                    stageStartMs = currentTimeProvider.currentTimeMillis(),
+                                ),
+                            )
+                        }
+
+                        else -> {
+                            state
+                        }
                     }
 
                     Next(
@@ -255,21 +264,11 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             actionToExecute.id,
                             actionToExecute,
                             pushDelay,
-                            completeRequestData(currentBrokerStep, actionToExecute, state.profileQuery, requestData),
+                            completeRequestData(currentBrokerStep, actionToExecute, state.profileQuery, requestData, state.generatedEmailData),
                         ),
                     )
                 }
             }
-        }
-    }
-
-    private fun hasEmail(brokerStep: BrokerStep): Boolean {
-        return if (brokerStep is OptOutStep) {
-            brokerStep.profileToOptOut.email.isNotEmpty()
-        } else if (brokerStep is EmailConfirmationStep) {
-            brokerStep.profileToOptOut.email.isNotEmpty()
-        } else {
-            false
         }
     }
 
@@ -278,6 +277,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         actionToExecute: BrokerAction,
         profileQuery: ProfileQuery,
         requestData: PirScriptRequestData,
+        generatedEmailData: GeneratedEmailData?,
     ): PirScriptRequestData {
         val extractedProfile = if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
             (requestData as UserProfile).extractedProfile == null
@@ -292,9 +292,14 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         }
 
         return if (extractedProfile != null && requestData is UserProfile) {
+            val params = extractedProfile.toParams(profileQuery.fullName)
             UserProfile(
                 userProfile = requestData.userProfile,
-                extractedProfile = extractedProfile.toParams(profileQuery.fullName),
+                extractedProfile = if (generatedEmailData != null) {
+                    params.copy(email = generatedEmailData.emailAddress)
+                } else {
+                    params
+                },
             )
         } else {
             requestData

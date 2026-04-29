@@ -51,6 +51,7 @@ import com.duckduckgo.pir.impl.scripts.models.ElementSelector
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
+import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -791,5 +792,107 @@ class ExecuteBrokerStepActionEventHandlerTest {
         assertEquals("action-gen-email", sideEffect.actionId)
         assertEquals(testBrokerName, sideEffect.brokerName)
         assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenOptOutActionNeedsEmailButGeneratedEmailDataExistsThenDoesNotRequestEmailGeneration() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-1",
+            elements = listOf(
+                ElementSelector(
+                    type = "email",
+                    selector = "input[name='email']",
+                    parent = null,
+                    multiple = null,
+                    min = null,
+                    max = null,
+                    failSilently = null,
+                ),
+            ),
+            selector = "form",
+        )
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(action),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile.copy(email = ""),
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = GeneratedEmailData(
+                emailAddress = "already-generated@example.com",
+                pattern = "pattern-123",
+            ),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.EMAIL_GENERATE,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(
+            UserProfile(
+                userProfile = testProfileQuery,
+                extractedProfile = null,
+            ),
+        )
+
+        val result = testee.invoke(state, event)
+
+        // Should NOT request email generation; should fall through to PushJsAction
+        assertTrue(result.sideEffect is PushJsAction)
+        assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenFillFormRetryWithGeneratedEmailDataThenIncludesEmailInRequestData() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-1",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(action),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile.copy(email = ""),
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = GeneratedEmailData(
+                emailAddress = "generated@example.com",
+                pattern = "pattern-123",
+            ),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.FILL_FORM,
+                stageStartMs = testStageStartMs,
+            ),
+        )
+        // Retry dispatches fresh UserProfile without extractedProfile (mimics BrokerActionFailedEventHandler)
+        val event = ExecuteBrokerStepAction(
+            UserProfile(
+                userProfile = testProfileQuery,
+                extractedProfile = null,
+            ),
+        )
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertEquals("generated@example.com", userData.extractedProfile?.email)
     }
 }
