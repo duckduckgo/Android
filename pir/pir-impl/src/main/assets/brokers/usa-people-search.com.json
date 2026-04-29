@@ -1,7 +1,7 @@
 {
   "name": "USA People Search",
   "url": "usa-people-search.com",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.usa-people-search.com/manage",
@@ -13,10 +13,20 @@
         {
           "actionType": "navigate",
           "id": "3cb9a2ce-6443-4934-9df3-ec63a181d9bb",
-          "url": "https://usa-people-search.com/name/${firstName|downcase}-${lastName|downcase}/${city|downcase}-${state|stateFull|downcase}"
+          "url": "https://usa-people-search.com/name/${firstName|downcase|hyphenated}-${lastName|downcase|hyphenated}/${city|downcase|hyphenated}-${state|stateFull|downcase|hyphenated}"
         },
         {
-          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-29d08bed-8034-40e6-bbb9-6b7a21e91eae"
+        },
+        {
           "actionType": "expectation",
           "expectations": [
             {

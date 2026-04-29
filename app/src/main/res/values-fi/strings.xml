@@ -139,6 +139,7 @@
     <string name="leaveFeedbackNew">Lähetä palautetta</string>
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
     <string name="settingsHeadingNextSteps">Seuraavat vaiheet</string>
+    <string name="settingsNextStepsHideItem">Piilota</string>
     <string name="settingsLightTheme">Vaalea</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tumma</string>

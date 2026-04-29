@@ -45,6 +45,10 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':data-store-test')

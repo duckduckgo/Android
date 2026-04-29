@@ -21,12 +21,14 @@ import android.content.Context
 import android.graphics.Color
 import android.text.InputType
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Space
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -67,7 +69,8 @@ interface NativeInputWidget {
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
-    var onVoiceClick: (() -> Unit)?
+    var onVoiceSearchClick: (() -> Unit)?
+    var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
 
@@ -80,10 +83,12 @@ interface NativeInputWidget {
     fun selectChatTab()
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
-    fun setVoiceButtonVisible(visible: Boolean)
+    fun setVoiceSearchAvailable(available: Boolean)
+    fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
+    fun setBrowserMenuHighlightVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean
@@ -137,13 +142,28 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
+    private var inputScreenSettingJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
+    private var isInputScreenUserSettingEnabled: Boolean = false
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+    private var voiceSearchAvailable: Boolean = false
+    private var voiceChatAvailable: Boolean = false
     override var onStopTapped: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
+    override var onVoiceSearchClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceSearchClick = value
+            onVoiceClick = value
+        }
+    override var onVoiceChatClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceChatClick = value
+        }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -165,6 +185,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
+        observeInputScreenUserSetting()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -176,6 +197,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob = null
         tierJob?.cancel()
         tierJob = null
+        inputScreenSettingJob?.cancel()
+        inputScreenSettingJob = null
         tearDownChatSuggestions()
     }
 
@@ -226,19 +249,59 @@ class NativeInputModeWidget @JvmOverloads constructor(
         hideBackArrow()
         hideInputFieldBackground()
         removeMargins()
-        if (duckChatInternal.isEnabled()) {
-            setToggleMatchParent()
-        } else {
-            hideToggle()
-        }
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
             if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
             }
+            updateSendButtonVisibility()
+            updateVoiceButtonVisibility()
         }
     }
+
+    override fun setVoiceSearchAvailable(available: Boolean) {
+        voiceSearchAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    override fun setVoiceChatAvailable(available: Boolean) {
+        voiceChatAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    private fun updateVoiceButtonVisibility() {
+        val isBlank = inputField.text.isNullOrBlank()
+        setVoiceButtonVisible(voiceSearchAvailable && isBlank)
+        submitButtons?.setVoiceSearchVisible(false)
+        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank)
+    }
+
+    private fun updateSendButtonVisibility() {
+        val visible = isChatTabSelected() && (isStreaming || inputField.text.isNotBlank())
+        submitButtons?.setSendButtonVisible(visible)
+    }
+
+    private fun applyToggleVisibility() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        when {
+            !duckChatInternal.isEnabled() -> {
+                hideToggle()
+                matchOmnibarHeight()
+            }
+            !isInputScreenUserSettingEnabled -> {
+                setToggleMatchParent()
+                hideToggle()
+                matchOmnibarHeight()
+            }
+            else -> {
+                setToggleMatchParent()
+                toggle.visibility = VISIBLE
+            }
+        }
+    }
+
+    private fun shouldShowToggle(): Boolean = duckChatInternal.isEnabled() && isInputScreenUserSettingEnabled
 
     private fun removeMargins() {
         findViewById<EditText?>(R.id.inputField)?.updateLayoutParams<MarginLayoutParams> {
@@ -274,6 +337,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         toggle.getTabAt(0)?.select()
         toggle.visibility = GONE
+    }
+
+    private fun matchOmnibarHeight() {
+        if (floatingSubmitContainer == null) return
+        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
+        getActionBarSize()?.let { minimumHeight = it }
+    }
+
+    private fun getActionBarSize(): Int? {
+        val typedValue = TypedValue()
+        return if (context.theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+            TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
+        } else {
+            null
+        }
     }
 
     private fun setToggleMatchParent() {
@@ -346,8 +426,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setToggleVisible(visible: Boolean) {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        val isVisible = visible && shouldShowToggle()
         suspendLayoutTransitions {
-            toggle.visibility = if (visible) VISIBLE else GONE
+            toggle.visibility = if (isVisible) VISIBLE else GONE
         }
     }
 
@@ -457,6 +538,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
+    private fun observeInputScreenUserSetting() {
+        inputScreenSettingJob?.cancel()
+        inputScreenSettingJob = duckChatInternal.observeInputScreenUserSettingEnabled()
+            .onEach { enabled ->
+                isInputScreenUserSettingEnabled = enabled
+                applyToggleVisibility()
+            }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
     private fun observeTier() {
         tierJob?.cancel()
         tierJob = subscriptions.getEntitlementStatus()
@@ -510,6 +601,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showSendButton()
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
+        updateSendButtonVisibility()
     }
 
     private fun updateDuckAiSubmitButton() {
@@ -518,7 +610,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setImageButtonVisible(isChatTab)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
-            submitButtons?.setSendButtonVisible(true)
             if (!isStreaming) {
                 submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
             }
@@ -526,8 +617,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             inputField.maxLines = MAX_LINES
         } else {
             submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
-            submitButtons?.setSendButtonVisible(false)
         }
+        updateSendButtonVisibility()
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
@@ -549,12 +640,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
             onSendClick = { submitMessage() }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+            onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
+            onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
             setSendButtonVisible(false)
             setNewLineButtonVisible(false)
-            setVoiceButtonVisible(false)
         }
         container.addView(buttons)
         submitButtons = buttons
+        updateVoiceButtonVisibility()
     }
 
     companion object {

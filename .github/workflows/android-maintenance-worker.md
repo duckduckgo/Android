@@ -12,7 +12,10 @@ permissions:
   issues: read
   pull-requests: read
 
-network: defaults
+network:
+  allowed:
+    - defaults
+    - app.asana.com
 
 tools:
   github:
@@ -26,9 +29,46 @@ safe-outputs:
   allowed-github-references: []
   create-pull-request:
     title-prefix: "[Android Maintenance] "
+    labels: [agentic-maintenance]
     base-branch: develop
     draft: true
     github-token: ${{ secrets.GT_DAXMOBILE }}
+mcp-scripts:
+  asana_get_section_tasks:
+    description: "List tasks in a given section of an Asana project. Returns task GIDs, names, and URLs."
+    inputs:
+      section_gid:
+        type: string
+        required: true
+        description: "The GID of the Asana section to list tasks from"
+    script: |
+      const token = process.env.ASANA_ACCESS_TOKEN;
+      const res = await fetch(
+        `https://app.asana.com/api/1.0/sections/${section_gid}/tasks?opt_fields=name,permalink_url`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!res.ok) throw new Error(`Asana API error: ${res.status}`);
+      return await res.json();
+    env:
+      ASANA_ACCESS_TOKEN: "${{ secrets.ASANA_ACCESS_TOKEN }}"
+
+  asana_get_task:
+    description: "Get full details of an Asana task by GID. Returns name, notes (description), and URL."
+    inputs:
+      task_gid:
+        type: string
+        required: true
+        description: "The GID of the Asana task to fetch"
+    script: |
+      const token = process.env.ASANA_ACCESS_TOKEN;
+      const res = await fetch(
+        `https://app.asana.com/api/1.0/tasks/${task_gid}?opt_fields=name,notes,permalink_url,memberships.section.name`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!res.ok) throw new Error(`Asana API error: ${res.status}`);
+      return await res.json();
+    env:
+      ASANA_ACCESS_TOKEN: "${{ secrets.ASANA_ACCESS_TOKEN }}"
 engine: claude
 ---
 
@@ -62,22 +102,30 @@ PR against live data before acting on memory.
 
 ### Step 1: Check for in-progress work
 
-1. Read memory for any task marked in_progress
-2. If found, fetch the current state of that task and its PR from live data
-3. If the PR has CI failures caused by your changes → fix them, push an update, and stop
-4. If the PR has merge conflicts → resolve them, push an update, and stop
-5. If the PR is in "In Review" with no issues → nothing to do, stop
-6. If no in-progress task exists → proceed to Step 2
+**Before doing anything else, check live state — do not rely on memory alone.**
+
+1. Use the `asana_get_section_tasks` tool to list tasks in the "In Progress" section
+   (section GID: `1213746476312672`).
+2. List open GitHub PRs whose title starts with `[Android Maintenance]`
+   (use the GitHub MCP tool `list_pull_requests` with state `open`).
+3. If EITHER check returns results → in-progress work exists. Go to step 5.
+4. If BOTH checks are empty → no in-progress work. Proceed to Step 2.
+5. Inspect the in-progress work:
+   - If the PR has CI failures caused by your changes → fix them, push an update, and **stop**.
+   - If the PR has merge conflicts → resolve them, push an update, and **stop**.
+   - Otherwise (PR is open and healthy, or no PR exists yet) → **stop**. Do not start a new task.
+
+**Never proceed to Step 2 when step 3 applies.**
+Use memory (`in_progress_task`, `in_progress_pr`) only as a hint to locate the task and PR
+faster — it is not the source of truth.
 
 ### Step 2: Select a task
 
-1. Use the Asana API to fetch tasks in the "Ready" section of the Android Agentic Maintenance Backlog
-   - Project GID: `1213746476312668`
+1. Use the `asana_get_section_tasks` tool to fetch tasks in the "Ready" section
    - "Ready" section GID: `1213746476312669`
 2. Pick the first task listed
-3. Move the task to "In Progress" (section GID: `1213746476312672`) via the Asana API
-4. Leave a comment: "🤖 Android Maintenance Worker: starting work on this task."
-5. Save the task GID and URL to memory as in_progress_task
+3. Use the `asana_get_task` tool to fetch the full task details (name, notes, URL)
+4. Save the task GID and URL to memory as in_progress_task
 
 ### Step 3: Read project conventions
 
@@ -140,19 +188,15 @@ Body (follow the template exactly — replace the placeholder sections):
     | No UI changes | No UI changes |
 
 After opening the PR:
-- Move the Asana task to "In Review" (section GID: `1213746476312674`) via the Asana API
-- Leave a comment on the Asana task with the PR link
 - Update memory: in_progress_pr → PR number and branch
 
 ### Step 7: If stuck
 
 If at any point you cannot proceed (the task is ambiguous, the approach does not work,
 verification fails in a way you cannot resolve):
-1. Comment on the Asana task tagging the original task owner
-2. Describe specifically what is blocking you
-3. Move the task back to "Ready"
-4. Do NOT open a partial PR
-5. Update memory: clear in_progress_task and in_progress_pr
+1. Do NOT open a partial PR
+2. Update memory: clear in_progress_task and in_progress_pr
+3. Stop and explain what blocked you in the workflow output
 
 ## Guidelines
 
@@ -164,5 +208,5 @@ verification fails in a way you cannot resolve):
 - No breaking changes: if a change could break existing behavior, stop and comment instead
 - Format before committing: always run spotlessApply before committing
 - One task per run: never pick up a second task even if the first completes quickly
-- Asana API: use bash with curl and the ASANA_ACCESS_TOKEN secret for all Asana operations
-- AI transparency: every PR description and Asana comment must include the 🤖 Android Maintenance Worker disclosure
+- Asana API: use the `asana_get_section_tasks` and `asana_get_task` tools for all Asana reads; do not attempt Asana writes
+- AI transparency: every PR description must include the 🤖 Android Maintenance Worker disclosure

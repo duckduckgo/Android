@@ -41,6 +41,7 @@ import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
 import android.view.ContextMenu
+import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -61,7 +62,9 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -71,6 +74,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
 import androidx.core.view.ViewCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -321,6 +325,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -428,6 +433,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ntpAfterIdleManager: NtpAfterIdleManager
 
     @Inject
     lateinit var vpnMenuStore: VpnMenuStore
@@ -704,6 +712,12 @@ class BrowserTabFragment :
 
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
+
+    private val daxDialogIntroBubbleBrandDesign
+        get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubbleBrandDesignUpdate
+
+    private val brandDesignDialogScrollView
+        get() = binding.includeNewBrowserTab.brandDesignDialogScrollView
 
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
@@ -1163,6 +1177,18 @@ class BrowserTabFragment :
                 daxDialogIntroBubble.daxBubbleDialogTitle.isSaveEnabled = false
                 daxDialogIntroBubble.daxDialogDismissButton.isSaveEnabled = false
                 daxDialogIntroBubble.logo.isSaveEnabled = false
+
+                daxDialogIntroBubbleBrandDesign.brandDesignTitle.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignHiddenTitle.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignDescription.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.brandDesignDismissButton.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption1.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption2.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption3.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.optionsContent.brandDesignOption4.isSaveEnabled = false
+                daxDialogIntroBubbleBrandDesign.primaryCta.isSaveEnabled = false
+
+                daxDialogIntroBubbleBrandDesign.brandDesignHeaderImage.isSaveEnabled = false
 
                 daxDialogInContext.daxDialogOption1.isSaveEnabled = false
                 daxDialogInContext.daxDialogOption2.isSaveEnabled = false
@@ -1874,6 +1900,7 @@ class BrowserTabFragment :
                 if (bottomSheetMenu?.isShowing != true) {
                     return@postDelayed
                 }
+                viewModel.onBrowserMenuLaunched(omnibar.viewMode)
                 val viewState = viewModel.browserViewState.value
                 if (isActiveCustomTab()) {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
@@ -1914,7 +1941,7 @@ class BrowserTabFragment :
                 } else {
                     popupMenu?.show(binding.rootView, omnibar.toolbar)
                 }
-                viewModel.onPopupMenuLaunched()
+                viewModel.onBrowserMenuLaunched(omnibar.viewMode)
                 fireMenuOpenedPixels(isFocusedNtp, currentViewState)
             }
         }
@@ -2252,6 +2279,7 @@ class BrowserTabFragment :
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
+        browserNavigationBarIntegration.configureDuckAIViewMode()
         showNativeInput()
     }
 
@@ -2608,18 +2636,18 @@ class BrowserTabFragment :
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
+                handleExternalIntent(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
 
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
                 intent.data = Uri.parse(it.emailAddress)
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.SendSms -> {
                 val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${it.telephoneNumber}"))
-                openExternalDialog(intent)
+                handleExternalIntent(intent)
             }
 
             is Command.ShowKeyboard -> {
@@ -2685,12 +2713,13 @@ class BrowserTabFragment :
             }
 
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(
+                handleExternalIntent(
                     intent = it.nonHttpAppLink.intent,
                     fallbackUrl = it.nonHttpAppLink.fallbackUrl,
                     fallbackIntent = it.nonHttpAppLink.fallbackIntent,
                     useFirstActivityFound = false,
                     headers = it.headers,
+                    showConfirmation = it.showConfirmation,
                 )
             }
 
@@ -2791,7 +2820,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
-            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta()
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -2812,8 +2841,12 @@ class BrowserTabFragment :
                 duckPlayerScripts.sendSubscriptionEvent(it.duckPlayerData)
             }
 
-            is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
-            is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
+            is Command.SetBrowserBackground -> {
+                setBrowserBackgroundRes(it.backgroundRes, it.useRebrandBackground)
+                if (it.backgroundColorAttr != 0) {
+                    setNewTabBackgroundColor(it.backgroundColorAttr)
+                }
+            }
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2914,14 +2947,36 @@ class BrowserTabFragment :
         }
     }
 
-    private fun setBrowserBackgroundRes(backgroundRes: Int) {
-        newBrowserTab.browserBackground.setImageResource(backgroundRes)
+    private fun setBrowserBackgroundRes(@DrawableRes backgroundRes: Int, useRebrandBackground: Boolean) {
+        if (useRebrandBackground) {
+            newBrowserTab.browserBackground.apply {
+                setImageResource(0)
+                isGone = true
+            }
+            newBrowserTab.rebrandBrowserBackground.apply {
+                setImageResource(backgroundRes)
+                isVisible = true
+            }
+        } else {
+            newBrowserTab.rebrandBrowserBackground.gone()
+            newBrowserTab.browserBackground.setImageResource(backgroundRes)
+        }
     }
 
     private fun setNewTabBackgroundColor(
-        @ColorRes colorRes: Int,
+        @AttrRes colorAttr: Int,
     ) {
-        newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
+        val onboardingContext = resolveOnboardingContext(requireContext())
+        newBrowserTab.newTabLayout.setBackgroundColor(onboardingContext.getColorFromAttr(colorAttr))
+    }
+
+    private fun resolveOnboardingContext(context: Context): Context {
+        val themeRes = if (appTheme.isLightModeEnabled()) {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        return ContextThemeWrapper(context, themeRes)
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
@@ -3168,12 +3223,13 @@ class BrowserTabFragment :
         appLinksSnackBar = null
     }
 
-    private fun openExternalDialog(
+    private fun handleExternalIntent(
         intent: Intent,
         fallbackUrl: String? = null,
         fallbackIntent: Intent? = null,
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap(),
+        showConfirmation: Boolean = true,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3190,7 +3246,15 @@ class BrowserTabFragment :
                                 ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
 
                             if (pm.resolveActivity(playIntent, 0) != null) {
-                                launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                                launchExternalIntent(
+                                    it,
+                                    pm,
+                                    playIntent,
+                                    activities,
+                                    useFirstActivityFound,
+                                    viewModel.linkOpenedInNewTab(),
+                                    showConfirmation,
+                                )
                                 return
                             }
                         }
@@ -3198,7 +3262,15 @@ class BrowserTabFragment :
 
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
-                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                        launchExternalIntent(
+                            it,
+                            pm,
+                            fallbackIntent,
+                            fallbackActivities,
+                            useFirstActivityFound,
+                            viewModel.linkOpenedInNewTab(),
+                            showConfirmation,
+                        )
                     }
 
                     fallbackUrl != null -> {
@@ -3218,34 +3290,38 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                launchExternalIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab(), showConfirmation)
             }
         }
     }
 
-    private fun launchDialogForIntent(
+    private fun launchExternalIntent(
         context: Context,
         pm: PackageManager,
         intent: Intent,
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,
         isOpenedInNewTab: Boolean,
+        showConfirmation: Boolean = true,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
-            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
+            logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
             return
         }
 
         runCatching {
-            if (activities.size == 1 || useFirstActivityFound) {
-                val activity = activities.first()
-                val appTitle = activity.loadLabel(pm)
+            val resolvedIntent = if (activities.size == 1 || useFirstActivityFound) {
+                val appTitle = activities.first().loadLabel(pm)
                 logcat(INFO) { "Exactly one app available for intent: $appTitle" }
-                launchExternalAppDialog(context) { context.startActivity(intent) }
+                intent
             } else {
-                val title = getString(R.string.openExternalApp)
-                val intentChooser = Intent.createChooser(intent, title)
-                launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+                Intent.createChooser(intent, getString(R.string.openExternalApp))
+            }
+
+            if (showConfirmation) {
+                launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
+            } else {
+                context.startActivity(resolvedIntent)
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
@@ -3513,6 +3589,7 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    ntpAfterIdleManager.onReturnToPageTapped()
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
 
@@ -3974,8 +4051,7 @@ class BrowserTabFragment :
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
     }
 
-    private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
-        daxBubbleCta.hideDaxBubbleCta(binding)
+    private fun hideOnboardingDaxBubbleCta() {
         hideDaxBubbleCta()
         renderer.showNewTab()
         showKeyboard()
@@ -3983,7 +4059,17 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         newBrowserTab.browserBackground.setImageResource(0)
+        val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
+        newBrowserTab.rebrandBrowserBackground.apply {
+            setImageResource(0)
+            gone()
+        }
+        if (wasBrandDesign) {
+            newBrowserTab.newTabLayout.setBackgroundColor(0)
+        }
         daxDialogIntroBubble.root.gone()
+        daxDialogIntroBubbleBrandDesign.root.gone()
+        brandDesignDialogScrollView.gone()
     }
 
     @SuppressLint("AddDocumentStartJavaScriptUsage")
@@ -5681,8 +5767,17 @@ class BrowserTabFragment :
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
+            val container = if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                daxDialogIntroBubble.root.gone()
+                brandDesignDialogScrollView.show()
+                daxDialogIntroBubbleBrandDesign.daxCtaContainer
+            } else {
+                daxDialogIntroBubbleBrandDesign.root.gone()
+                brandDesignDialogScrollView.gone()
+                daxDialogIntroBubble.daxCtaContainer
+            }
             configuration.apply {
-                showCta(daxDialogIntroBubble.daxCtaContainer) {
+                showCta(container) {
                     setOnOptionClicked(
                         onboardingExperimentEnabled = false,
                         configuration = configuration,
@@ -5704,7 +5799,12 @@ class BrowserTabFragment :
                 }
             }
 
-            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
+                setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
+            } else {
+                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+            }
             viewModel.onCtaShown()
         }
 

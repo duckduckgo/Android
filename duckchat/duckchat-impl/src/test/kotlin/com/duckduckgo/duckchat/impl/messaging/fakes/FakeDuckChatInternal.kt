@@ -146,6 +146,7 @@ class FakeDuckChatInternal(
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
+    override fun isNativeStorageEnabled(): Boolean = false
 
     override fun keepSessionIntervalInMinutes(): Int = 30
 
@@ -169,11 +170,10 @@ class FakeDuckChatInternal(
         chatSuggestionsUserSettingEnabled.value = enabled
     }
 
-    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
-
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
+    override fun isVoiceSessionActive(): Boolean = false
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

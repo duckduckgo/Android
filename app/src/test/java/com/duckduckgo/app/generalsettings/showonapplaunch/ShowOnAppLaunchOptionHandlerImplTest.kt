@@ -20,28 +20,37 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ShowOnAppLaunchOptionHandlerImplTest {
@@ -50,16 +59,29 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     val coroutineTestRule = CoroutineTestRule()
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
 
-    private lateinit var fakeDataStore: ShowOnAppLaunchOptionDataStore
+    private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private lateinit var fakeTabRepository: TabRepository
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val settingsDataStore: SettingsDataStore = mock()
+    private val systemAutofillEngagement: SystemAutofillEngagement = mock()
     private lateinit var testee: ShowOnAppLaunchOptionHandler
 
     @Before
     fun setup() {
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore()
         fakeTabRepository = FakeTabRepository()
-        testee =
-            ShowOnAppLaunchOptionHandlerImpl(dispatcherProvider, fakeDataStore, fakeTabRepository)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        testee = ShowOnAppLaunchOptionHandlerImpl(
+            dispatcherProvider,
+            fakeDataStore,
+            fakeTabRepository,
+            appBuildConfig,
+            ntpAfterIdleManager,
+            settingsDataStore,
+            systemAutofillEngagement,
+        )
     }
 
     @Test
@@ -771,6 +793,350 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == url)
         }
+    }
+
+    // handleAfterInactivityOption tests
+
+    @Test
+    fun whenNewInstallAndNoOptionSelectedThenSetsNewTabPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // NewTabPage was set, then handleAppLaunchOption added a tab
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+    }
+
+    @Test
+    fun whenNewInstallAndOptionAlreadySelectedThenDoesNotOverrideOption() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // LastOpenedTab was preserved, no tab added
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNotNewInstallThenDoesNotSetNewTabPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // No option was set, default is LastOpenedTab → no tab added
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNotNewInstallWithExistingOptionThenHandlesExistingOption() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+    }
+
+    @Test
+    fun whenNotNewInstallWithSpecificPageOptionThenNavigatesToSpecificPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://example.com/")
+        }
+    }
+
+    @Test
+    fun whenNewInstallWithSpecificPageAlreadySelectedThenPreservesSpecificPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://example.com/")
+        }
+    }
+
+    @Test
+    fun whenUpdatedFromNewInstallBeforeFirstInactivityFiredThenGetsLastOpenedTab() = runTest {
+        // Simulates a user who installed fresh but updated the app before the inactivity
+        // timeout ever fired. isNewInstall() returns false post-update so the NTP default
+        // is not applied — this is an accepted trade-off. Without the isNewInstall() guard,
+        // existing users who never explicitly set a preference would incorrectly get NTP.
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNtpSetOnFirstInactivityThenSubsequentInactivityAfterUpdateStillShowsNtp() = runTest {
+        // First inactivity on new install: NTP is persisted in the store
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        // After an app update isNewInstall() returns false, but the stored NTP option is preserved
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // Both inactivity returns opened NTP
+            assertTrue(tabs.size == 2)
+            assertTrue(tabs.all { it.url == "" })
+        }
+    }
+
+    // onIdleReturnTriggered notification tests
+
+    @Test
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabHasUrlThenIdleReturnIsNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "https://example.com", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnIsNotified() = runTest {
+        // Even when no new tab is added because the user is already on an NTP, the handler should
+        // still notify — the currently-shown NTP counts as an after-idle shown event.
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = null, position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityWasIdleFalseAndOptionNewTabPageThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityOptionLastOpenedTabThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenInactivityOptionSpecificPageThenIdleReturnNotNotified() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenAppLaunchOptionHandledOutsideInactivityPathThenIdleReturnNotNotified() = runTest {
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAppLaunchOption()
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    // autofill idle return flag tests
+
+    @Test
+    fun whenInactivityWithThresholdAlwaysAndNewTabPageThenAutofillFlagSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement).setIdleReturnTriggered("new_tab_page")
+    }
+
+    @Test
+    fun whenInactivityWithThresholdAlwaysAndSpecificPageThenAutofillFlagSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement).setIdleReturnTriggered("specific_page")
+    }
+
+    @Test
+    fun whenInactivityWithThresholdAlwaysAndLastOpenedTabThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenInactivityWithThresholdNonZeroAndNewTabPageThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(300L)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenInactivityWithThresholdNullAndNewTabPageThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenInactivityWithThresholdAlwaysAndNewTabPageButAlreadyOnNtpThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+        (fakeTabRepository as FakeTabRepository).selectedTab =
+            TabEntity(tabId = "1", url = "", position = 0)
+
+        testee.handleAfterInactivityOption(wasIdle = true)
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenAppLaunchOptionNotFromInactivityThenAutofillFlagNotSet() = runTest {
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(0L)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAppLaunchOption()
+
+        verify(systemAutofillEngagement, never()).setIdleReturnTriggered(org.mockito.kotlin.any())
+    }
+
+    // handleResolvedUrlStorage tests
+
+    @Test
+    fun whenConditionsMatchThenResolvedUrlIsStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = true,
+            tabId = tabId,
+        )
+
+        assertEquals("https://www.example.com/", fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenCurrentUrlIsNullThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = null,
+            isRootOfTab = true,
+            tabId = tabId,
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenNotRootOfTabThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = false,
+            tabId = tabId,
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenTabIdDoesNotMatchThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = true,
+            tabId = "wrong-tab-id",
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
     }
 
     private class FakeTabRepository : TabRepository {

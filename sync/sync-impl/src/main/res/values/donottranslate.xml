@@ -35,10 +35,10 @@
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
 
     <!-- Previous Session Ready Screen -->
-    <string name="sync_previous_session_ready_title">Your previous Sync &amp; Backup session is ready.</string>
-    <string name="sync_previous_session_ready_body">Resume your Sync &amp; Backup session to restore your bookmarks, passwords, and more, or continue with a new setup.</string>
-    <string name="sync_previous_session_ready_resume_cta">Resume Sync &amp; Backup</string>
-    <string name="sync_previous_session_ready_continue_cta">Continue Setup</string>
+    <string name="sync_previous_session_ready_title">Restore Sync &amp; Backup data from previous install?</string>
+    <string name="sync_previous_session_ready_body">Restore to get your previous bookmarks, passwords and other data back in DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Restore Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Set Up New Sync</string>
 
     <!-- Recover Data Screen -->
     <string name="sync_recover_data_title">Recover Your Data Easily</string>

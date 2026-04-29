@@ -24,6 +24,7 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -212,6 +213,7 @@ sealed class Command {
     class HandleNonHttpAppLink(
         val nonHttpAppLink: NonHttpAppLink,
         val headers: Map<String, String>,
+        val showConfirmation: Boolean = true,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -456,10 +458,8 @@ sealed class Command {
 
     class SetBrowserBackground(
         @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetBrowserBackgroundColor(
-        @ColorRes val colorRes: Int,
+        val useRebrandBackground: Boolean = false,
+        @AttrRes val backgroundColorAttr: Int = 0,
     ) : Command()
 
     class SetOnboardingDialogBackground(

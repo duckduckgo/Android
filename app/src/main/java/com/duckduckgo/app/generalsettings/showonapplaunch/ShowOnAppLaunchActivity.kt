@@ -168,7 +168,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun Long.toTimeoutLabel(): String = when {
-        this == 1L -> getString(R.string.afterInactivityTimeoutAlways)
+        this == 0L -> getString(R.string.afterInactivityTimeoutAlways)
         this < 3600L -> {
             val minutes = this / 60
             if (minutes == 1L) {

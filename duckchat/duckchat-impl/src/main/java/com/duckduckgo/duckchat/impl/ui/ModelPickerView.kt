@@ -17,17 +17,22 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -203,7 +208,9 @@ class ModelPickerView @JvmOverloads constructor(
     private fun LinearLayout.addModelItem(model: AIChatModel, selected: Boolean, popup: PopupWindow) {
         val item = PopupMenuItemView(context).apply {
             setPrimaryText(model.displayName)
+            setLeadingIcon(viewModel.getIconResForModel(model))
             if (selected) setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+            configureTrailingIcon()
             if (model.isAccessible) {
                 setOnClickListener {
                     viewModel.selectModel(model)
@@ -215,6 +222,28 @@ class ModelPickerView @JvmOverloads constructor(
             layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         }
         addView(item)
+    }
+
+    private fun PopupMenuItemView.setLeadingIcon(@DrawableRes iconRes: Int?) {
+        val label = findViewById<DaxTextView>(com.duckduckgo.mobile.android.R.id.label) ?: return
+        label.maxLines = 1
+        label.isSingleLine = true
+        label.ellipsize = TextUtils.TruncateAt.END
+        label.setPaddingRelative(label.paddingStart, label.paddingTop, 0, label.paddingBottom)
+        val drawable = iconRes?.let { AppCompatResources.getDrawable(context, it) }
+        label.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+        label.compoundDrawablePadding = if (drawable != null) {
+            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        } else {
+            0
+        }
+    }
+
+    private fun PopupMenuItemView.configureTrailingIcon() {
+        val trailingIcon = findViewById<ImageView>(com.duckduckgo.mobile.android.R.id.trailingIcon) ?: return
+        trailingIcon.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_3)
+        }
     }
 
     private fun LinearLayout.addSectionHeader(title: String) {

@@ -6,14 +6,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -25,14 +21,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -44,14 +36,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -63,14 +51,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -82,14 +66,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -101,14 +81,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -120,14 +96,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -139,14 +111,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -158,14 +126,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]
@@ -177,14 +141,10 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "name",
                 "description": "The name of the sharedPreferences file that we were trying to migrate",
-                "type": "string"
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
             }
         ]

@@ -62,6 +62,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirNotificationManager: PirNotificationManager
 
+    @Inject
+    lateinit var pirDashboardUrlProvider: PirDashboardUrlProvider
+
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
@@ -133,7 +136,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
             setSupportZoom(true)
         }
 
-        binding.pirWebView.loadUrl(PirDashboardWebConstants.WEB_UI_URL)
+        binding.pirWebView.loadUrl(pirDashboardUrlProvider.getUrl())
     }
 
     private fun cleanupWebView() {

@@ -1,7 +1,7 @@
 {
   "name": "FastPeopleSearch",
   "url": "fastpeoplesearch.com",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1675317600000,
   "optOutUrl": "https://www.fastpeoplesearch.com/removal",
@@ -13,18 +13,18 @@
         {
           "actionType": "navigate",
           "id": "040e0a0a-095a-490e-8c55-ee7b66732030",
-          "url": "https://www.fastpeoplesearch.com/name/${firstName}-${lastName}_${city}-${state}"
+          "url": "https://www.fastpeoplesearch.com/name/${firstName|hyphenated}-${lastName|hyphenated}_${city|hyphenated}-${state|hyphenated}"
         },
         {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
           "actionType": "expectation",
-          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector because CF challenge page has class 'page-manage-challenge' on the html element",
           "expectations": [
             {
               "type": "element",
-              "selector": "//html[not(contains(@class, 'page-manage-challenge'))]"
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
             }
           ],
-          "id": "98a2a63e-1d47-45e9-a1f3-c1780b29cd1f"
+          "id": "cft-a59102a9-ec77-4d75-8009-2e604055a11a"
         },
         {
           "actionType": "condition",
@@ -59,6 +59,16 @@
             }
           ],
           "id": "99915607-e720-4e68-b464-5eb2f75ba5a0"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".list-results-header"
+            }
+          ],
+          "id": "51307f20-4cf8-4864-9718-bc2457e745ff"
         },
         {
           "actionType": "extract",

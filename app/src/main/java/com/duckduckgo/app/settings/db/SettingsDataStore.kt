@@ -111,6 +111,9 @@ interface SettingsDataStore {
     var hasNewDownload: Boolean
     var singleTabFireDialogShownCount: Int
     var getDesktopBrowserSettingDismissed: Boolean
+    var nextStepsAddressBarDismissed: Boolean
+    var nextStepsVoiceSearchDismissed: Boolean
+    var nextStepsSectionHidden: Boolean
 
     /**
      * Check if a value has been set to the URL display preference.
@@ -310,6 +313,18 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, false)
         set(value) = preferences.edit { putBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, value) }
 
+    override var nextStepsAddressBarDismissed: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED, value) }
+
+    override var nextStepsVoiceSearchDismissed: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED, value) }
+
+    override var nextStepsSectionHidden: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_SECTION_HIDDEN, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_SECTION_HIDDEN, value) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
 
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
@@ -395,6 +410,9 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT = "KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT"
         const val KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED = "KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED"
         const val KEY_HAS_NEW_DOWNLOAD = "KEY_HAS_NEW_DOWNLOAD"
+        const val KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED = "KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED"
+        const val KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED = "KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED"
+        const val KEY_NEXT_STEPS_SECTION_HIDDEN = "KEY_NEXT_STEPS_SECTION_HIDDEN"
     }
 
     private class FireAnimationPrefsMapper {

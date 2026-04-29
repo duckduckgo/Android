@@ -28,6 +28,8 @@ import android.widget.RemoteViews
 import androidx.core.widget.RemoteViewsCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconPersister
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_WIDGET_PLACEHOLDERS_DIR
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED
@@ -81,6 +83,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
+
+    @Inject
+    lateinit var faviconPersister: FaviconPersister
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -143,6 +148,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
         searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_AND_FAVORITES_WIDGET_DELETED)
+        appCoroutineScope.launch(dispatchers.io()) {
+            faviconPersister.deleteAll(FAVICON_WIDGET_PLACEHOLDERS_DIR)
+        }
     }
 
     private suspend fun updateWidget(

@@ -141,6 +141,7 @@
     <string name="leaveFeedbackNew">Отправить отзыв</string>
     <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
     <string name="settingsHeadingNextSteps">Дальнейшие шаги</string>
+    <string name="settingsNextStepsHideItem">Скрыть</string>
     <string name="settingsLightTheme">Светлая</string>
     <string name="settingsTheme">Тема</string>
     <string name="settingsDarkTheme">Тёмная</string>

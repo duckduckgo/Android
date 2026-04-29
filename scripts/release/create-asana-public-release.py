@@ -5,7 +5,6 @@ import re
 import argparse
 from typing import List
 import asana
-import subprocess
 import time
 
 from asana_release_utils import (
@@ -14,6 +13,7 @@ from asana_release_utils import (
     get_commits_between,
     extract_asana_task_links,
     extract_task_id_from_url,
+    get_public_release_tag_before,
 )
 
 
@@ -176,34 +176,6 @@ def remove_tasks_from_project(client: asana.ApiClient, task_links: List[AsanaTas
     log(f"Removed {removed_count} tasks from project")
 
 
-def get_latest_public_release_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
-    """
-    Return the previous public release tag before `current_tag`, sorted by semantic version.
-    Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
-    """
-    public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
-
-    try:
-        result = subprocess.run(
-            ["git", "-C", repo_path, "for-each-ref", "--sort=version:refname", "--format=%(refname:short)", "refs/tags"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        tags = result.stdout.strip().splitlines()
-
-        # Filter to only public release tags (X.Y.Z format)
-        public_tags = [tag for tag in tags if public_pattern.match(tag)]
-
-        if current_tag not in public_tags:
-            return None
-
-        idx = public_tags.index(current_tag)
-        return public_tags[idx - 1] if idx > 0 else None
-    except subprocess.CalledProcessError:
-        return None
-
-
 def main():
     parser = argparse.ArgumentParser(description='Create an Asana task for public releases with links to tasks from git commits')
     parser.add_argument('--tag', required=True, help='Tag to use as end commit (e.g., 5.264.0)')
@@ -231,8 +203,7 @@ def main():
         configuration.access_token = asana_api_key
         client = asana.ApiClient(configuration)
 
-        # Get the start tag (latest public release tag before the specified tag)
-        start_tag = get_latest_public_release_tag_before_commit(args.android_repo_path, args.tag)
+        start_tag = get_public_release_tag_before(args.android_repo_path, args.tag)
         if not start_tag:
             log(f"Error: No previous public release tag found before {args.tag}")
             return 1

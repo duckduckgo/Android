@@ -189,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Fizetés kezelése vagy lemondása</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">A csomagod %2$s dátummal erre vált vissza: %1$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">A csomagod %2$s dátummal erre frissül: %1$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">A csomagod %2$s dátummal erre vált vissza: %1$s.</string>
     <string name="planNamePlusMonthly">Plus – havi</string>
