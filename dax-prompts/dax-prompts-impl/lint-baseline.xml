@@ -2,17 +2,6 @@
 <issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
-        id="DenyListedApi"
-        message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
-        errorLine1="            if (userBrowserProperties.daysSinceInstalled() &lt; EXISTING_USER_DAY_COUNT_THRESHOLD) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/daxprompts/impl/RealDaxPrompts.kt"
-            line="71"
-            column="17"/>
-    </issue>
-
-    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;390dp&quot;"
