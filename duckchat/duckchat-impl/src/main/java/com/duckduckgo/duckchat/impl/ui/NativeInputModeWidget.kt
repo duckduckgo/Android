@@ -71,6 +71,7 @@ interface NativeInputWidget {
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
 
+    fun onBackPressed()
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
     fun clearInputFocus()

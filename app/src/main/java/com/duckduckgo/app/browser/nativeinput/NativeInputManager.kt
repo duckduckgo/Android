@@ -306,10 +306,7 @@ class RealNativeInputManager @Inject constructor(
         val backButton = LayoutInflater.from(rootView.context)
             .inflate(R.layout.view_native_input_top_back_button, rootView, false)
             .apply {
-                setOnClickListener {
-                    widget.hideKeyboard()
-                    hideNativeInput()
-                }
+                setOnClickListener { widget.onBackPressed() }
             }
         rootView.addView(backButton)
         topBackButton = backButton

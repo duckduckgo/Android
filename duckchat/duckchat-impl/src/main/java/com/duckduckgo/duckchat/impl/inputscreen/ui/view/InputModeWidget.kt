@@ -223,7 +223,7 @@ open class InputModeWidget @JvmOverloads constructor(
         return inputModeSwitch.selectedTabPosition
     }
 
-    private fun handleBackPressed() {
+    fun onBackPressed() {
         onBack?.invoke()
         val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
@@ -237,7 +237,7 @@ open class InputModeWidget @JvmOverloads constructor(
 
             onClearTextTapped?.invoke()
         }
-        val backClickListener = OnClickListener { handleBackPressed() }
+        val backClickListener = OnClickListener { onBackPressed() }
         inputModeWidgetBack.setOnClickListener(backClickListener)
         inputModeWidgetUnifiedBack.setOnClickListener(backClickListener)
 
