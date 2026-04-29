@@ -303,7 +303,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         } else {
             inputModeWidget.initOnSearch(animate = false)
         }
-        updateMenuIconButton(params?.useBottomSheetMenu ?: false)
+        updateMenuIconButton()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -782,13 +782,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
     }
 
-    private fun updateMenuIconButton(useBottomSheetMenu: Boolean) {
-        val drawable = if (useBottomSheetMenu) {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-        } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
-        }
-        inputModeWidget.setMenuIcon(drawable)
+    private fun updateMenuIconButton() {
+        inputModeWidget.setMenuIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
     }
 
     private fun updateButtonVisibility(state: InputScreenVisibilityState) {
