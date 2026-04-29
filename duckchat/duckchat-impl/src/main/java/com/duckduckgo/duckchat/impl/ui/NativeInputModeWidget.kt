@@ -63,6 +63,7 @@ import javax.inject.Inject
 interface NativeInputWidget {
 
     var text: String
+    var onBack: (() -> Unit)?
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
