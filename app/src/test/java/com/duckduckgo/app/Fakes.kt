@@ -230,12 +230,6 @@ class FakeSettingsDataStore :
             store["clearDuckAiData"] = value
         }
 
-    override var useBottomSheetMenu: Boolean
-        get() = store["useBottomSheetMenu"] as Boolean? ?: false
-        set(value) {
-            store["useBottomSheetMenu"] = value
-        }
-
     override var showTrackersCountInAddressBar: Boolean
         get() = store["showTrackersCountInAddressBar"] as Boolean? ?: true
         set(value) {
