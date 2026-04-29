@@ -104,9 +104,9 @@ class PageLoadWideEventTest {
             success = true,
             metadata = emptyMap(),
         )
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_finish_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(123L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
     }
 
     @Test
@@ -364,9 +364,9 @@ class PageLoadWideEventTest {
         )
 
         // Verify all intervals were managed
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_finish_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_visible_ms_bucketed", null)
-        verify(wideEventClient).intervalStart(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed", null)
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish_ms_bucketed")
