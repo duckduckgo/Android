@@ -29,8 +29,6 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Space
-import androidx.core.content.res.use
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
@@ -242,7 +240,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
         hideBackArrow()
-        showUnifiedBackArrow()
+        updateUnifiedBackArrow()
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()
@@ -284,6 +282,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         setToggleMatchParent()
         updateToggleVisibility(toggle, state)
+        updateUnifiedBackArrow()
         if (!state.toggleVisible) {
             minimize()
         }
@@ -336,8 +335,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.InputModeWidgetBack)?.visibility = GONE
     }
 
-    private fun showUnifiedBackArrow() {
-        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility = VISIBLE
+    private fun updateUnifiedBackArrow() {
+        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
+            if (nativeInputState.isBottom) GONE else VISIBLE
     }
 
     private fun hideInputFieldBackground() {
