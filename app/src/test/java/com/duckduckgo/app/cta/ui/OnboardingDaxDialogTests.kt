@@ -97,6 +97,7 @@ class OnboardingDaxDialogTests {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)

@@ -165,6 +165,9 @@ class CtaViewModel @Inject constructor(
             if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
+            if (cta is SubscriptionPromoModalCta) {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
         }
     }
 
@@ -304,7 +307,7 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            // Subscription onboarding for returning users who skipped onboarding
+            // Subscription promo for skipped-onboarding users
             canShowSubscriptionCtaForSkippedOnboarding() -> {
                 SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
@@ -346,6 +349,13 @@ class CtaViewModel @Inject constructor(
             isSubscriptionCtaAvailable()
 
     @WorkerThread
+    private suspend fun canShowSubscriptionPromoCta(): Boolean =
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers().isEnabled() &&
+            appInstallStore.daysInstalled() >= SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogSubscriptionShown() &&
+            isSubscriptionCtaAvailable()
+
+    @WorkerThread
     private fun canShowWidgetCta(): Boolean {
         return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
@@ -367,9 +377,12 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
+            if (canShowSubscriptionPromoCta()) {
+                return SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
+            }
+
             if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)
-                ) {
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null
@@ -528,7 +541,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun isPromoOnboardingDialogShowing(): Boolean =
         withContext(dispatchers.io()) {
-            canShowSubscriptionCtaForSkippedOnboarding()
+            canShowSubscriptionCtaForSkippedOnboarding() || canShowSubscriptionPromoCta()
         }
 
     private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
