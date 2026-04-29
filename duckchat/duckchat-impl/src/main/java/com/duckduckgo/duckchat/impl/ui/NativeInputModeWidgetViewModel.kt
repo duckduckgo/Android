@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
@@ -48,20 +49,23 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val chatSuggestionsReader: ChatSuggestionsReader,
 ) : ViewModel() {
 
-    private val inputContext = MutableStateFlow(NativeInputState.InputContext.BROWSER)
-    private val inputPosition = MutableStateFlow(NativeInputState.InputPosition.TOP)
+    private data class WidgetConfig(
+        val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
+        val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
+    )
+
+    private val widgetConfig = MutableStateFlow(WidgetConfig())
 
     val state: SharedFlow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
-        inputContext,
-        inputPosition,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, context, position ->
+        widgetConfig,
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
-            inputContext = context,
-            inputPosition = position,
+            inputContext = config.inputContext,
+            inputPosition = config.inputPosition,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -77,11 +81,19 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
-        inputContext.value = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
+        val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
+        widgetConfig.update { it.copy(inputContext = context) }
     }
 
     fun setWidgetPosition(isBottom: Boolean) {
-        inputPosition.value = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
+        val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
+        widgetConfig.update { it.copy(inputPosition = position) }
+    }
+
+    fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+        val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
+        val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
+        widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
     }
 
     fun storePendingPrompt(query: String, modelId: String?) {

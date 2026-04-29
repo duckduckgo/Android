@@ -88,10 +88,9 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean
     fun storePendingPrompt(query: String)
-    fun setDuckAiMode(isDuckAiMode: Boolean)
+    fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
-    fun applyOmnibarShape()
     fun setWidgetRootView(view: View)
 
     fun bindInputEvents(
@@ -448,22 +447,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.storePendingPrompt(query, getSelectedModelId())
     }
 
-    override fun setDuckAiMode(isDuckAiMode: Boolean) {
-        viewModel.setDuckAiMode(isDuckAiMode)
+    override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+        viewModel.configure(isDuckAiMode, isBottom)
         viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
         if (isDuckAiMode) selectChatTab()
+        applyOmnibarShape(isBottom)
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
 
     override fun setWidgetPosition(isBottom: Boolean) {
-        val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
-        nativeInputState = nativeInputState.copy(inputPosition = position)
         viewModel.setWidgetPosition(isBottom)
     }
 
-    override fun applyOmnibarShape() {
-        if (nativeInputState.isBottom) return
+    private fun applyOmnibarShape(isBottom: Boolean) {
+        if (isBottom) return
         if (nativeInputState.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)

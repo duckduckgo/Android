@@ -494,9 +494,7 @@ class RealNativeInputManager @Inject constructor(
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
-            setDuckAiMode(omnibarController.isDuckAiMode())
-            setWidgetPosition(isBottom)
-            applyOmnibarShape()
+            configure(isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
         applyWindowChrome(widgetView, isBottom)

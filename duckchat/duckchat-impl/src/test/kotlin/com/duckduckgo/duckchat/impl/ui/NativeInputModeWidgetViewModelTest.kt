@@ -247,6 +247,15 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfigureThenBothContextAndPositionSetAtomically() = runTest {
+        testee.configure(isDuckAiMode = true, isBottom = true)
+
+        val state = testee.state.firstOrNull()!!
+        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
+        assertEquals(NativeInputState.InputPosition.BOTTOM, state.inputPosition)
+    }
+
+    @Test
     fun whenStorePendingPromptThenDelegatesToStore() {
         testee.storePendingPrompt("hello", "model-1")
 
