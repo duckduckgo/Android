@@ -284,6 +284,8 @@ are a preview of how the diagrams will look once the PR is merged.
 
 Call `safe-outputs.create-pull-request` with:
 
+**Branch:** `feature/david/native_input_docs`
+
 **Title:** `[docs] Update NativeInput diagrams — <short subject of the triggering commit>`
 
 **Body:**
