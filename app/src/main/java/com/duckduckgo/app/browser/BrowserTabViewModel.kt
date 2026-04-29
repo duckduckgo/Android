@@ -3685,21 +3685,21 @@ class BrowserTabViewModel @Inject constructor(
     private fun handlePdfUrl(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
         command.value = Command.ExpandOmnibar
         loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
-        pdfDownloadJob += viewModelScope.launch(dispatchers.io()) {
+        pdfDownloadJob += viewModelScope.launch {
+            // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
+            // defaults to Main, so we stay on Main for the LiveData updates below.
             val cachedUri = inlinePdfHandler.downloadToCache(url)
-            withContext(dispatchers.main()) {
-                loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
-                if (cachedUri != null) {
-                    val pdfTitle = inlinePdfHandler.extractFileName(url)
-                    pageChanged(url, pdfTitle)
-                    browserViewState.value = currentBrowserViewState().copy(
-                        currentPdfCachedUri = cachedUri,
-                        currentPdfFileName = pdfTitle,
-                    )
-                    command.value = ShowPdfInTab(url, cachedUri)
-                } else {
-                    sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
-                }
+            loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
+            if (cachedUri != null) {
+                val pdfTitle = inlinePdfHandler.extractFileName(url)
+                pageChanged(url, pdfTitle)
+                browserViewState.value = currentBrowserViewState().copy(
+                    currentPdfCachedUri = cachedUri,
+                    currentPdfFileName = pdfTitle,
+                )
+                command.value = ShowPdfInTab(url, cachedUri)
+            } else {
+                sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
             }
         }
     }
