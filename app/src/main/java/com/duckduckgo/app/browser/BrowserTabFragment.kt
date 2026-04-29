@@ -2299,6 +2299,9 @@ class BrowserTabFragment :
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
         viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
+        // PdfViewerFragmentV2 dispatches window insets to handle edge-to-edge, which can
+        // leave a bottom padding on the WebView. Re-dispatch so siblings recompute insets.
+        ViewCompat.requestApplyInsets(binding.root)
     }
 
     private fun isPdfVisible(): Boolean {
