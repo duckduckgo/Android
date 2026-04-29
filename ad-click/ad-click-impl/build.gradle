@@ -39,6 +39,7 @@ android {
 
 dependencies {
     anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':browser-api')
     implementation project(path: ':ad-click-api')
