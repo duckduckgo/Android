@@ -94,8 +94,7 @@ Always be:
 
 ## Workflow
 
-State is derived from live data on every run. Do not maintain any persistent state file —
-the Asana "In Progress" section and open `[Android Maintenance]` PRs are the source of truth.
+State is derived from live data on every run — the Asana "In Progress" section and open `[Android Maintenance]` PRs are the source of truth.
 
 ### Step 1: Check for in-progress work
 
