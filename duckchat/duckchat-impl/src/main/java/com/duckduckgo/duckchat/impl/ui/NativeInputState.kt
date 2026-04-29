@@ -36,6 +36,9 @@ data class NativeInputState(
 
     val isBottom: Boolean get() = inputPosition == InputPosition.BOTTOM
 
-    val defaultToggleSelection: ToggleSelection get() =
-        if (inputContext == InputContext.DUCK_AI || inputContext == InputContext.DUCK_AI_CONTEXTUAL) ToggleSelection.DUCK_AI else ToggleSelection.SEARCH
+    val defaultToggleSelection: ToggleSelection
+        get() = when (inputContext) {
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> ToggleSelection.DUCK_AI
+            InputContext.BROWSER -> ToggleSelection.SEARCH
+        }
 }
