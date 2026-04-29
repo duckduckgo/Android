@@ -37,7 +37,7 @@ interface UserBrowserProperties {
      * Once true, this value is permanent — it does not revert if the user later
      * changes their default browser to something else.
      */
-    fun wasEverDefaultBrowser(): Boolean
+    suspend fun wasEverDefaultBrowser(): Boolean
     fun emailEnabled(): Boolean
     fun searchCount(): Long
     fun widgetAdded(): Boolean

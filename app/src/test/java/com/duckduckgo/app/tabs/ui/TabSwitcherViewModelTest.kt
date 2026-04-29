@@ -2018,7 +2018,7 @@ class TabSwitcherViewModelTest {
             TODO("Not yet implemented")
         }
 
-        override fun wasEverDefaultBrowser(): Boolean {
+        override suspend fun wasEverDefaultBrowser(): Boolean {
             TODO("Not yet implemented")
         }
 

@@ -61,7 +61,7 @@ class AndroidUserBrowserProperties(
         return appInstallStore.defaultBrowser
     }
 
-    override fun wasEverDefaultBrowser(): Boolean {
+    override suspend fun wasEverDefaultBrowser(): Boolean {
         return appInstallStore.wasEverDefaultBrowser
     }
 

@@ -168,7 +168,7 @@ class WinBackPromptEvaluatorImplTest {
         fakeReactivateUsersToggles.defaultBrowserWinBackPrompt().setRawStoredState(State(true))
     }
 
-    private fun givenUserIsEligible() {
+    private suspend fun givenUserIsEligible() {
         whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
     }
