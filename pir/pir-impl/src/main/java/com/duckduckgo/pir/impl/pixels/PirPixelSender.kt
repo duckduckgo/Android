@@ -114,12 +114,18 @@ interface PirPixelSender {
      * @param batteryOptimizationsEnabled - whether battery optimizations are enabled for the app
      * @param totalScanJobs - the number of scan jobs executed during the run
      * @param totalOptOutJobs - the number of opt-out jobs executed during the run
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
+     * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      */
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
         totalOptOutJobs: Int,
+        profileQueryCount: Int,
+        brokerCount: Int,
+        isPowerSavingEnabled: Boolean,
     )
 
     /**
@@ -593,6 +599,9 @@ interface PirPixelSender {
     fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
+        isPowerSavingEnabled: Boolean,
+        batteryOptimizationsEnabled: Boolean,
+        brokerCount: Int,
     )
 
     fun reportBackgroundScanStats(
@@ -636,12 +645,18 @@ class RealPirPixelSender @Inject constructor(
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
         totalOptOutJobs: Int,
+        profileQueryCount: Int,
+        brokerCount: Int,
+        isPowerSavingEnabled: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
             PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
             PARAM_KEY_TOTAL_SCAN to totalScanJobs.toString(),
             PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -1402,11 +1417,17 @@ class RealPirPixelSender @Inject constructor(
     override fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
+        isPowerSavingEnabled: Boolean,
+        batteryOptimizationsEnabled: Boolean,
+        brokerCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_DURATION_MS to durationMs.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+            PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
