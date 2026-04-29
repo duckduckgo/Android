@@ -3122,7 +3122,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState(useBottomSheetMenu = true)
+        browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()

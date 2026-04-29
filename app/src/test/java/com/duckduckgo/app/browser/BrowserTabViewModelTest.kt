@@ -109,8 +109,6 @@ import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -472,7 +470,6 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockUrlDisplayRepository: UrlDisplayRepository = mock()
-    private val mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository = mock()
 
     private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -641,7 +638,6 @@ class BrowserTabViewModelTest {
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
     private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
-    private val browserMenuStateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = false, isEnabled = false))
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
 
@@ -736,7 +732,6 @@ class BrowserTabViewModelTest {
             whenever(mockSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(mockSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
             whenever(mockUrlDisplayRepository.isFullUrlEnabled).then { isFullSiteAddressEnabledFlow }
-            whenever(mockBrowserMenuDisplayRepository.browserMenuState).then { browserMenuStateFlow }
             whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(false)
             whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
