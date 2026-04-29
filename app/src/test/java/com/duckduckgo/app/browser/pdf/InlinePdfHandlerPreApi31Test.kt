@@ -33,8 +33,13 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+// SDK 29 (not 30) is chosen for Robolectric Sandbox sharing with UriExtensionTest:
+// loading another SDK level inflates Sandbox memory and pushes CI into OOM. Any SDK
+// strictly below 31 exercises the same `Build.VERSION.SDK_INT < 31` guard, so the
+// specific number doesn't change what's under test — only the class name encodes
+// the production boundary.
 @Config(sdk = [29])
-class InlinePdfHandlerPreApi29Test {
+class InlinePdfHandlerPreApi31Test {
 
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
