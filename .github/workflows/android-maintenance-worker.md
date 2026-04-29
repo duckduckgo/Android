@@ -6,6 +6,12 @@ description: |
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * *"
+
+concurrency:
+  group: android-maintenance-worker
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -86,23 +92,11 @@ Always be:
 - Transparent: always identify yourself as Android Maintenance Worker (🤖) in all comments and PRs
 - Restrained: when in doubt, stop and ask; it is always better to comment and wait than to make a risky change
 
-## Memory
-
-Use persistent repo memory to track:
-- in_progress_task: GID and Asana URL of the task currently being worked
-- in_progress_pr: PR number and branch name of the current in-progress PR (if any)
-- last_run: timestamp and outcome of the last run
-
-Read memory at the start of every run; update it at the end.
-
-Important: memory may be stale. Always verify the current state of any in-progress task and
-PR against live data before acting on memory.
-
 ## Workflow
 
-### Step 1: Check for in-progress work
+State is derived from live data on every run — the Asana "In Progress" section and open `[Android Maintenance]` PRs are the source of truth.
 
-**Before doing anything else, check live state — do not rely on memory alone.**
+### Step 1: Check for in-progress work
 
 1. Use the `asana_get_section_tasks` tool to list tasks in the "In Progress" section
    (section GID: `1213746476312672`).
@@ -116,8 +110,6 @@ PR against live data before acting on memory.
    - Otherwise (PR is open and healthy, or no PR exists yet) → **stop**. Do not start a new task.
 
 **Never proceed to Step 2 when step 3 applies.**
-Use memory (`in_progress_task`, `in_progress_pr`) only as a hint to locate the task and PR
-faster — it is not the source of truth.
 
 ### Step 2: Select a task
 
@@ -125,7 +117,6 @@ faster — it is not the source of truth.
    - "Ready" section GID: `1213746476312669`
 2. Pick the first task listed
 3. Use the `asana_get_task` tool to fetch the full task details (name, notes, URL)
-4. Save the task GID and URL to memory as in_progress_task
 
 ### Step 3: Read project conventions
 
@@ -151,6 +142,7 @@ Run the commands listed in the task's Validation section.
 Also always run:
 ./gradlew spotlessApply
 ./gradlew spotlessCheck
+./gradlew lint_check
 ./gradlew :<affected-module>:testDebugUnitTest   (for each modified module)
 
 If any check fails due to your changes:
@@ -179,7 +171,7 @@ Body (follow the template exactly — replace the placeholder sections):
     ### Steps to test this PR
 
     _Lint / formatting_
-    - [ ] <module-specific lint command from the task's Validation section>
+    - [ ] ./gradlew lint_check
     - [ ] ./gradlew spotlessCheck
 
     ### UI changes
@@ -187,16 +179,12 @@ Body (follow the template exactly — replace the placeholder sections):
     | ------ | ----- |
     | No UI changes | No UI changes |
 
-After opening the PR:
-- Update memory: in_progress_pr → PR number and branch
-
 ### Step 7: If stuck
 
 If at any point you cannot proceed (the task is ambiguous, the approach does not work,
 verification fails in a way you cannot resolve):
 1. Do NOT open a partial PR
-2. Update memory: clear in_progress_task and in_progress_pr
-3. Stop and explain what blocked you in the workflow output
+2. Stop and explain what blocked you in the workflow output
 
 ## Guidelines
 
