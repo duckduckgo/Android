@@ -167,19 +167,17 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when initialized with search query and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
+    fun `when initialized with search query and autocomplete enabled then autocomplete suggestions should be visible`() =
         runTest {
             val viewModel = createViewModel("search query")
 
-            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
         }
 
     @Test
-    fun `when user modifies initial search query then autocomplete pixels are sent`() =
+    fun `when initialized with search query and autocomplete enabled then send autocomplete pixels`() =
         runTest {
-            val viewModel = createViewModel("search query")
-
-            viewModel.onSearchInputTextChanged("search query modified")
+            createViewModel("search query")
 
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
             verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
@@ -220,11 +218,11 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when user modifies initial search query then autocomplete suggestions should become visible`() =
+    fun `when user modifies initial search query then autocomplete suggestions should remain visible`() =
         runTest {
             val viewModel = createViewModel("search query")
 
-            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
             viewModel.onSearchInputTextChanged("modified search")
             assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
         }
@@ -297,19 +295,17 @@ class InputScreenViewModelTest {
             whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
             viewModel.onActivityResume()
 
-            // User modifies input to trigger autocomplete (suppressed on initial focus regardless of pre-filled text)
-            viewModel.onSearchInputTextChanged("search query modified")
-
+            // Should now show autocomplete for search query
             assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
         }
 
     @Test
-    fun `when initialized with partial URL then autocomplete suggestions should be hidden initially`() =
+    fun `when initialized with partial URL then autocomplete suggestions should be visible`() =
         runTest {
             val viewModel = createViewModel("example")
 
-            // Autocomplete is suppressed on initial focus regardless of whether pre-filled text is a URL
-            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            // Partial URLs that don't match web URL pattern should show autocomplete
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
         }
 
     @Test
@@ -322,15 +318,15 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when text input contains special characters then autocomplete is suppressed on initial focus`() =
+    fun `when text input contains special characters then autocomplete visibility follows URL pattern`() =
         runTest {
             // Test with URL-like string with special characters
             var viewModel = createViewModel("https://example.com?query=test&param=value")
             assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
-            // Test with non-URL string with special characters — also hidden on initial focus
+            // Test with non-URL string with special characters
             viewModel = createViewModel("search with @special #characters")
-            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
         }
 
     @Test
@@ -353,24 +349,18 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when search query provided and user modifies input then autoCompleteSuggestionResults emits autocomplete results`() =
+    fun `when search query provided and autocomplete enabled then autoCompleteSuggestionResults emits autocomplete results`() =
         runTest {
             val expectedSuggestions =
                 listOf(
                     AutoCompleteDefaultSuggestion("suggestion 1"),
                     AutoCompleteSearchSuggestion("suggestion 2", isUrl = false, isAllowedInTopHits = true),
                 )
-            val expectedResult = AutoCompleteResult("test query modified", expectedSuggestions)
+            val expectedResult = AutoCompleteResult("test query", expectedSuggestions)
 
-            whenever(autoComplete.autoComplete("test query modified")).thenReturn(flowOf(expectedResult))
+            whenever(autoComplete.autoComplete("test query")).thenReturn(flowOf(expectedResult))
 
             val viewModel = createViewModel("test query")
-
-            // Autocomplete is suppressed on initial focus; only shows after user modifies input
-            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-
-            viewModel.onSearchInputTextChanged("test query modified")
-            advanceTimeBy(301) // Wait for debounce
 
             assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
         }
@@ -397,8 +387,6 @@ class InputScreenViewModelTest {
             whenever(autoComplete.autoComplete(any())).thenReturn(flow { throw IOException("Network error") })
 
             val viewModel = createViewModel("test query")
-            viewModel.onSearchInputTextChanged("test query modified")
-            advanceTimeBy(301)
 
             assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
         }
@@ -406,20 +394,15 @@ class InputScreenViewModelTest {
     @Test
     fun `when search input text changes rapidly then autoComplete is debounced`() =
         runTest {
-            val result1 = AutoCompleteResult("tested", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
+            val result1 = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
             val result2 = AutoCompleteResult("testing", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
 
-            whenever(autoComplete.autoComplete("tested")).thenReturn(flowOf(result1))
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(result1))
             whenever(autoComplete.autoComplete("testing")).thenReturn(flowOf(result2))
 
             val viewModel = createViewModel("test")
 
-            // Autocomplete suppressed on initial focus
-            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-
-            // First user modification triggers autocomplete
-            viewModel.onSearchInputTextChanged("tested")
-            advanceTimeBy(301)
+            // First emission should be immediate
             assertEquals(result1, viewModel.autoCompleteSuggestionResults.value)
 
             // Change text rapidly
@@ -483,16 +466,14 @@ class InputScreenViewModelTest {
     @Test
     fun `when text input changes from non-empty to empty then autoCompleteSuggestionResults changes to empty value`() =
         runTest {
-            val modifiedResult = AutoCompleteResult("tested", listOf(AutoCompleteDefaultSuggestion("suggestion")))
+            val initialResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
             val clearedResult = AutoCompleteResult("", emptyList())
-            whenever(autoComplete.autoComplete("tested")).thenReturn(flowOf(modifiedResult))
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(initialResult))
 
             val viewModel = createViewModel("test")
 
-            // User modifies input to trigger autocomplete (suppressed on initial focus)
-            viewModel.onSearchInputTextChanged("tested")
-            advanceTimeBy(301)
-            assertEquals(modifiedResult, viewModel.autoCompleteSuggestionResults.value)
+            // Initially has results
+            assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
 
             // Change to empty text
             viewModel.onSearchInputTextChanged("")
@@ -600,8 +581,6 @@ class InputScreenViewModelTest {
             val initialText = "test query"
             val viewModel = createViewModel(initialText)
 
-            // Make autocomplete visible by modifying the search input first
-            viewModel.onSearchInputTextChanged("$initialText modified")
             assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
             viewModel.onChatInputTextChanged(initialText)
@@ -638,11 +617,7 @@ class InputScreenViewModelTest {
                 .thenReturn(flow1)
                 .thenReturn(flow2)
 
-            val viewModel = createViewModel("prefill")
-
-            // Autocomplete is suppressed on initial focus; user modification triggers it
-            viewModel.onSearchInputTextChanged("query")
-            advanceTimeBy(301)
+            val viewModel = createViewModel("query")
 
             flow1.emit(initialResult)
             advanceUntilIdle()
@@ -808,21 +783,11 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when initialized with search query then showSearchLogo should be true because autocomplete is suppressed on initial focus`() =
+    fun `when initialized with search query then showSearchLogo should be false due to autocomplete suggestions`() =
         runTest {
             val viewModel = createViewModel("search query")
 
-            // Autocomplete is hidden on initial focus regardless of pre-filled text, so logo remains visible
-            assertTrue(viewModel.visibilityState.value.showSearchLogo)
-        }
-
-    @Test
-    fun `when user modifies initial search query then showSearchLogo should be false due to autocomplete suggestions`() =
-        runTest {
-            val viewModel = createViewModel("search query")
-
-            viewModel.onSearchInputTextChanged("search query modified")
-
+            // Should be false because autocomplete suggestions are visible for search queries
             assertFalse(viewModel.visibilityState.value.showSearchLogo)
         }
 
@@ -904,8 +869,7 @@ class InputScreenViewModelTest {
         runTest {
             val viewModel = createViewModel("search query")
 
-            // Trigger autocomplete by modifying input
-            viewModel.onSearchInputTextChanged("search query modified")
+            // Initially false due to autocomplete
             assertFalse(viewModel.visibilityState.value.showSearchLogo)
 
             // Ensure new tab page has no content
@@ -923,8 +887,7 @@ class InputScreenViewModelTest {
         runTest {
             val viewModel = createViewModel("search query")
 
-            // Trigger autocomplete by modifying input
-            viewModel.onSearchInputTextChanged("search query modified")
+            // Initially false due to autocomplete
             assertFalse(viewModel.visibilityState.value.showSearchLogo)
 
             // Set new tab page to have content
@@ -1452,9 +1415,6 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel("search query")
             val capturedCommands = mutableListOf<Command>()
 
-            // Trigger autocomplete by modifying input
-            viewModel.onSearchInputTextChanged("search query modified")
-
             viewModel.command.observeForever { command ->
                 if (command != null) {
                     capturedCommands.add(command)
@@ -1605,10 +1565,6 @@ class InputScreenViewModelTest {
     fun `when onPageScrolled and search logo hidden then SetLogoProgress is not emitted`() =
         runTest {
             val viewModel = createViewModel("search query")
-
-            // Trigger autocomplete by modifying input so the logo is hidden
-            viewModel.onSearchInputTextChanged("search query modified")
-
             val capturedCommands = mutableListOf<Command>()
 
             viewModel.command.observeForever { command ->
@@ -1660,8 +1616,6 @@ class InputScreenViewModelTest {
         runTest {
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             val viewModel = createViewModel("search query")
-            // Trigger autocomplete by modifying input (suppressed on initial focus)
-            viewModel.onSearchInputTextChanged("search query modified")
 
             assertTrue(viewModel.visibilityState.value.bottomFadeVisible)
         }
@@ -1671,8 +1625,6 @@ class InputScreenViewModelTest {
         runTest {
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
             val viewModel = createViewModel("search query")
-            // Trigger autocomplete by modifying input (suppressed on initial focus)
-            viewModel.onSearchInputTextChanged("search query modified")
 
             assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
         }
@@ -2012,10 +1964,8 @@ class InputScreenViewModelTest {
 
             verify(autoCompleteFactory).create(expectedConfig)
 
-            // User modification required to trigger autocomplete
-            viewModel.onSearchInputTextChanged("test query modified")
             advanceTimeBy(301)
-            verify(autoComplete).autoComplete("test query modified")
+            verify(autoComplete).autoComplete("test query")
         }
 
     @Test
@@ -2027,10 +1977,8 @@ class InputScreenViewModelTest {
 
             verify(autoCompleteFactory).create(expectedConfig)
 
-            // User modification required to trigger autocomplete
-            viewModel.onSearchInputTextChanged("test query modified")
             advanceTimeBy(301)
-            verify(autoComplete).autoComplete("test query modified")
+            verify(autoComplete).autoComplete("test query")
         }
 
     @Test
