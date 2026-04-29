@@ -977,4 +977,10 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Πραγματοποιήστε αναζήτηση ιδιωτικά με το DuckDuckGo ή ρωτήστε το Duck.ai. Η φωνητική αναζήτηση και το Duck.ai είναι διαθέσιμα αν είναι ενεργοποιημένα.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Κάντε αναζήτηση ή επισκεφτείτε τους αγαπημένους ιστότοπούς σας ιδιωτικά, με ένα πάτημα. Η φωνητική αναζήτηση και το Duck.ai είναι διαθέσιμα αν είναι ενεργοποιημένα.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Ας συνεχίσουμε από εκεί που μείνατε</string>
+    <string name="syncRestoreDialogDescription">Θέλετε να επαναφέρετε τους σελιδοδείκτες, τους κωδικούς πρόσβασης και άλλα στοιχεία από τον προηγούμενο συγχρονισμό σας με το DuckDuckGo;</string>
+    <string name="syncRestoreDialogPrimaryCta">Επαναφορά των στοιχείων μου</string>
+    <string name="syncRestoreDialogSecondaryCta">Παράλειψη</string>
 </resources>

@@ -977,4 +977,10 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Cerca privatamente con DuckDuckGo o chiedi a Duck.ai. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Cerca o visita i tuoi siti preferiti in privato con un tocco. Ricerca vocale e Duck.ai disponibili se abilitati.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Riprendiamo da dove eravamo rimasti</string>
+    <string name="syncRestoreDialogDescription">Vuoi ripristinare i tuoi segnalibri, le password e altro ancora dalla precedente sincronizzazione con DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Ripristina i miei contenuti</string>
+    <string name="syncRestoreDialogSecondaryCta">Salta</string>
 </resources>
