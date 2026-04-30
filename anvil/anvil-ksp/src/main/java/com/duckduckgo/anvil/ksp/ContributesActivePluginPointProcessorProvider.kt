@@ -22,9 +22,9 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 @AutoService(SymbolProcessorProvider::class)
-class ContributesPluginPointProcessorProvider : SymbolProcessorProvider {
+class ContributesActivePluginPointProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return ContributesPluginPointProcessor(
+        return ContributesActivePluginPointProcessor(
             codeGenerator = environment.codeGenerator,
             logger = environment.logger,
         )
