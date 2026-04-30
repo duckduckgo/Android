@@ -28,7 +28,6 @@ dependencies {
     ksp project(':anvil-ksp')
     implementation project(":pir-api")
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':browser-api')
     implementation project(':design-system')

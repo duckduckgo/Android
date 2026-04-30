@@ -46,7 +46,6 @@ android {
 
 dependencies {
     ksp project(':anvil-ksp')
-    anvil project(':anvil-compiler')
     implementation project(':navigation-api')
     implementation project(':anrs-api')
     implementation project(':anvil-annotations')

@@ -316,7 +316,6 @@ dependencies {
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
     implementation project(':app-build-config-api')

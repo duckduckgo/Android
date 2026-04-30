@@ -27,7 +27,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":history-api")
 
-    anvil project(path: ':anvil-compiler')
     ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')

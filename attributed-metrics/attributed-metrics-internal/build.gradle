@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-    anvil project(':anvil-compiler')
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':attributed-metrics-api')

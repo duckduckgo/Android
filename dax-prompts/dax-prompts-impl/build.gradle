@@ -32,7 +32,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':statistics-api')

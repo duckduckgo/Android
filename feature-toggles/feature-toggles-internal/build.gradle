@@ -27,7 +27,6 @@ dependencies {
 	implementation project(":feature-toggles-api")
 	implementation project(":feature-toggles-impl")
 
-    anvil project(':anvil-compiler')
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':di')

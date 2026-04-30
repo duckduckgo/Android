@@ -38,7 +38,6 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':anvil-annotations')
 
-    anvil project(path: ':anvil-compiler')
 
     implementation Google.dagger
     implementation KotlinX.coroutines.core

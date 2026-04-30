@@ -27,7 +27,6 @@ dependencies {
     implementation project(":data-clearing-api")
     implementation project(path: ':common-utils')
 
-    anvil project(path: ':anvil-compiler')
     ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')

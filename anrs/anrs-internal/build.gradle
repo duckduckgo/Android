@@ -28,7 +28,6 @@ dependencies {
 	implementation project(":anrs-impl")
 	implementation project(":anrs-store")
 
-    anvil project(':anvil-compiler')
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':di')

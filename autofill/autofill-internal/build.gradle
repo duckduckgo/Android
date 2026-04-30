@@ -42,7 +42,6 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation project(':saved-sites-api')
 
-    anvil project(path: ':anvil-compiler')
     ksp project(path: ':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(':di')
