@@ -54,7 +54,7 @@
     </com.duckduckgo.browser.ui.inputmode.InputModeTabLayout>
 
     <ImageView
-        android:id="@+id/InputModeWidgetBack"
+        android:id="@+id/inputModeWidgetBack"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         android:layout_gravity="center"

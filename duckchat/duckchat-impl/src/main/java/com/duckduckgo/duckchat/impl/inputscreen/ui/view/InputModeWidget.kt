@@ -161,7 +161,7 @@ open class InputModeWidget @JvmOverloads constructor(
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
-        inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
+        inputModeWidgetBack = findViewById(R.id.inputModeWidgetBack)
         inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
@@ -237,9 +237,8 @@ open class InputModeWidget @JvmOverloads constructor(
 
             onClearTextTapped?.invoke()
         }
-        val backClickListener = OnClickListener { onBackPressed() }
-        inputModeWidgetBack.setOnClickListener(backClickListener)
-        inputModeWidgetUnifiedBack.setOnClickListener(backClickListener)
+        inputModeWidgetBack.setOnClickListener { onBackPressed() }
+        inputModeWidgetUnifiedBack.setOnClickListener{ onBackPressed() }
 
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()

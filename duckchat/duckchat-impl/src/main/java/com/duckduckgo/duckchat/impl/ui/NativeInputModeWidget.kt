@@ -333,7 +333,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun hideBackArrow() {
-        findViewById<View?>(R.id.InputModeWidgetBack)?.visibility = GONE
+        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility = GONE
     }
 
     private fun updateUnifiedBackArrow() {
