@@ -42,6 +42,7 @@ data class DaxSerpBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    backgroundRes = R.drawable.bg_onboarding_serp,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
