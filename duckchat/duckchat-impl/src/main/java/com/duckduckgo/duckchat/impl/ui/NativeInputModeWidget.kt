@@ -739,7 +739,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 }
 
 internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
-    toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
+    toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
-    !toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
+    !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER

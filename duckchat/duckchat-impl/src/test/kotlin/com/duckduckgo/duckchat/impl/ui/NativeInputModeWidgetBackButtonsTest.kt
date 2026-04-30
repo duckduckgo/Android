@@ -74,6 +74,18 @@ class NativeInputModeWidgetBackButtonsTest {
         assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI).shouldShowCardRowBack())
     }
 
+    @Test
+    fun `toggle row back is hidden in duck ai contextual context`() {
+        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack())
+        assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowToggleRowBack())
+    }
+
+    @Test
+    fun `card row back is hidden in duck ai contextual context`() {
+        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowCardRowBack())
+        assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowCardRowBack())
+    }
+
     private fun stateOf(inputMode: InputMode, inputContext: InputContext): NativeInputState =
         NativeInputState(inputMode = inputMode, inputContext = inputContext)
 }
