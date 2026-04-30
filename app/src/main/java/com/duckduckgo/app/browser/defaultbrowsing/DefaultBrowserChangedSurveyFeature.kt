@@ -10,6 +10,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     featureName = "defaultBrowserChangedSurvey",
 )
 interface DefaultBrowserChangedSurveyFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
