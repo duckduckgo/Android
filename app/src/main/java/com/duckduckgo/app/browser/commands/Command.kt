@@ -518,7 +518,7 @@ sealed class Command {
     ) : Command()
 
     data class ShowToast(@param:StringRes val textResId: Int) : Command()
-    
+
     data class ShowPdfInTab(
         val url: String,
         val cachedFileUri: Uri,
