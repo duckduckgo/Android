@@ -279,6 +279,8 @@ dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
+	implementation project(":data-clearing-api")
+	implementation project(":data-clearing-impl")
 	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
@@ -600,6 +602,9 @@ dependencies {
     // Browser
     implementation "androidx.browser:browser:_"
 
+    // PDF Viewer
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
+
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
@@ -608,6 +613,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
+    testImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit

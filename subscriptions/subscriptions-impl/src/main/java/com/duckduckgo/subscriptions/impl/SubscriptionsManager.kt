@@ -643,15 +643,16 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             if (subscription.isActive()) {
-                pixelSender.reportPurchaseSuccess()
+                val isFreeTrial = subscription.activeOffers.contains(ActiveOfferType.TRIAL)
+                pixelSender.reportPurchaseSuccess(isFreeTrial)
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
-                _currentPurchaseState.emit(CurrentPurchase.Success)
+                _currentPurchaseState.emit(CurrentPurchase.Success(isFreeTrial))
                 authRepository.registerLocalPurchasedAt()
 
                 subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
-                if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
+                if (isFreeTrial) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
                     if (subscriptionsFeature.get().vpnReminderNotification().isEnabled()) {
                         vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
@@ -1406,7 +1407,7 @@ sealed class CurrentPurchase {
     data object PreFlowInProgress : CurrentPurchase()
     data object PreFlowFinished : CurrentPurchase()
     data object InProgress : CurrentPurchase()
-    data object Success : CurrentPurchase()
+    data class Success(val isFreeTrial: Boolean) : CurrentPurchase()
     data object Waiting : CurrentPurchase()
     data object Recovered : CurrentPurchase()
     data object Canceled : CurrentPurchase()

@@ -27,23 +27,21 @@ class NativeInputLayoutCoordinator(
     private val rootView: ViewGroup,
     private val omnibarState: OmnibarState,
 ) {
-    fun isWidgetBottom(): Boolean = omnibarState.isDuckAiMode() || omnibarState.isOmnibarBottom()
-
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
     private fun View.snapshotPadding() = Padding(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
-    fun buildWidgetLayoutParams(): ViewGroup.LayoutParams {
+    fun buildWidgetLayoutParams(isBottom: Boolean): ViewGroup.LayoutParams {
         return CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         ).apply {
-            gravity = if (isWidgetBottom()) Gravity.BOTTOM else Gravity.TOP
+            gravity = if (isBottom) Gravity.BOTTOM else Gravity.TOP
         }
     }
 
-    fun applyBottomCardCorners(widgetView: View) {
-        if (!isWidgetBottom()) return
+    fun applyBottomCardCorners(widgetView: View, isBottom: Boolean) {
+        if (!isBottom) return
         val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
         val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
         card.shapeAppearanceModel =
@@ -56,9 +54,9 @@ class NativeInputLayoutCoordinator(
                 .build()
     }
 
-    fun applyBottomCardShape(widgetView: View) {
-        if (!isWidgetBottom()) return
-        applyBottomCardCorners(widgetView)
+    fun applyBottomCardShape(widgetView: View, isBottom: Boolean) {
+        if (!isBottom) return
+        applyBottomCardCorners(widgetView, isBottom)
         val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
         val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
         params.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -68,7 +66,7 @@ class NativeInputLayoutCoordinator(
         card.layoutParams = params
     }
 
-    fun configureAutocompleteLayout(widgetView: View) {
+    fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
         val baseElevation = maxOf(autoCompleteList.elevation, focusedView?.elevation ?: 0f)
@@ -83,17 +81,18 @@ class NativeInputLayoutCoordinator(
             }
         fun applyPadding(deltaTop: Int, deltaBottom: Int) {
             targets.forEach { (view, padding) ->
-                view.setPadding(
-                    padding.left,
-                    padding.top + deltaTop,
-                    padding.right,
-                    padding.bottom + deltaBottom,
-                )
+                val newTop = padding.top + deltaTop
+                val newBottom = padding.bottom + deltaBottom
+                // Only post requestLayout when padding actually changed to avoid extra layout passes in steady state
+                if (view.paddingTop != newTop || view.paddingBottom != newBottom) {
+                    view.setPadding(padding.left, newTop, padding.right, newBottom)
+                    // Force RecyclerView to reposition items after padding changes during widget enter animation
+                    view.post { view.requestLayout() }
+                }
             }
         }
 
         fun applyForWidgetPosition() {
-            val isBottom = isWidgetBottom()
             val topOffset = if (isBottom) 0 else maxOf(0, widgetView.bottom - autoCompleteList.top)
             val bottomOffset = if (isBottom) maxOf(0, autoCompleteList.bottom - widgetView.top) else 0
             applyPadding(deltaTop = topOffset, deltaBottom = bottomOffset)
@@ -122,7 +121,7 @@ class NativeInputLayoutCoordinator(
         )
     }
 
-    fun configureContentOffset(widgetView: View) {
+    fun configureContentOffset(widgetView: View, isBottom: Boolean) {
         data class Target(val view: View, val basePadding: Padding)
         val newTabContent =
             rootView.findViewById<View?>(R.id.newTabPage)
@@ -151,13 +150,13 @@ class NativeInputLayoutCoordinator(
                 rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
         }
 
-        fun computeDeltaTop(view: View, isBottom: Boolean, anchorBottomInWindow: Int): Int {
+        fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
             if (isBottom || isLogoVisible(view)) return 0
             val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
             return maxOf(0, anchorBottomInWindow - viewLocation[1])
         }
 
-        fun computeDeltaBottom(isBottom: Boolean): Int {
+        fun computeDeltaBottom(): Int {
             if (!isBottom) return 0
             return if (omnibarState.isOmnibarBottom()) {
                 maxOf(0, overlap)
@@ -171,12 +170,11 @@ class NativeInputLayoutCoordinator(
                 targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
                 return
             }
-            val isBottom = isWidgetBottom()
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
-            val deltaBottom = computeDeltaBottom(isBottom)
+            val deltaBottom = computeDeltaBottom()
             targets.forEach { target ->
-                val deltaTop = computeDeltaTop(target.view, isBottom, anchorBottomInWindow)
+                val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
                 applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
@@ -204,8 +202,8 @@ class NativeInputLayoutCoordinator(
         )
     }
 
-    fun applyForcedBottomTranslation(widgetView: View) {
-        val shouldForce = isWidgetBottom() && !omnibarState.isOmnibarBottom()
+    fun applyForcedBottomTranslation(widgetView: View, isBottom: Boolean) {
+        val shouldForce = isBottom && !omnibarState.isOmnibarBottom()
         if (!shouldForce) {
             widgetView.translationY = 0f
             return

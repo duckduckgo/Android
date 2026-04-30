@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.ContinueSetup
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.StartRestore
@@ -31,9 +32,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
-class SyncPreviousSessionReadyViewModel @Inject constructor() : ViewModel() {
+class SyncPreviousSessionReadyViewModel @Inject constructor(
+    private val syncPixels: SyncPixels,
+) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
+
+    @Volatile private var source: String = ""
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -43,19 +48,27 @@ class SyncPreviousSessionReadyViewModel @Inject constructor() : ViewModel() {
         data object Close : Command()
     }
 
+    fun onScreenShown(source: String) {
+        this.source = source
+        syncPixels.fireAutoRestoreSettingsReadyShown(source)
+    }
+
     fun onResumeClicked() {
+        syncPixels.fireAutoRestoreSettingsRestoreTapped(source)
         viewModelScope.launch {
             command.send(StartRestore)
         }
     }
 
     fun onContinueSetupClicked() {
+        syncPixels.fireAutoRestoreSettingsSkipRestoreTapped(source)
         viewModelScope.launch {
             command.send(ContinueSetup)
         }
     }
 
     fun onCloseClicked() {
+        syncPixels.fireAutoRestoreSettingsCancelled(source)
         viewModelScope.launch {
             command.send(Close)
         }

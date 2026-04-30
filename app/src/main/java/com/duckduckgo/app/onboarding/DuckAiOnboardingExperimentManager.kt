@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -43,12 +44,21 @@ interface DuckAiOnboardingExperimentManager {
 class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
     private val browserConfig: AndroidBrowserConfigFeature,
     private val dispatcherProvider: DispatcherProvider,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : DuckAiOnboardingExperimentManager {
 
     override suspend fun enroll(): DuckAiOnboardingExperimentVariant? {
         if (!arePrerequisitesMet()) return null
 
-        // TODO experiment setup
+        val isBrandDesignEnabled = withContext(dispatcherProvider.io()) {
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        }
+        if (isBrandDesignEnabled) {
+            // TODO experiment 2 setup
+        } else {
+            // TODO experiment 1 setup
+        }
+
         return null
     }
 

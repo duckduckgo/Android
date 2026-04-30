@@ -129,6 +129,7 @@ class InputScreenViewModelTest {
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(MutableStateFlow(true))
+            whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(false))
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
@@ -2679,11 +2680,10 @@ class InputScreenViewModelTest {
 
     // region voice entry point
 
-    @SuppressLint("DenyListedApi")
     @Test
-    fun `when search mode and voice available and flag on then voice search button visible`() =
+    fun `when search mode and voice available and voice chat entry shown then voice search button visible`() =
         runTest {
-            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             val viewModel = createViewModel()
             viewModel.onSearchSelected()
@@ -2692,11 +2692,10 @@ class InputScreenViewModelTest {
             assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
         }
 
-    @SuppressLint("DenyListedApi")
     @Test
-    fun `when search mode and voice unavailable and flag on then voice search and voice chat button hidden`() =
+    fun `when search mode and voice unavailable and voice chat entry shown then voice search and voice chat button hidden`() =
         runTest {
-            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
             val viewModel = createViewModel()
             viewModel.onActivityResume()
@@ -2706,11 +2705,10 @@ class InputScreenViewModelTest {
             assertFalse(viewModel.visibilityState.value.voiceChatButtonVisible)
         }
 
-    @SuppressLint("DenyListedApi")
     @Test
-    fun `when duck ai mode and flag on and no text entered then voice chat button visible regardless of voice service`() =
+    fun `when duck ai mode and voice chat entry shown and no text entered then voice chat button visible regardless of voice service`() =
         runTest {
-            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
             val viewModel = createViewModel()
             viewModel.onActivityResume()
@@ -2721,11 +2719,10 @@ class InputScreenViewModelTest {
             assertFalse(viewModel.visibilityState.value.voiceSearchButtonVisible)
         }
 
-    @SuppressLint("DenyListedApi")
     @Test
-    fun `when duck ai mode and flag on and text entered then voice chat and search button hidden`() =
+    fun `when duck ai mode and voice chat entry shown and text entered then voice chat and search button hidden`() =
         runTest {
-            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showVoiceChatEntry).thenReturn(MutableStateFlow(true))
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
             val viewModel = createViewModel()
             viewModel.onActivityResume()

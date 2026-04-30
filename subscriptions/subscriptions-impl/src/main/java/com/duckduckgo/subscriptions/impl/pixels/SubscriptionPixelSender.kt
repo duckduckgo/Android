@@ -92,8 +92,8 @@ interface SubscriptionPixelSender {
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
-    fun reportPurchaseSuccess()
-    fun reportPurchaseSuccessOrigin(origin: String?)
+    fun reportPurchaseSuccess(isFreeTrial: Boolean)
+    fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean)
     fun reportOfferRestorePurchaseClick()
     fun reportActivateSubscriptionEnterEmailClick()
     fun reportActivateSubscriptionRestorePurchaseClick()
@@ -183,12 +183,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPurchaseFailureAccountCreation() =
         fire(PURCHASE_FAILURE_ACCOUNT_CREATION)
 
-    override fun reportPurchaseSuccess() =
-        fire(PURCHASE_SUCCESS)
+    override fun reportPurchaseSuccess(isFreeTrial: Boolean) =
+        fire(PURCHASE_SUCCESS, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
 
-    override fun reportPurchaseSuccessOrigin(origin: String?) {
+    override fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean) {
         val map = mutableMapOf(
             "locale" to appBuildConfig.deviceLocale.toSanitizedLanguageTag(),
+            SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
         )
         origin?.let {
             map.put("origin", origin)

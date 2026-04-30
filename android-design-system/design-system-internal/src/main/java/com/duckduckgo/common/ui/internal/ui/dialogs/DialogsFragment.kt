@@ -34,9 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.fragment.app.Fragment
-import com.duckduckgo.common.ui.compose.buttons.LargeSecondaryButton
-import com.duckduckgo.common.ui.compose.buttons.SmallGhostButton
-import com.duckduckgo.common.ui.compose.buttons.SmallPrimaryButton
+import com.duckduckgo.common.ui.compose.button.DaxButtonSize.Large
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
 import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
@@ -381,9 +382,10 @@ class DialogsFragment : Fragment() {
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
-                        LargeSecondaryButton(
+                        DaxSecondaryButton(
                             text = "Action Bottom Sheet",
                             onClick = { showBottomSheet = true },
+                            size = Large,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         if (showBottomSheet) {
@@ -434,11 +436,12 @@ class DialogsFragment : Fragment() {
                         val sheetState = rememberModalBottomSheetState()
                         val scope = rememberCoroutineScope()
                         var showBottomSheet by remember { mutableStateOf(false) }
-                        LargeSecondaryButton(
+                        DaxSecondaryButton(
                             text = "Action Bottom Sheet with title and icons",
                             onClick = {
                                 showBottomSheet = true
                             },
+                            size = Large,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         if (showBottomSheet) {
@@ -514,11 +517,12 @@ class DialogsFragment : Fragment() {
                                 }
                             }
                         }
-                        LargeSecondaryButton(
+                        DaxSecondaryButton(
                             text = "Promo Bottom Sheet",
                             onClick = {
                                 showBottomSheet = true
                             },
+                            size = Large,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         if (showBottomSheet) {
@@ -528,8 +532,8 @@ class DialogsFragment : Fragment() {
                                 promoIcon = null,
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }
@@ -570,11 +574,12 @@ class DialogsFragment : Fragment() {
                                 }
                             }
                         }
-                        LargeSecondaryButton(
+                        DaxSecondaryButton(
                             text = "Promo Bottom Sheet with title",
                             onClick = {
                                 showBottomSheet = true
                             },
+                            size = Large,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         if (showBottomSheet) {
@@ -584,8 +589,8 @@ class DialogsFragment : Fragment() {
                                 promoIcon = null,
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }
@@ -627,11 +632,12 @@ class DialogsFragment : Fragment() {
                                 }
                             }
                         }
-                        LargeSecondaryButton(
+                        DaxSecondaryButton(
                             text = "Promo Bottom Sheet with image",
                             onClick = {
                                 showBottomSheet = true
                             },
+                            size = Large,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         if (showBottomSheet) {
@@ -641,8 +647,8 @@ class DialogsFragment : Fragment() {
                                 promoIcon = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
                                 onDismissRequest = dismiss::invoke,
                                 buttons = {
-                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
-                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    DaxPrimaryButton(text = "Button", onClick = dismiss::invoke)
                                 },
                             )
                         }

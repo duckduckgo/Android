@@ -16,11 +16,12 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
+import com.duckduckgo.app.browser.Domain
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,12 +29,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 interface MaliciousSiteProtectionRCRepository {
-    fun isExempted(hostName: String): Boolean
-    val exceptions: CopyOnWriteArrayList<FeatureException>
+    fun isExempted(domain: Domain): Boolean
 }
 
 @ContributesBinding(
@@ -52,7 +51,8 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     @IsMainProcess private val isMainProcess: Boolean,
 ) : MaliciousSiteProtectionRCRepository, PrivacyConfigCallbackPlugin {
 
-    override val exceptions = CopyOnWriteArrayList<FeatureException>()
+    @Volatile
+    private var exceptionDomains = emptyList<Domain>()
 
     init {
         loadToMemory()
@@ -62,15 +62,14 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
         loadToMemory()
     }
 
-    override fun isExempted(hostName: String): Boolean {
-        return exceptions.any { it.domain == hostName }
+    override fun isExempted(domain: Domain): Boolean {
+        return exceptionDomains.any { UriString.sameOrSubdomain(domain, it) }
     }
 
     private fun loadToMemory() {
         coroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
-                exceptions.clear()
-                exceptions.addAll(feature.self().getExceptions())
+                exceptionDomains = feature.self().getExceptions().map { Domain(it.domain) }
             }
         }
     }
