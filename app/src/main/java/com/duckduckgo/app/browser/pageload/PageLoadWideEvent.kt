@@ -42,7 +42,6 @@ import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
 
 /**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
@@ -129,7 +128,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
-                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT.toJavaDuration()),
+                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT),
                 )
 
                 result.onSuccess { flowId ->
