@@ -207,6 +207,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             LayoutTransition().apply {
                 enableTransitionType(LayoutTransition.CHANGING)
                 setDuration(ANIMATION_DURATION_MS)
+                setAnimateParentHierarchy(false)
             }
         }
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidgetCard)?.layoutTransition = changingTransition()
