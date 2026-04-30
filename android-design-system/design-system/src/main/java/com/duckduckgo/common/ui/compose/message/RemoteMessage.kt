@@ -43,8 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.buttons.SmallGhostButton
-import com.duckduckgo.common.ui.compose.buttons.SmallPrimaryButton
+import com.duckduckgo.common.ui.compose.button.DaxButtonSize
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -100,9 +101,10 @@ fun BigSingleActionMessage(
         modifier = modifier,
         topIllustration = topIllustration,
         bottomContent = {
-            SmallPrimaryButton(
+            DaxPrimaryButton(
                 text = actionText,
                 onClick = onActionClick,
+                size = DaxButtonSize.Small,
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
                     .align(Alignment.CenterHorizontally),
@@ -128,9 +130,10 @@ fun BigSingleActionMessage(
         topIllustration = topIllustration,
         onDismissClicked = onDismissed,
         bottomContent = {
-            SmallPrimaryButton(
+            DaxPrimaryButton(
                 text = actionText,
                 onClick = onActionClick,
+                size = DaxButtonSize.Small,
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
                     .align(Alignment.CenterHorizontally),
@@ -164,13 +167,15 @@ fun BigTwoActionsMessage(
                     .align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                SmallGhostButton(
+                DaxGhostButton(
                     text = secondaryActionText,
                     onClick = onSecondaryActionClick,
+                    size = DaxButtonSize.Small,
                 )
-                SmallPrimaryButton(
+                DaxPrimaryButton(
                     text = primaryActionText,
                     onClick = onPrimaryActionClick,
+                    size = DaxButtonSize.Small,
                     modifier = Modifier
                         .padding(start = dimensionResource(R.dimen.keyline_2)),
                 )
@@ -252,9 +257,10 @@ fun PromoSingleActionMessage(
                     )
                     .fillMaxWidth(),
             )
-            SmallPrimaryButton(
+            DaxPrimaryButton(
                 text = actionText,
                 onClick = onActionClick,
+                size = DaxButtonSize.Small,
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.keyline_2), bottom = dimensionResource(R.dimen.keyline_2))
                     .align(Alignment.CenterHorizontally),
