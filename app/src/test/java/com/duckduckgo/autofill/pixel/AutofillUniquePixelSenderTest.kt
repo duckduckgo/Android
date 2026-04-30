@@ -18,10 +18,12 @@ package com.duckduckgo.autofill.pixel
 
 import android.content.Context
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_CAPABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_DEVICE_AUTH_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_DAILY
 import com.duckduckgo.autofill.impl.pixel.AutofillUniquePixelSender
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
@@ -91,6 +93,12 @@ class AutofillUniquePixelSenderTest {
     fun whenDeviceAuthDisabledAndSecureStorageIsNotAvailableThenSendCorrectPixel() {
         testee.sendCapabilitiesPixel(secureStorageAvailable = false, deviceAuthAvailable = false)
         verify(mockPixel).fire(AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED)
+    }
+
+    @Test
+    fun whenSecureStorageUnavailableDailyPixelSentThenFiresAsDailyPixel() {
+        testee.sendSecureStorageUnavailableDailyPixel()
+        verify(mockPixel).fire(AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_DAILY, type = Daily())
     }
 
     private fun configureSharePreferencesMissingKey() {
