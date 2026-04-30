@@ -65,6 +65,7 @@ import javax.inject.Inject
 interface NativeInputWidget {
 
     var text: String
+    var onBack: (() -> Unit)?
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
@@ -74,6 +75,7 @@ interface NativeInputWidget {
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
 
+    fun onBackPressed()
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
@@ -250,7 +252,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
-        hideBackArrow()
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()
@@ -292,6 +293,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         setToggleMatchParent()
         updateToggleVisibility(toggle, state)
+        updateBackButtons(state)
         if (!state.toggleVisible) {
             minimize()
         }
@@ -309,6 +311,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateSelectedTab(toggle, state)
         }
         toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+    }
+
+    private fun updateBackButtons(state: NativeInputState) {
+        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility =
+            if (state.shouldShowToggleRowBack()) VISIBLE else GONE
+        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
+            if (state.shouldShowCardRowBack()) VISIBLE else GONE
+        findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
+            com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
+        )
     }
 
     private fun minimize() {
@@ -340,10 +352,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.visibility = VISIBLE
     }
 
-    private fun hideBackArrow() {
-        findViewById<View?>(R.id.InputModeWidgetBack)?.visibility = GONE
-    }
-
     private fun hideInputFieldBackground() {
         findViewById<View?>(R.id.backgroundLayer)?.setBackgroundColor(Color.TRANSPARENT)
         findViewById<MaterialCardView?>(R.id.inputModeWidgetCard)?.apply {
@@ -370,6 +378,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 width = 0
                 matchConstraintDefaultWidth = LayoutParams.MATCH_CONSTRAINT_SPREAD
                 constrainedWidth = false
+                startToStart = LayoutParams.UNSET
+                startToEnd = R.id.inputModeWidgetBack
             }
             toggle.tabMode = TabLayout.MODE_FIXED
             toggle.tabGravity = TabLayout.GRAVITY_FILL
@@ -699,3 +709,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         private const val MAX_LINES = 5
     }
 }
+
+internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
+    toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
+
+internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
+    !toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI

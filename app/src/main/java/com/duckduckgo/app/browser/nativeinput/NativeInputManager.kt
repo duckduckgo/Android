@@ -350,6 +350,10 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+        widget.onBack = {
+            widget.hideKeyboard()
+            hideNativeInput()
+        }
         val previousOnChatSelected = widget.onChatSelected
         widget.onChatSelected = { animate ->
             callbacks.onClearAutocomplete()
