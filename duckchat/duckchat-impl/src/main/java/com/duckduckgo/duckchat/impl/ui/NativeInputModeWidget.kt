@@ -306,7 +306,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBlank = inputField.text.isNullOrBlank()
         setVoiceButtonVisible(voiceSearchAvailable && isBlank)
         submitButtons?.setVoiceSearchVisible(false)
-        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank)
+        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
     }
 
     private fun updateSendButtonVisibility() {
@@ -686,6 +686,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
         updateSendButtonVisibility()
+        updateVoiceButtonVisibility()
     }
 
     private fun updateDuckAiSubmitButton() {
