@@ -679,4 +679,4 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
     toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
-    !toggleVisible
+    !toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
