@@ -21,7 +21,6 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -29,9 +28,7 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -54,8 +51,6 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
-    var onMenuDismissed: (() -> Unit)?
-    fun isMenuVisible(): Boolean
     fun getSelectedModelId(): String?
     fun setPickerEnabled(enabled: Boolean)
 }
@@ -75,13 +70,10 @@ class ModelPickerView @JvmOverloads constructor(
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
     private var popupWindow: PopupWindow? = null
-    override var onMenuDismissed: (() -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
     }
-
-    override fun isMenuVisible(): Boolean = viewModel.menuShowing
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
@@ -123,14 +115,7 @@ class ModelPickerView @JvmOverloads constructor(
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
-
-        val imm = context.getSystemService<InputMethodManager>()
-        if (imm?.isAcceptingText == true) {
-            imm.hideSoftInputFromWindow(windowToken, 0)
-            postDelayed(KEYBOARD_DELAY) { if (isAttachedToWindow) showPopupWindow(state) }
-        } else {
-            showPopupWindow(state)
-        }
+        showPopupWindow(state)
     }
 
     private fun showPopupWindow(state: ModelState) {
@@ -159,9 +144,10 @@ class ModelPickerView @JvmOverloads constructor(
             },
             resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
             LayoutParams.WRAP_CONTENT,
-            true,
+            false,
         ).apply {
             elevation = resources.getDimension(R.dimen.modelPickerMenuElevation)
+            isOutsideTouchable = true
             setOnDismissListener { onPopupDismissed() }
         }
     }
@@ -176,7 +162,6 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
-        onMenuDismissed?.invoke()
     }
 
     override fun onDetachedFromWindow() {
@@ -254,9 +239,5 @@ class ModelPickerView @JvmOverloads constructor(
 
     private fun LinearLayout.addDivider() {
         addView(HorizontalDivider(context))
-    }
-
-    companion object {
-        private const val KEYBOARD_DELAY = 250L
     }
 }

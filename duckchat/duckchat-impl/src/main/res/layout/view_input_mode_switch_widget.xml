@@ -192,8 +192,8 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <com.duckduckgo.duckchat.impl.ui.ModelPickerView
-                            android:id="@+id/modelPickerView"
+                        <FrameLayout
+                            android:id="@id/modelPickerContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"

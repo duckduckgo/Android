@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.ChatState
@@ -28,17 +29,25 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
@@ -48,7 +57,37 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     subscriptions: Subscriptions,
     private val pendingNativePromptStore: PendingNativePromptStore,
     private val chatSuggestionsReader: ChatSuggestionsReader,
+    private val nativeInputPlugins: ActivePluginPoint<NativeInputPlugin>,
 ) : ViewModel() {
+
+    sealed class Command {
+        data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
+    }
+
+    private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
+    val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands = commandChannel.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            _plugins.value = nativeInputPlugins.getPlugins().toList()
+        }
+    }
+
+    fun updatePluginContainerVisibility(isChatTab: Boolean) {
+        val containerIds = _plugins.value.map { it.containerId }
+        if (containerIds.isNotEmpty()) {
+            commandChannel.trySend(Command.UpdatePluginVisibility(containerIds, isChatTab))
+        }
+    }
+
+    fun getSelectedModelId(): String? {
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
+            (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
+        }
+    }
 
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
@@ -105,8 +144,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
     }
 
-    fun storePendingPrompt(query: String, modelId: String?) {
-        pendingNativePromptStore.store(query, modelId)
+    fun storePendingPrompt(query: String) {
+        pendingNativePromptStore.store(query, getSelectedModelId())
     }
 
     suspend fun fetchChatSuggestions(query: String): List<ChatSuggestion> =
