@@ -1,0 +1,104 @@
+// Browsing Menu pixels
+// Fired by the bottom-sheet browser menu (BrowserMenuBottomSheet) for menu open / dismiss / item-tap events.
+// Renamed from m_experimental-browsing-menu_* once the experiment was rolled out to 100% of users.
+// See https://app.asana.com/1/137249556945/project/72649045549333/task/1213541507583185
+{
+    "m_browsing-menu_used": {
+        "description": "Fires every time the user taps any item in the browsing menu (count).",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_used_daily": {
+        "description": "Fires once per day on the user's first browsing menu item tap.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_used_unique": {
+        "description": "Fires once ever, on the user's first browsing menu item tap.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_displayed": {
+        "description": "Fires when the browsing menu is displayed in regular browsing mode (not NTP, error, custom tab, or Duck.ai).",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_displayed_ntp": {
+        "description": "Fires when the browsing menu is displayed on the new tab page.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_displayed_aichat": {
+        "description": "Fires when the browsing menu is displayed in Duck.ai mode.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_displayed_customtabs": {
+        "description": "Fires when the browsing menu is displayed in a custom tab.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_displayed_error": {
+        "description": "Fires when the browsing menu is displayed on an SSL or WebView error page.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_browsing-menu_dismissed": {
+        "description": "Fires when the browsing menu is dismissed without making a selection (cancel / outside tap / close button).",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sheet-menu_aichat": {
+        "description": "Fires when the user taps the Duck.ai (New AI Chat) item in the browsing menu.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sheet-menu_passwords": {
+        "description": "Fires when the user taps the Password Manager (Autofill) item in the browsing menu.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sheet-menu_new-duck-address": {
+        "description": "Fires when the user taps the Email Protection (New Duck Address) item in the browsing menu.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sheet-menu_settings": {
+        "description": "Fires when the user taps the Settings item in the browsing menu.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_sheet-menu_vpn": {
+        "description": "Fires when the user taps the VPN item in the browsing menu.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
