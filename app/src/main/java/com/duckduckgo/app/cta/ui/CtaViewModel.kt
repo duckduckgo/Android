@@ -228,6 +228,16 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun getPromoCtaOnForeground(): Cta? {
+        return withContext(dispatchers.io()) {
+            when {
+                canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
+                canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
+                else -> null
+            }
+        }
+    }
+
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
@@ -307,11 +317,6 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            // Subscription promo for skipped-onboarding users
-            canShowSubscriptionCtaForSkippedOnboarding() -> {
-                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
-            }
-
             // Add Widget
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) {
@@ -375,10 +380,6 @@ class CtaViewModel @Inject constructor(
         nonNullSite.let {
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
-            }
-
-            if (canShowSubscriptionPromoCta()) {
-                return SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
             if (areInContextDaxDialogsCompleted()) {
