@@ -230,7 +230,6 @@ class RealNativeInputManager @Inject constructor(
         widget: NativeInputWidget,
         widgetRoot: View?,
     ) {
-        if (widget.isModelMenuVisible()) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
         } else {

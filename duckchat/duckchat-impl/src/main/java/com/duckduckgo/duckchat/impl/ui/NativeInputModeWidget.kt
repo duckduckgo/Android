@@ -92,7 +92,6 @@ interface NativeInputWidget {
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
-    fun isModelMenuVisible(): Boolean
     fun storePendingPrompt(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun isWidgetBottom(): Boolean
@@ -181,22 +180,39 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
 
     private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
-    private val modelPickerView: ModelPicker by lazy { findViewById<ModelPickerView>(R.id.modelPickerView) }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         imageButton.setOnClickListener { onImageClick?.invoke() }
-        modelPickerView.setPickerEnabled(isChatTabSelected())
-        modelPickerView.onMenuDismissed = {
-            if (hasInputFocus()) {
-                (context as? Activity)?.showKeyboard(inputField)
-            }
-        }
+        setupPlugins()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
         if (onPaidTierChanged != null) observeTier()
+    }
+
+    private fun setupPlugins() {
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            viewModel.commands.collect { command ->
+                when (command) {
+                    is NativeInputModeWidgetViewModel.Command.InstallPlugins -> {
+                        for (plugin in command.plugins) {
+                            val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
+                            val pluginView = plugin.createView(context)
+                            container.removeAllViews()
+                            container.addView(pluginView)
+                            container.isVisible = isChatTabSelected()
+                        }
+                    }
+                    is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
+                        for (containerId in command.containerIds) {
+                            findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -384,12 +400,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
-                    modelPickerView.setPickerEnabled(isChatTabSelected())
+                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
-                    modelPickerView.setPickerEnabled(isChatTabSelected())
+                    viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
             },
         )
@@ -473,13 +489,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         ancestors.zip(saved).forEach { (vg, lt) -> vg.layoutTransition = lt }
     }
 
-    override fun getSelectedModelId(): String? = modelPickerView.getSelectedModelId()
-
-    override fun isModelMenuVisible(): Boolean = modelPickerView.isMenuVisible()
+    override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
     override fun storePendingPrompt(query: String) {
-        // TODO: This should not be the widget's responsibility
-        viewModel.storePendingPrompt(query, getSelectedModelId())
+        viewModel.storePendingPrompt(query)
     }
 
     override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
