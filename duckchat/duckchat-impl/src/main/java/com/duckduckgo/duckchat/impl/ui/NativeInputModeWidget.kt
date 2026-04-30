@@ -198,7 +198,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pluginsJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             viewModel.commands.collect { command ->
                 when (command) {
-                    is NativeInputModeWidgetViewModel.Command.InstallPlugins -> {
+                    is NativeInputModeWidgetViewModel.Command.AddPluginViews -> {
                         for (plugin in command.plugins) {
                             val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
                             val pluginView = plugin.createView(context)

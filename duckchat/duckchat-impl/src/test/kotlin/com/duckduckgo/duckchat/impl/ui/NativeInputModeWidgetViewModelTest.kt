@@ -404,8 +404,8 @@ class NativeInputModeWidgetViewModelTest {
 
         val command = viewModel.commands.firstOrNull()
 
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.InstallPlugins)
-        assertTrue((command as NativeInputModeWidgetViewModel.Command.InstallPlugins).plugins.isEmpty())
+        assertTrue(command is NativeInputModeWidgetViewModel.Command.AddPluginViews)
+        assertTrue((command as NativeInputModeWidgetViewModel.Command.AddPluginViews).plugins.isEmpty())
     }
 
     @Test
@@ -415,8 +415,8 @@ class NativeInputModeWidgetViewModelTest {
 
         val command = viewModel.commands.firstOrNull()
 
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.InstallPlugins)
-        val plugins = (command as NativeInputModeWidgetViewModel.Command.InstallPlugins).plugins
+        assertTrue(command is NativeInputModeWidgetViewModel.Command.AddPluginViews)
+        val plugins = (command as NativeInputModeWidgetViewModel.Command.AddPluginViews).plugins
         assertEquals(1, plugins.size)
         assertEquals(42, plugins[0].containerId)
     }

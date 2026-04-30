@@ -59,7 +59,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class Command {
-        data class InstallPlugins(val plugins: List<NativeInputPlugin>) : Command()
+        data class AddPluginViews(val plugins: List<NativeInputPlugin>) : Command()
         data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
     }
 
@@ -72,7 +72,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         viewModelScope.launch {
             val plugins = nativeInputPlugins.getPlugins().toList()
             activePlugins = plugins
-            commandChannel.trySend(Command.InstallPlugins(plugins))
+            commandChannel.trySend(Command.AddPluginViews(plugins))
         }
     }
 
