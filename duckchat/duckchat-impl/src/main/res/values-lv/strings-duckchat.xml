@@ -112,4 +112,7 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Notīrīt datus</string>
     <string name="duckChatBrowserMenuContentDescription">Citas iespējas</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Balss tērzēšana</string>
 </resources>
