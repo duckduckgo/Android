@@ -38,6 +38,7 @@ class FakeDuckChatInternal(
     private val showInBrowserMenuUserSetting = MutableStateFlow(false)
     private val showInAddressBarUserSetting = MutableStateFlow(false)
     private val showInVoiceSearchUserSetting = MutableStateFlow(false)
+    private val showInVoiceChatUserSetting = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.READY)
     private val _inputScreenBottomBarEnabled = MutableStateFlow(false)
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
@@ -105,6 +106,10 @@ class FakeDuckChatInternal(
         showInVoiceSearchUserSetting.value = showToggle
     }
 
+    override suspend fun setShowInVoiceChatUserSetting(showToggle: Boolean) {
+        showInVoiceChatUserSetting.value = showToggle
+    }
+
     override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
@@ -121,6 +126,8 @@ class FakeDuckChatInternal(
 
     override fun observeShowInVoiceSearchUserSetting(): Flow<Boolean> = showInVoiceSearchUserSetting
 
+    override fun observeShowInVoiceChatUserSetting(): Flow<Boolean> = showInVoiceChatUserSetting
+
     override fun openDuckChatSettings() { }
 
     override fun closeDuckChat() { }
@@ -132,6 +139,8 @@ class FakeDuckChatInternal(
     override fun isAddressBarEntryPointEnabled(): Boolean = true
 
     override fun isVoiceSearchEntryPointEnabled(): Boolean = false
+
+    override fun isVoiceChatEntryPointEnabled(): Boolean = false
 
     override fun isDuckChatUserEnabled(): Boolean = enableDuckChatUserSetting.value
 
