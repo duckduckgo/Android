@@ -40,19 +40,23 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -77,6 +81,8 @@ interface NativeInputWidget {
     fun selectAllText()
     fun hideKeyboard()
     fun selectChatTab()
+    fun applyDefaultTogglePosition()
+    fun saveLastUsedTogglePosition(isChat: Boolean)
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
     fun setVoiceSearchAvailable(available: Boolean)
@@ -127,6 +133,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val viewModel: NativeInputModeWidgetViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NativeInputModeWidgetViewModel::class.java]
     }
+
+    @Inject
+    lateinit var duckChatFeature: DuckChatFeature
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
@@ -413,6 +425,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         if (toggle.selectedTabPosition != 1) {
             toggle.getTabAt(1)?.select()
+        }
+    }
+
+    override fun applyDefaultTogglePosition() {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
+            val resolved = if (position == DefaultTogglePosition.LAST_USED) {
+                DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
+            } else {
+                position
+            }
+            if (resolved == DefaultTogglePosition.DUCK_AI) {
+                selectChatTab()
+            }
+        }
+    }
+
+    override fun saveLastUsedTogglePosition(isChat: Boolean) {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
+            viewModel.saveLastUsedTogglePosition(position.name)
         }
     }
 

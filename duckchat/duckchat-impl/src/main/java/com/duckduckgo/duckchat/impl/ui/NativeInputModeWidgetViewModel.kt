@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.Flow
@@ -79,6 +80,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .map { entitlements -> entitlements.any { it == Product.DuckAiPlus } }
 
     val chatSuggestionsUserEnabled: Flow<Boolean> = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
+
+    val defaultTogglePosition: Flow<DefaultTogglePosition> = duckChatInternal.observeDefaultTogglePosition()
+
+    val lastUsedTogglePosition: Flow<String?> = duckChatInternal.observeLastUsedTogglePosition()
+
+    suspend fun saveLastUsedTogglePosition(position: String) {
+        duckChatInternal.saveLastUsedTogglePosition(position)
+    }
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER

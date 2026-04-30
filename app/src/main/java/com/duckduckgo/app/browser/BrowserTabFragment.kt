@@ -992,7 +992,7 @@ class BrowserTabFragment :
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
                     when (val result = it.result) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
-                            nativeInputManager.hideNativeInput(animate = false)
+                            nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
                             omnibar.setText(result.query)
                             userEnteredQuery(result.query)
                         }
@@ -2418,6 +2418,7 @@ class BrowserTabFragment :
     }
 
     fun submitQuery(query: String) {
+        nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -3557,7 +3558,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener = {
-                    nativeInputManager.hideNativeInput(animate = false)
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
                     viewModel.userSelectedAutocomplete(it)
                 },
                 editableSearchClickListener = {
