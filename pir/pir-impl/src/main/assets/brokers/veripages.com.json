@@ -1,7 +1,7 @@
 {
   "name": "Veripages",
   "url": "veripages.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "addedDatetime": 1691989200000,
   "optOutUrl": "https://veripages.com/inner/control/privacy",
   "steps": [
@@ -22,6 +22,27 @@
             "71-80",
             "81+"
           ]
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-44043ed9-ae63-4dd2-843a-9956bfd820cc"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header-nav"
+            }
+          ],
+          "id": "c03084e4-7973-4684-916c-b25288eff4bb"
         },
         {
           "actionType": "extract",

@@ -116,5 +116,15 @@
         "key": "subscription_promo_shown",
         "type": "boolean",
         "description": "Whether the subscription promo CTA has been shown to the user"
+    },
+    "error": {
+        "key": "error",
+        "type": "string",
+        "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data"
+    },
+    "freeTrial": {
+        "key": "free_trial",
+        "type": "boolean",
+        "description": "Whether the subscription purchase is a free trial"
     }
 }

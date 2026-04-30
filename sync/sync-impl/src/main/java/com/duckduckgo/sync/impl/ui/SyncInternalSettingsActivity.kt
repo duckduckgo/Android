@@ -205,27 +205,13 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.secretKeyTextView.text = viewState.secretKey
         binding.recoveryCodeTextView.text = viewState.recoveryCode.ifEmpty { "(not signed in)" }
         binding.connectedDevicesList.removeAllViews()
-        binding.blockStoreFeatureFlag.text = if (viewState.syncAutoRestoreEnabled) {
-            "✅ syncAutoRestore flag enabled"
-        } else {
-            "❌ syncAutoRestore flag disabled"
-        }
-        binding.blockStoreAvailability.text = when (viewState.blockStoreAvailable) {
-            null -> "Checking..."
-            true -> "✅ Available"
-            false -> "❌ Unavailable (Play Services missing)"
-        }
-        binding.blockStoreE2eStatus.text = when {
-            viewState.blockStoreAvailable == null -> ""
-            viewState.blockStoreAvailable == false -> ""
-            viewState.blockStoreE2ESupported == true -> "✅ E2E encryption supported"
-            else -> "❌ E2E encryption not supported"
-        }
-        binding.blockStoreCurrentValue.text = when (val value = viewState.blockStoreCurrentValue) {
-            is SyncInternalSettingsViewModel.BlockStoreValue.Loading -> "Loading..."
-            is SyncInternalSettingsViewModel.BlockStoreValue.NotSet -> "(key not set)"
-            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> value.value
-        }
+        binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
+        binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
+        binding.blockStoreApiInUse.text = viewState.blockStoreApiLevelText
+        binding.blockStoreDeviceLockStatus.text = viewState.blockStoreDeviceLockText
+        binding.blockStoreE2eStatus.text = viewState.blockStoreE2eText
+        binding.blockStoreInferredBackupStatus.text = viewState.blockStoreInferredBackupText
+        binding.blockStoreCurrentValue.text = viewState.blockStoreCurrentValueText
 
         binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->
             viewModel.onEnvironmentChanged(enabled)

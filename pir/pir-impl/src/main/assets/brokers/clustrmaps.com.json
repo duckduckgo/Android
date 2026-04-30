@@ -1,7 +1,7 @@
 {
   "name": "ClustrMaps",
   "url": "clustrmaps.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "neighbor.report",
   "addedDatetime": 1692594000000,
   "optOutUrl": "https://clustrmaps.com/bl/opt-out",
@@ -13,7 +13,7 @@
         {
           "actionType": "navigate",
           "id": "c4d4ce8d-0b33-46cb-8e73-a544b362460d",
-          "url": "https://clustrmaps.com/persons/${firstName}-${lastName}/${state|stateFull|capitalize}/${city|hyphenated}"
+          "url": "https://clustrmaps.com/persons/${firstName|hyphenated}-${lastName|hyphenated}/${state|stateFull|capitalize|hyphenated}/${city|hyphenated}"
         },
         {
           "_comment": "Wait for CF challenge interstitial to complete",

@@ -408,6 +408,35 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenFetchModelsThenProviderResolvedFromRemoteFields() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt-5-mini", provider = "openai"),
+                    remoteModel("claude-3-5-sonnet", provider = "anthropic"),
+                    remoteModel("meta-llama/Llama-3.3", provider = "openai"),
+                    remoteModel("mistralai/Mistral-Small", provider = null),
+                    remoteModel("openai/gpt-oss-120b", provider = "openai"),
+                    remoteModel("some-other-model", provider = "perplexity"),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val byId = testee.modelState.value.models.associateBy { it.id }
+        assertEquals(ModelProvider.OPENAI, byId.getValue("gpt-5-mini").provider)
+        assertEquals(ModelProvider.ANTHROPIC, byId.getValue("claude-3-5-sonnet").provider)
+        assertEquals(ModelProvider.META, byId.getValue("meta-llama/Llama-3.3").provider)
+        assertEquals(ModelProvider.MISTRAL, byId.getValue("mistralai/Mistral-Small").provider)
+        assertEquals(ModelProvider.OSS, byId.getValue("openai/gpt-oss-120b").provider)
+        assertEquals(ModelProvider.UNKNOWN, byId.getValue("some-other-model").provider)
+    }
+
+    @Test
     fun whenEntitlementsChangeThenModelsFetched() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -428,6 +457,7 @@ class RealDuckAiModelManagerTest {
         shortName: String? = null,
         accessTier: List<String> = listOf("free"),
         entityHasAccess: Boolean = true,
+        provider: String? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -435,5 +465,6 @@ class RealDuckAiModelManagerTest {
         shortName = shortName,
         accessTier = accessTier,
         entityHasAccess = entityHasAccess,
+        provider = provider,
     )
 }

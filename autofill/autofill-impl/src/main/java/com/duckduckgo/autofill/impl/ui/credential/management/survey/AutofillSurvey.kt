@@ -76,7 +76,7 @@ class AutofillSurveyImpl @Inject constructor(
 
     private suspend fun String.addSurveyParameters(): String {
         return withContext(dispatchers.io()) {
-            val passwordsSaved = internalAutofillStore.getCredentialCount().firstOrNull() ?: 0
+            val passwordsSaved = internalAutofillStore.getCredentialCount().firstOrNull()?.getOrThrow() ?: 0
 
             val urlBuilder = toUri()
                 .buildUpon()

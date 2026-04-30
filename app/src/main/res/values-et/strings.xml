@@ -977,4 +977,10 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Otsi privaatselt DuckDuckGo\'ga või küsi Duck.ai käest. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Otsi või külasta oma lemmiksaite privaatselt ühe puudutusega. Häälotsing ja Duck.ai on saadaval, kui need on lubatud.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Jätkame sealt, kus pooleli jäid</string>
+    <string name="syncRestoreDialogDescription">Kas tahad taastada oma järjehoidjad, paroolid ja muu eelmisest DuckDuckGo sünkroonimisest?</string>
+    <string name="syncRestoreDialogPrimaryCta">Taasta minu andmed</string>
+    <string name="syncRestoreDialogSecondaryCta">Jäta vahele</string>
 </resources>

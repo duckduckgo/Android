@@ -75,12 +75,12 @@ class FireDialogProviderImplTest {
     }
 
     @Test
-    fun `when all flags disabled then return LegacyFireDialog`() = runTest {
+    fun `when all flags disabled then return NonGranularFireDialog`() = runTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
-        assertTrue(dialog is LegacyFireDialog)
+        assertTrue(dialog is NonGranularFireDialog)
     }
 }

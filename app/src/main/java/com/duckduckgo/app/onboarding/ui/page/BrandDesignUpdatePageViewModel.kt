@@ -23,8 +23,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
@@ -87,6 +92,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
+    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -97,6 +103,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenSelected: Boolean = true,
         val showSplitOption: Boolean = false,
         val isReinstallUser: Boolean = false,
+        val inputScreenPreviewSearchSuggestions: List<DaxDialogIntroOption> = emptyList(),
+        val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
+        val inputScreenPreviewIsSearchSelected: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -121,6 +130,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data object RequestNotificationPermissions : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
+        data class FinishAndSubmitSearchQuery(val query: String) : Command
+        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
         data object OnboardingSkipped : Command
         data object SkipDialogAnimation : Command
     }
@@ -140,6 +151,19 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
         _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
         fireDialogShownPixel(dialogType)
+    }
+
+    private fun setInputScreenPreviewDialog(isSearchDefault: Boolean) {
+        _viewState.update {
+            it.copy(
+                currentDialog = INPUT_SCREEN_PREVIEW,
+                hasAnimatedCurrentDialog = false,
+                inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
+                inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
+                inputScreenPreviewIsSearchSelected = isSearchDefault,
+            )
+        }
+        fireDialogShownPixel(INPUT_SCREEN_PREVIEW)
     }
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
@@ -265,12 +289,34 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputSelected)
                     onboardingStore.storeInputScreenSelection(inputSelected)
-                    _commands.send(Command.Finish)
+                    if (inputSelected) {
+                        when (duckAiOnboardingExperimentManager.enroll()) {
+                            null,
+                            CONTROL,
+                            -> _commands.send(Command.Finish)
+                            TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
+                            TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
+                        }
+                    } else {
+                        _commands.send(Command.Finish)
+                    }
                 }
             }
 
             INPUT_SCREEN_PREVIEW -> {
-                // no-op
+                viewModelScope.launch {
+                    _commands.send(Command.Finish)
+                }
+            }
+        }
+    }
+
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+        viewModelScope.launch {
+            if (isChat) {
+                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+            } else {
+                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
             }
         }
     }
@@ -298,6 +344,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
+        appInstallStore.wasEverDefaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
         viewModelScope.launch {
             _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }

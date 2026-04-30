@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
@@ -34,7 +35,7 @@ interface SyncAutoRestoreManager {
     suspend fun isAutoRestoreAvailable(): Boolean
     suspend fun saveAutoRestoreData(recoveryCode: String, deviceId: String?): Boolean
     suspend fun retrieveRecoveryPayload(): RestorePayload?
-    suspend fun clearAutoRestoreData()
+    suspend fun clearAutoRestoreData(): Result<Unit>
     suspend fun isRestoreOnReinstallEnabled(): Boolean
 }
 
@@ -78,13 +79,21 @@ class RealSyncAutoRestoreManager @Inject constructor(
         }
     }
 
-    override suspend fun clearAutoRestoreData() {
-        withContext(dispatcherProvider.io()) {
+    override suspend fun clearAutoRestoreData(): Result<Unit> {
+        return withContext(dispatcherProvider.io()) {
             logcat { "Sync-Recovery: clearing auto-restore data" }
-            persistentStorage.clear(SyncRecoveryPersistentStorageKey)
-                .onSuccess { logcat { "Sync-Recovery: recovery code cleared successfully" } }
-                .onFailure { logcat(LogPriority.ERROR) { "Sync-Recovery: failed to clear recovery code - ${it.message}" } }
-            dataStore.setRestoreOnReinstallEnabled(false)
+            val storageResult = persistentStorage.clear(SyncRecoveryPersistentStorageKey)
+            storageResult.fold(
+                onSuccess = {
+                    dataStore.setRestoreOnReinstallEnabled(false)
+                    logcat { "Sync-Recovery: recovery code cleared successfully" }
+                    Result.Success(Unit)
+                },
+                onFailure = { e ->
+                    logcat(LogPriority.ERROR) { "Sync-Recovery: failed to clear recovery code - ${e.message}" }
+                    Result.Error(reason = e.message ?: "")
+                },
+            )
         }
     }
 

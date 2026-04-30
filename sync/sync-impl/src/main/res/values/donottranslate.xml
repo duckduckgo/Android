@@ -34,20 +34,6 @@
     <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
 
-    <!-- Previous Session Ready Screen -->
-    <string name="sync_previous_session_ready_title">Your previous Sync &amp; Backup session is ready.</string>
-    <string name="sync_previous_session_ready_body">Resume your Sync &amp; Backup session to restore your bookmarks, passwords, and more, or continue with a new setup.</string>
-    <string name="sync_previous_session_ready_resume_cta">Resume Sync &amp; Backup</string>
-    <string name="sync_previous_session_ready_continue_cta">Continue Setup</string>
-
-    <!-- Recover Data Screen -->
-    <string name="sync_recover_data_title">Recover Your Data Easily</string>
-    <string name="sync_recover_data_content">Use this code to restore your data if you lose access to this device. Sync &amp; Backup data can\'t be recovered after 18 months of inactivity.</string>
-    <string name="sync_recover_data_recovery_code_label">Recovery Code</string>
-    <string name="sync_recover_data_download_pdf">Download as PDF</string>
-    <string name="sync_restore_on_reinstall_title">Restore on App Reinstall</string>
-    <string name="sync_restore_on_reinstall_description">If you reinstall the DuckDuckGo app, we\'ll ask if you want to restore your data on this device.</string>
-
     <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
     <string name="sync_internal_block_store_write_recovery_code">Save account recovery code &amp; device ID to Block Store</string>
 

@@ -51,6 +51,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
     PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),
     PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_split_address_bar_selected_unique"),
+    PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE("sync-auto-restore_onboarding_prompt_shown_unique"),
+    PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_restore_tapped_unique"),
+    PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE("sync-auto-restore_onboarding_skip_tapped_unique"),
     PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE("m_preonboarding_skip_onboarding_shown_unique"),
     PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE("m_preonboarding_choose_search_experience_impressions_unique"),
     PREONBOARDING_AICHAT_SELECTED("m_preonboarding_aichat_selected"),
@@ -483,6 +486,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DAU_DAILY("m_product_telemetry_surface_usage_dau_daily"),
 
     ERROR_PAGE_SHOWN("m_errorpageshown"),
+    ERROR_CODE_PIXEL("m_errorpageshown_code"),
 
     APP_VERSION_AT_SEARCH_TIME("app_version_at_search_time"),
 

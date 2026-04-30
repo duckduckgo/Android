@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
@@ -94,6 +95,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val pendingNativePromptStore: PendingNativePromptStore,
     private val faviconManager: FaviconManager,
     private val duckChatFeature: DuckChatFeature,
+    private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -223,7 +225,13 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_STARTED -> {
+                voiceSessionStateManager.onVoiceSessionStarted()
                 duckChatPixels.reportVoiceSessionStarted()
+                null
+            }
+
+            METHOD_VOICE_SESSION_ENDED -> {
+                voiceSessionStateManager.onVoiceSessionEnded()
                 null
             }
 
@@ -352,6 +360,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -458,6 +467,7 @@ class RealDuckChatJSHelper @Inject constructor(
         const val METHOD_OPEN_KEYBOARD = "openKeyboard"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"
+        private const val METHOD_VOICE_SESSION_ENDED = "voiceSessionEnded"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
@@ -474,6 +484,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
+        private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"

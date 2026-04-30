@@ -32,6 +32,6 @@ class AutofillUserAdditionalPixelParamPlugin @Inject constructor(
     )
 
     private suspend fun getSavedPasswordCount(): Int {
-        return internalAutofillStore.getCredentialCount().firstOrNull() ?: 0
+        return internalAutofillStore.getCredentialCount().firstOrNull()?.getOrThrow() ?: 0
     }
 }

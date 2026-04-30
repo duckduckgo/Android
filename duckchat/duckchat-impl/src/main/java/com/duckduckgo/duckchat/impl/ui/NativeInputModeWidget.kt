@@ -21,40 +21,42 @@ import android.content.Context
 import android.graphics.Color
 import android.text.InputType
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.core.net.toUri
+import android.widget.Space
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
-import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -67,7 +69,8 @@ interface NativeInputWidget {
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
-    var onVoiceClick: (() -> Unit)?
+    var onVoiceSearchClick: (() -> Unit)?
+    var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
 
@@ -78,9 +81,12 @@ interface NativeInputWidget {
     fun selectAllText()
     fun hideKeyboard()
     fun selectChatTab()
+    fun applyDefaultTogglePosition()
+    fun saveLastUsedTogglePosition(isChat: Boolean)
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
-    fun setVoiceButtonVisible(visible: Boolean)
+    fun setVoiceSearchAvailable(available: Boolean)
+    fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
@@ -88,6 +94,10 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean
     fun storePendingPrompt(query: String)
+    fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
+    fun isWidgetBottom(): Boolean
+    fun setWidgetPosition(isBottom: Boolean)
+    fun setWidgetRootView(view: View)
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -118,16 +128,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
 ) : InputModeWidget(context, attrs, defStyle), NativeInputWidget {
 
     @Inject
-    lateinit var duckChatInternal: DuckChatInternal
+    lateinit var viewModelFactory: ViewViewModelFactory
+
+    private val viewModel: NativeInputModeWidgetViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NativeInputModeWidgetViewModel::class.java]
+    }
 
     @Inject
-    lateinit var chatSuggestionsReader: ChatSuggestionsReader
+    lateinit var duckChatFeature: DuckChatFeature
 
     @Inject
-    lateinit var subscriptions: Subscriptions
-
-    @Inject
-    lateinit var pendingNativePromptStore: PendingNativePromptStore
+    lateinit var dispatchers: DispatcherProvider
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
@@ -137,13 +148,32 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
+    private var nativeInputStateJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
+    private var nativeInputState: NativeInputState = NativeInputState(
+        inputMode = NativeInputState.InputMode.SEARCH_ONLY,
+        inputContext = NativeInputState.InputContext.BROWSER,
+    )
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
+    private var voiceSearchAvailable: Boolean = false
+    private var voiceChatAvailable: Boolean = false
+    private var widgetRoot: View? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
+    override var onVoiceSearchClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceSearchClick = value
+            onVoiceClick = value
+        }
+    override var onVoiceChatClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            submitButtons?.onVoiceChatClick = value
+        }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -165,6 +195,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
+        observeNativeInputState()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -176,14 +207,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob = null
         tierJob?.cancel()
         tierJob = null
+        nativeInputStateJob?.cancel()
+        nativeInputStateJob = null
+        widgetRoot = null
         tearDownChatSuggestions()
+    }
+
+    override fun setWidgetRootView(view: View) {
+        widgetRoot = view
     }
 
     private fun observeChatState() {
         var isFocussed = false
 
         chatStateJob?.cancel()
-        chatStateJob = duckChatInternal.chatState
+        chatStateJob = viewModel.chatState
             .drop(1)
             .onEach { state ->
                 setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
@@ -210,34 +248,75 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
-    private val widgetRoot: View?
-        get() {
-            var v: View? = this
-            while (v != null) {
-                val p = v.parent
-                if (p is androidx.coordinatorlayout.widget.CoordinatorLayout) return v
-                v = p as? View
-            }
-            return null
-        }
-
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
         hideBackArrow()
         hideInputFieldBackground()
         removeMargins()
-        if (duckChatInternal.isEnabled()) {
-            setToggleMatchParent()
-        } else {
-            hideToggle()
-        }
+        applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
             if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
             }
+            updateSendButtonVisibility()
+            updateVoiceButtonVisibility()
         }
+    }
+
+    override fun setVoiceSearchAvailable(available: Boolean) {
+        voiceSearchAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    override fun setVoiceChatAvailable(available: Boolean) {
+        voiceChatAvailable = available
+        updateVoiceButtonVisibility()
+    }
+
+    private fun updateVoiceButtonVisibility() {
+        val isBlank = inputField.text.isNullOrBlank()
+        setVoiceButtonVisible(voiceSearchAvailable && isBlank)
+        submitButtons?.setVoiceSearchVisible(false)
+        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank)
+    }
+
+    private fun updateSendButtonVisibility() {
+        val visible = isChatTabSelected() && (isStreaming || inputField.text.isNotBlank())
+        submitButtons?.setSendButtonVisible(visible)
+    }
+
+    private fun applyState(state: NativeInputState) {
+        nativeInputState = state
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        setToggleMatchParent()
+        updateToggleVisibility(toggle, state)
+        if (!state.toggleVisible) {
+            minimize()
+        }
+    }
+
+    private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
+        val targetIndex = if (state.defaultToggleSelection == NativeInputState.ToggleSelection.DUCK_AI) 1 else 0
+        if (toggle.selectedTabPosition != targetIndex) {
+            toggle.getTabAt(targetIndex)?.select()
+        }
+    }
+
+    private fun updateToggleVisibility(toggle: TabLayout, state: NativeInputState) {
+        if (!state.toggleVisible) {
+            updateSelectedTab(toggle, state)
+        }
+        toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+    }
+
+    private fun minimize() {
+        if (floatingSubmitContainer == null) return
+        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
+        getActionBarSize()?.let { minimumHeight = it }
     }
 
     private fun removeMargins() {
@@ -246,6 +325,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.updateLayoutParams<MarginLayoutParams> {
             marginEnd = 0
+        }
+    }
+
+    private fun applyTrailingButtonMargin() {
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
         }
     }
 
@@ -270,10 +355,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun hideToggle() {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        toggle.getTabAt(0)?.select()
-        toggle.visibility = GONE
+    private fun getActionBarSize(): Int? {
+        val typedValue = TypedValue()
+        return if (context.theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+            TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
+        } else {
+            null
+        }
     }
 
     private fun setToggleMatchParent() {
@@ -340,14 +428,38 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun applyDefaultTogglePosition() {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+            val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
+            val resolved = if (position == DefaultTogglePosition.LAST_USED) {
+                DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
+            } else {
+                position
+            }
+            if (resolved == DefaultTogglePosition.DUCK_AI) {
+                selectChatTab()
+            }
+        }
+    }
+
+    override fun saveLastUsedTogglePosition(isChat: Boolean) {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
+        findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
+            viewModel.saveLastUsedTogglePosition(position.name)
+        }
+    }
+
     override fun hideMainButtons() {
         setMainButtonsVisible(false)
     }
 
     override fun setToggleVisible(visible: Boolean) {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        val isVisible = visible && nativeInputState.toggleVisible
         suspendLayoutTransitions {
-            toggle.visibility = if (visible) VISIBLE else GONE
+            toggle.visibility = if (isVisible) VISIBLE else GONE
         }
     }
 
@@ -367,7 +479,35 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun storePendingPrompt(query: String) {
         // TODO: This should not be the widget's responsibility
-        pendingNativePromptStore.store(query, getSelectedModelId())
+        viewModel.storePendingPrompt(query, getSelectedModelId())
+    }
+
+    override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+        viewModel.configure(isDuckAiMode, isBottom)
+        viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
+        if (isDuckAiMode) selectChatTab()
+        applyOmnibarShape(isBottom)
+    }
+
+    override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
+
+    override fun setWidgetPosition(isBottom: Boolean) {
+        viewModel.setWidgetPosition(isBottom)
+    }
+
+    private fun applyOmnibarShape(isBottom: Boolean) {
+        if (isBottom) return
+        if (nativeInputState.toggleVisible) return
+        val card = parent as? MaterialCardView ?: return
+        card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
+        val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
+        val targetHorizontalMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginHorizontal)
+        (card.layoutParams as? MarginLayoutParams)?.let { lp ->
+            lp.topMargin = targetTopMargin - card.paddingTop
+            lp.marginStart = targetHorizontalMargin - card.paddingLeft
+            lp.marginEnd = targetHorizontalMargin - card.paddingRight
+            card.layoutParams = lp
+        }
     }
 
     override fun bindInputEvents(
@@ -409,7 +549,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onClearSuggestions = onClearSuggestions
 
         val adapter = ChatSuggestionsAdapter { suggestion ->
-            onChatSuggestionSelected(buildChatUrl(suggestion))
+            onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
         }.also { chatSuggestionsAdapter = it }
 
         fun showSuggestions(query: String) {
@@ -452,18 +592,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeChatSuggestionsEnabled() {
         chatSuggestionsSettingJob?.cancel()
-        chatSuggestionsSettingJob = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
+        chatSuggestionsSettingJob = viewModel.chatSuggestionsUserEnabled
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
+    private fun observeNativeInputState() {
+        nativeInputStateJob?.cancel()
+        val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
+        nativeInputStateJob = viewModel.state
+            .onEach(::applyState)
+            .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
     private fun observeTier() {
         tierJob?.cancel()
-        tierJob = subscriptions.getEntitlementStatus()
-            .onEach { entitlements ->
-                val hasDuckAiPlus = entitlements.any { it == Product.DuckAiPlus }
-                onPaidTierChanged?.invoke(hasDuckAiPlus)
-            }
+        tierJob = viewModel.isPaidTier
+            .onEach { hasDuckAiPlus -> onPaidTierChanged?.invoke(hasDuckAiPlus) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
@@ -474,7 +619,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     ) {
         chatSuggestionsJob?.cancel()
         chatSuggestionsJob = lifecycleOwner.lifecycleScope.launch {
-            val suggestions = runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
+            val suggestions = viewModel.fetchChatSuggestions(query)
             if (suggestions.isNotEmpty()) {
                 onShowSuggestions?.invoke(adapter)
             }
@@ -488,17 +633,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun hideChatSuggestions(hideList: Boolean) {
         chatSuggestionsJob?.cancel()
         chatSuggestionsAdapter?.submitList(emptyList())
-        chatSuggestionsReader.tearDown()
+        viewModel.cancelChatSuggestions()
         onClearSuggestions?.invoke(hideList)
-    }
-
-    private fun buildChatUrl(suggestion: ChatSuggestion): String {
-        return duckChatInternal.getDuckChatUrl("", false)
-            .toUri()
-            .buildUpon()
-            .appendQueryParameter(CHAT_ID_PARAM, suggestion.chatId)
-            .build()
-            .toString()
     }
 
     private fun setChatStreaming(streaming: Boolean) {
@@ -510,6 +646,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showSendButton()
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
+        updateSendButtonVisibility()
     }
 
     private fun updateDuckAiSubmitButton() {
@@ -518,7 +655,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setImageButtonVisible(isChatTab)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
-            submitButtons?.setSendButtonVisible(true)
             if (!isStreaming) {
                 submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
             }
@@ -526,8 +662,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
             inputField.maxLines = MAX_LINES
         } else {
             submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
-            submitButtons?.setSendButtonVisible(false)
         }
+        updateSendButtonVisibility()
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
@@ -549,16 +685,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
             onSendClick = { submitMessage() }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+            onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
+            onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
             setSendButtonVisible(false)
             setNewLineButtonVisible(false)
-            setVoiceButtonVisible(false)
         }
         container.addView(buttons)
         submitButtons = buttons
+        updateVoiceButtonVisibility()
     }
 
     companion object {
-        private const val CHAT_ID_PARAM = "chatID"
         private const val MAX_LINES = 5
     }
 }

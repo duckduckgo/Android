@@ -289,6 +289,7 @@ class FileBasedFaviconPersister(
     companion object {
         const val FAVICON_TEMP_DIR = "faviconsTemp"
         const val FAVICON_PERSISTED_DIR = "favicons"
+        const val FAVICON_WIDGET_PLACEHOLDERS_DIR = "faviconsWidgetPlaceholders"
         const val NO_SUBFOLDER = ""
     }
 }

@@ -6,11 +6,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            },
+            "error",
             {
                 "key": "useHarmony",
                 "description": "Whether the useHarmony feature flag is enabled",
@@ -26,6 +22,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -38,11 +40,7 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
-            },
+            "error",
             {
                 "key": "useHarmony",
                 "description": "Whether the useHarmony feature flag is enabled",
@@ -58,6 +56,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -70,16 +74,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to update",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -96,6 +96,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -108,16 +114,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to update in Harmony",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -134,6 +136,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -146,16 +154,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from Harmony",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -172,6 +176,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -184,16 +194,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from legacy",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -210,6 +216,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -245,6 +257,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -276,6 +294,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -311,6 +335,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -342,6 +372,12 @@
             {
                 "key": "readFromHarmony",
                 "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -377,6 +413,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -410,6 +452,12 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -420,16 +468,12 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
+            "error",
             {
                 "key": "key",
                 "description": "The name of the key that failed to rollback",
                 "type": "string",
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
-            },
-            {
-                "key": "error",
-                "description": "The stacktrace for the rollback error, sanitized to remove potentially sensitive data",
-                "type": "string"
             },
             {
                 "key": "useHarmony",
@@ -448,7 +492,27 @@
                 "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "autofillService",
+                "description": "Whether the autofill service feature flag is enabled (multi-process mode)",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
+    },
+    "autofill_decrypt_failed": {
+        "description": "Decrypting autofill data failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "error"]
+    },
+    "autofill_encrypt_failed": {
+        "description": "Encrypting autofill data failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "error"]
     }
 }

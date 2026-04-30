@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Κάντε λήψη του κώδικα ανάκτησης σε μορφή PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
     <string name="sync_settings_data_expiration">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Επαναφορά δεδομένων Sync &amp; Backup από προηγούμενη εγκατάσταση;</string>
+    <string name="sync_previous_session_ready_body">Κάντε επαναφορά για να ανακτήσετε προηγούμενους σελιδοδείκτες, κωδικούς πρόσβασης και άλλα δεδομένα σας στο DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Επαναφορά Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Ρύθμιση νέου συγχρονισμού</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Ανακτήστε τα δεδομένα σας εύκολα</string>
+    <string name="sync_recover_data_content">Χρησιμοποιήστε αυτόν τον κωδικό ώστε να επαναφέρετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή. Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας.</string>
+    <string name="sync_recover_data_recovery_code_label">Κωδικός ανάκτησης</string>
+    <string name="sync_recover_data_download_pdf">Λήψη σε μορφή PDF</string>
+    <string name="sync_restore_on_reinstall_title">Επαναφορά στην Εκ νέου εγκατάσταση εφαρμογής</string>
+    <string name="sync_restore_on_reinstall_description">Εάν εγκαταστήσετε ξανά την εφαρμογή DuckDuckGo, θα σας ρωτήσουμε εάν θέλετε να επαναφέρετε τα δεδομένα σας σε αυτήν τη συσκευή.</string>
 </resources>

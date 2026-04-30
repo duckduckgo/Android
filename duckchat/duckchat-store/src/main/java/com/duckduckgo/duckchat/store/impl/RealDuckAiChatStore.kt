@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.store.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.store.impl.bridge.MessageBridge
-import com.duckduckgo.duckchat.store.impl.bridge.MessageBridgeFeatureApi
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
@@ -57,6 +55,9 @@ interface DuckAiChatStore {
 
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
+
+    /** Deletes all chats and their associated files. */
+    suspend fun deleteAllChats()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -67,12 +68,11 @@ class RealDuckAiChatStore @Inject constructor(
     @param:DuckAiBridgeFilesDir private val filesDirLazy: Lazy<File>,
     private val dispatchers: DispatcherProvider,
     private val migrationPrefs: DuckAiMigrationPrefs,
-    @param:MessageBridgeFeatureApi private val messageBridge: MessageBridge,
 ) : DuckAiChatStore {
 
     override suspend fun hasMigrated(): Boolean =
         withContext(dispatchers.io()) {
-            messageBridge.isDuckAiNativeStorageFeatureEnabled() && migrationPrefs.isMigrationDone(DuckAiMigrationPrefs.CHATS_KEY)
+            migrationPrefs.isMigrationDone(DuckAiMigrationPrefs.CHATS_KEY)
         }
 
     override suspend fun getChats(): List<DuckAiChat> =
@@ -104,6 +104,22 @@ class RealDuckAiChatStore @Inject constructor(
 
             true
         }
+
+    override suspend fun deleteAllChats() {
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.deleteAllChats()...deleting all chats" }
+            chatsDao.deleteAll()
+            val filesDir = filesDirLazy.get()
+            fileMetaDao.getAll().forEach { meta ->
+                val file = File(filesDir, meta.uuid)
+                if (file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
+                    logcat { "DuckAI: deleting chat file $file" }
+                    file.delete()
+                }
+            }
+            fileMetaDao.deleteAll()
+        }
+    }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)

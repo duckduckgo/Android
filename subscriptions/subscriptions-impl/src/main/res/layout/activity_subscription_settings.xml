@@ -129,6 +129,16 @@
 
             </LinearLayout>
 
+            <com.duckduckgo.common.ui.view.InfoPanel
+                android:id="@+id/pendingDowngradeInfoPanel"
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:visibility="gone"
+                app:panelBackground="@drawable/info_panel_tooltip_background" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

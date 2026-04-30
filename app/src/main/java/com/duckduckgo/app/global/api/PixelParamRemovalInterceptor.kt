@@ -148,6 +148,9 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS.pixelName to PixelParameter.removeAll(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED.pixelName to PixelParameter.removeAll(),
             AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED.pixelName to PixelParameter.removeAll(),
+            AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
@@ -206,6 +209,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_DECRYPT_DATA_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_ENCRYPT_DATA_FAILED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_INSTALL_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_UPDATE_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
@@ -238,6 +243,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ERROR_PAGE_SHOWN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.ERROR_CODE_PIXEL.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

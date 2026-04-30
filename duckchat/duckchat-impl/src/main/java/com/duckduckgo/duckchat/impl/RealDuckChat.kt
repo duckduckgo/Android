@@ -38,8 +38,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
-import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -53,11 +51,10 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -96,6 +93,11 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether the Input Mode toggle should be shown on the voice search screen.
      */
     suspend fun setShowInVoiceSearchUserSetting(showToggle: Boolean)
+
+    /**
+     * Set user setting to determine whether the voice chat entry point should be shown.
+     */
+    suspend fun setShowInVoiceChatUserSetting(showToggle: Boolean)
 
     /**
      * Set user setting to determine whether DuckChat should automatically update the page context in Contextual Mode
@@ -148,6 +150,11 @@ interface DuckChatInternal : DuckChat {
     fun observeShowInVoiceSearchUserSetting(): Flow<Boolean>
 
     /**
+     * Observes whether the voice chat entry point should be shown based on user settings only.
+     */
+    fun observeShowInVoiceChatUserSetting(): Flow<Boolean>
+
+    /**
      * Opens DuckChat settings.
      */
     fun openDuckChatSettings()
@@ -179,6 +186,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether voice search entry point is enabled or not.
      */
     fun isVoiceSearchEntryPointEnabled(): Boolean
+
+    /**
+     * Returns whether voice chat entry point is enabled or not.
+     */
+    fun isVoiceChatEntryPointEnabled(): Boolean
 
     /**
      * Returns whether DuckChat is user enabled or not.
@@ -239,6 +251,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether Duck.ai in contextual mode should auto attach context (its feature flag is enabled and user setting is enabled).
      */
     fun isAutomaticContextAttachmentEnabled(): Boolean
+
+    /**
+     * Returns whether Duck.ai native storage is available and enabled/ready to use
+     */
+    fun isNativeStorageEnabled(): Boolean
 
     /**
      * Returns whether Duck.ai in contextual mode should attach more than one content
@@ -338,11 +355,9 @@ class RealDuckChat @Inject constructor(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
-    private val duckChatDeleter: DuckChatDeleter,
-    private val duckChatSyncRepository: DuckChatSyncRepository,
-    private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -361,9 +376,11 @@ class RealDuckChat @Inject constructor(
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
+    private val _showVoiceChatEntry = MutableStateFlow(false)
     private val _showFullScreenMode = MutableStateFlow(false)
     private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
+    private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -381,6 +398,7 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isVoiceSearchEntryPointEnabled: Boolean = false
+    private var isVoiceChatEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
     private var isStandaloneMigrationEnabled: Boolean = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
@@ -390,6 +408,7 @@ class RealDuckChat @Inject constructor(
     private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
+    private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
 
     init {
@@ -434,6 +453,12 @@ class RealDuckChat @Inject constructor(
             cacheUserSettings()
         }
 
+    override suspend fun setShowInVoiceChatUserSetting(showToggle: Boolean) =
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setShowInVoiceChat(showToggle)
+            cacheUserSettings()
+        }
+
     override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
         withContext(dispatchers.io()) {
             duckChatFeatureRepository.setAutomaticPageContextAttachment(isEnabled)
@@ -461,6 +486,7 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
+    override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
 
     override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
@@ -483,6 +509,8 @@ class RealDuckChat @Inject constructor(
 
     override fun observeShowInVoiceSearchUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInVoiceSearch()
 
+    override fun observeShowInVoiceChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInVoiceChat()
+
     override fun openDuckChatSettings() {
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
         intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -497,17 +525,6 @@ class RealDuckChat @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(this)
         }
-    }
-
-    override suspend fun deleteChat(url: String): Boolean {
-        logcat { "DuckAI: RealDuckChat.deleteChat url=$url" }
-        val chatId = extractChatId(url) ?: return false
-        val deleted = duckChatDeleter.deleteChat(chatId)
-        if (deleted) {
-            duckChatSyncRepository.recordSingleChatDeletion(chatId)
-            syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-        }
-        return deleted
     }
 
     override fun observeCloseEvent(
@@ -529,6 +546,7 @@ class RealDuckChat @Inject constructor(
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
     override fun isVoiceSearchEntryPointEnabled(): Boolean = isVoiceSearchEntryPointEnabled
+    override fun isVoiceChatEntryPointEnabled(): Boolean = isVoiceChatEntryPointEnabled
 
     override fun isDuckChatUserEnabled(): Boolean = isDuckChatUserEnabled
 
@@ -560,11 +578,15 @@ class RealDuckChat @Inject constructor(
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
 
+    override val showVoiceChatEntry: StateFlow<Boolean> = _showVoiceChatEntry.asStateFlow()
+
     override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
 
     override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
+
+    override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -715,12 +737,6 @@ class RealDuckChat @Inject constructor(
         }.getOrDefault(false)
     }
 
-    private fun extractChatId(url: String): String? {
-        val uri = url.toUri()
-        if (!isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
-    }
-
     private fun isDuckChatBang(uri: Uri): Boolean = bangRegex?.containsMatchIn(uri.toString()) == true
 
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
@@ -776,8 +792,7 @@ class RealDuckChat @Inject constructor(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()
 
-    override fun isChatSuggestionsFeatureAvailable(): Boolean =
-        duckChatFeature.aiChatSuggestions().isEnabled()
+    override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
@@ -808,6 +823,7 @@ class RealDuckChat @Inject constructor(
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             val featureEnabled = duckChatFeature.self().isEnabled()
+            duckAiNativeStorage = duckChatFeature.duckAiNativeStorage().isEnabled()
             isDuckChatFeatureEnabled = featureEnabled
             _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
@@ -841,6 +857,8 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isVoiceSearchEntryPointEnabled = duckChatFeature.duckAiVoiceSearch().isEnabled()
+            isVoiceChatEntryPointEnabled = duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
+            _allowDuckAiAsDigitalAssistant.emit(featureEnabled && duckChatFeature.digitalAssistantDuckAi().isEnabled())
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             isStandaloneMigrationEnabled = duckChatFeature.standaloneMigration().isEnabled()
 
@@ -888,6 +906,11 @@ class RealDuckChat @Inject constructor(
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
+
+            val showVoiceChatEntry =
+                duckChatFeatureRepository.shouldShowInVoiceChat() &&
+                    isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceChatEntryPointEnabled
+            _showVoiceChatEntry.emit(showVoiceChatEntry)
 
             val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                 (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())

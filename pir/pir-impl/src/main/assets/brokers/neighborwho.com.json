@@ -1,7 +1,7 @@
 {
   "name": "NeighborWho",
   "url": "neighborwho.com",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "parent": "beenverified.com",
   "optOutUrl": "https://www.neighborwho.com/svc/optout/search/optouts",
   "mirrorSites": [
@@ -22,6 +22,17 @@
           "actionType": "navigate",
           "url": "https://www.neighborwho.com/svc/optout/search/optouts",
           "id": "777df3ca-c08b-4261-9d19-6b6463865677"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-b925d36d-ce04-418e-871f-b6787fdc0ffb"
         },
         {
           "actionType": "expectation",
@@ -54,6 +65,17 @@
           "id": "777a01d9-630f-42e4-a8b8-4c87ddab91e3"
         },
         {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-f464162f-bdcb-459f-a348-c832ee8dd49f"
+        },
+        {
           "actionType": "click",
           "elements": [
             {
@@ -62,6 +84,100 @@
             }
           ],
           "id": "777eb5ef-b469-41a6-af92-da9056c00781"
+        },
+        {
+          "_comment": "Wait for either form to appear before branching. The condition below runs once without retries.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//*[@id='comprehensive-form'] | //*[@id='result-filter']"
+            }
+          ],
+          "id": "26f825f6-eec4-4439-a1f3-6a4464adfd34"
+        },
+        {
+          "_comment": "Highly populated states show a different form.",
+          "actionType": "condition",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#comprehensive-form",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "dataSource": "userProfile",
+              "elements": [
+                {
+                  "type": "firstName",
+                  "selector": "#fname"
+                },
+                {
+                  "type": "middleName",
+                  "selector": "#mn"
+                },
+                {
+                  "type": "lastName",
+                  "selector": "#ln"
+                },
+                {
+                  "type": "age",
+                  "selector": "#age"
+                },
+                {
+                  "type": "city",
+                  "selector": "#city"
+                }
+              ],
+              "id": "d61fece1-8300-4dd3-ba27-a043a424f668"
+            },
+            {
+              "actionType": "fillForm",
+              "selector": "#comprehensive-form",
+              "elements": [
+                {
+                  "type": "email",
+                  "selector": "#requestor_email"
+                },
+                {
+                  "type": "$generated_street_address$",
+                  "selector": "#street"
+                },
+                {
+                  "type": "$generated_zip_code$",
+                  "selector": "#zip"
+                }
+              ],
+              "id": "fcda8348-9c1e-4304-9163-6d546b7aa099"
+            },
+            {
+              "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+              "actionType": "expectation",
+              "expectations": [
+                {
+                  "type": "element",
+                  "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+                  "parent": "//*[@id='comprehensive-form']"
+                }
+              ],
+              "id": "cft-86642ccf-0273-4523-ad03-a90260e9f47b"
+            },
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[aria-label='continue-button']"
+                }
+              ],
+              "id": "dc412524-0265-4e69-8a97-7f7c1438c8d5"
+            }
+          ],
+          "id": "08170fc2-18d2-4dad-8dce-5341795f3557"
         },
         {
           "actionType": "expectation",
@@ -87,7 +203,7 @@
               "afterText": ", "
             },
             "addressCityState": {
-              "selector": ".MuiGrid-item:nth-child(3) .MuiTypography-body1"
+              "selector": ".MuiGrid-item.MuiGrid-grid-xs-12 > p.MuiTypography-body1"
             }
           },
           "id": "7775ef9d-aebf-4176-80e6-2959fc9f5c8a"

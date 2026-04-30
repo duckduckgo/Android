@@ -189,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Upravljanje plaćanjem ili otkazivanje</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Tvoj će se plan smanjiti na %1$s dana %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj će se plan nadograditi na %1$s dana %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj će se plan smanjiti na %1$s dana %2$s.</string>
     <string name="planNamePlusMonthly">mjesečni Plus</string>

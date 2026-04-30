@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Atsisiųsk atkūrimo kodą PDF formatu</string>
     <string name="sync_settings_download_recovery_code_item_hint">Naudok šį kodą duomenims atkurti, jei prarasi prieigą prie šio įrenginio. Saugok jį.</string>
     <string name="sync_settings_data_expiration">Po 18 mėnesių neaktyvumo negalima atkurti „Sync &amp; Backup“ duomenų. <annotation type="learn_more_link">Sužinoti daugiau</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Ar atkurti sinchronizavimo ir atsarginio kopijavimo duomenis iš ankstesnio įdiegimo?</string>
+    <string name="sync_previous_session_ready_body">Atkurk, kad susigrąžintum ankstesnes parankines, slaptažodžius ir kitus duomenis į „DuckDuckGo“.</string>
+    <string name="sync_previous_session_ready_resume_cta">Atkurti „Sync &amp; Backup“</string>
+    <string name="sync_previous_session_ready_continue_cta">Nustatyk naują sinchronizavimą</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Lengvas duomenų atkūrimas</string>
+    <string name="sync_recover_data_content">Naudok šį kodą duomenims atkurti, jei prarasi prieigą prie šio įrenginio. Po 18 mėnesių neaktyvumo negalima atkurti „Sync &amp; Backup“ duomenų.</string>
+    <string name="sync_recover_data_recovery_code_label">Atkūrimo kodas</string>
+    <string name="sync_recover_data_download_pdf">Atsisiųsti kaip PDF</string>
+    <string name="sync_restore_on_reinstall_title">Atkurti iš naujo įdiegus programą</string>
+    <string name="sync_restore_on_reinstall_description">Jei iš naujo įdiegsi programą „DuckDuckGo“, paklausime, ar nori atkurti duomenis šiame įrenginyje.</string>
 </resources>
