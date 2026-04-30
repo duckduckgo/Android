@@ -33,7 +33,6 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -271,7 +270,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenStorePendingPromptThenDelegatesToStoreWithModelId() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         viewModel.storePendingPrompt("hello")
 
@@ -281,7 +280,7 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         viewModel.storePendingPrompt("hello")
 
@@ -403,7 +402,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenNoPluginsThenInstallPluginsCommandHasEmptyList() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
-        val command = viewModel.commands.first()
+        val command = viewModel.commands.firstOrNull()
 
         assertTrue(command is NativeInputModeWidgetViewModel.Command.InstallPlugins)
         assertTrue((command as NativeInputModeWidgetViewModel.Command.InstallPlugins).plugins.isEmpty())
@@ -414,7 +413,7 @@ class NativeInputModeWidgetViewModelTest {
         val plugin = fakePlugin(containerId = 42, modelId = "gpt-4o")
         val viewModel = createViewModel(plugins = listOf(plugin))
 
-        val command = viewModel.commands.first()
+        val command = viewModel.commands.firstOrNull()
 
         assertTrue(command is NativeInputModeWidgetViewModel.Command.InstallPlugins)
         val plugins = (command as NativeInputModeWidgetViewModel.Command.InstallPlugins).plugins
@@ -425,7 +424,7 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenNoPluginsThenGetSelectedModelIdReturnsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         assertNull(viewModel.getSelectedModelId())
     }
@@ -434,7 +433,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsModelSelectionThenGetSelectedModelIdReturnsIt() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         assertEquals("claude-3", viewModel.getSelectedModelId())
     }
@@ -443,7 +442,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsNullContributionThenGetSelectedModelIdReturnsNull() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         assertNull(viewModel.getSelectedModelId())
     }
@@ -452,11 +451,11 @@ class NativeInputModeWidgetViewModelTest {
     fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
         val plugin = fakePlugin(containerId = 99, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.first()
+        viewModel.commands.firstOrNull()
 
         viewModel.updatePluginContainerVisibility(isChatTab = true)
 
-        val command = viewModel.commands.first()
+        val command = viewModel.commands.firstOrNull()
         assertTrue(command is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility)
         val update = command as NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility
         assertEquals(listOf(99), update.containerIds)

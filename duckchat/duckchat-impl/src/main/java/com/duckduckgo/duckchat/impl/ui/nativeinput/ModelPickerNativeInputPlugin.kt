@@ -24,6 +24,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.ModelPicker
 import com.duckduckgo.duckchat.impl.ui.ModelPickerView
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -36,17 +37,17 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = com.duckduckgo.duckchat.impl.R.id.modelPickerContainer
 
-    private var modelPicker: ModelPicker? = null
+    private var modelPicker: WeakReference<ModelPicker> = WeakReference(null)
 
     override fun createView(context: Context): View {
         return ModelPickerView(context).also { picker ->
-            modelPicker = picker
+            modelPicker = WeakReference(picker)
             picker.setPickerEnabled(true)
         }
     }
 
     override fun getPromptContribution(): PromptContribution? {
-        val modelId = modelPicker?.getSelectedModelId() ?: return null
+        val modelId = modelPicker.get()?.getSelectedModelId() ?: return null
         return PromptContribution.ModelSelection(modelId)
     }
 }
