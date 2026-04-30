@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.pixel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -54,6 +55,7 @@ class AutofillUniquePixelSenderTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun before() {
         whenever(context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)).thenReturn(fakePreferences)
