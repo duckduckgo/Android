@@ -687,6 +687,7 @@ class BrowserTabViewModelTest {
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
+            whenever(mockInlinePdfHandler.decideForPdf(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
 
             db =
                 Room
