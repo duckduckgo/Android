@@ -33,6 +33,8 @@ class OnboardingPageManagerTest {
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
+    private val brandDesignWelcomePage: BrandDesignUpdateWelcomePage = mock()
+    private val brandDesignDefaultBrowserPage: BrandDesignUpdateDefaultBrowserPage = mock()
 
     @Before
     fun setup() {
@@ -113,9 +115,9 @@ class OnboardingPageManagerTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         whenever(onboardingPageBuilder.buildBrandDesignUpdateWelcomePage())
-            .thenReturn(BrandDesignUpdateWelcomePage())
+            .thenReturn(brandDesignWelcomePage)
         whenever(onboardingPageBuilder.buildBrandDesignUpdateDefaultBrowserPage())
-            .thenReturn(BrandDesignUpdateDefaultBrowserPage())
+            .thenReturn(brandDesignDefaultBrowserPage)
 
         testee.buildBrandDesignUpdatePageBlueprints()
 
@@ -130,7 +132,7 @@ class OnboardingPageManagerTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         whenever(onboardingPageBuilder.buildBrandDesignUpdateWelcomePage())
-            .thenReturn(BrandDesignUpdateWelcomePage())
+            .thenReturn(brandDesignWelcomePage)
 
         testee.buildBrandDesignUpdatePageBlueprints()
 
@@ -144,7 +146,7 @@ class OnboardingPageManagerTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(onboardingPageBuilder.buildBrandDesignUpdateWelcomePage())
-            .thenReturn(BrandDesignUpdateWelcomePage())
+            .thenReturn(brandDesignWelcomePage)
 
         testee.buildBrandDesignUpdatePageBlueprints()
 
@@ -157,7 +159,7 @@ class OnboardingPageManagerTest {
         configureDeviceDoesNotSupportDefaultBrowser()
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         whenever(onboardingPageBuilder.buildBrandDesignUpdateWelcomePage())
-            .thenReturn(BrandDesignUpdateWelcomePage())
+            .thenReturn(brandDesignWelcomePage)
 
         testee.buildBrandDesignUpdatePageBlueprints()
 
