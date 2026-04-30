@@ -148,6 +148,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsJob: Job? = null
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
+    private var pluginsJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var nativeInputState: NativeInputState = NativeInputState(
@@ -193,7 +194,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun setupPlugins() {
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+        pluginsJob?.cancel()
+        pluginsJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
             viewModel.commands.collect { command ->
                 when (command) {
                     is NativeInputModeWidgetViewModel.Command.InstallPlugins -> {
@@ -225,6 +227,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         tierJob = null
         nativeInputStateJob?.cancel()
         nativeInputStateJob = null
+        pluginsJob?.cancel()
+        pluginsJob = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
