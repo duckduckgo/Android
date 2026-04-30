@@ -42,6 +42,7 @@ data class DaxFireButtonBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    backgroundRes = R.drawable.bg_onboarding_fire_button,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
