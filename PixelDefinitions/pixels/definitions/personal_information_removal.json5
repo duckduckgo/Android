@@ -1208,6 +1208,12 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
+            },
+            {
+                "key": "scan_trigger",
+                "description": "What triggered the scan run",
+                "type": "string",
+                "enum": ["onboarding", "profile_edit", "scheduled"]
             }
         ]
     },
@@ -1287,6 +1293,12 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
+            },
+            {
+                "key": "scan_trigger",
+                "description": "What triggered the scan run",
+                "type": "string",
+                "enum": ["onboarding", "profile_edit", "scheduled"]
             }
         ]
     },
@@ -1354,6 +1366,12 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
+            },
+            {
+                "key": "scan_trigger",
+                "description": "What triggered the scan run",
+                "type": "string",
+                "enum": ["onboarding", "profile_edit", "scheduled"]
             }
         ]
     },

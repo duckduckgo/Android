@@ -69,7 +69,9 @@ class PirWebSaveProfileMessageHandlerTest {
     private val testScope = TestScope()
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
+
         testee = PirWebSaveProfileMessageHandler(
             pirWebProfileStateHolder = mockPirWebProfileStateHolder,
             repository = mockRepository,
@@ -595,6 +597,7 @@ class PirWebSaveProfileMessageHandlerTest {
         whenever(mockPirWebProfileStateHolder.toProfileQueries(currentYear)).thenReturn(
             listOf(existingProfileQuery.copy(id = 0), newProfileQuery),
         )
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
         whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(existingProfileQuery))
         whenever(mockRepository.getAllExtractedProfiles()).thenReturn(emptyList())
         whenever(mockRepository.updateProfileQueries(any(), any(), any())).thenReturn(true)
