@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Kas tahad taastada oma järjehoidjad, paroolid ja muu eelmisest DuckDuckGo sünkroonimisest?</string>
     <string name="syncRestoreDialogPrimaryCta">Taasta minu andmed</string>
     <string name="syncRestoreDialogSecondaryCta">Jäta vahele</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopeeri lingi tekst</string>
+    <string name="linkTextCopied">Lingi tekst on kopeeritud</string>
+    <string name="linkTextCopyFailed">Lingi teksti ei saanud kopeerida</string>
 </resources>

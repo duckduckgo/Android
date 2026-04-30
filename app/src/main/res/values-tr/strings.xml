@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Önceki DuckDuckGo senkronizasyonundan yer işaretleri, şifreler ve daha fazlasını geri yüklemek mi istiyorsunuz?</string>
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
+    <string name="linkTextCopied">Bağlantı metni kopyalandı</string>
+    <string name="linkTextCopyFailed">Bağlantı metni kopyalanamadı</string>
 </resources>

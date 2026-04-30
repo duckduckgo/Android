@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Möchtest du deine Lesezeichen, Passwörter und mehr aus deiner vorherigen DuckDuckGo-Synchronisierung wiederherstellen?</string>
     <string name="syncRestoreDialogPrimaryCta">Meine Sachen wiederherstellen</string>
     <string name="syncRestoreDialogSecondaryCta">Überspringen</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Linktext kopieren</string>
+    <string name="linkTextCopied">Linktext kopiert</string>
+    <string name="linkTextCopyFailed">Linktext konnte nicht kopiert werden</string>
 </resources>

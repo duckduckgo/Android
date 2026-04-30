@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Wil je je bladwijzers, wachtwoorden en meer van je vorige DuckDuckGo-synchronisatie herstellen?</string>
     <string name="syncRestoreDialogPrimaryCta">Herstel mijn gegevens</string>
     <string name="syncRestoreDialogSecondaryCta">Overslaan</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Linktekst kopiëren</string>
+    <string name="linkTextCopied">Linktekst gekopieerd</string>
+    <string name="linkTextCopyFailed">Linktekst kon niet worden gekopieerd.</string>
 </resources>

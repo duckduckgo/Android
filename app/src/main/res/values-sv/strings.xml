@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Vill du återställa dina bokmärken, lösenord med mera från din tidigare DuckDuckGo-synkronisering?</string>
     <string name="syncRestoreDialogPrimaryCta">Återställ mitt innehåll</string>
     <string name="syncRestoreDialogSecondaryCta">Hoppa över</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopiera länktext</string>
+    <string name="linkTextCopied">Länktext kopierad</string>
+    <string name="linkTextCopyFailed">Kunde inte kopiera länktext</string>
 </resources>

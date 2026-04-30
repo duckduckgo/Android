@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Θέλετε να επαναφέρετε τους σελιδοδείκτες, τους κωδικούς πρόσβασης και άλλα στοιχεία από τον προηγούμενο συγχρονισμό σας με το DuckDuckGo;</string>
     <string name="syncRestoreDialogPrimaryCta">Επαναφορά των στοιχείων μου</string>
     <string name="syncRestoreDialogSecondaryCta">Παράλειψη</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Αντιγραφή κειμένου συνδέσμου</string>
+    <string name="linkTextCopied">Το κείμενο του συνδέσμου αντιγράφηκε</string>
+    <string name="linkTextCopyFailed">Δεν ήταν δυνατή η αντιγραφή του κειμένου του συνδέσμου</string>
 </resources>

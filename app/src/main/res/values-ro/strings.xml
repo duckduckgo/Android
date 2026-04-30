@@ -1003,4 +1003,9 @@
     <string name="syncRestoreDialogDescription">Vrei să restaurezi marcajele, parolele și alte elemente din sincronizarea anterioară DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Copiază textul linkului</string>
+    <string name="linkTextCopied">Textul linkului a fost copiat</string>
+    <string name="linkTextCopyFailed">Nu s-a putut copia textul linkului</string>
 </resources>
