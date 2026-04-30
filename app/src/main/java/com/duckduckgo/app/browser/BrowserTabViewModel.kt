@@ -1733,10 +1733,11 @@ class BrowserTabViewModel @Inject constructor(
         onSiteChanged()
         webNavigationState = null
         returnedHomeAfterSiteLoaded = true
-
         val browserState =
             browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
                 canGoForward = currentGlobalLayoutState() !is Invalidated,
+                currentPdfCachedUri = null,
+                currentPdfFileName = null,
             )
         browserViewState.value = browserState
 
@@ -2199,6 +2200,8 @@ class BrowserTabViewModel @Inject constructor(
                 canReportSite = false,
                 canFireproofSite = false,
                 canPrintPage = false,
+                currentPdfCachedUri = null,
+                currentPdfFileName = null,
             )
         logcat { "showPrivacyShield=false, showSearchIcon=true, showClearButton=true" }
     }

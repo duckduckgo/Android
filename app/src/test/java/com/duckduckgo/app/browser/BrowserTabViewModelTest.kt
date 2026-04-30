@@ -3722,6 +3722,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenNavigateHomeWhilePdfShownThenCurrentPdfStateCleared() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+
+        assertTrue(testee.onUserPressedBack())
+
+        assertNull(browserViewState().currentPdfCachedUri)
+        assertNull(browserViewState().currentPdfFileName)
+        assertFalse(browserViewState().browserShowing)
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCanGoForward() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
