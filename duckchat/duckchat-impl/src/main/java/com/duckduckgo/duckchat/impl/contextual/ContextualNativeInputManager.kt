@@ -93,7 +93,7 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
-        widget.selectChatTab()
+        widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onImageClick = onImageButtonPressed

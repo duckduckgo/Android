@@ -96,6 +96,7 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun storePendingPrompt(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
+    fun configureContextual()
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -519,6 +520,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
         if (isDuckAiMode) selectChatTab()
         applyOmnibarShape(isBottom)
+    }
+
+    override fun configureContextual() {
+        viewModel.configureContextual()
+        selectChatTab()
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
