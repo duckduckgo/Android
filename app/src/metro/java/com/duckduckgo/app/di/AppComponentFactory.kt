@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+package com.duckduckgo.app.di
+
+import android.app.Application
+import kotlinx.coroutines.CoroutineScope
+
+/**
+ * Creates the [AppComponent] using Metro's generated graph (Metro path).
+ * This is a placeholder — Metro graph creation is not yet implemented.
+ */
+object AppComponentFactory {
+    fun create(application: Application, applicationCoroutineScope: CoroutineScope): AppComponent {
+        TODO("Metro graph creation not yet implemented. This will be wired once Metro can generate the full DI graph.")
+    }
 }
-
-apply from: "$rootProject.projectDir/code-formatting.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-kotlin {
-    jvmToolchain(21)
-}
-
-dependencies {
-    implementation Square.moshi
-    implementation Square.okio
-    implementation "org.json:json:_"
-}
-

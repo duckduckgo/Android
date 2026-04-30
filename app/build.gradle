@@ -82,7 +82,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
     ksp {
         arg("room.generateKotlin", "true")
@@ -204,6 +204,18 @@ android {
 
     room {
         schemaDirectory("$projectDir/schemas")
+    }
+
+    // Conditional source set: swap DI graph creation based on ddg.di property
+    def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+    sourceSets {
+        main {
+            if (diFramework == 'Metro') {
+                java.srcDirs += 'src/metro/java'
+            } else {
+                java.srcDirs += 'src/anvilDagger/java'
+            }
+        }
     }
 }
 
