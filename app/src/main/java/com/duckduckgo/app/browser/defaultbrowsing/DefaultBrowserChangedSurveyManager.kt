@@ -8,7 +8,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.Locale
 import javax.inject.Inject
 
 interface DefaultBrowserChangedSurveyManager {
@@ -39,11 +38,7 @@ class RealDefaultBrowserChangedSurveyManager @Inject constructor(
     }
 
     override fun shouldTriggerSurvey(): Boolean {
-        return defaultBrowserChangedSurveyFeature.self().isEnabled() &&
-            !appInstallStore.defaultBrowserChangedSurveyDone &&
-            appBuildConfig.deviceLocale.language == Locale.ENGLISH.language &&
-            appInstallStore.wasEverDefaultBrowser &&
-            !defaultBrowserDetector.isDefaultBrowser()
+        return false
     }
 
     override fun markSurveyShown() {
