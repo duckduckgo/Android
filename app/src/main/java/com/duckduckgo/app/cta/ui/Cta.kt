@@ -603,6 +603,7 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore: OnboardingStore,
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
+        @DrawableRes open val backgroundRes: Int = 0,
     ) : OnboardingDaxDialogCta(
         ctaId = ctaId,
         description = description,
