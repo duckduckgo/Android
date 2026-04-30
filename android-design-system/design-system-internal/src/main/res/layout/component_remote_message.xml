@@ -105,6 +105,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/promo_single_remote_message_compose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

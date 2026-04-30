@@ -47,6 +47,7 @@ import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.message.BigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.BigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.MediumMessage
+import com.duckduckgo.common.ui.compose.message.PromoSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.SmallMessage
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
@@ -189,6 +190,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
                 setMessage(promoSingleMessage)
+            }
+
+            view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
+                PromoSingleActionMessage(
+                    title = "Promo Single Action Message",
+                    body = "Body text goes here. This component has two buttons and showcases and app update",
+                    illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
+                    actionText = "Promo Link",
+                    onActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.promo_single_remote_message_compose).gone()
+                    },
+                )
             }
 
             view.setupThemedComposeView(R.id.small_remote_message_compose, isDarkTheme = isDarkTheme) {

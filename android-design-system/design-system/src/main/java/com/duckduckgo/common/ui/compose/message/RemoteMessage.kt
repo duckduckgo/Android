@@ -180,6 +180,90 @@ fun BigTwoActionsMessage(
 }
 
 @Composable
+fun PromoSingleActionMessage(
+    title: String,
+    body: String,
+    illustration: Painter,
+    actionText: String,
+    onActionClick: () -> Unit,
+    onDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    DaxCard(
+        modifier = modifier.padding(
+            start = dimensionResource(R.dimen.keyline_4),
+            end = dimensionResource(R.dimen.keyline_4),
+            bottom = dimensionResource(R.dimen.keyline_4),
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = DuckDuckGoTheme.shapes.large,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.keyline_2)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_close_24),
+                contentDescription = stringResource(R.string.closeButtonContentDescription),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .size(dimensionResource(R.dimen.messageCtaCloseButtonSize))
+                    .clip(CircleShape)
+                    .clickable(
+                        onClick = onDismissed,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(bounded = true),
+                    )
+                    .padding(
+                        horizontal = dimensionResource(R.dimen.keyline_2),
+                    ),
+            )
+            DaxText(
+                text = title,
+                style = DuckDuckGoTheme.typography.h2,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(R.dimen.keyline_4),
+                        end = dimensionResource(R.dimen.keyline_4),
+                    )
+                    .fillMaxWidth(),
+            )
+            Image(
+                painter = illustration,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(
+                        top = dimensionResource(R.dimen.keyline_2),
+                        bottom = dimensionResource(R.dimen.keyline_2),
+                    ),
+            )
+            DaxText(
+                text = body,
+                style = DuckDuckGoTheme.typography.body2,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(R.dimen.keyline_4),
+                        end = dimensionResource(R.dimen.keyline_4),
+                    )
+                    .fillMaxWidth(),
+            )
+            SmallPrimaryButton(
+                text = actionText,
+                onClick = onActionClick,
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.keyline_2), bottom = dimensionResource(R.dimen.keyline_2))
+                    .align(Alignment.CenterHorizontally),
+            )
+        }
+    }
+}
+
+@Composable
 internal fun RemoteMessageWithIllustration(
     title: String,
     body: String,
@@ -351,6 +435,21 @@ private fun BigTwoActionsMessagePreview() {
             secondaryActionText = "Secondary",
             onPrimaryActionClick = {},
             onSecondaryActionClick = {},
+            onDismissed = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun PromoSingleActionMessagePreview() {
+    PreviewBox {
+        PromoSingleActionMessage(
+            title = "Promo Single Action Message",
+            body = "Body text goes here. This component has two buttons and showcases and app update",
+            illustration = painterResource(R.drawable.promo_mac_and_windows),
+            actionText = "Promo Link",
+            onActionClick = {},
             onDismissed = {},
         )
     }
