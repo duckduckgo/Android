@@ -48,14 +48,10 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Job
@@ -435,9 +431,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun applyDefaultTogglePosition() {
         if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            val position = duckChatInternal.observeDefaultTogglePosition().firstOrNull() ?: return@launch
+            val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
             val resolved = if (position == DefaultTogglePosition.LAST_USED) {
-                DefaultTogglePosition.fromName(duckChatInternal.observeLastUsedTogglePosition().firstOrNull())
+                DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
             } else {
                 position
             }
@@ -451,7 +447,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
         val position = if (isChat) DefaultTogglePosition.DUCK_AI else DefaultTogglePosition.SEARCH
         findViewTreeLifecycleOwner()?.lifecycleScope?.launch(dispatchers.io()) {
-            duckChatInternal.saveLastUsedTogglePosition(position.name)
+            viewModel.saveLastUsedTogglePosition(position.name)
         }
     }
 
