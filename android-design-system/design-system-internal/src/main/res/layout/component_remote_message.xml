@@ -70,6 +70,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/big_single_lottie_remote_message_compose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.MessageCta
                 android:id="@+id/big_two_actions_remote_message"
@@ -88,6 +92,11 @@
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/big_two_actions_update_remote_message_compose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/big_two_actions_server_image_remote_message_compose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

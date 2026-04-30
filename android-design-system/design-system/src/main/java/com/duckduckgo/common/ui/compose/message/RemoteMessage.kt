@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.compose.message
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ripple
@@ -37,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -60,146 +59,91 @@ fun SmallMessage(
     modifier: Modifier = Modifier,
 ) {
     RemoteMessage(
+        title = title,
+        body = body,
         modifier = modifier,
         onDismissClicked = onDismissed,
-    ) {
-        DaxText(
-            text = title,
-            style = DuckDuckGoTheme.typography.h3,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_2),
-                    start = 40.dp,
-                    end = 40.dp,
-                )
-                .fillMaxWidth(),
-        )
-        DaxText(
-            text = body,
-            style = DuckDuckGoTheme.typography.body2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_1),
-                    bottom = dimensionResource(R.dimen.keyline_2),
-                    start = dimensionResource(R.dimen.keyline_4),
-                    end = dimensionResource(R.dimen.keyline_4),
-                )
-                .fillMaxWidth(),
-        )
-    }
+    )
 }
 
 @Composable
 fun MediumMessage(
     title: String,
     body: String,
-    @DrawableRes illustration: Int,
+    topIllustration: Painter,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessage(
+    RemoteMessageWithIllustration(
+        title = title,
+        body = body,
         modifier = modifier,
         onDismissClicked = onDismissed,
-    ) {
-        Image(
-            painter = painterResource(illustration),
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.keyline_2))
-                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
-            contentScale = ContentScale.None,
-            contentDescription = null,
-        )
-        DaxText(
-            text = title,
-            style = DuckDuckGoTheme.typography.h3,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_2),
-                    start = 40.dp,
-                    end = 40.dp,
-                )
-                .fillMaxWidth(),
-        )
-        DaxText(
-            text = body,
-            style = DuckDuckGoTheme.typography.body2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_1),
-                    bottom = dimensionResource(R.dimen.keyline_2),
-                    start = dimensionResource(R.dimen.keyline_4),
-                    end = dimensionResource(R.dimen.keyline_4),
-                )
-                .fillMaxWidth(),
-        )
-    }
+        topIllustration = topIllustration,
+    )
 }
 
 @Composable
 fun BigSingleActionMessage(
     title: String,
     body: String,
-    @DrawableRes illustration: Int,
+    topIllustration: @Composable ColumnScope.() -> Unit,
     actionText: String,
     onActionClick: () -> Unit,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessage(
-        modifier = modifier,
+    RemoteMessageWithIllustration(
+        title = title,
+        body = body,
         onDismissClicked = onDismissed,
-    ) {
-        Image(
-            painter = painterResource(illustration),
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.keyline_2))
-                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
-            contentScale = ContentScale.None,
-            contentDescription = null,
-        )
-        DaxText(
-            text = title,
-            style = DuckDuckGoTheme.typography.h3,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_2),
-                    start = 40.dp,
-                    end = 40.dp,
-                )
-                .fillMaxWidth(),
-        )
-        DaxText(
-            text = body,
-            style = DuckDuckGoTheme.typography.body2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_1),
-                    start = dimensionResource(R.dimen.keyline_4),
-                    end = dimensionResource(R.dimen.keyline_4),
-                )
-                .fillMaxWidth(),
-        )
-        SmallPrimaryButton(
-            text = actionText,
-            onClick = onActionClick,
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.keyline_3), bottom = dimensionResource(R.dimen.keyline_2))
-                .align(Alignment.CenterHorizontally),
-        )
-    }
+        modifier = modifier,
+        topIllustration = topIllustration,
+        bottomContent = {
+            SmallPrimaryButton(
+                text = actionText,
+                onClick = onActionClick,
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
+                    .align(Alignment.CenterHorizontally),
+            )
+        },
+    )
+}
+
+@Composable
+fun BigSingleActionMessage(
+    title: String,
+    body: String,
+    topIllustration: Painter,
+    actionText: String,
+    onActionClick: () -> Unit,
+    onDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    RemoteMessageWithIllustration(
+        title = title,
+        body = body,
+        modifier = modifier,
+        topIllustration = topIllustration,
+        onDismissClicked = onDismissed,
+        bottomContent = {
+            SmallPrimaryButton(
+                text = actionText,
+                onClick = onActionClick,
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
+                    .align(Alignment.CenterHorizontally),
+            )
+        },
+    )
 }
 
 @Composable
 fun BigTwoActionsMessage(
     title: String,
     body: String,
-    @DrawableRes illustration: Int,
+    topIllustration: Painter,
     primaryActionText: String,
     onPrimaryActionClick: () -> Unit,
     secondaryActionText: String,
@@ -207,72 +151,97 @@ fun BigTwoActionsMessage(
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessage(
+    RemoteMessageWithIllustration(
+        title = title,
+        body = body,
+        topIllustration = topIllustration,
         modifier = modifier,
         onDismissClicked = onDismissed,
-    ) {
-        Image(
-            painter = painterResource(illustration),
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.keyline_2))
-                .size(dimensionResource(R.dimen.messageCtaIllustrationSize)),
-            contentScale = ContentScale.None,
-            contentDescription = null,
-        )
-        DaxText(
-            text = title,
-            style = DuckDuckGoTheme.typography.h3,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_2),
-                    start = 40.dp,
-                    end = 40.dp,
-                )
-                .fillMaxWidth(),
-        )
-        DaxText(
-            text = body,
-            style = DuckDuckGoTheme.typography.body2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(R.dimen.keyline_1),
-                    start = dimensionResource(R.dimen.keyline_4),
-                    end = dimensionResource(R.dimen.keyline_4),
-                )
-                .fillMaxWidth(),
-        )
-        Row(
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.keyline_3), bottom = dimensionResource(R.dimen.keyline_2))
-                .align(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SmallGhostButton(
-                text = secondaryActionText,
-                onClick = onSecondaryActionClick,
-            )
-            SmallPrimaryButton(
-                text = primaryActionText,
-                onClick = onPrimaryActionClick,
+        bottomContent = {
+            Row(
                 modifier = Modifier
-                    .padding(start = dimensionResource(R.dimen.keyline_2)),
+                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
+                    .align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SmallGhostButton(
+                    text = secondaryActionText,
+                    onClick = onSecondaryActionClick,
+                )
+                SmallPrimaryButton(
+                    text = primaryActionText,
+                    onClick = onPrimaryActionClick,
+                    modifier = Modifier
+                        .padding(start = dimensionResource(R.dimen.keyline_2)),
+                )
+            }
+        },
+    )
+}
+
+@Composable
+internal fun RemoteMessageWithIllustration(
+    title: String,
+    body: String,
+    topIllustration: @Composable ColumnScope.() -> Unit = {},
+    onDismissClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    bottomContent: @Composable ColumnScope.() -> Unit = {},
+) {
+    RemoteMessage(
+        title = title,
+        body = body,
+        onDismissClicked = onDismissClicked,
+        modifier = modifier,
+        topContent = topIllustration,
+        bottomContent = bottomContent,
+    )
+}
+
+@Composable
+internal fun RemoteMessageWithIllustration(
+    title: String,
+    body: String,
+    topIllustration: Painter,
+    onDismissClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    bottomContent: @Composable ColumnScope.() -> Unit = {},
+) {
+    RemoteMessage(
+        title = title,
+        body = body,
+        onDismissClicked = onDismissClicked,
+        modifier = modifier,
+        topContent = {
+            Image(
+                painter = topIllustration,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(
+                        top = dimensionResource(R.dimen.keyline_2),
+                        bottom = dimensionResource(R.dimen.keyline_2),
+                    )
+                    .size(48.dp),
             )
-        }
-    }
+        },
+        bottomContent = bottomContent,
+    )
 }
 
 @Composable
 internal fun RemoteMessage(
+    title: String,
+    body: String,
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
+    topContent: @Composable ColumnScope.() -> Unit = {},
+    bottomContent: @Composable ColumnScope.() -> Unit = {},
 ) {
     DaxCard(
         modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.largeShapeCornerRadius)),
+        shape = DuckDuckGoTheme.shapes.large,
     ) {
         Box(
             modifier = Modifier
@@ -284,7 +253,33 @@ internal fun RemoteMessage(
                     .padding(vertical = dimensionResource(R.dimen.keyline_2)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                content()
+                topContent()
+                DaxText(
+                    text = title,
+                    style = DuckDuckGoTheme.typography.h3,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(
+                            top = dimensionResource(R.dimen.keyline_2),
+                            start = 40.dp,
+                            end = 40.dp,
+                        )
+                        .fillMaxWidth(),
+                )
+                DaxText(
+                    text = body,
+                    style = DuckDuckGoTheme.typography.body2,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(
+                            top = dimensionResource(R.dimen.keyline_1),
+                            bottom = dimensionResource(R.dimen.keyline_2),
+                            start = dimensionResource(R.dimen.keyline_4),
+                            end = dimensionResource(R.dimen.keyline_4),
+                        )
+                        .fillMaxWidth(),
+                )
+                bottomContent()
             }
             Icon(
                 painter = painterResource(R.drawable.ic_close_24),
@@ -323,7 +318,7 @@ private fun MediumMessagePreview() {
         MediumMessage(
             title = "Medium message",
             body = "Body text goes here. This component doesn't have buttons",
-            illustration = R.drawable.ic_critical_update,
+            topIllustration = painterResource(R.drawable.ic_critical_update),
             onDismissed = {},
         )
     }
@@ -336,7 +331,7 @@ private fun BigSingleActionMessagePreview() {
         BigSingleActionMessage(
             title = "Big Single Message",
             body = "Body text goes here. This component has one button",
-            illustration = R.drawable.ic_ddg_announce,
+            topIllustration = painterResource(R.drawable.ic_ddg_announce),
             actionText = "Action",
             onActionClick = {},
             onDismissed = {},
@@ -351,7 +346,7 @@ private fun BigTwoActionsMessagePreview() {
         BigTwoActionsMessage(
             title = "Big Two Actions Message",
             body = "Body text goes here. This component has two buttons and showcases and app update",
-            illustration = R.drawable.ic_app_update,
+            topIllustration = painterResource(R.drawable.ic_app_update),
             primaryActionText = "Action",
             secondaryActionText = "Secondary",
             onPrimaryActionClick = {},

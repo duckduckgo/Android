@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
+import coil3.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.message.BigSingleActionMessage
@@ -198,7 +205,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 MediumMessage(
                     title = "Compose Medium Message",
                     body = "Body text goes here. This component doesn't have buttons",
-                    illustration = CommonR.drawable.ic_critical_update,
+                    topIllustration = painterResource(CommonR.drawable.ic_critical_update),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
                     },
@@ -207,7 +214,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
                 BigSingleActionMessage(
-                    illustration = CommonR.drawable.ic_announce,
+                    topIllustration = painterResource(CommonR.drawable.ic_announce),
                     title = "Compose Big Single Message",
                     body = "Body text goes here. This component has one button",
                     actionText = "Primary",
@@ -218,9 +225,32 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 )
             }
 
+            view.setupThemedComposeView(R.id.big_single_lottie_remote_message_compose, isDarkTheme = isDarkTheme) {
+                BigSingleActionMessage(
+                    topIllustration = {
+                        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.anim_password_keys))
+                        val progress by animateLottieCompositionAsState(
+                            composition = composition,
+                        )
+                        LottieAnimation(
+                            composition = composition,
+                            progress = { progress },
+                            modifier = Modifier.heightIn(max = 96.dp),
+                        )
+                    },
+                    title = "Bring your passwords from Google to DuckDuckGo",
+                    body = "Quickly and securely import your passwords to DuckDuckGo. Google may ask you to enter your password.",
+                    actionText = "Import From Google",
+                    onActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.big_single_lottie_remote_message_compose).gone()
+                    },
+                )
+            }
+
             view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
                 BigTwoActionsMessage(
-                    illustration = CommonR.drawable.ic_ddg_announce,
+                    topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
                     primaryActionText = "Primary",
@@ -235,7 +265,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
                 BigTwoActionsMessage(
-                    illustration = CommonR.drawable.ic_app_update,
+                    topIllustration = painterResource(CommonR.drawable.ic_app_update),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons and showcases and app update",
                     primaryActionText = "Primary",
@@ -244,6 +274,25 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     onSecondaryActionClick = {},
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_two_actions_update_remote_message_compose).gone()
+                    },
+                )
+            }
+
+            view.setupThemedComposeView(R.id.big_two_actions_server_image_remote_message_compose, isDarkTheme = isDarkTheme) {
+                BigTwoActionsMessage(
+                    topIllustration = rememberAsyncImagePainter(
+                        model = "https://staticcdn.duckduckgo.com/remotemessaging/illustrations/image2.png",
+                        error = painterResource(CommonR.drawable.ic_app_update),
+                        fallback = painterResource(CommonR.drawable.ic_app_update),
+                    ),
+                    title = "Compose Remote Image",
+                    body = "Body text goes here. This component has two buttons and showcases and app update",
+                    primaryActionText = "Primary",
+                    secondaryActionText = "Secondary",
+                    onPrimaryActionClick = {},
+                    onSecondaryActionClick = {},
+                    onDismissed = {
+                        view.findViewById<ComposeView>(R.id.big_two_actions_server_image_remote_message_compose).gone()
                     },
                 )
             }

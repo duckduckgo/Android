@@ -49,8 +49,8 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 fun DaxCard(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
-    shape: Shape = CardDefaults.shape,
-    elevation: CardElevation = CardDefaults.cardElevation(),
+    shape: Shape = DaxCardDefaults.shape,
+    elevation: CardElevation = DaxCardDefaults.elevation,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
@@ -82,8 +82,8 @@ fun DaxCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     border: BorderStroke? = null,
-    shape: Shape = CardDefaults.shape,
-    elevation: CardElevation = CardDefaults.cardElevation(),
+    shape: Shape = DaxCardDefaults.shape,
+    elevation: CardElevation = DaxCardDefaults.elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
