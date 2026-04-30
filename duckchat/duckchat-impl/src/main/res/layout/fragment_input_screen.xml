@@ -188,11 +188,14 @@
         android:id="@+id/duckAiEndCta"
         layout="@layout/include_duck_ai_end_cta"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:elevation="5dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop" />
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"
+        app:layout_constraintVertical_bias="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
