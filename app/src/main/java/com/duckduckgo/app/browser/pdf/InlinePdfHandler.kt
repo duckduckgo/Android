@@ -49,28 +49,28 @@ import kotlin.coroutines.coroutineContext
 interface InlinePdfHandler {
 
     /**
-     * Determines whether a download response should be rendered as an inline PDF
-     * inside the browser tab instead of triggering a standard file download.
+     * Decides how a download response should be handled for PDF rendering.
      *
-     * Checks SDK level (>= Android 12), MIME type or `.pdf` URL extension, and
-     * rejects `Content-Disposition: attachment` responses.
-     *
-     * @param url the URL of the PDF document
-     * @param contentDisposition the value of the `Content-Disposition` header, if present
-     * @param mimeType the MIME type of the response, if provided by the server
-     * @return true if the response should be rendered inline, false to trigger a download
+     * - [PdfRenderDecision.Inline]: feature flag on, SDK >= Android 12, MIME or
+     *   `.pdf` URL extension matches, and `Content-Disposition: attachment` not set.
+     * - [PdfRenderDecision.Fallback]: same eligibility but the device is below
+     *   Android 12 — caller should fall back to the standard file download.
+     * - [PdfRenderDecision.NotApplicable]: response is not an inline-eligible PDF
+     *   (or the feature flag is off).
      */
-    fun shouldRenderPdfInline(url: String, contentDisposition: String?, mimeType: String): Boolean
+    fun decideForPdf(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision
 
     /**
      * Downloads the PDF at [url] into internal cache for inline rendering.
      *
      * Forwards WebView cookies for authenticated downloads, validates the file
-     * starts with `%PDF-` magic bytes, and returns a `file://` URI on success.
+     * starts with `%PDF-` magic bytes, and returns [PdfDownloadResult.Success] on
+     * success.
      *
-     * Returns `null` if the server returns an error or the downloaded file is not a
-     * valid PDF. The feature flag and SDK gate live in [shouldRenderPdfInline] so
-     * callers shouldn't reach this method when the feature is off.
+     * Returns [PdfDownloadResult.Failure] with an error category when the network,
+     * server, or file content prevents inline rendering. The feature flag and SDK
+     * gate live in [decideForPdf] so callers shouldn't reach this method when the
+     * feature is off.
      *
      * Cancellation-safe: if the calling coroutine is cancelled (e.g. the user
      * navigates away), the in-flight HTTP request is aborted and any partial
@@ -78,7 +78,7 @@ interface InlinePdfHandler {
      *
      * @param url the URL of the PDF to download
      */
-    suspend fun downloadToCache(url: String): Uri?
+    suspend fun downloadToCache(url: String): PdfDownloadResult
 
     /**
      * Extracts a sanitized filename from the PDF [url]'s last path segment.
@@ -86,6 +86,23 @@ interface InlinePdfHandler {
      * @param url the URL of the PDF document
      */
     fun extractFileName(url: String): String
+}
+
+sealed class PdfRenderDecision {
+    data object Inline : PdfRenderDecision()
+    data object Fallback : PdfRenderDecision()
+    data object NotApplicable : PdfRenderDecision()
+}
+
+sealed class PdfDownloadResult {
+    data class Success(val uri: Uri) : PdfDownloadResult()
+    data class Failure(val errorType: PdfErrorType) : PdfDownloadResult()
+}
+
+enum class PdfErrorType(val paramValue: String) {
+    IO_ERROR("io_error"),
+    SECURITY_ERROR("security_error"),
+    UNKNOWN("unknown"),
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -98,21 +115,23 @@ class RealInlinePdfHandler @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : InlinePdfHandler {
 
-    override fun shouldRenderPdfInline(url: String, contentDisposition: String?, mimeType: String): Boolean {
-        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return false
-        if (Build.VERSION.SDK_INT < 31) return false
+    override fun decideForPdf(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision {
+        if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return PdfRenderDecision.NotApplicable
         // Use lastPathSegment so query strings and fragments don't break the .pdf check
         // (e.g. signed URLs like https://cdn.example.com/report.pdf?auth=token).
         val pathEndsInPdf = url.toUri().lastPathSegment?.endsWith(".pdf", ignoreCase = true) == true
-        if (mimeType != "application/pdf" && !pathEndsInPdf) return false
-        if (contentDisposition != null && contentDisposition.trim().startsWith("attachment", ignoreCase = true)) return false
-        return true
+        if (mimeType != "application/pdf" && !pathEndsInPdf) return PdfRenderDecision.NotApplicable
+        if (contentDisposition != null && contentDisposition.trim().startsWith("attachment", ignoreCase = true)) {
+            return PdfRenderDecision.NotApplicable
+        }
+        if (Build.VERSION.SDK_INT < 31) return PdfRenderDecision.Fallback
+        return PdfRenderDecision.Inline
     }
 
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
-    override suspend fun downloadToCache(url: String): Uri? = withContext(dispatcherProvider.io()) {
+    override suspend fun downloadToCache(url: String): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
         // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
         // (e.g. report.pdf at site A and site B) don't collide and serve stale content.
@@ -122,7 +141,7 @@ class RealInlinePdfHandler @Inject constructor(
                 // Bump mtime so LRU eviction treats this file as recently *used*,
                 // not just recently *written*.
                 targetFile.setLastModified(System.currentTimeMillis())
-                return@withContext Uri.fromFile(targetFile)
+                return@withContext PdfDownloadResult.Success(Uri.fromFile(targetFile))
             }
 
             val requestBuilder = Request.Builder().url(url)
@@ -135,7 +154,7 @@ class RealInlinePdfHandler @Inject constructor(
             executeRequestCancellably(okHttpClient.newCall(requestBuilder.build())).use { response ->
                 if (!response.isSuccessful) {
                     logcat { "PDF download failed: HTTP ${response.code}" }
-                    return@withContext null
+                    return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
                 }
 
                 response.body?.byteStream()?.use { input ->
@@ -149,7 +168,7 @@ class RealInlinePdfHandler @Inject constructor(
                     }
                 } ?: run {
                     logcat { "PDF download failed: empty response body" }
-                    return@withContext null
+                    return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
                 }
             }
 
@@ -158,19 +177,22 @@ class RealInlinePdfHandler @Inject constructor(
             if (!hasPdfMagicBytes(targetFile)) {
                 logcat { "PDF download failed: file does not start with %PDF magic bytes" }
                 targetFile.delete()
-                return@withContext null
+                return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
             }
 
             enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
 
-            Uri.fromFile(targetFile)
+            PdfDownloadResult.Success(Uri.fromFile(targetFile))
         } catch (e: CancellationException) {
             logcat { "PDF download cancelled, cleaning up partial file" }
             targetFile.delete()
             throw e
         } catch (e: IOException) {
             logcat { "PDF download failed: ${e.message}" }
-            null
+            PdfDownloadResult.Failure(PdfErrorType.IO_ERROR)
+        } catch (e: SecurityException) {
+            logcat { "PDF download denied: ${e.message}" }
+            PdfDownloadResult.Failure(PdfErrorType.SECURITY_ERROR)
         }
     }
 

@@ -25,7 +25,7 @@ import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import okhttp3.OkHttpClient
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,17 +65,34 @@ class InlinePdfHandlerPreApi31Test {
     }
 
     @Test
-    fun whenApiBelow31AndPdfMimeTypeThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
+    fun whenApiBelow31AndPdfMimeTypeThenDecisionIsFallback() {
+        assertEquals(
+            PdfRenderDecision.Fallback,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"),
+        )
     }
 
     @Test
-    fun whenApiBelow31AndContentDispositionInlineThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
+    fun whenApiBelow31AndContentDispositionInlineThenDecisionIsFallback() {
+        assertEquals(
+            PdfRenderDecision.Fallback,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "inline", "application/pdf"),
+        )
     }
 
     @Test
-    fun whenApiBelow31AndUrlEndsInPdfWithOctetMimeThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
+    fun whenApiBelow31AndUrlEndsInPdfWithOctetMimeThenDecisionIsFallback() {
+        assertEquals(
+            PdfRenderDecision.Fallback,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/octet-stream"),
+        )
+    }
+
+    @Test
+    fun whenApiBelow31AndContentDispositionAttachmentThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
+        )
     }
 }

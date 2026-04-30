@@ -206,6 +206,9 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
+import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfPixelName
+import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -3679,10 +3682,15 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 command.value = ConvertBlobToDataUri(url, mimeType)
             }
-        } else if (inlinePdfHandler.shouldRenderPdfInline(url, contentDisposition, mimeType)) {
-            handlePdfUrl(url, contentDisposition, mimeType, requestUserConfirmation)
-        } else {
-            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            return
+        }
+        when (inlinePdfHandler.decideForPdf(url, contentDisposition, mimeType)) {
+            PdfRenderDecision.Inline -> handlePdfUrl(url, contentDisposition, mimeType, requestUserConfirmation)
+            PdfRenderDecision.Fallback -> {
+                pixel.fire(PdfPixelName.PDF_FALLBACK)
+                sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            }
+            PdfRenderDecision.NotApplicable -> sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
         }
     }
 
@@ -3692,18 +3700,28 @@ class BrowserTabViewModel @Inject constructor(
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
-            val cachedUri = inlinePdfHandler.downloadToCache(url)
+            val result = inlinePdfHandler.downloadToCache(url)
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
-            if (cachedUri != null) {
-                val pdfTitle = inlinePdfHandler.extractFileName(url)
-                pageChanged(url, pdfTitle)
-                browserViewState.value = currentBrowserViewState().copy(
-                    currentPdfCachedUri = cachedUri,
-                    currentPdfFileName = pdfTitle,
-                )
-                command.value = ShowPdfInTab(url, cachedUri)
-            } else {
-                sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            when (result) {
+                is PdfDownloadResult.Success -> {
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
+                    val pdfTitle = inlinePdfHandler.extractFileName(url)
+                    pageChanged(url, pdfTitle)
+                    browserViewState.value = currentBrowserViewState().copy(
+                        currentPdfCachedUri = result.uri,
+                        currentPdfFileName = pdfTitle,
+                    )
+                    command.value = ShowPdfInTab(url, result.uri)
+                }
+                is PdfDownloadResult.Failure -> {
+                    pixel.fire(
+                        PdfPixelName.PDF_RENDER_FAILURE,
+                        parameters = mapOf("error_type" to result.errorType.paramValue),
+                    )
+                    sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+                }
             }
         }
     }

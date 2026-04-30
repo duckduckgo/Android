@@ -35,8 +35,7 @@ import okio.Buffer
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -95,21 +94,21 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(pdfBytes)),
         )
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
 
-        assertNotNull(uri)
-        val file = File(uri!!.path!!)
+        assertTrue(result is PdfDownloadResult.Success)
+        val file = File((result as PdfDownloadResult.Success).uri.path!!)
         assertTrue(file.exists())
         assertEquals(pdfBytes.size.toLong(), file.length())
     }
 
     @Test
-    fun whenServerReturnsErrorThenReturnsNull() = runTest {
+    fun whenServerReturnsErrorThenReturnsFailureUnknown() = runTest {
         server.enqueue(MockResponse().setResponseCode(404))
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/missing.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/missing.pdf").toString())
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
 
     @Test
@@ -121,14 +120,14 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(pdfBytes)),
         )
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/document").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/document").toString())
 
-        assertNotNull(uri)
-        assertTrue(uri!!.path!!.endsWith(".pdf"))
+        assertTrue(result is PdfDownloadResult.Success)
+        assertTrue((result as PdfDownloadResult.Success).uri.path!!.endsWith(".pdf"))
     }
 
     @Test
-    fun whenDownloadedFileIsNotPdfThenReturnsNullAndDeletesFile() = runTest {
+    fun whenDownloadedFileIsNotPdfThenReturnsFailureUnknownAndDeletesFile() = runTest {
         val htmlBytes = "<html><body>Not a PDF</body></html>".toByteArray()
         server.enqueue(
             MockResponse()
@@ -136,51 +135,72 @@ class InlinePdfHandlerTest {
                 .setBody(Buffer().write(htmlBytes)),
         )
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/fake.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/fake.pdf").toString())
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
 
-    // region shouldRenderPdfInline tests
+    // region decideForPdf tests
 
     @Test
-    fun whenPdfMimeTypeThenShouldRenderInline() {
-        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
-    }
-
-    @Test
-    fun whenContentDispositionIsAttachmentThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"))
+    fun whenPdfMimeTypeThenDecisionIsInline() {
+        assertEquals(PdfRenderDecision.Inline, inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"))
     }
 
     @Test
-    fun whenMimeTypeIsNotPdfAndUrlNotPdfThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.txt", null, "text/plain"))
+    fun whenContentDispositionIsAttachmentThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
+        )
     }
 
     @Test
-    fun whenMimeTypeIsNotPdfButUrlEndsPdfThenShouldRenderInline() {
-        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/octet-stream"))
+    fun whenMimeTypeIsNotPdfAndUrlNotPdfThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.txt", null, "text/plain"),
+        )
     }
 
     @Test
-    fun whenUrlEndsInPdfWithQueryParamsThenShouldRenderInline() {
-        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"))
+    fun whenMimeTypeIsNotPdfButUrlEndsPdfThenDecisionIsInline() {
+        assertEquals(
+            PdfRenderDecision.Inline,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/octet-stream"),
+        )
     }
 
     @Test
-    fun whenUrlEndsInPdfWithFragmentThenShouldRenderInline() {
-        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf#page=5", null, "application/octet-stream"))
+    fun whenUrlEndsInPdfWithQueryParamsThenDecisionIsInline() {
+        assertEquals(
+            PdfRenderDecision.Inline,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"),
+        )
     }
 
     @Test
-    fun whenContentDispositionIsExplicitInlineThenShouldRenderInline() {
-        assertTrue(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "inline", "application/pdf"))
+    fun whenUrlEndsInPdfWithFragmentThenDecisionIsInline() {
+        assertEquals(
+            PdfRenderDecision.Inline,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf#page=5", null, "application/octet-stream"),
+        )
     }
 
     @Test
-    fun whenContentDispositionHasLeadingWhitespaceAttachmentThenShouldNotRenderInline() {
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"))
+    fun whenContentDispositionIsExplicitInlineThenDecisionIsInline() {
+        assertEquals(
+            PdfRenderDecision.Inline,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "inline", "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionHasLeadingWhitespaceAttachmentThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"),
+        )
     }
 
     // endregion
@@ -188,10 +208,13 @@ class InlinePdfHandlerTest {
     // region feature flag tests
 
     @Test
-    fun whenFeatureDisabledThenShouldRenderPdfInlineReturnsFalse() {
+    fun whenFeatureDisabledThenDecisionIsNotApplicable() {
         androidBrowserConfigFeature.pdfViewer().setRawStoredState(State(enable = false))
 
-        assertFalse(inlinePdfHandler.shouldRenderPdfInline("https://example.com/doc.pdf", null, "application/pdf"))
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"),
+        )
     }
 
     @Test
@@ -204,13 +227,13 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/cached.pdf").toString()
 
-        val firstUri = inlinePdfHandler.downloadToCache(url)
-        assertNotNull(firstUri)
+        val firstResult = inlinePdfHandler.downloadToCache(url)
+        assertTrue(firstResult is PdfDownloadResult.Success)
         assertEquals(1, server.requestCount)
 
-        val secondUri = inlinePdfHandler.downloadToCache(url)
-        assertNotNull(secondUri)
-        assertEquals(firstUri, secondUri)
+        val secondResult = inlinePdfHandler.downloadToCache(url)
+        assertTrue(secondResult is PdfDownloadResult.Success)
+        assertEquals((firstResult as PdfDownloadResult.Success).uri, (secondResult as PdfDownloadResult.Success).uri)
         assertEquals(1, server.requestCount)
     }
 
@@ -223,12 +246,16 @@ class InlinePdfHandlerTest {
         val urlA = server.url("/site-a/report.pdf").toString()
         val urlB = server.url("/site-b/report.pdf").toString()
 
-        val uriA = inlinePdfHandler.downloadToCache(urlA)
-        val uriB = inlinePdfHandler.downloadToCache(urlB)
+        val resultA = inlinePdfHandler.downloadToCache(urlA)
+        val resultB = inlinePdfHandler.downloadToCache(urlB)
 
-        assertNotNull(uriA)
-        assertNotNull(uriB)
-        assertFalse("Cache files for distinct URLs sharing last path segment must differ", uriA == uriB)
+        assertTrue(resultA is PdfDownloadResult.Success)
+        assertTrue(resultB is PdfDownloadResult.Success)
+        assertNotEquals(
+            "Cache files for distinct URLs sharing last path segment must differ",
+            (resultA as PdfDownloadResult.Success).uri,
+            (resultB as PdfDownloadResult.Success).uri,
+        )
         assertEquals(2, server.requestCount)
     }
 
@@ -287,9 +314,9 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/auth.pdf").toString()
 
-        val uri = handlerWithCookies.downloadToCache(url)
+        val result = handlerWithCookies.downloadToCache(url)
 
-        assertNotNull(uri)
+        assertTrue(result is PdfDownloadResult.Success)
         val recordedRequest = server.takeRequest()
         assertEquals("session=abc123", recordedRequest.getHeader("Cookie"))
     }
@@ -301,16 +328,16 @@ class InlinePdfHandlerTest {
     }
 
     @Test
-    fun whenServerReturnsEmptyBodyThenReturnsNull() = runTest {
+    fun whenServerReturnsEmptyBodyThenReturnsFailureUnknown() = runTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(""))
 
-        val uri = inlinePdfHandler.downloadToCache(server.url("/empty.pdf").toString())
+        val result = inlinePdfHandler.downloadToCache(server.url("/empty.pdf").toString())
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
 
     @Test
-    fun whenServerReturnsBodyShorterThanMagicBytesThenReturnsNullAndDeletesFile() = runTest {
+    fun whenServerReturnsBodyShorterThanMagicBytesThenReturnsFailureUnknownAndDeletesFile() = runTest {
         server.enqueue(
             MockResponse()
                 .setResponseCode(200)
@@ -318,9 +345,9 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/short.pdf").toString()
 
-        val uri = inlinePdfHandler.downloadToCache(url)
+        val result = inlinePdfHandler.downloadToCache(url)
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
         val cacheDir = File(
             InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,
             "pdf_cache",
@@ -332,7 +359,7 @@ class InlinePdfHandlerTest {
     }
 
     @Test
-    fun whenDnsFailsThenReturnsNull() = runTest {
+    fun whenDnsFailsThenReturnsFailureIoError() = runTest {
         val throwingClient = OkHttpClient.Builder()
             .addInterceptor { throw UnknownHostException("test DNS failure") }
             .build()
@@ -344,13 +371,13 @@ class InlinePdfHandlerTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
 
-        val uri = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf")
+        val result = handlerWithFailingDns.downloadToCache("https://example.com/test.pdf")
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), result)
     }
 
     @Test
-    fun whenConnectionResetMidBodyThenReturnsNull() = runTest {
+    fun whenConnectionResetMidBodyThenReturnsFailureIoError() = runTest {
         val partialBody = ("%PDF-1.4 " + "x".repeat(8192)).toByteArray()
         server.enqueue(
             MockResponse()
@@ -360,9 +387,9 @@ class InlinePdfHandlerTest {
         )
         val url = server.url("/reset.pdf").toString()
 
-        val uri = inlinePdfHandler.downloadToCache(url)
+        val result = inlinePdfHandler.downloadToCache(url)
 
-        assertNull(uri)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), result)
     }
 
     // endregion
@@ -431,9 +458,9 @@ class InlinePdfHandlerTest {
         server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytes)))
         val url = server.url("/touch.pdf").toString()
 
-        val firstUri = inlinePdfHandler.downloadToCache(url)
-        assertNotNull(firstUri)
-        val cachedFile = File(firstUri!!.path!!)
+        val firstResult = inlinePdfHandler.downloadToCache(url)
+        assertTrue(firstResult is PdfDownloadResult.Success)
+        val cachedFile = File((firstResult as PdfDownloadResult.Success).uri.path!!)
 
         // Backdate the file so we can detect that the cache-hit path bumps it forward.
         val backdated = System.currentTimeMillis() - 60_000L

@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class PdfPixelName(override val pixelName: String) : Pixel.PixelName {
     PDF_VIEWER_OPENED("m_pdf_viewer_opened"),
+    PDF_VIEWER_OPENED_DAILY("m_pdf_viewer_opened_daily"),
+    PDF_VIEWER_OPENED_UNIQUE("m_pdf_viewer_opened_unique"),
     PDF_RENDER_FAILURE("m_pdf_render_failure"),
     PDF_DOWNLOAD_MENU_ITEM_PRESSED("m_nav_pdf_download_menu_item_pressed"),
     PDF_FALLBACK("m_pdf_fallback"),

@@ -158,6 +158,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -1811,6 +1812,7 @@ class BrowserTabFragment :
                 viewModel.onShareSelected()
             }
             onMenuItemClicked(downloadPdfMenuItem) {
+                pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
                 viewModel.onDownloadPdfMenuItemClicked()
             }
             onMenuItemClicked(addToHomeMenuItem) {
