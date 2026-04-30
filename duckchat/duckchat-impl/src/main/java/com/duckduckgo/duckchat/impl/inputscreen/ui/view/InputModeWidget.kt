@@ -238,7 +238,7 @@ open class InputModeWidget @JvmOverloads constructor(
             onClearTextTapped?.invoke()
         }
         inputModeWidgetBack.setOnClickListener { onBackPressed() }
-        inputModeWidgetUnifiedBack.setOnClickListener{ onBackPressed() }
+        inputModeWidgetUnifiedBack.setOnClickListener { onBackPressed() }
 
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
