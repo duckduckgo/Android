@@ -90,6 +90,15 @@
         <item name="daxSwitchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
 
         <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
+
+        <!-- Global TextInputLayout style for raw TextInputLayout instances (e.g. third-party
+             libraries like pdf-viewer). DaxTextInput is NOT affected — it uses a hardcoded
+             style="@style/Widget.DuckDuckGo.TextInput" and does not resolve textInputStyle.
+             Temporary: needed because pdf-viewer alpha08 creates its password dialog with
+             requireActivity() context, inheriting colorPrimary=daxColorBackground which makes
+             cursor and focused label invisible. Will be removable when upgrading to a newer
+             pdf-viewer version after the Kotlin 2.x migration. -->
+        <item name="textInputStyle">@style/Widget.DuckDuckGo.ThirdPartyTextInput</item>
     </style>
 
     <style name="Theme.DuckDuckGo.App" parent="Theme.DuckDuckGo.Light" />

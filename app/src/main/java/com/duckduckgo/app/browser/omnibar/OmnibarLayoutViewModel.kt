@@ -151,6 +151,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
         is Browser -> BrowserViewMode.Browser
+        is ViewMode.Pdf -> BrowserViewMode.Browser
         is NewTab -> BrowserViewMode.NewTab
         is CustomTab -> BrowserViewMode.CustomTab
         is ViewMode.DuckAI -> BrowserViewMode.DuckAi
