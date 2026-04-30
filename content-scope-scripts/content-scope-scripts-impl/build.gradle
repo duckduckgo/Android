@@ -38,7 +38,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation AndroidX.webkit
 
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
 
     implementation "com.squareup.logcat:logcat:_"

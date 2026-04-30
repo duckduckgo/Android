@@ -1,0 +1,33 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+    id 'com.google.devtools.ksp'
+}
+
+apply from: "$rootProject.projectDir/code-formatting.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation project(path: ':anvil-annotations')
+    implementation project(':feature-toggles-api')
+    implementation "com.google.devtools.ksp:symbol-processing-api:1.9.24-1.0.20"
+    implementation "com.squareup:kotlinpoet:1.11.0"
+    implementation "com.squareup:kotlinpoet-ksp:1.11.0"
+    implementation Google.dagger
+
+    implementation "com.google.auto.service:auto-service-annotations:1.1.0"
+    ksp "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
+
+    testImplementation Testing.junit4
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
+    testImplementation "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0"
+    testImplementation "com.google.devtools.ksp:symbol-processing-api:1.9.24-1.0.20"
+}

@@ -30,7 +30,7 @@ dependencies {
     implementation project(path: ':sync-settings-api')
     implementation project(path: ':sync-api')
 
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
 
     implementation AndroidX.appCompat

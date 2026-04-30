@@ -276,6 +276,7 @@ fladle {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
@@ -315,7 +316,6 @@ dependencies {
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
     implementation project(':app-build-config-api')

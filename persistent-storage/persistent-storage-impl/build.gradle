@@ -39,7 +39,6 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':persistent-storage-api')
 
-    anvil project(path: ':anvil-compiler')
 
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"

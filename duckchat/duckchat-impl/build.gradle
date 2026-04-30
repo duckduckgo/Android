@@ -24,6 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
     implementation project(':data-clearing-api')
     implementation project(':settings-api')
@@ -49,7 +50,6 @@ dependencies {
     implementation project(':cookies-api')
     implementation project(':duckchat-store')
 
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(':statistics-api')

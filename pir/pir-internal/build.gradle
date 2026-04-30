@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':browser-api')
     implementation project(':design-system')
