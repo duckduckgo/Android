@@ -1587,12 +1587,12 @@ class BrowserTabFragment :
             context = requireContext(),
             faviconManager = faviconManager,
             onDismissListener = {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
+                pixel.fire(AppPixelName.BROWSING_MENU_DISMISSED)
             },
             onMenuItemClickListener = {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_DAILY, type = Daily())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_UNIQUE, type = Unique())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
+                pixel.fire(AppPixelName.BROWSING_MENU_USED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
         )
         bottomSheetMenu?.apply {
@@ -1767,15 +1767,15 @@ class BrowserTabFragment :
                     }
                 }
                 if (isActiveCustomTab()) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_CUSTOMTABS)
                 } else if (omnibar.viewMode == ViewMode.DuckAI) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_AICHAT)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_AICHAT)
                 } else if (omnibar.viewMode == ViewMode.NewTab) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_NTP)
                 } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_ERROR)
                 } else {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED)
                 }
                 fireMenuOpenedPixels(isFocusedNtp, viewState)
             }
