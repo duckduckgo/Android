@@ -269,7 +269,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenRefreshCtaReturnsSubscriptionCta() = runTest {
+    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenGetPromoCtaOnForegroundReturnsSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -280,12 +280,7 @@ class OnboardingDaxDialogTests {
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
 
-        val result = testee.refreshCta(
-            coroutineRule.testDispatcherProvider.io(),
-            isBrowserShowing = false,
-            site = null,
-            detectedRefreshPatterns = emptySet(),
-        )
+        val result = testee.getPromoCtaOnForeground()
 
         assertNotNull(result)
         assertTrue(result is SubscriptionPromoModalCta)
