@@ -41,6 +41,7 @@ data class DaxEndBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    backgroundRes = R.drawable.bg_onboarding_end,
 ) {
     override val markAsReadOnShow: Boolean = true
 
