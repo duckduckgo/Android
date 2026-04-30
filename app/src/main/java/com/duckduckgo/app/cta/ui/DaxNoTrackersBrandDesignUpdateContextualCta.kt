@@ -42,6 +42,7 @@ data class DaxNoTrackersBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
