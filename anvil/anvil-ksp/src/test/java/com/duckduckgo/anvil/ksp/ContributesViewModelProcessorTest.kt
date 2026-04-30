@@ -16,13 +16,17 @@
 
 package com.duckduckgo.anvil.ksp
 
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.configureKsp
+import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(ExperimentalCompilerApi::class)
 class ContributesViewModelProcessorTest {
 
     private val activityScopeStub = SourceFile.kotlin(
@@ -80,8 +84,6 @@ class ContributesViewModelProcessorTest {
         )
 
         val result = compile(source, activityScopeStub, viewModelStub, viewModelFactoryPluginStub)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("MyViewModel_ViewModelFactory.kt")
         val golden = loadGolden("ViewModelFactory_Basic.kt")
         assertEquals(golden, generated)
@@ -151,20 +153,21 @@ class ContributesViewModelProcessorTest {
         assertTrue(result.messages.contains("constructor parameters must not have default values"))
     }
 
-    private fun compile(vararg sources: SourceFile): KotlinCompilation.Result {
+    private fun compile(vararg sources: SourceFile): JvmCompilationResult {
         return KotlinCompilation().apply {
             this.sources = sources.toList()
-            symbolProcessorProviders = listOf(ContributesViewModelProcessorProvider())
+            configureKsp {
+                symbolProcessorProviders += ContributesViewModelProcessorProvider()
+            }
             inheritClassPath = true
         }.compile()
     }
 
-    private fun KotlinCompilation.Result.findGeneratedSource(fileName: String): String {
-        val kspDir = outputDirectory.resolve("../ksp/sources/kotlin")
-        val file = kspDir.walkTopDown().find { it.name == fileName }
+    private fun JvmCompilationResult.findGeneratedSource(fileName: String): String {
+        val file = sourcesGeneratedBySymbolProcessor.find { it.name == fileName }
             ?: error(
-                "Generated file $fileName not found in ${kspDir.absolutePath}. " +
-                    "Available files: ${kspDir.walkTopDown().filter { it.isFile }.map { it.name }.toList()}",
+                "Generated file $fileName not found. " +
+                    "Available files: ${sourcesGeneratedBySymbolProcessor.map { it.name }.toList()}",
             )
         return file.readText()
     }

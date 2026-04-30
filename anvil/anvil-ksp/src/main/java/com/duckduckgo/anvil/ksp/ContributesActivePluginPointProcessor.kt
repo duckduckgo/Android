@@ -940,14 +940,36 @@ class ContributesActivePluginPointProcessor(
     /**
      * Returns the enum constant string representation suitable for KotlinPoet code generation.
      * For DefaultFeatureValue, returns "DefaultFeatureValue.TRUE" / "DefaultFeatureValue.FALSE" / "DefaultFeatureValue.INTERNAL".
+     *
+     * KSP 1.x returns enum values as KSType; KSP 2.x may return them as KSClassDeclaration (ENUM_ENTRY)
+     * or as a String. This method handles all representations.
      */
     private fun KSAnnotation.getArgumentEnum(name: String): String? {
         val arg = arguments.firstOrNull { it.name?.asString() == name }?.value ?: return null
-        if (arg is KSType) {
-            val enumDecl = arg.declaration
-            val enumName = enumDecl.simpleName.asString()
-            return "DefaultFeatureValue.$enumName"
+        return when (arg) {
+            is KSType -> {
+                val enumName = arg.declaration.simpleName.asString()
+                "DefaultFeatureValue.$enumName"
+            }
+            is KSClassDeclaration -> {
+                val enumName = arg.simpleName.asString()
+                "DefaultFeatureValue.$enumName"
+            }
+            is String -> {
+                // KSP2 may return the simple name directly
+                "DefaultFeatureValue.$arg"
+            }
+            else -> {
+                // Last resort: try toString and extract the enum entry name
+                val str = arg.toString()
+                val entryName = str.substringAfterLast(".")
+                if (entryName in listOf("TRUE", "FALSE", "INTERNAL")) {
+                    "DefaultFeatureValue.$entryName"
+                } else {
+                    logger.warn("Unexpected enum value type for $name: ${arg::class.simpleName} = $arg")
+                    null
+                }
+            }
         }
-        return null
     }
 }

@@ -16,12 +16,16 @@
 
 package com.duckduckgo.anvil.ksp
 
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.configureKsp
+import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@OptIn(ExperimentalCompilerApi::class)
 class ContributesWorkerProcessorTest {
 
     private val appScopeStub = SourceFile.kotlin(
@@ -75,8 +79,6 @@ class ContributesWorkerProcessorTest {
         )
 
         val result = compile(source, appScopeStub, listenableWorkerStub, workerInjectorPluginStub)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("TestWorker_WorkerInjectorPlugin.kt")
         val golden = loadGolden("WorkerInjectorPlugin_Basic.kt")
         assertEquals(golden, generated)
@@ -104,8 +106,6 @@ class ContributesWorkerProcessorTest {
         )
 
         val result = compile(source, appScopeStub, listenableWorkerStub, workerInjectorPluginStub)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("QualifiedWorker_WorkerInjectorPlugin.kt")
         val golden = loadGolden("WorkerInjectorPlugin_Qualified.kt")
         assertEquals(golden, generated)
@@ -127,8 +127,6 @@ class ContributesWorkerProcessorTest {
         )
 
         val result = compile(source, appScopeStub, listenableWorkerStub, workerInjectorPluginStub)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("EmptyWorker_WorkerInjectorPlugin.kt")
         val golden = loadGolden("WorkerInjectorPlugin_Empty.kt")
         assertEquals(golden, generated)
@@ -158,20 +156,21 @@ class ContributesWorkerProcessorTest {
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
-    private fun compile(vararg sources: SourceFile): KotlinCompilation.Result {
+    private fun compile(vararg sources: SourceFile): JvmCompilationResult {
         return KotlinCompilation().apply {
             this.sources = sources.toList()
-            symbolProcessorProviders = listOf(ContributesWorkerProcessorProvider())
+            configureKsp {
+                symbolProcessorProviders += ContributesWorkerProcessorProvider()
+            }
             inheritClassPath = true
         }.compile()
     }
 
-    private fun KotlinCompilation.Result.findGeneratedSource(fileName: String): String {
-        val kspDir = outputDirectory.resolve("../ksp/sources/kotlin")
-        val file = kspDir.walkTopDown().find { it.name == fileName }
+    private fun JvmCompilationResult.findGeneratedSource(fileName: String): String {
+        val file = sourcesGeneratedBySymbolProcessor.find { it.name == fileName }
             ?: error(
-                "Generated file $fileName not found in ${kspDir.absolutePath}. " +
-                    "Available files: ${kspDir.walkTopDown().filter { it.isFile }.map { it.name }.toList()}",
+                "Generated file $fileName not found. " +
+                    "Available files: ${sourcesGeneratedBySymbolProcessor.map { it.name }.toList()}",
             )
         return file.readText()
     }

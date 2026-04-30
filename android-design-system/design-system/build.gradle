@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -38,10 +39,6 @@ android {
 
     buildFeatures {
         compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "_"
     }
 }
 

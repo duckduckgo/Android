@@ -48,7 +48,6 @@ dependencies {
 
     // Room
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
 
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
