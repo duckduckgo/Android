@@ -161,7 +161,7 @@ class RealInlinePdfHandler @Inject constructor(
                 return@withContext null
             }
 
-            enforceCacheBudget(keepFile = targetFile, maxBytes = MAX_CACHE_BYTES)
+            enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
 
             Uri.fromFile(targetFile)
         } catch (e: CancellationException) {
@@ -209,28 +209,23 @@ class RealInlinePdfHandler @Inject constructor(
     }
 
     /**
-     * Keep the PDF cache directory under [maxBytes] using LRU eviction.
+     * Cap the PDF cache at [maxFiles] entries using LRU eviction.
      *
-     * Walks the directory's files (excluding [keepFile]) sorted by `lastModified`
-     * ascending and deletes oldest until the total is within budget. [keepFile]
-     * is never evicted, so a single PDF larger than [maxBytes] is still served —
-     * the budget is best-effort, not a hard cap on individual files.
+     * Counts all files in the cache directory (including [keepFile]) and, if the
+     * total exceeds [maxFiles], deletes the oldest non-keep files until exactly
+     * [maxFiles] remain. [keepFile] is never evicted, so a freshly-written entry
+     * always survives even when it's the one that pushed the cache over the cap.
      */
     @VisibleForTesting
-    internal fun enforceCacheBudget(keepFile: File, maxBytes: Long) {
+    internal fun enforceCacheBudget(keepFile: File, maxFiles: Int) {
         val dir = cacheDir
         val keepName = keepFile.name
         val candidates = dir.listFiles()?.filter { it.isFile && it.name != keepName } ?: return
-        var totalBytes = candidates.sumOf { it.length() } + keepFile.length()
-        if (totalBytes <= maxBytes) return
+        val totalFiles = candidates.size + 1
+        if (totalFiles <= maxFiles) return
 
-        candidates.sortedBy { it.lastModified() }.forEach { file ->
-            if (totalBytes <= maxBytes) return
-            val size = file.length()
-            if (file.delete()) {
-                totalBytes -= size
-            }
-        }
+        val toEvict = totalFiles - maxFiles
+        candidates.sortedBy { it.lastModified() }.take(toEvict).forEach { it.delete() }
     }
 
     override fun extractFileName(url: String): String {
@@ -246,6 +241,6 @@ class RealInlinePdfHandler @Inject constructor(
     companion object {
         private const val PDF_CACHE_DIR = "pdf_cache"
         private val PDF_MAGIC_BYTES = "%PDF-".toByteArray()
-        private const val MAX_CACHE_BYTES = 50L * 1024L * 1024L // 50 MB
+        private const val MAX_CACHED_FILES = 10
     }
 }
