@@ -19,8 +19,9 @@ package com.duckduckgo.daxprompts.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
@@ -32,6 +33,7 @@ import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -39,23 +41,31 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
-class WinBackPromptEvaluatorImplTest {
+class ReEngagementPromptEvaluatorImplTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockApplicationContext: Context = mock()
+    private val mockPackageManager: PackageManager = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val fakeReactivateUsersToggles = FakeFeatureToggleFactory.create(ReactivateUsersToggles::class.java)
-    private val mockOnboardingFlowChecker: OnboardingFlowChecker = mock()
     private val mockIntent: Intent = mock()
 
-    private val testee = WinBackPromptEvaluatorImpl(
+    @Before
+    fun setUp() {
+        whenever(mockApplicationContext.packageName).thenReturn(PACKAGE_NAME)
+        whenever(mockApplicationContext.packageManager).thenReturn(mockPackageManager)
+        givenInstalledDaysAgo(0L)
+    }
+
+    private val testee = ReEngagementPromptEvaluatorImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         applicationContext = mockApplicationContext,
         userBrowserProperties = mockUserBrowserProperties,
@@ -64,13 +74,12 @@ class WinBackPromptEvaluatorImplTest {
         globalActivityStarter = mockGlobalActivityStarter,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
         reactivateUsersToggles = fakeReactivateUsersToggles,
-        onboardingFlowChecker = mockOnboardingFlowChecker,
     )
 
     @Test
     fun whenSelfToggleIsDisabledThenEvaluationIsSkipped() = runTest {
         fakeReactivateUsersToggles.self().setRawStoredState(State(false))
-        fakeReactivateUsersToggles.defaultBrowserWinBackPrompt().setRawStoredState(State(true))
+        fakeReactivateUsersToggles.browserComparisonPrompt().setRawStoredState(State(true))
 
         val result = testee.evaluate()
 
@@ -79,9 +88,9 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     @Test
-    fun whenWinBackPromptToggleIsDisabledThenEvaluationIsSkipped() = runTest {
+    fun whenBrowserComparisonToggleIsDisabledThenEvaluationIsSkipped() = runTest {
         fakeReactivateUsersToggles.self().setRawStoredState(State(true))
-        fakeReactivateUsersToggles.defaultBrowserWinBackPrompt().setRawStoredState(State(false))
+        fakeReactivateUsersToggles.browserComparisonPrompt().setRawStoredState(State(false))
 
         val result = testee.evaluate()
 
@@ -90,12 +99,9 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     @Test
-    fun whenOnboardingIsNotCompleteThenEvaluationIsSkipped() = runTest {
+    fun whenInstalledLessThan28DaysThenEvaluationIsSkipped() = runTest {
         givenTogglesEnabled()
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(false)
-        whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
-        whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        givenInstalledDaysAgo(27L)
 
         val result = testee.evaluate()
 
@@ -104,11 +110,10 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     @Test
-    fun whenUserWasNeverDefaultBrowserThenEvaluationIsSkipped() = runTest {
+    fun whenUsedMoreThanOnceInLastSevenDaysThenEvaluationIsSkipped() = runTest {
         givenTogglesEnabled()
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        givenInstalledDaysAgo(30L)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(2L)
 
         val result = testee.evaluate()
 
@@ -117,11 +122,9 @@ class WinBackPromptEvaluatorImplTest {
     }
 
     @Test
-    fun whenUserIsCurrentlyDefaultBrowserThenEvaluationIsSkipped() = runTest {
+    fun whenAlreadyDefaultBrowserThenEvaluationIsSkipped() = runTest {
         givenTogglesEnabled()
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
-        whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
+        givenLapsedUser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
 
         val result = testee.evaluate()
@@ -147,8 +150,9 @@ class WinBackPromptEvaluatorImplTest {
         givenTogglesEnabled()
         givenUserIsEligible()
         whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
-        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK)))
-            .thenReturn(null)
+        whenever(
+            mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.REACTIVATE_USERS)),
+        ).thenReturn(null)
 
         val result = testee.evaluate()
 
@@ -161,8 +165,9 @@ class WinBackPromptEvaluatorImplTest {
         givenTogglesEnabled()
         givenUserIsEligible()
         whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
-        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK)))
-            .thenReturn(mockIntent)
+        whenever(
+            mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.REACTIVATE_USERS)),
+        ).thenReturn(mockIntent)
 
         val result = testee.evaluate()
 
@@ -174,22 +179,36 @@ class WinBackPromptEvaluatorImplTest {
 
     @Test
     fun evaluatorHasCorrectPriority() {
-        assertEquals(1, testee.priority)
+        assertEquals(2, testee.priority)
     }
 
     @Test
     fun evaluatorHasCorrectId() {
-        assertEquals("win_back_prompt", testee.evaluatorId)
+        assertEquals("re_engagement_prompt", testee.evaluatorId)
     }
 
     private fun givenTogglesEnabled() {
         fakeReactivateUsersToggles.self().setRawStoredState(State(true))
-        fakeReactivateUsersToggles.defaultBrowserWinBackPrompt().setRawStoredState(State(true))
+        fakeReactivateUsersToggles.browserComparisonPrompt().setRawStoredState(State(true))
+    }
+
+    private suspend fun givenLapsedUser() {
+        givenInstalledDaysAgo(30L)
+        whenever(mockUserBrowserProperties.daysUsedSince(any())).thenReturn(0L)
     }
 
     private suspend fun givenUserIsEligible() {
-        whenever(mockOnboardingFlowChecker.isOnboardingComplete()).thenReturn(true)
-        whenever(mockUserBrowserProperties.wasEverDefaultBrowser()).thenReturn(true)
+        givenLapsedUser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+    }
+
+    private fun givenInstalledDaysAgo(days: Long) {
+        val firstInstallTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days)
+        val packageInfo = PackageInfo().apply { this.firstInstallTime = firstInstallTime }
+        whenever(mockPackageManager.getPackageInfo(PACKAGE_NAME, 0)).thenReturn(packageInfo)
+    }
+
+    companion object {
+        private const val PACKAGE_NAME = "com.duckduckgo.test"
     }
 }
