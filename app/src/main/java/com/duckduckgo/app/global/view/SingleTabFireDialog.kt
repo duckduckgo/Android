@@ -240,6 +240,14 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
+        val animationRes = if (state.stateData.isBrandDesignEnabled) {
+            R.raw.fire_dialog_animation_brand_design
+        } else {
+            R.raw.fire_dialog_animation
+        }
+        binding.fireIcon.setAnimation(animationRes)
+        binding.fireIcon.playAnimation()
+
         if (!state.stateData.isFirePictogramVisible) {
             binding.fireIcon.gone()
         }
