@@ -31,8 +31,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -527,6 +529,26 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         binding.daxDialogCta.cardView.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
         binding.daxDialogCta.root.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 20.toPx() }
 
+        // Activity-level decorFitsSystemWindows is false (applyFullScreenFlags), so the dialog
+        // is measured against the full screen and doesn't shrink when the keyboard appears.
+        // The dialog is centered (bias=0.5) and 85% tall, so its bottom edge sits ~7.5% of the
+        // screen below the keyboard top. Apply just enough bottom padding to cap the inner
+        // content area at the keyboard top, so the inner ScrollView can scroll without
+        // changing the bubble's top margin.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.daxCtaContainer) { v, insets ->
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val parent = v.parent as? View
+            val paddingNeeded = if (parent != null && ime.bottom > 0) {
+                val keyboardTopY = parent.height - ime.bottom
+                (v.bottom - keyboardTopY).coerceAtLeast(0)
+            } else {
+                0
+            }
+            v.updatePadding(bottom = paddingNeeded)
+            insets
+        }
+        ViewCompat.requestApplyInsets(binding.daxDialogCta.daxCtaContainer)
+
         val ctaText = ctx.getString(R.string.preOnboardingInputModeDemoTitle)
         binding.daxDialogCta.hiddenTextCta.text = ctaText.html(ctx)
         binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
@@ -641,16 +663,18 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             }
         }
 
+        // Let the EditText grow vertically with content so the outer ScrollView can handle
+        // scrolling instead of the EditText's internal scroll (which the outer ScrollView
+        // intercepts). minLines still differs by mode to keep the initial visual cue.
+        inputScreenPreviewBinding.inputText.maxLines = Int.MAX_VALUE
         when (inputMode) {
             SEARCH -> {
                 inputScreenPreviewBinding.inputText.minLines = 1
-                inputScreenPreviewBinding.inputText.maxLines = 1
                 inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
                 inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
             }
             CHAT -> {
                 inputScreenPreviewBinding.inputText.minLines = 3
-                inputScreenPreviewBinding.inputText.maxLines = 3
                 inputScreenPreviewBinding.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
                 inputScreenPreviewBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
             }
