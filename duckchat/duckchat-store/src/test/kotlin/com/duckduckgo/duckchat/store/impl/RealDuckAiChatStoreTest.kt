@@ -22,6 +22,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
+import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -195,5 +196,48 @@ class RealDuckAiChatStoreTest {
 
         assertTrue(store.deleteChat("abc"))
         verify(chatsDao).delete("abc")
+    }
+
+    // --- deleteAllChats ---
+
+    @Test
+    fun `deleteAllChats clears all chats and file metadata`() = runTest {
+        whenever(fileMetaDao.getAll()).thenReturn(emptyList())
+
+        store.deleteAllChats()
+
+        verify(chatsDao).deleteAll()
+        verify(fileMetaDao).deleteAll()
+    }
+
+    @Test
+    fun `deleteAllChats deletes files from disk`() = runTest {
+        val file = File(filesDir, "uuid1").also { it.writeText("data") }
+        whenever(fileMetaDao.getAll()).thenReturn(
+            listOf(DuckAiBridgeFileMetaEntity("uuid1", "chat1", "file.png", "image/png")),
+        )
+
+        store.deleteAllChats()
+
+        assertFalse(file.exists())
+        verify(fileMetaDao).deleteAll()
+        verify(chatsDao).deleteAll()
+    }
+
+    @Test
+    fun `deleteAllChats ignores path traversal fileRefs`() = runTest {
+        val safeFile = File(filesDir, "uuid1").also { it.writeText("data") }
+        whenever(fileMetaDao.getAll()).thenReturn(
+            listOf(
+                DuckAiBridgeFileMetaEntity("uuid1", "chat1", "file.png", "image/png"),
+                DuckAiBridgeFileMetaEntity("../../etc/passwd", "chat2", "bad.txt", "text/plain"),
+            ),
+        )
+
+        store.deleteAllChats()
+
+        assertFalse(safeFile.exists())
+        // traversal file should not be deleted — it's outside filesDir
+        verify(chatsDao).deleteAll()
     }
 }

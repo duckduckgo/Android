@@ -21,7 +21,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete
 
 data class AutoCompleteViewState(
     val showSuggestions: Boolean = false,
-    val showFavorites: Boolean = false,
+    val showFocusedView: Boolean = false,
     val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
     val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
 )

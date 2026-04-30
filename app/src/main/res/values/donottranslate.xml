@@ -92,12 +92,6 @@
       }]
     </string>
 
-    <!-- Sync Restore (onboarding) -->
-    <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
-    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
-    <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
-    <string name="syncRestoreDialogSecondaryCta">Skip</string>
-
     <!--Onboarding Rebrand Design Update-->
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
@@ -116,4 +110,8 @@
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
+    <!-- Sharing options -->
+    <string name="copyLinkText">Copy Link Text</string>
+    <string name="linkTextCopied">Link text copied</string>
+    <string name="linkTextCopyFailed">Couldn\'t copy link text</string>
 </resources>

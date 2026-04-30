@@ -56,6 +56,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -131,6 +132,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var duckChatFeature: DuckChatFeature
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -274,6 +278,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureViewPager()
 
         binding.newTabContainerScrollView.setViewPager(binding.viewPager)
+
+        configureKeyboardDismissOnScroll()
 
         if (!useTopBar) {
             binding.autoCompleteBottomFadeContainer.isVisible = false
@@ -513,7 +519,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             onVoiceClick = {
                 val isChatTab = inputModeWidget.isChatTabSelected()
-                if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+                if (isChatTab && duckAiFeatureState.showVoiceChatEntry.value) {
                     viewModel.onVoiceEntryTapped()
                 } else {
                     voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
@@ -648,7 +654,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         inputScreenButtons.onVoiceSearchClick = {
             val isChatTab = inputModeWidget.isChatTabSelected()
-            if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+            if (isChatTab && duckAiFeatureState.showVoiceChatEntry.value) {
                 viewModel.onVoiceEntryTapped()
             } else {
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
@@ -656,7 +662,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         inputScreenButtons.onVoiceChatClick = {
             val isChatTab = inputModeWidget.isChatTabSelected()
-            if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+            if (isChatTab && duckAiFeatureState.showVoiceChatEntry.value) {
                 viewModel.onVoiceEntryTapped()
             } else {
                 voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
@@ -701,6 +707,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onResume() {
         super.onResume()
         viewModel.onActivityResume()
+    }
+
+    private fun configureKeyboardDismissOnScroll() {
+        binding.newTabContainerScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+            hideKeyboard(inputModeWidget.inputField)
+        }
     }
 
     private fun configureKeyboardListener() {
@@ -800,6 +812,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputScreenButtons.setSendButtonVisible(isOnChatTab && state.submitButtonVisible)
         }
         inputModeWidget.setMainButtonsVisible(state.mainButtonsVisible)
+    }
+
+    fun dismissKeyboard() {
+        hideKeyboard(inputModeWidget.inputField)
     }
 
     fun getFavoritesContainer(): FrameLayout = binding.newTabContainerLayout

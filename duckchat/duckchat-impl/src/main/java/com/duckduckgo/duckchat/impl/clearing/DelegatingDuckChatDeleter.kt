@@ -54,4 +54,15 @@ class DelegatingDuckChatDeleter @Inject constructor(
         }
         return@withContext deleter.deleteChat(chatId)
     }
+
+    override suspend fun deleteAllChats(): Boolean = withContext(dispatchers.io()) {
+        val hasMigrated = store.hasMigrated()
+        val deleter = if (hasMigrated && feature.useNativeStorageChatData().isEnabled()) nativeDeleter else webViewDeleter
+        logcat { "DuckAI delete all chats: using ${if (deleter === nativeDeleter) "native store" else "WebView"} deleter" }
+        pixels.get().reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
+        if (hasMigrated && deleter != nativeDeleter) {
+            nativeDeleter.deleteAllChats()
+        }
+        return@withContext deleter.deleteAllChats()
+    }
 }

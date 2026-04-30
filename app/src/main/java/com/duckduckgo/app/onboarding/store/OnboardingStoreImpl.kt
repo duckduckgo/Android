@@ -94,7 +94,7 @@ class OnboardingStoreImpl @Inject constructor(
             ),
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3),
-                iconRes = drawable.ic_ai_chat_16,
+                iconRes = drawable.ic_wand_16,
                 link = context.getString(R.string.preOnboardingInputModeDemoChatSuggestion3Prompt),
             ),
         )

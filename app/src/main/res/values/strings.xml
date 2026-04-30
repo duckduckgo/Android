@@ -977,6 +977,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Search or visit your favorite sites privately with one tap. Voice Search and Duck.ai available if enabled.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
+    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
+    <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
+    <string name="syncRestoreDialogSecondaryCta">Skip</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Copy Link Text</string>
     <string name="linkTextCopied">Link text copied</string>

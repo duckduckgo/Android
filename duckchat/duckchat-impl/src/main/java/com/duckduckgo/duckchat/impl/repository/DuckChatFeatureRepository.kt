@@ -39,6 +39,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setShowInVoiceSearch(showToggle: Boolean)
 
+    suspend fun setShowInVoiceChat(showToggle: Boolean)
+
     suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean)
 
     suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
@@ -59,6 +61,8 @@ interface DuckChatFeatureRepository {
 
     fun observeShowInVoiceSearch(): Flow<Boolean>
 
+    fun observeShowInVoiceChat(): Flow<Boolean>
+
     fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
@@ -78,6 +82,8 @@ interface DuckChatFeatureRepository {
     suspend fun shouldShowInAddressBar(): Boolean
 
     suspend fun shouldShowInVoiceSearch(): Boolean
+
+    suspend fun shouldShowInVoiceChat(): Boolean
 
     suspend fun registerOpened()
 
@@ -138,6 +144,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInVoiceSearch(showToggle)
     }
 
+    override suspend fun setShowInVoiceChat(showToggle: Boolean) {
+        duckChatDataStore.setShowInVoiceChat(showToggle)
+    }
+
     override suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean) {
         duckChatDataStore.setAutomaticPageContextAttachment(isEnabled)
     }
@@ -164,6 +174,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceSearch()
 
+    override fun observeShowInVoiceChat(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceChat()
+
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
         duckChatDataStore.observeChatSuggestionsUserSettingEnabled()
 
@@ -184,6 +196,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
 
     override suspend fun shouldShowInVoiceSearch(): Boolean = duckChatDataStore.getShowInVoiceSearch()
+
+    override suspend fun shouldShowInVoiceChat(): Boolean = duckChatDataStore.getShowInVoiceChat()
 
     override suspend fun registerOpened() {
         if (!duckChatDataStore.wasOpenedBefore()) {

@@ -978,6 +978,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tee hakuja ja käy lempisivustoillasi yhdellä napautuksella. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Jatketaan siitä, mihin jäit</string>
+    <string name="syncRestoreDialogDescription">Haluatko palauttaa kirjanmerkit, salasanat ja muita tietoja edellisestä DuckDuckGo-synkronoinnistasi?</string>
+    <string name="syncRestoreDialogPrimaryCta">Palauta tiedot</string>
+    <string name="syncRestoreDialogSecondaryCta">Ohita</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopioi linkin teksti</string>
     <string name="linkTextCopied">Linkin teksti kopioitu</string>

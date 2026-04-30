@@ -1018,6 +1018,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Z enim dotikom zasebno poiščite ali obiščite svoja najljubša spletna mesta. Glasovno iskanje in Duck.ai sta na voljo, če sta omogočena.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Nadaljujmo tam, kjer ste končali</string>
+    <string name="syncRestoreDialogDescription">Želite obnoviti zaznamke, gesla in drugo iz prejšnje sinhronizacije DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Obnovi moje stvari</string>
+    <string name="syncRestoreDialogSecondaryCta">Preskoči</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopiraj besedilo povezave</string>
     <string name="linkTextCopied">Besedilo povezave je bilo kopirano</string>

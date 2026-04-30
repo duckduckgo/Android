@@ -998,6 +998,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Caută sau vizitează site-urile preferate în mod privat, cu o singură atingere. Căutarea vocală și Duck.ai sunt disponibile dacă sunt activate.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Să continuăm de unde ai rămas</string>
+    <string name="syncRestoreDialogDescription">Vrei să restaurezi marcajele, parolele și alte elemente din sincronizarea anterioară DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
+    <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Copiază textul linkului</string>
     <string name="linkTextCopied">Textul linkului a fost copiat</string>

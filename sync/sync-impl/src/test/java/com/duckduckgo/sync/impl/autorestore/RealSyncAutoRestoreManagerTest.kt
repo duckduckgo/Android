@@ -22,6 +22,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
@@ -148,11 +150,23 @@ class RealSyncAutoRestoreManagerTest {
     }
 
     @Test
-    fun whenClearAutoRestoreDataCalledThenClearsPersistentStorageAndResetsPreference() = runTest {
-        testee.clearAutoRestoreData()
+    fun whenClearAutoRestoreDataSucceedsThenClearsPersistentStorageAndResetsPreference() = runTest {
+        val result = testee.clearAutoRestoreData()
 
         verify(persistentStorage).clear(any())
         verify(dataStore).setRestoreOnReinstallEnabled(false)
+        assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenClearAutoRestoreDataFailsThenPreferenceNotReset() = runTest {
+        whenever(persistentStorage.clear(any())).thenReturn(Result.failure(RuntimeException("Block Store error")))
+
+        val result = testee.clearAutoRestoreData()
+
+        verify(persistentStorage).clear(any())
+        verify(dataStore, never()).setRestoreOnReinstallEnabled(false)
+        assertTrue(result is Error)
     }
 
     @Test

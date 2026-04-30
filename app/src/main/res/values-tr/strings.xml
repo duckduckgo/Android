@@ -978,6 +978,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tek dokunuşla favori sitelerinizi gizlice arayın veya ziyaret edin. Etkinleştirildiğinde Sesli Arama ve Duck.ai kullanılabilir.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Kaldığınız yerden devam edelim</string>
+    <string name="syncRestoreDialogDescription">Önceki DuckDuckGo senkronizasyonundan yer işaretleri, şifreler ve daha fazlasını geri yüklemek mi istiyorsunuz?</string>
+    <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
+    <string name="syncRestoreDialogSecondaryCta">Atla</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
     <string name="linkTextCopied">Bağlantı metni kopyalandı</string>

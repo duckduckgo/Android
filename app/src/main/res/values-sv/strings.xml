@@ -978,6 +978,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Gör sökningar eller besök dina favoritwebbplatser privat med ett tryck. Röstsökning och Duck.ai kan användas efter aktivering.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Vi fortsätter där du slutade</string>
+    <string name="syncRestoreDialogDescription">Vill du återställa dina bokmärken, lösenord med mera från din tidigare DuckDuckGo-synkronisering?</string>
+    <string name="syncRestoreDialogPrimaryCta">Återställ mitt innehåll</string>
+    <string name="syncRestoreDialogSecondaryCta">Hoppa över</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopiera länktext</string>
     <string name="linkTextCopied">Länktext kopierad</string>

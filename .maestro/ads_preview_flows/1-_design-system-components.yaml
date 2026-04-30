@@ -30,8 +30,26 @@ tags:
               text: "Text Appearance Caption"
             direction: DOWN
         - tapOn: "BUTTONS"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Primary Large"
+            direction: DOWN
         - tapOn: "Primary Large"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Secondary Small"
+            direction: DOWN
         - tapOn: "Secondary Small"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Destructive Small"
+            direction: DOWN
         - tapOn: "Destructive Small"
         - tapOn: "TEXT INPUT"
         - tapOn: "DIALOGS"

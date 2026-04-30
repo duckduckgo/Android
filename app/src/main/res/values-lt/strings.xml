@@ -1018,6 +1018,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Ieškokite arba lankykitės savo mėgstamose svetainėse privačiai vienu spustelėjimu. Jei įjungta, galima naudotis paieška balsu ir „Duck.ai“.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Tęsk nuo ten, kur baigei</string>
+    <string name="syncRestoreDialogDescription">Ar nori atkurti žymes, slaptažodžius ir kt. iš ankstesnės „DuckDuckGo“ sinchronizacijos?</string>
+    <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
+    <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopijuoti nuorodos tekstą</string>
     <string name="linkTextCopied">Nuorodos tekstas nukopijuotas</string>

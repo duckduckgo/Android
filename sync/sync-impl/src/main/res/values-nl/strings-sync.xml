@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Herstelcode downloaden als PDF-bestand</string>
     <string name="sync_settings_download_recovery_code_item_hint">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest — bewaar hem veilig.</string>
     <string name="sync_settings_data_expiration">Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit. <annotation type="learn_more_link">Meer informatie</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Gegevens van eerdere installatie herstellen, synchroniseren en back-uppen?</string>
+    <string name="sync_previous_session_ready_body">Herstel je eerdere bladwijzers, wachtwoorden en andere gegevens in DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Herstel Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Nieuwe synchronisatie instellen</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Eenvoudig je gegevens herstellen</string>
+    <string name="sync_recover_data_content">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest. Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit.</string>
+    <string name="sync_recover_data_recovery_code_label">Herstelcode</string>
+    <string name="sync_recover_data_download_pdf">Downloaden als PDF</string>
+    <string name="sync_restore_on_reinstall_title">Herstellen bij app-herinstallatie</string>
+    <string name="sync_restore_on_reinstall_description">Als je de DuckDuckGo-app opnieuw installeert, vragen we of je je gegevens op dit apparaat wilt herstellen.</string>
 </resources>

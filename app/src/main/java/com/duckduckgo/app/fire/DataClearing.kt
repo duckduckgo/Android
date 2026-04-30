@@ -32,6 +32,8 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -71,6 +73,7 @@ class DataClearing @Inject constructor(
     private val duckChat: DuckChat,
     private val contextualDataStore: DuckChatContextualDataStore,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val dataClearingTrigger: DataClearingTrigger,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
@@ -130,7 +133,7 @@ class DataClearing @Inject constructor(
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
         logcat { "clearDuckAiChatIfNeeded url=$tabUrl" }
         if (tabUrl == null) return
-        duckChat.deleteChat(tabUrl)
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Single(tabUrl)))
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
@@ -251,6 +254,7 @@ class DataClearing @Inject constructor(
 
         if (shouldClearDuckAiChats) {
             clearDataAction.clearDuckAiChatsOnly()
+            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.All))
         }
 
         logcat { "Granular clear completed" }

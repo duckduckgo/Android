@@ -111,7 +111,7 @@ class SubscriptionWebViewViewModelTest {
             flowTest.emit(CurrentPurchase.Failure("test"))
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
 
-            flowTest.emit(CurrentPurchase.Success)
+            flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
             val success = awaitItem().purchaseState
             assertTrue(success is Success)
             assertEquals(Companion.PURCHASE_COMPLETED_FEATURE_NAME, (success as Success).subscriptionEventData.featureName)
@@ -728,7 +728,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenAddEmailClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -756,7 +756,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -784,7 +784,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsItrAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -813,7 +813,7 @@ class SubscriptionWebViewViewModelTest {
     fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirDisabledThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -829,7 +829,7 @@ class SubscriptionWebViewViewModelTest {
     fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowAndPirEnabledThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -857,7 +857,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenFeatureSelectedAndFeatureIsDuckAiAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -885,7 +885,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
@@ -913,7 +913,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenOnSubscriptionRestoredFromEmailAndSubscriptionExpiredThenCommandIsSent() = runTest {
         givenSubscriptionStatus(EXPIRED)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.commands().test {
@@ -926,7 +926,7 @@ class SubscriptionWebViewViewModelTest {
     @Test
     fun whenOnSubscriptionRestoredFromEmailAndSubscriptionActiveThenCommandIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
-        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success(isFreeTrial = false)))
         viewModel.start()
 
         viewModel.commands().test {

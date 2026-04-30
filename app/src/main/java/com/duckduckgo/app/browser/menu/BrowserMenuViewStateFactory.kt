@@ -160,6 +160,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
+            showDownloadPdfMenuItem = browserViewState.currentPdfCachedUri != null,
             pageContextHeader = createBrowserHeaderContextState(browserViewState, title, tabId, shortUrl, omnibarText, serpLogoUrl, siteUrl),
         )
     }

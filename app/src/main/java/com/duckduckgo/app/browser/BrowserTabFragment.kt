@@ -92,6 +92,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
@@ -156,6 +157,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -362,6 +365,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -445,6 +449,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var pdfPreviewGenerator: PdfPreviewGenerator
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -658,6 +665,14 @@ class BrowserTabFragment :
     private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+    private val autoCompleteKeyboardDismissScrollListener =
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    hideKeyboardRetainFocus()
+                }
+            }
+        }
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
@@ -993,7 +1008,7 @@ class BrowserTabFragment :
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
                     when (val result = it.result) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
-                            nativeInputManager.hideNativeInput(animate = false)
+                            nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
                             omnibar.setText(result.query)
                             userEnteredQuery(result.query)
                         }
@@ -1795,6 +1810,9 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
             }
+            onMenuItemClicked(downloadPdfMenuItem) {
+                viewModel.onDownloadPdfMenuItemClicked()
+            }
             onMenuItemClicked(addToHomeMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                 viewModel.onPinPageToHomeSelected()
@@ -2038,9 +2056,11 @@ class BrowserTabFragment :
 
     override fun onDestroyView() {
         binding.swipeRefreshContainer.removeCanChildScrollUpCallback()
+        binding.autoCompleteSuggestionsList.removeOnScrollListener(autoCompleteKeyboardDismissScrollListener)
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        hidePdf()
         contextualSheetLayoutChangeListener?.let { binding.rootView.removeOnLayoutChangeListener(it) }
         contextualSheetLayoutChangeListener = null
         contextualSheetBottomSheetCallback?.let {
@@ -2235,6 +2255,7 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
 
         browserNavigationBarIntegration.configureNewTabViewMode()
     }
@@ -2249,8 +2270,54 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun showPdf(url: String, cachedFileUri: Uri) {
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
+        binding.browserLayout.show()
+        webViewContainer.gone()
+        webView?.onPause()
+        webView?.hide()
+        errorView.errorLayout.gone()
+        sslErrorView.gone()
+        maliciousWarningView.gone()
+
+        binding.pdfViewerContainer.show()
+        val pdfFragment = DdgPdfViewerFragment()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.pdfViewerContainer, pdfFragment, PDF_VIEWER_FRAGMENT_TAG)
+            .commitNowAllowingStateLoss()
+        // documentUri must be set AFTER the fragment is attached — PdfViewerFragmentV2's setter
+        // resolves a viewModels() delegate, which throws IllegalStateException if detached.
+        pdfFragment.documentUri(cachedFileUri)
+
+        binding.swipeRefreshContainer.isEnabled = false
+        omnibar.setViewMode(ViewMode.Pdf(url))
+        browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun hidePdf() {
+        // Most callers (showHome / showBrowser / showError / NewTab navigation) invoke this
+        // defensively even when no PDF is showing. Skip the inset re-dispatch and other work
+        // unless there's actually a PDF fragment to remove.
+        val pdfFragment = childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) ?: return
+        childFragmentManager.beginTransaction()
+            .remove(pdfFragment)
+            .commitAllowingStateLoss()
+        binding.pdfViewerContainer.gone()
+        binding.swipeRefreshContainer.isEnabled = true
+        viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
+        // PdfViewerFragmentV2 dispatches window insets to handle edge-to-edge, which can
+        // leave a bottom padding on the WebView. Re-dispatch so siblings recompute insets.
+        ViewCompat.requestApplyInsets(binding.root)
+    }
+
+    private fun isPdfVisible(): Boolean {
+        return childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) != null
     }
 
     private fun showError(
@@ -2262,6 +2329,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
@@ -2418,6 +2486,7 @@ class BrowserTabFragment :
     }
 
     fun submitQuery(query: String) {
+        nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -2598,6 +2667,7 @@ class BrowserTabFragment :
 
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
+                if (isPdfVisible()) showBrowser()
                 navigate(it.url, it.headers)
             }
 
@@ -2909,6 +2979,14 @@ class BrowserTabFragment :
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
+
+            is Command.ShowPdfInTab -> {
+                showPdf(it.url, it.cachedFileUri)
+            }
+
+            is Command.ExpandOmnibar -> {
+                omnibar.setExpanded(true)
+            }
         }
     }
 
@@ -3185,21 +3263,30 @@ class BrowserTabFragment :
     }
 
     private fun generateWebViewPreviewImage() {
-        webView?.let { webView ->
+        val viewToCapture: android.view.View? = if (isPdfVisible()) {
+            binding.pdfViewerContainer
+        } else {
+            webView
+        }
 
+        viewToCapture?.let { view ->
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
 
             bitmapGeneratorJob =
                 launch {
-                    logcat { "Generating WebView preview" }
+                    logcat { "Generating preview (pdf=${isPdfVisible()})" }
                     try {
-                        val preview = previewGenerator.generatePreview(webView)
+                        val preview = if (view is android.webkit.WebView) {
+                            previewGenerator.generatePreview(view)
+                        } else {
+                            pdfPreviewGenerator.generatePreview(view)
+                        }
                         val fileName = previewPersister.save(preview, tabId)
                         viewModel.updateTabPreview(tabId, fileName)
                         logcat { "Saved and updated tab preview" }
                     } catch (e: Exception) {
-                        logcat { "Failed to generate WebView preview: ${e.asLog()}" }
+                        logcat { "Failed to generate preview: ${e.asLog()}" }
                     }
                 }
         }
@@ -3561,7 +3648,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener = {
-                    nativeInputManager.hideNativeInput(animate = false)
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
                     viewModel.userSelectedAutocomplete(it)
                 },
                 editableSearchClickListener = {
@@ -3573,6 +3660,10 @@ class BrowserTabFragment :
                 omnibarType = settingsDataStore.omnibarType,
             )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.removeOnScrollListener(autoCompleteKeyboardDismissScrollListener)
+        binding.autoCompleteSuggestionsList.addOnScrollListener(
+            autoCompleteKeyboardDismissScrollListener,
+        )
     }
 
     private fun configureNewTab() {
@@ -3580,6 +3671,10 @@ class BrowserTabFragment :
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
+        }
+
+        binding.focusedView.setOnScrollChangeListener {
+            hideKeyboardRetainFocus()
         }
 
         if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
@@ -3785,8 +3880,8 @@ class BrowserTabFragment :
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
-                override fun onBackKeyPressed() {
-                    onOmnibarBackKeyPressed()
+                override fun onBackKeyPressed(): Boolean {
+                    return onOmnibarBackKeyPressed()
                 }
 
                 override fun onEnterPressed() {
@@ -3837,9 +3932,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun onOmnibarBackKeyPressed() {
+    private fun onOmnibarBackKeyPressed(): Boolean {
+        val wasOverlayVisible = binding.focusedView.isVisible || binding.autoCompleteSuggestionsList.isVisible
         omnibar.omnibarTextInput.hideKeyboard()
         binding.focusDummy.requestFocus()
+        return wasOverlayVisible
     }
 
     private fun onFindInPageDismissed() {
@@ -4436,7 +4533,7 @@ class BrowserTabFragment :
         if (this.isResumed) {
             if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
                 pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     val text = extractLinkText()
                     if (text.isNullOrEmpty()) {
                         viewModel.onLinkTextCopyFailed()
@@ -4730,9 +4827,12 @@ class BrowserTabFragment :
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob +=
             lifecycleScope.launch {
-                viewModel.downloadCommands().cancellable().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).collectLatest {
-                    processFileDownloadedCommand(it)
-                }
+                merge(viewModel.downloadCommands(), viewModel.pdfDownloadCommands())
+                    .cancellable()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                    .collectLatest {
+                        processFileDownloadedCommand(it)
+                    }
             }
     }
 
@@ -4750,6 +4850,17 @@ class BrowserTabFragment :
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
         if (nativeInputManager.hideNativeInput()) return true
+        if (isPdfVisible()) {
+            hidePdf()
+            val currentUrl = webView?.url
+            // WebView lost its content after process death
+            if (currentUrl.isNullOrBlank() || currentUrl == "about:blank") {
+                viewModel.onUserPressedBack(isCustomTab)
+            } else {
+                showBrowser()
+            }
+            return true
+        }
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
@@ -5043,6 +5154,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
+        private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
@@ -5491,10 +5603,10 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
-                // viewState.showFavourites needs to be moved to FocusedViewModel
-                if (viewState.showSuggestions || viewState.showFavorites) {
-                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        showFocusedView()
+                // viewState.showFocusedView needs to be moved to FocusedViewModel
+                if (viewState.showSuggestions || viewState.showFocusedView) {
+                    if (viewState.showFocusedView) {
+                        showFocusedView(viewState.favorites.isNotEmpty())
                         if (binding.autoCompleteSuggestionsList.isVisible) {
                             viewModel.autoCompleteSuggestionsGone()
                         }
@@ -5514,8 +5626,9 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showFocusedView() {
+        private fun showFocusedView(hasFavorites: Boolean = true) {
             binding.focusedView.show()
+            binding.focusedView.showLogo(!hasFavorites)
         }
 
         private fun hideFocusedView() {

@@ -21,8 +21,11 @@ import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
@@ -83,6 +86,7 @@ class BrandDesignUpdatePageViewModelTest {
     )
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
+    private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -97,6 +101,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockAndroidBrowserConfigFeature,
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
+            mockDuckAiOnboardingExperimentManager,
         )
     }
 
@@ -711,6 +716,159 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
         testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
         verify(mockPixel).fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+    }
+
+    // endregion
+
+    // region onPrimaryCtaClicked - input screen enrollment
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsNullThenFinish() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(true)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.commands.test {
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
+            val command = awaitItem()
+            assertTrue(command is Command.Finish)
+        }
+    }
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsControlThenFinish() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(true)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.commands.test {
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
+            val command = awaitItem()
+            assertTrue(command is Command.Finish)
+        }
+    }
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentDuckAiThenShowInputScreenPreview() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
+        val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
+        val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
+        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(chatSuggestions)
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(true)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.viewState.test {
+            val preInputScreen = awaitItem()
+            assertEquals(PreOnboardingDialogType.INPUT_SCREEN, preInputScreen.currentDialog)
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, state.currentDialog)
+            assertFalse(state.inputScreenPreviewIsSearchSelected)
+            assertEquals(searchOptions, state.inputScreenPreviewSearchSuggestions)
+            assertEquals(chatSuggestions, state.inputScreenPreviewChatSuggestions)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentSearchThenShowInputScreenPreviewWithSearchDefault() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+        val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
+        val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(searchOptions)
+        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(chatSuggestions)
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(true)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.viewState.test {
+            val preInputScreen = awaitItem()
+            assertEquals(PreOnboardingDialogType.INPUT_SCREEN, preInputScreen.currentDialog)
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.INPUT_SCREEN_PREVIEW, state.currentDialog)
+            assertTrue(state.inputScreenPreviewIsSearchSelected)
+            assertEquals(searchOptions, state.inputScreenPreviewSearchSuggestions)
+            assertEquals(chatSuggestions, state.inputScreenPreviewChatSuggestions)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenDoNotEnrollAndFinish() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(false)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.commands.test {
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
+            val command = awaitItem()
+            assertTrue(command is Command.Finish)
+        }
+        verify(mockDuckAiOnboardingExperimentManager, never()).enroll()
+    }
+
+    // endregion
+
+    // region onPrimaryCtaClicked - input screen preview
+
+    @Test
+    fun whenPrimaryCtaFromInputScreenPreviewThenFinish() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
+        whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(emptyList())
+        val testee = createViewModel()
+        testee.onDefaultBrowserSet()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onInputScreenOptionSelected(true)
+        testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
+        testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
+        testee.commands.test {
+            testee.onPrimaryCtaClicked() // INPUT_SCREEN_PREVIEW -> Finish
+            val command = awaitItem()
+            assertTrue(command is Command.Finish)
+        }
+    }
+
+    // endregion
+
+    // region onInputModeDemoQuerySubmitted
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedWithChatThenSendFinishAndSubmitChatPromptCommand() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onInputModeDemoQuerySubmitted("hello world", isChat = true)
+            val command = awaitItem()
+            assertTrue(command is Command.FinishAndSubmitChatPrompt)
+            assertEquals("hello world", (command as Command.FinishAndSubmitChatPrompt).prompt)
+        }
+    }
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedWithSearchThenSendFinishAndSubmitSearchQueryCommand() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onInputModeDemoQuerySubmitted("search query", isChat = false)
+            val command = awaitItem()
+            assertTrue(command is Command.FinishAndSubmitSearchQuery)
+            assertEquals("search query", (command as Command.FinishAndSubmitSearchQuery).query)
+        }
     }
 
     // endregion

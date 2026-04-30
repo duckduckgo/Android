@@ -998,6 +998,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Savas iecienītākās vietnes meklē vai apmeklē privāti ar vienu pieskārienu. Balss meklēšana un Duck.ai ir pieejami, ja tie iespējoti.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Turpināsim no vietas, kur beidzi</string>
+    <string name="syncRestoreDialogDescription">Vai vēlies atjaunot grāmatzīmes, paroles un citus datus no iepriekšējās DuckDuckGo sinhronizācijas?</string>
+    <string name="syncRestoreDialogPrimaryCta">Manas lietas atjaunošana</string>
+    <string name="syncRestoreDialogSecondaryCta">Izlaist</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Saites teksta kopēšana</string>
     <string name="linkTextCopied">Saites teksts nokopēts</string>

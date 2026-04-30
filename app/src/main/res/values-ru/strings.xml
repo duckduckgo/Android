@@ -1018,6 +1018,12 @@
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Поиск или посещение любимых сайтов в приватном режиме одним касанием. По желанию можно включить голосовой поиск и Duck.ai.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Давайте продолжим с того места, где вы остановились</string>
+    <string name="syncRestoreDialogDescription">Восстановить закладки, пароли и другие данные из предыдущей синхронизации DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
+    <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Скопировать текст ссылки</string>
     <string name="linkTextCopied">Текст ссылки скопирован</string>
