@@ -5099,6 +5099,16 @@ class BrowserTabViewModel @Inject constructor(
         command.value = GenerateWebViewPreviewImage
     }
 
+    fun onLinkTextCopied(wasNotificationShown: Boolean) {
+        if (!wasNotificationShown) {
+            command.value = Command.ShowToast(R.string.linkTextCopied)
+        }
+    }
+
+    fun onLinkTextCopyFailed() {
+        command.value = Command.ShowToast(R.string.linkTextCopyFailed)
+    }
+
     fun onBookmarksMenuItemClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED)
         launchBookmarksActivity()
