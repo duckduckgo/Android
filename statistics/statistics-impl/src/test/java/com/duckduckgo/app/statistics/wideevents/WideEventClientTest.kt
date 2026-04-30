@@ -338,8 +338,7 @@ class WideEventClientTest {
                 eventId = wideEventId,
                 name = key,
                 timeout = Duration.ofSeconds(5),
-                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS
-                    .mapTo(mutableSetOf()) { it.toJavaDuration() },
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
             )
         }
 
@@ -358,7 +357,7 @@ class WideEventClientTest {
                 eventId = 1L,
                 name = "k",
                 timeout = null,
-                buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+                buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
             )
         }
 

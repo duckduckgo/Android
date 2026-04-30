@@ -107,7 +107,7 @@ data class WideEventEntity(
         @Json(name = "timeout")
         val timeout: Duration?,
         @Json(name = "buckets")
-        val buckets: Set<Duration>?,
+        val buckets: List<Duration>?,
     )
 }
 

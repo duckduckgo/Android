@@ -27,10 +27,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -492,7 +494,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
-            buckets = setOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2)),
+            buckets = listOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2)),
         )
 
         timeProvider.currentTime += Duration.ofMillis(750)
@@ -515,7 +517,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
-            buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(2)),
+            buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(2)),
         )
 
         timeProvider.currentTime += Duration.ofSeconds(10)
@@ -538,7 +540,7 @@ class WideEventRepositoryTest {
             eventId = eventId,
             name = "interval_1",
             timeout = null,
-            buckets = setOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+            buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
         )
 
         timeProvider.currentTime += Duration.ofMillis(50)
@@ -579,7 +581,7 @@ class WideEventRepositoryTest {
             metadata = emptyMap(),
             cleanupPolicy = DEFAULT_CLEANUP_POLICY,
         )
-        val customBuckets = setOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2))
+        val customBuckets = listOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2))
 
         wideEventRepository.startInterval(
             eventId = eventId,
@@ -591,6 +593,52 @@ class WideEventRepositoryTest {
         val readBack = wideEventRepository.getWideEvents(setOf(eventId)).single()
         val interval = readBack.activeIntervals.single { it.name == "interval_1" }
         assertEquals(customBuckets, interval.buckets)
+    }
+
+    @Test
+    fun `startInterval persists buckets in ascending order regardless of input order`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+        val unorderedBuckets = listOf(Duration.ofSeconds(2), Duration.ofMillis(100), Duration.ofMillis(500))
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = unorderedBuckets,
+        )
+
+        val readBack = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        val interval = readBack.activeIntervals.single { it.name == "interval_1" }
+        assertEquals(
+            listOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2)),
+            interval.buckets,
+        )
+    }
+
+    @Test
+    fun `startInterval rejects negative bucket boundaries`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            runBlocking {
+                wideEventRepository.startInterval(
+                    eventId = eventId,
+                    name = "interval_1",
+                    timeout = null,
+                    buckets = listOf(Duration.ofMillis(-1), Duration.ofMillis(100)),
+                )
+            }
+        }
     }
 
     @Test
@@ -625,7 +673,7 @@ class WideEventRepositoryTest {
                 metadata = emptyMap(),
             )
 
-        val DEFAULT_BUCKETS: Set<Duration> = setOf(
+        val DEFAULT_BUCKETS: List<Duration> = listOf(
             Duration.ofSeconds(1),
             Duration.ofSeconds(5),
             Duration.ofSeconds(10),

@@ -117,7 +117,7 @@ class WideEventClientImpl @Inject constructor(
                 eventId = wideEventId,
                 name = key,
                 timeout = timeout?.toJavaDuration(),
-                buckets = buckets?.mapTo(mutableSetOf()) { it.toJavaDuration() },
+                buckets = buckets?.map { it.toJavaDuration() },
             )
         }
     }
