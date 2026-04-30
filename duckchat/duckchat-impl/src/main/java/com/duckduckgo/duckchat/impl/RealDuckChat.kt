@@ -37,7 +37,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -64,9 +66,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -128,6 +133,21 @@ interface DuckChatInternal : DuckChat {
      * Observes the last used toggle position.
      */
     fun observeLastUsedTogglePosition(): Flow<String?>
+
+    /**
+     * Updates the live input-mode selection. Called by [InputModeWidget] on every tab change.
+     * Backs the flow exposed by [DuckChatInputModeState.displayedMode].
+     */
+    fun setSelectedMode(mode: InputMode)
+
+    /**
+     * Updates whether the Duck.ai input widget's text field has focus. Called by
+     * [InputModeWidget] from its focus listener. Used together with the user's selection to
+     * compute the value emitted by [DuckChatInputModeState.displayedMode] — when the field is
+     * not focused, the toggle is treated as dormant and `displayedMode` collapses to
+     * [InputMode.SEARCH].
+     */
+    fun setInputWidgetFocused(focused: Boolean)
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -339,6 +359,7 @@ data class DuckChatSettingJson(
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
 @ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
+@ContributesBinding(AppScope::class, boundType = DuckChatInputModeState::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
@@ -360,6 +381,7 @@ class RealDuckChat @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatInternal,
     DuckAiFeatureState,
+    DuckChatInputModeState,
     PrivacyConfigCallbackPlugin {
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
@@ -381,6 +403,8 @@ class RealDuckChat @Inject constructor(
     private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
+    private val _selectedMode = MutableStateFlow(InputMode.SEARCH)
+    private val _inputWidgetFocused = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -808,6 +832,22 @@ class RealDuckChat @Inject constructor(
 
     override fun observeLastUsedTogglePosition(): Flow<String?> =
         duckChatFeatureRepository.observeLastUsedTogglePosition()
+
+    override val displayedMode: StateFlow<InputMode> =
+        combine(_selectedMode, _inputWidgetFocused) { mode, focused ->
+            // The toggle is dormant when the input field isn't focused; collapse to SEARCH so
+            // ambient UI (e.g. NTP background logo) reverts. The underlying user selection is
+            // preserved in _selectedMode and re-emerges as soon as the field regains focus.
+            if (focused) mode else InputMode.SEARCH
+        }.stateIn(appCoroutineScope, SharingStarted.Eagerly, InputMode.SEARCH)
+
+    override fun setInputWidgetFocused(focused: Boolean) {
+        _inputWidgetFocused.value = focused
+    }
+
+    override fun setSelectedMode(mode: InputMode) {
+        _selectedMode.value = mode
+    }
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()

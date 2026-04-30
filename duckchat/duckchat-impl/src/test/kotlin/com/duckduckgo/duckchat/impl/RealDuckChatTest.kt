@@ -33,6 +33,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -1702,4 +1703,57 @@ class RealDuckChatTest {
 
         assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
     }
+
+    // region displayedMode — focus-collapse semantics
+
+    @Test
+    fun `displayedMode is SEARCH on construction`() = runTest {
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `setSelectedMode without focus does not surface user selection on displayedMode`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `displayedMode emits user selection while widget focused`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+        testee.setInputWidgetFocused(true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `displayedMode reverts to SEARCH on focus loss`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+        testee.setInputWidgetFocused(true)
+        coroutineRule.testScope.advanceUntilIdle()
+        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
+
+        testee.setInputWidgetFocused(false)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `displayedMode returns to user selection on focus regain`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+        testee.setInputWidgetFocused(true)
+        testee.setInputWidgetFocused(false)
+        coroutineRule.testScope.advanceUntilIdle()
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+
+        testee.setInputWidgetFocused(true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
+    }
+
+    // endregion
 }

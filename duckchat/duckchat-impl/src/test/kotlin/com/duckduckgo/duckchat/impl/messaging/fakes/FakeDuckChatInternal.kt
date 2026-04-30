@@ -19,12 +19,15 @@ package com.duckduckgo.duckchat.impl.messaging.fakes
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
 /**
@@ -32,7 +35,7 @@ import kotlinx.coroutines.flow.map
  */
 class FakeDuckChatInternal(
     private var enabled: Boolean = true,
-) : DuckChatInternal {
+) : DuckChatInternal, DuckChatInputModeState {
 
     private val enableDuckChatUserSetting = MutableStateFlow(enabled)
     private val showInBrowserMenuUserSetting = MutableStateFlow(false)
@@ -194,6 +197,26 @@ class FakeDuckChatInternal(
     override suspend fun saveLastUsedTogglePosition(position: String) { }
 
     override fun observeLastUsedTogglePosition(): Flow<String?> = MutableStateFlow(null)
+
+    private val _selectedMode = MutableStateFlow(InputMode.SEARCH)
+    private val _inputWidgetFocused = MutableStateFlow(false)
+    private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
+
+    override val displayedMode: StateFlow<InputMode> = _displayedMode.asStateFlow()
+
+    override fun setSelectedMode(mode: InputMode) {
+        _selectedMode.value = mode
+        publishDisplayedMode()
+    }
+
+    override fun setInputWidgetFocused(focused: Boolean) {
+        _inputWidgetFocused.value = focused
+        publishDisplayedMode()
+    }
+
+    private fun publishDisplayedMode() {
+        _displayedMode.value = if (_inputWidgetFocused.value) _selectedMode.value else InputMode.SEARCH
+    }
 
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled
