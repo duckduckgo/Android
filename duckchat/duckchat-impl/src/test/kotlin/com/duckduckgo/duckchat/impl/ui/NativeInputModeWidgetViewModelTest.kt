@@ -270,7 +270,6 @@ class NativeInputModeWidgetViewModelTest {
     fun whenStorePendingPromptThenDelegatesToStoreWithModelId() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.firstOrNull()
 
         viewModel.storePendingPrompt("hello")
 
@@ -280,7 +279,6 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
-        viewModel.commands.firstOrNull()
 
         viewModel.storePendingPrompt("hello")
 
@@ -399,24 +397,18 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenNoPluginsThenInstallPluginsCommandHasEmptyList() = runTest {
+    fun whenNoPluginsThenPluginsStateIsEmpty() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
-        val command = viewModel.commands.firstOrNull()
-
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.AddPluginViews)
-        assertTrue((command as NativeInputModeWidgetViewModel.Command.AddPluginViews).plugins.isEmpty())
+        assertTrue(viewModel.plugins.value.isEmpty())
     }
 
     @Test
-    fun whenPluginsExistThenInstallPluginsCommandContainsThem() = runTest {
+    fun whenPluginsExistThenPluginsStateContainsThem() = runTest {
         val plugin = fakePlugin(containerId = 42, modelId = "gpt-4o")
         val viewModel = createViewModel(plugins = listOf(plugin))
 
-        val command = viewModel.commands.firstOrNull()
-
-        assertTrue(command is NativeInputModeWidgetViewModel.Command.AddPluginViews)
-        val plugins = (command as NativeInputModeWidgetViewModel.Command.AddPluginViews).plugins
+        val plugins = viewModel.plugins.value
         assertEquals(1, plugins.size)
         assertEquals(42, plugins[0].containerId)
     }
@@ -424,7 +416,6 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenNoPluginsThenGetSelectedModelIdReturnsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
-        viewModel.commands.firstOrNull()
 
         assertNull(viewModel.getSelectedModelId())
     }
@@ -433,7 +424,6 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsModelSelectionThenGetSelectedModelIdReturnsIt() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.firstOrNull()
 
         assertEquals("claude-3", viewModel.getSelectedModelId())
     }
@@ -442,7 +432,6 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsNullContributionThenGetSelectedModelIdReturnsNull() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.firstOrNull()
 
         assertNull(viewModel.getSelectedModelId())
     }
@@ -451,7 +440,6 @@ class NativeInputModeWidgetViewModelTest {
     fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
         val plugin = fakePlugin(containerId = 99, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
-        viewModel.commands.firstOrNull()
 
         viewModel.updatePluginContainerVisibility(isChatTab = true)
 

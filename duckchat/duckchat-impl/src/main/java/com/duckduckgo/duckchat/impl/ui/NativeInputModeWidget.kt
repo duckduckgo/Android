@@ -195,21 +195,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun setupPlugins() {
         pluginsJob?.cancel()
-        pluginsJob = findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            viewModel.commands.collect { command ->
-                when (command) {
-                    is NativeInputModeWidgetViewModel.Command.AddPluginViews -> {
-                        for (plugin in command.plugins) {
-                            val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
-                            val pluginView = plugin.createView(context)
-                            container.removeAllViews()
-                            container.addView(pluginView)
-                            container.isVisible = isChatTabSelected()
-                        }
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        pluginsJob = scope.launch {
+            launch {
+                viewModel.plugins.collect { plugins ->
+                    for (plugin in plugins) {
+                        val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
+                        val pluginView = plugin.createView(context)
+                        container.removeAllViews()
+                        container.addView(pluginView)
+                        container.isVisible = isChatTabSelected()
                     }
-                    is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
-                        for (containerId in command.containerIds) {
-                            findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
+                }
+            }
+            launch {
+                viewModel.commands.collect { command ->
+                    when (command) {
+                        is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
+                            for (containerId in command.containerIds) {
+                                findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
+                            }
                         }
                     }
                 }

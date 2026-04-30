@@ -40,6 +40,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -59,32 +61,30 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class Command {
-        data class AddPluginViews(val plugins: List<NativeInputPlugin>) : Command()
         data class UpdatePluginVisibility(val containerIds: List<Int>, val visible: Boolean) : Command()
     }
+
+    private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
+    val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
-    private var activePlugins: List<NativeInputPlugin> = emptyList()
-
     init {
         viewModelScope.launch {
-            val plugins = nativeInputPlugins.getPlugins().toList()
-            activePlugins = plugins
-            commandChannel.trySend(Command.AddPluginViews(plugins))
+            _plugins.value = nativeInputPlugins.getPlugins().toList()
         }
     }
 
     fun updatePluginContainerVisibility(isChatTab: Boolean) {
-        val containerIds = activePlugins.map { it.containerId }
+        val containerIds = _plugins.value.map { it.containerId }
         if (containerIds.isNotEmpty()) {
             commandChannel.trySend(Command.UpdatePluginVisibility(containerIds, isChatTab))
         }
     }
 
     fun getSelectedModelId(): String? {
-        return activePlugins.firstNotNullOfOrNull { plugin ->
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
             (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
         }
     }
