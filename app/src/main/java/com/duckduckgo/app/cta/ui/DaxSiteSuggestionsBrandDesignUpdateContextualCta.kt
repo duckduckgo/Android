@@ -46,6 +46,7 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    backgroundRes = R.drawable.bg_onboarding_site_suggestions,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignOptionsContent
 
