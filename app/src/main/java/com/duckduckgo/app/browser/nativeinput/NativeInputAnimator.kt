@@ -207,6 +207,11 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             LayoutTransition().apply {
                 enableTransitionType(LayoutTransition.CHANGING)
                 setDuration(ANIMATION_DURATION_MS)
+                // Animating parent bounds tweens parents' top/bottom via ObjectAnimator.
+                // On Android 14+ Pixels, View.sizeChange fired during that tween clears focus
+                // on focused descendants, dropping the EditText focus when the bottom-bar
+                // widget settles. Keep the transition local to children's own bounds.
+                setAnimateParentHierarchy(false)
             }
         }
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidgetCard)?.layoutTransition = changingTransition()
