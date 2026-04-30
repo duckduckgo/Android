@@ -195,7 +195,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
                 PromoSingleActionMessage(
                     title = "Promo Single Action Message",
-                    body = "Body text goes here. This component has two buttons and showcases and app update",
+                    body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                     illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
                     actionText = "Promo Link",
                     onActionClick = {},

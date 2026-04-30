@@ -206,7 +206,7 @@ fun PromoSingleActionMessage(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.keyline_2)),
+                .padding(bottom = dimensionResource(R.dimen.keyline_4)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
@@ -231,6 +231,7 @@ fun PromoSingleActionMessage(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(
+                        top = dimensionResource(R.dimen.keyline_2),
                         start = dimensionResource(R.dimen.keyline_4),
                         end = dimensionResource(R.dimen.keyline_4),
                     )
@@ -242,16 +243,16 @@ fun PromoSingleActionMessage(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .padding(
-                        top = dimensionResource(R.dimen.keyline_2),
                         bottom = dimensionResource(R.dimen.keyline_2),
                     ),
             )
             DaxText(
                 text = body,
-                style = DuckDuckGoTheme.typography.body2,
+                style = DuckDuckGoTheme.typography.body1,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(
+                        top = dimensionResource(R.dimen.keyline_1),
                         start = dimensionResource(R.dimen.keyline_4),
                         end = dimensionResource(R.dimen.keyline_4),
                     )
@@ -261,8 +262,9 @@ fun PromoSingleActionMessage(
                 text = actionText,
                 onClick = onActionClick,
                 size = DaxButtonSize.Small,
+                leadingIconPainter = painterResource(R.drawable.ic_share_android_16),
                 modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.keyline_2), bottom = dimensionResource(R.dimen.keyline_2))
+                    .padding(top = dimensionResource(R.dimen.keyline_4), bottom = dimensionResource(R.dimen.keyline_2))
                     .align(Alignment.CenterHorizontally),
             )
         }
