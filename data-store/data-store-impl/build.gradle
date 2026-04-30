@@ -28,6 +28,7 @@ dependencies {
 	implementation project(":anrs-api")
 
     anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':common-utils')
     implementation project(':di')
