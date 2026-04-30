@@ -17,14 +17,14 @@
         android:id="@+id/inputModeUnifiedBack"
         android:layout_width="@dimen/inputModeSwitchHeight"
         android:layout_height="@dimen/inputModeSwitchHeight"
-        android:layout_marginTop="@dimen/keyline_2"
         android:background="@drawable/selectable_circular_container_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:visibility="gone"
         android:src="@drawable/ic_arrow_left_24"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/inputModeWidgetLayout" />
 
     <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
         android:id="@+id/inputModeSwitch"
@@ -36,7 +36,7 @@
         android:layout_marginStart="@dimen/keyline_2"
         app:layout_goneMarginStart="@dimen/keyline_empty"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabItem
@@ -81,12 +81,13 @@
         android:id="@+id/inputModeWidgetLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/inputScreenOmnibarCardMarginHorizontal"
+        android:layout_marginStart="@dimen/keyline_2"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spacer">
+        app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"
+        app:layout_constraintTop_toBottomOf="@id/spacer"
+        app:layout_goneMarginStart="@dimen/inputScreenOmnibarCardMarginHorizontal">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/inputModeWidgetCard"

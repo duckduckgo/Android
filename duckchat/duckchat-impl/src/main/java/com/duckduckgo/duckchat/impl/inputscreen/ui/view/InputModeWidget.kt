@@ -93,7 +93,7 @@ open class InputModeWidget @JvmOverloads constructor(
     private var bottomButtonsMode: Boolean = false
 
     private val inputModeCardExtendedEndMargin: Int by lazy {
-        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
+        resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
     }
 
     private val inputModeCardEndMargin: Int by lazy {

@@ -240,8 +240,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyNativeStyling() {
         setBackgroundColor(Color.TRANSPARENT)
-        hideBackArrow()
-        updateUnifiedBackArrow()
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()
@@ -283,7 +281,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         setToggleMatchParent()
         updateToggleVisibility(toggle, state)
-        updateUnifiedBackArrow()
+        updateBackButtons(state)
         if (!state.toggleVisible) {
             minimize()
         }
@@ -301,6 +299,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateSelectedTab(toggle, state)
         }
         toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+    }
+
+    private fun updateBackButtons(state: NativeInputState){
+        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility = if (state.toggleVisible) VISIBLE else GONE
+        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility = if (state.toggleVisible) GONE else VISIBLE
+        findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
+            com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
+        )
     }
 
     private fun minimize() {
@@ -332,15 +338,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.visibility = VISIBLE
     }
 
-    private fun hideBackArrow() {
-        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility = GONE
-    }
-
-    private fun updateUnifiedBackArrow() {
-        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
-            if (nativeInputState.isBottom) GONE else VISIBLE
-    }
-
     private fun hideInputFieldBackground() {
         findViewById<View?>(R.id.backgroundLayer)?.setBackgroundColor(Color.TRANSPARENT)
         findViewById<MaterialCardView?>(R.id.inputModeWidgetCard)?.apply {
@@ -367,6 +364,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 width = 0
                 matchConstraintDefaultWidth = LayoutParams.MATCH_CONSTRAINT_SPREAD
                 constrainedWidth = false
+                startToStart = LayoutParams.UNSET
+                startToEnd = R.id.inputModeWidgetBack
             }
             toggle.tabMode = TabLayout.MODE_FIXED
             toggle.tabGravity = TabLayout.GRAVITY_FILL
