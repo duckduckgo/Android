@@ -110,8 +110,4 @@
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
-    <!-- Sharing options -->
-    <string name="copyLinkText">Copy Link Text</string>
-    <string name="linkTextCopied">Link text copied</string>
-    <string name="linkTextCopyFailed">Couldn\'t copy link text</string>
 </resources>
