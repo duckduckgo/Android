@@ -15,7 +15,80 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:tag="onboardingDefaultBrowserUpdate" />
+    android:background="?attr/daxColorBackground"
+    android:tag="onboardingDefaultBrowserUpdate"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <ImageView
+        android:id="@+id/defaultBrowserImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/onboarding_default_browser_update_illustration_placeholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintWidth_max="312dp" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/browserProtectionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:gravity="center"
+        android:text="@string/onboardingDefaultBrowserTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage"
+        app:typography="h2" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/browserProtectionSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="@string/defaultBrowserDescriptionNoDefault"
+        app:layout_constraintBottom_toTopOf="@id/launchSettingsButton"
+        app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
+        app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
+        app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"
+        app:layout_constraintWidth_max="300dp"
+        app:layout_constraintWidth_percent="0.8"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/launchSettingsButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_1"
+        android:text="@string/setAsDefaultBrowser"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toTopOf="@+id/continueButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/continueButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_5"
+        android:text="@string/defaultBrowserMaybeLater"
+        app:daxButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
