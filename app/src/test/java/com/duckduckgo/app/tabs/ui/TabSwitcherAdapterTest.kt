@@ -145,12 +145,6 @@ class TabSwitcherAdapterTest {
     }
 
     // --- Title rendering on payload-based bind (regression: stale title kept after URL changed) ---
-    //
-    // Repro: the differ produces a payload Bundle where DIFF_KEY_TITLE is present-but-null
-    // (transition to null title can happen between pageChanged() and titleReceived() in the
-    // BrowserTabViewModel). Before the fix, `bundle.getString(KEY)?.let { ... }` skipped on null,
-    // leaving the previously-rendered text in place. After the fix, the title is re-derived from
-    // the entity (via displayTitle() with URL-host fallback).
 
     @Test
     fun `payload with null title re-derives title from entity instead of leaving stale text`() {
