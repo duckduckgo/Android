@@ -301,9 +301,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
     }
 
-    private fun updateBackButtons(state: NativeInputState){
-        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility = if (state.toggleVisible) VISIBLE else GONE
-        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility = if (state.toggleVisible) GONE else VISIBLE
+    private fun updateBackButtons(state: NativeInputState) {
+        findViewById<View?>(R.id.inputModeWidgetBack)?.visibility =
+            if (state.shouldShowToggleRowBack()) VISIBLE else GONE
+        findViewById<View?>(R.id.inputModeUnifiedBack)?.visibility =
+            if (state.shouldShowCardRowBack()) VISIBLE else GONE
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
@@ -672,3 +674,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         private const val MAX_LINES = 5
     }
 }
+
+internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
+    toggleVisible && inputContext != NativeInputState.InputContext.DUCK_AI
+
+internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
+    !toggleVisible

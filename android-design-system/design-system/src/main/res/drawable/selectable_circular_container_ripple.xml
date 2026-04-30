@@ -18,7 +18,7 @@
     <item android:id="@android:id/mask">
         <shape android:shape="oval">
             <solid android:color="?attr/daxColorBlack" />
-            <corners android:radius="@dimen/largeShapeCornerRadius" />
+            <corners android:radius="@dimen/extraLargeShapeCornerRadius" />
         </shape>
     </item>
     <item android:drawable="@drawable/background_circular_icon_container" />
