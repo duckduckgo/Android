@@ -231,13 +231,13 @@ class CtaViewModel @Inject constructor(
     suspend fun getPromoCtaOnForeground(): Cta? {
         return withContext(dispatchers.io()) {
             when {
-                canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_browsermodal_android",
-                )
                 canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     origin = "funnel_skippedonboarding_android",
+                )
+                canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                    origin = "funnel_browsermodal_android",
                 )
                 else -> null
             }
