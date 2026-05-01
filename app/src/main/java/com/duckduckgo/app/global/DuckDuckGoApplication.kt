@@ -41,11 +41,13 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.io.File
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
 private const val PIR_PROCESS_NAME = "pir"
 
+@HasMemberInjections
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
     @Inject

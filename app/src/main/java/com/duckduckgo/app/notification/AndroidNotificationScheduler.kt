@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.util.concurrent.TimeUnit
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 // Please don't rename any Worker class name or class path
@@ -111,6 +112,7 @@ class ShowClearDataNotification(
     override lateinit var notification: ClearDataNotification
 }
 
+@HasMemberInjections
 @ContributesWorker(AppScope::class)
 open class ClearDataNotificationWorker(
     context: Context,
