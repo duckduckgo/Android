@@ -465,14 +465,16 @@ class RealPirDashboardInitialScanStateProviderTest {
         // Given - a child broker with no form submission of its own and a parent broker
         // that has two opt-out records with different form-submitted timestamps. The child
         // should inherit the most recent parent timestamp regardless of profile match.
+        // Broker.parent stores the parent's URL (matching production broker JSON), so
+        // the propagation path must resolve URL → broker → opt-out records.
         val extractedProfiles = listOf(
             createExtractedProfile(dbId = 1L, brokerName = "parent", name = "Adam Joseph Smith"),
             createExtractedProfile(dbId = 2L, brokerName = "parent", name = "Emily Smith"),
             createExtractedProfile(dbId = 3L, brokerName = "child", name = "Adam P Smith"),
         )
         val activeBrokers = listOf(
-            createBroker("parent"),
-            createBroker("child", parent = "parent"),
+            createBroker("parent", url = "parent.com"),
+            createBroker("child", url = "child.com", parent = "parent.com"),
         )
         val optOutJobs = listOf(
             createOptOutJobRecord(
@@ -510,8 +512,8 @@ class RealPirDashboardInitialScanStateProviderTest {
             createExtractedProfile(dbId = 1L, brokerName = "child", name = "John Doe"),
         )
         val activeBrokers = listOf(
-            createBroker("parent"),
-            createBroker("child", parent = "parent"),
+            createBroker("parent", url = "parent.com"),
+            createBroker("child", url = "child.com", parent = "parent.com"),
         )
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
