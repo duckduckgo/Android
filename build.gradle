@@ -265,11 +265,15 @@ if (diFramework == 'Metro') {
                     }
                 }
                 // Override Anvil's languageVersion=1.9 AFTER evaluation (Anvil sets it during apply)
+                // Also disable KAPT tasks — Metro replaces Dagger, KAPT not needed
                 afterEvaluate {
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                         compilerOptions {
                             languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
                         }
+                    }
+                    tasks.matching { it.name.contains("kapt") || it.name.contains("Kapt") }.configureEach {
+                        enabled = false
                     }
                 }
             }
