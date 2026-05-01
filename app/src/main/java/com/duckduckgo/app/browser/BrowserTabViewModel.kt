@@ -3371,8 +3371,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        val origin = "funnel_skippedonboarding_android"
-                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.origin}".toUri())
                     }
                     null
                 }
