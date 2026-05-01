@@ -132,6 +132,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 relatives = it.extractedProfile.relatives,
                 foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
                 optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                optOutFormSubmittedDate = it.optOutFormSubmittedDateInMillis?.convertToSeconds(),
                 estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
                 removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
                 hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,
