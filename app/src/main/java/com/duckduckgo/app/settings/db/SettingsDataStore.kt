@@ -24,6 +24,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -31,6 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -143,6 +145,7 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val brandDesignUpdateToggles: Lazy<OnboardingBrandDesignUpdateToggles>,
 ) : SettingsDataStore,
     AutoCompleteSettings {
     private val fireAnimationMapper = FireAnimationPrefsMapper()
@@ -200,7 +203,10 @@ class SettingsSharedPreferences @Inject constructor(
 
     override var selectedFireAnimation: FireAnimation
         get() = selectedFireAnimationSavedValue()
-        set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, fireAnimationMapper.prefValue(value)) }
+        set(value) = preferences.edit {
+            putString(KEY_SELECTED_FIRE_ANIMATION, fireAnimationMapper.prefValue(value))
+            putBoolean(KEY_FIRE_ANIMATION_MIGRATION_DONE, true)
+        }
 
     override val fireAnimationEnabled: Boolean
         get() = selectedFireAnimation.resId != -1
@@ -356,8 +362,38 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
-        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
+        val flagOn = isFireAnimationUpdateEnabled()
+        val migrationDone = preferences.getBoolean(KEY_FIRE_ANIMATION_MIGRATION_DONE, false)
+        val savedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+
+        if (flagOn && !migrationDone) {
+            val migratedValue = if (savedValue == fireAnimationMapper.prefValue(FireAnimation.HeroFire)) {
+                fireAnimationMapper.prefValue(FireAnimation.Inferno)
+            } else {
+                savedValue
+            }
+            preferences.edit {
+                if (migratedValue != savedValue && migratedValue != null) {
+                    putString(KEY_SELECTED_FIRE_ANIMATION, migratedValue)
+                }
+                putBoolean(KEY_FIRE_ANIMATION_MIGRATION_DONE, true)
+            }
+            return fireAnimationMapper.fireAnimationFrom(migratedValue, FireAnimation.Inferno)
+        }
+
+        if (!flagOn && savedValue == fireAnimationMapper.prefValue(FireAnimation.Inferno)) {
+            val rolledBackValue = fireAnimationMapper.prefValue(FireAnimation.HeroFire)
+            preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, rolledBackValue) }
+            return FireAnimation.HeroFire
+        }
+
+        val implicitDefault = if (flagOn) FireAnimation.Inferno else FireAnimation.HeroFire
+        return fireAnimationMapper.fireAnimationFrom(savedValue, implicitDefault)
+    }
+
+    private fun isFireAnimationUpdateEnabled(): Boolean {
+        val toggles = brandDesignUpdateToggles.get()
+        return toggles.self().isEnabled() && toggles.fireAnimationUpdate().isEnabled()
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -389,6 +425,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
         const val KEY_SELECTED_FIRE_ANIMATION = "SELECTED_FIRE_ANIMATION"
+        const val KEY_FIRE_ANIMATION_MIGRATION_DONE = "FIRE_ANIMATION_MIGRATION_DONE"
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
@@ -420,11 +457,13 @@ class SettingsSharedPreferences @Inject constructor(
             private const val HERO_FIRE_PREFS_VALUE = "HERO_FIRE"
             private const val HERO_WATER_PREFS_VALUE = "HERO_WATER"
             private const val HERO_ABSTRACT_PREFS_VALUE = "HERO_ABSTRACT"
+            private const val INFERNO_PREFS_VALUE = "INFERNO"
             private const val NONE_PREFS_VALUE = "NONE"
         }
 
         fun prefValue(fireAnimation: FireAnimation) =
             when (fireAnimation) {
+                FireAnimation.Inferno -> INFERNO_PREFS_VALUE
                 FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
                 FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
                 FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
@@ -435,6 +474,7 @@ class SettingsSharedPreferences @Inject constructor(
             value: String?,
             defValue: FireAnimation,
         ) = when (value) {
+            INFERNO_PREFS_VALUE -> FireAnimation.Inferno
             HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
             HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
             HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract
