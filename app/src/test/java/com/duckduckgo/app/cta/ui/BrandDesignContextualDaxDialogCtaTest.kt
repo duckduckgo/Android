@@ -44,6 +44,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val hiddenTitle: DaxTextView = mock()
     private val descriptionView: DaxTextView = mock()
     private val dismissButton: ImageView = mock()
+    private val backgroundView: View = mock()
     private val cardContainer: TouchInterceptingLinearLayout = mock()
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
@@ -68,6 +69,8 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(primaryInclude)
         whenever(container.findViewById<View>(R.id.contextualBrandDesignOptionsContent))
             .thenReturn(optionsInclude)
+        whenever(container.findViewById<View>(R.id.contextualBrandDesignBackground))
+            .thenReturn(backgroundView)
 
         testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore)
     }
@@ -158,6 +161,21 @@ class BrandDesignContextualDaxDialogCtaTest {
         // Dismiss button must remain visible across content transitions — guard against the
         // regression where it was snapped to 0 then re-faded in, causing a visible flicker.
         verify(dismissButton, never()).alpha = 0f
+    }
+
+    @Test
+    fun resetSharedViewState_firstShow_hidesBackground() {
+        testee.invokeResetSharedViewState(isContentTransition = false)
+
+        verify(backgroundView).visibility = View.GONE
+    }
+
+    @Test
+    fun resetSharedViewState_contentTransition_leavesBackgroundUntouched() {
+        testee.invokeResetSharedViewState(isContentTransition = true)
+
+        verify(backgroundView, never()).visibility = View.GONE
+        verify(backgroundView, never()).visibility = View.VISIBLE
     }
 
     @Test
