@@ -39,7 +39,6 @@ import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
 import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -102,7 +101,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
-                    updateSelectedFireAnimation(it.selectedFireAnimation)
+                    updateSelectedFireAnimation(it.selectedFireAnimation, it.isFireAnimationUpdateEnabled)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                     updateClearDataAction(it.clearDuckAiData)
                 }
@@ -128,9 +127,22 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        val subtitle = getString(fireAnimation.nameResId)
-        binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
+    private fun updateSelectedFireAnimation(
+        fireAnimation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        binding.selectedFireAnimationSetting.setSecondaryText(getString(displayLabelResId(fireAnimation, isFireAnimationUpdateEnabled)))
+    }
+
+    private fun displayLabelResId(
+        fireAnimation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ): Int {
+        return if (fireAnimation == FireAnimation.HeroFire && isFireAnimationUpdateEnabled) {
+            R.string.settingsHeroFireAnimationClassic
+        } else {
+            fireAnimation.nameResId
+        }
     }
 
     private fun updateClearDuckAiDataSetting(
@@ -156,7 +168,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
+            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(
+                it.animation,
+                it.availableFireAnimations,
+                it.isFireAnimationUpdateEnabled,
+            )
             is Command.LaunchFireDialog -> launchFireDialog()
         }
     }
@@ -254,32 +270,28 @@ class FireButtonActivity : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
-    private fun launchFireAnimationSelector(animation: FireAnimation) {
-        val currentAnimationOption = animation.getOptionIndex()
+    private fun launchFireAnimationSelector(
+        animation: FireAnimation,
+        availableFireAnimations: List<FireAnimation>,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        val currentIndex = availableFireAnimations.indexOf(animation).coerceAtLeast(0) + 1
+        val labels = availableFireAnimations.map { displayLabelResId(it, isFireAnimationUpdateEnabled) }
 
         RadioListAlertDialogBuilder(this)
             .setTitle(R.string.settingsSelectFireAnimationDialog)
-            .setOptions(
-                listOf(
-                    R.string.settingsHeroFireAnimation,
-                    R.string.settingsHeroWaterAnimation,
-                    R.string.settingsHeroAbstractAnimation,
-                    R.string.settingsNoneAnimation,
-                ),
-                currentAnimationOption,
-            )
+            .setOptions(labels, currentIndex)
             .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-
+                        val selectedAnimation = availableFireAnimations[selectedItem - 1]
                         viewModel.onFireAnimationSelected(selectedAnimation)
                     }
 
                     override fun onRadioItemSelected(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
+                        val selectedAnimation = availableFireAnimations[selectedItem - 1]
                         if (selectedAnimation != FireAnimation.None) {
                             startActivity(FireAnimationActivity.intent(baseContext, selectedAnimation))
                         }

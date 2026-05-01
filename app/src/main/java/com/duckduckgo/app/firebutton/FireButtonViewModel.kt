@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -27,6 +28,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -48,6 +51,8 @@ class FireButtonViewModel @Inject constructor(
     private val pixel: Pixel,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -56,6 +61,8 @@ class FireButtonViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_ONLY,
         ),
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
+        val availableFireAnimations: List<FireAnimation> = DEFAULT_FIRE_ANIMATIONS,
+        val isFireAnimationUpdateEnabled: Boolean = false,
         val clearDuckAiData: Boolean = false,
         val showClearDuckAiDataSetting: Boolean = false,
         val clerDataWithDuckAiChats: Boolean = false,
@@ -75,7 +82,11 @@ class FireButtonViewModel @Inject constructor(
         ) : Command()
 
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
-        data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
+        data class LaunchFireAnimationSettings(
+            val animation: FireAnimation,
+            val availableFireAnimations: List<FireAnimation>,
+            val isFireAnimationUpdateEnabled: Boolean,
+        ) : Command()
         data object LaunchFireDialog : Command()
     }
 
@@ -83,11 +94,19 @@ class FireButtonViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
-        val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
-        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
-
         viewModelScope.launch {
+            val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
+                brandDesignUpdateToggles.self().isEnabled() &&
+                    brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+            }
+            val automaticallyClearWhat = withContext(dispatcherProvider.io()) { settingsDataStore.automaticallyClearWhatOption }
+            val automaticallyClearWhen = withContext(dispatcherProvider.io()) { settingsDataStore.automaticallyClearWhenOption }
+            val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
+            val initialFireAnimation = withContext(dispatcherProvider.io()) { settingsDataStore.selectedFireAnimation }
+            val initialClearDuckAi = withContext(dispatcherProvider.io()) { settingsDataStore.clearDuckAiData }
+            val initialShowClearDuckAi = withContext(dispatcherProvider.io()) {
+                duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value
+            }
             viewState.emit(
                 ViewState(
                     automaticallyClearData = AutomaticallyClearData(
@@ -95,9 +114,11 @@ class FireButtonViewModel @Inject constructor(
                         automaticallyClearWhen,
                         automaticallyClearWhenEnabled,
                     ),
-                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    clearDuckAiData = settingsDataStore.clearDuckAiData,
-                    showClearDuckAiDataSetting = duckChat.wasOpenedBefore() && duckAiFeatureState.showClearDuckAIChatHistory.value,
+                    selectedFireAnimation = initialFireAnimation,
+                    availableFireAnimations = if (isFireAnimationUpdateEnabled) FIRE_ANIMATIONS_WITH_INFERNO else DEFAULT_FIRE_ANIMATIONS,
+                    isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
+                    clearDuckAiData = initialClearDuckAi,
+                    showClearDuckAiDataSetting = initialShowClearDuckAi,
                 ),
             )
         }
@@ -176,7 +197,16 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
+        viewModelScope.launch {
+            val state = viewState.value
+            command.send(
+                Command.LaunchFireAnimationSettings(
+                    animation = state.selectedFireAnimation,
+                    availableFireAnimations = state.availableFireAnimations,
+                    isFireAnimationUpdateEnabled = state.isFireAnimationUpdateEnabled,
+                ),
+            )
+        }
         pixel.fire(AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
@@ -244,5 +274,22 @@ class FireButtonViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
+    }
+
+    companion object {
+        private val DEFAULT_FIRE_ANIMATIONS = listOf(
+            FireAnimation.HeroFire,
+            FireAnimation.HeroWater,
+            FireAnimation.HeroAbstract,
+            FireAnimation.None,
+        )
+
+        private val FIRE_ANIMATIONS_WITH_INFERNO = listOf(
+            FireAnimation.Inferno,
+            FireAnimation.HeroFire,
+            FireAnimation.HeroWater,
+            FireAnimation.HeroAbstract,
+            FireAnimation.None,
+        )
     }
 }
