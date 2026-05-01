@@ -75,11 +75,9 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     @Component.Builder
     interface Builder {
 
-        @BindsInstance
-        fun application(application: Application): Builder
+        fun application(@BindsInstance application: Application): Builder
 
-        @BindsInstance
-        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
+        fun applicationCoroutineScope(@BindsInstance @AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
 
         fun build(): AppComponent
     }
