@@ -122,7 +122,7 @@ object DeviceLockedCheckerModule {
         val keyguardManager = runCatching { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }.getOrNull()
         val powerManager = runCatching { context.getSystemService(Context.POWER_SERVICE) as PowerManager }.getOrNull()
 
-        return {
+        return DeviceLockedChecker {
             (keyguardManager?.isDeviceLocked == true || powerManager?.isInteractive == false)
         }
     }
