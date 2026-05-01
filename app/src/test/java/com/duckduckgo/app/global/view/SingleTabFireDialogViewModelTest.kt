@@ -109,6 +109,7 @@ class SingleTabFireDialogViewModelTest {
 
         whenever(mockBrandDesignUpdateToggles.self()).thenReturn(disabledToggle)
         whenever(mockBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(disabledToggle)
 
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
