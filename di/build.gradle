@@ -33,5 +33,5 @@ dependencies {
     implementation AndroidX.fragment.ktx
     implementation Google.dagger
     implementation AndroidX.appCompat
-    implementation "dev.zacsweers.metro:runtime:1.0.0"
+    api "dev.zacsweers.metro:runtime:1.0.0"
 }
