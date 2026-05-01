@@ -135,8 +135,13 @@ abstract class PirDashboardStateProvider(
         val allValidOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords()
         val optOutMap = allValidOptOutJobs.associateBy { it.extractedProfileId }
         // Child brokers don't run their own form submission; they inherit the parent broker's most recent timestamp.
-        val mostRecentFormSubmittedByBroker: Map<String, Long> = allValidOptOutJobs
-            .mapNotNull { job -> job.optOutFormSubmittedDateInMillis?.let { job.brokerName to it } }
+        // Keyed by broker URL because Broker.parent references the parent's URL, not its name.
+        val mostRecentFormSubmittedByBrokerUrl: Map<String, Long> = allValidOptOutJobs
+            .mapNotNull { job ->
+                val date = job.optOutFormSubmittedDateInMillis ?: return@mapNotNull null
+                val url = activeBrokerMap[job.brokerName]?.url ?: return@mapNotNull null
+                url to date
+            }
             .groupBy({ it.first }, { it.second })
             .mapValues { (_, dates) -> dates.max() }
 
@@ -144,8 +149,8 @@ abstract class PirDashboardStateProvider(
         return extractedProfiles.mapNotNull { extractedProfile ->
             val broker = activeBrokerMap[extractedProfile.brokerName] ?: return@mapNotNull null
             val optOutJob = optOutMap[extractedProfile.dbId]
-            val optOutFormSubmittedDateInMillis = broker.parent?.let { parentName ->
-                mostRecentFormSubmittedByBroker[parentName]
+            val optOutFormSubmittedDateInMillis = broker.parent?.let { parentUrl ->
+                mostRecentFormSubmittedByBrokerUrl[parentUrl]
             } ?: optOutJob?.optOutFormSubmittedDateInMillis
 
             DashboardExtractedProfileResult(
