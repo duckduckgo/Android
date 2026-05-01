@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
+import android.animation.LayoutTransition
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -136,6 +137,19 @@ class NativeInputLayoutCoordinator(
 
         val overlap = widgetView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
 
+        // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
+        val ntpGroup = newTabContent as? ViewGroup
+        val previousNtpTransition = ntpGroup?.layoutTransition
+        ntpGroup?.layoutTransition = LayoutTransition().apply {
+            disableTransitionType(LayoutTransition.APPEARING)
+            disableTransitionType(LayoutTransition.DISAPPEARING)
+            disableTransitionType(LayoutTransition.CHANGE_APPEARING)
+            disableTransitionType(LayoutTransition.CHANGE_DISAPPEARING)
+            enableTransitionType(LayoutTransition.CHANGING)
+            setDuration(RealNativeInputAnimator.ANIMATION_DURATION_MS)
+            setAnimateParentHierarchy(false)
+        }
+
         fun applyPadding(view: View, padding: Padding, deltaTop: Int, deltaBottom: Int) {
             view.setPadding(
                 padding.left,
@@ -191,6 +205,7 @@ class NativeInputLayoutCoordinator(
                 override fun onViewAttachedToWindow(v: View) = Unit
 
                 override fun onViewDetachedFromWindow(v: View) {
+                    ntpGroup?.layoutTransition = previousNtpTransition
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }
