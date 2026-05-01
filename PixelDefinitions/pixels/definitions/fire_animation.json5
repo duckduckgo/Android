@@ -1,0 +1,38 @@
+// Fire button animation pixels — selection settings + dialog playback
+{
+    "m_fas_o": {
+        "description": "The user opened the Fire Button animation picker in the Data Clearing settings screen.",
+        "owners": ["mscamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fas_s": {
+        "description": "The user selected a new Fire Button animation in the Data Clearing settings picker. The fire_animation parameter identifies which animation was chosen.",
+        "owners": ["mscamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "fire_animation",
+                "description": "Identifier of the selected fire animation. 'fai' is the legacy Inferno (now displayed as 'Inferno Classic' under the fireAnimationUpdate kill switch). 'inferno' is the new default Inferno.",
+                "enum": ["fai", "fawp", "faas", "fann", "inferno"]
+            }
+        ]
+    },
+    "m_fd_a": {
+        "description": "The Fire Button animation played during a data-clearing flow. The fire_animation parameter identifies which animation was played.",
+        "owners": ["mscamell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "fire_animation",
+                "description": "Identifier of the played fire animation. 'fai' is the legacy Inferno (now displayed as 'Inferno Classic' under the fireAnimationUpdate kill switch). 'inferno' is the new default Inferno.",
+                "enum": ["fai", "fawp", "faas", "fann", "inferno"]
+            }
+        ]
+    }
+}
