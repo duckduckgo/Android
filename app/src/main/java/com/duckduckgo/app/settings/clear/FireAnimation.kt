@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroFire
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroWater
+import com.duckduckgo.app.settings.clear.FireAnimation.Inferno
 import com.duckduckgo.app.settings.clear.FireAnimation.None
 import com.duckduckgo.app.statistics.pixels.Pixel
 import java.io.Serializable
@@ -28,31 +29,18 @@ sealed class FireAnimation(
     val resId: Int,
     val nameResId: Int,
 ) : Serializable {
+    data object Inferno : FireAnimation(R.raw.inferno, R.string.settingsHeroFireAnimation)
+
+    // Displayed as "Inferno Classic" when fireAnimationUpdate toggle is on; storage key,
+    // pixel value, and asset filename are intentionally preserved for blast-radius reasons.
     data object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
     data object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
     data object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
     data object None : FireAnimation(-1, R.string.settingsNoneAnimation)
-
-    fun getOptionIndex(): Int {
-        return when (this) {
-            HeroFire -> 1
-            HeroWater -> 2
-            HeroAbstract -> 3
-            None -> 4
-        }
-    }
-
-    fun Int.getAnimationForIndex(): FireAnimation {
-        return when (this) {
-            2 -> HeroWater
-            3 -> HeroAbstract
-            4 -> None
-            else -> HeroFire
-        }
-    }
 }
 
 fun FireAnimation.getPixelValue() = when (this) {
+    Inferno -> Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW
     HeroFire -> Pixel.PixelValues.FIRE_ANIMATION_INFERNO
     HeroWater -> Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL
     HeroAbstract -> Pixel.PixelValues.FIRE_ANIMATION_AIRSTREAM
