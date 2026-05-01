@@ -28,7 +28,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -44,6 +46,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val hiddenTitle: DaxTextView = mock()
     private val descriptionView: DaxTextView = mock()
     private val dismissButton: ImageView = mock()
+    private val backgroundView: View = mock()
     private val cardContainer: TouchInterceptingLinearLayout = mock()
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
@@ -68,6 +71,8 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(primaryInclude)
         whenever(container.findViewById<View>(R.id.contextualBrandDesignOptionsContent))
             .thenReturn(optionsInclude)
+        whenever(container.findViewById<View>(R.id.contextualBrandDesignBackground))
+            .thenReturn(backgroundView)
 
         testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore)
     }
@@ -161,6 +166,48 @@ class BrandDesignContextualDaxDialogCtaTest {
     }
 
     @Test
+    fun resetSharedViewState_firstShow_hidesBackground() {
+        testee.invokeResetSharedViewState(isContentTransition = false)
+
+        verify(backgroundView).visibility = View.GONE
+    }
+
+    @Test
+    fun resetSharedViewState_contentTransition_leavesBackgroundUntouched() {
+        testee.invokeResetSharedViewState(isContentTransition = true)
+
+        verify(backgroundView, never()).visibility = View.GONE
+        verify(backgroundView, never()).visibility = View.VISIBLE
+    }
+
+    @Test
+    fun isContentTransition_containerGoneAndAlphaZero_returnsFalse() {
+        whenever(container.alpha).thenReturn(0f)
+        whenever(container.visibility).thenReturn(View.GONE)
+
+        assertFalse(testee.invokeIsContentTransition())
+    }
+
+    @Test
+    fun isContentTransition_containerVisibleAndAlphaOne_returnsTrue() {
+        whenever(container.alpha).thenReturn(1f)
+        whenever(container.visibility).thenReturn(View.VISIBLE)
+
+        assertTrue(testee.invokeIsContentTransition())
+    }
+
+    @Test
+    fun isContentTransition_containerGoneButAlphaOne_returnsFalse() {
+        // After hideOnboardingCta() the layout is gone() but alpha is left at 1f from the previous
+        // animated show. The next show must be treated as first-show, not a content transition,
+        // so the dismiss button correctly fades back in from alpha=0.
+        whenever(container.alpha).thenReturn(1f)
+        whenever(container.visibility).thenReturn(View.GONE)
+
+        assertFalse(testee.invokeIsContentTransition())
+    }
+
+    @Test
     fun getAllContentIncludes_returnsPrimaryAndOptionsIncludes() {
         val includes = testee.invokeGetAllContentIncludes()
 
@@ -213,5 +260,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         }
 
         fun invokeGetAllContentIncludes(): List<View> = getAllContentIncludes(container)
+
+        fun invokeIsContentTransition(): Boolean = isContentTransition(container)
     }
 }
