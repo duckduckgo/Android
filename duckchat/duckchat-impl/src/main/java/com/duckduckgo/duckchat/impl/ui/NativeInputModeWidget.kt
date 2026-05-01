@@ -432,6 +432,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun EditText.applyChatInputType() {
+        hint = context.getString(R.string.native_input_chat_hint)
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
         setRawInputType(
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or

@@ -20,6 +20,7 @@
     <string name="input_screen_user_pref_without_ai_updated">Search only</string>
     <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
     <string name="duckAiChatSearchDuckDuckGo">Search DuckDuckGo</string>
+    <string name="native_input_chat_hint">Ask anything privately…</string>
 
     <!-- Model Picker -->
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
