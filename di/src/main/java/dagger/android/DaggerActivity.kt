@@ -18,8 +18,10 @@ package dagger.android
 
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.di.DaggerMap
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
+@HasMemberInjections
 abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
     @Inject
     lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
