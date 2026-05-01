@@ -25,15 +25,34 @@
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="36dp"
+    android:paddingBottom="@dimen/onboardingContextualBackgroundOverlap"
     android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
     tools:alpha="1">
+
+    <ImageView
+        android:id="@+id/contextualBrandDesignBackground"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/onboardingContextualBackgroundOverlapNegative"
+        android:adjustViewBounds="true"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/getDesktopBrowserMaxItemWidth"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/bg_onboarding_serp"
+        tools:visibility="visible" />
 
     <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
         android:id="@+id/contextualBrandDesignCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginBottom="32dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

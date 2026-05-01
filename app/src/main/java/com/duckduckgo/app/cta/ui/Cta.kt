@@ -27,11 +27,13 @@ import android.net.Uri
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewPropertyAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.transition.AutoTransition
@@ -650,6 +652,7 @@ sealed class OnboardingDaxDialogCta(
             }
 
             val typeAndFadeIn = {
+                animateBackgroundIn(container)
                 val daxTitle = titleView.text?.toString().orEmpty()
                 val startContentFadeIn = {
                     val animators = mutableListOf<Animator>(
@@ -701,6 +704,7 @@ sealed class OnboardingDaxDialogCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
+                buildBackgroundSlideOutAnimator(container)?.let { fadeOutAnimators += it }
                 AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
@@ -711,6 +715,7 @@ sealed class OnboardingDaxDialogCta(
                             configureContentViews(container)
                             hiddenTitle.text = titleView.text
                             applyTitleSlotVisibility(container, titleView)
+                            applyBackground(container)
                             typeAndFadeIn()
                         }
                     })
@@ -723,6 +728,7 @@ sealed class OnboardingDaxDialogCta(
                 configureContentViews(container)
                 hiddenTitle.text = titleView.text
                 applyTitleSlotVisibility(container, titleView)
+                applyBackground(container)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
@@ -811,6 +817,41 @@ sealed class OnboardingDaxDialogCta(
                 if (titleIsEmpty) View.GONE else View.VISIBLE
         }
 
+        private fun applyBackground(container: View) {
+            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
+                ?: return
+            if (backgroundRes == 0) return
+            backgroundView.setImageResource(backgroundRes)
+            backgroundView.visibility = View.VISIBLE
+            backgroundView.doOnPreDraw { it.translationY = offScreenY(it) }
+        }
+
+        private fun buildBackgroundSlideOutAnimator(container: View): Animator? {
+            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
+                ?: return null
+            if (backgroundView.visibility != View.VISIBLE) return null
+            if (backgroundRes == 0) return null
+            return ObjectAnimator.ofFloat(backgroundView, View.TRANSLATION_Y, offScreenY(backgroundView))
+                .setDuration(BACKGROUND_SLIDE_DURATION)
+        }
+
+        private fun animateBackgroundIn(container: View) {
+            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
+                ?: return
+            if (backgroundView.visibility != View.VISIBLE) return
+            backgroundView.animate()
+                .translationY(0f)
+                .setDuration(BACKGROUND_SLIDE_DURATION)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .start()
+        }
+
+        /** Y translation that takes [view] just below its parent's bottom edge. */
+        private fun offScreenY(view: View): Float {
+            val parent = view.parent as? View
+            return if (parent != null) (parent.height - view.top).toFloat() else view.height.toFloat()
+        }
+
         /**
          * Reset every mutable property shared views may carry over from a previous CTA. Called at
          * the start of both first-show and mid-transition flows.
@@ -825,6 +866,10 @@ sealed class OnboardingDaxDialogCta(
          * visible — we leave its alpha untouched.
          */
         internal fun resetSharedViewState(container: View, isContentTransition: Boolean) {
+            // Skip on content transitions so the slide-out animator can drive the banner off-screen.
+            if (!isContentTransition) {
+                container.findViewById<View>(R.id.contextualBrandDesignBackground)?.visibility = View.GONE
+            }
             container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility = View.VISIBLE
             container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)?.apply {
                 alpha = 0f
@@ -888,6 +933,7 @@ sealed class OnboardingDaxDialogCta(
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+            private const val BACKGROUND_SLIDE_DURATION = 300L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
         }
