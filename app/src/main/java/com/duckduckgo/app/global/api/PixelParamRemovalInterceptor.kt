@@ -244,6 +244,9 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_ANIMATION.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_ANIMATION_NEW_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ERROR_PAGE_SHOWN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.ERROR_CODE_PIXEL.pixelName to PixelParameter.removeAtb(),
         )
