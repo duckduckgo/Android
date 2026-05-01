@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -422,9 +423,109 @@ class RealPirDashboardInitialScanStateProviderTest {
         assertEquals("https://broker1.com", dashboardResult.broker.url)
         assertEquals("https://broker1.com/optout", dashboardResult.broker.optOutUrl)
         assertEquals(1641254400000L, dashboardResult.optOutSubmittedDateInMillis)
+        assertNull(dashboardResult.optOutFormSubmittedDateInMillis)
         assertEquals(0L, dashboardResult.optOutRemovedDateInMillis) // Should be 0L, not null
         assertEquals(1642464000000L, dashboardResult.estimatedRemovalDateInMillis!!) // Should be calculated
         assertFalse(dashboardResult.hasMatchingRecordOnParentBroker)
+    }
+
+    @Test
+    fun whenBrokerIsNotChildThenGetScanResultsUsesOwnOptOutFormSubmittedDate() = runTest {
+        // Given - a parent (non-child) broker with its own form submission timestamp
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                brokerName = "broker1",
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = 1641254400000L,
+                optOutFormSubmittedDateInMillis = 1641000000000L,
+            ),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals(1641000000000L, result[0].optOutFormSubmittedDateInMillis)
+    }
+
+    @Test
+    fun whenBrokerIsChildThenGetScanResultsPropagatesParentFormSubmittedDate() = runTest {
+        // Given - a child broker with no form submission of its own and a parent broker
+        // that has two opt-out records with different form-submitted timestamps. The child
+        // should inherit the most recent parent timestamp regardless of profile match.
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "parent", name = "Adam Joseph Smith"),
+            createExtractedProfile(dbId = 2L, brokerName = "parent", name = "Emily Smith"),
+            createExtractedProfile(dbId = 3L, brokerName = "child", name = "Adam P Smith"),
+        )
+        val activeBrokers = listOf(
+            createBroker("parent"),
+            createBroker("child", parent = "parent"),
+        )
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                brokerName = "parent",
+                status = OptOutJobStatus.REQUESTED,
+                optOutFormSubmittedDateInMillis = 1641000000000L,
+            ),
+            createOptOutJobRecord(
+                extractedProfileId = 2L,
+                brokerName = "parent",
+                status = OptOutJobStatus.REQUESTED,
+                optOutFormSubmittedDateInMillis = 1641500000000L, // most recent
+            ),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then - all child results inherit the most recent parent form-submitted date
+        val childResult = result.single { it.broker.name == "child" }
+        assertEquals(1641500000000L, childResult.optOutFormSubmittedDateInMillis)
+    }
+
+    @Test
+    fun whenChildBrokerHasNoParentSubmissionsThenOptOutFormSubmittedDateIsNull() = runTest {
+        // Given - a child broker with no opt-out records on its parent
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "child", name = "John Doe"),
+        )
+        val activeBrokers = listOf(
+            createBroker("parent"),
+            createBroker("child", parent = "parent"),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then
+        assertEquals(1, result.size)
+        assertNull(result[0].optOutFormSubmittedDateInMillis)
     }
 
     @Test
@@ -761,6 +862,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         userProfileId: Long = 1L,
         status: OptOutJobStatus = OptOutJobStatus.REQUESTED,
         optOutRequestedDateInMillis: Long = 0L,
+        optOutFormSubmittedDateInMillis: Long? = null,
         optOutRemovedDateInMillis: Long = 0L,
     ): OptOutJobRecord {
         return OptOutJobRecord(
@@ -771,6 +873,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             attemptCount = 0,
             lastOptOutAttemptDateInMillis = 0L,
             optOutRequestedDateInMillis = optOutRequestedDateInMillis,
+            optOutFormSubmittedDateInMillis = optOutFormSubmittedDateInMillis,
             optOutRemovedDateInMillis = optOutRemovedDateInMillis,
         )
     }

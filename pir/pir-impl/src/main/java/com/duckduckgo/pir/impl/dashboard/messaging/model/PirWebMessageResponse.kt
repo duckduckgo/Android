@@ -107,6 +107,7 @@ sealed interface PirWebMessageResponse {
         val relatives: List<String>,
         val foundDate: Long,
         val optOutSubmittedDate: Long?,
+        val optOutFormSubmittedDate: Long?,
         val estimatedRemovalDate: Long?,
         val removedDate: Long?,
         val hasMatchingRecordOnParentBroker: Boolean,

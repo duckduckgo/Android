@@ -407,6 +407,7 @@ class RealPirSchedulingRepository @Inject constructor(
             attemptCount = this.attemptCount,
             lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate ?: 0L,
             optOutRequestedDateInMillis = this.optOutRequestedDate,
+            optOutFormSubmittedDateInMillis = this.optOutFormSubmittedDate,
             optOutRemovedDateInMillis = this.optOutRemovedDate,
             deprecated = this.deprecated,
             dateCreatedInMillis = this.dateCreatedInMillis,
@@ -425,6 +426,7 @@ class RealPirSchedulingRepository @Inject constructor(
             attemptCount = this.attemptCount,
             lastOptOutAttemptDate = this.lastOptOutAttemptDateInMillis,
             optOutRequestedDate = this.optOutRequestedDateInMillis,
+            optOutFormSubmittedDate = this.optOutFormSubmittedDateInMillis,
             optOutRemovedDate = this.optOutRemovedDateInMillis,
             deprecated = this.deprecated,
             dateCreatedInMillis = if (this.dateCreatedInMillis != 0L) {

@@ -118,6 +118,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
                 extractedProfile = extractedProfile,
                 broker = dashboardBroker,
                 optOutSubmittedDateInMillis = 1640995200000L,
+                optOutFormSubmittedDateInMillis = 1640950000000L,
                 optOutRemovedDateInMillis = 1643673600000L,
                 estimatedRemovalDateInMillis = 1641081600000L,
                 hasMatchingRecordOnParentBroker = true,
@@ -159,6 +160,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
                 extractedProfile = extractedProfile,
                 broker = dashboardBroker,
                 optOutSubmittedDateInMillis = 1640995200000L,
+                optOutFormSubmittedDateInMillis = 1640950000000L,
                 optOutRemovedDateInMillis = 1643673600000L,
                 estimatedRemovalDateInMillis = 1641081600000L,
                 hasMatchingRecordOnParentBroker = true,
@@ -218,6 +220,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
                 extractedProfile = extractedProfile1,
                 broker = broker1,
                 optOutSubmittedDateInMillis = 1640995200000L,
+                optOutFormSubmittedDateInMillis = 1640900000000L,
                 hasMatchingRecordOnParentBroker = false,
             ),
             DashboardExtractedProfileResult(
@@ -257,6 +260,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
         assertEquals("MA", result1.addresses[1].state)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640995200000L), result1.foundDate)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640995200000L), result1.optOutSubmittedDate)
+        assertEquals(TimeUnit.MILLISECONDS.toSeconds(1640900000000L), result1.optOutFormSubmittedDate)
         assertEquals(false, result1.hasMatchingRecordOnParentBroker)
 
         // Verify second result
@@ -270,6 +274,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
         assertEquals("CA", result2.addresses[0].state)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1641081600000L), result2.foundDate)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1643673600000L), result2.removedDate)
+        assertEquals(null, result2.optOutFormSubmittedDate)
         assertEquals(true, result2.hasMatchingRecordOnParentBroker)
 
         // Verify scan progress
