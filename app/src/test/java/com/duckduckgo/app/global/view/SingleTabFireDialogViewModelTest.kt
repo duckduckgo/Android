@@ -945,6 +945,21 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete all clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
+        )
+    }
+
+    @Test
     fun `when delete all clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
         val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)

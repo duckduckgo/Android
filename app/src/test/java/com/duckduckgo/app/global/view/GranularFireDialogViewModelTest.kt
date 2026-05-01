@@ -364,6 +364,21 @@ class GranularFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
+        )
+    }
+
+    @Test
     fun `when delete clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
         val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)
