@@ -104,9 +104,11 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 import javax.inject.Named
 
+@HasMemberInjections
 @InjectWith(FragmentScope::class)
 open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
 

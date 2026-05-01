@@ -63,9 +63,11 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@HasMemberInjections
 @InjectWith(ViewScope::class)
 open class InputModeWidget @JvmOverloads constructor(
     context: Context,
