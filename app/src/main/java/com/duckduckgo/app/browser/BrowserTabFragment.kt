@@ -37,6 +37,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
@@ -159,6 +160,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
 import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
+import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -5740,22 +5742,31 @@ class BrowserTabFragment :
     ) {
         if (viewModel.isPrinting()) return
 
-        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+        val printManager = activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: return
+        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(url) ?: return
+        val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+            sourceAdapter,
+            onStartCallback = { viewModel.onStartPrint() },
+            onFinishCallback = { viewModel.onFinishPrint() },
+        )
+        printManager.print(
+            url,
+            printAdapter,
+            PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
+        )
+    }
 
-                val printAdapter =
-                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                        webViewPrintDocumentAdapter,
-                        onStartCallback = { viewModel.onStartPrint() },
-                        onFinishCallback = { viewModel.onFinishPrint() },
-                    )
-                printManager.print(
-                    url,
-                    printAdapter,
-                    PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
-                )
-            }
-        }
+    /**
+     * If an inline PDF is currently showing, build an adapter that prints the cached PDF
+     * file directly instead of routing through the WebView (which is still on the page that
+     * linked to the PDF — printing it would emit the parent page).
+     */
+    private fun pdfPrintDocumentAdapterOrNull(): PrintDocumentAdapter? {
+        val state = viewModel.browserViewState.value ?: return null
+        val pdfPath = state.currentPdfCachedUri?.path ?: return null
+        val pdfFile = File(pdfPath).takeIf { it.exists() } ?: return null
+        val displayName = state.currentPdfFileName ?: pdfFile.name
+        return CachedPdfPrintDocumentAdapter(pdfFile, displayName)
     }
 
     private fun showSitePermissionsDialog(
