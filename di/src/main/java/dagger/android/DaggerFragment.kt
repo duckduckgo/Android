@@ -20,8 +20,10 @@ import android.annotation.SuppressLint
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.di.DaggerMap
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
+@HasMemberInjections
 @SuppressLint("NoFragment") // this is base fragment class to be used instead of Fragment
 abstract class DaggerFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), HasDaggerInjector {
     @Inject
