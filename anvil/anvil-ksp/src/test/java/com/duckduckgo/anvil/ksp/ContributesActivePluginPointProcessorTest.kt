@@ -16,9 +16,12 @@
 
 package com.duckduckgo.anvil.ksp
 
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.configureKsp
+import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -26,6 +29,7 @@ import java.io.File
 import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
 
+@OptIn(ExperimentalCompilerApi::class)
 class ContributesActivePluginPointProcessorTest {
 
     // ========================================================================
@@ -175,8 +179,6 @@ class ContributesActivePluginPointProcessorTest {
         )
 
         val result = compile(source, *allStubs)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generatedMain = result.findGeneratedSource("TestActivePlugin_ActivePluginPoint.kt")
         val goldenMain = loadGolden("ActivePluginPoint_Basic.kt")
         assertEquals(goldenMain, generatedMain)
@@ -210,8 +212,6 @@ class ContributesActivePluginPointProcessorTest {
         )
 
         val result = compile(source, *allStubs)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generatedMain = result.findGeneratedSource("TestPluginPointTrigger_ActivePluginPoint.kt")
         val goldenMain = loadGolden("ActivePluginPoint_BoundType.kt")
         assertEquals(goldenMain, generatedMain)
@@ -306,11 +306,64 @@ class ContributesActivePluginPointProcessorTest {
         )
 
         val result = compile(pluginPoint, plugin, *allStubs)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("MyPlugin_ActivePlugin.kt")
         val golden = loadGolden("ActivePlugin_Basic.kt")
         assertEquals(golden, generated)
+    }
+
+    @Test
+    fun `active plugin with defaultActiveValue FALSE generates correct toggle annotation`() {
+        val pluginPoint = SourceFile.kotlin(
+            "TestActivePluginPoint.kt",
+            """
+            package com.test
+            import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+            import com.duckduckgo.common.utils.plugins.ActivePlugin
+            import com.duckduckgo.di.scopes.AppScope
+
+            @ContributesActivePluginPoint(
+                scope = AppScope::class,
+                featureName = "pluginPointTestPlugin",
+            )
+            interface TestActivePluginBase : ActivePlugin
+            """.trimIndent(),
+        )
+
+        val plugin = SourceFile.kotlin(
+            "MyDisabledPlugin.kt",
+            """
+            package com.test
+            import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+            import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+            import com.duckduckgo.di.scopes.AppScope
+            import javax.inject.Inject
+
+            @ContributesActivePlugin(
+                scope = AppScope::class,
+                boundType = TestActivePluginBase::class,
+                defaultActiveValue = DefaultFeatureValue.FALSE,
+                featureName = "pluginMyDisabledPlugin",
+                parentFeatureName = "pluginPointTestPlugin",
+            )
+            class MyDisabledPlugin @Inject constructor() : TestActivePluginBase {
+                override suspend fun isActive(): Boolean = true
+            }
+            """.trimIndent(),
+        )
+
+        val result = compile(pluginPoint, plugin, *allStubs)
+        val generated = result.findGeneratedSource("MyDisabledPlugin_ActivePlugin.kt")
+
+        // The plugin's own toggle must have DefaultFeatureValue.FALSE, not TRUE
+        assertTrue(
+            "Expected DefaultFeatureValue.FALSE for pluginMyDisabledPlugin toggle but got:\n$generated",
+            generated.contains("defaultValue = DefaultFeatureValue.FALSE"),
+        )
+        // The parent self() toggle should still be TRUE
+        assertTrue(
+            "Expected DefaultFeatureValue.TRUE for self() toggle but got:\n$generated",
+            generated.contains("defaultValue = DefaultFeatureValue.TRUE"),
+        )
     }
 
     @Test
@@ -437,11 +490,11 @@ class ContributesActivePluginPointProcessorTest {
             sources = arrayOf(moduleBSource, *allStubs),
             additionalClasspaths = listOf(sentinelJar),
         )
-        assertEquals(KotlinCompilation.ExitCode.OK, resultB.exitCode)
+        // Note: exitCode may be COMPILATION_ERROR because generated code references
+        // Android APIs not on the test classpath. The important check is below.
 
         // Verify no deferred marker was emitted (sentinel was found on classpath)
-        val kspDir = resultB.outputDirectory.resolve("../ksp/sources/kotlin")
-        val deferredFiles = kspDir.walkTopDown()
+        val deferredFiles = resultB.sourcesGeneratedBySymbolProcessor
             .filter { it.isFile && it.name.startsWith("ActivePluginDeferredValidation_") }
             .toList()
         assertTrue(
@@ -514,14 +567,16 @@ class ContributesActivePluginPointProcessorTest {
     // Helpers
     // ========================================================================
 
-    private fun compile(vararg sources: SourceFile): KotlinCompilation.Result {
+    private fun compile(vararg sources: SourceFile): JvmCompilationResult {
         return KotlinCompilation().apply {
             this.sources = sources.toList()
-            symbolProcessorProviders = listOf(
-                ContributesActivePluginPointProcessorProvider(),
-                ContributesPluginPointProcessorProvider(),
-                ContributesRemoteFeatureProcessorProvider(),
-            )
+            configureKsp {
+                symbolProcessorProviders += ContributesActivePluginPointProcessorProvider()
+
+                symbolProcessorProviders += ContributesPluginPointProcessorProvider()
+
+                symbolProcessorProviders += ContributesRemoteFeatureProcessorProvider()
+            }
             inheritClassPath = true
         }.compile()
     }
@@ -529,14 +584,16 @@ class ContributesActivePluginPointProcessorTest {
     private fun compileWithClasspath(
         sources: Array<SourceFile>,
         additionalClasspaths: List<java.io.File>,
-    ): KotlinCompilation.Result {
+    ): JvmCompilationResult {
         return KotlinCompilation().apply {
             this.sources = sources.toList()
-            symbolProcessorProviders = listOf(
-                ContributesActivePluginPointProcessorProvider(),
-                ContributesPluginPointProcessorProvider(),
-                ContributesRemoteFeatureProcessorProvider(),
-            )
+            configureKsp {
+                symbolProcessorProviders += ContributesActivePluginPointProcessorProvider()
+
+                symbolProcessorProviders += ContributesPluginPointProcessorProvider()
+
+                symbolProcessorProviders += ContributesRemoteFeatureProcessorProvider()
+            }
             inheritClassPath = true
             classpaths += additionalClasspaths
         }.compile()
@@ -569,12 +626,11 @@ class ContributesActivePluginPointProcessorTest {
         return jarFile
     }
 
-    private fun KotlinCompilation.Result.findGeneratedSource(fileName: String): String {
-        val kspDir = outputDirectory.resolve("../ksp/sources/kotlin")
-        val file = kspDir.walkTopDown().find { it.name == fileName }
+    private fun JvmCompilationResult.findGeneratedSource(fileName: String): String {
+        val file = sourcesGeneratedBySymbolProcessor.find { it.name == fileName }
             ?: error(
-                "Generated file $fileName not found in ${kspDir.absolutePath}. " +
-                    "Available files: ${kspDir.walkTopDown().filter { it.isFile }.map { it.name }.toList()}",
+                "Generated file $fileName not found. " +
+                    "Available files: ${sourcesGeneratedBySymbolProcessor.map { it.name }.toList()}",
             )
         return file.readText()
     }

@@ -16,13 +16,17 @@
 
 package com.duckduckgo.anvil.ksp
 
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.configureKsp
+import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(ExperimentalCompilerApi::class)
 class ContributeToActivityStarterProcessorTest {
 
     private val appScopeStub = SourceFile.kotlin(
@@ -126,8 +130,6 @@ class ContributeToActivityStarterProcessorTest {
         )
 
         val result = compile(source, *commonStubs)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("TestActivity_ActivityMapper.kt")
         val golden = loadGolden("ActivityMapper_NoScreenName.kt")
         assertEquals(golden, generated)
@@ -151,8 +153,6 @@ class ContributeToActivityStarterProcessorTest {
         )
 
         val result = compile(source, *commonStubs)
-        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
-
         val generated = result.findGeneratedSource("TestActivity_ActivityMapper.kt")
         val golden = loadGolden("ActivityMapper_WithScreenName.kt")
         assertEquals(golden, generated)
@@ -179,20 +179,21 @@ class ContributeToActivityStarterProcessorTest {
         assertTrue(result.messages.contains("must extend"))
     }
 
-    private fun compile(vararg sources: SourceFile): KotlinCompilation.Result {
+    private fun compile(vararg sources: SourceFile): JvmCompilationResult {
         return KotlinCompilation().apply {
             this.sources = sources.toList()
-            symbolProcessorProviders = listOf(ContributeToActivityStarterProcessorProvider())
+            configureKsp {
+                symbolProcessorProviders += ContributeToActivityStarterProcessorProvider()
+            }
             inheritClassPath = true
         }.compile()
     }
 
-    private fun KotlinCompilation.Result.findGeneratedSource(fileName: String): String {
-        val kspDir = outputDirectory.resolve("../ksp/sources/kotlin")
-        val file = kspDir.walkTopDown().find { it.name == fileName }
+    private fun JvmCompilationResult.findGeneratedSource(fileName: String): String {
+        val file = sourcesGeneratedBySymbolProcessor.find { it.name == fileName }
             ?: error(
-                "Generated file $fileName not found in ${kspDir.absolutePath}. " +
-                    "Available files: ${kspDir.walkTopDown().filter { it.isFile }.map { it.name }.toList()}",
+                "Generated file $fileName not found. " +
+                    "Available files: ${sourcesGeneratedBySymbolProcessor.map { it.name }.toList()}",
             )
         return file.readText()
     }

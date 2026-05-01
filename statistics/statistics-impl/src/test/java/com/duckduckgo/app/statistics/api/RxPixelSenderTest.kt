@@ -602,7 +602,7 @@ class RxPixelSenderTest {
 @TypeConverters(
     QueryParamsTypeConverter::class,
 )
-private abstract class TestAppDatabase : RoomDatabase() {
+internal abstract class TestAppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
 }
 
