@@ -254,6 +254,10 @@ if (diFramework == 'Metro') {
         // Nest callbacks: first wait for Kotlin, then check for Anvil.
         def applyMetro = {
             pluginManager.withPlugin('com.squareup.anvil') {
+                // Disable Anvil's component merging — Metro handles it
+                anvil {
+                    disableComponentMerging.set(true)
+                }
                 apply plugin: 'dev.zacsweers.metro'
                 metro {
                     interop {
