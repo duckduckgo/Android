@@ -73,7 +73,7 @@ class RealNetPRekeyer @Inject constructor(
             return
         }
 
-        if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
+        if (deviceLockedChecker.isDeviceLocked() || forceOrFalseInProductionBuilds) {
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
                 val config = wgTunnel.createAndSetWgConfig(KeyPair())
                     .onFailure {
@@ -108,7 +108,9 @@ class RealNetPRekeyer @Inject constructor(
 private annotation class InternalApi
 
 // visible for testing
-internal typealias DeviceLockedChecker = () -> Boolean
+fun interface DeviceLockedChecker {
+    fun isDeviceLocked(): Boolean
+}
 
 @Module
 @ContributesTo(VpnScope::class)
