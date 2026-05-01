@@ -21,24 +21,18 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * The input mode currently displayed by the Duck.ai input widget.
  *
- * This is consumer-facing state — what to render right now — not the user's persistent
- * selection. The toggle is treated as dormant when the omnibar input is not engaged
- * (focused), so [displayedMode] collapses to [InputMode.SEARCH] in that case regardless
- * of the user's underlying choice. When the user re-engages the omnibar, the value flips
- * back to their selection.
+ * Emits [InputMode.SEARCH] when no widget is showing, and the user's currently-selected
+ * tab while a widget is attached. Consumers can use this to drive ambient UI such as the
+ * NTP background logo.
  */
 interface DuckChatInputModeState {
 
     /**
-     * The input mode currently being expressed to ambient UI (e.g. the NTP background logo).
+     * The input mode currently being expressed to ambient UI.
      *
      * Emits the current value on subscription and on every change. Backed by an app-scoped
-     * state holder, so all subscribers see the same value.
-     *
-     * Behaviour:
-     * - Reflects the user's selection while the omnibar input is engaged (focused).
-     * - Collapses to [InputMode.SEARCH] when the input is not engaged, regardless of the
-     *   user's underlying selection (the toggle is dormant).
+     * state holder, so all subscribers see the same value. Resets to [InputMode.SEARCH] when
+     * no Duck.ai input widget is attached.
      */
     val displayedMode: StateFlow<InputMode>
 }

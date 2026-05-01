@@ -1704,7 +1704,7 @@ class RealDuckChatTest {
         assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
     }
 
-    // region displayedMode — focus-collapse semantics
+    // region displayedMode
 
     @Test
     fun `displayedMode is SEARCH on construction`() = runTest {
@@ -1712,47 +1712,18 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `setSelectedMode without focus does not surface user selection on displayedMode`() = runTest {
+    fun `setSelectedMode emits the new mode`() = runTest {
         testee.setSelectedMode(InputMode.DUCK_AI)
-        coroutineRule.testScope.advanceUntilIdle()
-
-        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
-    }
-
-    @Test
-    fun `displayedMode emits user selection while widget focused`() = runTest {
-        testee.setSelectedMode(InputMode.DUCK_AI)
-        testee.setInputWidgetFocused(true)
-        coroutineRule.testScope.advanceUntilIdle()
 
         assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
     }
 
     @Test
-    fun `displayedMode reverts to SEARCH on focus loss`() = runTest {
+    fun `setSelectedMode SEARCH after DUCK_AI reverts displayedMode`() = runTest {
         testee.setSelectedMode(InputMode.DUCK_AI)
-        testee.setInputWidgetFocused(true)
-        coroutineRule.testScope.advanceUntilIdle()
-        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
-
-        testee.setInputWidgetFocused(false)
-        coroutineRule.testScope.advanceUntilIdle()
+        testee.setSelectedMode(InputMode.SEARCH)
 
         assertEquals(InputMode.SEARCH, testee.displayedMode.value)
-    }
-
-    @Test
-    fun `displayedMode returns to user selection on focus regain`() = runTest {
-        testee.setSelectedMode(InputMode.DUCK_AI)
-        testee.setInputWidgetFocused(true)
-        testee.setInputWidgetFocused(false)
-        coroutineRule.testScope.advanceUntilIdle()
-        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
-
-        testee.setInputWidgetFocused(true)
-        coroutineRule.testScope.advanceUntilIdle()
-
-        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
     }
 
     // endregion

@@ -160,8 +160,8 @@ open class InputModeWidget @JvmOverloads constructor(
     private var isDeletingTag = false
     private val knownTagTabIds = mutableSetOf<String>()
 
-    // Listeners that depend on `duckChatInternal` are installed in onAttachedToWindow (after DI)
-    // and removed in onDetachedFromWindow, so we never have to guard against pre-DI invocation.
+    // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
+    // never have to guard against pre-DI invocation.
     private val duckChatTabSelectedListener =
         object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -170,11 +170,6 @@ open class InputModeWidget @JvmOverloads constructor(
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
-        }
-
-    private val duckChatFocusChangeListener =
-        View.OnFocusChangeListener { _, hasFocus ->
-            duckChatInternal.setInputWidgetFocused(hasFocus)
         }
 
     init {
@@ -206,17 +201,13 @@ open class InputModeWidget @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
-        inputField.onFocusChangeListener = duckChatFocusChangeListener
         val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
         duckChatInternal.setSelectedMode(mode)
     }
 
     override fun onDetachedFromWindow() {
         inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
-        if (inputField.onFocusChangeListener === duckChatFocusChangeListener) {
-            inputField.onFocusChangeListener = null
-        }
-        duckChatInternal.setInputWidgetFocused(false)
+        duckChatInternal.setSelectedMode(InputMode.SEARCH)
         super.onDetachedFromWindow()
     }
 

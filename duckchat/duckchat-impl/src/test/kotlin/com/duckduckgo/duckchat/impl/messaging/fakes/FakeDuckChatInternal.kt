@@ -198,24 +198,12 @@ class FakeDuckChatInternal(
 
     override fun observeLastUsedTogglePosition(): Flow<String?> = MutableStateFlow(null)
 
-    private val _selectedMode = MutableStateFlow(InputMode.SEARCH)
-    private val _inputWidgetFocused = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
 
     override val displayedMode: StateFlow<InputMode> = _displayedMode.asStateFlow()
 
     override fun setSelectedMode(mode: InputMode) {
-        _selectedMode.value = mode
-        publishDisplayedMode()
-    }
-
-    override fun setInputWidgetFocused(focused: Boolean) {
-        _inputWidgetFocused.value = focused
-        publishDisplayedMode()
-    }
-
-    private fun publishDisplayedMode() {
-        _displayedMode.value = if (_inputWidgetFocused.value) _selectedMode.value else InputMode.SEARCH
+        _displayedMode.value = mode
     }
 
     fun setDuckChatUserEnabled(enabled: Boolean) {
