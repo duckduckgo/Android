@@ -68,7 +68,7 @@ class RealSavedSitesImporter(
             val savedSites = contentResolver.openInputStream(uri)?.use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
                 savedSitesParser.parseHtml(document, savedSitesRepository, destination)
-            } ?: return ImportSavedSitesResult(emptyList(), emptyList())
+            } ?: return ImportSavedSitesResult.Success(emptyList())
 
             val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
             val bookmarksAndFolders = savedSites.filterNot { it is SavedSite.Favorite }
