@@ -65,6 +65,7 @@ class OfflinePixelScheduler @Inject constructor(
     }
 }
 
+@dev.zacsweers.metro.HasMemberInjections
 @ContributesWorker(AppScope::class)
 open class OfflinePixelWorker(
     val context: Context,
