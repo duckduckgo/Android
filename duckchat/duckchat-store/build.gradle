@@ -37,7 +37,6 @@ dependencies {
     implementation Google.dagger
 
     ksp AndroidX.room.compiler
-    implementation AndroidX.room.ktx
     implementation AndroidX.room.runtime
 
     implementation AndroidX.lifecycle.runtime.ktx

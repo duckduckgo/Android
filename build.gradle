@@ -196,7 +196,14 @@ subprojects {
             // Note: refreshVersions placeholders ("_") are not resolved in substitutions, so pin the version explicitly.
             substitute(module("com.google.guava:listenablefuture"))
                     .using(module("com.google.guava:guava:33.4.0-android"))
-                    .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
+                    .because("Use guava's bundled ListenableFuture to avoid duplicate classes")
+        }
+        resolutionStrategy.eachDependency { details ->
+            // kotlinx-serialization runtime must match Kotlin 2.2.x compiler plugin output
+            if (details.requested.group == 'org.jetbrains.kotlinx' && details.requested.name.startsWith('kotlinx-serialization')) {
+                details.useVersion '1.8.1'
+                details.because 'Kotlin 2.2.21 serialization compiler plugin requires runtime >= 1.8.x'
+            }
         }
     }
 
