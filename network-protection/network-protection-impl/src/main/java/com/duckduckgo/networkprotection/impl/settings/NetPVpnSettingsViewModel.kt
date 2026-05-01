@@ -54,7 +54,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val vpnDisableOnCall: VpnDisableOnCall,
     private val networkProtectionPixels: NetworkProtectionPixels,
-    @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
+    @BatteryOptimizationsApi private val isIgnoringBatteryOptimizations: BatteryOptimizationsChecker,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val shouldRestartVpn = AtomicBoolean(false)
@@ -80,7 +80,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
-            _recommendedSettingsState.tryEmit(RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations()))
+            _recommendedSettingsState.tryEmit(RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()))
         }
     }
 
@@ -111,7 +111,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
         fun updateRecommendedSettings() {
             owner.lifecycleScope.launch(dispatcherProvider.io()) {
                 _recommendedSettingsState.tryEmit(
-                    RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations()),
+                    RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()),
                 )
             }
         }
@@ -154,14 +154,18 @@ class NetPVpnSettingsViewModel @Inject constructor(
 
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
-private annotation class InternalApi
+private annotation class BatteryOptimizationsApi
+
+fun interface BatteryOptimizationsChecker {
+    fun isIgnoringBatteryOptimizations(): Boolean
+}
 
 @Module
 @ContributesTo(ActivityScope::class)
 class IgnoringBatteryOptimizationsModule {
     @Provides
-    @InternalApi
-    fun providesIsIgnoringBatteryOptimizations(context: Context): () -> Boolean {
-        return { context.isIgnoringBatteryOptimizations() }
+    @BatteryOptimizationsApi
+    fun providesIsIgnoringBatteryOptimizations(context: Context): BatteryOptimizationsChecker {
+        return BatteryOptimizationsChecker { context.isIgnoringBatteryOptimizations() }
     }
 }
