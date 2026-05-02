@@ -5766,7 +5766,7 @@ class BrowserTabFragment :
         val pdfPath = state.currentPdfCachedUri?.path ?: return null
         val pdfFile = File(pdfPath).takeIf { it.exists() } ?: return null
         val displayName = state.currentPdfFileName ?: pdfFile.name
-        return CachedPdfPrintDocumentAdapter(pdfFile, displayName)
+        return CachedPdfPrintDocumentAdapter(pdfFile, displayName, dispatchers)
     }
 
     private fun showSitePermissionsDialog(

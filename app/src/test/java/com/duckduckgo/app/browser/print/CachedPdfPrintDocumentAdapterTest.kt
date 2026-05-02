@@ -23,8 +23,12 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -39,9 +43,12 @@ import java.io.File
 @Config(sdk = [34])
 class CachedPdfPrintDocumentAdapterTest {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     @Test
-    fun whenLayoutThenReportsPdfDocumentInfoWithDisplayName() {
-        val adapter = CachedPdfPrintDocumentAdapter(createTempPdf("hello", "%PDF-1.4 hello".toByteArray()), "hello.pdf")
+    fun whenLayoutThenReportsPdfDocumentInfoWithDisplayName() = runTest {
+        val adapter = adapter(createTempPdf("hello", "%PDF-1.4 hello".toByteArray()), "hello.pdf")
         val callback = mock<PrintDocumentAdapter.LayoutResultCallback>()
 
         adapter.onLayout(null, PrintAttributes.Builder().build(), null, callback, null)
@@ -53,8 +60,8 @@ class CachedPdfPrintDocumentAdapterTest {
     }
 
     @Test
-    fun whenLayoutAndCancellationAlreadyTriggeredThenLayoutCancelled() {
-        val adapter = CachedPdfPrintDocumentAdapter(createTempPdf("doc", "%PDF-1.4".toByteArray()), "doc.pdf")
+    fun whenLayoutAndCancellationAlreadyTriggeredThenLayoutCancelled() = runTest {
+        val adapter = adapter(createTempPdf("doc", "%PDF-1.4".toByteArray()), "doc.pdf")
         val callback = mock<PrintDocumentAdapter.LayoutResultCallback>()
         val signal = CancellationSignal().apply { cancel() }
 
@@ -65,9 +72,9 @@ class CachedPdfPrintDocumentAdapterTest {
     }
 
     @Test
-    fun whenWriteThenPdfFileBytesCopiedToDestination() {
+    fun whenWriteThenPdfFileBytesCopiedToDestination() = runTest {
         val pdfBytes = "%PDF-1.4 lorem ipsum dolor sit amet".toByteArray()
-        val adapter = CachedPdfPrintDocumentAdapter(createTempPdf("doc", pdfBytes), "doc.pdf")
+        val adapter = adapter(createTempPdf("doc", pdfBytes), "doc.pdf")
         val outFile = File.createTempFile("printed", ".pdf").apply { deleteOnExit() }
         val pfd = ParcelFileDescriptor.open(
             outFile,
@@ -76,6 +83,7 @@ class CachedPdfPrintDocumentAdapterTest {
         val callback = mock<PrintDocumentAdapter.WriteResultCallback>()
 
         adapter.onWrite(arrayOf(PageRange.ALL_PAGES), pfd, null, callback)
+        advanceUntilIdle()
         pfd.close()
 
         verify(callback).onWriteFinished(arrayOf(PageRange.ALL_PAGES))
@@ -83,19 +91,26 @@ class CachedPdfPrintDocumentAdapterTest {
     }
 
     @Test
-    fun whenWriteAndSourceFileMissingThenFailureReported() {
+    fun whenWriteAndSourceFileMissingThenFailureReported() = runTest {
         val ghostFile = File.createTempFile("ghost", ".pdf").apply { delete() }
-        val adapter = CachedPdfPrintDocumentAdapter(ghostFile, "ghost.pdf")
+        val adapter = adapter(ghostFile, "ghost.pdf")
         val outFile = File.createTempFile("printed", ".pdf").apply { deleteOnExit() }
         val pfd = ParcelFileDescriptor.open(outFile, ParcelFileDescriptor.MODE_WRITE_ONLY)
         val callback = mock<PrintDocumentAdapter.WriteResultCallback>()
 
         adapter.onWrite(arrayOf(PageRange.ALL_PAGES), pfd, null, callback)
+        advanceUntilIdle()
         pfd.close()
 
         verify(callback).onWriteFailed(any())
         verify(callback, never()).onWriteFinished(any())
     }
+
+    private fun adapter(pdfFile: File, displayName: String) = CachedPdfPrintDocumentAdapter(
+        pdfFile,
+        displayName,
+        coroutineTestRule.testDispatcherProvider,
+    )
 
     private fun createTempPdf(prefix: String, bytes: ByteArray): File =
         File.createTempFile(prefix, ".pdf").apply {

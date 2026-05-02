@@ -23,6 +23,11 @@ import android.print.PageRange
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -37,7 +42,10 @@ import java.io.IOException
 class CachedPdfPrintDocumentAdapter(
     private val pdfFile: File,
     private val displayName: String,
+    private val dispatcherProvider: DispatcherProvider,
 ) : PrintDocumentAdapter() {
+
+    private val writeScope = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
 
     override fun onLayout(
         oldAttributes: PrintAttributes?,
@@ -63,24 +71,30 @@ class CachedPdfPrintDocumentAdapter(
         cancellationSignal: CancellationSignal?,
         callback: WriteResultCallback,
     ) {
-        try {
-            FileInputStream(pdfFile).use { input ->
-                FileOutputStream(destination.fileDescriptor).use { output ->
-                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                    var bytesRead: Int
-                    while (input.read(buffer).also { bytesRead = it } > 0) {
-                        if (cancellationSignal?.isCanceled == true) {
-                            callback.onWriteCancelled()
-                            return
+        writeScope.launch {
+            try {
+                FileInputStream(pdfFile).use { input ->
+                    FileOutputStream(destination.fileDescriptor).use { output ->
+                        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                        var bytesRead: Int
+                        while (input.read(buffer).also { bytesRead = it } > 0) {
+                            if (cancellationSignal?.isCanceled == true) {
+                                callback.onWriteCancelled()
+                                return@launch
+                            }
+                            output.write(buffer, 0, bytesRead)
                         }
-                        output.write(buffer, 0, bytesRead)
                     }
                 }
+                callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
+            } catch (e: IOException) {
+                logcat(WARN) { "PDF print failed while copying bytes: ${e.asLog()}" }
+                callback.onWriteFailed(e.message)
             }
-            callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
-        } catch (e: IOException) {
-            logcat(WARN) { "PDF print failed while copying bytes: ${e.asLog()}" }
-            callback.onWriteFailed(e.message)
         }
+    }
+
+    override fun onFinish() {
+        writeScope.cancel()
     }
 }
