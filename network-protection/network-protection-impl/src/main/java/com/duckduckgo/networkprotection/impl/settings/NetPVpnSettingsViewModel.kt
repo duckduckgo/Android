@@ -80,7 +80,9 @@ class NetPVpnSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
-            _recommendedSettingsState.tryEmit(RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()))
+            _recommendedSettingsState.tryEmit(
+                RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()),
+            )
         }
     }
 

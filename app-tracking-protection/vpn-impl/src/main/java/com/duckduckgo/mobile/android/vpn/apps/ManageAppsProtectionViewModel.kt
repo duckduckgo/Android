@@ -106,7 +106,9 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         coroutineScope.launch(dispatcherProvider.io()) {
-            _recommendedSettingsState.tryEmit(RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()))
+            _recommendedSettingsState.tryEmit(
+                RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()),
+            )
         }
     }
 

@@ -269,14 +269,21 @@ if (diFramework == 'Metro') {
                         enableDaggerAnvilInterop.set(true)
                     }
                 }
-                // Override Anvil's languageVersion=1.9 AFTER evaluation (Anvil sets it during apply)
-                // Also disable KAPT tasks — Metro replaces Dagger, KAPT not needed
+                // Disable Anvil's Kotlin compiler plugin entirely — it forces languageVersion=1.9
+                // which is incompatible with Metro. Metro replaces all Anvil functionality.
                 afterEvaluate {
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                         compilerOptions {
                             languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                            apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
                         }
+                        // Remove Anvil from the compiler plugin classpath so it can't
+                        // override language version or run its K1 compiler plugin
+                        pluginClasspath.setFrom(pluginClasspath.filter {
+                            !it.name.contains("anvil")
+                        })
                     }
+                    // Disable KAPT tasks — Metro replaces Dagger
                     tasks.matching { it.name.contains("kapt") || it.name.contains("Kapt") }.configureEach {
                         enabled = false
                     }
