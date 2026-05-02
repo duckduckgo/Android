@@ -23,11 +23,13 @@ import androidx.work.WorkerFactory
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
+@ContributesTo(AppScope::class)
 object WorkerModule {
 
     @Provides

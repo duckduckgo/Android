@@ -21,11 +21,14 @@ import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListDownloader
 import com.duckduckgo.app.survey.api.SurveyDownloader
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 
 @Module
+@ContributesTo(AppScope::class)
 open class AppConfigurationDownloaderModule {
 
     @Provides

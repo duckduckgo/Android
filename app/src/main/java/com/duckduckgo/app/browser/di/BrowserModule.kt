@@ -107,6 +107,7 @@ import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -116,6 +117,7 @@ import javax.inject.Named
 import javax.inject.Qualifier
 
 @Module
+@ContributesTo(AppScope::class)
 class BrowserModule {
 
     @Provides

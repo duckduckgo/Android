@@ -20,12 +20,14 @@ import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
+@ContributesTo(AppScope::class)
 object JsonModule {
 
     @Provides
