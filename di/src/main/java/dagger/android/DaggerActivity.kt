@@ -17,17 +17,16 @@
 package dagger.android
 
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.di.DaggerMap
 import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 @HasMemberInjections
 abstract class DaggerActivity : AppCompatActivity(), HasDaggerInjector {
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
+    lateinit var injectorFactoryMap: InjectorFactoryMap
 
     override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
-        return injectorFactoryMap[key]
+        return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
                 Could not find the dagger component for ${key.simpleName}.

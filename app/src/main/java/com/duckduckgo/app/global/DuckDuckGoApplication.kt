@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
+import dagger.android.getFactory
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
@@ -73,7 +74,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
+    lateinit var injectorFactoryMap: dagger.android.InjectorFactoryMap
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -238,7 +239,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
     override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
-        return injectorFactoryMap[key]
+        return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
                 Could not find the dagger component for ${key.simpleName}.
