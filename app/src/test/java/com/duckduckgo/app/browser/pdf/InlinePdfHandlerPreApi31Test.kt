@@ -68,7 +68,7 @@ class InlinePdfHandlerPreApi31Test {
     fun whenApiBelow31AndPdfMimeTypeThenDecisionIsFallback() {
         assertEquals(
             PdfRenderDecision.Fallback,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/pdf"),
         )
     }
 
@@ -76,7 +76,7 @@ class InlinePdfHandlerPreApi31Test {
     fun whenApiBelow31AndContentDispositionInlineThenDecisionIsFallback() {
         assertEquals(
             PdfRenderDecision.Fallback,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "inline", "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "inline", "application/pdf"),
         )
     }
 
@@ -84,7 +84,7 @@ class InlinePdfHandlerPreApi31Test {
     fun whenApiBelow31AndUrlEndsInPdfWithOctetMimeThenDecisionIsFallback() {
         assertEquals(
             PdfRenderDecision.Fallback,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/octet-stream"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/octet-stream"),
         )
     }
 
@@ -92,7 +92,7 @@ class InlinePdfHandlerPreApi31Test {
     fun whenApiBelow31AndContentDispositionAttachmentThenDecisionIsNotApplicable() {
         assertEquals(
             PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
         )
     }
 }

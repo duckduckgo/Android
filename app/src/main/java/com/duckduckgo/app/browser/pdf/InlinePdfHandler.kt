@@ -58,7 +58,7 @@ interface InlinePdfHandler {
      * - [PdfRenderDecision.NotApplicable]: response is not an inline-eligible PDF
      *   (or the feature flag is off).
      */
-    fun decideForPdf(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision
+    fun classifyPdfRequest(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision
 
     /**
      * Downloads the PDF at [url] into internal cache for inline rendering.
@@ -69,7 +69,7 @@ interface InlinePdfHandler {
      *
      * Returns [PdfDownloadResult.Failure] with an error category when the network,
      * server, or file content prevents inline rendering. The feature flag and SDK
-     * gate live in [decideForPdf] so callers shouldn't reach this method when the
+     * gate live in [classifyPdfRequest] so callers shouldn't reach this method when the
      * feature is off.
      *
      * Cancellation-safe: if the calling coroutine is cancelled (e.g. the user
@@ -115,7 +115,7 @@ class RealInlinePdfHandler @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : InlinePdfHandler {
 
-    override fun decideForPdf(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision {
+    override fun classifyPdfRequest(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision {
         if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return PdfRenderDecision.NotApplicable
         // Use lastPathSegment so query strings and fragments don't break the .pdf check
         // (e.g. signed URLs like https://cdn.example.com/report.pdf?auth=token).

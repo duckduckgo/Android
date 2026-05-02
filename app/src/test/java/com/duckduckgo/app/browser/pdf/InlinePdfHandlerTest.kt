@@ -140,18 +140,18 @@ class InlinePdfHandlerTest {
         assertEquals(PdfDownloadResult.Failure(PdfErrorType.UNKNOWN), result)
     }
 
-    // region decideForPdf tests
+    // region classifyPdfRequest tests
 
     @Test
     fun whenPdfMimeTypeThenDecisionIsInline() {
-        assertEquals(PdfRenderDecision.Inline, inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"))
+        assertEquals(PdfRenderDecision.Inline, inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/pdf"))
     }
 
     @Test
     fun whenContentDispositionIsAttachmentThenDecisionIsNotApplicable() {
         assertEquals(
             PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "attachment; filename=doc.pdf", "application/pdf"),
         )
     }
 
@@ -159,7 +159,7 @@ class InlinePdfHandlerTest {
     fun whenMimeTypeIsNotPdfAndUrlNotPdfThenDecisionIsNotApplicable() {
         assertEquals(
             PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.txt", null, "text/plain"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.txt", null, "text/plain"),
         )
     }
 
@@ -167,7 +167,7 @@ class InlinePdfHandlerTest {
     fun whenMimeTypeIsNotPdfButUrlEndsPdfThenDecisionIsInline() {
         assertEquals(
             PdfRenderDecision.Inline,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/octet-stream"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/octet-stream"),
         )
     }
 
@@ -175,7 +175,7 @@ class InlinePdfHandlerTest {
     fun whenUrlEndsInPdfWithQueryParamsThenDecisionIsInline() {
         assertEquals(
             PdfRenderDecision.Inline,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf?auth=token", null, "application/octet-stream"),
         )
     }
 
@@ -183,7 +183,7 @@ class InlinePdfHandlerTest {
     fun whenUrlEndsInPdfWithFragmentThenDecisionIsInline() {
         assertEquals(
             PdfRenderDecision.Inline,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf#page=5", null, "application/octet-stream"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf#page=5", null, "application/octet-stream"),
         )
     }
 
@@ -191,7 +191,7 @@ class InlinePdfHandlerTest {
     fun whenContentDispositionIsExplicitInlineThenDecisionIsInline() {
         assertEquals(
             PdfRenderDecision.Inline,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "inline", "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "inline", "application/pdf"),
         )
     }
 
@@ -199,7 +199,7 @@ class InlinePdfHandlerTest {
     fun whenContentDispositionHasLeadingWhitespaceAttachmentThenDecisionIsNotApplicable() {
         assertEquals(
             PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"),
         )
     }
 
@@ -213,7 +213,7 @@ class InlinePdfHandlerTest {
 
         assertEquals(
             PdfRenderDecision.NotApplicable,
-            inlinePdfHandler.decideForPdf("https://example.com/doc.pdf", null, "application/pdf"),
+            inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", null, "application/pdf"),
         )
     }
 

@@ -3684,7 +3684,7 @@ class BrowserTabViewModel @Inject constructor(
             }
             return
         }
-        when (inlinePdfHandler.decideForPdf(url, contentDisposition, mimeType)) {
+        when (inlinePdfHandler.classifyPdfRequest(url, contentDisposition, mimeType)) {
             PdfRenderDecision.Inline -> handlePdfUrl(url, contentDisposition, mimeType, requestUserConfirmation)
             PdfRenderDecision.Fallback -> {
                 pixel.fire(PdfPixelName.PDF_FALLBACK)
