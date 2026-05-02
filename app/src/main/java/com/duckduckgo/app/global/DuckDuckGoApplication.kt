@@ -29,10 +29,10 @@ import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import dagger.android.getFactory
+import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
@@ -42,7 +42,6 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.io.File
-import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"

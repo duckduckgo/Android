@@ -41,7 +41,9 @@ object DefaultBrowserPromptsModule {
     fun providesDefaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
 
     @Provides
-    fun providesDefaultBrowserPromptsAppUsageDao(database: AppDatabase): DefaultBrowserPromptsAppUsageDao = database.defaultBrowserPromptsAppUsageDao()
+    fun providesDefaultBrowserPromptsAppUsageDao(
+        database: AppDatabase,
+    ): DefaultBrowserPromptsAppUsageDao = database.defaultBrowserPromptsAppUsageDao()
 }
 
 @Qualifier

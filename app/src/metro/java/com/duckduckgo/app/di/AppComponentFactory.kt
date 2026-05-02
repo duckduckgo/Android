@@ -17,14 +17,15 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
+import dev.zacsweers.metro.createGraphFactory
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * Creates the [AppComponent] using Metro's generated graph (Metro path).
- * This is a placeholder — Metro graph creation is not yet implemented.
+ * Creates the [AppComponent] using Metro's generated graph.
  */
 object AppComponentFactory {
     fun create(application: Application, applicationCoroutineScope: CoroutineScope): AppComponent {
-        TODO("Metro graph creation not yet implemented. This will be wired once Metro can generate the full DI graph.")
+        return createGraphFactory<AppComponent.Factory>()
+            .create(application, applicationCoroutineScope)
     }
 }
