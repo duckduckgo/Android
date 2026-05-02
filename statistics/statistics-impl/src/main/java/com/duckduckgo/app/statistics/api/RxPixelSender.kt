@@ -58,14 +58,14 @@ class RxPixelSender @Inject constructor(
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val deviceInfo: DeviceInfo,
-    private val statisticsLibraryConfig: StatisticsLibraryConfig?,
+    private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
 
     private val shouldFirePixelsAsDev: Int? by lazy {
-        if (statisticsLibraryConfig?.shouldFirePixelsAsDev() == true) 1 else null
+        if (statisticsLibraryConfig.shouldFirePixelsAsDev()) 1 else null
     }
 
     override fun onStart(owner: LifecycleOwner) {
