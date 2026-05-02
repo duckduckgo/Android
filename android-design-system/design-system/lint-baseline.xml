@@ -1311,13 +1311,6 @@
     </issue>
 
     <issue
-        id="RtlEnabled"
-        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
-        <location
-            file="src/main/AndroidManifest.xml"/>
-    </issue>
-
-    <issue
         id="InvalidDaxSecureTextFieldTrailingIconUsage"
         message="Use composables from DaxTextFieldTrailingIconScope instead of arbitrary composables &#xA;for the trailingIcon parameter to maintain design system consistency.&#xA;&#xA;Example:&#xA;DaxSecureTextField(&#xA;    state = state,&#xA;    isPasswordVisible = isPasswordVisible,&#xA;    onShowHidePasswordIconClick = { /* toggle visibility */ },&#xA;    trailingIcon = {&#xA;        DaxTextFieldTrailingIcon(&#xA;            painter = painterResource(R.drawable.ic_copy_24),&#xA;            contentDescription = stringResource(R.string.icon_description)&#xA;        )&#xA;    }&#xA;)&#xA;&#xA;This ensures consistent styling, spacing, and behavior across all text field icons in the app."
         errorLine1="        trailingIcon = trailingIcon,"
