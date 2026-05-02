@@ -18,7 +18,13 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.ReceiverScope
+import com.duckduckgo.di.scopes.ServiceScope
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.widget.EmptyFavoritesWidgetItemFactory
 import com.duckduckgo.widget.FavoritesWidgetItemFactory
 import com.duckduckgo.widget.SearchAndFavoritesWidget
@@ -33,7 +39,11 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 @SingleIn(AppScope::class)
-@DependencyGraph(scope = AppScope::class)
+@DependencyGraph(
+    scope = AppScope::class,
+    additionalScopes = [ActivityScope::class, FragmentScope::class, ViewScope::class,
+        ServiceScope::class, ReceiverScope::class, VpnScope::class],
+)
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @DependencyGraph.Factory
