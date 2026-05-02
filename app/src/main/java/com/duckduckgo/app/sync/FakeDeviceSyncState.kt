@@ -24,12 +24,10 @@ import javax.inject.*
 
 /**
  * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
+ * Note: AppDeviceSyncState in sync-impl has RANK_HIGHEST and always wins. This fake is effectively dead code
+ * but kept for build variants that might not include sync-impl.
  */
-@ContributesBinding(
-    scope = AppScope::class,
-    rank = ContributesBinding.RANK_NORMAL,
-)
-class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
+class FakeDeviceSyncState : DeviceSyncState {
     override fun isFeatureEnabled(): Boolean = false
     override fun isUserSignedInOnDevice(): Boolean = false
     override fun isDuckChatSyncFeatureEnabled(): Boolean = false
