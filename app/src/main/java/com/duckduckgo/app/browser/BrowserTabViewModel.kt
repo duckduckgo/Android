@@ -207,6 +207,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
@@ -3727,6 +3728,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun pdfDownloadCommands(): Flow<DownloadCommand> = pdfDownloadCommandFlow.asSharedFlow()
+
+    fun onPdfRenderFailure(@Suppress("UNUSED_PARAMETER") throwable: Throwable) {
+        pixel.fire(
+            PdfPixelName.PDF_RENDER_FAILURE,
+            parameters = mapOf("error_type" to PdfErrorType.UNKNOWN.paramValue),
+        )
+    }
 
     /**
      * Called by the fragment when the inline PDF is hidden (back press, navigation).

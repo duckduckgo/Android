@@ -10579,6 +10579,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnPdfRenderFailureThenRenderFailurePixelFiresWithUnknownErrorType() {
+        testee.onPdfRenderFailure(RuntimeException("malformed pdf"))
+
+        verify(mockPixel).fire(PdfPixelName.PDF_RENDER_FAILURE, parameters = mapOf("error_type" to "unknown"))
+    }
+
+    @Test
     fun whenDecisionIsFallbackThenFallbackPixelFiresAndStandardDownloadCommandIssued() = runTest {
         whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Fallback)
 
