@@ -39,11 +39,7 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 @SingleIn(AppScope::class)
-@DependencyGraph(
-    scope = AppScope::class,
-    additionalScopes = [ActivityScope::class, FragmentScope::class, ViewScope::class,
-        ServiceScope::class, ReceiverScope::class, VpnScope::class],
-)
+@DependencyGraph(scope = AppScope::class)
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @DependencyGraph.Factory

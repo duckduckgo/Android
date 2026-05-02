@@ -169,24 +169,16 @@ class ContributesSubComponentProcessor(
         val parentScope = getParentScope(scopeClassName)
         val subComponentClassName = ClassName(packageName, subComponentName)
 
-        // Subcomponent annotation (MergeSubcomponent or ContributesSubcomponent)
-        val subComponentAnnotation = if (delayGeneration) {
-            AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_CLASS)
-                .addMember("scope = %T::class", scopeClassName)
-                .addMember("parentScope = %T::class", parentScope)
-                .build()
-        } else {
-            AnnotationSpec.builder(MERGE_SUBCOMPONENT_CLASS)
-                .addMember("scope = %T::class", scopeClassName)
-                .build()
-        }
+        // Always use @ContributesSubcomponent (with parentScope) instead of @MergeSubcomponent.
+        // Metro's interop recognizes @ContributesSubcomponent and establishes the parent-child
+        // scope relationship. @MergeSubcomponent doesn't carry parentScope and Metro can't
+        // determine the hierarchy.
+        val subComponentAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_CLASS)
+            .addMember("scope = %T::class", scopeClassName)
+            .addMember("parentScope = %T::class", parentScope)
+            .build()
 
-        // Factory annotation (ContributesSubcomponent.Factory or Subcomponent.Factory)
-        val factoryAnnotation = if (delayGeneration) {
-            AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS).build()
-        } else {
-            AnnotationSpec.builder(SUBCOMPONENT_FACTORY_CLASS).build()
-        }
+        val factoryAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS).build()
 
         // Factory interface
         val factoryType = TypeSpec.interfaceBuilder("Factory")
