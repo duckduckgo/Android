@@ -106,21 +106,10 @@ class ContributesSubComponentProcessor(
         }
         val scopeClassName = scopeType.toClassName()
 
-        val delayGeneration = annotation.getArgumentValue("delayGeneration") as? Boolean ?: false
-
-        if (delayGeneration && getParentScope(scopeClassName) != APP_SCOPE) {
-            logger.error(
-                "${classDeclaration.qualifiedName?.asString()}: " +
-                    "'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
-                classDeclaration,
-            )
-            return
-        }
-
         if (scopeClassName == ACTIVITY_SCOPE) {
             generateActivityInjector(classDeclaration, scopeClassName)
         } else {
-            generateSubComponent(classDeclaration, scopeClassName, delayGeneration)
+            generateSubComponent(classDeclaration, scopeClassName)
             generateSubComponentModule(classDeclaration, scopeClassName, annotation)
         }
     }
@@ -160,7 +149,6 @@ class ContributesSubComponentProcessor(
     private fun generateSubComponent(
         classDeclaration: KSClassDeclaration,
         scopeClassName: ClassName,
-        delayGeneration: Boolean,
     ) {
         val className = classDeclaration.simpleName.asString()
         val packageName = classDeclaration.packageName.asString()
@@ -311,7 +299,4 @@ class ContributesSubComponentProcessor(
         return arguments.firstOrNull { it.name?.asString() == name }?.value as? KSType
     }
 
-    private fun KSAnnotation.getArgumentValue(name: String): Any? {
-        return arguments.firstOrNull { it.name?.asString() == name }?.value
-    }
 }
