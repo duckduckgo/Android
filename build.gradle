@@ -229,6 +229,9 @@ subprojects {
     }
 
     plugins.withId('com.google.devtools.ksp') {
+        ksp {
+            arg("ddg.di", findProperty('ddg.di') ?: 'AnvilDagger')
+        }
         afterEvaluate {
             configurations.configureEach { config ->
                 if (config.name == 'ksp') {
