@@ -43,6 +43,7 @@ import com.squareup.kotlinpoet.ksp.writeTo
 class ContributesSubComponentProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
+    private val isMetro: Boolean,
 ) : SymbolProcessor {
 
     companion object {
@@ -203,12 +204,20 @@ class ContributesSubComponentProcessor(
             .build()
 
         // Main SubComponent interface
+        // In Metro mode, @SingleInstanceIn is omitted — Metro derives the scope from
+        // @ContributesSubcomponent(scope = ...) and adding @SingleInstanceIn would cause
+        // a "multiple scope annotations" error. In AnvilDagger mode, Dagger requires the
+        // explicit scope annotation on the generated subcomponent.
         val typeSpec = TypeSpec.interfaceBuilder(subComponentName)
-            .addAnnotation(
-                AnnotationSpec.builder(SINGLE_INSTANCE_IN_CLASS)
-                    .addMember("scope = %T::class", scopeClassName)
-                    .build(),
-            )
+            .apply {
+                if (!isMetro) {
+                    addAnnotation(
+                        AnnotationSpec.builder(SINGLE_INSTANCE_IN_CLASS)
+                            .addMember("scope = %T::class", scopeClassName)
+                            .build(),
+                    )
+                }
+            }
             .addAnnotation(subComponentAnnotation)
             .addSuperinterface(ANDROID_INJECTOR_CLASS.parameterizedBy(classType))
             .addType(factoryType)
