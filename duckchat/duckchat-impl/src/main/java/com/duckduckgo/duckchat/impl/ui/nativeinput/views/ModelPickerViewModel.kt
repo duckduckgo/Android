@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

@@ -16,4 +16,5 @@
 
 <resources>
     <item name="modelPickerContainer" type="id"/>
+    <item name="startChatContainer" type="id"/>
 </resources>
