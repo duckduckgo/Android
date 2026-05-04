@@ -30,7 +30,6 @@ import com.duckduckgo.widget.FavoritesWidgetItemFactory
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
-import dagger.android.AndroidInjector
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
@@ -40,7 +39,9 @@ import javax.inject.Named
 
 @SingleIn(AppScope::class)
 @DependencyGraph(scope = AppScope::class)
-interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
+interface AppComponent {
+
+    fun inject(instance: DuckDuckGoApplication)
 
     @DependencyGraph.Factory
     interface Factory {
