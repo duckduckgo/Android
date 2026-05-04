@@ -70,6 +70,10 @@ class FirstScreenHandlerImpl @Inject constructor(
         }
         appCoroutineScope.launch {
             logcat { "FirstScreen: onOpen isFreshLaunch $isFreshLaunch" }
+            // Persist the new-user default eagerly so screens that read optionFlow
+            // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
+            // after-inactivity flow has had a chance to run.
+            showOnAppLaunchOptionHandler.ensureNewUserDefault()
             handleFirstScreen(isFreshLaunch)
         }
     }

@@ -38,6 +38,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
+    suspend fun ensureNewUserDefault()
     suspend fun handleAfterInactivityOption(wasIdle: Boolean)
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
@@ -58,14 +59,15 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
-    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
-        // new users see New Tab
-        logcat { "FirstScreen: Inactivity Timer passed" }
+    override suspend fun ensureNewUserDefault() {
         if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
             logcat { "FirstScreen: setting New Tab for new users" }
             showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
         }
-        // existing users see whatever they had selected
+    }
+
+    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
+        logcat { "FirstScreen: Inactivity Timer passed" }
         applyShowOnAppLaunchOption(fromInactivity = wasIdle)
     }
 

@@ -37,6 +37,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
@@ -795,19 +796,52 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         }
     }
 
+    // ensureNewUserDefault tests
+
+    @Test
+    fun whenEnsureDefaultAndNewInstallAndNoOptionThenPersistsNewTabPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.ensureNewUserDefault()
+
+        assertTrue(fakeDataStore.hasOptionSelected())
+        assertEquals(NewTabPage, fakeDataStore.optionFlow.first())
+    }
+
+    @Test
+    fun whenEnsureDefaultAndNewInstallAndOptionAlreadySelectedThenDoesNotOverwrite() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.ensureNewUserDefault()
+
+        assertEquals(LastOpenedTab, fakeDataStore.optionFlow.first())
+    }
+
+    @Test
+    fun whenEnsureDefaultAndExistingInstallAndNoOptionThenDoesNothing() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.ensureNewUserDefault()
+
+        assertTrue(!fakeDataStore.hasOptionSelected())
+    }
+
     // handleAfterInactivityOption tests
 
     @Test
     fun whenNewInstallAndNoOptionSelectedThenSetsNewTabPage() = runTest {
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
+        // Mirrors FirstScreenHandlerImpl.onOpen which calls ensureNewUserDefault first.
+        testee.ensureNewUserDefault()
         testee.handleAfterInactivityOption(wasIdle = true)
 
         fakeTabRepository.flowTabs.test {
             val tabs = awaitItem()
             awaitComplete()
 
-            // NewTabPage was set, then handleAppLaunchOption added a tab
+            // NewTabPage was set by ensureNewUserDefault, then handleAfterInactivityOption added a tab
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == "")
         }
@@ -912,12 +946,14 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
     @Test
     fun whenNtpSetOnFirstInactivityThenSubsequentInactivityAfterUpdateStillShowsNtp() = runTest {
-        // First inactivity on new install: NTP is persisted in the store
+        // First inactivity on new install: NTP is persisted by ensureNewUserDefault
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        testee.ensureNewUserDefault()
         testee.handleAfterInactivityOption(wasIdle = true)
 
         // After an app update isNewInstall() returns false, but the stored NTP option is preserved
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        testee.ensureNewUserDefault()
         testee.handleAfterInactivityOption(wasIdle = true)
 
         fakeTabRepository.flowTabs.test {
