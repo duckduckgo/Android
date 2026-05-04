@@ -11,7 +11,8 @@ tags:
           stopApp: true
           arguments:
             # isMaestro is auto-injected by the Maestro runtime on every launchApp call
-            testScenario: "native_input_favorites_3"
+            testScenario: "favorites_3"
+            nativeInputToggle: "true"
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: ./shared/enable_unified_input.yaml
       - assertVisible:

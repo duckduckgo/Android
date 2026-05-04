@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.launch
 
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -27,11 +28,18 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface TestScenarioSeeder {
-    suspend fun seedIfNeeded(isMaestroExtra: String?, scenarioKey: String?)
+    suspend fun seedIfNeeded(
+        isMaestroExtra: String?,
+        scenarioKey: String?,
+        omnibarPosition: String?,
+        nativeInputToggle: String?,
+    )
 
     companion object {
         const val EXTRA_IS_MAESTRO = "isMaestro"
         const val EXTRA_TEST_SCENARIO = "testScenario"
+        const val EXTRA_OMNIBAR_POSITION = "omnibarPosition"
+        const val EXTRA_NATIVE_INPUT_TOGGLE = "nativeInputToggle"
     }
 }
 
@@ -44,12 +52,25 @@ class RealTestScenarioSeeder @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : TestScenarioSeeder {
 
-    override suspend fun seedIfNeeded(isMaestroExtra: String?, scenarioKey: String?) {
+    override suspend fun seedIfNeeded(
+        isMaestroExtra: String?,
+        scenarioKey: String?,
+        omnibarPosition: String?,
+        nativeInputToggle: String?,
+    ) {
         if (isMaestroExtra != "true") return
-        val key = scenarioKey ?: return
-        val scenario = TestScenario.fromKey(key) ?: return
         withContext(dispatchers.io()) {
-            scenario.seed(savedSitesRepository, settingsDataStore, duckChatDataStore)
+            scenarioKey?.let { TestScenario.fromKey(it)?.seed(savedSitesRepository) }
+            omnibarPosition?.let {
+                when (it.lowercase()) {
+                    "top" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+                    "bottom" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+                    "split" -> settingsDataStore.omnibarType = OmnibarType.SPLIT
+                }
+            }
+            nativeInputToggle?.let {
+                duckChatDataStore.setDuckChatUserEnabled(it == "true")
+            }
         }
     }
 }

@@ -16,46 +16,23 @@
 
 package com.duckduckgo.app.launch
 
-import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 
 enum class TestScenario(val key: String) {
-    NATIVE_INPUT_FAVORITES_3("native_input_favorites_3"),
-    NATIVE_INPUT_BOOKMARKS_2("native_input_bookmarks_2"),
-    NATIVE_INPUT_OMNIBAR_TOP("native_input_omnibar_top"),
-    NATIVE_INPUT_OMNIBAR_BOTTOM("native_input_omnibar_bottom"),
-    NATIVE_INPUT_DUCK_AI_ENABLED("native_input_duck_ai_enabled"),
-    NATIVE_INPUT_DUCK_AI_DISABLED("native_input_duck_ai_disabled");
+    FAVORITES_3("favorites_3"),
+    BOOKMARKS_2("bookmarks_2");
 
     // Caller is responsible for providing an IO dispatcher context (e.g. withContext(dispatchers.io())).
-    suspend fun seed(
-        savedSitesRepository: SavedSitesRepository,
-        settingsDataStore: SettingsDataStore,
-        duckChatDataStore: DuckChatDataStore,
-    ) {
+    suspend fun seed(savedSitesRepository: SavedSitesRepository) {
         when (this) {
-            NATIVE_INPUT_FAVORITES_3 -> {
+            FAVORITES_3 -> {
                 savedSitesRepository.insertFavorite(url = "https://example.com", title = "Example")
                 savedSitesRepository.insertFavorite(url = "https://duckduckgo.com", title = "DuckDuckGo")
                 savedSitesRepository.insertFavorite(url = "https://privacy-test-pages.site", title = "Privacy Test Pages")
             }
-            NATIVE_INPUT_BOOKMARKS_2 -> {
+            BOOKMARKS_2 -> {
                 savedSitesRepository.insertBookmark(url = "https://example.com", title = "Example")
                 savedSitesRepository.insertBookmark(url = "https://duckduckgo.com", title = "DuckDuckGo")
-            }
-            NATIVE_INPUT_OMNIBAR_TOP -> {
-                settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-            }
-            NATIVE_INPUT_OMNIBAR_BOTTOM -> {
-                settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-            }
-            NATIVE_INPUT_DUCK_AI_ENABLED -> {
-                duckChatDataStore.setDuckChatUserEnabled(true)
-            }
-            NATIVE_INPUT_DUCK_AI_DISABLED -> {
-                duckChatDataStore.setDuckChatUserEnabled(false)
             }
         }
     }

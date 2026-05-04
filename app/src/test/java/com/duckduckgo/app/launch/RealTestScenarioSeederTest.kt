@@ -48,91 +48,115 @@ class RealTestScenarioSeederTest {
         seeder = RealTestScenarioSeeder(savedSitesRepository, settingsDataStore, duckChatDataStore, coroutineRule.testDispatcherProvider)
     }
 
+    private suspend fun seed(
+        isMaestro: String? = "true",
+        scenario: String? = null,
+        omnibarPosition: String? = null,
+        nativeInputToggle: String? = null,
+    ) = seeder.seedIfNeeded(
+        isMaestroExtra = isMaestro,
+        scenarioKey = scenario,
+        omnibarPosition = omnibarPosition,
+        nativeInputToggle = nativeInputToggle,
+    )
+
     @Test
     fun `when isMaestro extra is absent, nothing is seeded`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = null, scenarioKey = null)
+        seed(isMaestro = null, scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(savedSitesRepository, never()).insertBookmark(any(), any())
-        verifyNoInteractions(settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
     }
 
     @Test
-    fun `when isMaestro is true but testScenario is absent, nothing is seeded`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = null)
+    fun `when isMaestro is not true, nothing is seeded`() = runTest {
+        seed(isMaestro = "false", scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(savedSitesRepository, never()).insertBookmark(any(), any())
-        verifyNoInteractions(settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
     }
 
     @Test
-    fun `when isMaestro is true but testScenario key is unknown, nothing is seeded`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "unknown_scenario_key")
+    fun `when isMaestro is true but all args absent, nothing is seeded`() = runTest {
+        seed()
 
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(savedSitesRepository, never()).insertBookmark(any(), any())
-        verifyNoInteractions(settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
     }
 
     @Test
-    fun `when isMaestro is present but not true, nothing is seeded`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "false", scenarioKey = "native_input_favorites_3")
+    fun `when scenario key is unknown, no data is seeded`() = runTest {
+        seed(scenario = "unknown_scenario_key")
 
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(savedSitesRepository, never()).insertBookmark(any(), any())
-        verifyNoInteractions(settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
     }
 
     @Test
-    fun `when scenario is NATIVE_INPUT_FAVORITES_3, three favorites are inserted`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_favorites_3")
+    fun `when scenario is favorites_3, three favorites are inserted`() = runTest {
+        seed(scenario = "favorites_3")
 
         verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
     }
 
     @Test
-    fun `when scenario is NATIVE_INPUT_BOOKMARKS_2, two bookmarks are inserted`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_bookmarks_2")
+    fun `when scenario is bookmarks_2, two bookmarks are inserted`() = runTest {
+        seed(scenario = "bookmarks_2")
 
         verify(savedSitesRepository, times(2)).insertBookmark(any(), any())
         verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
     }
 
     @Test
-    fun `when scenario is NATIVE_INPUT_OMNIBAR_BOTTOM, omnibar type is set to bottom`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_omnibar_bottom")
-
-        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verifyNoInteractions(duckChatDataStore)
-    }
-
-    @Test
-    fun `when scenario is NATIVE_INPUT_OMNIBAR_TOP, omnibar type is set to top`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_omnibar_top")
+    fun `when omnibarPosition is top, omnibar type is set to top`() = runTest {
+        seed(omnibarPosition = "top")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verifyNoInteractions(duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
     }
 
     @Test
-    fun `when scenario is NATIVE_INPUT_DUCK_AI_ENABLED, duck ai user enabled is set to true`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_duck_ai_enabled")
+    fun `when omnibarPosition is bottom, omnibar type is set to bottom`() = runTest {
+        seed(omnibarPosition = "bottom")
+
+        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
+    }
+
+    @Test
+    fun `when omnibarPosition is split, omnibar type is set to split`() = runTest {
+        seed(omnibarPosition = "split")
+
+        verify(settingsDataStore).omnibarType = OmnibarType.SPLIT
+        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
+    }
+
+    @Test
+    fun `when omnibarPosition is unknown, omnibar type is not set`() = runTest {
+        seed(omnibarPosition = "unknown")
+
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+    }
+
+    @Test
+    fun `when nativeInputToggle is true, duck ai is enabled`() = runTest {
+        seed(nativeInputToggle = "true")
 
         verify(duckChatDataStore).setDuckChatUserEnabled(true)
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verifyNoInteractions(settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
     @Test
-    fun `when scenario is NATIVE_INPUT_DUCK_AI_DISABLED, duck ai user enabled is set to false`() = runTest {
-        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_duck_ai_disabled")
+    fun `when nativeInputToggle is false, duck ai is disabled`() = runTest {
+        seed(nativeInputToggle = "false")
 
         verify(duckChatDataStore).setDuckChatUserEnabled(false)
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-        verifyNoInteractions(settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+    }
+
+    @Test
+    fun `all three args can be combined independently`() = runTest {
+        seed(scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
+
+        verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
+        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        verify(duckChatDataStore).setDuckChatUserEnabled(true)
     }
 }
