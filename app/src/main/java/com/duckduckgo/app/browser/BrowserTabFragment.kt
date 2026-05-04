@@ -159,6 +159,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
@@ -1813,6 +1814,7 @@ class BrowserTabFragment :
                 viewModel.onShareSelected()
             }
             onMenuItemClicked(downloadPdfMenuItem) {
+                pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
                 viewModel.onDownloadPdfMenuItemClicked()
             }
             onMenuItemClicked(addToHomeMenuItem) {
@@ -2290,6 +2292,11 @@ class BrowserTabFragment :
 
         binding.pdfViewerContainer.show()
         val pdfFragment = DdgPdfViewerFragment()
+        pdfFragment.errorListener = object : DdgPdfViewerFragment.ErrorListener {
+            override fun onLoadDocumentError(throwable: Throwable) {
+                viewModel.onPdfRenderFailure(throwable)
+            }
+        }
         childFragmentManager.beginTransaction()
             .replace(R.id.pdfViewerContainer, pdfFragment, PDF_VIEWER_FRAGMENT_TAG)
             .commitNowAllowingStateLoss()

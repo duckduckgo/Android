@@ -35,6 +35,12 @@ import com.duckduckgo.app.browser.R
 @SuppressLint("RestrictedApi")
 class DdgPdfViewerFragment : PdfViewerFragmentV2() {
 
+    interface ErrorListener {
+        fun onLoadDocumentError(throwable: Throwable)
+    }
+
+    var errorListener: ErrorListener? = null
+
     override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
         val inflater = super.onGetLayoutInflater(savedInstanceState)
         val themedContext = ContextThemeWrapper(
@@ -46,5 +52,10 @@ class DdgPdfViewerFragment : PdfViewerFragmentV2() {
 
     fun documentUri(uri: Uri) {
         documentUri = uri
+    }
+
+    override fun onLoadDocumentError(throwable: Throwable) {
+        super.onLoadDocumentError(throwable)
+        errorListener?.onLoadDocumentError(throwable)
     }
 }

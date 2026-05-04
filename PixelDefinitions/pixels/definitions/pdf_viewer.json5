@@ -1,6 +1,20 @@
 {
     "m_pdf_viewer_opened": {
-        "description": "Fired when a PDF is successfully rendered inline in a browser tab",
+        "description": "Fired every time a PDF is successfully rendered inline in a browser tab",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_pdf_viewer_opened_daily": {
+        "description": "Fired once per calendar day when a PDF is successfully rendered inline in a browser tab",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_pdf_viewer_opened_unique": {
+        "description": "Fired once per install the first time a PDF is successfully rendered inline in a browser tab",
         "owners": ["GerardPaligot"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
