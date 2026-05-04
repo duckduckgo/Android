@@ -71,6 +71,8 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
                 testScenarioSeeder.seedIfNeeded(
                     isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
                     scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+                    omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
+                    nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
                 )
             }
             viewModel.determineViewToShow()
