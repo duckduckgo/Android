@@ -1174,7 +1174,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             },
             {
                 "key": "power_saving",
@@ -1203,7 +1221,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1217,7 +1253,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             },
             {
                 "key": "power_saving",
@@ -1251,7 +1305,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             },
             {
                 "key": "power_saving",
@@ -1295,7 +1367,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1309,7 +1399,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1330,7 +1438,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1349,7 +1475,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1630,7 +1774,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
@@ -1659,7 +1821,25 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
             }
         ]
     },
