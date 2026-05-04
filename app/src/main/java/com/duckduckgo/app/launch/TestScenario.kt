@@ -20,7 +20,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 
 enum class TestScenario(val key: String) {
     FAVORITES_3("favorites_3"),
-    BOOKMARKS_2("bookmarks_2");
+    BOOKMARKS_2("bookmarks_2"),
+    ;
 
     // Caller is responsible for providing an IO dispatcher context (e.g. withContext(dispatchers.io())).
     suspend fun seed(savedSitesRepository: SavedSitesRepository) {
