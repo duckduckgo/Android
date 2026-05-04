@@ -461,6 +461,13 @@
             }
         ]
     },
+    "autofill_device_capability_secure_storage_unavailable_daily": {
+        "description": "Fired when secure storage is unavailable for autofill on app start (daily)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "autofill_harmony_update_key_rollback_failed": {
         "description": "Rolling back legacy key write after Harmony write failure also failed (daily unique)",
         "owners": ["CrisBarreiro"],

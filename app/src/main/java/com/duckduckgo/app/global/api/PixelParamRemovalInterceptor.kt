@@ -205,6 +205,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AutofillPixelNames.AUTOFILL_PREFERENCES_KEY_MISSING.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_DAILY.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
