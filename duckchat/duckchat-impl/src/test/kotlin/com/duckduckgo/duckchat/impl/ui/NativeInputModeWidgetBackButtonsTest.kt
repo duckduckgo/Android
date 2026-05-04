@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.ui
 
 import com.duckduckgo.duckchat.impl.ui.NativeInputState.InputContext
 import com.duckduckgo.duckchat.impl.ui.NativeInputState.InputMode
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowCardRowBack
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowToggleRowBack
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

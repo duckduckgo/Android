@@ -164,6 +164,14 @@
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
 
+                    <FrameLayout
+                        android:id="@id/startChatContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
                 </LinearLayout>
 
                 <FrameLayout

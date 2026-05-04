@@ -442,6 +442,13 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun submitAsChat(): Boolean {
+        val textToSubmit = inputField.text.getTextToSubmit()?.toString() ?: return false
+        onChatSent?.invoke(textToSubmit)
+        inputField.clearFocus()
+        return true
+    }
+
     fun selectTab(index: Int) {
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()

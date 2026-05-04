@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.nativeinput
+package com.duckduckgo.duckchat.impl.ui.nativeinput.plugins
 
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
-import com.duckduckgo.duckchat.impl.ui.ModelPicker
-import com.duckduckgo.duckchat.impl.ui.ModelPickerView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPicker
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerView
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ import javax.inject.Inject
 )
 class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
-    override val containerId: Int = com.duckduckgo.duckchat.impl.R.id.modelPickerContainer
+    override val containerId: Int = R.id.modelPickerContainer
 
     private var modelPicker: WeakReference<ModelPicker> = WeakReference(null)
 

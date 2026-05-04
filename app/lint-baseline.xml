@@ -1037,12 +1037,12 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.NativeInputWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.ui.NativeInputWidget"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"
-            line="36"
+            line="40"
             column="1"/>
     </issue>
 
@@ -12434,9 +12434,9 @@
 
     <issue
         id="NoImplImportsInAppModule"
-        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.NativeInputWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
-        errorLine1="import com.duckduckgo.duckchat.impl.ui.NativeInputWidget"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
     </issue>
