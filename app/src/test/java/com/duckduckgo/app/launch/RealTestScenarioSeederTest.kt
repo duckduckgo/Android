@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.launch
 
-import android.content.Intent
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -27,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -50,135 +50,89 @@ class RealTestScenarioSeederTest {
 
     @Test
     fun `when isMaestro extra is absent, nothing is seeded`() = runTest {
-        val intent = Intent()
+        seeder.seedIfNeeded(isMaestroExtra = null, scenarioKey = null)
 
-        seeder.seedIfNeeded(intent)
-
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
         verifyNoInteractions(settingsDataStore, duckChatDataStore)
     }
 
     @Test
     fun `when isMaestro is true but testScenario is absent, nothing is seeded`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-        }
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = null)
 
-        seeder.seedIfNeeded(intent)
-
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
         verifyNoInteractions(settingsDataStore, duckChatDataStore)
     }
 
     @Test
     fun `when isMaestro is true but testScenario key is unknown, nothing is seeded`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "unknown_scenario_key")
-        }
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "unknown_scenario_key")
 
-        seeder.seedIfNeeded(intent)
-
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
         verifyNoInteractions(settingsDataStore, duckChatDataStore)
     }
 
     @Test
     fun `when isMaestro is present but not true, nothing is seeded`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "false")
-            putExtra("testScenario", "native_input_favorites_3")
-        }
+        seeder.seedIfNeeded(isMaestroExtra = "false", scenarioKey = "native_input_favorites_3")
 
-        seeder.seedIfNeeded(intent)
-
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
         verifyNoInteractions(settingsDataStore, duckChatDataStore)
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_FAVORITES_3, three favorites are inserted`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_favorites_3")
-        }
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_favorites_3")
 
-        seeder.seedIfNeeded(intent)
-
-        verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
         verify(savedSitesRepository, never()).insertBookmark(any(), any())
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_BOOKMARKS_2, two bookmarks are inserted`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_bookmarks_2")
-        }
-
-        seeder.seedIfNeeded(intent)
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_bookmarks_2")
 
         verify(savedSitesRepository, times(2)).insertBookmark(any(), any())
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_OMNIBAR_BOTTOM, omnibar type is set to bottom`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_omnibar_bottom")
-        }
-
-        seeder.seedIfNeeded(intent)
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_omnibar_bottom")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verifyNoInteractions(duckChatDataStore)
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_OMNIBAR_TOP, omnibar type is set to top`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_omnibar_top")
-        }
-
-        seeder.seedIfNeeded(intent)
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_omnibar_top")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verifyNoInteractions(duckChatDataStore)
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_DUCK_AI_ENABLED, duck ai user enabled is set to true`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_duck_ai_enabled")
-        }
-
-        seeder.seedIfNeeded(intent)
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_duck_ai_enabled")
 
         verify(duckChatDataStore).setDuckChatUserEnabled(true)
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verifyNoInteractions(settingsDataStore)
     }
 
     @Test
     fun `when scenario is NATIVE_INPUT_DUCK_AI_DISABLED, duck ai user enabled is set to false`() = runTest {
-        val intent = Intent().apply {
-            putExtra("isMaestro", "true")
-            putExtra("testScenario", "native_input_duck_ai_disabled")
-        }
-
-        seeder.seedIfNeeded(intent)
+        seeder.seedIfNeeded(isMaestroExtra = "true", scenarioKey = "native_input_duck_ai_disabled")
 
         verify(duckChatDataStore).setDuckChatUserEnabled(false)
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), any())
+        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
         verifyNoInteractions(settingsDataStore)
     }
 }
