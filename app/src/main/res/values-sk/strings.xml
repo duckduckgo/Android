@@ -1024,6 +1024,9 @@
     <string name="syncRestoreDialogPrimaryCta">Obnoviť moje veci</string>
     <string name="syncRestoreDialogSecondaryCta">Preskočiť</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopírovať text odkazu</string>
     <string name="linkTextCopied">Skopírovaný text prepojenia</string>

@@ -1024,6 +1024,9 @@
     <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
     <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Скачать PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Скопировать текст ссылки</string>
     <string name="linkTextCopied">Текст ссылки скопирован</string>

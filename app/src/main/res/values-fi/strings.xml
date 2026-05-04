@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Palauta tiedot</string>
     <string name="syncRestoreDialogSecondaryCta">Ohita</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Lataa PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopioi linkin teksti</string>
     <string name="linkTextCopied">Linkin teksti kopioitu</string>

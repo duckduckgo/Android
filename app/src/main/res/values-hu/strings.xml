@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Saját adataim visszaállítása</string>
     <string name="syncRestoreDialogSecondaryCta">Kihagyás</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF letöltése</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Link szövegének másolása</string>
     <string name="linkTextCopied">Link szövege másolva</string>

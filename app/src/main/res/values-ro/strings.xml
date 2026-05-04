@@ -1004,6 +1004,9 @@
     <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Descarcă PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Copiază textul linkului</string>
     <string name="linkTextCopied">Textul linkului a fost copiat</string>

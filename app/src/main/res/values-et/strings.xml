@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Taasta minu andmed</string>
     <string name="syncRestoreDialogSecondaryCta">Jäta vahele</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Laadi alla PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopeeri lingi tekst</string>
     <string name="linkTextCopied">Lingi tekst on kopeeritud</string>
