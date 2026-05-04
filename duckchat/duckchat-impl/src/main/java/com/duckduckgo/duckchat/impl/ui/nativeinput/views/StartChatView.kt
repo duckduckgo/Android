@@ -59,7 +59,10 @@ class StartChatView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        icon.setOnClickListener { findNativeInputWidget()?.submitAsChat() }
+        icon.setOnClickListener {
+            val submitted = findNativeInputWidget()?.submitAsChat() == true
+            if (!submitted) viewModel.openNewChat()
+        }
         observeVisibility()
     }
 

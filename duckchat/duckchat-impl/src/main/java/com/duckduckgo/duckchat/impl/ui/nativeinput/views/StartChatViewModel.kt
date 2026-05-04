@@ -28,7 +28,7 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class StartChatViewModel @Inject constructor(
     duckAiFeatureState: DuckAiFeatureState,
-    duckChatInternal: DuckChatInternal,
+    private val duckChatInternal: DuckChatInternal,
 ) : ViewModel() {
 
     /**
@@ -44,5 +44,9 @@ class StartChatViewModel @Inject constructor(
         duckChatInternal.observeInputScreenUserSettingEnabled(),
     ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled ->
         isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled
+    }
+
+    fun openNewChat() {
+        duckChatInternal.openNewDuckChatSession()
     }
 }
