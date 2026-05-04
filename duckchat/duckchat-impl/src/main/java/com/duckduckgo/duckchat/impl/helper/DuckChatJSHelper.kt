@@ -225,7 +225,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_STARTED -> {
-                voiceSessionStateManager.onVoiceSessionStarted()
+                voiceSessionStateManager.onVoiceSessionStarted(tabId)
                 duckChatPixels.reportVoiceSessionStarted()
                 null
             }
