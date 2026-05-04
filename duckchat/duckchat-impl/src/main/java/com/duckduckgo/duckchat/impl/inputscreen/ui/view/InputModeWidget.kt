@@ -475,6 +475,13 @@ open class InputModeWidget @JvmOverloads constructor(
         return true
     }
 
+    fun submitAsSearch(): Boolean {
+        val textToSubmit = inputField.text.getTextToSubmit()?.toString() ?: return false
+        onSearchSent?.invoke(textToSubmit)
+        inputField.clearFocus()
+        return true
+    }
+
     fun selectTab(index: Int) {
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()

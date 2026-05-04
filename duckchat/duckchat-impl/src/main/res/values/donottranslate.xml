@@ -34,4 +34,7 @@
 
     <!-- Start chat icon content description -->
     <string name="duckChatStartChatContentDescription">Start chat</string>
+
+    <!-- Search-in-new-tab icon content description -->
+    <string name="duckAiInputScreenSearchInNewTabContentDescription">Search in new tab</string>
 </resources>

@@ -172,6 +172,14 @@
                         android:visibility="gone"
                         tools:visibility="visible" />
 
+                    <FrameLayout
+                        android:id="@id/searchInNewTabContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
                 </LinearLayout>
 
                 <FrameLayout
