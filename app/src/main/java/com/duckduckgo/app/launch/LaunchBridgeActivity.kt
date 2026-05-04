@@ -54,6 +54,9 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var testScenarioSeeder: TestScenarioSeeder
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -63,7 +66,13 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        lifecycleScope.launch {
+            testScenarioSeeder.seedIfNeeded(
+                isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
+                scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+            )
+            viewModel.determineViewToShow()
+        }
     }
 
     private fun configureObservers() {
