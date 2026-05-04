@@ -67,10 +67,12 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         configureObservers()
 
         lifecycleScope.launch {
-            testScenarioSeeder.seedIfNeeded(
-                isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
-                scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
-            )
+            runCatching {
+                testScenarioSeeder.seedIfNeeded(
+                    isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
+                    scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+                )
+            }
             viewModel.determineViewToShow()
         }
     }
