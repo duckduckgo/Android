@@ -418,6 +418,8 @@ dependencies {
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
 
+    implementation project(':fire-mode-impl')
+
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
