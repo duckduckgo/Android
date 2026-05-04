@@ -37,7 +37,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -87,6 +87,42 @@ class FirstScreenHandlerImplTest {
         )
     }
 
+    // --- ensureNewUserDefault is invoked on every onOpen ---
+
+    @Test
+    fun whenOnOpenWithIdleReturnEnabledThenInvokesEnsureNewUserDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+    }
+
+    @Test
+    fun whenOnOpenWithIdleReturnDisabledAndShowOnAppLaunchEnabledThenInvokesEnsureNewUserDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+    }
+
+    @Test
+    fun whenOnOpenWithBothFeaturesDisabledThenStillInvokesEnsureNewUserDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+    }
+
     // --- Idle return enabled (covers both fresh and non-fresh launches) ---
 
     @Test
@@ -125,7 +161,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -138,7 +175,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -189,7 +227,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -252,7 +291,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -262,7 +302,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
         verify(showOnAppLaunchToggle, never()).isEnabled()
     }
 
@@ -282,7 +323,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -330,7 +372,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
@@ -475,7 +518,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     // --- RC default used directly ---
@@ -511,7 +555,8 @@ class FirstScreenHandlerImplTest {
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchOptionHandler).ensureNewUserDefault()
+        verifyNoMoreInteractions(showOnAppLaunchOptionHandler)
     }
 
     @Test
