@@ -151,7 +151,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canChangeBrowsingMode = browserViewState.canChangeBrowsingMode,
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             hasPreviousAppLink = browserViewState.previousAppLink != null,
-            canFindInPage = browserViewState.canFindInPage,
+            canFindInPage = browserViewState.canFindInPage && browserViewState.currentPdfCachedUri == null,
             addToHomeVisible = browserViewState.addToHomeVisible,
             addToHomeEnabled = browserViewState.addToHomeEnabled,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
