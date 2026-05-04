@@ -31,7 +31,6 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
-import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -146,7 +145,7 @@ class RealPirJobsRunner @Inject constructor(
         val totalScanJobs = executeScanJobs(context, executionType, activeBrokers)
 
         // We emit a pixel after the scans are completed from the foreground scan
-        if (executionType == MANUAL) {
+        if (executionType.isManual) {
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
             pixelSender.reportInitialScanDuration(
                 durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
@@ -154,6 +153,7 @@ class RealPirJobsRunner @Inject constructor(
                 isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
                 batteryOptimizationsEnabled = batteryOptimizationsEnabled,
                 brokerCount = activeBrokers.size,
+                executionType = executionType,
             )
         }
 
@@ -213,9 +213,9 @@ class RealPirJobsRunner @Inject constructor(
         profileQueryCount: Int,
         brokerCount: Int,
     ) {
-        if (executionType == MANUAL) {
+        if (executionType.isManual) {
             val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
-            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount)
+            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount, executionType)
         } else {
             pixelSender.reportScheduledScanStarted()
         }
@@ -231,7 +231,7 @@ class RealPirJobsRunner @Inject constructor(
         brokerCount: Int,
     ) {
         val totalTimeMillis = currentTimeProvider.currentTimeMillis() - startTimeInMillis
-        if (executionType == MANUAL) {
+        if (executionType.isManual) {
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
             pixelSender.reportManualScanCompleted(
                 totalTimeInMillis = totalTimeMillis,
@@ -241,6 +241,7 @@ class RealPirJobsRunner @Inject constructor(
                 profileQueryCount = profileQueryCount,
                 brokerCount = brokerCount,
                 isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
+                executionType = executionType,
             )
         } else {
             pixelSender.reportScheduledScanCompleted(totalTimeMillis)
@@ -290,7 +291,7 @@ class RealPirJobsRunner @Inject constructor(
     ): Int {
         val eligibleJobs = eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
             .filter { it.brokerName in activeBrokers }
-        val runType = if (executionType == MANUAL) {
+        val runType = if (executionType.isManual) {
             RunType.MANUAL
         } else {
             RunType.SCHEDULED
