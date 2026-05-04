@@ -29,6 +29,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Space
+import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
@@ -517,21 +518,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
-        viewModel.configure(isDuckAiMode, isBottom)
-        viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
-        if (isDuckAiMode) selectChatTab()
-        applyOmnibarShape(isBottom)
+        doOnAttach {
+            viewModel.configure(isDuckAiMode, isBottom)
+            viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
+            if (isDuckAiMode) selectChatTab()
+            applyOmnibarShape(isBottom)
+        }
     }
 
     override fun configureContextual() {
-        viewModel.configureContextual()
-        selectChatTab()
+        doOnAttach {
+            viewModel.configureContextual()
+            selectChatTab()
+        }
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
 
     override fun setWidgetPosition(isBottom: Boolean) {
-        viewModel.setWidgetPosition(isBottom)
+        doOnAttach {
+            viewModel.setWidgetPosition(isBottom)
+        }
     }
 
     private fun applyOmnibarShape(isBottom: Boolean) {
