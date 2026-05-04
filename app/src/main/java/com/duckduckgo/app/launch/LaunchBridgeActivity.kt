@@ -27,6 +27,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -47,13 +48,17 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         configureObservers()
 
         lifecycleScope.launch {
-            runCatching {
+            try {
                 testScenarioSeeder.seedIfNeeded(
                     isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
                     scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
                     omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
                     nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
                 )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // seed failure must not prevent routing to BrowserActivity
             }
             viewModel.determineViewToShow()
         }
