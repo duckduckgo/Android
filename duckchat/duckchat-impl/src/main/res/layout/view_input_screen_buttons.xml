@@ -42,12 +42,13 @@
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/background_input_screen_button"
-        android:backgroundTint="?attr/daxColorFabSecondaryContainer"
+        android:backgroundTint="?attr/daxColorAccentAltPrimary"
         android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_ai_chat_voice_24"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:tint="?attr/daxColorAccentAltContentPrimary" />
 
     <ImageView
         android:id="@+id/actionNewLine"
