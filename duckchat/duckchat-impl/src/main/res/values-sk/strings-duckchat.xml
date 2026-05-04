@@ -112,4 +112,7 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Vymazať údaje</string>
     <string name="duckChatBrowserMenuContentDescription">Ďalšie možnosti</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Hlasový čet</string>
 </resources>
