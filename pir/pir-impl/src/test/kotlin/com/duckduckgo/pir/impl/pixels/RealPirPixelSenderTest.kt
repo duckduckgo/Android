@@ -167,9 +167,7 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportManualScanStartFailedThenEnqueuesPixelWithVpnState() = runTest {
-        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
-
+    fun whenReportManualScanStartFailedThenEnqueuesCorrectPixel() = runTest {
         testee.reportManualScanStartFailed()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -180,13 +178,11 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue.isEmpty())
     }
 
     @Test
-    fun whenReportManualScanLowMemoryThenEnqueuesPixelWithVpnState() = runTest {
-        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
-
+    fun whenReportManualScanLowMemoryThenEnqueuesCorrectPixel() = runTest {
         testee.reportManualScanLowMemory()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -197,7 +193,7 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
+        assert(paramsCaptor.firstValue.isEmpty())
     }
 
     @Test
