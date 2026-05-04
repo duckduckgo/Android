@@ -26,12 +26,16 @@ import com.duckduckgo.app.browser.mode.AppLauncher
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private val viewModel: LaunchViewModel by bindViewModel()
+
+    @Inject
+    lateinit var testScenarioSeeder: TestScenarioSeeder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -42,7 +46,13 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        lifecycleScope.launch {
+            testScenarioSeeder.seedIfNeeded(
+                isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
+                scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+            )
+            viewModel.determineViewToShow()
+        }
     }
 
     private fun configureObservers() {
