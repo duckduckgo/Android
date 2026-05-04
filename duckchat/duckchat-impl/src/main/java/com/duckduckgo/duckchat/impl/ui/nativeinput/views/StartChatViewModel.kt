@@ -21,10 +21,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.ui.NativeInputState.InputMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
@@ -33,17 +31,18 @@ class StartChatViewModel @Inject constructor(
     duckChatInternal: DuckChatInternal,
 ) : ViewModel() {
 
-    val inputMode: Flow<InputMode> = combine(
+    /**
+     * Show the start-chat icon only when Duck.ai is available (feature enabled +
+     * user setting on) but the input-screen toggle is off — i.e. the user has Duck.ai
+     * but is in `SEARCH_ONLY` mode. Mapping `inputMode == SEARCH_ONLY` directly would
+     * also match the case where Duck.ai is entirely disabled, which would let the icon
+     * navigate to a Duck.ai URL the user has opted out of.
+     */
+    val isVisible: Flow<Boolean> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
     ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled ->
-        if (isFeatureEnabled && isUserEnabled && isInputScreenUserSettingEnabled) {
-            InputMode.SEARCH_AND_DUCK_AI
-        } else {
-            InputMode.SEARCH_ONLY
-        }
+        isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled
     }
-
-    val isVisible: Flow<Boolean> = inputMode.map { it == InputMode.SEARCH_ONLY }
 }
