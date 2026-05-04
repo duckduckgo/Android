@@ -37,7 +37,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
@@ -805,7 +805,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         testee.ensureNewUserDefault()
 
         assertTrue(fakeDataStore.hasOptionSelected())
-        assertEquals(NewTabPage, fakeDataStore.optionFlow.first())
+        assertEquals(NewTabPage, fakeDataStore.optionFlow.firstOrNull())
     }
 
     @Test
@@ -815,7 +815,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
 
         testee.ensureNewUserDefault()
 
-        assertEquals(LastOpenedTab, fakeDataStore.optionFlow.first())
+        assertEquals(LastOpenedTab, fakeDataStore.optionFlow.firstOrNull())
     }
 
     @Test
