@@ -1229,6 +1229,11 @@
                 "description": "Reported VPN connection state when the initial scan completed",
                 "type": "string",
                 "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "notifications_permission_granted",
+                "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
+                "type": "boolean"
             }
         ]
     },
@@ -1320,6 +1325,11 @@
                 "description": "Reported VPN connection state when the foreground run started",
                 "type": "string",
                 "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "notifications_permission_granted",
+                "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
+                "type": "boolean"
             }
         ]
     },
@@ -1399,6 +1409,11 @@
                 "description": "Reported VPN connection state when the foreground run completed",
                 "type": "string",
                 "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "notifications_permission_granted",
+                "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
+                "type": "boolean"
             }
         ]
     },

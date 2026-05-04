@@ -54,6 +54,7 @@ class RealPirPixelSenderTest {
             profileQueryCount = 3,
             brokerCount = 10,
             executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -72,6 +73,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["broker_count"] == "10")
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
     }
 
     @Test
@@ -83,6 +85,7 @@ class RealPirPixelSenderTest {
             profileQueryCount = 1,
             brokerCount = 5,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -95,6 +98,7 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 
     @Test
@@ -111,6 +115,7 @@ class RealPirPixelSenderTest {
             brokerCount = 10,
             isPowerSavingEnabled = true,
             executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -137,6 +142,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["power_saving"] == "true")
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
     }
 
     @Test
@@ -152,6 +158,7 @@ class RealPirPixelSenderTest {
             brokerCount = 0,
             isPowerSavingEnabled = false,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -164,6 +171,7 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 
     @Test
@@ -1096,6 +1104,7 @@ class RealPirPixelSenderTest {
             batteryOptimizationsEnabled = false,
             brokerCount = 10,
             executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1115,6 +1124,7 @@ class RealPirPixelSenderTest {
         assert(params["broker_count"] == "10")
         assert(params["scan_trigger"] == "onboarding")
         assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["notifications_permission_granted"] == "true")
     }
 
     @Test
@@ -1128,6 +1138,7 @@ class RealPirPixelSenderTest {
             batteryOptimizationsEnabled = true,
             brokerCount = 0,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1140,5 +1151,6 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 }

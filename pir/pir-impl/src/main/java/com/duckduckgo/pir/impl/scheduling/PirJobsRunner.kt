@@ -16,8 +16,11 @@
 
 package com.duckduckgo.pir.impl.scheduling
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.PowerManager
+import androidx.core.app.ActivityCompat
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
@@ -154,6 +157,7 @@ class RealPirJobsRunner @Inject constructor(
                 batteryOptimizationsEnabled = batteryOptimizationsEnabled,
                 brokerCount = activeBrokers.size,
                 executionType = executionType,
+                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
             )
         }
 
@@ -215,7 +219,13 @@ class RealPirJobsRunner @Inject constructor(
     ) {
         if (executionType.isManual) {
             val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
-            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount, executionType)
+            pixelSender.reportManualScanStarted(
+                isPowerSavingEnabled = isPowerSavingEnabled,
+                profileQueryCount = profileQueryCount,
+                brokerCount = brokerCount,
+                executionType = executionType,
+                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+            )
         } else {
             pixelSender.reportScheduledScanStarted(profileQueryCount, brokerCount)
         }
@@ -242,6 +252,7 @@ class RealPirJobsRunner @Inject constructor(
                 brokerCount = brokerCount,
                 isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
                 executionType = executionType,
+                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
             )
         } else {
             pixelSender.reportScheduledScanCompleted(totalTimeMillis, profileQueryCount, brokerCount)
@@ -355,6 +366,12 @@ class RealPirJobsRunner @Inject constructor(
     private fun Context.isPowerSavingModeEnabled(): Boolean {
         return runCatching {
             (getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
+        }.getOrDefault(false)
+    }
+
+    private fun Context.areNotificationsPermissionGranted(): Boolean {
+        return runCatching {
+            ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PERMISSION_GRANTED
         }.getOrDefault(false)
     }
 }
