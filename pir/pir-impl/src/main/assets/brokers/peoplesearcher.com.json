@@ -1,7 +1,7 @@
 {
   "name": "PeopleSearcher",
   "url": "peoplesearcher.com",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.peoplesearcher.com/api/helper/optOutLight/search",
   "steps": [
@@ -149,6 +149,9 @@
             "addressCityStateList": {
               "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
               "separator": "/(?<=, [A-Z]{2}), /"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "b235a497-3ceb-4dee-9704-dcda0349bd3a"

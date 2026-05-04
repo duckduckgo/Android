@@ -1,7 +1,7 @@
 {
   "name": "BeenVerified",
   "url": "beenverified.com",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts",
   "mirrorSites": [
     {
@@ -259,6 +259,9 @@
             },
             "addressCityState": {
               "selector": ".MuiGrid-item.MuiGrid-grid-xs-12 > p.MuiTypography-body1"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "94f0c65d-cac1-4724-ba3a-4da7fd59ab2c"
