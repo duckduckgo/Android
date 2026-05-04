@@ -30,6 +30,7 @@ import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity.Companion.DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -67,13 +68,17 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         configureObservers()
 
         lifecycleScope.launch {
-            runCatching {
+            try {
                 testScenarioSeeder.seedIfNeeded(
                     isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
                     scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
                     omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
                     nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
                 )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // seed failure must not prevent routing to BrowserActivity
             }
             viewModel.determineViewToShow()
         }
