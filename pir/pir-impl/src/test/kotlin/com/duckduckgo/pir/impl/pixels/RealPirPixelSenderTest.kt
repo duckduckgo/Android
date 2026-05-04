@@ -68,7 +68,15 @@ class RealPirPixelSenderTest {
     fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
         val totalTimeInMillis = 12345L
 
-        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false, totalScanJobs = 5, totalOptOutJobs = 3)
+        testee.reportManualScanCompleted(
+            totalTimeInMillis,
+            batteryOptimizationsEnabled = false,
+            totalScanJobs = 5,
+            totalOptOutJobs = 3,
+            profileQueryCount = 3,
+            brokerCount = 10,
+            isPowerSavingEnabled = true,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -86,6 +94,12 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["total_scan"] == "5")
         assert(paramsCaptor.firstValue.containsKey("total_optout"))
         assert(paramsCaptor.firstValue["total_optout"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue.containsKey("power_saving"))
+        assert(paramsCaptor.firstValue["power_saving"] == "true")
     }
 
     @Test
@@ -996,6 +1010,9 @@ class RealPirPixelSenderTest {
         testee.reportInitialScanDuration(
             durationMs = 45000L,
             profileQueryCount = 3,
+            isPowerSavingEnabled = true,
+            batteryOptimizationsEnabled = false,
+            brokerCount = 10,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1010,5 +1027,8 @@ class RealPirPixelSenderTest {
         assert(params["duration_in_ms"] == "45000")
         assert(params["profile_queries"] == "3")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["power_saving"] == "true")
+        assert(params["battery-optimizations"] == "false")
+        assert(params["broker_count"] == "10")
     }
 }
