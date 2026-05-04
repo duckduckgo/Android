@@ -103,7 +103,7 @@ interface PirPixelSender {
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      */
-    fun reportManualScanStarted(
+    suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
         brokerCount: Int,
@@ -122,7 +122,7 @@ interface PirPixelSender {
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      */
-    fun reportManualScanCompleted(
+    suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
@@ -613,7 +613,7 @@ interface PirPixelSender {
 
     fun reportInitialScanIncomplete()
 
-    fun reportInitialScanDuration(
+    suspend fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
         isPowerSavingEnabled: Boolean,
@@ -645,7 +645,7 @@ class RealPirPixelSender @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val pirRemoteFeatures: PirRemoteFeatures,
 ) : PirPixelSender {
-    override fun reportManualScanStarted(
+    override suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
         brokerCount: Int,
@@ -655,12 +655,13 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
 
-    override fun reportManualScanCompleted(
+    override suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
@@ -678,6 +679,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
@@ -1447,7 +1449,7 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INITIAL_SCAN_INCOMPLETE)
     }
 
-    override fun reportInitialScanDuration(
+    override suspend fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
         isPowerSavingEnabled: Boolean,
@@ -1463,6 +1465,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
