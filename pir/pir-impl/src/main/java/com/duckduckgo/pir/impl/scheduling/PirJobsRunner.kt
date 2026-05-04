@@ -147,14 +147,11 @@ class RealPirJobsRunner @Inject constructor(
 
         // We emit a pixel after the scans are completed from the foreground scan
         if (executionType == MANUAL) {
-            val isPowerSavingEnabled = runCatching {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
-            }.getOrDefault(false)
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
             pixelSender.reportInitialScanDuration(
                 durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
                 profileQueryCount = profileQueries.size,
-                isPowerSavingEnabled = isPowerSavingEnabled,
+                isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
                 batteryOptimizationsEnabled = batteryOptimizationsEnabled,
                 brokerCount = activeBrokers.size,
             )
@@ -217,9 +214,7 @@ class RealPirJobsRunner @Inject constructor(
         brokerCount: Int,
     ) {
         if (executionType == MANUAL) {
-            val isPowerSavingEnabled = runCatching {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
-            }.getOrDefault(false)
+            val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
             pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount)
         } else {
             pixelSender.reportScheduledScanStarted()
@@ -238,9 +233,6 @@ class RealPirJobsRunner @Inject constructor(
         val totalTimeMillis = currentTimeProvider.currentTimeMillis() - startTimeInMillis
         if (executionType == MANUAL) {
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
-            val isPowerSavingEnabled = runCatching {
-                (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
-            }.getOrDefault(false)
             pixelSender.reportManualScanCompleted(
                 totalTimeInMillis = totalTimeMillis,
                 batteryOptimizationsEnabled = batteryOptimizationsEnabled,
@@ -248,7 +240,7 @@ class RealPirJobsRunner @Inject constructor(
                 totalOptOutJobs = totalOptOutJobs,
                 profileQueryCount = profileQueryCount,
                 brokerCount = brokerCount,
-                isPowerSavingEnabled = isPowerSavingEnabled,
+                isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
             )
         } else {
             pixelSender.reportScheduledScanCompleted(totalTimeMillis)
@@ -357,5 +349,11 @@ class RealPirJobsRunner @Inject constructor(
     override fun stop() {
         pirScan.stop()
         pirOptOut.stop()
+    }
+
+    private fun Context.isPowerSavingModeEnabled(): Boolean {
+        return runCatching {
+            (getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
+        }.getOrDefault(false)
     }
 }
