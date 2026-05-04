@@ -111,7 +111,6 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Clear data</string>
     <string name="duckChatBrowserMenuContentDescription">More options</string>
-    <string name="duckChatStartChatContentDescription" tools:ignore="MissingTranslation">Start chat</string>
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Voice Chat</string>
