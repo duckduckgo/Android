@@ -307,5 +307,4 @@ class ContributesSubComponentProcessor(
     private fun KSAnnotation.getArgumentType(name: String): KSType? {
         return arguments.firstOrNull { it.name?.asString() == name }?.value as? KSType
     }
-
 }

@@ -82,7 +82,9 @@ class RealAppBuildConfig @Inject constructor(
     override val isPerformanceTest: Boolean = BuildConfig.IS_PERFORMANCE_TEST
     private val diFramework: String = if (BuildConfig.DEBUG || BuildConfig.FLAVOR == "internal") {
         BuildConfig.DI_FRAMEWORK
-    } else ""
+    } else {
+        ""
+    }
 
     override val isDefaultVariantForced: Boolean = BuildConfig.FORCE_DEFAULT_VARIANT
 
