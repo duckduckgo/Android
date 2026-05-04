@@ -1304,6 +1304,11 @@
                 "description": "What triggered the scan run",
                 "type": "string",
                 "enum": ["onboarding", "profile_edit", "scheduled"]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the foreground run started",
+                "type": "string"
             }
         ]
     },
@@ -1377,6 +1382,11 @@
                 "description": "What triggered the scan run",
                 "type": "string",
                 "enum": ["onboarding", "profile_edit", "scheduled"]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the foreground run completed",
+                "type": "string"
             }
         ]
     },
@@ -1490,11 +1500,6 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            },
-            {
-                "key": "vpn_connection_state",
-                "description": "Reported VPN connection state when the foreground run completed",
-                "type": "string"
             }
         ]
     },
@@ -1542,11 +1547,6 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            },
-            {
-                "key": "vpn_connection_state",
-                "description": "Reported VPN connection state when the foreground run started",
-                "type": "string"
             }
         ]
     },
