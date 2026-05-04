@@ -398,8 +398,8 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, SCHEDULED)
 
         // Then
-        verify(mockPixelSender).reportScheduledScanStarted()
-        verify(mockPixelSender).reportScheduledScanCompleted(any())
+        verify(mockPixelSender).reportScheduledScanStarted(any(), any())
+        verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any())
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,

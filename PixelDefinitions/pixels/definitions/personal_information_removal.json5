@@ -1526,6 +1526,16 @@
                 "key": "cpuUsage",
                 "description": "Average CPU usage percent",
                 "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
@@ -1615,6 +1625,16 @@
                 "key": "tries",
                 "description": "Number of tries it took to complete the stage",
                 "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
