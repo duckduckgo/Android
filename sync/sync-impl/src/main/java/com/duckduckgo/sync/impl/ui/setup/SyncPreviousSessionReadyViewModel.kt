@@ -24,6 +24,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.ContinueSetup
 import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyViewModel.Command.StartRestore
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +35,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class SyncPreviousSessionReadyViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -56,6 +58,7 @@ class SyncPreviousSessionReadyViewModel @Inject constructor(
     fun onResumeClicked() {
         syncPixels.fireAutoRestoreSettingsRestoreTapped(source)
         viewModelScope.launch {
+            syncSetupWideEvent.onSyncRestoreStarted()
             command.send(StartRestore)
         }
     }
