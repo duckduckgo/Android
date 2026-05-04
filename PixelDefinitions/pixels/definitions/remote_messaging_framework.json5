@@ -7,7 +7,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -22,7 +21,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -37,7 +35,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -58,7 +55,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -73,7 +69,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -88,7 +83,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -103,7 +97,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -123,7 +116,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
@@ -143,7 +135,6 @@
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
-            "atb",
             {
                 "key": "message",
                 "description": "The identifier for the message, sourced from the remote message configuration",
