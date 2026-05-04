@@ -35,12 +35,26 @@ def get_commits_between(repo_path: str, start_commit: str, end_commit: str) -> L
     return commits
 
 
+def _build_flexible_prefix_pattern(prefix: str) -> str:
+    """
+    Build a flexible regex pattern from a prefix string.
+    Allows flexible whitespace (including newlines) between words and around "/".
+    """
+    # Split prefix by whitespace, escape each part, join with \s+ to allow flexible whitespace
+    prefix_parts = prefix.split()
+    flexible = r"\s+".join(re.escape(part) for part in prefix_parts)
+    # Allow optional whitespace around "/" (e.g., "Task / Issue" or "Task/ Issue")
+    flexible = flexible.replace("/", r"\s*/\s*")
+    return flexible
+
+
 def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List[AsanaTaskLink]:
     """
     Extract Asana task links from commit messages.
     """
     task_links = []
-    url_pattern = re.compile(rf"{re.escape(url_prefix)}\s*(https://app\.asana\.com/\S*)")
+    prefix_pattern = _build_flexible_prefix_pattern(url_prefix)
+    url_pattern = re.compile(rf"(?:{prefix_pattern})\s*(https://app\.asana\.com/\S*)")
     
     for commit in commits:
         message = commit.message
