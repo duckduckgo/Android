@@ -110,4 +110,6 @@
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Download PDF</string>
 </resources>
