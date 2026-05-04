@@ -129,6 +129,7 @@ open class InputModeWidget @JvmOverloads constructor(
     var onTabSwitcherTapped: (() -> Unit)? = null
     var onMenuTapped: (() -> Unit)? = null
     var onClearTextTapped: (() -> Unit)? = null
+    var onOpenNewTabTapped: ((query: String?) -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()

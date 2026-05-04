@@ -72,6 +72,7 @@ interface NativeInputWidget {
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
+    var onOpenNewTabTapped: ((query: String?) -> Unit)?
     var onStopTapped: (() -> Unit)?
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?
@@ -94,6 +95,7 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun submitAsChat(): Boolean
+    fun isDuckAiContext(): Boolean
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
@@ -541,6 +543,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
+
+    override fun isDuckAiContext(): Boolean = nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI
 
     override fun setWidgetPosition(isBottom: Boolean) {
         doOnAttach {

@@ -56,6 +56,7 @@ class NativeInputCallbacks(
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onImageButtonPressed: () -> Unit = {},
+    val onNewTabRequested: (query: String?) -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -421,6 +422,10 @@ class RealNativeInputManager @Inject constructor(
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }
+            }
+            onOpenNewTabTapped = { query ->
+                hideNativeInput(isNavigation = true)
+                callbacks.onNewTabRequested(query)
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())

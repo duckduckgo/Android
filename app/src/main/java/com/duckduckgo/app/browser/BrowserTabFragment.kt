@@ -1359,6 +1359,15 @@ class BrowserTabFragment :
                 onImageButtonPressed = {
                     // To be implemented
                 },
+                onNewTabRequested = { query ->
+                    if (query == null) {
+                        browserActivity?.launchNewTab()
+                    } else if (swipingTabsFeature.isEnabled) {
+                        browserActivity?.launchNewTab(query = query, sourceTabId = tabId)
+                    } else {
+                        browserActivity?.openInNewTab(query = query, sourceTabId = tabId)
+                    }
+                },
             ),
         )
     }
