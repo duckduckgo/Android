@@ -433,9 +433,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
-        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
         setRawInputType(
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or
+            InputType.TYPE_CLASS_TEXT or
                 InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
         )
         setHorizontallyScrolling(false)
