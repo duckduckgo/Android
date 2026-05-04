@@ -1179,12 +1179,12 @@
             {
                 "key": "power_saving",
                 "description": "Whether the device is in power saving mode",
-                "type": "string"
+                "type": "boolean"
             },
             {
                 "key": "battery-optimizations",
                 "description": "Whether battery optimizations are enabled for the app",
-                "type": "string"
+                "type": "boolean"
             },
             {
                 "key": "broker_count",
@@ -1222,7 +1222,7 @@
             {
                 "key": "power_saving",
                 "description": "Whether the device is in power saving mode",
-                "type": "string"
+                "type": "boolean"
             },
             {
                 "key": "profile_queries",
@@ -1256,12 +1256,12 @@
             {
                 "key": "power_saving",
                 "description": "Whether the device is in power saving mode",
-                "type": "string"
+                "type": "boolean"
             },
             {
                 "key": "battery-optimizations",
                 "description": "Whether battery optimizations are enabled for the app",
-                "type": "string"
+                "type": "boolean"
             },
             {
                 "key": "total_scan",
