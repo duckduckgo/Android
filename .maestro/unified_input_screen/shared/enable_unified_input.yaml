@@ -1,0 +1,7 @@
+appId: com.duckduckgo.mobile.android
+---
+- runFlow: ../../shared/open_ai_settings_screen.yaml
+- tapOn:
+    id: "duckAiInputScreenToggleWithAiImage"
+- action: back
+- action: back
