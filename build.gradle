@@ -26,6 +26,9 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
+        // Metro DI plugin (requires JVM 21+ to load)
+        classpath "dev.zacsweers.metro:gradle-plugin:1.0.0"
     }
 }
 
@@ -207,6 +210,24 @@ subprojects {
         }
     }
 
+    // Use JDK 21 for Kotlin compilation (required for Metro compiler plugin)
+    // Output bytecode still targets JVM 17
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+    pluginManager.withPlugin('org.jetbrains.kotlin.android') {
+        kotlin {
+            jvmToolchain(21)
+        }
+    }
+    pluginManager.withPlugin('org.jetbrains.kotlin.jvm') {
+        kotlin {
+            jvmToolchain(21)
+        }
+    }
+
     plugins.withId('com.google.devtools.ksp') {
         afterEvaluate {
             configurations.configureEach { config ->
@@ -221,6 +242,40 @@ subprojects {
                 }
             }
         }
+    }
+}
+
+// Metro dual-build: conditionally swap Anvil for Metro based on ddg.di property
+def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+logger.lifecycle("DI FRAMEWORK: ${diFramework}")
+if (diFramework == 'Metro') {
+    subprojects {
+        // Metro must be applied after Kotlin but during plugin application (not afterEvaluate).
+        // Nest callbacks: first wait for Kotlin, then check for Anvil.
+        def applyMetro = {
+            pluginManager.withPlugin('com.squareup.anvil') {
+                apply plugin: 'dev.zacsweers.metro'
+                metro {
+                    interop {
+                        includeDaggerAnnotations.set(true)
+                        includeJavaxAnnotations.set(true)
+                        includeAnvilAnnotations.set(true)
+                        enableDaggerRuntimeInterop.set(true)
+                        enableDaggerAnvilInterop.set(true)
+                    }
+                }
+                // Override Anvil's languageVersion=1.9 AFTER evaluation (Anvil sets it during apply)
+                afterEvaluate {
+                    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                        compilerOptions {
+                            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                        }
+                    }
+                }
+            }
+        }
+        pluginManager.withPlugin('org.jetbrains.kotlin.android', applyMetro)
+        pluginManager.withPlugin('org.jetbrains.kotlin.jvm', applyMetro)
     }
 }
 
