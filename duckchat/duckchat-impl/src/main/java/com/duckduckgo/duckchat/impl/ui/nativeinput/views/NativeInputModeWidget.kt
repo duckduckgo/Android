@@ -93,6 +93,7 @@ interface NativeInputWidget {
     fun setVoiceSearchAvailable(available: Boolean)
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
+    fun submitAsChat()
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
@@ -210,7 +211,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         val pluginView = plugin.createView(context)
                         container.removeAllViews()
                         container.addView(pluginView)
-                        container.isVisible = isChatTabSelected()
+                        // The start-chat container drives its own visibility from input mode.
+                        if (plugin.containerId != R.id.startChatContainer) {
+                            container.isVisible = isChatTabSelected()
+                        }
                     }
                 }
             }
@@ -219,6 +223,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     when (command) {
                         is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility -> {
                             for (containerId in command.containerIds) {
+                                if (containerId == R.id.startChatContainer) continue
                                 findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
                             }
                         }
