@@ -977,4 +977,15 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Търси анонимно с DuckDuckGo или попитай Duck.ai. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Търсете или посещавайте любимите си сайтове анонимно с едно докосване. Гласово търсене и Duck.ai са налични, ако са активирани.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Да продължим оттам, откъдето спряхте</string>
+    <string name="syncRestoreDialogDescription">Искате да възстановите отметки, пароли и други данни от предишната синхронизация с DuckDuckGo?</string>
+    <string name="syncRestoreDialogPrimaryCta">Възстановяване на моите неща</string>
+    <string name="syncRestoreDialogSecondaryCta">Пропускане</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Копиране на текста на връзката</string>
+    <string name="linkTextCopied">Копиран текст на връзката</string>
+    <string name="linkTextCopyFailed">Неуспешно копиране на текста на връзката</string>
 </resources>

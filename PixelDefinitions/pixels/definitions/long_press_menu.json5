@@ -1,0 +1,8 @@
+{
+    "m_long_press_copy_link_text": {
+        "description": "Fires when the user selects 'Copy Link Text' from the long-press context menu on a link",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "parameters": ["appVersion"]
+    }
+}

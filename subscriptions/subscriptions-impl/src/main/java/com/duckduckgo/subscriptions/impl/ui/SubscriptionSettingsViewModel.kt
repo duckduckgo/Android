@@ -122,6 +122,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         val pendingPlanDisplayNameResId = pendingPlan?.let {
             getPendingPlanDisplayName(it.tier, it.billingPeriod)
         }
+        val pendingEffectiveDateShort = pendingPlan?.let {
+            DateFormat.getInstanceForSkeleton("MMMMd").format(Date(it.effectiveAt))
+        }
+        val pendingTierNameResId = pendingPlan?.let {
+            getPendingTierNameResId(it.tier)
+        }
 
         val effectiveTier = if (subscriptionsFeature.showPendingPlanHint().isEnabled()) {
             pendingPlan?.tier ?: subscription.tier
@@ -144,6 +150,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingEffectiveDate = pendingEffectiveDate,
                 isPendingDowngrade = isPendingDowngrade,
                 pendingPlanDisplayNameResId = pendingPlanDisplayNameResId,
+                pendingEffectiveDateShort = pendingEffectiveDateShort,
+                pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
             ),
         )
@@ -215,6 +223,14 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun getPendingTierNameResId(tier: SubscriptionTier): Int {
+        return when (tier) {
+            SubscriptionTier.PLUS -> R.string.planTierNamePlus
+            SubscriptionTier.PRO -> R.string.planTierNamePro
+            SubscriptionTier.UNKNOWN -> R.string.planTierNamePlus // fallback
+        }
+    }
+
     sealed class SubscriptionDuration {
         data object Monthly : SubscriptionDuration()
         data object Yearly : SubscriptionDuration()
@@ -244,6 +260,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingEffectiveDate: String? = null,
             val isPendingDowngrade: Boolean? = null,
             val pendingPlanDisplayNameResId: Int? = null,
+            val pendingEffectiveDateShort: String? = null,
+            val pendingTierNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
         ) : ViewState()
     }

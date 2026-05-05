@@ -43,6 +43,11 @@ interface BrowserMenuDisplayRepository {
     val browserMenuState: Flow<BrowserMenuDisplayState>
 
     /**
+     * Synchronously checks whether the bottom sheet browser menu is enabled.
+     */
+    fun isBottomSheetMenuEnabled(): Boolean
+
+    /**
      * Sets the experimental menu enabled state.
      *
      * @param enabled true to enable the experimental menu, false to disable it
@@ -90,6 +95,12 @@ class RealBrowserMenuDisplayRepository @Inject constructor(
             replay = 1,
             started = SharingStarted.WhileSubscribed(),
         )
+
+    override fun isBottomSheetMenuEnabled(): Boolean {
+        val isEnabled = browserConfigFeature.experimentalBrowsingMenu().isEnabled()
+        val isRolloutEnabled = browserConfigFeature.rolloutBrowsingMenu().isEnabled()
+        return isRolloutEnabled || (isEnabled && browserMenuStore.useBottomSheetMenu)
+    }
 
     override suspend fun setExperimentalMenuEnabled(enabled: Boolean) {
         browserMenuStore.useBottomSheetMenu = enabled

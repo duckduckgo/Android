@@ -105,6 +105,9 @@ class BrowserMenuBottomSheet(
     val printPageMenuItem: MenuItemView
         get() = binding.printPageMenuItem
 
+    val downloadPdfMenuItem: MenuItemView
+        get() = binding.downloadPdfMenuItem
+
     val vpnMenuItem: View
         get() = binding.includeVpnMenuItem.vpnMenuItem
 
@@ -221,6 +224,7 @@ class BrowserMenuBottomSheet(
         refreshMenuItem.isVisible = true
         defaultBrowserMenuItem.isVisible = viewState.showSelectDefaultBrowserMenuItem
         printPageMenuItem.isVisible = viewState.canPrintPage
+        downloadPdfMenuItem.isVisible = viewState.showDownloadPdfMenuItem
         sharePageMenuItem.isVisible = viewState.canSharePage
         openInAppMenuItem.isVisible = viewState.hasPreviousAppLink
         openInDdgBrowserMenuItem.isVisible = false

@@ -1,7 +1,7 @@
 {
   "name": "SmartBackgroundChecks",
   "url": "smartbackgroundchecks.com",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678082400000,
   "optOutUrl": "https://www.smartbackgroundchecks.com/optout",
@@ -13,13 +13,13 @@
         {
           "actionType": "navigate",
           "id": "290d3add-c786-4ecf-a528-50b2a240f791",
-          "url": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${city}/${state}"
+          "url": "https://www.smartbackgroundchecks.com/people/${firstName|hyphenated}-${lastName|hyphenated}/${city|hyphenated}/${state|hyphenated}"
         },
         {
           "actionType": "extract",
           "id": "2e04c4da-5f4b-4ab3-bd9e-4d4300d51f63",
           "selector": "//div[contains(@class, 'card-block') and not(.//text()[contains(., 'Paid Results')])]",
-          "noResultsFound": "//h1[contains(text(), '0 Results')]",
+          "noResultsSelector": "//h1[contains(text(), '0 Results')]",
           "profile": {
             "name": {
               "selector": ".name-list-title"

@@ -7,7 +7,8 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
@@ -61,6 +62,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -83,8 +85,11 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
-    private val browserMenuHighlightFlow = MutableStateFlow(false)
+    private val highlightFlow = MutableStateFlow(false)
+
+    private val browserMenuHighlight: BrowserMenuHighlight = mock {
+        on { shouldShowHighlightForMode(any()) } doReturn highlightFlow
+    }
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
@@ -122,7 +127,6 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(browserMenuHighlightFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -177,7 +181,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            browserMenuHighlightState = browserMenuHighlightState,
+            browserMenuHighlight = browserMenuHighlight,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -1252,12 +1256,42 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun `when browser menu highlight state emits true, then update the view state`() = runTest {
-        browserMenuHighlightFlow.value = true
+    fun `when highlight flow emits true, then viewState shows highlight`() = runTest {
+        highlightFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when highlight flow emits false, then viewState does not show highlight`() = runTest {
+        highlightFlow.value = false
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showBrowserMenuHighlight)
+        }
+    }
+
+    @Test
+    fun `when onViewModeChanged NewTab, then highlight is queried for NewTab mode`() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.NewTab))
+        }
+    }
+
+    @Test
+    fun `when onViewModeChanged CustomTab, then highlight is queried for CustomTab mode`() = runTest {
+        testee.onViewModeChanged(ViewMode.CustomTab(0, null, null, false))
+
+        testee.viewState.test {
+            awaitItem()
+            verify(browserMenuHighlight).shouldShowHighlightForMode(eq(BrowserViewMode.CustomTab))
         }
     }
 
@@ -1765,6 +1799,33 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertEquals(expected, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when set empty draft and current state is SERP, then omnibar text not overwritten`() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val originalQuery = "cats"
+        testee.onInputStateChanged(query = originalQuery, hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.setDraftTextIfNtpOrSerp("")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(originalQuery, viewState.omnibarText)
+        }
+    }
+
+    @Test
+    fun `when set empty draft and current state is NTP, then omnibar text not overwritten`() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onInputStateChanged(query = "partial", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.setDraftTextIfNtpOrSerp("")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("partial", viewState.omnibarText)
         }
     }
 

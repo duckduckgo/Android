@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface InBrowserImportPromo {
@@ -33,6 +34,8 @@ interface InBrowserImportPromo {
         url: String?,
     ): Boolean
 }
+
+private const val TAG = "InBrowserImportPromo"
 
 @ContributesBinding(AppScope::class)
 class RealInBrowserImportPromo @Inject constructor(
@@ -73,9 +76,17 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if ((autofillStore.getCredentialCount().firstOrNull() ?: 0) >= MAX_CREDENTIALS_FOR_PROMO) {
-                return@withContext false
-            }
+            autofillStore.getCredentialCount().firstOrNull()?.fold(
+                onSuccess = { value ->
+                    if ((value) >= MAX_CREDENTIALS_FOR_PROMO) {
+                        return@withContext false
+                    }
+                },
+                onFailure = {
+                    logcat(TAG) { "Credential count retrieval failed, fallback to disabled" }
+                    return@withContext false
+                },
+            ) ?: return@withContext false
 
             if (autofillStore.inBrowserImportPromoShownCount >= MAX_PROMO_SHOWN_COUNT) {
                 return@withContext false

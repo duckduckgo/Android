@@ -189,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Управлявай плащането или отмени</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Планът ще бъде намален до %1$s на %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Планът ще бъде надграден до %1$s на %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Планът ще бъде намален до %1$s на %2$s.</string>
     <string name="planNamePlusMonthly">Месечен план Plus</string>

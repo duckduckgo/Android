@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.RestorationComplete
 import com.duckduckgo.sync.impl.ui.setup.SyncRestoreAccountViewModel.Command.ShowError
@@ -43,10 +44,12 @@ class SyncRestoreAccountViewModelTest {
 
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = SyncRestoreAccountViewModel(
         syncAutoRestoreManager = syncAutoRestoreManager,
         syncAccountRepository = syncAccountRepository,
+        syncPixels = syncPixels,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 

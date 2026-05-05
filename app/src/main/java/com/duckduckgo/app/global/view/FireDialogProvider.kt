@@ -31,7 +31,7 @@ import javax.inject.Inject
  *
  * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
  * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
- * from GranularFireDialog or LegacyFireDialog.
+ * from GranularFireDialog or NonGranularFireDialog.
  */
 interface FireDialogProvider {
     /**
@@ -64,9 +64,7 @@ class FireDialogProviderImpl @Inject constructor(
                 SingleTabFireDialog.newInstance(origin)
             androidBrowserConfigFeature.granularFireDialog().isEnabled() ->
                 GranularFireDialog.newInstance()
-            androidBrowserConfigFeature.singleTabFireDialog().isEnabled() ->
-                NonGranularFireDialog.newInstance()
-            else -> LegacyFireDialog.newInstance()
+            else -> NonGranularFireDialog.newInstance()
         }
     }
 }

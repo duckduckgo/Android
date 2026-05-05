@@ -17,6 +17,13 @@
 package com.duckduckgo.duckchat.internal.store
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
@@ -25,8 +32,12 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import fi.iki.elonen.NanoHTTPD
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -48,22 +59,44 @@ class RealDuckAiDebugServer @Inject constructor(
     private val fileMetaDao: DuckAiBridgeFileMetaDao,
     private val context: Context,
     private val migrationPrefs: DuckAiMigrationPrefs,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiDebugServer {
 
     override val port = 8765
     private var server: InternalNanoServer? = null
     override val isRunning get() = server?.isAlive == true
 
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = false, migrate = false)
+    }
+
     override fun start() {
         if (isRunning) return
         server = InternalNanoServer().also { it.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false) }
+        appCoroutineScope.launch(dispatchers.io()) {
+            preferences.edit { putBoolean(KEY_SERVER_ENABLED, true) }
+        }
         logcat { "DuckAiDebugServer started on port $port" }
     }
 
     override fun stop() {
         server?.stop()
         server = null
+        appCoroutineScope.launch(dispatchers.io()) {
+            preferences.edit { putBoolean(KEY_SERVER_ENABLED, false) }
+        }
         logcat { "DuckAiDebugServer stopped" }
+    }
+
+    internal suspend fun startIfPreviouslyEnabled() {
+        val enabled = withContext(dispatchers.io()) {
+            preferences.getBoolean(KEY_SERVER_ENABLED, false)
+        }
+        if (enabled) {
+            withContext(dispatchers.main()) { start() }
+        }
     }
 
     private val filesDir: File get() = File(context.filesDir, "duck_ai_bridge_files")
@@ -233,6 +266,9 @@ class RealDuckAiDebugServer @Inject constructor(
     }
 
     companion object {
+        private const val PREFS_FILENAME = "com.duckduckgo.duckchat.debug.server"
+        private const val KEY_SERVER_ENABLED = "server_enabled"
+
         @Suppress("LongMethod")
         private val DEBUG_HTML = """
             <!DOCTYPE html>
@@ -287,10 +323,20 @@ class RealDuckAiDebugServer @Inject constructor(
                 th.sortable:hover { background: #e0e0e0; }
                 th.sortable .sort-arrow { margin-left: 4px; opacity: 0.35; font-size: 11px; }
                 th.sortable.sorted .sort-arrow { opacity: 1; }
+                /* Collapsible sections */
+                h2.collapsible { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; }
+                h2.collapsible .caret { font-size: 11px; transition: transform 0.2s; display: inline-block; }
+                h2.collapsible.collapsed .caret { transform: rotate(-90deg); }
+                .collapsible-body { display: block; }
+                .collapsible-body.collapsed { display: none; }
               </style>
             </head>
             <body>
               <h1>🦆 Duck.ai Native Storage Debug</h1>
+
+              <div class="actions" style="margin-bottom:16px">
+                <button class="del-all" style="font-size:15px;padding:12px 24px" onclick="nukeAll()">☢️ Nuke Everything</button>
+              </div>
 
               <h2>Migration</h2>
               <div id="migrationStatus"></div>
@@ -298,44 +344,56 @@ class RealDuckAiDebugServer @Inject constructor(
                 <button class="reset" onclick="resetMigration()">Reset All Migration Flags</button>
               </div>
 
-              <h2>Settings</h2>
-              <table>
-                <thead><tr><th>Key</th><th>Value</th><th></th></tr></thead>
-                <tbody id="settingsBody"></tbody>
-              </table>
-              <div class="add-form">
-                <input id="newSettingKey" type="text" placeholder="Key" />
-                <input id="newSettingValue" type="text" placeholder="Value" />
-                <button class="add" onclick="addSetting()">Add / Update</button>
+              <h2 class="collapsible collapsed" id="settingsHeader" onclick="toggleSection('settings')">
+                <span class="caret">▼</span>Settings <span id="settingsCount" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="settingsBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr><th>Key</th><th>Value</th><th></th></tr></thead>
+                  <tbody id="settingsBody"></tbody>
+                </table>
+                <div class="add-form">
+                  <input id="newSettingKey" type="text" placeholder="Key" />
+                  <input id="newSettingValue" type="text" placeholder="Value" />
+                  <button class="add" onclick="addSetting()">Add / Update</button>
+                </div>
               </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('settings')">Delete All Settings</button>
               </div>
 
-              <h2>Chats <span id="chatsCount" style="font-size:13px;font-weight:normal;color:#888"></span></h2>
-              <table>
-                <thead><tr>
-                  <th class="sortable" id="th-title" onclick="sortChats('title')">Title<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-model" onclick="sortChats('model')">Model<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-msgs" onclick="sortChats('msgs')" style="text-align:center">Msgs<span class="sort-arrow">↕</span></th>
-                  <th class="sortable" id="th-lastEdit" onclick="sortChats('lastEdit')">Last Edit<span class="sort-arrow">↕</span></th>
-                  <th></th>
-                </tr></thead>
-                <tbody id="chatsBody"></tbody>
-              </table>
-              <div class="add-form">
-                <textarea id="newChatJson" placeholder='{"chatId":"...","messages":[]}'></textarea>
-                <button class="add" onclick="addChat()">Add Chat (JSON)</button>
+              <h2 class="collapsible collapsed" id="chatsHeader" onclick="toggleSection('chats')">
+                <span class="caret">▼</span>Chats <span id="chatsCount" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="chatsBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr>
+                    <th class="sortable" id="th-title" onclick="sortChats('title')">Title<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-model" onclick="sortChats('model')">Model<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-msgs" onclick="sortChats('msgs')" style="text-align:center">Msgs<span class="sort-arrow">↕</span></th>
+                    <th class="sortable" id="th-lastEdit" onclick="sortChats('lastEdit')">Last Edit<span class="sort-arrow">↕</span></th>
+                    <th></th>
+                  </tr></thead>
+                  <tbody id="chatsBody"></tbody>
+                </table>
+                <div class="add-form">
+                  <textarea id="newChatJson" placeholder='{"chatId":"...","messages":[]}'></textarea>
+                  <button class="add" onclick="addChat()">Add Chat (JSON)</button>
+                </div>
               </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('chats')">Delete All Chats</button>
               </div>
 
-              <h2>Files <span id="filesStats" style="font-size:13px;font-weight:normal;color:#888"></span></h2>
-              <table>
-                <thead><tr><th>UUID</th><th>Chat ID</th><th>File Name</th><th>MIME Type</th><th>Size</th><th></th></tr></thead>
-                <tbody id="filesBody"></tbody>
-              </table>
+              <h2 class="collapsible collapsed" id="filesHeader" onclick="toggleSection('files')">
+                <span class="caret">▼</span>Files <span id="filesStats" style="font-size:13px;font-weight:normal;color:#888"></span>
+              </h2>
+              <div id="filesBody-section" class="collapsible-body collapsed">
+                <table>
+                  <thead><tr><th>UUID</th><th>Chat ID</th><th>File Name</th><th>MIME Type</th><th>Size</th><th></th></tr></thead>
+                  <tbody id="filesBody"></tbody>
+                </table>
+              </div>
               <div class="actions">
                 <button class="del-all" onclick="deleteAll('files')">Delete All Files</button>
               </div>
@@ -393,6 +451,14 @@ class RealDuckAiDebugServer @Inject constructor(
                 let editingSettingKey = null;
                 let editingChatId = null;
 
+                // ── Collapsible sections ─────────────────────────────────────────────
+                function toggleSection(name) {
+                  const header = document.getElementById(name + 'Header');
+                  const body = document.getElementById(name + 'Body-section');
+                  const collapsed = header.classList.toggle('collapsed');
+                  body.classList.toggle('collapsed', collapsed);
+                }
+
                 // ── Load ─────────────────────────────────────────────────────────────
                 async function load() {
                   loadSettings(); loadChats(); loadFiles(); loadMigration();
@@ -423,8 +489,10 @@ class RealDuckAiDebugServer @Inject constructor(
 
                 async function loadSettings() {
                   const obj = await fetchJson('/debug/settings');
+                  const entries = Object.entries(obj);
+                  document.getElementById('settingsCount').textContent = '(' + entries.length + ')';
                   const tbody = document.getElementById('settingsBody');
-                  const rows = Object.entries(obj).map(([k, v]) =>
+                  const rows = entries.map(([k, v]) =>
                     '<tr><td class="nowrap">' + esc(k) + '</td><td>' + esc(v) + '</td><td class="btns">' +
                     '<button class="del" data-key="' + esc(k) + '" onclick="deleteSetting(this.dataset.key)">Delete</button>' +
                     '<button class="edit-btn" data-key="' + esc(k) + '" data-val="' + esc(v) + '" onclick="openSettingEdit(this.dataset.key, this.dataset.val)">Edit</button>' +
@@ -581,8 +649,17 @@ class RealDuckAiDebugServer @Inject constructor(
                 }
 
                 async function deleteAll(type) {
-                  if (!confirm('Delete all ' + type + '?')) return;
                   await fetch('/debug/' + type, { method: 'DELETE' });
+                  load();
+                }
+
+                async function nukeAll() {
+                  await Promise.all([
+                    fetch('/debug/settings', { method: 'DELETE' }),
+                    fetch('/debug/chats', { method: 'DELETE' }),
+                    fetch('/debug/files', { method: 'DELETE' }),
+                    fetch('/debug/migration', { method: 'DELETE' }),
+                  ]);
                   load();
                 }
 
@@ -751,5 +828,21 @@ class RealDuckAiDebugServer @Inject constructor(
             </body>
             </html>
         """.trimIndent()
+    }
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
+class DuckAiDebugServerLifecycleObserver @Inject constructor(
+    private val server: RealDuckAiDebugServer,
+    @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : MainProcessLifecycleObserver {
+
+    override fun onCreate(owner: LifecycleOwner) {
+        appCoroutineScope.launch {
+            server.startIfPreviouslyEnabled()
+        }
     }
 }

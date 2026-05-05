@@ -1,0 +1,172 @@
+{
+  "name": "WeInform",
+  "url": "weinform.org",
+  "version": "0.1.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.weinform.org/api/helper/optOutLight/search",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.weinform.org/api/helper/optOutLight/search",
+          "id": "c89890c9-0b0b-49d5-b72a-152afebea3aa"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#pageForm"
+            }
+          ],
+          "id": "65c4efa6-5543-4827-85ac-9beda826f3e9"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#pageForm",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "input[name='fname']"
+            },
+            {
+              "type": "lastName",
+              "selector": "input[name='lname']"
+            },
+            {
+              "type": "city",
+              "selector": "input[name='city']"
+            },
+            {
+              "type": "state",
+              "selector": "select[name='state']"
+            }
+          ],
+          "id": "9c021278-27a7-4711-8a1a-24d39ac88924"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#pageFormSubmitBtn"
+            }
+          ],
+          "id": "20c9a47d-c2a0-4e33-a1a0-2bfe6f3efe46"
+        },
+        {
+          "_comment": "Turnstile auto-completes (there are two sequential turnstiles). This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-b371ee5f-8818-44f4-b36d-77b97fc4c69e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "840e1115-7bab-4b9c-862c-311ba49a383f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "id": "f8751aac-4d41-4aa9-89d2-35c80eaf2a6a"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "captcha is not always present at this stage",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "getCaptchaInfo",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+              "id": "79a765f3-c1bb-4c2d-af18-071725f0ddee"
+            },
+            {
+              "actionType": "solveCaptcha",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+              "id": "4a2a35f3-3526-43fa-a24e-d519b8a000d6"
+            },
+            {
+              "actionType": "click",
+              "failSilently": true,
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
+                }
+              ],
+              "id": "e5b42120-6dcf-4413-9139-523cbc71cc5a"
+            }
+          ],
+          "id": "ebe52f0a-0176-4853-8f9b-447868a05cd4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "766ccef8-c27f-4dc7-9691-ba6377fd6fe6"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//h2[contains(text(), 'Select the person')]/following-sibling::div/div",
+          "noResultsSelector": "//p[contains(text(), 'unable to find')]|//p[contains(text(), 'Too many')]",
+          "profile": {
+            "name": {
+              "selector": ".//span[contains(text(), 'Name')]/following-sibling::span[1]"
+            },
+            "age": {
+              "selector": ".//span[contains(text(), 'Age')]/following-sibling::span[1]"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
+              "separator": "/(?<=, [A-Z]{2}), /"
+            }
+          },
+          "id": "fd69267b-59ce-4b1a-ba94-e1fd3dd99474"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1777063664947,
+  "removedAt": null
+}

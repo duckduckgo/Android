@@ -16,11 +16,19 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.content.Context
+import android.os.Bundle
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.tabs.adapter.TabSwitcherItemDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
@@ -123,7 +131,7 @@ class TabSwitcherAdapterTest {
     @Test
     fun `NormalTab in grid mode returns GRID_TAB`() {
         val entity = TabEntity("1", url = "https://example.com", position = 0)
-        adapter.updateData(listOf(NormalTab(entity, isActive = false)))
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
         adapter.onLayoutTypeChanged(GRID)
         assertEquals(GRID_TAB, adapter.getItemViewType(0))
     }
@@ -131,8 +139,68 @@ class TabSwitcherAdapterTest {
     @Test
     fun `NormalTab in list mode returns LIST_TAB`() {
         val entity = TabEntity("1", url = "https://example.com", position = 0)
-        adapter.updateData(listOf(NormalTab(entity, isActive = false)))
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
         adapter.onLayoutTypeChanged(LIST)
         assertEquals(LIST_TAB, adapter.getItemViewType(0))
+    }
+
+    // --- Title rendering on payload-based bind (regression: stale title kept after URL changed) ---
+
+    @Test
+    fun `payload with null title re-derives title from entity instead of leaving stale text`() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val entity = TabEntity(tabId = "1", url = "https://clicks.easyjet.com/redirect", title = null, position = 0)
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
+        adapter.onLayoutTypeChanged(LIST)
+
+        val holder = listHolderWithStaleTitle(context, staleTitle = "How can we help? | Huel ES")
+
+        // The diff callback writes the new title (null) under DIFF_KEY_TITLE - this is the buggy
+        // bundle that previously caused the holder's TextView to keep its prior text.
+        val payload = Bundle().apply { putString(DIFF_KEY_TITLE, null) }
+
+        adapter.onBindViewHolder(holder, 0, mutableListOf(payload))
+
+        // displayTitle() falls back to URL host when title is null
+        assertEquals("clicks.easyjet.com", holder.title.text.toString())
+    }
+
+    @Test
+    fun `payload with non-null title still updates TextView`() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val entity = TabEntity(tabId = "1", url = "https://example.com", title = "Fresh Title", position = 0)
+        adapter.updateData(listOf(NormalTab(entity = entity, isActive = false)))
+        adapter.onLayoutTypeChanged(LIST)
+
+        val holder = listHolderWithStaleTitle(context, staleTitle = "Old Title")
+
+        val payload = Bundle().apply { putString(DIFF_KEY_TITLE, "Fresh Title") }
+
+        adapter.onBindViewHolder(holder, 0, mutableListOf(payload))
+
+        assertEquals("Fresh Title", holder.title.text.toString())
+    }
+
+    private fun listHolderWithStaleTitle(
+        context: Context,
+        staleTitle: String,
+    ): TabSwitcherAdapter.TabSwitcherViewHolder.ListTabViewHolder {
+        val titleView = TextView(context).apply { text = staleTitle }
+        val holder = TabSwitcherAdapter.TabSwitcherViewHolder.ListTabViewHolder(
+            rootView = FrameLayout(context),
+            favicon = ImageView(context),
+            title = titleView,
+            close = ImageView(context),
+            tabUnread = ImageView(context),
+            selectionIndicator = ImageView(context),
+            url = TextView(context),
+        )
+        // RecyclerView normally sets mItemViewType when binding. Hand-constructed holders default
+        // to INVALID_TYPE, which would make the adapter's `when (holder.itemViewType)` dispatch
+        // miss LIST_TAB and silently drop the payload. Force it here.
+        val field = RecyclerView.ViewHolder::class.java.getDeclaredField("mItemViewType")
+        field.isAccessible = true
+        field.setInt(holder, LIST_TAB)
+        return holder
     }
 }

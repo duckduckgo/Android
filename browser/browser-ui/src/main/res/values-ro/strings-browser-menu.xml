@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Tipărire</string>
     <string name="browserMenuOpenAppLink">Deschide în aplicație</string>
     <string name="browserMenuAddToHome">Adaugă pe ecranul de pornire</string>
+    <string name="browserMenuDownloadPdf">Descarcă PDF</string>
     <string name="browserMenuReportBrokenSite">Raportează Site-ul Defect</string>
     <string name="browserMenuAutofill">Parole</string>
     <string name="browserMenuDownloads">Descărcări</string>

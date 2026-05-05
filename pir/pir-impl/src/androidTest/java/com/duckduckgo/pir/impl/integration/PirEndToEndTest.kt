@@ -427,7 +427,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run Eligible Scan and Opt-Out Jobs ====================")
 
         // Run eligible jobs - this will trigger PirScan and PirOptOut
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Verify: Scan jobs created only for active broker
@@ -659,7 +659,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should fail gracefully ====================")
 
         // Run eligible jobs - should not crash even though scan step has unknown action
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed overall (not crash)", scanResult.isSuccess)
 
         // Verify scan job was created
@@ -726,7 +726,7 @@ class PirEndToEndTest {
         println("==================== STEP 2: Run scan - should succeed (scan step is valid) ====================")
 
         // Run scan - should succeed since the scan step is valid
-        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL_INITIAL)
         assertTrue("Scan should succeed", scanResult.isSuccess)
 
         // Check scan job record

@@ -34,6 +34,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @RunWith(AndroidJUnit4::class)
 class WideEventClientTest {
@@ -322,19 +326,57 @@ class WideEventClientTest {
         }
 
     @Test
-    fun `when intervalStart called then starts interval in repository`() =
+    fun `when intervalStart called with default buckets then forwards default set as java duration`() =
         runTest {
             val wideEventId = 101L
             val key = "network_call"
-            val timeout = Duration.ofSeconds(5)
 
-            val result = wideEventClient.intervalStart(wideEventId, key, timeout)
+            val result = wideEventClient.intervalStart(wideEventId, key, 5.seconds)
 
             assertTrue(result.isSuccess)
             verify(wideEventRepository).startInterval(
                 eventId = wideEventId,
                 name = key,
-                timeout = timeout,
+                timeout = Duration.ofSeconds(5),
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+            )
+        }
+
+    @Test
+    fun `when intervalStart called with custom buckets then forwards them as java durations`() =
+        runTest {
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                timeout = null,
+                buckets = setOf(100.milliseconds, 1.seconds),
+            )
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+            )
+        }
+
+    @Test
+    fun `when intervalStart called with null buckets then forwards null`() =
+        runTest {
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                timeout = null,
+                buckets = null,
+            )
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = null,
             )
         }
 
@@ -343,14 +385,13 @@ class WideEventClientTest {
         runTest {
             val wideEventId = 202L
             val key = "network_call"
-            val expectedDuration = Duration.ofSeconds(3)
 
-            whenever(wideEventRepository.endInterval(wideEventId, key)).thenReturn(expectedDuration)
+            whenever(wideEventRepository.endInterval(wideEventId, key)).thenReturn(Duration.ofSeconds(3))
 
             val result = wideEventClient.intervalEnd(wideEventId, key)
 
             assertTrue(result.isSuccess)
-            assertEquals(expectedDuration, result.getOrNull())
+            assertEquals(3.seconds, result.getOrNull())
             verify(wideEventRepository).endInterval(wideEventId, key)
         }
 
@@ -359,11 +400,10 @@ class WideEventClientTest {
         runTest {
             val wideEventId = 303L
             val key = "network_call"
-            val timeout = Duration.ofSeconds(5)
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull())).thenThrow(exception)
+            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull())).thenThrow(exception)
 
-            val result = wideEventClient.intervalStart(wideEventId, key, timeout)
+            val result = wideEventClient.intervalStart(wideEventId, key, 5.seconds)
 
             assertTrue(result.isFailure)
             assertEquals(exception, result.exceptionOrNull())
@@ -389,7 +429,7 @@ class WideEventClientTest {
             val wideEventId = 505L
             val cleanupPolicy =
                 CleanupPolicy.OnTimeout(
-                    duration = Duration.ofMinutes(5),
+                    duration = 5.minutes,
                     flowStatus = FlowStatus.Failure("timeout"),
                 )
 

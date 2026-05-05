@@ -23,7 +23,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
-import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.card.MaterialCardView
@@ -93,7 +93,7 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
-        widget.selectChatTab()
+        widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onImageClick = onImageButtonPressed

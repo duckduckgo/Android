@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
     id 'kotlin-parcelize'
 }
 
@@ -44,7 +45,7 @@ android {
 }
 
 dependencies {
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':navigation-api')
     implementation project(':anrs-api')
     implementation project(':anvil-annotations')
@@ -113,7 +114,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx

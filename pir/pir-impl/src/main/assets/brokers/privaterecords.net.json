@@ -1,7 +1,7 @@
 {
   "name": "PrivateRecords",
   "url": "privaterecords.net",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.privaterecords.net/optOut/name/landing",
   "steps": [
@@ -61,6 +61,17 @@
             }
           ],
           "id": "cdba1374-4bdd-41c3-b1fb-a135c6accd37"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-ed8bd1d5-991c-4ef8-ad3c-6fd8ecd1288c"
         },
         {
           "actionType": "expectation",

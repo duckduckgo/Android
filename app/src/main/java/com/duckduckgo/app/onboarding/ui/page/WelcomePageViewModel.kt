@@ -179,6 +179,7 @@ class WelcomePageViewModel @Inject constructor(
             SYNC_RESTORE -> {
                 viewModelScope.launch {
                     logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
+                    pixel.fire(AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
                     syncAutoRestore.restoreSyncAccount()
                     _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
@@ -302,6 +303,7 @@ class WelcomePageViewModel @Inject constructor(
             SYNC_RESTORE -> {
                 viewModelScope.launch {
                     logcat { "Sync-AutoRestore: user skipped restore" }
+                    pixel.fire(AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
                     _commands.send(ShowSkipOnboardingOption)
                 }
             }
@@ -377,7 +379,7 @@ class WelcomePageViewModel @Inject constructor(
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
             SYNC_RESTORE -> {
-                // TODO - SyncRestore: add pixel for dialog shown
+                pixel.fire(AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
             }
             INITIAL_REINSTALL_USER -> {
                 pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())

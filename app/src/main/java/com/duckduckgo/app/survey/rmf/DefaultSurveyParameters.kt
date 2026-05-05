@@ -22,10 +22,15 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource.IN_APP
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.firstOrNull
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -133,5 +138,29 @@ class CohortSurveyParameterPlugin @Inject constructor(
         return matchingExperiment?.let {
             "${it.featureName().name}_${it.getCohort()?.name}"
         }.orEmpty()
+    }
+}
+
+@ContributesMultibinding(AppScope::class)
+class LastSearchStateSurveyParameterPlugin @Inject constructor(
+    private val navigationHistory: NavigationHistory,
+    private val currentTimeProvider: CurrentTimeProvider,
+) : SurveyParameterPlugin {
+    override fun matches(paramKey: String): Boolean = paramKey == "last_search_state"
+
+    override suspend fun evaluate(paramKey: String): String {
+        val history = navigationHistory.getHistory().firstOrNull() ?: return "none"
+        val mostRecentSearch = history
+            .filterIsInstance<HistoryEntry.VisitedSERP>()
+            .flatMap { it.visits }
+            .maxOrNull() ?: return "none"
+
+        val daysSinceLastSearch = ChronoUnit.DAYS.between(mostRecentSearch, currentTimeProvider.localDateTimeNow())
+
+        return when {
+            daysSinceLastSearch < 2 -> "day"
+            daysSinceLastSearch <= 7 -> "week"
+            else -> "none"
+        }
     }
 }

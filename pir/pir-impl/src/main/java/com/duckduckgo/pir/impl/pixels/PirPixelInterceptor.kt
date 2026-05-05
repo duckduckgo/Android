@@ -42,7 +42,7 @@ class PirPixelInterceptor @Inject constructor(
 
         return if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
             val newUrl = originalRequest.url.newBuilder()
-                .addQueryParameter(KEY_MANUFACTURER, appBuildConfig.manufacturer)
+                .addQueryParameter(KEY_MANUFACTURER, normalizedManufacturer())
                 .build()
             val newRequest = originalRequest.newBuilder().url(newUrl).build()
             chain.proceed(newRequest)
@@ -59,7 +59,7 @@ class PirPixelInterceptor @Inject constructor(
             chain.request().url.newBuilder()
                 .addQueryParameter(
                     KEY_MANUFACTURER,
-                    appBuildConfig.manufacturer,
+                    normalizedManufacturer(),
                 ).build()
         } else {
             chain.request().url
@@ -68,10 +68,33 @@ class PirPixelInterceptor @Inject constructor(
         return chain.proceed(request.url(url).build())
     }
 
+    private fun normalizedManufacturer(): String {
+        val raw = appBuildConfig.manufacturer.lowercase()
+        return if (raw in COMMON_MANUFACTURERS) raw else OTHER_MANUFACTURER
+    }
+
     override fun getInterceptor(): Interceptor = this
 
     companion object {
         private const val KEY_MANUFACTURER = "manufacturer"
+        private const val OTHER_MANUFACTURER = "other"
+        private val COMMON_MANUFACTURERS = setOf(
+            "samsung",
+            "google",
+            "xiaomi",
+            "huawei",
+            "honor",
+            "oneplus",
+            "oppo",
+            "vivo",
+            "motorola",
+            "realme",
+            "sony",
+            "lg",
+            "nokia",
+            "lenovo",
+            "asus",
+        )
         private val ALLOWLIST = listOf(
             "m_dbp_foreground-run_started",
             "m_dbp_foreground-run_completed",
@@ -82,6 +105,7 @@ class PirPixelInterceptor @Inject constructor(
             "m_dbp_email-confirmation_started",
             "m_dbp_email-confirmation_completed",
             "m_dbp_initial-scan_incomplete",
+            "m_dbp_initial_scan_duration",
         )
     }
 }

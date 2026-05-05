@@ -1,0 +1,23 @@
+{
+    "m_errorpageshown": {
+        "description": "A WebView error page was shown for a main-frame navigation failure",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_errorpageshown_code": {
+        "description": "A main-frame WebView error occurred (including errors that do not show an error page). Used to gather data on error code distribution before expanding error page coverage.",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_code",
+                "description": "The raw WebView error code string, e.g. ERROR_HOST_LOOKUP, ERROR_FAILED_SSL_HANDSHAKE",
+                "type": "string"
+            }
+        ]
+    }
+}

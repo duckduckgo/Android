@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Helyreállítási kód letöltése PDF-ként</string>
     <string name="sync_settings_download_recovery_code_item_hint">Használd ezt a kódot az adataid helyreállításához, ha elveszíted a hozzáférést ehhez az eszközhöz – őrizd meg egy biztonságos helyen.</string>
     <string name="sync_settings_data_expiration">A Sync &amp; Backup-adatok 18 hónapnyi inaktivitás után nem állíthatók vissza. <annotation type="learn_more_link">További információ</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Visszaállítod a korábbi telepítésből származó Sync &amp; Backup-adatokat?</string>
+    <string name="sync_previous_session_ready_body">A visszaállítással a korábbi könyvjelzőidet, jelszavaidat és egyéb adataidat is visszakapod a DuckDuckGóban.</string>
+    <string name="sync_previous_session_ready_resume_cta">Sync &amp; Backup visszaállítása</string>
+    <string name="sync_previous_session_ready_continue_cta">Új szinkronizálás beállítása</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Az adataid egyszerű helyreállítása</string>
+    <string name="sync_recover_data_content">Ezzel a kóddal állíthatod vissza az adataidat, ha elveszíted a hozzáférést ehhez az eszközhöz. A Sync &amp; Backup-adatok 18 hónapnyi inaktivitás után nem állíthatók vissza.</string>
+    <string name="sync_recover_data_recovery_code_label">Helyreállítási kód</string>
+    <string name="sync_recover_data_download_pdf">Letöltés PDF-ként</string>
+    <string name="sync_restore_on_reinstall_title">Visszaállítás az alkalmazás újratelepítésekor</string>
+    <string name="sync_restore_on_reinstall_description">Ha újratelepíted a DuckDuckGo-alkalmazást, megkérdezzük, hogy szeretnéd-e visszaállítani az adataidat ezen az eszközön.</string>
 </resources>

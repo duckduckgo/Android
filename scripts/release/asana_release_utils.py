@@ -4,6 +4,7 @@ Shared utilities for Asana release scripts.
 """
 
 import re
+import subprocess
 import sys
 from typing import List
 import git
@@ -34,12 +35,26 @@ def get_commits_between(repo_path: str, start_commit: str, end_commit: str) -> L
     return commits
 
 
+def _build_flexible_prefix_pattern(prefix: str) -> str:
+    """
+    Build a flexible regex pattern from a prefix string.
+    Allows flexible whitespace (including newlines) between words and around "/".
+    """
+    # Split prefix by whitespace, escape each part, join with \s+ to allow flexible whitespace
+    prefix_parts = prefix.split()
+    flexible = r"\s+".join(re.escape(part) for part in prefix_parts)
+    # Allow optional whitespace around "/" (e.g., "Task / Issue" or "Task/ Issue")
+    flexible = flexible.replace("/", r"\s*/\s*")
+    return flexible
+
+
 def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List[AsanaTaskLink]:
     """
     Extract Asana task links from commit messages.
     """
     task_links = []
-    url_pattern = re.compile(rf"{re.escape(url_prefix)}\s*(https://app\.asana\.com/\S*)")
+    prefix_pattern = _build_flexible_prefix_pattern(url_prefix)
+    url_pattern = re.compile(rf"(?:{prefix_pattern})\s*(https://app\.asana\.com/\S*)")
     
     for commit in commits:
         message = commit.message
@@ -54,6 +69,47 @@ def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List
         ))
     
     return task_links
+
+
+def get_public_release_tags(repo_path: str) -> List[str]:
+    """
+    Return all public release tags sorted by semantic version (ascending).
+    Public release tags match the pattern: X.Y.Z (e.g., 5.264.0)
+    """
+    public_pattern = re.compile(r'^\d+\.\d+\.\d+$')
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", repo_path, "for-each-ref", "--sort=version:refname",
+             "--format=%(refname:short)", "refs/tags"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        tags = result.stdout.strip().splitlines()
+        return [tag for tag in tags if public_pattern.match(tag)]
+    except subprocess.CalledProcessError:
+        return []
+
+
+def get_latest_public_release_tag(repo_path: str) -> str | None:
+    """Return the most recent public release tag, or None."""
+    tags = get_public_release_tags(repo_path)
+    return tags[-1] if tags else None
+
+
+def get_public_release_tag_before(repo_path: str, current_tag: str) -> str | None:
+    """
+    Return the public release tag immediately before `current_tag` by semantic version.
+    Returns None if `current_tag` is not found or is the earliest tag.
+    """
+    tags = get_public_release_tags(repo_path)
+
+    if current_tag not in tags:
+        return None
+
+    idx = tags.index(current_tag)
+    return tags[idx - 1] if idx > 0 else None
 
 
 def extract_task_id_from_url(url: str) -> str:

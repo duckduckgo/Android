@@ -1,7 +1,5 @@
 appId: com.duckduckgo.mobile.android
 name: "Custom Tabs navigation"
-tags:
-  - customTabsTest
 ---
 - retry:
     maxRetries: 3
