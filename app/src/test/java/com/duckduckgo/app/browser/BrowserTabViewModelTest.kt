@@ -129,6 +129,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
@@ -657,6 +658,7 @@ class BrowserTabViewModelTest {
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val mockInlinePdfHandler: InlinePdfHandler = mock()
+    private val mockPdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore = mock()
     private val mockCachedFileDownloader: CachedFileDownloader = mock()
     private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
@@ -688,6 +690,7 @@ class BrowserTabViewModelTest {
 
             whenever(mockDuckChatJSHelper.enrichPageContextIfPossible(any(), any())).thenAnswer { it.getArgument<String>(1) }
             whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.NotApplicable)
+            whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(false)
 
             db =
                 Room
@@ -957,6 +960,7 @@ class BrowserTabViewModelTest {
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
                 inlinePdfHandler = mockInlinePdfHandler,
+                pdfDownloadTooltipDataStore = mockPdfDownloadTooltipDataStore,
                 cachedFileDownloader = mockCachedFileDownloader,
                 downloadMenuStateProvider = mockDownloadMenuStateProvider,
                 downloadsRepository = mockDownloadsRepository,
@@ -10602,6 +10606,60 @@ class BrowserTabViewModelTest {
         testee.requestFileDownload(mock(), "https://example.com/doc.pdf", "attachment", "application/pdf", true, false)
 
         verify(mockPixel, never()).fire(PdfPixelName.PDF_FALLBACK)
+    }
+
+    @Test
+    fun whenInlinePdfRendersSuccessfullyAndCanShowReturnsTrueThenTooltipCommandIsEmittedAndStoreIsIncremented() = runTest {
+        whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
+
+        testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
+
+        assertCommandIssued<Command.ShowPdfDownloadTooltip>()
+        verify(mockPdfDownloadTooltipDataStore).incrementShownCount()
+    }
+
+    @Test
+    fun whenInlinePdfRendersSuccessfullyAndCanShowReturnsFalseThenTooltipCommandIsNotEmitted() = runTest {
+        whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(false)
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
+
+        testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
+
+        assertCommandNotIssued<Command.ShowPdfDownloadTooltip>()
+        verify(mockPdfDownloadTooltipDataStore, never()).incrementShownCount()
+    }
+
+    @Test
+    fun whenInlinePdfDownloadFailsThenTooltipCommandIsNotEmittedAndStoreIsNotIncremented() = runTest {
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+
+        testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
+
+        assertCommandNotIssued<Command.ShowPdfDownloadTooltip>()
+        verify(mockPdfDownloadTooltipDataStore, never()).incrementShownCount()
+    }
+
+    @Test
+    fun whenInCustomTabModeAndInlinePdfRendersSuccessfullyThenTooltipCommandIsNotEmittedAndStoreIsNotIncremented() = runTest {
+        testee.setIsCustomTab(true)
+        whenever(mockPdfDownloadTooltipDataStore.canShow()).thenReturn(true)
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/test.pdf")).thenReturn(PdfDownloadResult.Success(testUri))
+        whenever(mockInlinePdfHandler.extractFileName("https://example.com/test.pdf")).thenReturn("test.pdf")
+
+        testee.requestFileDownload(mock(), "https://example.com/test.pdf", null, "application/pdf", true, false)
+
+        assertCommandNotIssued<Command.ShowPdfDownloadTooltip>()
+        verify(mockPdfDownloadTooltipDataStore, never()).incrementShownCount()
     }
 
     // endregion

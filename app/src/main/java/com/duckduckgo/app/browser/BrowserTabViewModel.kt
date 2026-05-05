@@ -207,6 +207,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
@@ -539,6 +540,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val inlinePdfHandler: InlinePdfHandler,
+    private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
@@ -3715,6 +3717,10 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfFileName = pdfTitle,
                     )
                     command.value = ShowPdfInTab(url, result.uri)
+                    if (!isCustomTabScreen && pdfDownloadTooltipDataStore.canShow()) {
+                        pdfDownloadTooltipDataStore.incrementShownCount()
+                        command.value = Command.ShowPdfDownloadTooltip
+                    }
                 }
                 is PdfDownloadResult.Failure -> {
                     pixel.fire(
