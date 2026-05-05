@@ -59,7 +59,7 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (!surveyManager.shouldTriggerSurvey()) {
-            logcat(tag = "RadoiuC") { "Should not trigger survey from default browser changed evaluator" }
+            logcat { "Should not trigger survey from default browser changed evaluator" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
