@@ -486,6 +486,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
+            is ViewMode.Pdf -> if (hasFocus) Search else PrivacyShield
             else -> {
                 when {
                     hasFocus -> Search

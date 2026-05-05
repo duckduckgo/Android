@@ -10319,6 +10319,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPdfShownThenPrivacyShieldEnabled() = runTest {
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val url = "https://example.com/doc.pdf"
+        whenever(mockInlinePdfHandler.downloadToCache(url)).thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
+        testee.browserViewState.value = browserViewState().copy(
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
+        )
+
+        testee.requestFileDownload(mock(), url, null, "application/pdf", true, false)
+
+        assertTrue(browserViewState().showPrivacyShield.isEnabled())
+    }
+
+    @Test
     fun whenOnPdfHiddenThenCurrentPdfStateClears() {
         testee.browserViewState.value = browserViewState().copy(
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
