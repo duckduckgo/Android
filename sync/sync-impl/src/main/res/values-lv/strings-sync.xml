@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Lejupielādēt atkopšanas kodu PDF formātā</string>
     <string name="sync_settings_download_recovery_code_item_hint">Izmanto šo kodu, lai atgūtu datus, ja zaudēsi piekļuvi šai ierīcei — glabā to drošībā.</string>
     <string name="sync_settings_data_expiration">Sync &amp; Backup datus nevar atgūt pēc 18 mēnešu neaktivitātes. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Vai atjaunot Sync &amp; Backup datus no iepriekšējās instalācijas?</string>
+    <string name="sync_previous_session_ready_body">Atjauno, lai atgūtu iepriekšējās grāmatzīmes, paroles un citus datus DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Atjaunot Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Iestatīt jaunu sinhronizāciju</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Viegli atjauno datus</string>
+    <string name="sync_recover_data_content">Izmanto šo kodu, lai atjaunotu datus, ja esi zaudējis piekļuvi šai ierīcei. Sync &amp; Backup datus nevar atgūt pēc 18 mēnešu neaktivitātes.</string>
+    <string name="sync_recover_data_recovery_code_label">Atkopšanas kods</string>
+    <string name="sync_recover_data_download_pdf">Lejupielādēt PDF formātā</string>
+    <string name="sync_restore_on_reinstall_title">Atjauno, atkārtoti instalējot lietotni</string>
+    <string name="sync_restore_on_reinstall_description">Ja atkārtoti instalēsi lietotni DuckDuckGo, mēs jautāsim, vai vēlies atjaunot datus šajā ierīcē.</string>
 </resources>

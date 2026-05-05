@@ -238,6 +238,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         CustomTab,
         NewTab,
         Browser,
+        DuckAI,
         TabManager,
     }
 

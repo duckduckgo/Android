@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
@@ -74,7 +74,6 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
     // Testing dependencies

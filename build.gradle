@@ -26,6 +26,9 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
+        // Metro DI plugin (requires JVM 21+ to load)
+        classpath "dev.zacsweers.metro:gradle-plugin:1.0.0"
     }
 }
 
@@ -34,6 +37,7 @@ plugins {
     id 'org.jetbrains.dokka'
     id 'com.osacky.fulladle'
     id 'org.jetbrains.kotlin.android' apply false
+    id 'org.jetbrains.kotlin.plugin.compose' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
 }
@@ -195,8 +199,83 @@ subprojects {
             // Note: refreshVersions placeholders ("_") are not resolved in substitutions, so pin the version explicitly.
             substitute(module("com.google.guava:listenablefuture"))
                     .using(module("com.google.guava:guava:33.4.0-android"))
-                    .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
+                    .because("Use guava's bundled ListenableFuture to avoid duplicate classes")
         }
+        resolutionStrategy.eachDependency { details ->
+            // kotlinx-serialization runtime must match Kotlin 2.2.x compiler plugin output
+            if (details.requested.group == 'org.jetbrains.kotlinx' && details.requested.name.startsWith('kotlinx-serialization')) {
+                details.useVersion '1.8.1'
+                details.because 'Kotlin 2.2.21 serialization compiler plugin requires runtime >= 1.8.x'
+            }
+        }
+    }
+
+    // Use JDK 21 for Kotlin compilation (required for Metro compiler plugin)
+    // Output bytecode still targets JVM 17
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+    pluginManager.withPlugin('org.jetbrains.kotlin.android') {
+        kotlin {
+            jvmToolchain(21)
+        }
+    }
+    pluginManager.withPlugin('org.jetbrains.kotlin.jvm') {
+        kotlin {
+            jvmToolchain(21)
+        }
+    }
+
+    plugins.withId('com.google.devtools.ksp') {
+        afterEvaluate {
+            configurations.configureEach { config ->
+                if (config.name == 'ksp') {
+                    config.dependencies.matching {
+                        it.group == 'androidx.room' && it.name == 'room-compiler'
+                    }.configureEach {
+                        ksp {
+                            arg("room.generateKotlin", "true")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Metro dual-build: conditionally swap Anvil for Metro based on ddg.di property
+def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+logger.lifecycle("DI FRAMEWORK: ${diFramework}")
+if (diFramework == 'Metro') {
+    subprojects {
+        // Metro must be applied after Kotlin but during plugin application (not afterEvaluate).
+        // Nest callbacks: first wait for Kotlin, then check for Anvil.
+        def applyMetro = {
+            pluginManager.withPlugin('com.squareup.anvil') {
+                apply plugin: 'dev.zacsweers.metro'
+                metro {
+                    interop {
+                        includeDaggerAnnotations.set(true)
+                        includeJavaxAnnotations.set(true)
+                        includeAnvilAnnotations.set(true)
+                        enableDaggerRuntimeInterop.set(true)
+                        enableDaggerAnvilInterop.set(true)
+                    }
+                }
+                // Override Anvil's languageVersion=1.9 AFTER evaluation (Anvil sets it during apply)
+                afterEvaluate {
+                    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                        compilerOptions {
+                            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                        }
+                    }
+                }
+            }
+        }
+        pluginManager.withPlugin('org.jetbrains.kotlin.android', applyMetro)
+        pluginManager.withPlugin('org.jetbrains.kotlin.jvm', applyMetro)
     }
 }
 
@@ -243,13 +322,6 @@ fladle {
             flakyTestAttempts.set(1)
         }
     }
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-    compilerOptions.freeCompilerArgs.addAll(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
-    )
 }
 
 afterEvaluate {

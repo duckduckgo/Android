@@ -18,6 +18,7 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
@@ -148,7 +149,7 @@ class RealMaliciousSiteProtectionTest {
 
         whenever(mockMaliciousSiteRepository.getFeedForHashPrefix(hashPrefix)).thenReturn(PHISHING)
         whenever(mockMaliciousSiteRepository.getFilters(hash)).thenReturn(FilterSet(filter, PHISHING))
-        whenever(mockMaliciousSiteProtectionRCRepository.isExempted(hostname)).thenReturn(true)
+        whenever(mockMaliciousSiteProtectionRCRepository.isExempted(Domain(hostname))).thenReturn(true)
 
         val result = realMaliciousSiteProtection.isMalicious(url) {}
 

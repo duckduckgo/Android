@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -30,7 +31,7 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
@@ -47,6 +48,7 @@ dependencies {
     implementation project(path: ':survey-api')
     implementation project(path: ':modal-coordinator-api')
 
+    implementation AndroidX.room.runtime
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -62,7 +64,6 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation Google.dagger
-    implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
     implementation AndroidX.recyclerView
     implementation AndroidX.appCompat

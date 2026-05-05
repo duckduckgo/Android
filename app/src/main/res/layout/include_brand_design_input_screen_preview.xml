@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:paddingHorizontal="12dp">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/inputScreenPreviewTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/preOnboardingInputModeDemoTitle"
+            android:visibility="invisible"
+            app:typography="onboarding_title" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/inputScreenPreviewTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="?attr/daxColorPrimaryText" />
+
+    </FrameLayout>
+
+    <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
+        android:id="@+id/inputModeToggle"
+        style="@style/Widget.DuckDuckGo.TabLayout.Rounded"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/inputModeSwitchHeight">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/view_search_tab_indicator" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/view_chat_tab_indicator" />
+
+    </com.duckduckgo.browser.ui.inputmode.InputModeTabLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/inputModeDemoCard"
+        style="@style/Widget.DuckDuckGo.OmnibarCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_3"
+        app:cardElevation="0dp"
+        app:strokeColor="?attr/daxColorLines"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/keyline_0">
+
+            <EditText
+                android:id="@+id/inputText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:fontFamily="sans-serif"
+                android:gravity="start|top"
+                android:hint="@string/preOnboardingInputModeDemoSearchHint"
+                android:importantForAutofill="no"
+                android:maxLines="1"
+                android:minHeight="@dimen/toolbarIcon"
+                android:paddingVertical="@dimen/keyline_2"
+                android:textColor="?attr/daxColorPrimaryText"
+                android:textColorHint="?attr/daxColorSecondaryText"
+                android:textCursorDrawable="@drawable/text_cursor"
+                android:textSize="16sp"
+                android:textStyle="normal"
+                tools:ignore="Autofill,LabelFor,TextFields" />
+
+            <ImageView
+                android:id="@+id/inputModeDemoActionIcon"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="bottom"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_find_search_24"
+                app:tint="?attr/daxColorSecondaryIcon" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/suggestion1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        android:visibility="gone"
+        app:icon="@drawable/ic_find_search_16"
+        tools:alpha="1"
+        tools:text="how to say duck in spanish"
+        tools:visibility="visible" />
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/suggestion2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        android:visibility="gone"
+        app:icon="@drawable/ic_find_search_16"
+        tools:alpha="1"
+        tools:text="mighty ducks cast"
+        tools:visibility="visible" />
+
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
+        android:id="@+id/suggestion3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        android:visibility="gone"
+        app:icon="@drawable/ic_wand_16"
+        tools:alpha="1"
+        tools:text="Surprise me!"
+        tools:visibility="visible" />
+
+</LinearLayout>

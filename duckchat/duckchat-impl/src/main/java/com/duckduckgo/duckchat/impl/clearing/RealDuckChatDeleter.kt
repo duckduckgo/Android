@@ -50,6 +50,7 @@ import javax.inject.Inject
 
 interface DuckChatDeleter {
     suspend fun deleteChat(chatId: String): Boolean
+    suspend fun deleteAllChats(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -102,6 +103,11 @@ class RealDuckChatDeleter @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun deleteAllChats(): Boolean {
+        logcat { "deleteAllChats is no-op for the webview legacy implementation" }
+        return true // no-op as we don't clear IDB data from here
     }
 
     private fun tearDown() {

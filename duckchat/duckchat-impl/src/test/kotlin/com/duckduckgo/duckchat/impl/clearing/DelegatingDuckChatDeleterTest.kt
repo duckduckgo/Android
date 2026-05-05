@@ -147,4 +147,49 @@ class DelegatingDuckChatDeleterTest {
 
         assertFalse(deleter.deleteChat("chat-1"))
     }
+
+    // --- deleteAllChats ---
+
+    @Test
+    fun `deleteAllChats uses native deleter when migrated and FF enabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeDeleter.deleteAllChats()).thenReturn(true)
+
+        assertTrue(deleter.deleteAllChats())
+        verify(nativeDeleter).deleteAllChats()
+        verify(webViewDeleter, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `deleteAllChats uses WebView deleter when not migrated`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(false)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(webViewDeleter.deleteAllChats()).thenReturn(true)
+
+        assertTrue(deleter.deleteAllChats())
+        verify(webViewDeleter).deleteAllChats()
+        verify(nativeDeleter, never()).deleteAllChats()
+    }
+
+    @Test
+    fun `deleteAllChats also clears native store when migrated but FF disabled`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(false)
+        whenever(webViewDeleter.deleteAllChats()).thenReturn(true)
+
+        deleter.deleteAllChats()
+
+        verify(nativeDeleter).deleteAllChats()
+        verify(webViewDeleter).deleteAllChats()
+    }
+
+    @Test
+    fun `deleteAllChats returns false when deleter fails`() = runTest {
+        whenever(store.hasMigrated()).thenReturn(true)
+        whenever(nativeStorageToggle.isEnabled()).thenReturn(true)
+        whenever(nativeDeleter.deleteAllChats()).thenReturn(false)
+
+        assertFalse(deleter.deleteAllChats())
+    }
 }

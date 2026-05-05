@@ -29,8 +29,14 @@ interface DuckAiBridgeFileMetaDao {
     @Query("SELECT * FROM duck_ai_file_meta")
     fun getAll(): List<DuckAiBridgeFileMetaEntity>
 
+    @Query("SELECT * FROM duck_ai_file_meta WHERE chatId = :chatId")
+    fun getByChatId(chatId: String): List<DuckAiBridgeFileMetaEntity>
+
     @Query("DELETE FROM duck_ai_file_meta WHERE uuid = :uuid")
     fun delete(uuid: String)
+
+    @Query("DELETE FROM duck_ai_file_meta WHERE chatId = :chatId")
+    fun deleteByChatId(chatId: String)
 
     @Query("DELETE FROM duck_ai_file_meta")
     fun deleteAll()

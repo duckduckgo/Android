@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Nyomtatás</string>
     <string name="browserMenuOpenAppLink">Megnyitás az alkalmazásban</string>
     <string name="browserMenuAddToHome">Hozzáadás a kezdőlaphoz</string>
+    <string name="browserMenuDownloadPdf">PDF letöltése</string>
     <string name="browserMenuReportBrokenSite">Hibás weboldal jelentése</string>
     <string name="browserMenuAutofill">Jelszavak</string>
     <string name="browserMenuDownloads">Letöltések</string>

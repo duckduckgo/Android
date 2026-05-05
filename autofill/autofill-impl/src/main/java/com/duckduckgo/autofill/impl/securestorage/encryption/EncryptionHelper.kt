@@ -17,10 +17,14 @@
 package com.duckduckgo.autofill.impl.securestorage.encryption
 
 import android.security.keystore.KeyProperties
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.sync.Mutex
@@ -59,6 +63,7 @@ interface EncryptionHelper {
 @ContributesBinding(AppScope::class)
 class RealEncryptionHelper @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : EncryptionHelper {
     private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
     private val decryptionCipher = Cipher.getInstance(TRANSFORMATION)
@@ -75,7 +80,14 @@ class RealEncryptionHelper @Inject constructor(
                 encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
                 encryptionCipher.doFinal(raw)
             } catch (exception: Exception) {
-                throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
+                InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception).let {
+                    pixel.fire(
+                        pixel = AutofillPixelNames.AUTOFILL_ENCRYPT_DATA_FAILED,
+                        parameters = mapOf("error" to it.sanitizeStackTrace()),
+                        type = Daily(),
+                    )
+                    throw it
+                }
             }
             val iv = encryptionCipher.iv
 
@@ -93,7 +105,14 @@ class RealEncryptionHelper @Inject constructor(
                 decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
                 decryptionCipher.doFinal(toDecrypt.data)
             } catch (exception: Exception) {
-                throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
+                InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception).let {
+                    pixel.fire(
+                        pixel = AutofillPixelNames.AUTOFILL_DECRYPT_DATA_FAILED,
+                        parameters = mapOf("error" to it.sanitizeStackTrace()),
+                        type = Daily(),
+                    )
+                    throw it
+                }
             }
         }
     }

@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightPlugin
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
@@ -419,3 +420,6 @@ private interface BookmarkAddedDialogPluginPoint
 
 @ContributesPluginPoint(scope = AppScope::class, boundType = DuckAiChatDeletionListener::class)
 private interface DuckAiChatDeletionListenerPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = BrowserMenuHighlightPlugin::class)
+private interface BrowserMenuHighlightPluginPoint

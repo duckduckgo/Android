@@ -323,12 +323,24 @@ class InputScreenViewModel @AssistedInject constructor(
             voiceInputAllowed,
             isSearchModeFlow,
             chatInputTextState,
-        ) { serviceAvailable, inputAllowed, isSearchMode, chatInputText ->
-            val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
+            duckAiFeatureState.showVoiceSearchToggle,
+            duckAiFeatureState.showVoiceChatEntry,
+        ) { values ->
+            val serviceAvailable = values[0] as Boolean
+            val inputAllowed = values[1] as Boolean
+            val isSearchMode = values[2] as Boolean
+            val chatInputText = values[3] as String
+            val showVoiceSearch = values[4] as Boolean
+            val showVoiceChatEntry = values[5] as Boolean
+            val newEntryPointActive = !isSearchMode && showVoiceChatEntry
             _visibilityState.update {
                 it.copy(
                     voiceSearchButtonVisible = if (!newEntryPointActive) {
-                        serviceAvailable && inputAllowed
+                        if (isSearchMode) {
+                            serviceAvailable && inputAllowed
+                        } else {
+                            serviceAvailable && inputAllowed && showVoiceSearch
+                        }
                     } else {
                         false
                     },
@@ -393,28 +405,26 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        if (duckChatFeature.aiChatSuggestions().isEnabled()) {
-            duckChat.observeChatSuggestionsUserSettingEnabled()
-                .onEach { enabled ->
-                    chatSuggestionsUserEnabled.value = enabled
-                    if (!enabled) {
-                        chatSuggestionsFetchJob?.cancel()
-                        _chatSuggestions.value = emptyList()
-                    }
+        duckChat.observeChatSuggestionsUserSettingEnabled()
+            .onEach { enabled ->
+                chatSuggestionsUserEnabled.value = enabled
+                if (!enabled) {
+                    chatSuggestionsFetchJob?.cancel()
+                    _chatSuggestions.value = emptyList()
                 }
-                .launchIn(viewModelScope)
+            }
+            .launchIn(viewModelScope)
 
-            @OptIn(FlowPreview::class)
-            chatInputTextState
-                .drop(1)
-                .debounce(CHAT_SUGGESTIONS_DEBOUNCE_MS)
-                .onEach { query ->
-                    if (!_visibilityState.value.searchMode && chatSuggestionsUserEnabled.value) {
-                        fetchChatSuggestionsWithQuery(query)
-                    }
+        @OptIn(FlowPreview::class)
+        chatInputTextState
+            .drop(1)
+            .debounce(CHAT_SUGGESTIONS_DEBOUNCE_MS)
+            .onEach { query ->
+                if (!_visibilityState.value.searchMode && chatSuggestionsUserEnabled.value) {
+                    fetchChatSuggestionsWithQuery(query)
                 }
-                .launchIn(viewModelScope)
-        }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onActivityResume() {
@@ -625,8 +635,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
         // Fetch if the query hasn't changed since the last fetch. The observer
         // on chatInputTextState will handle the case where the query changed.
-        if (duckChatFeature.aiChatSuggestions().isEnabled() &&
-            chatSuggestionsUserEnabled.value &&
+        if (chatSuggestionsUserEnabled.value &&
             chatInputTextState.value == searchInputTextState.value
         ) {
             fetchChatSuggestionsWithQuery(chatInputTextState.value)

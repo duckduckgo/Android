@@ -88,6 +88,7 @@ fun WideEventEntity.WideEventInterval.mapToRepositoryWideEventInterval(): WideEv
         name = name,
         startedAt = startedAt,
         timeout = timeout,
+        buckets = buckets,
     )
 
 fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventEntity.WideEventInterval =
@@ -95,4 +96,5 @@ fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventE
         name = name,
         startedAt = startedAt,
         timeout = timeout,
+        buckets = buckets,
     )

@@ -1,0 +1,30 @@
+name: 'Agentic Maintenance PR -> Move Asana task to In Review'
+
+on:
+  pull_request:
+    types: [opened, labeled]
+
+jobs:
+  move-task-to-in-review:
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'agentic-maintenance') ||
+      (github.event.action == 'opened' && contains(github.event.pull_request.labels.*.name, 'agentic-maintenance'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find Asana Task ID from PR body
+        id: find-asana-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          trigger-phrase: "Task/Issue URL:"
+          action: 'find-asana-task-id'
+
+      - name: Move task to In Review in Agentic Backlog
+        if: ${{ steps.find-asana-task.outputs.asanaTaskId != '' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_AGENTIC_BACKLOG_PROJECT_ID }}
+          asana-section: ${{ vars.GH_AGENTIC_BACKLOG_IN_REVIEW_SECTION_ID }}
+          asana-task-id: ${{ steps.find-asana-task.outputs.asanaTaskId }}
+          action: 'add-task-asana-project'

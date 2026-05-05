@@ -1,7 +1,7 @@
 {
   "name": "mylife",
   "url": "mylife.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "addedDatetime": 1715797497496,
   "optOutUrl": "https://mylife.jotform.com/260284407610047",
   "steps": [
@@ -13,6 +13,17 @@
           "actionType": "navigate",
           "id": "31285970-27bd-4ec6-a4c1-afc5fb501624",
           "url": "https://www.mylife.com/pub-multisearch.pubview?searchFirstName=${firstName}&searchLastName=${lastName}&searchLocation=${city}%2C+${state|upcase}&whyReg=peoplesearch&whySub=Member+Profile+Sub&pageType=ps"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-f0f516ec-a5eb-4a49-81cf-3ac076d5a06b"
         },
         {
           "actionType": "expectation",

@@ -17,4 +17,5 @@
 <resources>
     <dimen name="sslWarningTextWidth">628dp</dimen>
     <dimen name="toolbar_horizontal_margin">0dp</dimen>
+    <dimen name="onboardingBackgroundMaxHeight">252dp</dimen>
 </resources>

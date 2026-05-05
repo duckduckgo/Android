@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Распечатать</string>
     <string name="browserMenuOpenAppLink">Открыть в приложении</string>
     <string name="browserMenuAddToHome">Добавить на домашнюю страницу</string>
+    <string name="browserMenuDownloadPdf">Скачать PDF</string>
     <string name="browserMenuReportBrokenSite">Сообщить о неработающем сайте</string>
     <string name="browserMenuAutofill">Пароли</string>
     <string name="browserMenuDownloads">Загрузки</string>

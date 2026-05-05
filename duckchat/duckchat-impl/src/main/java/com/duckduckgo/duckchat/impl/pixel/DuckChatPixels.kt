@@ -541,10 +541,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT("m_aichat_settings_default_toggle_position_changed_count"),
     DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY("m_aichat_settings_default_toggle_position_changed_daily"),
 
-    DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY("m_aichat_native_storage_reader_native_daily"),
-    DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY("m_aichat_native_storage_reader_webview_daily"),
-    DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT("m_aichat_native_storage_deletion_native_count"),
-    DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT("m_aichat_native_storage_deletion_webview_count"),
+    DUCK_CHAT_NATIVE_STORAGE_READER_NATIVE_DAILY("m_duck-ai_native-storage_reader_native_daily"),
+    DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY("m_duck-ai_native-storage_reader_webview_daily"),
+    DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT("m_duck-ai_native-storage_deletion_native_count"),
+    DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT("m_duck-ai_native-storage_deletion_webview_count"),
 }
 
 object DuckChatPixelParameters {
@@ -694,7 +694,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_READER_WEBVIEW_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_NATIVE_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_NATIVE_STORAGE_DELETION_WEBVIEW_COUNT.pixelName to PixelParameter.removeAtb(),
-            "m_aichat_native_storage_migration_done_" to PixelParameter.removeAtb(),
+            "m_duck-ai_native-storage_" to PixelParameter.removeAtb(),
         )
     }
 }

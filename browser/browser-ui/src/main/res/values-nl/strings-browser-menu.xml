@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Afdrukken</string>
     <string name="browserMenuOpenAppLink">Openen in de app</string>
     <string name="browserMenuAddToHome">Toevoegen aan Home Screen</string>
+    <string name="browserMenuDownloadPdf">PDF downloaden</string>
     <string name="browserMenuReportBrokenSite">Defecte website melden</string>
     <string name="browserMenuAutofill">Wachtwoorden</string>
     <string name="browserMenuDownloads">Downloads</string>

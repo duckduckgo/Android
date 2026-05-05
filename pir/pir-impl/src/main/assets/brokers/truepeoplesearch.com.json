@@ -1,7 +1,7 @@
 {
   "name": "TruePeopleSearch",
   "url": "truepeoplesearch.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "parent": "peoplefinders.com",
   "addedDatetime": 1703138400000,
   "optOutUrl": "https://www.truepeoplesearch.com/removal",
@@ -17,24 +17,11 @@
         },
         {
           "actionType": "expectation",
-          "_comment": "detect CF managed challenge - the page renders a hidden input named cf-turnstile-response when Cloudflare intercepts with an inline challenge",
-          "expectations": [
-            {
-              "type": "element",
-              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]",
-              "failSilently": false
-            }
-          ],
-          "id": "8ae2fd99-5e9d-4f2e-bdb0-8acf9d7237ba"
-        },
-        {
-          "actionType": "expectation",
           "_comment": "detect Datadome bot protection - Datadome injects an iframe from captcha-delivery.com with a slide-to-verify challenge",
           "expectations": [
             {
               "type": "element",
-              "selector": "//body[not(.//iframe[contains(@src,'captcha-delivery.com')])]",
-              "failSilently": false
+              "selector": "//body[not(.//iframe[contains(@src,'captcha-delivery.com')])]"
             }
           ],
           "id": "263f1b6f-674f-46e5-9f0f-97e832c34219"
@@ -45,8 +32,7 @@
           "expectations": [
             {
               "type": "element",
-              "selector": "//body[not(.//form[@id='captchaForm'])]",
-              "failSilently": false
+              "selector": "//body[not(.//form[@id='captchaForm'])]"
             }
           ],
           "id": "9ea1684f-1953-45b7-954e-d1597a0c5063"

@@ -58,6 +58,9 @@ class SyncPreviousSessionReadyFragment : DuckDuckGoFragment(R.layout.fragment_pr
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.onScreenShown(arguments?.getString(ARG_SOURCE).orEmpty())
+        }
         configureListeners()
         observeUiEvents()
     }
@@ -94,6 +97,12 @@ class SyncPreviousSessionReadyFragment : DuckDuckGoFragment(R.layout.fragment_pr
     }
 
     companion object {
-        fun instance() = SyncPreviousSessionReadyFragment()
+        private const val ARG_SOURCE = "ARG_SOURCE"
+
+        fun instance(source: String? = null) = SyncPreviousSessionReadyFragment().apply {
+            arguments = Bundle().apply {
+                source?.let { putString(ARG_SOURCE, it) }
+            }
+        }
     }
 }
