@@ -94,6 +94,7 @@ interface NativeInputWidget {
     fun setVoiceChatAvailable(available: Boolean)
     fun submitMessage(message: String?)
     fun submitAsChat(): Boolean
+    fun submitAsSearch(): Boolean
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
