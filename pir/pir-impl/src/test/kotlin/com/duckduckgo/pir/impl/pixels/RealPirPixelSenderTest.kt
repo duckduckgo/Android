@@ -246,6 +246,8 @@ class RealPirPixelSenderTest {
 
         testee.reportScheduledScanCompleted(
             totalTimeInMillis = totalTimeInMillis,
+            totalScanJobs = 7,
+            totalOptOutJobs = 4,
             profileQueryCount = 3,
             brokerCount = 10,
         )
@@ -260,6 +262,10 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "54321")
+        assert(paramsCaptor.firstValue.containsKey("total_scan"))
+        assert(paramsCaptor.firstValue["total_scan"] == "7")
+        assert(paramsCaptor.firstValue.containsKey("total_optout"))
+        assert(paramsCaptor.firstValue["total_optout"] == "4")
         assert(paramsCaptor.firstValue.containsKey("profile_queries"))
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
