@@ -3349,6 +3349,8 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun checkSubscriptionPromoOnForeground(): Boolean {
         if (currentGlobalLayoutState() !is Browser) return false
+        val currentUrl = url
+        if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) return false
         val cta = withContext(dispatchers.io()) { ctaViewModel.getPromoCtaOnForeground() }
         if (cta != null) {
             ctaViewState.value = currentCtaViewState().copy(
