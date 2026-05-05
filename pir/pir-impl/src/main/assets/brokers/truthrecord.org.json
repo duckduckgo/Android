@@ -1,7 +1,7 @@
 {
   "name": "TruthRecord",
   "url": "truthrecord.org",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.truthrecord.org/api/helper/optOutLight/search",
   "steps": [
@@ -149,6 +149,9 @@
             "addressCityStateList": {
               "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
               "separator": "/(?<=, [A-Z]{2}), /"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "cd0f0aa3-fba2-4330-b4ab-6d7700aad9cb"
