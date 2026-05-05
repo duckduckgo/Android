@@ -697,6 +697,40 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenViewModeChangedToPdfThenLeadingIconIsPrivacyShield() = runTest {
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
+            assertTrue(viewState.viewMode is ViewMode.Pdf)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToPdfBeforeUrlPropagatedThenLeadingIconIsPrivacyShield() = runTest {
+        // No prior loading state means _viewState.value.url is empty — the shield must still appear.
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToPdfAndFocusThenLeadingIconIsSearch() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.viewMode is ViewMode.Pdf)
+        }
+    }
+
+    @Test
     fun whenPrivacyShieldChangedToProtectedThenViewStateCorrect() = runTest {
         val privacyShield = PROTECTED
         testee.onPrivacyShieldChanged(privacyShield)
