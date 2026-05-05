@@ -51,6 +51,8 @@ dependencies {
     implementation project(path: ':navigation-api')
     implementation "androidx.datastore:datastore-preferences:_"
 
+    implementation "com.airbnb.android:lottie-compose:_"
+
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
