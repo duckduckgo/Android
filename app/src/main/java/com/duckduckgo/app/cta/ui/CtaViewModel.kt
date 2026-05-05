@@ -165,6 +165,9 @@ class CtaViewModel @Inject constructor(
             if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
+            if (cta is SubscriptionPromoModalCta) {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
         }
     }
 
@@ -221,6 +224,22 @@ class CtaViewModel @Inject constructor(
                 getBrowserCta(site, detectedRefreshPatterns)
             } else {
                 getHomeCta()
+            }
+        }
+    }
+
+    suspend fun getPromoCtaOnForeground(): Cta? {
+        return withContext(dispatchers.io()) {
+            when {
+                canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                    origin = "funnel_skippedonboarding_android",
+                )
+                canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                    origin = "funnel_browsermodal_android",
+                )
+                else -> null
             }
         }
     }
@@ -304,11 +323,6 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            // Subscription onboarding for returning users who skipped onboarding
-            canShowSubscriptionCtaForSkippedOnboarding() -> {
-                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
-            }
-
             // Add Widget
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) {
@@ -346,6 +360,13 @@ class CtaViewModel @Inject constructor(
             isSubscriptionCtaAvailable()
 
     @WorkerThread
+    private suspend fun canShowSubscriptionPromoCta(): Boolean =
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers().isEnabled() &&
+            appInstallStore.daysInstalled() >= SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogSubscriptionShown() &&
+            isSubscriptionCtaAvailable()
+
+    @WorkerThread
     private fun canShowWidgetCta(): Boolean {
         return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
@@ -368,8 +389,7 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)
-                ) {
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null
@@ -528,7 +548,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun isPromoOnboardingDialogShowing(): Boolean =
         withContext(dispatchers.io()) {
-            canShowSubscriptionCtaForSkippedOnboarding()
+            canShowSubscriptionCtaForSkippedOnboarding() || canShowSubscriptionPromoCta()
         }
 
     private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN

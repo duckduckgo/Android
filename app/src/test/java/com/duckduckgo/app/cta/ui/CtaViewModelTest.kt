@@ -161,6 +161,7 @@ class CtaViewModelTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
@@ -1014,7 +1015,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenOnUserClickCtaOkButtonWithSubscriptionPromoModalCtaThenDismissedCtaIsInserted() = runTest {
-        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false))
+        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android"))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
     }
 
@@ -1026,7 +1027,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSubscriptionPromoModalCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android"))
         verify(mockSubscriptionPromoCtaShownPlugin).onSubscriptionPromoCtaShown()
     }
 
@@ -1150,5 +1151,151 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
+    }
+
+    @Test
+    fun whenSubscriptionPromoModalCtaIsShownThenDismissedCtaIsInserted() = runTest {
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android"))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
+    }
+
+    private suspend fun givenSubscriptionPromoEligible() {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(8))
+        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+    }
+
+    @Test
+    fun givenBrowsingAndEligibleWhenRefreshCtaThenDontReturnSubscriptionPromoModalCta() = runTest {
+        givenSubscriptionPromoEligible()
+        val site = site(url = "https://example.com")
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenBrowsingButExistingUsersToggleDisabledWhenRefreshCtaThenDontReturnSubscriptionPromoModalCta() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(8))
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        val site = site(url = "https://example.com")
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenBrowsingAndInstalledLessThan7DaysWhenRefreshCtaThenDontReturnSubscriptionPromoModalCta() = runTest {
+        // installTimestamp defaults to 1 day ago in @Before
+        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        val site = site(url = "https://example.com")
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenBrowsingAndSubscriptionModalAlreadyShownWhenRefreshCtaThenDontReturnSubscriptionPromoModalCta() = runTest {
+        givenSubscriptionPromoEligible()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
+        val site = site(url = "https://example.com")
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenBrowsingAndNotEligibleWhenRefreshCtaThenDontReturnSubscriptionPromoModalCta() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(8))
+        whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        // mockSubscriptions.isEligible() returns false by default from @Before
+        val site = site(url = "https://example.com")
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenForegroundAndEligibleWhenGetPromoCtaOnForegroundThenReturnSubscriptionPromoModalCta() = runTest {
+        givenSubscriptionPromoEligible()
+        val value = testee.getPromoCtaOnForeground()
+        assertTrue(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenForegroundButToggleDisabledWhenGetPromoCtaOnForegroundThenDontReturnSubscriptionPromoModalCta() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(8))
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        val value = testee.getPromoCtaOnForeground()
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenForegroundAndSubscriptionModalAlreadyShownWhenGetPromoCtaOnForegroundThenDontReturnSubscriptionPromoModalCta() = runTest {
+        givenSubscriptionPromoEligible()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
+        val value = testee.getPromoCtaOnForeground()
+        assertFalse(value is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun givenForegroundWithFreeTrialCopyWhenGetPromoCtaOnForegroundThenReturnSubscriptionPromoModalCtaWithFreeTrialCopy() = runTest {
+        givenSubscriptionPromoEligible()
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
+        val value = testee.getPromoCtaOnForeground()
+        assertTrue(value is SubscriptionPromoModalCta)
+        assertTrue((value as SubscriptionPromoModalCta).isFreeTrialCopy)
+    }
+
+    @Test
+    fun givenSubscriptionPromoModalCtaShownWhenOnboardingActiveAndEligibleThenBubbleCtaNotShown() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android"))
+
+        // After modal is shown, DAX_INTRO_PRIVACY_PRO is in dismissed_cta, so bubble must not show
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertFalse(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 }

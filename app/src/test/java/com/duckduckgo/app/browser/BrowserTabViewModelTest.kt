@@ -749,6 +749,7 @@ class BrowserTabViewModelTest {
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
             whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
             whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
@@ -3388,11 +3389,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSubscriptionPromoModalCtaThenLaunchSubscriptionWithReinstallModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false)
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_skippedonboarding_android")
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
             assertEquals("funnel_skippedonboarding_android", uri.getQueryParameter("origin"))
+        }
+    }
+
+    @Test
+    fun whenUserClickedBrowserModalSubscriptionPromoCtaThenLaunchSubscriptionWithBrowserModalOrigin() {
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android")
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_browsermodal_android", uri.getQueryParameter("origin"))
         }
     }
 

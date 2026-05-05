@@ -1175,11 +1175,15 @@ class BrowserTabViewModel @Inject constructor(
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
+                if (checkSubscriptionPromoOnForeground()) return@launch
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
             }
         } else {
             command.value = HideKeyboard
+            if (currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
+                viewModelScope.launch { checkSubscriptionPromoOnForeground() }
+            }
         }
 
         browserViewState.value =
@@ -3348,6 +3352,21 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
+    private suspend fun checkSubscriptionPromoOnForeground(): Boolean {
+        if (currentGlobalLayoutState() !is Browser) return false
+        val cta = withContext(dispatchers.io()) { ctaViewModel.getPromoCtaOnForeground() }
+        if (cta != null) {
+            ctaViewState.value = currentCtaViewState().copy(
+                cta = cta,
+                isBrowserShowing = currentBrowserViewState().browserShowing,
+                isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+            )
+            ctaChangedTicker.emit(System.currentTimeMillis().toString())
+            return true
+        }
+        return false
+    }
+
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
@@ -3380,8 +3399,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        val origin = "funnel_skippedonboarding_android"
-                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.origin}".toUri())
                     }
                     null
                 }
