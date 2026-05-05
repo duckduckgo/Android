@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Lepj meg!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Ez a <b>DuckDuckGo Search</b>! Privát. Gyors. Kevesebb hirdetés.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Ez a DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privát. Gyors. Kevesebb hirdetés.</string>
     <string name="onboardingSerpDaxDialogButton">Megvan!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A következő lépésben próbálj meg ellátogatni egy webhelyre!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

@@ -1,66 +1,92 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/daxCtaContainer"
+    android:id="@+id/contextualBrandDesignCtaContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0"
+    android:background="?attr/onboardingSurfaceBackdrop"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="36dp"
+    android:paddingTop="@dimen/keyline_4"
+    android:paddingBottom="@dimen/onboardingContextualBackgroundOverlap"
+    android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
     tools:alpha="1">
 
+    <ImageView
+        android:id="@+id/contextualBrandDesignBackground"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/onboardingContextualBackgroundOverlapNegative"
+        android:adjustViewBounds="true"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/getDesktopBrowserMaxItemWidth"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/bg_onboarding_serp"
+        tools:visibility="visible" />
+
     <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
-        android:id="@+id/brandDesignCardView"
+        android:id="@+id/contextualBrandDesignCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginBottom="32dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"
+        app:layout_constraintWidth_max="@dimen/getDesktopBrowserMaxItemWidth"
         app:showArrow="false">
 
         <com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
-            android:id="@+id/brandDesignCardContainer"
+            android:id="@+id/contextualBrandDesignCardContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_6"
             android:paddingBottom="20dp">
 
-            <ImageView
-                android:id="@+id/brandDesignHeaderImage"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no"
-                android:padding="16dp"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_onboarding_subscription_shield"
-                tools:visibility="visible" />
-
             <FrameLayout
+                android:id="@+id/contextualBrandDesignTitleSlot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_6">
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:layout_marginBottom="@dimen/keyline_4">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/brandDesignHiddenTitle"
+                    android:id="@+id/contextualBrandDesignHiddenTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
                     android:visibility="invisible"
                     app:typography="h2"
-                    tools:text="@string/onboardingSearchDaxDialogTitle"
+                    tools:text="@string/onboardingEndDaxDialogTitle"
                     tools:visibility="visible" />
 
                 <com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
-                    android:id="@+id/brandDesignTitle"
+                    android:id="@+id/contextualBrandDesignTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -71,20 +97,19 @@
             </FrameLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/brandDesignDescription"
+                android:id="@+id/contextualBrandDesignDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_6"
-                android:layout_marginTop="@dimen/keyline_4"
                 android:alpha="0"
                 android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body.InContext"
                 tools:alpha="1"
-                tools:text="@string/onboardingSearchDaxDialogDescription" />
+                tools:text="@string/onboardingEndDaxDialogDescription" />
 
-            <!-- Content include slots — only one visible at a time -->
+            <!-- Content include slots — only one visible at a time. Unique IDs across both includes. -->
             <include
-                android:id="@+id/optionsContent"
-                layout="@layout/include_brand_design_dialog_options"
+                android:id="@+id/contextualBrandDesignPrimaryCtaContent"
+                layout="@layout/include_brand_design_contextual_dialog_primary_cta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
@@ -92,17 +117,14 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/primaryCta"
+            <include
+                android:id="@+id/contextualBrandDesignOptionsContent"
+                layout="@layout/include_brand_design_contextual_dialog_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="20dp"
-                android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
                 android:visibility="gone"
-                tools:ignore="InvalidDaxButtonProperty"
-                tools:text="High Five!"
                 tools:visibility="gone" />
 
         </com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout>
@@ -111,7 +133,7 @@
 
     <!-- Dismiss button: bordered circular button overlapping card corner. -->
     <ImageView
-        android:id="@+id/brandDesignDismissButton"
+        android:id="@+id/contextualBrandDesignDismissButton"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginTop="-4dp"
@@ -125,10 +147,9 @@
         android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
         app:tint="?attr/onboardingIconsPrimary"
         android:translationZ="8dp"
-        app:layout_constraintEnd_toEndOf="@id/brandDesignCardView"
-        app:layout_constraintTop_toTopOf="@id/brandDesignCardView"
+        app:layout_constraintEnd_toEndOf="@id/contextualBrandDesignCardView"
+        app:layout_constraintTop_toTopOf="@id/contextualBrandDesignCardView"
         app:srcCompat="@drawable/ic_close_16"
         tools:alpha="1" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
