@@ -451,6 +451,97 @@ class RealDuckAiModelManagerTest {
         assertEquals(1, testee.modelState.value.models.size)
     }
 
+    @Test
+    fun whenAttachmentLimitsProvidedThenResolvedForFreeTier() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                models = listOf(remoteModel("id")),
+                attachmentLimits = mapOf(
+                    "free" to RemoteTierAttachmentLimits(
+                        images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 5, maxInputCharsWithAttachments = 4500),
+                    ),
+                    "plus" to RemoteTierAttachmentLimits(
+                        images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 10, maxInputCharsWithAttachments = 4500),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val limits = testee.modelState.value.attachmentLimits
+        assertEquals(3, limits.images.maxPerTurn)
+        assertEquals(5, limits.images.maxPerConversation)
+    }
+
+    @Test
+    fun whenAttachmentLimitsProvidedThenResolvedForPlusTier() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                models = listOf(remoteModel("id")),
+                attachmentLimits = mapOf(
+                    "free" to RemoteTierAttachmentLimits(
+                        images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 5),
+                    ),
+                    "plus" to RemoteTierAttachmentLimits(
+                        images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 10),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val limits = testee.modelState.value.attachmentLimits
+        assertEquals(10, limits.images.maxPerConversation)
+    }
+
+    @Test
+    fun whenNoAttachmentLimitsThenDefaultsUsed() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(models = listOf(remoteModel("id"))),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val limits = testee.modelState.value.attachmentLimits
+        assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN, limits.images.maxPerTurn)
+        assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_CONVERSATION, limits.images.maxPerConversation)
+    }
+
+    @Test
+    fun whenAttachmentLimitsMissingTierThenDefaultsUsed() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                models = listOf(remoteModel("id")),
+                attachmentLimits = mapOf(
+                    "free" to RemoteTierAttachmentLimits(
+                        images = RemoteImageLimits(maxPerTurn = 2),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val limits = testee.modelState.value.attachmentLimits
+        assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN, limits.images.maxPerTurn)
+    }
+
     private fun remoteModel(
         id: String,
         displayName: String? = null,

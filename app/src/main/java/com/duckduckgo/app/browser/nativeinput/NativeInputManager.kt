@@ -17,10 +17,12 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -45,19 +47,20 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
+import org.json.JSONArray
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (query: String, modelId: String?) -> Unit,
+    val onDuckAiChatSubmitted: (query: String, modelId: String?, imagesJson: JSONArray?) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
-    val onImageButtonPressed: () -> Unit = {},
+    val onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -83,6 +86,7 @@ interface NativeInputManager {
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
+    fun setPickingImage(picking: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -99,6 +103,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
+    private var isPickingImage: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
 
@@ -129,6 +134,10 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return false
         val widget = widgetFrom(rootView) ?: return false
         return widget.isChatTabSelected()
+    }
+
+    override fun setPickingImage(picking: Boolean) {
+        isPickingImage = picking
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -226,6 +235,7 @@ class RealNativeInputManager @Inject constructor(
         }
 
         if (isVisible) {
+            isPickingImage = false
             onKeyboardShown(widgetRoot)
         } else {
             onKeyboardHidden(widget)
@@ -239,6 +249,8 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun onKeyboardHidden(widget: NativeInputWidget) {
+        if (widget.isModelMenuVisible) return
+        if (isPickingImage) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
         }
@@ -332,12 +344,14 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onSearchSubmitted(query)
                 } else if (omnibarController.isDuckAiMode()) {
                     widget.saveLastUsedTogglePosition(isChat = true)
+                    val imagesJson = widget.getImageAttachmentsJson()
                     widget.text = ""
+                    widget.clearImageAttachments()
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
+                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
-                    widget.storePendingPrompt(query)
+                    widget.storePendingPromptWithAttachments(query)
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
@@ -419,7 +433,8 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
-            onImageClick = { callbacks.onImageButtonPressed() }
+            onImagePickerRequested = { callback -> callbacks.onImagePickerRequested(callback) }
+            onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }

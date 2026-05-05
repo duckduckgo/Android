@@ -433,8 +433,8 @@ class DuckChatContextualFragment :
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
-            onImageButtonPressed = {
-                // To be implemented
+            onImagePickerRequested = { callback ->
+                launchNativeImagePicker(callback)
             },
         )
         observeViewModel()
@@ -701,6 +701,14 @@ class DuckChatContextualFragment :
         viewModel.viewModelScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
         }
+    }
+
+    private fun launchNativeImagePicker(callback: ValueCallback<Array<Uri>>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = listOf("image/*"),
+        )
+        launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
     data class FileChooserRequestedParams(

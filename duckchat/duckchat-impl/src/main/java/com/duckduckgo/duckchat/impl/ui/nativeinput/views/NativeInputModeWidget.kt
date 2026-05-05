@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.net.Uri
+import android.webkit.ValueCallback
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -27,7 +29,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.Space
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
@@ -50,7 +51,12 @@ import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.image.ImageAttachmentsContainerView
+import com.duckduckgo.duckchat.impl.nativeinput.image.RealAttachmentHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.AttachmentButtonView
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.nativeinput.Action
@@ -59,6 +65,7 @@ import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
+import org.json.JSONArray
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
@@ -79,6 +86,9 @@ interface NativeInputWidget {
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
+    var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
+    var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
+    val isModelMenuVisible: Boolean
 
     fun onBackPressed()
     fun focusInput(activity: Activity?)
@@ -100,7 +110,9 @@ interface NativeInputWidget {
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
-    fun storePendingPrompt(query: String)
+    fun getImageAttachmentsJson(): JSONArray?
+    fun clearImageAttachments()
+    fun storePendingPromptWithAttachments(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual()
     fun isWidgetBottom(): Boolean
@@ -163,8 +175,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+    private var imageUploadLimitJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
+    private var attachmentLimitExceeded: Boolean = false
+    private var hasAttachments: Boolean = false
     private var nativeInputState: NativeInputState = NativeInputState(
         inputMode = NativeInputState.InputMode.SEARCH_ONLY,
         inputContext = NativeInputState.InputContext.BROWSER,
@@ -193,12 +208,62 @@ class NativeInputModeWidget @JvmOverloads constructor(
             field = value
             if (value != null && isAttachedToWindow) observeTier()
         }
+    override var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    override var onAttachmentChooserStateChanged: ((Boolean) -> Unit)? = null
+    override var isModelMenuVisible: Boolean = false
+        private set
 
-    private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
+    private val attachmentHandler: RealAttachmentHandler?
+        get() {
+            val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return null
+            return (0 until container.childCount)
+                .mapNotNull { (container.getChildAt(it) as? AttachmentButtonView)?.attachmentHandler }
+                .firstOrNull()
+        }
+
+    private lateinit var attachmentsLayout: android.widget.LinearLayout
+    private lateinit var imageAttachmentsScroll: android.widget.HorizontalScrollView
+    private lateinit var imageAttachmentsContainer: ImageAttachmentsContainerView
+    private var attachmentViewsInitialized = false
+
+    private fun initAttachmentViews() {
+        if (attachmentViewsInitialized) return
+        attachmentViewsInitialized = true
+        val container = findViewById<FrameLayout>(R.id.attachmentsContainer)
+
+        attachmentsLayout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+            )
+        }
+        container.addView(attachmentsLayout)
+
+        imageAttachmentsScroll = android.widget.HorizontalScrollView(context).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+            )
+            isHorizontalScrollBarEnabled = false
+        }
+        attachmentsLayout.addView(imageAttachmentsScroll)
+
+        imageAttachmentsContainer = ImageAttachmentsContainerView(context)
+        imageAttachmentsScroll.addView(imageAttachmentsContainer)
+        imageAttachmentsContainer.onAttachmentRemoved = { _ ->
+            val count = imageAttachmentsContainer.attachmentCount()
+            attachmentHandler?.updateImageCount(count)
+            if (count == 0) {
+                container.isVisible = false
+            }
+            updateAttachmentState()
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        imageButton.setOnClickListener { onImageClick?.invoke() }
+        initAttachmentViews()
         setupPlugins()
         applyNativeStyling()
         observeChatState()
@@ -218,10 +283,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         val pluginView = plugin.createView(context, onPluginAction)
                         container.removeAllViews()
                         container.addView(pluginView)
-                        // The start-chat container drives its own visibility from input mode.
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected()
                         }
+                        wirePluginView(pluginView)
                     }
                 }
             }
@@ -233,11 +298,56 @@ class NativeInputModeWidget @JvmOverloads constructor(
                                 if (containerId == R.id.startChatContainer) continue
                                 findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
                             }
+                            val hasImages = imageAttachmentsContainer.attachmentCount() > 0
+                            findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
+                                command.visible && hasImages
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun wirePluginView(pluginView: View) {
+        (pluginView as? AttachmentButtonView)?.attachmentHandler?.let { handler ->
+            handler.onImagePickerRequested = { callback -> onImagePickerRequested?.invoke(callback) }
+            handler.onChooserStateChanged = { showing -> onAttachmentChooserStateChanged?.invoke(showing) }
+            handler.onRequestFocus = { focusInput(context as? Activity) }
+            handler.onImageAttachmentAdded = { attachment ->
+                imageAttachmentsContainer.addAttachment(attachment)
+                findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible = true
+                handler.updateImageCount(imageAttachmentsContainer.attachmentCount())
+                updateAttachmentState()
+            }
+            handler.onImageLimitError = { message ->
+                showAttachmentLimitError(message)
+                attachmentLimitExceeded = true
+                floatingSubmitContainer?.visibility = View.GONE
+            }
+            handler.onImageLimitErrorClear = {
+                hideAttachmentLimitError()
+                attachmentLimitExceeded = false
+                floatingSubmitContainer?.visibility = View.VISIBLE
+                updateSendButtonVisibility()
+            }
+            observeImageUploadLimit(handler)
+        }
+        (pluginView as? ModelPicker)?.let { picker ->
+            picker.onMenuShown = { isModelMenuVisible = true }
+            picker.onMenuDismissed = { isModelMenuVisible = false }
+        }
+    }
+
+    private fun observeImageUploadLimit(handler: RealAttachmentHandler) {
+        imageUploadLimitJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        imageUploadLimitJob = handler.imageUploadLimitReached
+            .onEach { reached ->
+                handler.conversationImageLimitReached = reached
+                if (!reached) handler.resetConversationCounts()
+                updateAttachmentState()
+            }
+            .launchIn(scope)
     }
 
     override fun onDetachedFromWindow() {
@@ -252,6 +362,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         nativeInputStateJob = null
         pluginsJob?.cancel()
         pluginsJob = null
+        imageUploadLimitJob?.cancel()
+        imageUploadLimitJob = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -300,7 +412,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
             if (isChatTabSelected() && !isStreaming) {
-                submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
+                submitButtons?.setSendButtonEnabled(!text.isNullOrBlank() || hasAttachments)
             }
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
@@ -318,15 +430,28 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateVoiceButtonVisibility() {
-        val isBlank = inputField.text.isNullOrBlank()
+        val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
         setVoiceButtonVisible(voiceSearchAvailable && isBlank)
         submitButtons?.setVoiceSearchVisible(false)
         submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
     }
 
     private fun updateSendButtonVisibility() {
-        val visible = isChatTabSelected() && (isStreaming || inputField.text.isNotBlank())
+        val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
+        val visible = isChatTabSelected() && hasContent && !attachmentLimitExceeded
         submitButtons?.setSendButtonVisible(visible)
+    }
+
+    private fun updateAttachmentState() {
+        hasAttachments = imageAttachmentsContainer.attachmentCount() > 0
+        updateSendButtonVisibility()
+        submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
+        val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return
+        for (i in 0 until container.childCount) {
+            val buttonView = container.getChildAt(i) as? AttachmentButtonView ?: continue
+            val atMax = buttonView.attachmentHandler.isAtMaxCapacity()
+            buttonView.isEnabled = !atMax
+        }
     }
 
     private fun applyState(state: NativeInputState) {
@@ -378,6 +503,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.updateLayoutParams<MarginLayoutParams> {
             marginEnd = 0
+        }
+        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.updateLayoutParams<MarginLayoutParams> {
+            marginStart = 0
         }
     }
 
@@ -527,8 +655,60 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
-    override fun storePendingPrompt(query: String) {
-        viewModel.storePendingPrompt(query)
+    override fun getImageAttachmentsJson(): JSONArray? {
+        val attachments = imageAttachmentsContainer.getAttachments()
+        if (attachments.isEmpty()) return null
+        return JSONArray().apply {
+            attachments.forEach { attachment ->
+                put(org.json.JSONObject().apply {
+                    put("data", attachment.base64Data)
+                    put("format", attachment.format)
+                })
+            }
+        }
+    }
+
+    override fun clearImageAttachments() {
+        val sentCount = imageAttachmentsContainer.attachmentCount()
+        imageAttachmentsContainer.clearAttachments()
+        findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible = false
+        if (sentCount > 0) attachmentHandler?.onImagesSubmitted(sentCount)
+        attachmentHandler?.updateImageCount(0)
+        updateAttachmentState()
+    }
+
+    private fun showAttachmentLimitError(message: String) {
+        val container = findViewById<FrameLayout?>(R.id.attachmentsContainer) ?: return
+        container.isVisible = true
+        val layout = attachmentsLayout
+        val errorView = layout.findViewWithTag<android.widget.TextView>("attachmentError")
+            ?: android.widget.TextView(context).apply {
+                tag = "attachmentError"
+                setPadding(
+                    (12 * resources.displayMetrics.density).toInt(),
+                    (4 * resources.displayMetrics.density).toInt(),
+                    (12 * resources.displayMetrics.density).toInt(),
+                    (4 * resources.displayMetrics.density).toInt(),
+                )
+                setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+                textSize = 13f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                layout.addView(this)
+            }
+        errorView.text = message
+        errorView.visibility = VISIBLE
+    }
+
+    private fun hideAttachmentLimitError() {
+        attachmentsLayout.findViewWithTag<android.widget.TextView>("attachmentError")?.visibility = GONE
+    }
+
+    override fun storePendingPromptWithAttachments(query: String) {
+        val images = imageAttachmentsContainer.getAttachments().map {
+            PendingNativeImage(base64Data = it.base64Data, format = it.format)
+        }
+        viewModel.storePendingPrompt(query, getSelectedModelId(), images)
+        clearImageAttachments()
     }
 
     override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
@@ -716,7 +896,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showStopButton()
         } else {
             submitButtons?.showSendButton()
-            submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
+            submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
         }
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
@@ -729,7 +909,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             if (!isStreaming) {
-                submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
+                submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
             }
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
@@ -740,7 +920,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
-        imageButton.isVisible = visible
+        findViewById<FrameLayout?>(R.id.attachButtonContainer)?.isVisible = visible
     }
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
@@ -762,7 +942,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
             (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
         }
         val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
-            onSendClick = { submitMessage() }
+            onSendClick = {
+                if (inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
+                    onChatSent?.invoke("")
+                    inputField.clearFocus()
+                } else {
+                    submitMessage()
+                }
+            }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
             onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
             onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick

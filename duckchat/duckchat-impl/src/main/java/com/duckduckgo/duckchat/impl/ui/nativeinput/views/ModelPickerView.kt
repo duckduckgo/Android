@@ -51,6 +51,8 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
+    var onMenuShown: (() -> Unit)?
+    var onMenuDismissed: (() -> Unit)?
     fun getSelectedModelId(): String?
     fun setPickerEnabled(enabled: Boolean)
 }
@@ -70,6 +72,8 @@ class ModelPickerView @JvmOverloads constructor(
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
     private var popupWindow: PopupWindow? = null
+    override var onMenuShown: (() -> Unit)? = null
+    override var onMenuDismissed: (() -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
@@ -115,6 +119,7 @@ class ModelPickerView @JvmOverloads constructor(
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
+        onMenuShown?.invoke()
         showPopupWindow(state)
     }
 
@@ -162,6 +167,7 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
+        onMenuDismissed?.invoke()
     }
 
     override fun onDetachedFromWindow() {

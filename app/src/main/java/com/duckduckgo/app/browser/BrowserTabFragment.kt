@@ -1323,13 +1323,14 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId ->
+                onDuckAiChatSubmitted = { query, modelId, imagesJson ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
                             subscriptionName = "submitAIChatNativePrompt",
                             params = JSONObject().apply {
                                 put("platform", "android")
+                                put("tool", "query")
                                 put(
                                     "query",
                                     JSONObject().apply {
@@ -1339,6 +1340,9 @@ class BrowserTabFragment :
                                         // if (modelId != null) {
                                         //     put("modelId", modelId)
                                         // }
+                                        if (imagesJson != null) {
+                                            put("images", imagesJson)
+                                        }
                                     },
                                 )
                             },
@@ -1362,8 +1366,8 @@ class BrowserTabFragment :
                     hideKeyboard()
                     voiceSearchLauncher.launch(requireActivity(), mode)
                 },
-                onImageButtonPressed = {
-                    // To be implemented
+                onImagePickerRequested = { callback ->
+                    launchNativeImageAttachmentChooser(callback)
                 },
             ),
         )
@@ -4921,6 +4925,15 @@ class BrowserTabFragment :
                     },
                 ).show()
         }
+    }
+
+    private fun launchNativeImageAttachmentChooser(callback: ValueCallback<Array<Uri>>) {
+        nativeInputManager.setPickingImage(true)
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = listOf("image/*"),
+        )
+        launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
     private fun minSdk30(): Boolean = appBuildConfig.sdkInt >= Build.VERSION_CODES.R

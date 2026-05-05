@@ -37,6 +37,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
@@ -55,6 +58,8 @@ interface DuckChatJSHelper {
         pageContext: String = "",
         tabId: String = "",
     ): JsCallbackData?
+
+    val imageUploadLimitReached: StateFlow<Boolean>
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
 
@@ -98,6 +103,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatJSHelper {
+
+    private val _imageUploadLimitReached = MutableStateFlow(false)
+    override val imageUploadLimitReached: StateFlow<Boolean> = _imageUploadLimitReached.asStateFlow()
 
     private val registerOpenedJob = ConflatedJob()
 
@@ -233,6 +241,16 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_VOICE_SESSION_ENDED -> {
                 voiceSessionStateManager.onVoiceSessionEnded()
+                null
+            }
+
+            METHOD_IMAGE_UPLOAD_LIMIT_REACHED -> {
+                _imageUploadLimitReached.value = true
+                null
+            }
+
+            METHOD_IMAGE_UPLOAD_LIMIT_RESET -> {
+                _imageUploadLimitReached.value = false
                 null
             }
 
@@ -390,6 +408,21 @@ class RealDuckChatJSHelper @Inject constructor(
                         if (pending.modelId != null) {
                             put("modelId", pending.modelId)
                         }
+                        if (pending.images.isNotEmpty()) {
+                            put(
+                                "images",
+                                JSONArray().apply {
+                                    pending.images.forEach { image ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", image.base64Data)
+                                                put("format", image.format)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
                     },
                 )
             }
@@ -470,6 +503,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"
         private const val METHOD_VOICE_SESSION_ENDED = "voiceSessionEnded"
+        private const val METHOD_IMAGE_UPLOAD_LIMIT_REACHED = "imageUploadLimitReached"
+        private const val METHOD_IMAGE_UPLOAD_LIMIT_RESET = "imageUploadLimitReset"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"

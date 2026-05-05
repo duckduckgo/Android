@@ -22,13 +22,23 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
+data class PendingNativeImage(
+    val base64Data: String,
+    val format: String,
+)
+
 data class PendingNativePrompt(
     val prompt: String,
     val modelId: String?,
+    val images: List<PendingNativeImage> = emptyList(),
 )
 
 interface PendingNativePromptStore {
-    fun store(prompt: String, modelId: String?)
+    fun store(
+        prompt: String,
+        modelId: String?,
+        images: List<PendingNativeImage> = emptyList(),
+    )
     fun consume(): PendingNativePrompt?
 }
 
@@ -38,8 +48,12 @@ class RealPendingNativePromptStore @Inject constructor() : PendingNativePromptSt
 
     private val pending = AtomicReference<PendingNativePrompt?>(null)
 
-    override fun store(prompt: String, modelId: String?) {
-        pending.set(PendingNativePrompt(prompt, modelId))
+    override fun store(
+        prompt: String,
+        modelId: String?,
+        images: List<PendingNativeImage>,
+    ) {
+        pending.set(PendingNativePrompt(prompt, modelId, images))
     }
 
     override fun consume(): PendingNativePrompt? {

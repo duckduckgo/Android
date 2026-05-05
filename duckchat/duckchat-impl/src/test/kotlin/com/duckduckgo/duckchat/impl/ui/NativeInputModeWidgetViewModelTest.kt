@@ -337,18 +337,18 @@ class NativeInputModeWidgetViewModelTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
 
-        viewModel.storePendingPrompt("hello")
+        viewModel.storePendingPrompt("hello", "model-1")
 
-        verify(pendingNativePromptStore).store("hello", "model-1")
+        verify(pendingNativePromptStore).store("hello", "model-1", emptyList())
     }
 
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
-        viewModel.storePendingPrompt("hello")
+        viewModel.storePendingPrompt("hello", null)
 
-        verify(pendingNativePromptStore).store("hello", null)
+        verify(pendingNativePromptStore).store("hello", null, emptyList())
     }
 
     @Test
