@@ -55,7 +55,6 @@ interface NativeInputOmnibarController : OmnibarState {
     fun hide()
     fun getText(): String
     fun hideBackground()
-    fun showTransparentOmnibar()
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
@@ -107,22 +106,6 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
         omnibarView.findViewById<View?>(R.id.tabsMenu)?.gone()
         omnibarView.findViewById<View?>(R.id.browserMenu)?.gone()
-    }
-
-    override fun showTransparentOmnibar() {
-        val omnibarView = omnibar.omnibarView as? View ?: return
-        if (rootView.findViewById<View?>(R.id.inputModeWidget) == null) return
-        omnibar.show()
-        omnibar.isScrollingEnabled = false
-        omnibar.setExpanded(true)
-        applyOnLayout(omnibarView) {
-            makeOmnibarTransparent(omnibarView)
-            hideOmnibarContent(omnibarView)
-            omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
-            omnibarView.findViewById<View?>(R.id.duckAIFreePill)?.gone()
-            omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
-            omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-        }
     }
 
     private fun makeOmnibarTransparent(omnibarView: View) {
