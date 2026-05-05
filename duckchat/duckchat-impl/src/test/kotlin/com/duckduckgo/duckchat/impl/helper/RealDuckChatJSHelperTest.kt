@@ -1400,6 +1400,14 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenNativeActionEndVoiceSessionRequestedThenSubscriptionDataSent() = runTest {
+        val result = testee.onNativeAction(NativeAction.END_VOICE_SESSION)
+
+        assertEquals("endVoiceSession", result.subscriptionName)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result.featureName)
+    }
+
+    @Test
     fun whenGetAIChatNativeHandoffDataThenReportOpenIsCalled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
