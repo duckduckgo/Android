@@ -192,6 +192,7 @@ class RealInlinePdfHandler @Inject constructor(
             throw e
         } catch (e: IOException) {
             logcat { "PDF download failed: ${e.message}" }
+            targetFile.delete()
             PdfDownloadResult.Failure(PdfErrorType.IO_ERROR)
         } catch (e: SecurityException) {
             logcat { "PDF download denied: ${e.message}" }

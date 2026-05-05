@@ -258,6 +258,35 @@ class InlinePdfHandlerTest {
     }
 
     @Test
+    fun whenForceRefreshFailsMidStreamThenPartialFileDeletedAndNextLoadRefetches() = runTest {
+        val originalBytes = "%PDF-1.4 original".toByteArray()
+        val replacementBytes = "%PDF-1.4 replacement after recovery".toByteArray()
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(originalBytes)))
+        // The truncated body still starts with %PDF-, so without cleanup the cached file would
+        // pass hasPdfMagicBytes on the next load and serve the corrupt partial.
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(("%PDF-1.4 " + "x".repeat(8192)).toByteArray()))
+                .setSocketPolicy(SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY),
+        )
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(replacementBytes)))
+        val url = server.url("/refresh-fails.pdf").toString()
+
+        assertTrue(inlinePdfHandler.downloadToCache(url) is PdfDownloadResult.Success)
+        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true)
+        assertEquals(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR), refreshResult)
+
+        // A subsequent non-force-refresh load must not pick up a corrupt partial: it should
+        // re-fetch from the server (3rd request) and return the replacement bytes.
+        val recovered = inlinePdfHandler.downloadToCache(url)
+        assertTrue(recovered is PdfDownloadResult.Success)
+        assertEquals(3, server.requestCount)
+        val recoveredFile = File((recovered as PdfDownloadResult.Success).uri.path!!)
+        assertTrue(recoveredFile.readBytes().contentEquals(replacementBytes))
+    }
+
+    @Test
     fun whenTwoUrlsShareLastPathSegmentThenCacheFilesDontCollide() = runTest {
         val pdfBytesA = "%PDF-1.4 content A".toByteArray()
         val pdfBytesB = "%PDF-1.4 content B".toByteArray()
