@@ -238,6 +238,26 @@ class InlinePdfHandlerTest {
     }
 
     @Test
+    fun whenForceRefreshThenCacheBypassedAndNewContentReplacesOld() = runTest {
+        val firstBytes = "%PDF-1.4 first version".toByteArray()
+        val secondBytes = "%PDF-1.4 second version after refresh".toByteArray()
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(firstBytes)))
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(secondBytes)))
+        val url = server.url("/refreshable.pdf").toString()
+
+        val firstResult = inlinePdfHandler.downloadToCache(url)
+        assertTrue(firstResult is PdfDownloadResult.Success)
+        assertEquals(1, server.requestCount)
+
+        val refreshResult = inlinePdfHandler.downloadToCache(url, forceRefresh = true)
+        assertTrue(refreshResult is PdfDownloadResult.Success)
+        assertEquals(2, server.requestCount)
+
+        val refreshedFile = File((refreshResult as PdfDownloadResult.Success).uri.path!!)
+        assertTrue(refreshedFile.readBytes().contentEquals(secondBytes))
+    }
+
+    @Test
     fun whenTwoUrlsShareLastPathSegmentThenCacheFilesDontCollide() = runTest {
         val pdfBytesA = "%PDF-1.4 content A".toByteArray()
         val pdfBytesB = "%PDF-1.4 content B".toByteArray()

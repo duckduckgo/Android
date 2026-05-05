@@ -10332,6 +10332,62 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshRequestedWhilePdfShownThenForceRefreshDownloadAndEmitNewShowPdfCommand() = runTest {
+        val pdfUrl = "https://example.com/doc.pdf"
+        val refreshedUri = Uri.parse("file:///cache/doc-refreshed.pdf")
+        loadUrl(pdfUrl)
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Success(refreshedUri))
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        advanceUntilIdle()
+
+        verify(mockInlinePdfHandler).downloadToCache(pdfUrl, forceRefresh = true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val lastShowPdf = commandCaptor.allValues.filterIsInstance<Command.ShowPdfInTab>().last()
+        assertEquals(pdfUrl, lastShowPdf.url)
+        assertEquals(refreshedUri, lastShowPdf.cachedFileUri)
+        assertEquals(refreshedUri, browserViewState().currentPdfCachedUri)
+    }
+
+    @Test
+    fun whenRefreshRequestedAndNoPdfShownThenNavigationRefreshEmittedAndPdfHandlerNotCalled() = runTest {
+        setBrowserShowing(true)
+        loadUrl("https://example.com")
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        advanceUntilIdle()
+
+        assertCommandIssued<NavigationCommand.Refresh>()
+        verify(mockInlinePdfHandler, never()).downloadToCache(any(), eq(true))
+    }
+
+    @Test
+    fun whenPdfRefreshFailsThenRenderFailurePixelFiresAndStandardDownloadCommandEmitted() = runTest {
+        val pdfUrl = "https://example.com/doc.pdf"
+        val originalUri = Uri.parse("file:///cache/doc.pdf")
+        loadUrl(pdfUrl)
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = originalUri,
+            currentPdfFileName = "doc.pdf",
+        )
+        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl, forceRefresh = true)).thenReturn(PdfDownloadResult.Failure(PdfErrorType.IO_ERROR))
+
+        testee.onRefreshRequested(triggeredByUser = true)
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(PdfPixelName.PDF_RENDER_FAILURE, parameters = mapOf("error_type" to "io_error"))
+        assertEquals(originalUri, browserViewState().currentPdfCachedUri)
+        assertCommandIssued<Command.RequestFileDownload> {
+            assertEquals(pdfUrl, this.url)
+            assertEquals("application/pdf", this.mimeType)
+        }
+    }
+
+    @Test
     fun whenDownloadPdfClickedAndPdfShownThenCachedFileDownloaderInvoked() = runTest {
         val cachedUri = Uri.parse("file:///cache/doc.pdf")
         testee.browserViewState.value = browserViewState().copy(

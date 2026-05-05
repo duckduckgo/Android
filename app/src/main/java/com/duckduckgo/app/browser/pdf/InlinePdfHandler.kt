@@ -77,8 +77,11 @@ interface InlinePdfHandler {
      * file is deleted.
      *
      * @param url the URL of the PDF to download
+     * @param forceRefresh when true, ignore any existing cache entry and re-fetch from the network.
+     *   Used by the user-triggered refresh action so an updated server-side document replaces the
+     *   stale cached copy.
      */
-    suspend fun downloadToCache(url: String): PdfDownloadResult
+    suspend fun downloadToCache(url: String, forceRefresh: Boolean = false): PdfDownloadResult
 
     /**
      * Extracts a sanitized filename from the PDF [url]'s last path segment.
@@ -131,13 +134,13 @@ class RealInlinePdfHandler @Inject constructor(
     private val cacheDir: File
         get() = File(context.cacheDir, PDF_CACHE_DIR).also { it.mkdirs() }
 
-    override suspend fun downloadToCache(url: String): PdfDownloadResult = withContext(dispatcherProvider.io()) {
+    override suspend fun downloadToCache(url: String, forceRefresh: Boolean): PdfDownloadResult = withContext(dispatcherProvider.io()) {
         val fileName = extractFileName(url)
         // Prefix the cache filename with the URL hash so two URLs sharing a last path segment
         // (e.g. report.pdf at site A and site B) don't collide and serve stale content.
         val targetFile = File(cacheDir, "${url.hashCode()}-$fileName")
         try {
-            if (targetFile.exists() && hasPdfMagicBytes(targetFile)) {
+            if (!forceRefresh && targetFile.exists() && hasPdfMagicBytes(targetFile)) {
                 // Bump mtime so LRU eviction treats this file as recently *used*,
                 // not just recently *written*.
                 targetFile.setLastModified(System.currentTimeMillis())
