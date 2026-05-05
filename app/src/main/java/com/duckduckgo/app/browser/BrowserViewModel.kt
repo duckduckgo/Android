@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDef
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog
@@ -59,7 +58,6 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -104,7 +102,6 @@ class BrowserViewModel @Inject constructor(
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    private val defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel(), CoroutineScope {
@@ -126,7 +123,6 @@ class BrowserViewModel @Inject constructor(
         data object LaunchPlayStore : Command()
         data object LaunchFeedbackView : Command()
         data object LaunchTabSwitcher : Command()
-        data class LaunchSurvey(val survey: Survey) : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
@@ -501,21 +497,6 @@ class BrowserViewModel @Inject constructor(
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
         val tabsCount = tabs.value?.size ?: 0
         sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
-    }
-
-    fun checkForDefaultBrowserChangedSurvey() {
-        viewModelScope.launch(dispatchers.io()) {
-            if (defaultBrowserChangedSurveyManager.shouldTriggerSurvey()) {
-                defaultBrowserChangedSurveyManager.markSurveyShown()
-                val survey = Survey(
-                    surveyId = DefaultBrowserChangedSurveyManager.SURVEY_ID_IN_APP,
-                    url = defaultBrowserChangedSurveyManager.buildSurveyUrl("in-app"),
-                    daysInstalled = null,
-                    status = Survey.Status.SCHEDULED,
-                )
-                sendCommand(Command.LaunchSurvey(survey))
-            }
-        }
     }
 
     fun sendPixelEventForLandscapeOrientation() {
