@@ -8632,7 +8632,7 @@
     /**
      * @param {YouTubeDetectorConfig} config - Configuration from privacy-config (required)
      * @param {{info: Function, warn: Function, error: Function}} [logger] - Optional logger from ContentFeature
-     * @param {(type: string) => void} [onEvent] - Callback fired when a new detection occurs (may be async)
+     * @param {(type: string, data?: Record<string, unknown>) => void} [onEvent] - Callback fired when a new detection occurs (may be async)
      */
     constructor(config, logger, onEvent) {
       this.log = logger || noopLogger;
@@ -8709,6 +8709,27 @@
       };
     }
     /**
+     * Fire an event notification for native telemetry/action handling.
+     * @param {'videoAd'|'staticAd'|'playabilityError'|'adBlocker'|'buffering'} type
+     */
+    fireDetectionEvent(type) {
+      if (this.config.fireDetectionEvents?.[type]) {
+        try {
+          const result = (
+            /** @type {any} */
+            this.onEvent(`youtube_${type}`, {
+              loginState: this.state.loginState?.state || "unknown"
+            })
+          );
+          if (result && typeof result.catch === "function") {
+            result.catch(() => {
+            });
+          }
+        } catch {
+        }
+      }
+    }
+    /**
      * Report a detection event
      * @param {'videoAd'|'staticAd'|'playabilityError'|'adBlocker'} type
      * @param {Object} [details]
@@ -8727,19 +8748,7 @@
       if (details.message && "lastMessage" in typeState) {
         typeState.lastMessage = details.message;
       }
-      if (this.config.fireDetectionEvents?.[type]) {
-        try {
-          const result = (
-            /** @type {any} */
-            this.onEvent(`youtube_${type}`)
-          );
-          if (result && typeof result.catch === "function") {
-            result.catch(() => {
-            });
-          }
-        } catch {
-        }
-      }
+      this.fireDetectionEvent(type);
       return true;
     }
     /**
@@ -9075,11 +9084,16 @@
         }
       };
       const onPlaying = () => {
+        let firedBufferingEvent = false;
         if (this.bufferingStartTime) {
           const bufferingDuration = performance.now() - this.bufferingStartTime;
           this.state.buffering.durations.push(Math.round(bufferingDuration));
           if (this.state.buffering.durations.length > 50) {
             this.state.buffering.durations.shift();
+          }
+          if (bufferingDuration > this.config.slowLoadThresholdMs) {
+            this.fireDetectionEvent("buffering");
+            firedBufferingEvent = true;
           }
           this.bufferingStartTime = null;
         }
@@ -9092,6 +9106,9 @@
         if (isSlow && !duringAd && !tabWasHidden && !tooLong) {
           this.state.buffering.count++;
           this.state.buffering.durations.push(Math.round(loadTime));
+          if (!firedBufferingEvent) {
+            this.fireDetectionEvent("buffering");
+          }
           if (this.state.buffering.durations.length > 50) {
             this.state.buffering.durations.shift();
           }
@@ -9250,9 +9267,9 @@
   var WebInterferenceDetection = class extends ContentFeature {
     init() {
       const settings = this.getFeatureSetting("interferenceTypes");
-      const fireEvent = async (type) => {
+      const fireEvent = async (type, data) => {
         try {
-          const result = await this.callFeatureMethod("webEvents", "fireEvent", { type });
+          const result = await this.callFeatureMethod("webEvents", "fireEvent", { type, data });
           if (result instanceof CallFeatureMethodError && this.isDebug) {
             this.log.warn("webEvents.fireEvent failed:", result.message);
           }
@@ -12364,11 +12381,19 @@ ${iframeContent}
     }
     /**
      * Determine if UI should be locked based on scrollbar visibility or content type.
-     * Lock if the page is a direct image display or has no visible vertical scrollbar.
+     * Lock if the `isLockedPage` feature setting is enabled for the current page
+     * (configured via privacy-config `conditionalChanges` / `patchSettings`);
+     * otherwise lock if the page is a direct image display, or if there is no
+     * visible vertical scrollbar AND a locking `overflow-y` value is explicitly
+     * set on html or body. The set of locking overflow values is controlled by
+     * the `overflowTypes` setting (default: `['hidden', 'clip']`).
      * @returns {boolean}
      */
     _detectShouldLock() {
       try {
+        if (this.getFeatureSettingEnabled("isLockedPage")) {
+          return true;
+        }
         if (this.getFeatureSettingEnabled("lockImagePages", "enabled") && this._isImageDisplayPage()) {
           return true;
         }
@@ -12380,11 +12405,19 @@ ${iframeContent}
         if (body && this._hasExplicitlyVisibleScrollbar(body)) {
           return false;
         }
-        return true;
+        return Boolean(html2 && this._hasLockingOverflowY(html2) || body && this._hasLockingOverflowY(body));
       } catch (e) {
         this.log.warn("Failed to detect scroll state:", e);
         return false;
       }
+    }
+    /**
+     * Get the list of `overflow-y` values that indicate the page is in lock mode
+     * (no usable scrollbar). Configurable via the `overflowTypes` feature setting.
+     * @returns {string[]}
+     */
+    _getOverflowTypes() {
+      return this.getFeatureSetting("overflowTypes") ?? ["hidden", "clip"];
     }
     /**
      * Detect if the current page is a browser-rendered image display page.
@@ -12397,15 +12430,23 @@ ${iframeContent}
     }
     /**
      * Check if an element has a visible vertical scrollbar.
-     * A scrollbar is visible when content overflows AND overflow isn't hidden/clip.
+     * A scrollbar is visible when content overflows AND `overflow-y` is not in
+     * the configured `overflowTypes` list.
      * @param {Element} el
      * @returns {boolean}
      */
     _hasExplicitlyVisibleScrollbar(el) {
-      const style = getComputedStyle(el);
-      const overflowY = style.overflowY;
-      const overflowTypes = this.getFeatureSetting("overflowTypes") ?? ["hidden", "clip", "auto"];
-      return el.scrollHeight > el.clientHeight && !overflowTypes.includes(overflowY);
+      const overflowY = getComputedStyle(el).overflowY;
+      return el.scrollHeight > el.clientHeight && !this._getOverflowTypes().includes(overflowY);
+    }
+    /**
+     * Check if the element's computed `overflow-y` matches a configured locking
+     * value (default: `hidden`, `clip`).
+     * @param {Element} el
+     * @returns {boolean}
+     */
+    _hasLockingOverflowY(el) {
+      return this._getOverflowTypes().includes(getComputedStyle(el).overflowY);
     }
     /**
      * Notify native if lock state changed
