@@ -44,7 +44,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
@@ -104,12 +103,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val userBrowserProperties: UserBrowserProperties,
-    private val daxPrompts: DaxPrompts,
     private val pixel: Pixel,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
-    override val priority: Int = 3
+    override val priority: Int = 4
     override val evaluatorId: String = "additional_default_browser_prompts"
 
     private val evaluationMutex = Mutex()
@@ -199,11 +197,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = evaluationMutex.withLock {
-        if (daxPrompts.evaluate() != DaxPrompts.ActionType.NONE) {
-            logcat { "evaluate: DaxPrompts will show a prompt or has recently shown a prompt, skipping evaluation this time" }
-            return@withLock ModalEvaluator.EvaluationResult.Skipped
-        }
-
         val isEnabled =
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
         logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
