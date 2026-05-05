@@ -192,6 +192,15 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 },
             )
         autoCompleteRecyclerView?.adapter = autoCompleteSuggestionsAdapter
+        autoCompleteRecyclerView?.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        parentFragment.dismissKeyboard()
+                    }
+                }
+            },
+        )
     }
 
     private fun configureObservers() {

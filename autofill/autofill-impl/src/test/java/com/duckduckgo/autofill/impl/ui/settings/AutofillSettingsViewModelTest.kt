@@ -67,7 +67,7 @@ class AutofillSettingsViewModelTest {
     fun setup() {
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
-            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
+            whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
             whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
@@ -120,7 +120,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun `when send launch pixel and no credentials saved then pixel is sent`() = runTest {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(0)))
         testee.sendLaunchPixel(AutofillScreenLaunchSource.SettingsActivity)
         val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "0")
         verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
@@ -128,7 +128,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun `when send launch pixel and has credentials saved then pixel is sent`() = runTest {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(5))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(5)))
         testee.sendLaunchPixel(AutofillScreenLaunchSource.BrowserOverflow)
         val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
         verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
@@ -181,7 +181,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenViewCreatedShowNumberOfPasswords() = runTest {
-        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(10))
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(Result.success(10)))
         testee.viewState(launchSource).test {
             assertEquals(10, this.awaitItem().loginsCount)
             cancelAndIgnoreRemainingEvents()

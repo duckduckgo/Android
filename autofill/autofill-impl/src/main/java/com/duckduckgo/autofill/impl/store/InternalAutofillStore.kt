@@ -85,7 +85,7 @@ interface InternalAutofillStore : AutofillStore {
     /**
      * Returns a count of how many credentials are stored
      */
-    suspend fun getCredentialCount(): Flow<Int>
+    suspend fun getCredentialCount(): Flow<Result<Int>>
 
     /**
      * Deletes all saved credentials

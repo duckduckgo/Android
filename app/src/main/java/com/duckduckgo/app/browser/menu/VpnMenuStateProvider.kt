@@ -48,6 +48,9 @@ class VpnMenuStateProviderImpl @Inject constructor(
             subscriptions.getEntitlementStatus(),
             networkProtectionState.getConnectionStateFlow(),
         ) { subscriptionStatus, entitlements, connectionState ->
+            if (!subscriptions.isEligible()) {
+                return@combine VpnMenuState.Hidden
+            }
             if (!androidBrowserConfigFeature.vpnMenuItem().isEnabled() && !androidBrowserConfigFeature.vpnMenuItemInternational().isEnabled()) {
                 return@combine VpnMenuState.Hidden
             }

@@ -171,6 +171,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.viewAllPlansTop.isVisible = false
         binding.upgradeToProContainer.isVisible = false
         binding.verticalTierDivider.isVisible = false
+        binding.pendingDowngradeInfoPanel.gone()
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
@@ -419,6 +420,23 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.changePlan.setSecondaryText(
                 getString(changeTypeString, pendingPlanDisplayName, viewState.pendingEffectiveDate),
             )
+            if (viewState.isPendingDowngrade == true &&
+                viewState.pendingTierNameResId != null &&
+                viewState.pendingEffectiveDateShort != null
+            ) {
+                binding.pendingDowngradeInfoPanel.show()
+                binding.pendingDowngradeInfoPanel.setText(
+                    getString(
+                        string.subscriptionPendingPlanChangeDowngradePanel,
+                        getString(viewState.pendingTierNameResId),
+                        viewState.pendingEffectiveDateShort,
+                    ),
+                )
+            } else {
+                binding.pendingDowngradeInfoPanel.gone()
+            }
+        } else {
+            binding.pendingDowngradeInfoPanel.gone()
         }
     }
 

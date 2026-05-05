@@ -32,6 +32,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -42,11 +43,15 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import junit.framework.TestCase
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,6 +62,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -93,9 +99,15 @@ class BrowserViewModelTest {
     @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
+    private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+
+    private val selectedTabFlow = MutableSharedFlow<TabEntity?>(replay = 1)
+
     private lateinit var testee: BrowserViewModel
 
     private val skipUrlConversionOnNewTabFeature = FakeFeatureToggleFactory.create(SkipUrlConversionOnNewTabFeature::class.java)
+
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
 
@@ -106,8 +118,10 @@ class BrowserViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
 
         configureSkipUrlConversionInNewTabState(enabled = true)
+        fakeAndroidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(State(enable = true))
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
@@ -127,6 +141,56 @@ class BrowserViewModelTest {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
+    }
+
+    // --- selectedTab flow → NtpAfterIdleManager.onNtpShown ---
+
+    @Test
+    fun whenSelectedTabBecomesNtpThenNtpShownNotified() = runTest {
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "", position = 0))
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager).onNtpShown()
+    }
+
+    @Test
+    fun whenSelectedTabHasUrlThenNtpShownNotNotified() = runTest {
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "https://example.com", position = 0))
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager, never()).onNtpShown()
+    }
+
+    @Test
+    fun whenSelectedTabRemainsNtpAcrossEmissionsThenNtpShownNotifiedOnce() = runTest {
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "", position = 0))
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "", position = 0))
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager, org.mockito.kotlin.times(1)).onNtpShown()
+    }
+
+    @Test
+    fun whenSelectedTabTransitionsFromUrlToNtpThenNtpShownNotified() = runTest {
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "https://example.com", position = 0))
+        selectedTabFlow.emit(TabEntity(tabId = "t1", url = "", position = 0))
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager).onNtpShown()
+    }
+
+    @Test
+    fun whenFeatureDisabledThenSelectedTabFlowDoesNotNotifyNtpShown() = runTest {
+        val freshFlow = MutableSharedFlow<TabEntity?>(replay = 1)
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(freshFlow)
+        fakeAndroidBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
+        initTestee()
+        clearInvocations(mockNtpAfterIdleManager)
+
+        freshFlow.emit(TabEntity(tabId = "t1", url = "", position = 0))
+        advanceUntilIdle()
+
+        verify(mockNtpAfterIdleManager, never()).onNtpShown()
     }
 
     @Test
@@ -635,6 +699,8 @@ class BrowserViewModelTest {
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
+            ntpAfterIdleManager = mockNtpAfterIdleManager,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
         )
     }
 
@@ -656,6 +722,8 @@ class BrowserViewModelTest {
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
+            ntpAfterIdleManager = mockNtpAfterIdleManager,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
         )
     }
 

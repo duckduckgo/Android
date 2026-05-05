@@ -43,6 +43,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -269,8 +270,10 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             }
     }
 
-    override suspend fun getCredentialCount(): Flow<Int> {
-        return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
+    override suspend fun getCredentialCount(): Flow<Result<Int>> {
+        return secureStorage.websiteLoginDetailsWithCredentials()
+            .map { Result.success(it.size) }
+            .catch { e -> emit(Result.failure(e)) }
     }
 
     override suspend fun deleteCredentials(id: Long): LoginCredentials? {

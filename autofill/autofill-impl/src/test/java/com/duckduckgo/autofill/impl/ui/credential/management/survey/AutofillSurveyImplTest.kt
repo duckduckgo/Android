@@ -108,7 +108,7 @@ class AutofillSurveyImplTest {
         if (count == null) {
             whenever(autofillStore.getCredentialCount()).thenReturn(null)
         } else {
-            whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(count))
+            whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(Result.success(count)))
         }
     }
 }

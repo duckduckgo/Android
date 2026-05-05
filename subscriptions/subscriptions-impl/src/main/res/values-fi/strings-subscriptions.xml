@@ -189,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Hallitse maksua tai peruuta</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Sopimuksesi alenee tasolle %1$s alkaen %2$s.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi päivittyy sopimukseen %1$s %2$s.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi alenee tasolle %1$s alkaen %2$s.</string>
     <string name="planNamePlusMonthly">Plus kuukausittain</string>

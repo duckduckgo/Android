@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Natisni</string>
     <string name="browserMenuOpenAppLink">Odpri v aplikaciji</string>
     <string name="browserMenuAddToHome">Dodaj na Domači Zaslon</string>
+    <string name="browserMenuDownloadPdf">Prenesi PDF</string>
     <string name="browserMenuReportBrokenSite">Prijavite poškodovano spletno mesto</string>
     <string name="browserMenuAutofill">Gesla</string>
     <string name="browserMenuDownloads">Prenosi</string>

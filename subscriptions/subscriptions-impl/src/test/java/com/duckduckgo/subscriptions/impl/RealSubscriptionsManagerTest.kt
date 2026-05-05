@@ -57,6 +57,7 @@ import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
+import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
@@ -1322,9 +1323,29 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
 
-            verify(pixelSender).reportPurchaseSuccess()
+            verify(pixelSender).reportPurchaseSuccess(isFreeTrial = false)
             verify(pixelSender).reportSubscriptionActivated()
             verifyNoMoreInteractions(pixelSender)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseIsSuccessfulWithFreeTrialThenPixelIsSentWithFreeTrialTrue() = runTest {
+        givenUserIsSignedIn()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenConfirmPurchaseSucceedsWithFreeTrial()
+        givenV2AccessTokenRefreshSucceeds()
+
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(Purchased("any", "any")))
+
+        subscriptionsManager.currentPurchaseState.test {
+            assertTrue(awaitItem() is CurrentPurchase.InProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Success)
+
+            verify(pixelSender).reportPurchaseSuccess(isFreeTrial = true)
+            verify(pixelSender).reportSubscriptionActivated()
 
             cancelAndConsumeRemainingEvents()
         }
@@ -1973,6 +1994,26 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
                     startedAt = 1000000L,
                     expiresOrRenewsAt = 1000000L,
                     activeOffers = listOf(),
+                ),
+            ),
+        )
+    }
+
+    private suspend fun givenConfirmPurchaseSucceedsWithFreeTrial() {
+        whenever(subscriptionsService.confirm(any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(
+                    ConfirmationEntitlement(NetP.value, NetP.value),
+                ),
+                subscription = SubscriptionResponse(
+                    productId = "id",
+                    billingPeriod = "Monthly",
+                    platform = "google",
+                    status = "Auto-Renewable",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                    activeOffers = listOf(ActiveOfferResponse("Trial")),
                 ),
             ),
         )

@@ -112,7 +112,6 @@ internal class GeneralSettingsViewModelTest {
             fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
 
             whenever(mockDuckChat.isEnabled()).thenReturn(false)
-            whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(false)
             whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(mockDuckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
         }
@@ -398,9 +397,8 @@ internal class GeneralSettingsViewModelTest {
     }
 
     @Test
-    fun whenDuckChatEnabledAndInputScreenEnabledAndFeatureAvailableThenChatSuggestionsToggleIsVisible() = runTest {
+    fun whenDuckChatEnabledAndInputScreenEnabledThenChatSuggestionsToggleIsVisible() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
         whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
 
         initTestee()
@@ -415,7 +413,6 @@ internal class GeneralSettingsViewModelTest {
     @Test
     fun whenDuckChatDisabledThenChatSuggestionsToggleIsHidden() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
         whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
 
         initTestee()
@@ -430,23 +427,7 @@ internal class GeneralSettingsViewModelTest {
     @Test
     fun whenInputScreenDisabledThenChatSuggestionsToggleIsHidden() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
         whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
-
-        initTestee()
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state!!.showChatSuggestionsToggle)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenChatSuggestionsFeatureNotAvailableThenChatSuggestionsToggleIsHidden() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(false)
-        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
 
         initTestee()
 
@@ -460,7 +441,6 @@ internal class GeneralSettingsViewModelTest {
     @Test
     fun whenChatSuggestionsUserSettingDisabledThenToggleIsOff() = runTest {
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
         whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
         whenever(mockDuckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
 

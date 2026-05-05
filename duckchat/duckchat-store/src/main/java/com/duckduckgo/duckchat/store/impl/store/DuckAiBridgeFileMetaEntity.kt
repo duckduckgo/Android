@@ -17,9 +17,10 @@
 package com.duckduckgo.duckchat.store.impl.store
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "duck_ai_file_meta")
+@Entity(tableName = "duck_ai_file_meta", indices = [Index("chatId")])
 data class DuckAiBridgeFileMetaEntity(
     @PrimaryKey val uuid: String,
     val chatId: String,

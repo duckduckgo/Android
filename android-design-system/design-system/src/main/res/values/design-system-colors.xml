@@ -99,6 +99,9 @@
     <attr name="daxColorFabSecondaryText" format="color"/>
     <attr name="daxColorFabSecondaryIcon" format="color"/>
 
+    <attr name="daxColorAccentAltContentPrimary" format="color"/>
+    <attr name="daxColorAccentAltPrimary" format="color"/>
+
     <attr name="daxColorTabHighlight" format="color"/>
 
     <attr name="daxColorButtonPrimaryText" format="color"/>

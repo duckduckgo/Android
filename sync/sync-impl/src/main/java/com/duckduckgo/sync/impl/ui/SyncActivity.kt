@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -63,6 +64,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSet
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
@@ -168,7 +170,8 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             is SyncPreviousSessionReadyResult.Resumed -> viewModel.onDeviceConnected()
             is SyncPreviousSessionReadyResult.ContinueSetup -> {
-                launchOriginalFlow(pendingOriginalFlow).also { pendingOriginalFlow = null }
+                viewModel.onContinueSetupAfterSkipRestore(pendingOriginalFlow)
+                pendingOriginalFlow = null
             }
             is SyncPreviousSessionReadyResult.Cancelled -> viewModel.onConnectionCancelled()
         }
@@ -402,9 +405,10 @@ class SyncActivity : DuckDuckGoActivity() {
             is ShowPreviousSessionReady -> {
                 pendingOriginalFlow = command.originalFlow
                 authenticate {
-                    previousSessionReadyLauncher.launch(extractSource())
+                    previousSessionReadyLauncher.launch(command.originalFlow.toPixelSource())
                 }
             }
+            is LaunchOriginalFlow -> launchOriginalFlow(command.originalFlow)
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,
@@ -610,6 +614,12 @@ class SyncActivity : DuckDuckGoActivity() {
     companion object {
         private const val KEY_PENDING_ORIGINAL_FLOW = "pendingOriginalFlow"
     }
+}
+
+private fun OriginalFlow.toPixelSource(): String = when (this) {
+    OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
+    OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
+    OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
 }
 
 data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams

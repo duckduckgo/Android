@@ -30,8 +30,8 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
 
 interface InputScreenOnboardingWideEvent {
     /**
@@ -80,7 +80,7 @@ class InputScreenOnboardingWideEventImpl @Inject constructor(
                     flowEntryPoint = "onboarding",
                     metadata = mapOf("reinstallUser" to reinstallUser.toString()),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
-                        duration = Duration.ofDays(30),
+                        duration = 30.days,
                         flowStatus = FlowStatus.Unknown,
                     ),
                 )

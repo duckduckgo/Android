@@ -20,6 +20,8 @@
     <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
     <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
     <string name="pirStorageUnavailableDialogButton">Got It</string>
+    <string name="planTierNamePlus">Plus</string>
+    <string name="planTierNamePro">Pro</string>
 
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>

@@ -28,7 +28,7 @@ android {
 }
 
 dependencies {
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':privacy-dashboard-api')

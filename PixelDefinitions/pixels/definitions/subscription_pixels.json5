@@ -113,6 +113,33 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
     },
+    "m_privacy-pro_app_subscription-purchase_success": {
+        "description": "Fired when a subscription purchase completes successfully.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["atb", "appVersion", "freeTrial"]
+    },
+    "m_subscribe": {
+        "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "locale",
+                "description": "The sanitized BCP 47 language tag of the device locale.",
+                "type": "string"
+            },
+            {
+                "key": "origin",
+                "description": "The origin from which the user initiated the purchase, if available.",
+                "type": "string"
+            },
+            "freeTrial"
+        ]
+    },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",
         "owners": ["lmac012"],

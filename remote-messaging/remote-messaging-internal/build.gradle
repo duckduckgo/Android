@@ -27,7 +27,7 @@ dependencies {
 	implementation project(":remote-messaging-api")
 	implementation project(":remote-messaging-impl")
 
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':design-system')

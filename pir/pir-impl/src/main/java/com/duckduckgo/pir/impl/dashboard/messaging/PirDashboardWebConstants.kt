@@ -17,7 +17,7 @@
 package com.duckduckgo.pir.impl.dashboard.messaging
 
 object PirDashboardWebConstants {
-    const val WEB_UI_URL = "https://duckduckgo.com/dbp"
+    const val DEFAULT_WEB_UI_URL = "https://duckduckgo.com/dbp"
     const val CUSTOM_UA = "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko)" +
         " Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
 
@@ -26,5 +26,5 @@ object PirDashboardWebConstants {
     internal const val SCRIPT_FEATURE_NAME = "dbpuiCommunication"
     internal const val MESSAGE_CALLBACK = "messageCallback"
     internal const val SECRET = "duckduckgo-android-messaging-secret"
-    internal const val ALLOWED_DOMAIN = "duckduckgo.com"
+    const val ALLOWED_DOMAIN = "duckduckgo.com"
 }

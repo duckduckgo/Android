@@ -30,6 +30,7 @@ class FakeSecureStore(
 ) : SecureStorage {
 
     private val credentials = mutableMapOf<Long, WebsiteLoginDetailsWithCredentials>()
+    var exceptionToThrow: Exception? = null
 
     override suspend fun addWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
@@ -83,6 +84,7 @@ class FakeSecureStore(
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> {
         return flow {
+            exceptionToThrow?.let { throw it }
             emit(credentials.values.toList())
         }
     }

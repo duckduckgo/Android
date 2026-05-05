@@ -69,6 +69,13 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun whenSetShowInVoiceChatThenSetInDataStore() = runTest {
+        testee.setShowInVoiceChat(false)
+
+        verify(mockDataStore).setShowInVoiceChat(false)
+    }
+
+    @Test
     fun `when setInputScreenUserSetting then set in data store`() = runTest {
         testee.setInputScreenUserSetting(false)
 
@@ -140,6 +147,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun whenObserveShowInVoiceChatThenObserveDataStore() = runTest {
+        whenever(mockDataStore.observeShowInVoiceChat()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeShowInVoiceChat().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun `when observeInputScreenUserSettingEnabled then observe data store`() = runTest {
         whenever(mockDataStore.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false, true))
 
@@ -199,6 +215,12 @@ class DuckChatFeatureRepositoryTest {
     fun whenShouldShowInVoiceSearchThenGetFromDataStore() = runTest {
         whenever(mockDataStore.getShowInVoiceSearch()).thenReturn(true)
         assertTrue(testee.shouldShowInVoiceSearch())
+    }
+
+    @Test
+    fun whenShouldShowInVoiceChatThenGetFromDataStore() = runTest {
+        whenever(mockDataStore.getShowInVoiceChat()).thenReturn(true)
+        assertTrue(testee.shouldShowInVoiceChat())
     }
 
     @Test

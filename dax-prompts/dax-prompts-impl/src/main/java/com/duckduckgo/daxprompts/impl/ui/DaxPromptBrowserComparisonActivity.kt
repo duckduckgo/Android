@@ -18,6 +18,7 @@ package com.duckduckgo.daxprompts.impl.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -25,6 +26,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,6 +52,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 
@@ -156,8 +159,18 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             }
 
             is Command.LaunchSystemDefaultAppsSettings -> {
-                startSystemDefaultAppsSettingsForResult.launch(systemDefaultAppsSettingsIntent())
+                launchSystemDefaultAppSettings()
             }
+        }
+    }
+
+    private fun launchSystemDefaultAppSettings() {
+        try {
+            startSystemDefaultAppsSettingsForResult.launch(systemDefaultAppsSettingsIntent())
+        } catch (e: ActivityNotFoundException) {
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { errorMessage }
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 

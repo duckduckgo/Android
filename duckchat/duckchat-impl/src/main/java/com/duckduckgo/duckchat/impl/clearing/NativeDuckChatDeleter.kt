@@ -24,4 +24,9 @@ class NativeDuckChatDeleter @Inject constructor(
 ) : DuckChatDeleter {
 
     override suspend fun deleteChat(chatId: String): Boolean = store.deleteChat(chatId)
+
+    override suspend fun deleteAllChats(): Boolean {
+        store.deleteAllChats()
+        return true
+    }
 }

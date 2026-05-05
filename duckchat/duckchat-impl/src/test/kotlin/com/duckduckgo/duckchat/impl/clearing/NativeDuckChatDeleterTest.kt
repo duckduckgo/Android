@@ -59,4 +59,10 @@ class NativeDuckChatDeleterTest {
         deleter.deleteChat("chat-1")
         verify(store).deleteChat("chat-1")
     }
+
+    @Test
+    fun `deleteAllChats delegates to store and returns true`() = runTest {
+        assertTrue(deleter.deleteAllChats())
+        verify(store).deleteAllChats()
+    }
 }

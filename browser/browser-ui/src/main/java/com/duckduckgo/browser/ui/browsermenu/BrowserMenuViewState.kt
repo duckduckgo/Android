@@ -45,6 +45,7 @@ sealed class BrowserMenuViewState {
         val showAutofill: Boolean = false,
         val isSSLError: Boolean = false,
         val canPrintPage: Boolean = false,
+        val showDownloadPdfMenuItem: Boolean = false,
         val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 

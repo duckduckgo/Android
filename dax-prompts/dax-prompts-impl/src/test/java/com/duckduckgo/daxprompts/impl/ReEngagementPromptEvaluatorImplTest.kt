@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
 import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
@@ -56,12 +57,14 @@ class ReEngagementPromptEvaluatorImplTest {
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val fakeReactivateUsersToggles = FakeFeatureToggleFactory.create(ReactivateUsersToggles::class.java)
+    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockIntent: Intent = mock()
 
     @Before
     fun setUp() {
         whenever(mockApplicationContext.packageName).thenReturn(PACKAGE_NAME)
         whenever(mockApplicationContext.packageManager).thenReturn(mockPackageManager)
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(NOW_MILLIS)
         givenInstalledDaysAgo(0L)
     }
 
@@ -74,6 +77,7 @@ class ReEngagementPromptEvaluatorImplTest {
         globalActivityStarter = mockGlobalActivityStarter,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
         reactivateUsersToggles = fakeReactivateUsersToggles,
+        currentTimeProvider = mockCurrentTimeProvider,
     )
 
     @Test
@@ -203,12 +207,13 @@ class ReEngagementPromptEvaluatorImplTest {
     }
 
     private fun givenInstalledDaysAgo(days: Long) {
-        val firstInstallTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days)
+        val firstInstallTime = NOW_MILLIS - TimeUnit.DAYS.toMillis(days)
         val packageInfo = PackageInfo().apply { this.firstInstallTime = firstInstallTime }
         whenever(mockPackageManager.getPackageInfo(PACKAGE_NAME, 0)).thenReturn(packageInfo)
     }
 
     companion object {
         private const val PACKAGE_NAME = "com.duckduckgo.test"
+        private const val NOW_MILLIS = 1_700_000_000_000L
     }
 }

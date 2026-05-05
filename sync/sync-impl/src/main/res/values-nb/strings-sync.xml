@@ -227,4 +227,18 @@
     <string name="sync_settings_download_recovery_code_item">Last ned gjenopprettingskoden som PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Bruk denne koden til å gjenopprette dataene dine hvis du mister tilgang til denne enheten. Oppbevar den på et trygt sted.</string>
     <string name="sync_settings_data_expiration">Sync &amp; Backup-data kan ikke gjenopprettes etter 18 måneder med inaktivitet. <annotation type="learn_more_link">Finn ut mer</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Vil du gjenopprette Sync &amp; Backup-data fra forrige installasjon?</string>
+    <string name="sync_previous_session_ready_body">Gjenopprett for å få tilbake tidligere bokmerker, passord og andre data i DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Gjenopprett Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Sett opp ny synkronisering</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Gjenopprett dataene dine enkelt</string>
+    <string name="sync_recover_data_content">Bruk denne koden til å gjenopprette dataene dine hvis du mister tilgang til enheten. Sync &amp; Backup-data kan ikke gjenopprettes etter 18 måneder med inaktivitet.</string>
+    <string name="sync_recover_data_recovery_code_label">Gjenopprettingskode</string>
+    <string name="sync_recover_data_download_pdf">Last ned som PDF</string>
+    <string name="sync_restore_on_reinstall_title">Gjenopprett ved ny appinstallasjon</string>
+    <string name="sync_restore_on_reinstall_description">Hvis du installerer DuckDuckGo-appen på nytt, spør vi deg om du vil gjenopprette dataene dine på denne enheten.</string>
 </resources>

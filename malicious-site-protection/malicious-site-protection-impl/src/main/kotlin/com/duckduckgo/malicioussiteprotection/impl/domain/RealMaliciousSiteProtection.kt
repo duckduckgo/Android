@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 import android.R.attr.priority
 import android.net.Uri
 import android.util.LruCache
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -99,7 +100,7 @@ class RealMaliciousSiteProtection @Inject constructor(
             }
         }
 
-        if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
+        if (maliciousSiteProtectionRCRepository.isExempted(Domain(hostname))) {
             logcat { "should not block (exempted) $hostname" }
             cacheResult(canonicalUriString, Safe)
             return ConfirmedResult(Safe)

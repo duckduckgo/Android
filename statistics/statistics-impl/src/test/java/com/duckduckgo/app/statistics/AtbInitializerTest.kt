@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -27,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -49,7 +51,7 @@ class AtbInitializerTest {
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val statisticsUpdater: StatisticsUpdater = mock()
     private var atbInitializerListener = FakeAtbInitializerListener()
-    private val lifecycleOwner = TestLifecycleOwner()
+    private lateinit var lifecycleOwner: LifecycleOwner
 
     private val pixel: Pixel = mock()
 
@@ -62,6 +64,11 @@ class AtbInitializerTest {
         override fun getPlugins(): Collection<AtbInitializerListener> {
             return emptyList()
         }
+    }
+
+    @Before
+    fun setup() {
+        lifecycleOwner = TestLifecycleOwner()
     }
 
     @Test

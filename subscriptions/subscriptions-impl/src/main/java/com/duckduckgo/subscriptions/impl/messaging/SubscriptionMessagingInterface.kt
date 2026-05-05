@@ -408,8 +408,6 @@ class SubscriptionMessagingInterface @Inject constructor(
         ) {
             val jsMessageId = jsMessage.id ?: return
 
-            if (subscriptionsFeature.enableNewSubscriptionMessages().isEnabled().not()) return
-
             val authV2Enabled = subscriptionsFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = subscriptionsFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = subscriptionsFeature.supportsAlternateStripePaymentFlow().isEnabled()

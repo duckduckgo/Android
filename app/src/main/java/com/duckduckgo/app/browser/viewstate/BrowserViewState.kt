@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.viewstate
 
+import android.net.Uri
 import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.WebViewErrorResponse
@@ -61,6 +62,8 @@ data class BrowserViewState(
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
     val useBottomSheetMenu: Boolean = false,
+    val currentPdfCachedUri: Uri? = null,
+    val currentPdfFileName: String? = null,
 )
 
 sealed class HighlightableButton {

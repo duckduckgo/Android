@@ -36,8 +36,8 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 interface SubscriptionSwitchWideEvent {
     suspend fun onSwitchFlowStarted(
@@ -248,7 +248,7 @@ class SubscriptionSwitchWideEventImpl @Inject constructor(
             wideEventClient.intervalStart(
                 wideEventId = wideEventId,
                 key = KEY_ACTIVATION_LATENCY,
-                timeout = Duration.ofMinutes(10),
+                timeout = 10.minutes,
             )
             wideEventClient.flowStep(
                 wideEventId = wideEventId,

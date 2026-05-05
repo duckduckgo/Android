@@ -1,7 +1,7 @@
 {
   "name": "BackgroundCheckers",
   "url": "backgroundcheckers.net",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.backgroundcheckers.net/optOut/name/landing",
   "steps": [
@@ -61,6 +61,17 @@
             }
           ],
           "id": "fc993b0d-773a-4279-a634-0ce401da0e20"
+        },
+        {
+          "_comment": "Turnstile auto-completes. This one should disappear after clicking, so we'll use a negative selector to ensure it's not present.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]"
+            }
+          ],
+          "id": "cft-cd37d114-6091-49f9-b682-9b13f221c9e1"
         },
         {
           "actionType": "expectation",

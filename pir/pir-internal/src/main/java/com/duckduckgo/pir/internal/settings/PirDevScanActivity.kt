@@ -43,6 +43,7 @@ import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirRemoteWorkerService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -154,7 +155,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                     saveUserInputToDatabase()
                 }
             }
-            startForegroundService(Intent(this, PirForegroundScanService::class.java))
+            startForegroundService(PirForegroundScanService.intentFor(this, PirExecutionType.MANUAL_EDIT_PROFILE))
             globalActivityStarter.start(this, PirResultsScreenParams.PirScanResultsScreen)
         }
 

@@ -132,6 +132,7 @@ interface WebViewClientListener {
     fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,
+        errorCode: String,
     )
 
     fun onReceivedMaliciousSiteWarning(
