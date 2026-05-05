@@ -530,4 +530,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
     GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
     GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
+
+    AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 }
