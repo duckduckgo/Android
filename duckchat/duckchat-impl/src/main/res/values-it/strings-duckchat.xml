@@ -112,6 +112,7 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Elimina dati</string>
     <string name="duckChatBrowserMenuContentDescription">Altre opzioni</string>
+    <string name="duckAiInputScreenSearchInNewTabContentDescription">Cerca in una nuova scheda</string>
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Chat vocale</string>
