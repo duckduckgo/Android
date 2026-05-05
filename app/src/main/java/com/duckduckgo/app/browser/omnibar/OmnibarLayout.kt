@@ -1126,7 +1126,7 @@ class OmnibarLayout @JvmOverloads constructor(
         renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShieldState
             val shieldIconView =
-                if (viewMode is ViewMode.Browser) {
+                if (viewMode is ViewMode.Browser || viewMode is ViewMode.Pdf) {
                     shieldIcon
                 } else if (omnibarRepository.isNewCustomTabEnabled) {
                     newCustomTabToolbarContainer.customTabShieldIcon

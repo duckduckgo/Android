@@ -183,6 +183,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.MaliciousSiteStatus.PHISHING
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
+import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactoryImpl
 import com.duckduckgo.app.location.data.LocationPermissionsDao
@@ -10365,6 +10366,40 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnPrivacyProtectionToggledForPdfThenPrivacyShieldReflectsAllowListChange() = runTest {
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
+        loadUrl("https://www.example.com/doc.pdf")
+
+        // Simulate the user adding the domain to the allow list (menu or dashboard toggle).
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
+        testee.onPrivacyProtectionToggledForPdf()
+
+        assertEquals(UNPROTECTED, privacyShieldState().privacyShield)
+    }
+
+    @Test
+    fun whenPdfReopenedAfterUserAllowListedThenShieldShowsUnprotected() = runTest {
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val pdfUrl = "https://www.example.com/doc.pdf"
+        whenever(mockInlinePdfHandler.downloadToCache(pdfUrl))
+            .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf")))
+        whenever(mockInlinePdfHandler.extractFileName(pdfUrl)).thenReturn("doc.pdf")
+        // Domain is already in the user allow list (user disabled protection in a previous session).
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
+
+        // First open: PDF should land with UNPROTECTED shield.
+        testee.requestFileDownload(mock(), pdfUrl, null, "application/pdf", true, false)
+        assertEquals(UNPROTECTED, privacyShieldState().privacyShield)
+
+        // User backs out of the PDF onto a different page.
+        testee.onPdfHidden(currentWebViewUrl = "https://other.com/", currentWebViewTitle = "other")
+
+        // Re-open the same PDF — site cache may evict, allow list state must still propagate.
+        testee.requestFileDownload(mock(), pdfUrl, null, "application/pdf", true, false)
+        assertEquals(UNPROTECTED, privacyShieldState().privacyShield)
+    }
+
+    @Test
     fun whenOnPdfHiddenThenCurrentPdfStateClears() {
         testee.browserViewState.value = browserViewState().copy(
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
@@ -10431,6 +10466,23 @@ class BrowserTabViewModelTest {
             assertEquals(pdfUrl, this.url)
             assertEquals("application/pdf", this.mimeType)
         }
+    }
+
+    @Test
+    fun whenOnPdfHiddenWithUnderlyingPageCertificateThenSiteCertificatePopulated() {
+        testee.browserViewState.value = browserViewState().copy(
+            currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
+            currentPdfFileName = "doc.pdf",
+        )
+        val certificate: SslCertificate = mock()
+
+        testee.onPdfHidden(
+            currentWebViewUrl = "https://www.example.com/",
+            currentWebViewTitle = "Example",
+            currentWebViewCertificate = certificate,
+        )
+
+        assertEquals(certificate, testee.siteLiveData.value?.certificate)
     }
 
     @Test

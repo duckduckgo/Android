@@ -2343,7 +2343,11 @@ class BrowserTabFragment :
             .commitAllowingStateLoss()
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
-        viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
+        viewModel.onPdfHidden(
+            currentWebViewUrl = webView?.url,
+            currentWebViewTitle = webView?.title,
+            currentWebViewCertificate = webView?.certificate,
+        )
         // PdfViewerFragmentV2 dispatches window insets to handle edge-to-edge, which can
         // leave a bottom padding on the WebView. Re-dispatch so siblings recompute insets.
         ViewCompat.requestApplyInsets(binding.root)
@@ -2681,20 +2685,24 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
-                webView?.let { safeWebView ->
-                    lifecycleScope.launch {
-                        refresh()
-                        privacyProtectionEnabledConfirmation(it.domain)
+                lifecycleScope.launch {
+                    if (isPdfVisible()) {
+                        viewModel.onPrivacyProtectionToggledForPdf()
+                    } else {
+                        webView?.let { refresh() }
                     }
+                    privacyProtectionEnabledConfirmation(it.domain)
                 }
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
-                webView?.let { safeWebView ->
-                    lifecycleScope.launch {
-                        refresh()
-                        privacyProtectionDisabledConfirmation(it.domain)
+                lifecycleScope.launch {
+                    if (isPdfVisible()) {
+                        viewModel.onPrivacyProtectionToggledForPdf()
+                    } else {
+                        webView?.let { refresh() }
                     }
+                    privacyProtectionDisabledConfirmation(it.domain)
                 }
             }
 

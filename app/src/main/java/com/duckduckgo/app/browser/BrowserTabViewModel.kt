@@ -3733,6 +3733,7 @@ class BrowserTabViewModel @Inject constructor(
                         pageChanged(url, pdfTitle)
                     }
                     onCertificateReceived(result.certificate)
+                    onSiteChanged()
                     browserViewState.value = currentBrowserViewState().copy(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,
@@ -3764,13 +3765,29 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     /**
+     * Re-publishes the current site's privacy state when the user toggles protections
+     * while a PDF is showing. The WebView path relies on `webView.reload()` re-firing
+     * `pageChanged`, which doesn't work for PDFs (the WebView is hidden + paused and
+     * the cached PDF doesn't need to be re-fetched). [Site.privacyProtection] re-reads
+     * the user allow list on every call, so [onSiteChanged] alone is enough to refresh
+     * the shield variant.
+     */
+    fun onPrivacyProtectionToggledForPdf() {
+        onSiteChanged()
+    }
+
+    /**
      * Called by the fragment when the inline PDF is hidden (back press, navigation).
      * Clears the cached PDF state so the "Download PDF" menu item disappears, and
      * re-runs [pageChanged] for the WebView's actual URL/title so the omnibar,
      * page header, and tab title revert from the PDF entry to the underlying page —
      * the same path that fires when the WebView itself navigates back.
      */
-    fun onPdfHidden(currentWebViewUrl: String?, currentWebViewTitle: String?) {
+    fun onPdfHidden(
+        currentWebViewUrl: String?,
+        currentWebViewTitle: String?,
+        currentWebViewCertificate: SslCertificate? = null,
+    ) {
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
@@ -3778,6 +3795,7 @@ class BrowserTabViewModel @Inject constructor(
         )
         if (!currentWebViewUrl.isNullOrBlank() && currentWebViewUrl != ABOUT_BLANK) {
             pageChanged(currentWebViewUrl, currentWebViewTitle)
+            onCertificateReceived(currentWebViewCertificate)
         }
     }
 
