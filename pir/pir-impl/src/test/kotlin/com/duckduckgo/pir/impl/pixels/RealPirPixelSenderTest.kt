@@ -47,6 +47,8 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
         testee.reportManualScanStarted(
             isPowerSavingEnabled = true,
             profileQueryCount = 3,
@@ -69,10 +71,13 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
         assert(paramsCaptor.firstValue["broker_count"] == "10")
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
     }
 
     @Test
     fun whenReportManualScanStartedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
         testee.reportManualScanStarted(
             isPowerSavingEnabled = false,
             profileQueryCount = 1,
@@ -89,10 +94,12 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
     }
 
     @Test
     fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         val totalTimeInMillis = 12345L
 
         testee.reportManualScanCompleted(
@@ -129,10 +136,13 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue.containsKey("power_saving"))
         assert(paramsCaptor.firstValue["power_saving"] == "true")
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
     }
 
     @Test
     fun whenReportManualScanCompletedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
         testee.reportManualScanCompleted(
             totalTimeInMillis = 1L,
             batteryOptimizationsEnabled = false,
@@ -153,6 +163,7 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
     }
 
     @Test
@@ -171,7 +182,7 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportManualScanLowMemoryThenEnqueuesPixelWithMemoryLevel() = runTest {
+    fun whenReportManualScanLowMemoryThenEnqueuesCorrectPixel() = runTest {
         testee.reportManualScanLowMemory()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -181,6 +192,8 @@ class RealPirPixelSenderTest {
             encodedParameters = any(),
             type = any(),
         )
+
+        assert(paramsCaptor.firstValue.isEmpty())
     }
 
     @Test
@@ -1074,6 +1087,8 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInitialScanDurationThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
         testee.reportInitialScanDuration(
             durationMs = 45000L,
             profileQueryCount = 3,
@@ -1099,10 +1114,13 @@ class RealPirPixelSenderTest {
         assert(params["battery-optimizations"] == "false")
         assert(params["broker_count"] == "10")
         assert(params["scan_trigger"] == "onboarding")
+        assert(params["vpn_connection_state"] == "disconnected")
     }
 
     @Test
     fun whenReportInitialScanDurationWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
         testee.reportInitialScanDuration(
             durationMs = 1L,
             profileQueryCount = 0,
@@ -1121,5 +1139,6 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
     }
 }

@@ -207,7 +207,7 @@ class RealPirJobsRunner @Inject constructor(
         }
     }
 
-    private fun emitStartPixel(
+    private suspend fun emitStartPixel(
         context: Context,
         executionType: PirExecutionType,
         profileQueryCount: Int,
@@ -221,7 +221,7 @@ class RealPirJobsRunner @Inject constructor(
         }
     }
 
-    private fun emitCompletedPixel(
+    private suspend fun emitCompletedPixel(
         context: Context,
         executionType: PirExecutionType,
         startTimeInMillis: Long,

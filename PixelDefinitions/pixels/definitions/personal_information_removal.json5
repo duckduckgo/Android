@@ -34,7 +34,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the submission succeeded",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             },
             {
                 "key": "vpn_bypass",
@@ -116,7 +117,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the failure happened",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             },
             {
                 "key": "vpn_bypass",
@@ -402,7 +404,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the scan happened",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             },
             {
                 "key": "vpn_bypass",
@@ -453,7 +456,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the scan happened",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             },
             {
                 "key": "vpn_bypass",
@@ -535,7 +539,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the error happened",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             },
             {
                 "key": "vpn_bypass",
@@ -1024,7 +1029,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the submission succeeded",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1043,7 +1049,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the submission succeeded",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1062,7 +1069,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the pixel is fired",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1076,7 +1084,8 @@
             {
                 "key": "vpn_connection_state",
                 "description": "Reported VPN connection state when the pixel is fired",
-                "type": "string"
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1214,6 +1223,12 @@
                 "description": "What triggered the scan run",
                 "type": "string",
                 "enum": ["onboarding", "profile_edit", "scheduled"]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the initial scan completed",
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1299,6 +1314,12 @@
                 "description": "What triggered the scan run",
                 "type": "string",
                 "enum": ["onboarding", "profile_edit", "scheduled"]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the foreground run started",
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
@@ -1372,6 +1393,12 @@
                 "description": "What triggered the scan run",
                 "type": "string",
                 "enum": ["onboarding", "profile_edit", "scheduled"]
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the foreground run completed",
+                "type": "string",
+                "enum": ["connected", "disconnected"]
             }
         ]
     },
