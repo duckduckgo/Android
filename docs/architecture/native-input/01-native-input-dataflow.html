@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NativeInputWidget Data Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    background: #F5F5F7;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+<svg width="740" height="680" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+
+  <!-- ── User pill ── -->
+  <rect x="295" y="2" width="80" height="28" rx="14" fill="#1D1D1F"/>
+  <text x="335" y="20.5" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="600" fill="white">User</text>
+
+  <!-- User → inputField -->
+  <line x1="335" y1="30" x2="335" y2="46" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- inputField box -->
+  <rect x="0" y="50" width="660" height="32" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="330" y="71" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="600" fill="#3730A3">NativeInputModeWidget · inputField</text>
+
+  <!-- ────────────────────────────────────────────
+       VIEWMODEL SECTION
+  ──────────────────────────────────────────── -->
+
+  <!-- ViewModel box (center) -->
+  <rect x="200" y="112" width="260" height="48" rx="8" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="330" y="130" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" font-weight="600" fill="#6B21A8">NativeInputModeWidgetViewModel</text>
+  <text x="330" y="144" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#7E22CE">@ContributesViewModel(ViewScope)</text>
+  <text x="330" y="156" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#9333EA">combines feature flags + config → NativeInputState</text>
+
+  <!-- Widget → ViewModel arrow (observes state) -->
+  <line x1="335" y1="82" x2="335" y2="110" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="341" y="98" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">observes</text>
+
+  <!-- Feature inputs to ViewModel -->
+  <!-- DuckAiFeatureState -->
+  <rect x="0" y="122" width="170" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="85" y="138" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">DuckAiFeatureState</text>
+  <text x="85" y="148" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">duckchat-api</text>
+  <line x1="170" y1="136" x2="198" y2="133" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- DuckChatInternal -->
+  <rect x="0" y="164" width="170" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="85" y="179" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">DuckChatInternal</text>
+  <text x="85" y="190" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">userSetting + inputScreen flows</text>
+  <line x1="170" y1="178" x2="198" y2="150" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Subscriptions -->
+  <rect x="490" y="122" width="170" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="575" y="138" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">Subscriptions</text>
+  <text x="575" y="148" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">DuckAiPlus tier</text>
+  <line x1="490" y1="136" x2="462" y2="133" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- NativeInputState output -->
+  <rect x="220" y="192" width="220" height="40" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="330" y="209" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" font-weight="600" fill="#166534">NativeInputState</text>
+  <text x="330" y="222" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">inputMode · inputContext · inputPosition</text>
+
+  <!-- ViewModel → NativeInputState arrow -->
+  <line x1="330" y1="160" x2="330" y2="190" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="336" y="178" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">emits</text>
+
+  <!-- NativeInputState → Widget (applyState) -->
+  <path d="M440,212 C560,212 560,66 440,66" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="548" y="148" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">applyState()</text>
+  <text x="548" y="159" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">toggle · tabs · pos</text>
+
+  <!-- ────────────────────────────────────────────
+       CALLBACK SECTION
+  ──────────────────────────────────────────── -->
+
+  <!-- Vertical spine (x=40, from below inputField down to branch 3) -->
+  <line x1="40" y1="82" x2="40" y2="368" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <!-- Branch 1: onSearchTextChanged (y=268) -->
+  <line x1="40" y1="268" x2="76" y2="268" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="80" y="254" width="158" height="28" rx="8" fill="#E0E7FF" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="159" y="272" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="600" fill="#312E81">onSearchTextChanged</text>
+  <line x1="238" y1="268" x2="256" y2="268" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="260" y="254" width="200" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="360" y="272" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">NativeInputManager.callbacks</text>
+  <line x1="80" y1="282" x2="80" y2="300" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="94" y="304" width="200" height="26" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="194" y="321" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#166534">BrowserFragment (autocomplete)</text>
+
+  <!-- Branch 2: onSearchSubmitted (y=370) -->
+  <line x1="40" y1="370" x2="76" y2="370" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="80" y="356" width="158" height="28" rx="8" fill="#E0E7FF" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="159" y="374" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="600" fill="#312E81">onSearchSubmitted</text>
+  <line x1="238" y1="370" x2="256" y2="370" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="260" y="356" width="144" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="332" y="374" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">NativeInputManager</text>
+  <line x1="80" y1="384" x2="80" y2="402" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="94" y="406" width="200" height="26" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="194" y="423" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#166534">BrowserFragment.submitQuery()</text>
+
+  <!-- Extend spine for branch 3 -->
+  <line x1="40" y1="368" x2="40" y2="490" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <!-- Branch 3: onDuckAiChatSubmitted (y=490) -->
+  <line x1="40" y1="490" x2="76" y2="490" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="80" y="476" width="188" height="28" rx="8" fill="#E0E7FF" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="174" y="494" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="600" fill="#312E81">onDuckAiChatSubmitted</text>
+  <line x1="268" y1="490" x2="286" y2="490" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="290" y="476" width="144" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="362" y="494" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">NativeInputManager</text>
+
+  <!-- Sub-spine for branch 3 -->
+  <line x1="80" y1="504" x2="80" y2="616" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <!-- Sub-branch A: DuckChat (y=540) -->
+  <line x1="80" y1="540" x2="108" y2="540" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="112" y="526" width="168" height="28" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="196" y="544" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#166534">DuckChat.openDuckChat()</text>
+  <line x1="280" y1="540" x2="298" y2="540" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="302" y="526" width="106" height="28" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="355" y="544" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#166534">DuckAI WebView</text>
+
+  <!-- OR badge -->
+  <rect x="90" y="568" width="30" height="18" rx="9" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="105" y="581" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#64748B">OR</text>
+
+  <!-- Sub-branch B: ContextualNativeInputManager (y=616) -->
+  <line x1="80" y1="616" x2="108" y2="616" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="112" y="602" width="220" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="222" y="620" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">ContextualNativeInputManager</text>
+  <line x1="112" y1="630" x2="112" y2="648" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="126" y="652" width="174" height="26" rx="8" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="213" y="669" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#6B21A8">JsMessaging → WebView</text>
+
+</svg>
+</body>
+</html>
