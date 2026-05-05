@@ -1566,6 +1566,16 @@
                 ]
             },
             {
+                "key": "total_scan",
+                "description": "The number of scan jobs executed during the run",
+                "type": "integer"
+            },
+            {
+                "key": "total_optout",
+                "description": "The number of opt-out jobs executed during the run",
+                "type": "integer"
+            },
+            {
                 "key": "profile_queries",
                 "description": "The number of profile queries used in the scan",
                 "type": "integer"

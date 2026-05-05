@@ -167,11 +167,15 @@ interface PirPixelSender {
      * Emits a pixel to signal that a scheduled scan run has been completed.
      *
      * @param totalTimeInMillis - how long it took for the scan to complete
+     * @param totalScanJobs - the number of scan jobs executed during the run
+     * @param totalOptOutJobs - the number of opt-out jobs executed during the run
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
     )
@@ -719,11 +723,15 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_TOTAL_SCAN to totalScanJobs.toString(),
+            PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
         )

@@ -253,7 +253,13 @@ class RealPirJobsRunner @Inject constructor(
                 notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
             )
         } else {
-            pixelSender.reportScheduledScanCompleted(totalTimeMillis, profileQueryCount, brokerCount)
+            pixelSender.reportScheduledScanCompleted(
+                totalTimeInMillis = totalTimeMillis,
+                totalScanJobs = totalScanJobs,
+                totalOptOutJobs = totalOptOutJobs,
+                profileQueryCount = profileQueryCount,
+                brokerCount = brokerCount,
+            )
         }
     }
 
