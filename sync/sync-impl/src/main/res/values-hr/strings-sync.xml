@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Izbrisati podatke poslužitelja?</string>
-    <string name="sync_delete_server_data_dialog_content">Svi uređaji bit će isključeni i tvoji sinkronizirani podaci bit će izbrisani s poslužitelja.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Izbriši podatke</string>
+    <string name="sync_delete_server_data_dialog_content">Tvoja sigurnosna kopija bit će izbrisana s poslužitelja. Svi uređaji bit će isključeni iz sinkronizacije, ali ništa se neće izbrisati s bilo kojeg uređaja.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podataka poslužitelja</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Odustani</string>
 
     <!-- Sync feature promo -->

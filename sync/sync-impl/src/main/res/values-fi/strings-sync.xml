@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Poista palvelimen tiedot?</string>
-    <string name="sync_delete_server_data_dialog_content">Kaikkien laitteiden yhteys katkaistaan, ja synkronoidut tietosi poistetaan palvelimelta.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Poista tiedot</string>
+    <string name="sync_delete_server_data_dialog_content">Varmuuskopiosi poistetaan palvelimelta. Kaikkien laitteiden synkronointi katkaistaan, mutta mitään ei poisteta mistään laitteesta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Poista palvelimen tiedot</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Peruuta</string>
 
     <!-- Sync feature promo -->

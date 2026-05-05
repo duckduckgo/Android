@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Serverdaten löschen?</string>
-    <string name="sync_delete_server_data_dialog_content">Alle Geräte werden getrennt und deine synchronisierten Daten werden vom Server gelöscht.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Daten löschen</string>
+    <string name="sync_delete_server_data_dialog_content">Dein Backup wird vom Server gelöscht. Alle Geräte werden von der Synchronisierung getrennt, es werden jedoch keine Daten von den Geräten gelöscht.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Serverdaten löschen</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Abbrechen</string>
 
     <!-- Sync feature promo -->

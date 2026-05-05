@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Eliminare i dati del server?</string>
-    <string name="sync_delete_server_data_dialog_content">Tutti i dispositivi saranno disconnessi e i dati sincronizzati verranno eliminati dal server.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Elimina dati</string>
+    <string name="sync_delete_server_data_dialog_content">Il tuo backup verrà eliminato dal server. Tutti i dispositivi verranno disconnessi dalla sincronizzazione, ma nessun dato verrà eliminato da alcun dispositivo.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Elimina i dati del server</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annulla</string>
 
     <!-- Sync feature promo -->

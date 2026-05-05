@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Διαγραφή δεδομένων διακομιστή;</string>
-    <string name="sync_delete_server_data_dialog_content">Όλες οι συσκευές θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων</string>
+    <string name="sync_delete_server_data_dialog_content">Το αντίγραφο ασφαλείας σου θα διαγραφεί από τον διακομιστή. Όλες οι συσκευές θα αποσυνδεθούν από τον συγχρονισμό, αλλά τίποτα δεν θα διαγραφεί από καμία συσκευή.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων διακομιστή</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Ακύρωση</string>
 
     <!-- Sync feature promo -->
