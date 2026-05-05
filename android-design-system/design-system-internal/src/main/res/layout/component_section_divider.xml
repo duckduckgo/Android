@@ -20,6 +20,7 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:paddingTop="@dimen/keyline_5"
+              android:paddingStart="@dimen/keyline_4"
               android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

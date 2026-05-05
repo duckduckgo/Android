@@ -464,17 +464,6 @@
     </issue>
 
     <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="                        android:paddingEnd=&quot;@dimen/keyline_2&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="310"
-            column="25"/>
-    </issue>
-
-    <issue
         id="RtlEnabled"
         message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
         <location
