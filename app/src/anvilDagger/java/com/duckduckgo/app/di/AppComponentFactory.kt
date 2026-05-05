@@ -24,9 +24,7 @@ import kotlinx.coroutines.CoroutineScope
  */
 object AppComponentFactory {
     fun create(application: Application, applicationCoroutineScope: CoroutineScope): AppComponent {
-        return DaggerAppComponent.builder()
-            .application(application)
-            .applicationCoroutineScope(applicationCoroutineScope)
-            .build()
+        return DaggerAppComponent.factory()
+            .create(application, applicationCoroutineScope)
     }
 }

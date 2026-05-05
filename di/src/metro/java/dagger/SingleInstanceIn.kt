@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.surrogates.di
+package dagger
 
-import com.duckduckgo.app.surrogates.ResourceSurrogates
-import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-
-@Module
-@ContributesTo(AppScope::class)
-class ResourceSurrogateModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun analyticsSurrogates(): ResourceSurrogates = ResourceSurrogatesImpl()
-}
+/**
+ * In Metro mode, [SingleInstanceIn] is a typealias for Metro's [dev.zacsweers.metro.SingleIn].
+ *
+ * This ensures that `@SingleInstanceIn(AppScope::class)` on bindings is the same annotation
+ * as the synthetic `@SingleIn(AppScope::class)` that Metro creates from `@DependencyGraph(scope)`.
+ * Without this, Metro treats them as different scopes and fails to delegate scoped bindings
+ * to parent graphs.
+ */
+typealias SingleInstanceIn = dev.zacsweers.metro.SingleIn

@@ -20,7 +20,9 @@ import android.content.Context
 import androidx.annotation.LayoutRes
 import dagger.android.DaggerFragment
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
 
+@HasMemberInjections
 abstract class DuckDuckGoFragment(@LayoutRes contentLayoutId: Int = 0) : DaggerFragment(contentLayoutId) {
 
     override fun onAttach(context: Context) {

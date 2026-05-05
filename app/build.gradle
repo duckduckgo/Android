@@ -49,6 +49,8 @@ android {
             }
         }
 
+        buildConfigField "String", "DI_FRAMEWORK", "\"${findProperty('ddg.di') ?: 'AnvilDagger'}\""
+
         if (project.hasProperty('perf-test')) {
             buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
         } else {

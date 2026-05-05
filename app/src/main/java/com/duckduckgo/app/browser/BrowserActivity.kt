@@ -131,6 +131,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVE
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -148,6 +149,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
+@HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject

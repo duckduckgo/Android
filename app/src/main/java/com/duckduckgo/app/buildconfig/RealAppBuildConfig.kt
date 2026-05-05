@@ -55,7 +55,12 @@ class RealAppBuildConfig @Inject constructor(
     override val applicationId: String = BuildConfig.APPLICATION_ID
     override val buildType: String = BuildConfig.BUILD_TYPE
     override val versionCode: Int = BuildConfig.VERSION_CODE
-    override val versionName: String = BuildConfig.VERSION_NAME
+    override val versionName: String
+        get() = if (isInternalBuild() || isDebug) {
+            "${BuildConfig.VERSION_NAME}-$diFramework"
+        } else {
+            BuildConfig.VERSION_NAME
+        }
     override val flavor: BuildFlavor
         get() = when (BuildConfig.FLAVOR) {
             "internal" -> BuildFlavor.INTERNAL
@@ -75,6 +80,11 @@ class RealAppBuildConfig @Inject constructor(
         }
     }
     override val isPerformanceTest: Boolean = BuildConfig.IS_PERFORMANCE_TEST
+    private val diFramework: String = if (BuildConfig.DEBUG || BuildConfig.FLAVOR == "internal") {
+        BuildConfig.DI_FRAMEWORK
+    } else {
+        ""
+    }
 
     override val isDefaultVariantForced: Boolean = BuildConfig.FORCE_DEFAULT_VARIANT
 

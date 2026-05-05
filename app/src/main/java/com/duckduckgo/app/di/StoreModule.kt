@@ -36,13 +36,16 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
 
 @Module
+@ContributesTo(AppScope::class)
 abstract class StoreModule {
 
     @Binds

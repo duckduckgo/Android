@@ -60,7 +60,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppTpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
+    @AppTpBatteryOptimizationsApi private val isIgnoringBatteryOptimizations: AppTpBatteryOptimizationsChecker,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -106,7 +106,9 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         coroutineScope.launch(dispatcherProvider.io()) {
-            _recommendedSettingsState.tryEmit(RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations()))
+            _recommendedSettingsState.tryEmit(
+                RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()),
+            )
         }
     }
 
@@ -250,7 +252,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         fun updateRecommendedSettings() {
             owner.lifecycleScope.launch(dispatcherProvider.io()) {
                 _recommendedSettingsState.tryEmit(
-                    RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations()),
+                    RecommendedSettings(isIgnoringBatteryOptimizations = isIgnoringBatteryOptimizations.isIgnoringBatteryOptimizations()),
                 )
             }
         }
@@ -364,14 +366,18 @@ internal sealed class Command {
 
 @Retention(AnnotationRetention.BINARY)
 @Qualifier
-private annotation class InternalApi
+private annotation class AppTpBatteryOptimizationsApi
+
+fun interface AppTpBatteryOptimizationsChecker {
+    fun isIgnoringBatteryOptimizations(): Boolean
+}
 
 @Module
 @ContributesTo(ActivityScope::class)
 class IgnoringBatteryOptimizationsModule {
     @Provides
-    @InternalApi
-    fun providesIsIgnoringBatteryOptimizations(context: Context): () -> Boolean {
-        return { context.isIgnoringBatteryOptimizations() }
+    @AppTpBatteryOptimizationsApi
+    fun providesIsIgnoringBatteryOptimizations(context: Context): AppTpBatteryOptimizationsChecker {
+        return AppTpBatteryOptimizationsChecker { context.isIgnoringBatteryOptimizations() }
     }
 }

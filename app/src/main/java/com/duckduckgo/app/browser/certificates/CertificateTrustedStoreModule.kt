@@ -24,11 +24,13 @@ import com.duckduckgo.app.browser.certificates.rootstore.LetsEncryptR3
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStoreImpl
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
+@ContributesTo(AppScope::class)
 class CertificateTrustedStoreModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
