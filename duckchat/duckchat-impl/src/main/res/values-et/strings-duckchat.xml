@@ -112,6 +112,7 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Kustuta andmed</string>
     <string name="duckChatBrowserMenuContentDescription">Veel valikuid</string>
+    <string name="duckAiInputScreenSearchInNewTabContentDescription">Otsi uuel vahekaardil</string>
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Häälvestlus</string>
