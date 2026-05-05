@@ -472,7 +472,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 override fun onBackKey(): Boolean {
                     if (isAttachedToWindow) {
                         viewModel.onBackKeyPressed()
-                        omnibarTextListener?.onBackKeyPressed()
+                        return omnibarTextListener?.onBackKeyPressed() ?: false
                     }
                     return false
                 }

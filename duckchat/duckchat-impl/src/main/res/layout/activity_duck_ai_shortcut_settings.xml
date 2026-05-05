@@ -58,6 +58,13 @@
                 app:primaryText="@string/duckAiVoiceSearchVisibilitySetting"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/show_duck_ai_in_voice_chat_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duckAiVoiceChatVisibilitySetting"
+                app:showSwitch="true" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

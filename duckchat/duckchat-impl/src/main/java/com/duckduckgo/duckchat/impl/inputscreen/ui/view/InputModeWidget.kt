@@ -56,6 +56,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentTagSpan
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -75,9 +77,13 @@ open class InputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var duckChatInternal: DuckChatInternal
+
     val inputField: EditText
     private val inputFieldClearText: View
     private val inputModeWidgetBack: View
+    private val inputModeWidgetUnifiedBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
@@ -86,12 +92,13 @@ open class InputModeWidget @JvmOverloads constructor(
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
     private val menuIconImageView: ImageView
+    private val browserMenuHighlight: View
     private val fireButton: View
     private val voiceInputButton: View
     private var bottomButtonsMode: Boolean = false
 
     private val inputModeCardExtendedEndMargin: Int by lazy {
-        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
+        resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
     }
 
     private val inputModeCardEndMargin: Int by lazy {
@@ -154,16 +161,30 @@ open class InputModeWidget @JvmOverloads constructor(
     private var isDeletingTag = false
     private val knownTagTabIds = mutableSetOf<String>()
 
+    // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
+    // never have to guard against pre-DI invocation.
+    private val duckChatTabSelectedListener =
+        object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
+                duckChatInternal.setSelectedMode(mode)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
-        inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
+        inputModeWidgetBack = findViewById(R.id.inputModeWidgetBack)
+        inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
         menuIconImageView = findViewById(R.id.browserMenuImageView)
+        browserMenuHighlight = findViewById(R.id.browserMenuHighlight)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
@@ -181,6 +202,15 @@ open class InputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
+        val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
+        duckChatInternal.setSelectedMode(mode)
+    }
+
+    override fun onDetachedFromWindow() {
+        inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
+        duckChatInternal.setSelectedMode(InputMode.SEARCH)
+        super.onDetachedFromWindow()
     }
 
     private fun provideInitialText(text: String) {
@@ -219,6 +249,12 @@ open class InputModeWidget @JvmOverloads constructor(
         return inputModeSwitch.selectedTabPosition
     }
 
+    fun onBackPressed() {
+        onBack?.invoke()
+        val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
+    }
+
     private fun configureClickListeners() {
         inputFieldClearText.setOnClickListener {
             inputField.text.clear()
@@ -227,12 +263,9 @@ open class InputModeWidget @JvmOverloads constructor(
 
             onClearTextTapped?.invoke()
         }
-        inputModeWidgetBack.setOnClickListener {
-            onBack?.invoke()
+        inputModeWidgetBack.setOnClickListener { onBackPressed() }
+        inputModeWidgetUnifiedBack.setOnClickListener { onBackPressed() }
 
-            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
-        }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
         }
@@ -435,6 +468,13 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun submitAsChat(): Boolean {
+        val textToSubmit = inputField.text.getTextToSubmit()?.toString() ?: return false
+        onChatSent?.invoke(textToSubmit)
+        inputField.clearFocus()
+        return true
+    }
+
     fun selectTab(index: Int) {
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()
@@ -515,6 +555,10 @@ open class InputModeWidget @JvmOverloads constructor(
 
     fun setVoiceButtonVisible(visible: Boolean) {
         voiceInputButton.isVisible = visible
+    }
+
+    fun setBrowserMenuHighlightVisible(visible: Boolean) {
+        browserMenuHighlight.isVisible = visible
     }
 
     fun setMenuIcon(@DrawableRes resId: Int) {

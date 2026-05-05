@@ -21,8 +21,8 @@ import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppComponentFactory
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
@@ -159,10 +159,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureDependencyInjection() {
-        daggerAppComponent = DaggerAppComponent.builder()
-            .application(this)
-            .applicationCoroutineScope(applicationCoroutineScope)
-            .build()
+        daggerAppComponent = AppComponentFactory.create(this, applicationCoroutineScope)
         daggerAppComponent.inject(this)
     }
 

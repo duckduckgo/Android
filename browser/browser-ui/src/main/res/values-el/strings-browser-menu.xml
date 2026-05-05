@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Εκτύπωση</string>
     <string name="browserMenuOpenAppLink">Ανοίξτε στην εφαρμογή</string>
     <string name="browserMenuAddToHome">Προσθήκη στην Αρχική Οθόνη</string>
+    <string name="browserMenuDownloadPdf">Λήψη PDF</string>
     <string name="browserMenuReportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
     <string name="browserMenuAutofill">Κωδικοί πρόσβασης</string>
     <string name="browserMenuDownloads">Λήψεις</string>

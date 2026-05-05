@@ -310,7 +310,11 @@
     <!-- Dialogs -->
     <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
-        <item name="colorOnSurface">?attr/daxColorSurface</item>
+        <item name="colorPrimary">?attr/daxColorAccentBlue</item>
+        <item name="colorSurface">?attr/daxColorSurface</item>
+        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSurfaceVariant">?attr/daxColorSecondaryText</item>
+        <item name="colorError">?attr/daxColorDestructive</item>
     </style>
 
     <style name="Widget.DuckDuckGo.LegacyDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -426,6 +430,26 @@
         <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
         <item name="android:colorPrimary">?attr/daxColorAccentBlue</item>
         <item name="colorPrimary">?attr/daxColorAccentBlue</item>
+    </style>
+
+    <!--
+      Default style for raw TextInputLayout instances inflated by third-party libraries.
+      DaxTextInput is NOT affected — it uses a hardcoded style and ignores textInputStyle.
+      Temporary: needed because pdf-viewer alpha08 resolves colorPrimary from the activity
+      theme (which is daxColorBackground), making cursor and focused label invisible.
+      Removable after Kotlin 2.x migration allows upgrading to a newer pdf-viewer version.
+      NOTE: Must NOT use FilledBox — it adds a bottom active indicator on top of the
+      EditText's own underline, causing a visible double-line.
+    -->
+    <style name="Widget.DuckDuckGo.ThirdPartyTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.ThirdPartyTextInput</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.ThirdPartyTextInput" parent="">
+        <item name="colorPrimary">?attr/daxColorAccentBlue</item>
+        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSurfaceVariant">?attr/daxColorSecondaryText</item>
+        <item name="colorError">?attr/daxColorDestructive</item>
     </style>
 
     <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">

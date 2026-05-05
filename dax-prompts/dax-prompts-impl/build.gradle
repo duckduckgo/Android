@@ -24,6 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(':dax-prompts-api')
     implementation project(':modal-coordinator-api')
     implementation project(':browser-api')
@@ -32,7 +33,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':statistics-api')
@@ -66,7 +66,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp

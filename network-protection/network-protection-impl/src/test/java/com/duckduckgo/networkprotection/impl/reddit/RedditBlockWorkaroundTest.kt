@@ -33,11 +33,17 @@ import java.net.URISyntaxException
 class RedditBlockWorkaroundTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
     private val networkProtectionState: NetworkProtectionState = mock()
-    private val lifecycleOwner: LifecycleOwner = TestLifecycleOwner()
+    private lateinit var lifecycleOwner: LifecycleOwner
 
     private val cookieManager = FakeCookieManagerWrapper()
 
-    private val redditBlockWorkaround = RedditBlockWorkaround(networkProtectionState, coroutineRule.testDispatcherProvider, cookieManager)
+    private lateinit var redditBlockWorkaround: RedditBlockWorkaround
+
+    @org.junit.Before
+    fun setUp() {
+        lifecycleOwner = TestLifecycleOwner()
+        redditBlockWorkaround = RedditBlockWorkaround(networkProtectionState, coroutineRule.testDispatcherProvider, cookieManager)
+    }
 
     @Test
     fun `on resume with netp disabled removes the reddit_session dummy`() = runTest {

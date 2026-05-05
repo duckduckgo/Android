@@ -41,8 +41,9 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toJavaDuration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
@@ -129,7 +130,7 @@ class RealPageLoadWideEvent @Inject constructor(
 
                 val result = wideEventClient.flowStart(
                     name = PAGE_LOAD_FEATURE_NAME,
-                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT.toJavaDuration()),
+                    cleanupPolicy = CleanupPolicy.OnTimeout(CLEANUP_TIMEOUT),
                 )
 
                 result.onSuccess { flowId ->
@@ -144,16 +145,19 @@ class RealPageLoadWideEvent @Inject constructor(
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_FINISH,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
 
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_VISIBLE,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
 
                     wideEventClient.intervalStart(
                         wideEventId = flowId,
                         key = KEY_ELAPSED_TIME_TO_ESCAPED_FIXED_PROGRESS,
+                        buckets = PAGE_LOAD_INTERVAL_BUCKETS,
                     )
                 }.onFailure { error ->
                     logcat { "Failed to start page load flow for tabId=$tabId: ${error.message}" }
@@ -303,6 +307,16 @@ class RealPageLoadWideEvent @Inject constructor(
     private companion object {
         const val ABOUT_BLANK = "about:blank"
         val CLEANUP_TIMEOUT = 5.minutes
+        val PAGE_LOAD_INTERVAL_BUCKETS: Set<Duration> = setOf(
+            1.seconds,
+            2.seconds,
+            3.seconds,
+            4.seconds,
+            5.seconds,
+            10.seconds,
+            30.seconds,
+            1.minutes,
+        )
         const val PAGE_LOAD_FEATURE_NAME = "page-load"
         const val STEP_PAGE_START = "page_start"
         const val STEP_PAGE_VISIBLE = "page_visible"

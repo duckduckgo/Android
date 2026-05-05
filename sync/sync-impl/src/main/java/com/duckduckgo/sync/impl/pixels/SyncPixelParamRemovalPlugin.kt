@@ -58,6 +58,21 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS.pixelName to PixelParameter.removeAtb(),
 
+            SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_TOGGLE_OPTED_OUT.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_READY_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_RESTORE_TAPPED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_SKIP_RESTORE_TAPPED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_CANCELLED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_MANUAL_RECOVERY_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_ENABLED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SETTINGS_PAGE_TOGGLE_DISABLED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_FAILURE.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEARED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_AUTO_RESTORE_PRESERVED_ACCOUNT_CLEAR_FAILED.pixelName to PixelParameter.removeAtb(),
+
         )
     }
 }

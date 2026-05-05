@@ -385,6 +385,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_session_digital-assistant_started": {
+        "description": "Fires when Duck.ai voice chat is launched as the digital assistant (e.g. via Google Assistant ACTION_ASSIST intent)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_settings_default_toggle_position_changed": {
         "description": "User changed the default toggle position setting in AI Features settings",
         "owners": ["YoussefKeyrouz"],
@@ -433,81 +440,146 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_reader_native_daily": {
+    "m_duck-ai_native-storage_reader_native_daily": {
         "description": "Duck.ai chat suggestions were loaded from the native store (daily)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_reader_webview_daily": {
+    "m_duck-ai_native-storage_reader_webview_daily": {
         "description": "Duck.ai chat suggestions were loaded from the WebView store (daily)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_deletion_native_count": {
+    "m_duck-ai_native-storage_deletion_native_count": {
         "description": "A Duck.ai chat was deleted via the native store path",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_deletion_webview_count": {
+    "m_duck-ai_native-storage_deletion_webview_count": {
         "description": "A Duck.ai chat was deleted via the WebView store path",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_chats_unique": {
+    "m_duck-ai_native-storage_migration_done_chats_unique": {
         "description": "Duck.ai chat history migration to native storage completed for the chats key (unique per install)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_chats_count": {
+    "m_duck-ai_native-storage_migration_done_chats_count": {
         "description": "Duck.ai chat history migration to native storage completed for the chats key (count; should match unique)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_entries_unique": {
+    "m_duck-ai_native-storage_migration_done_entries_unique": {
         "description": "Duck.ai chat history migration to native storage completed for the entries key (unique per install)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_entries_count": {
+    "m_duck-ai_native-storage_migration_done_entries_count": {
         "description": "Duck.ai chat history migration to native storage completed for the entries key (count; should match unique)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_files_unique": {
+    "m_duck-ai_native-storage_migration_done_files_unique": {
         "description": "Duck.ai chat history migration to native storage completed for the files key (unique per install)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_files_count": {
+    "m_duck-ai_native-storage_migration_done_files_count": {
         "description": "Duck.ai chat history migration to native storage completed for the files key (count; should match unique)",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_native_storage_migration_done_blank_count": {
+    "m_duck-ai_native-storage_migration_done_blank_count": {
         "description": "Duck.ai markMigrationDone was called with a blank key — indicates a JS-side bug",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_duck-ai_native-storage_migration_started": {
+        "description": "Duck.ai native storage: markMigrationDone was called (migration was attempted by the web layer)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_migration_already-done": {
+        "description": "Duck.ai native storage: isMigrationDone returned true (page load found migration already complete)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_migration_error": {
+        "description": "Duck.ai native storage: isMigrationDone or markMigrationDone threw an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-put_error": {
+        "description": "Duck.ai native storage: putEntry or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-get_error": {
+        "description": "Duck.ai native storage: getEntry or getAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_settings-delete_error": {
+        "description": "Duck.ai native storage: deleteEntry, deleteAllEntries, or replaceAllEntries failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-put_error": {
+        "description": "Duck.ai native storage: putChat, putChats, or migrateChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-get_error": {
+        "description": "Duck.ai native storage: getChat or getAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_chat-delete_error": {
+        "description": "Duck.ai native storage: deleteChat or deleteAllChats failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-put_error": {
+        "description": "Duck.ai native storage: putFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-get_error": {
+        "description": "Duck.ai native storage: getFile failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-list_error": {
+        "description": "Duck.ai native storage: listFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
+    },
+    "m_duck-ai_native-storage_file-delete_error": {
+        "description": "Duck.ai native storage: deleteFile, deleteFiles, or deleteAllFiles failed with an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["other"]
     }
 }

@@ -336,6 +336,7 @@ object SubscriptionPixelParameter {
     const val RETURNING_USER = "returning_user"
     const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
     const val SUBSCRIPTION_PROMO_SHOWN = "subscription_promo_shown"
+    const val FREE_TRIAL = "free_trial"
 }
 
 internal val PixelType.pixelNameSuffix: String

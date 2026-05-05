@@ -73,4 +73,10 @@
     <string name="pirDevEmailActions">Actions</string>
     <string name="pirDevRunEmailConfirmation">Run Email Confirmation</string>
     <string name="pirDevFetchLink">Fetch Link</string>
+    <string name="pirDevCustomDashboardUrl">Custom Dashboard URL</string>
+    <string name="pirDevSetCustomUrl">Set Custom URL</string>
+    <string name="pirDevResetCustomUrl">Reset to Default</string>
+    <string name="pirDevCustomUrlSet">Custom dashboard URL set</string>
+    <string name="pirDevCustomUrlReset">Dashboard URL reset to default</string>
+    <string name="pirDevCustomUrlEmpty">URL cannot be empty</string>
 </resources>

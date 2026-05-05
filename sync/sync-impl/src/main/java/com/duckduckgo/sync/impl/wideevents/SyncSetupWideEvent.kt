@@ -46,6 +46,7 @@ interface SyncSetupWideEvent {
     suspend fun onRecoveryCodeShown()
     suspend fun onRecoveryCodeGenerationFailed()
     suspend fun onFlowCancelled()
+    suspend fun onSyncRestoreStarted()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -227,6 +228,14 @@ class SyncSetupWideEventImpl @Inject constructor(
             wideEventId = id,
             status = FlowStatus.Cancelled,
         )
+        cachedFlowId = null
+    }
+
+    override suspend fun onSyncRestoreStarted() {
+        if (!isFeatureEnabled()) return
+        val id = getCurrentWideEventId() ?: return
+
+        wideEventClient.flowAbort(wideEventId = id)
         cachedFlowId = null
     }
 

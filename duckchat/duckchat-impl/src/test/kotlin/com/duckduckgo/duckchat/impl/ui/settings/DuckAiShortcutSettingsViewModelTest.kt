@@ -18,9 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.settings
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -41,22 +39,20 @@ class DuckAiShortcutSettingsViewModelTest {
     private lateinit var testee: DuckAiShortcutSettingsViewModel
 
     private val duckChat: DuckChatInternal = mock()
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
-    private val showVoiceSearchToggleFlow = MutableStateFlow(false)
 
     @Before
     fun setUp() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.observeShowInVoiceSearchUserSetting()).thenReturn(flowOf(false))
-        whenever(duckAiFeatureState.showVoiceSearchToggle).thenReturn(showVoiceSearchToggleFlow)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        whenever(duckChat.observeShowInVoiceChatUserSetting()).thenReturn(flowOf(false))
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
     }
 
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInBrowserMenu)
@@ -66,7 +62,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsDisabledThenEmitDisabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInBrowserMenu)
@@ -76,7 +72,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInAddressBar)
@@ -85,7 +81,7 @@ class DuckAiShortcutSettingsViewModelTest {
 
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsDisabledThenEmitDisabled() = runTest {
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInAddressBar)
@@ -95,7 +91,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInVoiceSearchIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInVoiceSearchUserSetting()).thenReturn(flowOf(true))
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInVoiceSearch)
@@ -104,7 +100,7 @@ class DuckAiShortcutSettingsViewModelTest {
 
     @Test
     fun whenViewModelIsCreatedAndShowInVoiceSearchIsDisabledThenEmitDisabled() = runTest {
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInVoiceSearch)
@@ -114,7 +110,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenAddressBarEntryPointEnabledTogglesShown() = runTest {
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -126,7 +122,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenAddressBarEntryPointDisabledThenToggleHidden() = runTest {
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(false)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -137,7 +133,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEntryPointEnabledThenToggleShown() = runTest {
         whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(true)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -149,7 +145,7 @@ class DuckAiShortcutSettingsViewModelTest {
     @Test
     fun whenVoiceSearchEntryPointDisabledThenToggleHidden() = runTest {
         whenever(duckChat.isVoiceSearchEntryPointEnabled()).thenReturn(false)
-        testee = DuckAiShortcutSettingsViewModel(duckChat, duckAiFeatureState)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -162,5 +158,54 @@ class DuckAiShortcutSettingsViewModelTest {
         testee.onShowDuckChatInVoiceSearchToggled(true)
 
         verify(duckChat).setShowInVoiceSearchUserSetting(true)
+    }
+
+    @Test
+    fun whenViewModelIsCreatedAndShowInVoiceChatIsEnabledThenEmitEnabled() = runTest {
+        whenever(duckChat.observeShowInVoiceChatUserSetting()).thenReturn(flowOf(true))
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().showInVoiceChat)
+        }
+    }
+
+    @Test
+    fun whenViewModelIsCreatedAndShowInVoiceChatIsDisabledThenEmitDisabled() = runTest {
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().showInVoiceChat)
+        }
+    }
+
+    @Test
+    fun whenVoiceChatEntryEnabledThenToggleShown() = runTest {
+        whenever(duckChat.isVoiceChatEntryPointEnabled()).thenReturn(true)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShowVoiceChatToggle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVoiceChatEntryDisabledThenToggleHidden() = runTest {
+        whenever(duckChat.isVoiceChatEntryPointEnabled()).thenReturn(false)
+        testee = DuckAiShortcutSettingsViewModel(duckChat)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.shouldShowVoiceChatToggle)
+        }
+    }
+
+    @Test
+    fun whenOnShowDuckChatInVoiceChatToggledThenCallDuckChatSetShowInVoiceChat() = runTest {
+        testee.onShowDuckChatInVoiceChatToggled(true)
+
+        verify(duckChat).setShowInVoiceChatUserSetting(true)
     }
 }

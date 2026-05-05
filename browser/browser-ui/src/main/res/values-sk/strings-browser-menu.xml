@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Vytlačiť</string>
     <string name="browserMenuOpenAppLink">Otvoriť v aplikácii</string>
     <string name="browserMenuAddToHome">Pridať na domovskú obrazovku</string>
+    <string name="browserMenuDownloadPdf">Stiahnuť PDF</string>
     <string name="browserMenuReportBrokenSite">Nahlásiť nefunkčný web</string>
     <string name="browserMenuAutofill">Heslá</string>
     <string name="browserMenuDownloads">Stiahnuté</string>

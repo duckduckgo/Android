@@ -223,8 +223,10 @@ class ClearPersonalDataAction(
                 shouldClearDuckAiData = true,
             )
 
-            logcat(INFO) { "Finished clearing chats" }
+            logcat(INFO) { "Finished clearing chats (web storage)" }
         }
+
+        logcat(INFO) { "Finished clearing chats" }
     }
 
     override suspend fun clearDataForSpecificDomains(

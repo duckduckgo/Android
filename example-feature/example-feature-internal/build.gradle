@@ -26,7 +26,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(':example-feature-api')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':common-utils')

@@ -141,6 +141,15 @@ jobs:
         run: |
           bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
 
+      - name: Upload AAB as artifact
+        if: failure() && steps.create_app_bundle.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: release-aab
+          path: ${{ steps.capture_output.outputs.bundle_path }}
+          retention-days: 1
+
       - name: Tag Internal Release
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: tag_internal_release

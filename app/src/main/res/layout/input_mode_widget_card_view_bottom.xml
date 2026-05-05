@@ -31,7 +31,7 @@
         app:cardElevation="3dp"
         app:cardUseCompatPadding="false">
 
-        <com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
+        <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
             android:id="@+id/inputModeWidget"
             android:paddingHorizontal="8dp"
             android:layout_width="match_parent"

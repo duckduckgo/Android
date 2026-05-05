@@ -213,7 +213,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
     }
 
     @Test

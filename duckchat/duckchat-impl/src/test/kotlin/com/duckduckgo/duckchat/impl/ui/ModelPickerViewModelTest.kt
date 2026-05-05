@@ -20,8 +20,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -110,7 +112,7 @@ class ModelPickerViewModelTest {
         val sections = testee.buildSections(state)
 
         assertEquals(2, sections.size)
-        assertEquals(R.string.duckAiModelPickerPremiumModels, sections[1].headerRes)
+        assertNull(sections[1].headerRes)
         assertEquals(listOf("id2"), sections[1].models.map { it.id })
     }
 
@@ -137,7 +139,7 @@ class ModelPickerViewModelTest {
         val sections = testee.buildSections(state)
 
         assertEquals(1, sections.size)
-        assertEquals(R.string.duckAiModelPickerPremiumModels, sections[0].headerRes)
+        assertNull(sections[0].headerRes)
     }
 
     @Test
@@ -211,13 +213,56 @@ class ModelPickerViewModelTest {
         assertTrue(sections.isEmpty())
     }
 
-    private fun freeModel(id: String, shortName: String) = AIChatModel(
+    @Test
+    fun whenModelProviderIsAnthropicThenClaudeIcon() {
+        val model = freeModel(id = "claude-3-haiku", shortName = "Claude", provider = ModelProvider.ANTHROPIC)
+
+        assertEquals(R.drawable.ic_ai_model_claude_16, testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenModelProviderIsOpenAiThenOpenAiIcon() {
+        val model = freeModel(id = "gpt-5-mini", shortName = "GPT 5 mini", provider = ModelProvider.OPENAI)
+
+        assertEquals(R.drawable.ic_ai_model_openai_16, testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenModelProviderIsMistralThenMistralIcon() {
+        val model = freeModel(id = "mistralai/Mistral-Small", shortName = "Mistral Small", provider = ModelProvider.MISTRAL)
+
+        assertEquals(R.drawable.ic_ai_model_mistral_16, testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenModelProviderIsMetaThenLlamaIcon() {
+        val model = freeModel(id = "meta-llama/Llama-3", shortName = "Llama 3", provider = ModelProvider.META)
+
+        assertEquals(R.drawable.ic_ai_model_llama_16, testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenModelProviderIsOssThenOssIcon() {
+        val model = freeModel(id = "openai/gpt-oss-120b", shortName = "GPT-OSS", provider = ModelProvider.OSS)
+
+        assertEquals(R.drawable.ic_ai_model_oss_16, testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenModelProviderIsUnknownThenNoIcon() {
+        val model = freeModel(id = "some-other-model", shortName = "Other", provider = ModelProvider.UNKNOWN)
+
+        assertNull(testee.getIconResForModel(model))
+    }
+
+    private fun freeModel(id: String, shortName: String, provider: ModelProvider = ModelProvider.UNKNOWN) = AIChatModel(
         id = id,
         name = id,
         displayName = id,
         shortName = shortName,
         accessTier = listOf("free"),
         isAccessible = true,
+        provider = provider,
     )
 
     private fun premiumModel(id: String, shortName: String) = AIChatModel(

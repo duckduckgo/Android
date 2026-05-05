@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [DuckAiBridgeChatEntity::class, DuckAiBridgeSettingEntity::class, DuckAiBridgeFileMetaEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class DuckAiBridgeDatabase : RoomDatabase() {
@@ -39,6 +39,13 @@ abstract class DuckAiBridgeDatabase : RoomDatabase() {
                         "(`uuid` TEXT NOT NULL, `chatId` TEXT NOT NULL, " +
                         "`fileName` TEXT NOT NULL, `mimeType` TEXT NOT NULL, " +
                         "PRIMARY KEY(`uuid`))",
+                )
+            }
+        }
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_duck_ai_file_meta_chatId` ON `duck_ai_file_meta` (`chatId`)",
                 )
             }
         }

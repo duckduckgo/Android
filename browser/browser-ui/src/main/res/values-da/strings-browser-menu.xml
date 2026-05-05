@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Print</string>
     <string name="browserMenuOpenAppLink">Åbn i app</string>
     <string name="browserMenuAddToHome">Tilføj til startskærm</string>
+    <string name="browserMenuDownloadPdf">Download PDF-fil</string>
     <string name="browserMenuReportBrokenSite">Rapporter ødelagt websted</string>
     <string name="browserMenuAutofill">Adgangskoder</string>
     <string name="browserMenuDownloads">Downloads</string>

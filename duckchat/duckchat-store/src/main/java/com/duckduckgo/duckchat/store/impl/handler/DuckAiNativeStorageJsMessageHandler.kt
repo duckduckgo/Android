@@ -62,11 +62,11 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                 "getEntry", "putEntry", "getAllEntries", "replaceAllEntries", "deleteEntry", "deleteAllEntries",
                 // Chats
                 "migrateChats", // will replace putChats
-                "getAllChats", "putChat", "putChats", "deleteChat", "deleteAllChats",
+                "getChat", "getAllChats", "putChat", "putChats", "deleteChat", "deleteAllChats",
                 // Migration
                 "isMigrationDone", "markMigrationDone",
                 // Images
-                "getFile", "putFile", "deleteFile", "deleteAllFiles", "listFiles",
+                "getFile", "putFile", "deleteFile", "deleteFiles", "deleteAllFiles", "listFiles",
             )
 
             // Runs on the JavaBridge thread — DAO/file I/O are safe here.
@@ -75,16 +75,30 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     // --- Entries ---
                     "getEntry" -> {
                         val key = jsMessage.params.optString("key")
-                        val value = if (key.isBlank()) null else settingsDao.get(key)?.value
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = JSONObject().put("value", value ?: JSONObject.NULL),
-                                ),
-                            )
+                        try {
+                            val value = if (key.isBlank()) null else settingsDao.get(key)?.value
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("value", value ?: JSONObject.NULL),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportSettingsGetError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("value", JSONObject.NULL),
+                                    ),
+                                )
+                            }
                         }
                     }
                     "putEntry" -> {
@@ -92,21 +106,39 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val value = jsMessage.params.optString("value")
                         if (key.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: putEntry key=$key value=${value.take(80)}" }
-                            settingsDao.upsert(DuckAiBridgeSettingEntity(key = key, value = value))
+                            try {
+                                settingsDao.upsert(DuckAiBridgeSettingEntity(key = key, value = value))
+                            } catch (e: Exception) {
+                                pixels.reportSettingsPutError()
+                            }
                         }
                     }
                     "getAllEntries" -> {
-                        val obj = JSONObject()
-                        settingsDao.getAll().forEach { obj.put(it.key, it.value) }
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = JSONObject().put("entries", obj),
-                                ),
-                            )
+                        try {
+                            val obj = JSONObject()
+                            settingsDao.getAll().forEach { obj.put(it.key, it.value) }
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("entries", obj),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportSettingsGetError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("entries", JSONObject()),
+                                    ),
+                                )
+                            }
                         }
                     }
                     "replaceAllEntries" -> {
@@ -116,7 +148,11 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                             .toList()
                         if (entities.isNotEmpty()) {
                             logcat { "DuckAiNativeStorage: replaceAllEntries count=${entities.size}" }
-                            settingsDao.replaceAll(entities)
+                            try {
+                                settingsDao.replaceAll(entities)
+                            } catch (e: Exception) {
+                                pixels.reportSettingsPutError()
+                            }
                         } else {
                             logcat { "DuckAiNativeStorage: trying to replaceAllEntries with empty list, no-op" }
                         }
@@ -125,78 +161,157 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val key = jsMessage.params.optString("key")
                         if (key.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: deleteEntry key=$key" }
-                            settingsDao.delete(key)
+                            try {
+                                settingsDao.delete(key)
+                            } catch (e: Exception) {
+                                pixels.reportSettingsDeleteError()
+                            }
                         }
                     }
                     "deleteAllEntries" -> {
                         logcat { "DuckAiNativeStorage: deleteAllEntries" }
-                        settingsDao.deleteAll()
+                        try {
+                            settingsDao.deleteAll()
+                        } catch (e: Exception) {
+                            pixels.reportSettingsDeleteError()
+                        }
                     }
 
                     // --- Chats ---
+                    "getChat" -> {
+                        val chatId = jsMessage.params.optString("chatId")
+                        logcat { "DuckAiNativeStorage: getChat $chatId" }
+                        try {
+                            val chat = if (chatId.isNotBlank()) chatsDao.getById(chatId) else null
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put(
+                                            "chat",
+                                            chat?.let { runCatching { JSONObject(it.data) }.getOrNull() } ?: JSONObject.NULL,
+                                        ),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportChatGetError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("chat", JSONObject.NULL),
+                                    ),
+                                )
+                            }
+                        }
+                    }
                     "getAllChats" -> {
-                        val array = JSONArray()
-                        chatsDao.getAll().forEach { array.put(JSONObject(it.data)) }
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = JSONObject().put("chats", array),
-                                ),
-                            )
+                        try {
+                            val array = JSONArray()
+                            logcat { "DuckAiNativeStorage: getAllChats" }
+                            chatsDao.getAll().forEach { array.put(JSONObject(it.data)) }
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("chats", array),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportChatGetError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("chats", JSONArray()),
+                                    ),
+                                )
+                            }
                         }
                     }
                     "putChat" -> {
                         val chatId = jsMessage.params.optString("chatId")
                         val dataObj = jsMessage.params.optJSONObject("data") ?: return
+                        logcat { "DuckAiNativeStorage: putChat $chatId" }
                         if (chatId.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: putChat chatId=$chatId" }
-                            chatsDao.upsert(DuckAiBridgeChatEntity(chatId = chatId, data = dataObj.toString()))
+                            try {
+                                chatsDao.upsert(DuckAiBridgeChatEntity(chatId = chatId, data = dataObj.toString()))
+                            } catch (e: Exception) {
+                                pixels.reportChatPutError()
+                            }
                         }
                     }
                     "putChats", "migrateChats" -> {
                         val array = jsMessage.params.optJSONArray("chats") ?: return
-                        val entities = (0 until array.length()).mapNotNull { i ->
-                            val obj = array.optJSONObject(i) ?: return@mapNotNull null
-                            val chatId = obj.optString("chatId")
-                            val dataObj = obj.optJSONObject("data") ?: return@mapNotNull null
-                            if (chatId.isBlank()) {
-                                null
-                            } else {
-                                DuckAiBridgeChatEntity(chatId = chatId, data = dataObj.toString())
+                        logcat { "DuckAiNativeStorage: putChats $array" }
+                        try {
+                            val entities = (0 until array.length()).mapNotNull { i ->
+                                val obj = array.optJSONObject(i) ?: return@mapNotNull null
+                                val chatId = obj.optString("chatId")
+                                val dataObj = obj.optJSONObject("data") ?: return@mapNotNull null
+                                if (chatId.isBlank()) {
+                                    null
+                                } else {
+                                    DuckAiBridgeChatEntity(chatId = chatId, data = dataObj.toString())
+                                }
                             }
-                        }
-                        logcat { "DuckAiNativeStorage: ${jsMessage.method} count=${entities.size}" }
-                        if (entities.isNotEmpty()) chatsDao.upsertAll(entities)
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = JSONObject().put("success", true),
-                                ),
-                            )
+                            logcat { "DuckAiNativeStorage: ${jsMessage.method} count=${entities.size}" }
+                            if (entities.isNotEmpty()) chatsDao.upsertAll(entities)
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("success", true),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportChatPutError()
                         }
                     }
                     "deleteChat" -> {
                         val chatId = jsMessage.params.optString("chatId")
                         if (chatId.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: deleteChat chatId=$chatId" }
-                            chatsDao.delete(chatId)
+                            try {
+                                chatsDao.delete(chatId)
+                            } catch (e: Exception) {
+                                pixels.reportChatDeleteError()
+                            }
                         }
                     }
                     "deleteAllChats" -> {
                         logcat { "DuckAiNativeStorage: deleteAllChats" }
-                        chatsDao.deleteAll()
+                        try {
+                            chatsDao.deleteAll()
+                        } catch (e: Exception) {
+                            pixels.reportChatDeleteError()
+                        }
                     }
 
                     // --- Migration ---
                     "isMigrationDone" -> {
                         val key = jsMessage.params.optString("key")
-                        val done = if (key.isNotBlank()) migrationPrefs.isMigrationDone(key) else false
+                        val done = try {
+                            if (key.isNotBlank()) migrationPrefs.isMigrationDone(key) else false
+                        } catch (e: Exception) {
+                            pixels.reportMigrationError()
+                            false
+                        }
+                        if (done) pixels.reportMigrationAlreadyDone()
                         logcat { "DuckAiNativeStorage: isMigrationDone key=$key / done=$done" }
                         jsMessage.id?.let { id ->
                             jsMessaging.onResponse(
@@ -213,8 +328,13 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         val key = jsMessage.params.optString("key")
                         if (key.isNotBlank()) {
                             logcat { "DuckAiNativeStorage: markMigrationDone key=$key" }
-                            migrationPrefs.markMigrationDone(key)
-                            pixels.reportMigrationDone(key)
+                            try {
+                                migrationPrefs.markMigrationDone(key)
+                                pixels.reportMigrationDone(key)
+                                pixels.reportMigrationStarted()
+                            } catch (e: Exception) {
+                                pixels.reportMigrationError()
+                            }
                         } else {
                             pixels.reportMigrationDoneBlankKey()
                         }
@@ -223,23 +343,38 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     // --- Files ---
                     "getFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
-                        val json = if (isValidUuid(uuid)) {
-                            val file = File(filesDir, uuid)
-                            if (file.exists()) file.readText() else null
-                        } else {
-                            null
-                        }
-                        jsMessage.id?.let { id ->
-                            val params = json?.let { runCatching { JSONObject(it) }.getOrNull() }
-                                ?: JSONObject().put("value", JSONObject.NULL)
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = params,
-                                ),
-                            )
+                        logcat { "DuckAiNativeStorage: getFile $uuid" }
+                        try {
+                            val json = if (isValidUuid(uuid)) {
+                                val file = File(filesDir, uuid)
+                                if (file.exists()) file.readText() else null
+                            } else {
+                                null
+                            }
+                            jsMessage.id?.let { id ->
+                                val params = json?.let { runCatching { JSONObject(it) }.getOrNull() }
+                                    ?: JSONObject().put("value", JSONObject.NULL)
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = params,
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportFileGetError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("value", JSONObject.NULL),
+                                    ),
+                                )
+                            }
                         }
                     }
                     "putFile" -> {
@@ -247,52 +382,95 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         if (isValidUuid(uuid)) {
                             val sizeBytes = jsMessage.params.toString().length
                             logcat { "DuckAiNativeStorage: putFile uuid=$uuid size=${sizeBytes}B" }
-                            fileMetaDao.upsert(
-                                DuckAiBridgeFileMetaEntity(
-                                    uuid = uuid,
-                                    chatId = jsMessage.params.optString("chatId"),
-                                    fileName = jsMessage.params.optString("fileName"),
-                                    mimeType = jsMessage.params.optString("mimeType"),
-                                ),
-                            )
-                            filesDir.mkdirs()
-                            File(filesDir, uuid).writeText(jsMessage.params.toString())
+                            try {
+                                fileMetaDao.upsert(
+                                    DuckAiBridgeFileMetaEntity(
+                                        uuid = uuid,
+                                        chatId = jsMessage.params.optString("chatId"),
+                                        fileName = jsMessage.params.optString("fileName"),
+                                        mimeType = jsMessage.params.optString("mimeType"),
+                                    ),
+                                )
+                                filesDir.mkdirs()
+                                File(filesDir, uuid).writeText(jsMessage.params.toString())
+                            } catch (e: Exception) {
+                                pixels.reportFilePutError()
+                            }
                         }
                     }
                     "deleteFile" -> {
                         val uuid = jsMessage.params.optString("uuid")
+                        logcat { "DuckAiNativeStorage: deleteFile $uuid" }
                         if (isValidUuid(uuid)) {
                             logcat { "DuckAiNativeStorage: deleteFile uuid=$uuid" }
-                            File(filesDir, uuid).delete()
-                            fileMetaDao.delete(uuid)
+                            try {
+                                File(filesDir, uuid).delete()
+                                fileMetaDao.delete(uuid)
+                            } catch (e: Exception) {
+                                pixels.reportFileDeleteError()
+                            }
+                        }
+                    }
+                    "deleteFiles" -> {
+                        val chatId = jsMessage.params.optString("chatId")
+                        logcat { "DuckAiNativeStorage: deleteFiles for chat $chatId" }
+                        if (chatId.isNotBlank()) {
+                            logcat { "DuckAiNativeStorage: deleteFiles chatId=$chatId" }
+                            try {
+                                fileMetaDao.getByChatId(chatId).forEach { meta ->
+                                    if (isValidUuid(meta.uuid)) File(filesDir, meta.uuid).delete()
+                                }
+                                fileMetaDao.deleteByChatId(chatId)
+                            } catch (e: Exception) {
+                                pixels.reportFileDeleteError()
+                            }
                         }
                     }
                     "deleteAllFiles" -> {
                         logcat { "DuckAiNativeStorage: deleteAllFiles" }
-                        filesDir.listFiles()?.filter { isValidUuid(it.name) }?.forEach { it.delete() }
-                        fileMetaDao.deleteAll()
+                        try {
+                            filesDir.listFiles()?.filter { isValidUuid(it.name) }?.forEach { it.delete() }
+                            fileMetaDao.deleteAll()
+                        } catch (e: Exception) {
+                            pixels.reportFileDeleteError()
+                        }
                     }
                     "listFiles" -> {
-                        val array = JSONArray()
-                        fileMetaDao.getAll().forEach { meta ->
-                            array.put(
-                                JSONObject()
-                                    .put("uuid", meta.uuid)
-                                    .put("chatId", meta.chatId)
-                                    .put("fileName", meta.fileName)
-                                    .put("mimeType", meta.mimeType)
-                                    .put("dataSize", File(filesDir, meta.uuid).length()),
-                            )
-                        }
-                        jsMessage.id?.let { id ->
-                            jsMessaging.onResponse(
-                                JsCallbackData(
-                                    featureName = featureName,
-                                    method = jsMessage.method,
-                                    id = id,
-                                    params = JSONObject().put("files", array),
-                                ),
-                            )
+                        logcat { "DuckAiNativeStorage: listFiles" }
+                        try {
+                            val array = JSONArray()
+                            fileMetaDao.getAll().forEach { meta ->
+                                array.put(
+                                    JSONObject()
+                                        .put("uuid", meta.uuid)
+                                        .put("chatId", meta.chatId)
+                                        .put("fileName", meta.fileName)
+                                        .put("mimeType", meta.mimeType)
+                                        .put("dataSize", File(filesDir, meta.uuid).length()),
+                                )
+                            }
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("files", array),
+                                    ),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            pixels.reportFileListError()
+                            jsMessage.id?.let { id ->
+                                jsMessaging.onResponse(
+                                    JsCallbackData(
+                                        featureName = featureName,
+                                        method = jsMessage.method,
+                                        id = id,
+                                        params = JSONObject().put("files", JSONArray()),
+                                    ),
+                                )
+                            }
                         }
                     }
                 }

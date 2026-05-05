@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,6 +43,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -87,6 +89,8 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val appTheme: AppTheme,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -105,6 +109,11 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+
+    private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
+        onboardingBrandDesignUpdateToggles.self().isEnabled() &&
+            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+    }
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
@@ -153,7 +162,7 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
-            if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is SubscriptionPromoModalCta) {
+            if (cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
         }
@@ -252,26 +261,47 @@ class CtaViewModel @Inject constructor(
 
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                } else {
+                    DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                }
             }
 
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                } else {
+                    DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                }
             }
 
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
 
             // Subscription onboarding
             canShowSubscriptionCta() -> {
-                DaxBubbleCta.DaxSubscriptionCta(
-                    onboardingStore,
-                    appInstallStore,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                )
+                if (isBrandDesignUpdateEnabled()) {
+                    DaxSubscriptionBrandDesignUpdateBubbleCta(
+                        onboardingStore,
+                        appInstallStore,
+                        appTheme.isLightModeEnabled(),
+                        isFreeTrialCopy = freeTrialCopyAvailable(),
+                    )
+                } else {
+                    DaxBubbleCta.DaxSubscriptionCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isFreeTrialCopy = freeTrialCopyAvailable(),
+                    )
+                }
             }
 
             // Subscription onboarding for returning users who skipped onboarding
