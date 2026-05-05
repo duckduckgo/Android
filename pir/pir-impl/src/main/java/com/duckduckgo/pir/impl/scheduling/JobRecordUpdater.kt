@@ -125,7 +125,9 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt has been successfully completed.
      * It updates the corresponding all necessary attributes to mark the [OptOutJobRecord] as
-     * requested.
+     * requested. Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call,
+     * leaving it untouched on subsequent retries so that it always reflects the first
+     * successful form submission.
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      */
@@ -147,6 +149,8 @@ interface JobRecordUpdater {
      *
      * This method should be called when the opt-out attempt requires email confirmation.
      * Ir updates the [OptOutJobStatus] accordingly and also creates a corresponding [EmailConfirmationJobRecord].
+     * Also stamps [OptOutJobRecord.optOutFormSubmittedDateInMillis] on first call (this represents
+     * the form-submission moment for email-confirming brokers).
      *
      * @param extractedProfileId The id stored in our database for the [ExtractedProfile]
      * @param profileQueryId  The ID of the [ProfileQuery] related to the scan job.
@@ -415,9 +419,11 @@ class RealJobRecordUpdater @Inject constructor(
     override suspend fun updateOptOutRequested(extractedProfileId: Long): OptOutJobRecord? {
         return withContext(dispatcherProvider.io()) {
             schedulingRepository.getValidOptOutJobRecord(extractedProfileId)?.also {
+                val now = currentTimeProvider.currentTimeMillis()
                 val updatedRecord = it.copy(
                     status = OptOutJobStatus.REQUESTED,
-                    optOutRequestedDateInMillis = currentTimeProvider.currentTimeMillis(),
+                    optOutRequestedDateInMillis = now,
+                    optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: now,
                 )
                 schedulingRepository.saveOptOutJobRecord(updatedRecord)
 
@@ -466,6 +472,7 @@ class RealJobRecordUpdater @Inject constructor(
                 it
                     .copy(
                         status = OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                        optOutFormSubmittedDateInMillis = it.optOutFormSubmittedDateInMillis ?: currentTimeProvider.currentTimeMillis(),
                     ).also {
                         logcat { "PIR-JOB-RECORD: Updating OptOutRecord for $extractedProfileId to $it" }
                     },
