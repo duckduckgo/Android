@@ -21,6 +21,7 @@ import android.content.Intent
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
 import com.duckduckgo.daxprompts.api.LaunchSource
@@ -59,6 +60,7 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
     private val reactivateUsersToggles: ReactivateUsersToggles,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : ModalEvaluator, ReEngagementPromptEvaluator {
 
     override val priority: Int = 2
@@ -86,11 +88,13 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     private fun isEnabled() = reactivateUsersToggles.self().isEnabled() && reactivateUsersToggles.browserComparisonPrompt().isEnabled()
 
     private suspend fun isEligible(): Boolean {
-        if (daysSinceInstall() < EXISTING_USER_DAY_COUNT_THRESHOLD) {
+        val now = currentTimeProvider.currentTimeMillis()
+
+        if (daysSinceInstall(now) < EXISTING_USER_DAY_COUNT_THRESHOLD) {
             return false
         }
 
-        val sevenDaysAgo = Date(Date().time - EXISTING_USER_DAYS_INACTIVE_MILLIS)
+        val sevenDaysAgo = Date(now - EXISTING_USER_DAYS_INACTIVE_MILLIS)
         if (userBrowserProperties.daysUsedSince(sevenDaysAgo) > MAX_DAYS_USED_IN_INACTIVE_WINDOW) {
             return false
         }
@@ -100,10 +104,10 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
         return !daxPromptsRepository.getDaxPromptsBrowserComparisonShown()
     }
 
-    private fun daysSinceInstall(): Long {
+    private fun daysSinceInstall(nowMillis: Long): Long {
         val firstInstallTime = applicationContext.packageManager
             .getPackageInfo(applicationContext.packageName, 0).firstInstallTime
-        return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstInstallTime)
+        return TimeUnit.MILLISECONDS.toDays(nowMillis - firstInstallTime)
     }
 
     companion object {
