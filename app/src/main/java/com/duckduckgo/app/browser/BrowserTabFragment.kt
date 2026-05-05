@@ -1346,6 +1346,7 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+                onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -5497,6 +5498,11 @@ class BrowserTabFragment :
         }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
+            // Chat tab owns rendering its autoCompleteSuggestionsList.
+            if (nativeInputManager.isChatTabSelected()) {
+                lastSeenAutoCompleteViewState = null
+                return
+            }
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
