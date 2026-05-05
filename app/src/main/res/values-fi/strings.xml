@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Haluatko palauttaa kirjanmerkit, salasanat ja muita tietoja edellisestä DuckDuckGo-synkronoinnistasi?</string>
     <string name="syncRestoreDialogPrimaryCta">Palauta tiedot</string>
     <string name="syncRestoreDialogSecondaryCta">Ohita</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopioi linkin teksti</string>
+    <string name="linkTextCopied">Linkin teksti kopioitu</string>
+    <string name="linkTextCopyFailed">Linkin tekstin kopiointi epäonnistui</string>
 </resources>

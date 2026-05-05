@@ -24,12 +24,12 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckplayer-api")
     implementation project(':feature-toggles-api')
     implementation project(':common-utils')
     implementation project(':browser-api')
 
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(':design-system')

@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Imprimir</string>
     <string name="browserMenuOpenAppLink">Abrir na app</string>
     <string name="browserMenuAddToHome">Adicionar à Página Inicial</string>
+    <string name="browserMenuDownloadPdf">Descarregar PDF</string>
     <string name="browserMenuReportBrokenSite">Denunciar site danificado</string>
     <string name="browserMenuAutofill">Palavras-passe</string>
     <string name="browserMenuDownloads">Transferências</string>

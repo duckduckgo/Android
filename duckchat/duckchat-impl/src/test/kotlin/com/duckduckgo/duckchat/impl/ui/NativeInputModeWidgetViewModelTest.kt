@@ -16,14 +16,19 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.content.Context
+import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +37,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -65,6 +71,11 @@ class NativeInputModeWidgetViewModelTest {
     private val chatSuggestionsUserEnabledFlow = MutableStateFlow(true)
     private val entitlementsFlow = MutableStateFlow<List<Product>>(emptyList())
 
+    private var fakePlugins: List<NativeInputPlugin> = emptyList()
+    private val fakePluginPoint = object : ActivePluginPoint<NativeInputPlugin> {
+        override suspend fun getPlugins(): Collection<NativeInputPlugin> = fakePlugins
+    }
+
     private lateinit var testee: NativeInputModeWidgetViewModel
 
     @Before
@@ -76,12 +87,18 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
 
-        testee = NativeInputModeWidgetViewModel(
+        testee = createViewModel()
+    }
+
+    private fun createViewModel(plugins: List<NativeInputPlugin> = emptyList()): NativeInputModeWidgetViewModel {
+        fakePlugins = plugins
+        return NativeInputModeWidgetViewModel(
             duckChatInternal = duckChatInternal,
             duckAiFeatureState = duckAiFeatureState,
             subscriptions = subscriptions,
             pendingNativePromptStore = pendingNativePromptStore,
             chatSuggestionsReader = chatSuggestionsReader,
+            nativeInputPlugins = fakePluginPoint,
         )
     }
 
@@ -95,13 +112,7 @@ class NativeInputModeWidgetViewModelTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
 
-        val freshTestee = NativeInputModeWidgetViewModel(
-            duckChatInternal = duckChatInternal,
-            duckAiFeatureState = duckAiFeatureState,
-            subscriptions = subscriptions,
-            pendingNativePromptStore = pendingNativePromptStore,
-            chatSuggestionsReader = chatSuggestionsReader,
-        )
+        val freshTestee = createViewModel()
 
         assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, freshTestee.state.firstOrNull()!!.inputMode)
     }
@@ -193,6 +204,38 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleVisible() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        testee.setDuckAiMode(true)
+
+        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
+    }
+
+    @Test
+    fun whenConfigureContextualThenContextIsDuckAiContextual() = runTest {
+        testee.configureContextual()
+
+        assertEquals(NativeInputState.InputContext.DUCK_AI_CONTEXTUAL, testee.state.firstOrNull()!!.inputContext)
+    }
+
+    @Test
+    fun whenContextIsDuckAiContextualAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+        testee.configureContextual()
+
+        assertFalse(testee.state.firstOrNull()!!.toggleVisible)
+    }
+
+    @Test
+    fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
+        testee.configureContextual()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
+    }
+
+    @Test
     fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
@@ -256,10 +299,22 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenStorePendingPromptThenDelegatesToStore() {
-        testee.storePendingPrompt("hello", "model-1")
+    fun whenStorePendingPromptThenDelegatesToStoreWithModelId() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "model-1")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.storePendingPrompt("hello")
 
         verify(pendingNativePromptStore).store("hello", "model-1")
+    }
+
+    @Test
+    fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello")
+
+        verify(pendingNativePromptStore).store("hello", null)
     }
 
     @Test
@@ -371,5 +426,68 @@ class NativeInputModeWidgetViewModelTest {
         testee.fetchChatSuggestions("hello world")
 
         verify(chatSuggestionsReader).fetchSuggestions("hello world")
+    }
+
+    @Test
+    fun whenNoPluginsThenPluginsStateIsEmpty() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        assertTrue(viewModel.plugins.value.isEmpty())
+    }
+
+    @Test
+    fun whenPluginsExistThenPluginsStateContainsThem() = runTest {
+        val plugin = fakePlugin(containerId = 42, modelId = "gpt-4o")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        val plugins = viewModel.plugins.value
+        assertEquals(1, plugins.size)
+        assertEquals(42, plugins[0].containerId)
+    }
+
+    @Test
+    fun whenNoPluginsThenGetSelectedModelIdReturnsNull() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPluginReturnsModelSelectionThenGetSelectedModelIdReturnsIt() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertEquals("claude-3", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPluginReturnsNullContributionThenGetSelectedModelIdReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = null)
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
+        val plugin = fakePlugin(containerId = 99, modelId = null)
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.updatePluginContainerVisibility(isChatTab = true)
+
+        val command = viewModel.commands.firstOrNull()
+        assertTrue(command is NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility)
+        val update = command as NativeInputModeWidgetViewModel.Command.UpdatePluginVisibility
+        assertEquals(listOf(99), update.containerIds)
+        assertTrue(update.visible)
+    }
+
+    private fun fakePlugin(containerId: Int, modelId: String?): NativeInputPlugin {
+        return object : NativeInputPlugin {
+            override val containerId: Int = containerId
+            override fun createView(context: Context): View = View(context)
+            override fun getPromptContribution(): PromptContribution? =
+                modelId?.let { PromptContribution.ModelSelection(it) }
+        }
     }
 }

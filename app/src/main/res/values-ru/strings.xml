@@ -1023,4 +1023,9 @@
     <string name="syncRestoreDialogDescription">Восстановить закладки, пароли и другие данные из предыдущей синхронизации DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
     <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Скопировать текст ссылки</string>
+    <string name="linkTextCopied">Текст ссылки скопирован</string>
+    <string name="linkTextCopyFailed">Не удалось скопировать текст ссылки</string>
 </resources>

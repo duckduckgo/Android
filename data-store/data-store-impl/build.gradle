@@ -27,7 +27,7 @@ dependencies {
 	implementation project(":data-store-api")
 	implementation project(":anrs-api")
 
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':common-utils')
     implementation project(':di')
@@ -51,7 +51,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

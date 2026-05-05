@@ -9,6 +9,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -24,10 +25,15 @@ class SerpPromoTest {
 
     private val cookieManager: CookieManagerWrapper = mock()
     private val subscriptions: Subscriptions = mock()
-    private val lifecycleOwner: LifecycleOwner = TestLifecycleOwner()
+    private lateinit var lifecycleOwner: LifecycleOwner
     private var subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private val serpPromo = RealSerpPromo(cookieManager, coroutineRule.testDispatcherProvider, { subscriptionsFeature }, { subscriptions })
+
+    @Before
+    fun setup() {
+        lifecycleOwner = TestLifecycleOwner()
+    }
 
     @Test
     fun whenInjectCookieThenSetCookie() = runTest {

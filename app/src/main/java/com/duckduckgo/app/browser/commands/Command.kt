@@ -27,6 +27,7 @@ import android.webkit.ValueCallback
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -515,4 +516,13 @@ sealed class Command {
         val tabId: String,
         val pageContext: String,
     ) : Command()
+
+    data class ShowToast(@param:StringRes val textResId: Int) : Command()
+
+    data class ShowPdfInTab(
+        val url: String,
+        val cachedFileUri: Uri,
+    ) : Command()
+
+    data object ExpandOmnibar : Command()
 }

@@ -77,9 +77,12 @@
             "error",
             {
                 "key": "key",
-                "description": "The name of the key that failed to update",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that failed to update",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -117,9 +120,12 @@
             "error",
             {
                 "key": "key",
-                "description": "The name of the key that failed to update in Harmony",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that failed to update in Harmony",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -157,9 +163,12 @@
             "error",
             {
                 "key": "key",
-                "description": "The name of the key that failed to read from Harmony",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that failed to read from Harmony",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -197,9 +206,12 @@
             "error",
             {
                 "key": "key",
-                "description": "The name of the key that failed to read from legacy",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that failed to read from legacy",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -236,9 +248,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key whose value failed to decode from legacy",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) whose value failed to decode from legacy",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -275,9 +290,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key whose value failed to decode from Harmony",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) whose value failed to decode from Harmony",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -314,9 +332,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key that has a mismatch between Harmony and legacy",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that has a mismatch between Harmony and legacy",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -353,9 +374,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key that is missing from Harmony",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that is missing from Harmony",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -392,9 +416,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key that is missing from legacy preferences",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that is missing from legacy preferences",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -431,9 +458,12 @@
             "appVersion",
             {
                 "key": "key",
-                "description": "The name of the key that already exists and was protected from overwrite",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that already exists and was protected from overwrite",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",
@@ -461,6 +491,13 @@
             }
         ]
     },
+    "autofill_device_capability_secure_storage_unavailable_daily": {
+        "description": "Fired when secure storage is unavailable for autofill on app start (daily)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "autofill_harmony_update_key_rollback_failed": {
         "description": "Rolling back legacy key write after Harmony write failure also failed (daily unique)",
         "owners": ["CrisBarreiro"],
@@ -471,9 +508,12 @@
             "error",
             {
                 "key": "key",
-                "description": "The name of the key that failed to rollback",
-                "type": "string",
-                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                "description": "The name of the key(s) that failed to rollback",
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+                }
             },
             {
                 "key": "useHarmony",

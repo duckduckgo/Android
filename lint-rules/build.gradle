@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
 dependencies {
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
@@ -33,7 +35,7 @@ java {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 // Force Kotlin 1.9.0 compatibility for lint-rules module

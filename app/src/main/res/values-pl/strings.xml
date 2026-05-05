@@ -1023,4 +1023,9 @@
     <string name="syncRestoreDialogDescription">Chcesz przywrócić zakładki, hasła i nie tylko z poprzedniej synchronizacji DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Przywróć moje dane</string>
     <string name="syncRestoreDialogSecondaryCta">Pomiń</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopiuj tekst linku</string>
+    <string name="linkTextCopied">Skopiowano tekst linku</string>
+    <string name="linkTextCopyFailed">Nie udało się skopiować tekstu linku</string>
 </resources>

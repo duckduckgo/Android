@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Szeretnéd visszaállítani a könyvjelzőidet, a jelszavaidat és az egyéb dolgokat az előző DuckDuckGo-szinkronizálásból?</string>
     <string name="syncRestoreDialogPrimaryCta">Saját adataim visszaállítása</string>
     <string name="syncRestoreDialogSecondaryCta">Kihagyás</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Link szövegének másolása</string>
+    <string name="linkTextCopied">Link szövege másolva</string>
+    <string name="linkTextCopyFailed">Nem sikerült másolni a link szövegét</string>
 </resources>

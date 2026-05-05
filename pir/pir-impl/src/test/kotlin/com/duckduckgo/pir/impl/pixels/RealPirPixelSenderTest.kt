@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +47,15 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
-        testee.reportManualScanStarted(isPowerSavingEnabled = true, profileQueryCount = 3, brokerCount = 10)
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
+        testee.reportManualScanStarted(
+            isPowerSavingEnabled = true,
+            profileQueryCount = 3,
+            brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender, times(2)).fire(
@@ -62,13 +71,52 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
         assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
+    }
+
+    @Test
+    fun whenReportManualScanStartedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
+        testee.reportManualScanStarted(
+            isPowerSavingEnabled = false,
+            profileQueryCount = 1,
+            brokerCount = 5,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender, times(2)).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 
     @Test
     fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         val totalTimeInMillis = 12345L
 
-        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false, totalScanJobs = 5, totalOptOutJobs = 3)
+        testee.reportManualScanCompleted(
+            totalTimeInMillis,
+            batteryOptimizationsEnabled = false,
+            totalScanJobs = 5,
+            totalOptOutJobs = 3,
+            profileQueryCount = 3,
+            brokerCount = 10,
+            isPowerSavingEnabled = true,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -86,6 +134,44 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["total_scan"] == "5")
         assert(paramsCaptor.firstValue.containsKey("total_optout"))
         assert(paramsCaptor.firstValue["total_optout"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue.containsKey("power_saving"))
+        assert(paramsCaptor.firstValue["power_saving"] == "true")
+        assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
+    }
+
+    @Test
+    fun whenReportManualScanCompletedWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
+        testee.reportManualScanCompleted(
+            totalTimeInMillis = 1L,
+            batteryOptimizationsEnabled = false,
+            totalScanJobs = 0,
+            totalOptOutJobs = 0,
+            profileQueryCount = 0,
+            brokerCount = 0,
+            isPowerSavingEnabled = false,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 
     @Test
@@ -104,7 +190,7 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportManualScanLowMemoryThenEnqueuesPixelWithMemoryLevel() = runTest {
+    fun whenReportManualScanLowMemoryThenEnqueuesCorrectPixel() = runTest {
         testee.reportManualScanLowMemory()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -114,6 +200,8 @@ class RealPirPixelSenderTest {
             encodedParameters = any(),
             type = any(),
         )
+
+        assert(paramsCaptor.firstValue.isEmpty())
     }
 
     @Test
@@ -133,7 +221,10 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScheduledScanStartedThenFiresCorrectPixel() = runTest {
-        testee.reportScheduledScanStarted()
+        testee.reportScheduledScanStarted(
+            profileQueryCount = 3,
+            brokerCount = 10,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -143,14 +234,21 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test
     fun whenReportScheduledScanCompletedThenFiresPixelWithTotalTime() = runTest {
         val totalTimeInMillis = 54321L
 
-        testee.reportScheduledScanCompleted(totalTimeInMillis)
+        testee.reportScheduledScanCompleted(
+            totalTimeInMillis = totalTimeInMillis,
+            profileQueryCount = 3,
+            brokerCount = 10,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -162,6 +260,10 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "54321")
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test
@@ -993,9 +1095,16 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportInitialScanDurationThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+
         testee.reportInitialScanDuration(
             durationMs = 45000L,
             profileQueryCount = 3,
+            isPowerSavingEnabled = true,
+            batteryOptimizationsEnabled = false,
+            brokerCount = 10,
+            executionType = PirExecutionType.MANUAL_INITIAL,
+            notificationsPermissionGranted = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -1010,5 +1119,38 @@ class RealPirPixelSenderTest {
         assert(params["duration_in_ms"] == "45000")
         assert(params["profile_queries"] == "3")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["power_saving"] == "true")
+        assert(params["battery-optimizations"] == "false")
+        assert(params["broker_count"] == "10")
+        assert(params["scan_trigger"] == "onboarding")
+        assert(params["vpn_connection_state"] == "disconnected")
+        assert(params["notifications_permission_granted"] == "true")
+    }
+
+    @Test
+    fun whenReportInitialScanDurationWithEditProfileThenScanTriggerIsProfileEdit() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+
+        testee.reportInitialScanDuration(
+            durationMs = 1L,
+            profileQueryCount = 0,
+            isPowerSavingEnabled = false,
+            batteryOptimizationsEnabled = true,
+            brokerCount = 0,
+            executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
+            notificationsPermissionGranted = false,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
+        assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
+        assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
     }
 }

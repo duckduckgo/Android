@@ -11,6 +11,7 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
     id 'androidx.room'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -81,7 +82,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
     ksp {
         arg("room.generateKotlin", "true")
@@ -201,11 +202,20 @@ android {
         compose true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "_"
-    }
     room {
         schemaDirectory("$projectDir/schemas")
+    }
+
+    // Conditional source set: swap DI graph creation based on ddg.di property
+    def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+    sourceSets {
+        main {
+            if (diFramework == 'Metro') {
+                java.srcDirs += 'src/metro/java'
+            } else {
+                java.srcDirs += 'src/anvilDagger/java'
+            }
+        }
     }
 }
 
@@ -276,6 +286,7 @@ fladle {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
@@ -315,7 +326,6 @@ dependencies {
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
     implementation project(':app-build-config-api')
@@ -407,6 +417,8 @@ dependencies {
     implementation project(':fingerprint-protection-api')
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
+
+    implementation project(':fire-mode-impl')
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
@@ -566,7 +578,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
@@ -602,6 +613,9 @@ dependencies {
     // Browser
     implementation "androidx.browser:browser:_"
 
+    // PDF Viewer
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
+
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
@@ -610,6 +624,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
+    testImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit

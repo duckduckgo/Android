@@ -1023,4 +1023,9 @@
     <string name="syncRestoreDialogDescription">Ar nori atkurti žymes, slaptažodžius ir kt. iš ankstesnės „DuckDuckGo“ sinchronizacijos?</string>
     <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
     <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopijuoti nuorodos tekstą</string>
+    <string name="linkTextCopied">Nuorodos tekstas nukopijuotas</string>
+    <string name="linkTextCopyFailed">Nepavyko nukopijuoti nuorodos teksto</string>
 </resources>

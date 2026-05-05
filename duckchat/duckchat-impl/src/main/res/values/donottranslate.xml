@@ -20,11 +20,18 @@
     <string name="input_screen_user_pref_without_ai_updated">Search only</string>
     <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
     <string name="duckAiChatSearchDuckDuckGo">Search DuckDuckGo</string>
+    <string name="native_input_chat_hint">Ask anything privately…</string>
 
     <!-- Model Picker -->
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
     <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
+    <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
 
-    <!-- Duck AI Voice Chat Shortcut Setting -->
-    <string name="duckAiVoiceChatVisibilitySetting" translatable="false">Voice Chat</string>
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle">Duck.ai Voice Chat Active</string>
+    <string name="duckAiVoiceNotificationMessage">Microphone is in use by Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName">Duck.ai Voice Chat</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Start chat</string>
 </resources>

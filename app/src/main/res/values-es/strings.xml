@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">¿Quieres restaurar tus marcadores, contraseñas y más de tu sincronización anterior con DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Restaura mis cosas</string>
     <string name="syncRestoreDialogSecondaryCta">Omitir</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Copiar texto del enlace</string>
+    <string name="linkTextCopied">Texto del enlace copiado</string>
+    <string name="linkTextCopyFailed">No se pudo copiar el texto del enlace</string>
 </resources>

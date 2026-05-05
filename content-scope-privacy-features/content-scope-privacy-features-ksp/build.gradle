@@ -11,10 +11,10 @@ java {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 dependencies {
     implementation project(':content-scope-privacy-features-api')
-    implementation "com.google.devtools.ksp:symbol-processing-api:1.9.24-1.0.20"
+    implementation "com.google.devtools.ksp:symbol-processing-api:_"
 }

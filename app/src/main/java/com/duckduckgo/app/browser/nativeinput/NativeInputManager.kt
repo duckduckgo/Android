@@ -37,7 +37,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -230,7 +230,6 @@ class RealNativeInputManager @Inject constructor(
         widget: NativeInputWidget,
         widgetRoot: View?,
     ) {
-        if (widget.isModelMenuVisible()) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
         } else {
@@ -350,6 +349,10 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+        widget.onBack = {
+            widget.hideKeyboard()
+            hideNativeInput()
+        }
         val previousOnChatSelected = widget.onChatSelected
         widget.onChatSelected = { animate ->
             callbacks.onClearAutocomplete()

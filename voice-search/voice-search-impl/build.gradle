@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'com.squareup.anvil'
     id 'kotlin-android'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -30,6 +31,7 @@ android {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
@@ -43,10 +45,10 @@ dependencies {
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':browser-ui')
 
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
     implementation AndroidX.appCompat
+    implementation AndroidX.room.runtime
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
@@ -58,7 +60,6 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
 
-    implementation AndroidX.room.ktx
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')

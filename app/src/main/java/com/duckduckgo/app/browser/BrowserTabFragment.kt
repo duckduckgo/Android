@@ -37,6 +37,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Spanned
@@ -157,6 +158,10 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfPixelName
+import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
+import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -185,6 +190,7 @@ import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.ClipboardImageInjector
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -362,8 +368,10 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -373,7 +381,9 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
@@ -442,6 +452,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var pdfPreviewGenerator: PdfPreviewGenerator
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -629,6 +642,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var addressDisplayFormatter: AddressDisplayFormatter
 
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -735,6 +751,9 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
+    private var lastTouchX: Float = 0f
+    private var lastTouchY: Float = 0f
+    private var lastLongPressUrl: String? = null
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -1794,6 +1813,10 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                 viewModel.onShareSelected()
             }
+            onMenuItemClicked(downloadPdfMenuItem) {
+                pixel.fire(PdfPixelName.PDF_DOWNLOAD_MENU_ITEM_PRESSED)
+                viewModel.onDownloadPdfMenuItemClicked()
+            }
             onMenuItemClicked(addToHomeMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                 viewModel.onPinPageToHomeSelected()
@@ -2041,6 +2064,7 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        hidePdf()
         contextualSheetLayoutChangeListener?.let { binding.rootView.removeOnLayoutChangeListener(it) }
         contextualSheetLayoutChangeListener = null
         contextualSheetBottomSheetCallback?.let {
@@ -2235,6 +2259,7 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
 
         browserNavigationBarIntegration.configureNewTabViewMode()
     }
@@ -2249,8 +2274,59 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun showPdf(url: String, cachedFileUri: Uri) {
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
+        binding.browserLayout.show()
+        webViewContainer.gone()
+        webView?.onPause()
+        webView?.hide()
+        errorView.errorLayout.gone()
+        sslErrorView.gone()
+        maliciousWarningView.gone()
+
+        binding.pdfViewerContainer.show()
+        val pdfFragment = DdgPdfViewerFragment()
+        pdfFragment.errorListener = object : DdgPdfViewerFragment.ErrorListener {
+            override fun onLoadDocumentError(throwable: Throwable) {
+                viewModel.onPdfRenderFailure(throwable)
+            }
+        }
+        childFragmentManager.beginTransaction()
+            .replace(R.id.pdfViewerContainer, pdfFragment, PDF_VIEWER_FRAGMENT_TAG)
+            .commitNowAllowingStateLoss()
+        // documentUri must be set AFTER the fragment is attached — PdfViewerFragmentV2's setter
+        // resolves a viewModels() delegate, which throws IllegalStateException if detached.
+        pdfFragment.documentUri(cachedFileUri)
+
+        binding.swipeRefreshContainer.isEnabled = false
+        omnibar.setViewMode(ViewMode.Pdf(url))
+        browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun hidePdf() {
+        // Most callers (showHome / showBrowser / showError / NewTab navigation) invoke this
+        // defensively even when no PDF is showing. Skip the inset re-dispatch and other work
+        // unless there's actually a PDF fragment to remove.
+        val pdfFragment = childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) ?: return
+        childFragmentManager.beginTransaction()
+            .remove(pdfFragment)
+            .commitAllowingStateLoss()
+        binding.pdfViewerContainer.gone()
+        binding.swipeRefreshContainer.isEnabled = true
+        viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
+        // PdfViewerFragmentV2 dispatches window insets to handle edge-to-edge, which can
+        // leave a bottom padding on the WebView. Re-dispatch so siblings recompute insets.
+        ViewCompat.requestApplyInsets(binding.root)
+    }
+
+    private fun isPdfVisible(): Boolean {
+        return childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) != null
     }
 
     private fun showError(
@@ -2262,6 +2338,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
@@ -2599,6 +2676,7 @@ class BrowserTabFragment :
 
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
+                if (isPdfVisible()) showBrowser()
                 navigate(it.url, it.headers)
             }
 
@@ -2659,6 +2737,10 @@ class BrowserTabFragment :
 
             is Command.HideKeyboard -> {
                 hideKeyboard()
+            }
+
+            is Command.ShowToast -> {
+                Toast.makeText(requireActivity(), it.textResId, Toast.LENGTH_LONG).show()
             }
 
             is Command.HideKeyboardForChat -> {
@@ -2905,6 +2987,14 @@ class BrowserTabFragment :
 
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
+            }
+
+            is Command.ShowPdfInTab -> {
+                showPdf(it.url, it.cachedFileUri)
+            }
+
+            is Command.ExpandOmnibar -> {
+                omnibar.setExpanded(true)
             }
         }
     }
@@ -3182,21 +3272,30 @@ class BrowserTabFragment :
     }
 
     private fun generateWebViewPreviewImage() {
-        webView?.let { webView ->
+        val viewToCapture: android.view.View? = if (isPdfVisible()) {
+            binding.pdfViewerContainer
+        } else {
+            webView
+        }
 
+        viewToCapture?.let { view ->
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
 
             bitmapGeneratorJob =
                 launch {
-                    logcat { "Generating WebView preview" }
+                    logcat { "Generating preview (pdf=${isPdfVisible()})" }
                     try {
-                        val preview = previewGenerator.generatePreview(webView)
+                        val preview = if (view is android.webkit.WebView) {
+                            previewGenerator.generatePreview(view)
+                        } else {
+                            pdfPreviewGenerator.generatePreview(view)
+                        }
                         val fileName = previewPersister.save(preview, tabId)
                         viewModel.updateTabPreview(tabId, fileName)
                         logcat { "Saved and updated tab preview" }
                     } catch (e: Exception) {
-                        logcat { "Failed to generate WebView preview: ${e.asLog()}" }
+                        logcat { "Failed to generate preview: ${e.asLog()}" }
                     }
                 }
         }
@@ -3922,6 +4021,8 @@ class BrowserTabFragment :
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         isWebViewGestureInProgress = true
+                        lastTouchX = event.x
+                        lastTouchY = event.y
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -4395,6 +4496,7 @@ class BrowserTabFragment :
     ) {
         webView?.safeHitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
+            lastLongPressUrl = target.url
             viewModel.userLongPressedInWebView(target, menu)
         }
     }
@@ -4411,8 +4513,8 @@ class BrowserTabFragment :
         return message.data.getString(URL_BUNDLE_KEY)
     }
 
-    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? =
-        when {
+    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
+        return when {
             hitTestResult.extra == null -> null
             hitTestResult.type == UNKNOWN_TYPE -> null
             hitTestResult.type == IMAGE_TYPE ->
@@ -4429,15 +4531,29 @@ class BrowserTabFragment :
                     type = hitTestResult.type,
                 )
 
-            else ->
-                LongPressTarget(
-                    url = hitTestResult.extra,
-                    type = hitTestResult.type,
-                )
+            else -> LongPressTarget(
+                url = hitTestResult.extra,
+                type = hitTestResult.type,
+            )
         }
+    }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
+            if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
+                pixel.fire(AppPixelName.LONG_PRESS_COPY_LINK_TEXT)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val text = extractLinkText()
+                    if (text.isNullOrEmpty()) {
+                        viewModel.onLinkTextCopyFailed()
+                    } else {
+                        val wasNotificationShown = clipboardInteractor.copyToClipboard(text, false)
+                        viewModel.onLinkTextCopied(wasNotificationShown)
+                    }
+                }
+                return true
+            }
+
             runCatching {
                 webView?.safeHitTestResult?.let {
                     val target = getLongPressTarget(it)
@@ -4450,6 +4566,40 @@ class BrowserTabFragment :
             }
         }
         return super.onContextItemSelected(item)
+    }
+
+    private suspend fun extractLinkText(): String? {
+        val wv = webView ?: return null
+        val density = wv.resources.displayMetrics.density.takeIf { it > 0f } ?: 1f
+        val pageScale = wv.scale.takeIf { it > 0f } ?: 1f
+        val escapedUrl = lastLongPressUrl
+            ?.replace("\\", "\\\\")
+            ?.replace("'", "\\'")
+            ?.replace("\n", "\\n")
+            ?.replace("\r", "\\r")
+        val urlParam = if (escapedUrl != null) "'$escapedUrl'" else "null"
+        return suspendCancellableCoroutine { continuation ->
+            val js = String.format(Locale.US, JS_EXTRACT_LINK_TEXT, lastTouchX, lastTouchY, density, pageScale, urlParam)
+            wv.evaluateJavascript(js) { result ->
+                val text = decodeJavascriptStringResult(result)
+                continuation.resume(text) { _, _, _ -> }
+            }
+        }
+    }
+
+    /** Decodes JSON-encoded string from [WebView.evaluateJavascript] (escapes quotes, newlines, etc.). */
+    private fun decodeJavascriptStringResult(encoded: String?): String? {
+        if (encoded == null) return null
+        val trimmed = encoded.trim()
+        if (trimmed.isEmpty() || trimmed == "null") return null
+        return try {
+            when (val value = JSONTokener(trimmed).nextValue()) {
+                is String -> value.takeIf { it.isNotEmpty() }
+                else -> null
+            }
+        } catch (_: Exception) {
+            trimmed.trim('"').takeIf { it.isNotEmpty() && it != "null" }
+        }
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
@@ -4686,9 +4836,12 @@ class BrowserTabFragment :
     private fun launchDownloadMessagesJob() {
         downloadMessagesJob +=
             lifecycleScope.launch {
-                viewModel.downloadCommands().cancellable().flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).collectLatest {
-                    processFileDownloadedCommand(it)
-                }
+                merge(viewModel.downloadCommands(), viewModel.pdfDownloadCommands())
+                    .cancellable()
+                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                    .collectLatest {
+                        processFileDownloadedCommand(it)
+                    }
             }
     }
 
@@ -4706,6 +4859,17 @@ class BrowserTabFragment :
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
         if (nativeInputManager.hideNativeInput()) return true
+        if (isPdfVisible()) {
+            hidePdf()
+            val currentUrl = webView?.url
+            // WebView lost its content after process death
+            if (currentUrl.isNullOrBlank() || currentUrl == "about:blank") {
+                viewModel.onUserPressedBack(isCustomTab)
+            } else {
+                showBrowser()
+            }
+            return true
+        }
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
@@ -4999,6 +5163,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
+        private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L
@@ -5027,6 +5192,362 @@ class BrowserTabFragment :
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
 
         private const val STORE_PREFIX = "market://details?id="
+
+        private const val JS_EXTRACT_LINK_TEXT = """
+            (function() {
+                var rawPointX = %s;
+                var rawPointY = %s;
+                var density = %s;
+                var pageScale = %s;
+                var targetUrl = %s;
+
+                function normalizeWhitespace(value) {
+                    return (value || '').replace(/\s+/g, ' ').trim();
+                }
+
+                function normalizeUrl(url) {
+                    if (!url) return '';
+                    try {
+                        var parsedUrl = new URL(url, document.baseURI);
+                        parsedUrl.hash = '';
+                        var normalizedPath = parsedUrl.pathname.replace(/\/+$/g, '');
+                        parsedUrl.pathname = normalizedPath === '' ? '/' : normalizedPath;
+                        return parsedUrl.toString();
+                    } catch (_) {
+                        return String(url);
+                    }
+                }
+
+                function isVisible(element) {
+                    if (!element) return false;
+                    if (element.getAttribute('aria-hidden') === 'true') return false;
+
+                    var style = window.getComputedStyle(element);
+                    if (!style) return true;
+
+                    if (style.display === 'none') return false;
+                    if (style.visibility === 'hidden') return false;
+                    if (style.opacity === '0') return false;
+                    return element.getClientRects().length > 0;
+                }
+
+                function extractVisibleText(link) {
+                    var text = normalizeWhitespace(link.innerText);
+                    if (text) return text;
+
+                    // Some links render text through nested elements where innerText can be empty.
+                    var visibleText = '';
+                    var walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+                    while (walker.nextNode()) {
+                        var textNode = walker.currentNode;
+                        var parentElement = textNode && textNode.parentElement;
+                        if (!parentElement || !isVisible(parentElement)) continue;
+                        var piece = normalizeWhitespace(textNode.textContent);
+                        if (!piece) continue;
+                        visibleText = visibleText ? visibleText + ' ' + piece : piece;
+                    }
+                    return normalizeWhitespace(visibleText);
+                }
+
+                function isUrlOrBreadcrumbLine(text) {
+                    var t = normalizeWhitespace(text);
+                    if (!t) return true;
+                    if (/^https?:\/\//i.test(t)) return true;
+                    if (/^www\.[a-z0-9.-]+\.[a-z]{2,}/i.test(t)) return true;
+                    // SERP URL lines: "host › path" or "https://... > wiki > ..."
+                    if ((/\s[›>]\s/.test(t) || /\s>\s/.test(t)) && /(\.[a-z]{2,}\/|wikipedia|\.org|\.com)/i.test(t)) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                function scoreText(text) {
+                    if (!text) return -1;
+                    // Strongly prefer human titles over URL / breadcrumb lines
+                    return (isUrlOrBreadcrumbLine(text) ? 0 : 10000) + text.length;
+                }
+
+                function distancePointToRect(px, py, rect) {
+                    if (!rect || !rect.width || !rect.height) return Infinity;
+                    var cx = Math.min(Math.max(px, rect.left), rect.right);
+                    var cy = Math.min(Math.max(py, rect.top), rect.bottom);
+                    var dx = px - cx;
+                    var dy = py - cy;
+                    return Math.sqrt(dx * dx + dy * dy);
+                }
+
+                function isRelatedToAnchor(el, anchor) {
+                    if (!el || !anchor) return false;
+                    return el === anchor || el.contains(anchor) || anchor.contains(el);
+                }
+
+                function pickBestTitleInBlock(card, anchor, px, py) {
+                    if (!card) return '';
+                    var selectors = '[data-testid="result-title-a"], h2 a[href], h3 a[href], [class*="result__title"] a[href], [class*="result-title"] a[href]';
+                    var nodes = card.querySelectorAll(selectors);
+                    var bestText = '';
+                    var bestKey = Infinity;
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = nodes[i];
+                        if (!isVisible(node)) continue;
+                        var t = extractVisibleText(node);
+                        if (!t || isUrlOrBreadcrumbLine(t)) continue;
+                        var rect = node.getBoundingClientRect();
+                        var dist = distancePointToRect(px, py, rect);
+                        if (isRelatedToAnchor(node, anchor)) dist -= 0.5;
+                        var key = dist * 1000 - scoreText(t);
+                        if (key < bestKey) {
+                            bestKey = key;
+                            bestText = t;
+                        }
+                    }
+                    return bestText;
+                }
+
+                function pickBestLinkInBlock(card, anchor, px, py, targetUrlForMatch) {
+                    if (!card) return '';
+                    var bestText = '';
+                    var bestKey = Infinity;
+                    var links = card.querySelectorAll('a[href]');
+                    for (var i = 0; i < links.length; i++) {
+                        var link = links[i];
+                        if (!isVisible(link)) continue;
+                        if (targetUrlForMatch && !urlsMatchLongPress(link.href, targetUrlForMatch)) continue;
+                        var t = extractVisibleText(link);
+                        if (!t) continue;
+                        var rect = link.getBoundingClientRect();
+                        var dist = distancePointToRect(px, py, rect);
+                        if (isRelatedToAnchor(link, anchor)) dist -= 0.5;
+                        var st = scoreText(t);
+                        var key = dist * 10000 - st;
+                        if (key < bestKey) {
+                            bestKey = key;
+                            bestText = t;
+                        }
+                    }
+                    return bestText;
+                }
+
+                function findAnchorAtPoint(x, y) {
+                    var topElement = null;
+                    if (document.elementsFromPoint) {
+                        var elements = document.elementsFromPoint(x, y);
+                        for (var i = 0; i < elements.length; i++) {
+                            if (elements[i] && elements[i].tagName === 'A' && elements[i].href) {
+                                topElement = elements[i];
+                                break;
+                            }
+                            if (!topElement && elements[i]) {
+                                var ancestor = elements[i].closest && elements[i].closest('a[href]');
+                                if (ancestor) {
+                                    topElement = ancestor;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (topElement) return topElement;
+
+                    var element = document.elementFromPoint(x, y);
+                    while (element) {
+                        if (element.tagName === 'A' && element.href) return element;
+                        element = element.parentElement;
+                    }
+                    return null;
+                }
+
+                function addCoordinateCandidate(candidates, value) {
+                    if (!isFinite(value) || value <= 0) return;
+                    for (var i = 0; i < candidates.length; i++) {
+                        if (Math.abs(candidates[i] - value) < 0.5) return;
+                    }
+                    candidates.push(value);
+                }
+
+                function buildCoordinateCandidates(raw, densityValue, scaleValue) {
+                    var candidates = [];
+                    addCoordinateCandidate(candidates, raw);
+                    addCoordinateCandidate(candidates, raw / scaleValue);
+                    addCoordinateCandidate(candidates, raw / densityValue);
+                    addCoordinateCandidate(candidates, raw / (densityValue * scaleValue));
+                    return candidates;
+                }
+
+                function minDistancePointToRect(xs, ys, rect) {
+                    var best = Infinity;
+                    for (var xi = 0; xi < xs.length; xi++) {
+                        for (var yi = 0; yi < ys.length; yi++) {
+                            var d = distancePointToRect(xs[xi], ys[yi], rect);
+                            if (d < best) best = d;
+                        }
+                    }
+                    return best;
+                }
+
+                function findSearchResultCard(startEl) {
+                    var el = startEl;
+                    for (var depth = 0; depth < 8 && el; depth++) {
+                        if (el.querySelectorAll) {
+                            var n = el.querySelectorAll('a[href]').length;
+                            if (n >= 2) return el;
+                        }
+                        el = el.parentElement;
+                    }
+                    return null;
+                }
+
+                function findTightBlock(anchor) {
+                    if (!anchor) return null;
+                    var byTestId = anchor.closest('[data-testid="web-result"], [data-testid*="web-result"], [data-testid*="result"]');
+                    if (byTestId) return byTestId;
+                    return anchor.closest('article, [role="article"], li') || findSearchResultCard(anchor);
+                }
+
+                function findLargestFontTextNode(anchor) {
+                    if (!anchor || !anchor.querySelectorAll) return null;
+                    var nodes = anchor.querySelectorAll('*');
+                    var best = null;
+                    var bestFs = 0;
+                    var bestLen = 0;
+                    for (var i = 0; i < nodes.length; i++) {
+                        var el = nodes[i];
+                        if (!isVisible(el)) continue;
+                        var directLen = 0;
+                        for (var j = 0; j < el.childNodes.length; j++) {
+                            var n = el.childNodes[j];
+                            if (n.nodeType === 3) {
+                                var piece = normalizeWhitespace(n.textContent);
+                                if (piece) directLen += piece.length;
+                            }
+                        }
+                        if (directLen < 8) continue;
+                        var style = window.getComputedStyle(el);
+                        if (!style) continue;
+                        var fs = parseFloat(style.fontSize);
+                        if (!isFinite(fs) || fs <= 0) continue;
+                        if (fs > bestFs + 0.5 || (Math.abs(fs - bestFs) < 0.5 && directLen > bestLen)) {
+                            bestFs = fs;
+                            bestLen = directLen;
+                            best = el;
+                        }
+                    }
+                    return best;
+                }
+
+                function getBestTextAroundAnchor(anchor, targetUrlForMatch, px, py) {
+                    if (!anchor || !isVisible(anchor)) return '';
+
+                    var heading = anchor.querySelector('h1, h2, h3, h4, h5, h6');
+                    if (heading && isVisible(heading)) {
+                        var headingText = extractVisibleText(heading);
+                        if (headingText && !isUrlOrBreadcrumbLine(headingText)) return headingText;
+                    }
+
+                    var direct = extractVisibleText(anchor);
+
+                    if (direct && !isUrlOrBreadcrumbLine(direct) && direct.length <= 120) {
+                        return direct;
+                    }
+
+                    var largest = findLargestFontTextNode(anchor);
+                    if (largest) {
+                        var largestText = extractVisibleText(largest);
+                        if (largestText && !isUrlOrBreadcrumbLine(largestText)) return largestText;
+                    }
+
+                    if (direct && !isUrlOrBreadcrumbLine(direct)) return direct;
+
+                    var card = findTightBlock(anchor);
+
+                    var titleNear = pickBestTitleInBlock(card, anchor, px, py);
+                    if (titleNear) return titleNear;
+
+                    var linkNear = pickBestLinkInBlock(card, anchor, px, py, targetUrlForMatch);
+                    if (linkNear) return linkNear;
+
+                    return direct;
+                }
+
+                function urlsMatchLongPress(linkHref, longPressUrl) {
+                    if (!longPressUrl) return true;
+                    if (!linkHref) return false;
+                    var want = normalizeUrl(longPressUrl);
+                    var have = normalizeUrl(linkHref);
+                    if (have === want) return true;
+                    try {
+                        var u = new URL(linkHref, document.baseURI);
+                        var raw = u.searchParams.get('uddg') || u.searchParams.get('u');
+                        if (raw) {
+                            try {
+                                var decoded = decodeURIComponent(raw);
+                                if (normalizeUrl(decoded) === want) return true;
+                            } catch (_) {}
+                        }
+                    } catch (_) {}
+                    return false;
+                }
+
+                var normalizedTargetUrl = targetUrl ? normalizeUrl(targetUrl) : '';
+                var xCandidates = buildCoordinateCandidates(rawPointX, density, pageScale);
+                var yCandidates = buildCoordinateCandidates(rawPointY, density, pageScale);
+                var bestPointText = '';
+                var bestPointScore = -1;
+
+                for (var xIndex = 0; xIndex < xCandidates.length; xIndex++) {
+                    for (var yIndex = 0; yIndex < yCandidates.length; yIndex++) {
+                        var px = xCandidates[xIndex];
+                        var py = yCandidates[yIndex];
+                        var anchorAtPoint = findAnchorAtPoint(px, py);
+                        if (!anchorAtPoint) continue;
+                        if (normalizedTargetUrl && !urlsMatchLongPress(anchorAtPoint.href, targetUrl)) continue;
+
+                        var anchorText = getBestTextAroundAnchor(anchorAtPoint, targetUrl, px, py);
+                        var anchorScore = scoreText(anchorText);
+                        if (anchorScore > bestPointScore) {
+                            bestPointText = anchorText;
+                            bestPointScore = anchorScore;
+                        }
+                        if (anchorScore >= 10000) {
+                            return anchorText;
+                        }
+                    }
+                }
+
+                var links = document.querySelectorAll('a[href]');
+                var bestText = '';
+                var bestScore = bestPointScore;
+                var bestDistanceKey = Infinity;
+                if (bestPointText) {
+                    bestText = bestPointText;
+                }
+                if (!normalizedTargetUrl) {
+                    return bestText;
+                }
+                if (bestScore >= 10000 && bestText) {
+                    return bestText;
+                }
+                var maxFallbackDist = 220;
+                for (var i = 0; i < links.length; i++) {
+                    var link = links[i];
+                    if (!isVisible(link)) continue;
+
+                    if (urlsMatchLongPress(link.href, targetUrl)) {
+                        var visibleText = extractVisibleText(link);
+                        var candidateScore = scoreText(visibleText);
+                        var rect = link.getBoundingClientRect();
+                        var dist = minDistancePointToRect(xCandidates, yCandidates, rect);
+                        if (dist > maxFallbackDist) continue;
+                        var distKey = dist * 10000 - candidateScore;
+                        if (distKey < bestDistanceKey || (distKey === bestDistanceKey && candidateScore > bestScore)) {
+                            bestText = visibleText;
+                            bestScore = candidateScore;
+                            bestDistanceKey = distKey;
+                        }
+                    }
+                }
+                return bestText;
+            })()
+        """
 
         fun newInstance(
             tabId: String,
@@ -5649,22 +6170,31 @@ class BrowserTabFragment :
     ) {
         if (viewModel.isPrinting()) return
 
-        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createSafePrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+        val printManager = activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: return
+        val sourceAdapter = pdfPrintDocumentAdapterOrNull() ?: webView?.createSafePrintDocumentAdapter(url) ?: return
+        val printAdapter = PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+            sourceAdapter,
+            onStartCallback = { viewModel.onStartPrint() },
+            onFinishCallback = { viewModel.onFinishPrint() },
+        )
+        printManager.print(
+            url,
+            printAdapter,
+            PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
+        )
+    }
 
-                val printAdapter =
-                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                        webViewPrintDocumentAdapter,
-                        onStartCallback = { viewModel.onStartPrint() },
-                        onFinishCallback = { viewModel.onFinishPrint() },
-                    )
-                printManager.print(
-                    url,
-                    printAdapter,
-                    PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
-                )
-            }
-        }
+    /**
+     * If an inline PDF is currently showing, build an adapter that prints the cached PDF
+     * file directly instead of routing through the WebView (which is still on the page that
+     * linked to the PDF — printing it would emit the parent page).
+     */
+    private fun pdfPrintDocumentAdapterOrNull(): PrintDocumentAdapter? {
+        val state = viewModel.browserViewState.value ?: return null
+        val pdfPath = state.currentPdfCachedUri?.path ?: return null
+        val pdfFile = File(pdfPath).takeIf { it.exists() } ?: return null
+        val displayName = state.currentPdfFileName ?: pdfFile.name
+        return CachedPdfPrintDocumentAdapter(pdfFile, displayName, dispatchers)
     }
 
     private fun showSitePermissionsDialog(

@@ -1023,4 +1023,9 @@
     <string name="syncRestoreDialogDescription">Želite obnoviti zaznamke, gesla in drugo iz prejšnje sinhronizacije DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Obnovi moje stvari</string>
     <string name="syncRestoreDialogSecondaryCta">Preskoči</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopiraj besedilo povezave</string>
+    <string name="linkTextCopied">Besedilo povezave je bilo kopirano</string>
+    <string name="linkTextCopyFailed">Besedila povezave ni bilo mogoče kopirati</string>
 </resources>

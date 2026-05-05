@@ -859,6 +859,7 @@ class SystemSearchViewModelTest {
         testee.onDigitalAssistOpened(mock())
 
         verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
+        verify(mockPixel).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
@@ -870,6 +871,7 @@ class SystemSearchViewModelTest {
         testee.onDigitalAssistOpened(intent)
 
         verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
@@ -880,6 +882,7 @@ class SystemSearchViewModelTest {
         testee.onDigitalAssistOpened(intent)
 
         verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     companion object {

@@ -43,8 +43,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 
 class FreeTrialConversionWideEventTest {
 
@@ -89,7 +89,7 @@ class FreeTrialConversionWideEventTest {
             flowEntryPoint = null,
             metadata = mapOf("free_trial_plan" to "ddg.privacy.pro.yearly.renews.us"),
             cleanupPolicy = CleanupPolicy.OnTimeout(
-                duration = Duration.ofDays(8),
+                duration = 8.days,
                 flowStatus = FlowStatus.Failure("timeout"),
             ),
         )

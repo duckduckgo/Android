@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
+import com.duckduckgo.app.browser.commands.Command.ShowPdfInTab
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
@@ -189,6 +190,7 @@ import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -202,6 +204,12 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pdf.CachedFileDownloader
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
+import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfErrorType
+import com.duckduckgo.app.browser.pdf.PdfPixelName
+import com.duckduckgo.app.browser.pdf.PdfRenderDecision
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -320,6 +328,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -328,8 +337,11 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEve
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
+import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
@@ -390,8 +402,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -419,11 +433,13 @@ import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.random.Random
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
@@ -522,6 +538,10 @@ class BrowserTabViewModel @Inject constructor(
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val inlinePdfHandler: InlinePdfHandler,
+    private val cachedFileDownloader: CachedFileDownloader,
+    private val downloadMenuStateProvider: DownloadMenuStateProvider,
+    private val downloadsRepository: DownloadsRepository,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -607,6 +627,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
+    private var pdfDownloadJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -641,6 +662,8 @@ class BrowserTabViewModel @Inject constructor(
     @Volatile
     var isSerpLogoInMenuEnabled: Boolean = true
         private set
+
+    private val pdfDownloadCommandFlow = MutableSharedFlow<DownloadCommand>(extraBufferCapacity = 1)
 
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
         .stateIn(
@@ -1709,14 +1732,16 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
+        pdfDownloadJob.cancel()
         site = null
         onSiteChanged()
         webNavigationState = null
         returnedHomeAfterSiteLoaded = true
-
         val browserState =
             browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
                 canGoForward = currentGlobalLayoutState() !is Invalidated,
+                currentPdfCachedUri = null,
+                currentPdfFileName = null,
             )
         browserViewState.value = browserState
 
@@ -1755,6 +1780,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
+        pdfDownloadJob.cancel()
 
         viewModelScope.launch {
             showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
@@ -2178,6 +2204,8 @@ class BrowserTabViewModel @Inject constructor(
                 canReportSite = false,
                 canFireproofSite = false,
                 canPrintPage = false,
+                currentPdfCachedUri = null,
+                currentPdfFileName = null,
             )
         logcat { "showPrivacyShield=false, showSearchIcon=true, showClearButton=true" }
     }
@@ -3655,8 +3683,119 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 command.value = ConvertBlobToDataUri(url, mimeType)
             }
-        } else {
-            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            return
+        }
+        when (inlinePdfHandler.classifyPdfRequest(url, contentDisposition, mimeType)) {
+            PdfRenderDecision.Inline -> handlePdfUrl(url, contentDisposition, mimeType, requestUserConfirmation)
+            PdfRenderDecision.Fallback -> {
+                pixel.fire(PdfPixelName.PDF_FALLBACK)
+                sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+            }
+            PdfRenderDecision.NotApplicable -> sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
+    }
+
+    private fun handlePdfUrl(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        command.value = Command.ExpandOmnibar
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
+        pdfDownloadJob += viewModelScope.launch {
+            // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
+            // defaults to Main, so we stay on Main for the LiveData updates below.
+            val result = inlinePdfHandler.downloadToCache(url)
+            loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
+            when (result) {
+                is PdfDownloadResult.Success -> {
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
+                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
+                    val pdfTitle = inlinePdfHandler.extractFileName(url)
+                    pageChanged(url, pdfTitle)
+                    browserViewState.value = currentBrowserViewState().copy(
+                        currentPdfCachedUri = result.uri,
+                        currentPdfFileName = pdfTitle,
+                    )
+                    command.value = ShowPdfInTab(url, result.uri)
+                }
+                is PdfDownloadResult.Failure -> {
+                    pixel.fire(
+                        PdfPixelName.PDF_RENDER_FAILURE,
+                        parameters = mapOf("error_type" to result.errorType.paramValue),
+                    )
+                    sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+                }
+            }
+        }
+    }
+
+    fun pdfDownloadCommands(): Flow<DownloadCommand> = pdfDownloadCommandFlow.asSharedFlow()
+
+    fun onPdfRenderFailure(@Suppress("UNUSED_PARAMETER") throwable: Throwable) {
+        pixel.fire(
+            PdfPixelName.PDF_RENDER_FAILURE,
+            parameters = mapOf("error_type" to PdfErrorType.UNKNOWN.paramValue),
+        )
+    }
+
+    /**
+     * Called by the fragment when the inline PDF is hidden (back press, navigation).
+     * Clears the cached PDF state so the "Download PDF" menu item disappears, and
+     * re-runs [pageChanged] for the WebView's actual URL/title so the omnibar,
+     * page header, and tab title revert from the PDF entry to the underlying page —
+     * the same path that fires when the WebView itself navigates back.
+     */
+    fun onPdfHidden(currentWebViewUrl: String?, currentWebViewTitle: String?) {
+        if (currentBrowserViewState().currentPdfCachedUri == null) return
+        browserViewState.value = currentBrowserViewState().copy(
+            currentPdfCachedUri = null,
+            currentPdfFileName = null,
+        )
+        if (!currentWebViewUrl.isNullOrBlank() && currentWebViewUrl != ABOUT_BLANK) {
+            pageChanged(currentWebViewUrl, currentWebViewTitle)
+        }
+    }
+
+    fun onDownloadPdfMenuItemClicked() {
+        val state = currentBrowserViewState()
+        val cachedUri = state.currentPdfCachedUri ?: return
+        val fileName = state.currentPdfFileName ?: return
+
+        viewModelScope.launch(dispatchers.io()) {
+            pdfDownloadCommandFlow.emit(
+                DownloadCommand.ShowDownloadStartedMessage(
+                    messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadStartedMessage,
+                    fileName = fileName,
+                ),
+            )
+            val savedFilePath = cachedFileDownloader.saveToDownloads(cachedUri, fileName, "application/pdf")
+            if (savedFilePath != null) {
+                val savedFileName = File(savedFilePath).name
+                val contentLength = cachedUri.path?.let { File(it) }?.takeIf { it.exists() }?.length() ?: 0L
+                downloadsRepository.insert(
+                    DownloadItem(
+                        downloadId = Random.nextLong(),
+                        downloadStatus = DownloadStatus.FINISHED,
+                        fileName = savedFileName,
+                        contentLength = contentLength,
+                        createdAt = DatabaseDateFormatter.timestamp(),
+                        filePath = savedFilePath,
+                    ),
+                )
+                downloadMenuStateProvider.onDownloadComplete()
+                pdfDownloadCommandFlow.emit(
+                    DownloadCommand.ShowDownloadSuccessMessage(
+                        messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadFinishedMessage,
+                        fileName = savedFileName,
+                        filePath = savedFilePath,
+                        mimeType = "application/pdf",
+                    ),
+                )
+            } else {
+                pdfDownloadCommandFlow.emit(
+                    DownloadCommand.ShowDownloadFailedMessage(
+                        messageId = com.duckduckgo.downloads.impl.R.string.downloadsDownloadGenericErrorMessage,
+                    ),
+                )
+            }
         }
     }
 
@@ -4347,6 +4486,7 @@ class BrowserTabViewModel @Inject constructor(
                         method,
                         id,
                         data,
+                        tabId = tabId,
                     )
                     withContext(dispatchers.main()) {
                         response?.let {
@@ -4984,6 +5124,16 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onTabSwipedAway() {
         command.value = GenerateWebViewPreviewImage
+    }
+
+    fun onLinkTextCopied(wasNotificationShown: Boolean) {
+        if (!wasNotificationShown) {
+            command.value = Command.ShowToast(R.string.linkTextCopied)
+        }
+    }
+
+    fun onLinkTextCopyFailed() {
+        command.value = Command.ShowToast(R.string.linkTextCopyFailed)
     }
 
     fun onBookmarksMenuItemClicked() {

@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Vil du gendanne dine bogmærker, adgangskoder og andet fra din tidligere DuckDuckGo-synkronisering?</string>
     <string name="syncRestoreDialogPrimaryCta">Gendan mine data</string>
     <string name="syncRestoreDialogSecondaryCta">Spring over</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopier linktekst</string>
+    <string name="linkTextCopied">Linktekst kopieret</string>
+    <string name="linkTextCopyFailed">Linkteksten kunne ikke kopieres</string>
 </resources>

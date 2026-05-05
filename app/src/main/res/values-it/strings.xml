@@ -983,4 +983,9 @@
     <string name="syncRestoreDialogDescription">Vuoi ripristinare i tuoi segnalibri, le password e altro ancora dalla precedente sincronizzazione con DuckDuckGo?</string>
     <string name="syncRestoreDialogPrimaryCta">Ripristina i miei contenuti</string>
     <string name="syncRestoreDialogSecondaryCta">Salta</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Copia il testo del link</string>
+    <string name="linkTextCopied">Testo del link copiato</string>
+    <string name="linkTextCopyFailed">Impossibile copiare il testo del link</string>
 </resources>

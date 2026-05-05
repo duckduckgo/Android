@@ -315,6 +315,16 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
+    fun `onSyncRestoreStarted aborts the flow`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(1L)))
+
+        wideEvent.onSyncRestoreStarted()
+
+        verify(wideEventClient).flowAbort(wideEventId = 1L)
+    }
+
+    @Test
     fun `operations without flowId are no-ops`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(emptyList()))

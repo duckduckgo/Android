@@ -393,12 +393,12 @@ class TabSwitcherAdapter(
                 loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
             }
 
-            bundle.getString(DIFF_KEY_URL)?.let {
+            if (bundle.containsKey(DIFF_KEY_URL)) {
                 loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon, viewHolder)
             }
 
-            bundle.getString(DIFF_KEY_TITLE)?.let {
-                viewHolder.title.text = it
+            if (bundle.containsKey(DIFF_KEY_TITLE)) {
+                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -422,14 +422,15 @@ class TabSwitcherAdapter(
                 logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
-            bundle.getString(DIFF_KEY_URL)?.let {
-                viewHolder.url.show()
-                viewHolder.url.text = formatUrl(it)
+            if (bundle.containsKey(DIFF_KEY_URL)) {
+                val url = tab.tabEntity.url
+                viewHolder.url.text = formatUrl(url)
+                viewHolder.url.visibility = if (url.isNullOrEmpty()) View.GONE else View.VISIBLE
                 loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon, viewHolder)
             }
 
-            bundle.getString(DIFF_KEY_TITLE)?.let {
-                viewHolder.title.text = it
+            if (bundle.containsKey(DIFF_KEY_TITLE)) {
+                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -455,8 +456,8 @@ class TabSwitcherAdapter(
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
                 loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
             }
-            bundle.getString(DIFF_KEY_TITLE)?.let {
-                viewHolder.title.text = it
+            if (bundle.containsKey(DIFF_KEY_TITLE)) {
+                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
             }
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
                 loadSelectionState(viewHolder, tab)
@@ -477,8 +478,8 @@ class TabSwitcherAdapter(
             for (key in bundle.keySet()) {
                 logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
-            bundle.getString(DIFF_KEY_TITLE)?.let {
-                viewHolder.url.text = it
+            if (bundle.containsKey(DIFF_KEY_TITLE)) {
+                viewHolder.url.text = tab.tabEntity.title.orEmpty()
             }
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
                 loadSelectionState(viewHolder, tab)

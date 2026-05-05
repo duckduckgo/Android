@@ -93,6 +93,13 @@ jobs:
           output=$(find app/build/outputs/bundle/playRelease -name "*.aab")
           echo "bundle_path=$output" >> "$GITHUB_OUTPUT"
 
+      - name: Upload AAB as artifact
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: release-aab
+          path: ${{ steps.capture_output.outputs.bundle_path }}
+
       - name: Upload bundle to Play Store
         id: upload_bundle_play
         run: |

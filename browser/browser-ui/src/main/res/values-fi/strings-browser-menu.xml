@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Tulosta</string>
     <string name="browserMenuOpenAppLink">Avaa sovelluksessa</string>
     <string name="browserMenuAddToHome">Lisää kotinäytölle</string>
+    <string name="browserMenuDownloadPdf">Lataa PDF</string>
     <string name="browserMenuReportBrokenSite">Ilmoita viallisesta sivustosta</string>
     <string name="browserMenuAutofill">Salasanat</string>
     <string name="browserMenuDownloads">Lataukset</string>

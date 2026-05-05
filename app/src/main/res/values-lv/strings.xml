@@ -1003,4 +1003,9 @@
     <string name="syncRestoreDialogDescription">Vai vēlies atjaunot grāmatzīmes, paroles un citus datus no iepriekšējās DuckDuckGo sinhronizācijas?</string>
     <string name="syncRestoreDialogPrimaryCta">Manas lietas atjaunošana</string>
     <string name="syncRestoreDialogSecondaryCta">Izlaist</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Saites teksta kopēšana</string>
+    <string name="linkTextCopied">Saites teksts nokopēts</string>
+    <string name="linkTextCopyFailed">Neizdevās nokopēt saites tekstu</string>
 </resources>
