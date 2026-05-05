@@ -33,6 +33,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -1702,4 +1703,28 @@ class RealDuckChatTest {
 
         assertFalse(testee.allowDuckAiAsDigitalAssistant.value)
     }
+
+    // region displayedMode
+
+    @Test
+    fun `displayedMode is SEARCH on construction`() = runTest {
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `setSelectedMode emits the new mode`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+
+        assertEquals(InputMode.DUCK_AI, testee.displayedMode.value)
+    }
+
+    @Test
+    fun `setSelectedMode SEARCH after DUCK_AI reverts displayedMode`() = runTest {
+        testee.setSelectedMode(InputMode.DUCK_AI)
+        testee.setSelectedMode(InputMode.SEARCH)
+
+        assertEquals(InputMode.SEARCH, testee.displayedMode.value)
+    }
+
+    // endregion
 }

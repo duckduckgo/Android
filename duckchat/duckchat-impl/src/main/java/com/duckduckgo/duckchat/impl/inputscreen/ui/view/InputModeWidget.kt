@@ -56,6 +56,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentTagSpan
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -74,6 +76,9 @@ open class InputModeWidget @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var duckChatInternal: DuckChatInternal
 
     val inputField: EditText
     private val inputFieldClearText: View
@@ -156,6 +161,18 @@ open class InputModeWidget @JvmOverloads constructor(
     private var isDeletingTag = false
     private val knownTagTabIds = mutableSetOf<String>()
 
+    // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
+    // never have to guard against pre-DI invocation.
+    private val duckChatTabSelectedListener =
+        object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
+                duckChatInternal.setSelectedMode(mode)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
 
@@ -185,6 +202,15 @@ open class InputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
+        val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
+        duckChatInternal.setSelectedMode(mode)
+    }
+
+    override fun onDetachedFromWindow() {
+        inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
+        duckChatInternal.setSelectedMode(InputMode.SEARCH)
+        super.onDetachedFromWindow()
     }
 
     private fun provideInitialText(text: String) {

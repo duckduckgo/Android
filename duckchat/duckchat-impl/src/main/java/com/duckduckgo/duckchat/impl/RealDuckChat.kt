@@ -37,7 +37,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -128,6 +130,13 @@ interface DuckChatInternal : DuckChat {
      * Observes the last used toggle position.
      */
     fun observeLastUsedTogglePosition(): Flow<String?>
+
+    /**
+     * Updates the live input-mode selection. Called by [InputModeWidget] when its tab
+     * selection changes, and on attach/detach to keep [DuckChatInputModeState.displayedMode]
+     * in sync with the actual widget state.
+     */
+    fun setSelectedMode(mode: InputMode)
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -339,6 +348,7 @@ data class DuckChatSettingJson(
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
 @ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
+@ContributesBinding(AppScope::class, boundType = DuckChatInputModeState::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
@@ -360,6 +370,7 @@ class RealDuckChat @Inject constructor(
     private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : DuckChatInternal,
     DuckAiFeatureState,
+    DuckChatInputModeState,
     PrivacyConfigCallbackPlugin {
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showSettings = MutableStateFlow(false)
@@ -381,6 +392,7 @@ class RealDuckChat @Inject constructor(
     private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
+    private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -808,6 +820,12 @@ class RealDuckChat @Inject constructor(
 
     override fun observeLastUsedTogglePosition(): Flow<String?> =
         duckChatFeatureRepository.observeLastUsedTogglePosition()
+
+    override val displayedMode: StateFlow<InputMode> = _displayedMode.asStateFlow()
+
+    override fun setSelectedMode(mode: InputMode) {
+        _displayedMode.value = mode
+    }
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
