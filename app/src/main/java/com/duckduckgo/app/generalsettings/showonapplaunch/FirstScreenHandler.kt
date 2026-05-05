@@ -45,7 +45,7 @@ import javax.inject.Inject
     boundType = BrowserLifecycleObserver::class,
 )
 @SingleInstanceIn(AppScope::class)
-class FirstScreenHandlerImpl     @Inject constructor(
+class FirstScreenHandlerImpl @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
