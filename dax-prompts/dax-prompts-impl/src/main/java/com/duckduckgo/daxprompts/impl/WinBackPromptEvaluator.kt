@@ -61,7 +61,7 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
     private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ModalEvaluator, WinBackPromptEvaluator {
 
-    override val priority: Int = 1
+    override val priority: Int = 2
 
     override val evaluatorId: String = "win_back_prompt"
 

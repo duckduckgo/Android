@@ -61,7 +61,7 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     private val reactivateUsersToggles: ReactivateUsersToggles,
 ) : ModalEvaluator, ReEngagementPromptEvaluator {
 
-    override val priority: Int = 2
+    override val priority: Int = 3
 
     override val evaluatorId: String = "re_engagement_prompt"
 
