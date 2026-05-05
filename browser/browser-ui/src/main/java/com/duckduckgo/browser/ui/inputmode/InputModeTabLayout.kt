@@ -61,16 +61,6 @@ class InputModeTabLayout @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        val searchTabView = getTabAt(0)!!.view
-        val searchTabIcon = searchTabView.findViewById<ImageView>(R.id.tab_icon)
-        // We're changing the selector to ensure that the right icon is used even if user manually changes the theme,
-        // without relying on the system theme. For these cases, using "drawable-night" directory is not sufficient.
-        if (appTheme.isLightModeEnabled()) {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector))
-        } else {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
-        }
     }
 
     private fun buildShadowedTabIndicator(

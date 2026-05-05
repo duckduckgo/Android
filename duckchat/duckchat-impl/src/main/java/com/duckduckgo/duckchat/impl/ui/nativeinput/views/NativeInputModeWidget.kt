@@ -29,6 +29,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Space
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -379,6 +380,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.updateLayoutParams<MarginLayoutParams> {
             marginEnd = 0
         }
+        findViewById<AppCompatImageView?>(R.id.inputFieldImageButton)?.updateLayoutParams<MarginLayoutParams> {
+            marginStart = 0
+        }
     }
 
     private fun applyTrailingButtonMargin() {
@@ -727,7 +731,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab)
         if (isChatTab) {
-            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
+            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
             if (!isStreaming) {
                 submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
             }

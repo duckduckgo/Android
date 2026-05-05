@@ -188,7 +188,7 @@
                         android:importantForAccessibility="no"
                         android:scaleType="center"
                         android:visibility="gone"
-                        app:srcCompat="@drawable/ic_image_24"
+                        app:srcCompat="@drawable/ic_attach_24"
                         tools:visibility="visible" />
 
                     <LinearLayout

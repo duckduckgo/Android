@@ -69,6 +69,8 @@
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
+    <attr name="daxColorControlRaisedFillPrimary" format="color"/>
+    <attr name="daxColorControlRaisedBackdrop" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>

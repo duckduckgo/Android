@@ -18,7 +18,7 @@
     <style name="Widget.DuckDuckGo.TabLayout.Rounded" parent="Widget.MaterialComponents.TabLayout">
         <item name="android:background">@drawable/tab_layout_background</item>
         <item name="tabIndicatorGravity">center</item>
-        <item name="tabIndicatorColor">?attr/daxColorInputModeIndicator</item>
+        <item name="tabIndicatorColor">?attr/daxColorControlRaisedFillPrimary</item>
         <item name="tabIndicatorAnimationMode">linear</item>
         <item name="tabIndicatorFullWidth">true</item>
         <item name="tabSelectedTextColor">?attr/daxColorPrimaryText</item>
