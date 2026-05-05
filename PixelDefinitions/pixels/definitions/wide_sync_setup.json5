@@ -27,7 +27,7 @@
             {
                 "key": "feature.data.ext.user_auth_required",
                 "description": "Whether device authentication is required for this Sync setup flow",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.account_creation_latency_ms_bucketed",
