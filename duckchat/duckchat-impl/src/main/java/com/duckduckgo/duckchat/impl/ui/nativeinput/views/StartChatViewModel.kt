@@ -20,7 +20,10 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatInputModeState
+import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -29,6 +32,7 @@ import javax.inject.Inject
 class StartChatViewModel @Inject constructor(
     duckAiFeatureState: DuckAiFeatureState,
     private val duckChatInternal: DuckChatInternal,
+    private val duckChatInputModeState: DuckChatInputModeState,
 ) : ViewModel() {
 
     /**
@@ -42,8 +46,9 @@ class StartChatViewModel @Inject constructor(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled ->
-        isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled
+        duckChatInputModeState.displayedMode
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, displayedMode ->
+        isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled && displayedMode == InputMode.SEARCH
     }
 
     fun openNewChat() {
