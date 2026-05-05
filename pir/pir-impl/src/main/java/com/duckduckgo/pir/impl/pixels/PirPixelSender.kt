@@ -102,7 +102,7 @@ interface PirPixelSender {
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
-     * @param notificationsPermissionGranted - whether the user has granted the POST_NOTIFICATIONS runtime permission
+     * @param notificationsPermissionGranted - whether notifications are enabled for the app
      */
     suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
@@ -123,7 +123,7 @@ interface PirPixelSender {
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
-     * @param notificationsPermissionGranted - whether the user has granted the POST_NOTIFICATIONS runtime permission
+     * @param notificationsPermissionGranted - whether notifications are enabled for the app
      */
     suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,

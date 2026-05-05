@@ -16,11 +16,9 @@
 
 package com.duckduckgo.pir.impl.scheduling
 
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.PowerManager
-import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
@@ -371,7 +369,7 @@ class RealPirJobsRunner @Inject constructor(
 
     private fun Context.areNotificationsPermissionGranted(): Boolean {
         return runCatching {
-            ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+            NotificationManagerCompat.from(this).areNotificationsEnabled()
         }.getOrDefault(false)
     }
 }
