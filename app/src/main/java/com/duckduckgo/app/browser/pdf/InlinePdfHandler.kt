@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.pdf
 
 import android.content.Context
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -39,6 +40,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.File
 import java.io.IOException
+import java.security.cert.X509Certificate
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -98,7 +100,7 @@ sealed class PdfRenderDecision {
 }
 
 sealed class PdfDownloadResult {
-    data class Success(val uri: Uri) : PdfDownloadResult()
+    data class Success(val uri: Uri, val certificate: SslCertificate? = null) : PdfDownloadResult()
     data class Failure(val errorType: PdfErrorType) : PdfDownloadResult()
 }
 
@@ -154,11 +156,18 @@ class RealInlinePdfHandler @Inject constructor(
                 requestBuilder.addHeader("Cookie", cookie)
             }
 
+            var certificate: SslCertificate? = null
             executeRequestCancellably(okHttpClient.newCall(requestBuilder.build())).use { response ->
                 if (!response.isSuccessful) {
                     logcat { "PDF download failed: HTTP ${response.code}" }
                     return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
                 }
+
+                certificate = response.handshake
+                    ?.peerCertificates
+                    ?.firstOrNull()
+                    ?.let { it as? X509Certificate }
+                    ?.let { SslCertificate(it) }
 
                 response.body?.byteStream()?.use { input ->
                     targetFile.outputStream().use { output ->
@@ -185,7 +194,7 @@ class RealInlinePdfHandler @Inject constructor(
 
             enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
 
-            PdfDownloadResult.Success(Uri.fromFile(targetFile))
+            PdfDownloadResult.Success(Uri.fromFile(targetFile), certificate)
         } catch (e: CancellationException) {
             logcat { "PDF download cancelled, cleaning up partial file" }
             targetFile.delete()

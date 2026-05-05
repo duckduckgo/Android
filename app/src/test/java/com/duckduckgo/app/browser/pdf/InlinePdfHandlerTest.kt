@@ -36,6 +36,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -100,6 +101,21 @@ class InlinePdfHandlerTest {
         val file = File((result as PdfDownloadResult.Success).uri.path!!)
         assertTrue(file.exists())
         assertEquals(pdfBytes.size.toLong(), file.length())
+    }
+
+    @Test
+    fun whenDownloadOverPlainHttpThenCertificateIsNull() = runTest {
+        val pdfBytes = "%PDF-1.4 test content".toByteArray()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(pdfBytes)),
+        )
+
+        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
+
+        assertTrue(result is PdfDownloadResult.Success)
+        assertNull((result as PdfDownloadResult.Success).certificate)
     }
 
     @Test

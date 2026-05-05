@@ -3732,6 +3732,7 @@ class BrowserTabViewModel @Inject constructor(
                         pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
                         pageChanged(url, pdfTitle)
                     }
+                    onCertificateReceived(result.certificate)
                     browserViewState.value = currentBrowserViewState().copy(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,

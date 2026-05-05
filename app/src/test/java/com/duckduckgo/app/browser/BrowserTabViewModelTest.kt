@@ -10338,6 +10338,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPdfDownloadCarriesCertificateThenSiteCertificateIsPopulated() = runTest {
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val url = "https://example.com/doc.pdf"
+        val certificate: SslCertificate = mock()
+        whenever(mockInlinePdfHandler.downloadToCache(url))
+            .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate))
+        whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
+
+        testee.requestFileDownload(mock(), url, null, "application/pdf", true, false)
+
+        assertEquals(certificate, testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
+    fun whenPdfDownloadHasNoCertificateThenSiteCertificateRemainsNull() = runTest {
+        whenever(mockInlinePdfHandler.classifyPdfRequest(any(), anyOrNull(), any())).thenReturn(PdfRenderDecision.Inline)
+        val url = "https://example.com/doc.pdf"
+        whenever(mockInlinePdfHandler.downloadToCache(url))
+            .thenReturn(PdfDownloadResult.Success(Uri.parse("file:///cache/doc.pdf"), certificate = null))
+        whenever(mockInlinePdfHandler.extractFileName(url)).thenReturn("doc.pdf")
+
+        testee.requestFileDownload(mock(), url, null, "application/pdf", true, false)
+
+        assertNull(testee.siteLiveData.value?.certificate)
+    }
+
+    @Test
     fun whenOnPdfHiddenThenCurrentPdfStateClears() {
         testee.browserViewState.value = browserViewState().copy(
             currentPdfCachedUri = Uri.parse("file:///cache/doc.pdf"),
