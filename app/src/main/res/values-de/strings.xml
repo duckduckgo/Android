@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Meine Sachen wiederherstellen</string>
     <string name="syncRestoreDialogSecondaryCta">Überspringen</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF herunterladen</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Linktext kopieren</string>
     <string name="linkTextCopied">Linktext kopiert</string>
