@@ -175,6 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ištrinti serverio duomenis?</string>
+    <string name="sync_delete_server_data_dialog_content">Jūsų atsarginė kopija bus ištrinta iš serverio. Visi įrenginiai bus atjungti nuo sinchronizavimo, bet iš nė vieno įrenginio niekas nebus ištrinta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Ištrinti serverio duomenis</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Atšaukti</string>
 
     <!-- Sync feature promo -->

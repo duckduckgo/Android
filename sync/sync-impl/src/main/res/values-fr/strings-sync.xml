@@ -175,6 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Supprimer les données du serveur ?</string>
+    <string name="sync_delete_server_data_dialog_content">Votre sauvegarde sera supprimée du serveur. Tous les appareils seront déconnectés de la synchronisation, mais rien ne sera supprimé sur aucun appareil.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Supprimer les données du serveur</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuler</string>
 
     <!-- Sync feature promo -->

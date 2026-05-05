@@ -175,6 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>
+    <string name="sync_delete_server_data_dialog_content">Sinu varukoopia kustutatakse serverist. Kõigi seadmete sünkroonimine katkestatakse, kuid ühestki seadmest ei kustutata midagi.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Kustuta serveri andmed</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
 
     <!-- Sync feature promo -->

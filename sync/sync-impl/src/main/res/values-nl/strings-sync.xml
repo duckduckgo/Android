@@ -175,6 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Wil je de servergegevens verwijderen?</string>
+    <string name="sync_delete_server_data_dialog_content">Je back-up wordt verwijderd van de server. Alle apparaten worden losgekoppeld van de synchronisatie, maar er wordt niets van de apparaten verwijderd.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Servergegevens verwijderen</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuleren</string>
 
     <!-- Sync feature promo -->

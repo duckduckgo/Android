@@ -175,6 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Изтриване на данните от сървъра?</string>
+    <string name="sync_delete_server_data_dialog_content">Резервното копие ще бъде изтрито от сървъра. Синхронизацията на всички устройства ще бъде изключена, но от устройствата няма да бъде изтрито нищо.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данните от сървъра</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отмени</string>
 
     <!-- Sync feature promo -->
