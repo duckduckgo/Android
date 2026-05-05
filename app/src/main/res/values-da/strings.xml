@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Gendan mine data</string>
     <string name="syncRestoreDialogSecondaryCta">Spring over</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Download PDF-fil</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopier linktekst</string>
     <string name="linkTextCopied">Linktekst kopieret</string>

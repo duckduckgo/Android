@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Gjenopprett innholdet mitt</string>
     <string name="syncRestoreDialogSecondaryCta">Hopp over</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Last ned PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopier lenketekst</string>
     <string name="linkTextCopied">Lenketeksten er kopiert</string>

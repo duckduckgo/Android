@@ -1024,6 +1024,9 @@
     <string name="syncRestoreDialogPrimaryCta">Atkurti mano duomenis</string>
     <string name="syncRestoreDialogSecondaryCta">Praleisti</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Atsisiųsti PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopijuoti nuorodos tekstą</string>
     <string name="linkTextCopied">Nuorodos tekstas nukopijuotas</string>

@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF indir</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Bağlantı Metnini Kopyala</string>
     <string name="linkTextCopied">Bağlantı metni kopyalandı</string>
