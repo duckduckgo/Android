@@ -144,7 +144,9 @@ class PirModule {
                     .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
                     .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
-                    .withSubtype(BrokerAction.Condition::class.java, "condition"),
+                    .withSubtype(BrokerAction.Condition::class.java, "condition")
+                    .withSubtype(BrokerAction.GenerateEmail::class.java, "generateEmail")
+                    .withSubtype(BrokerAction.GetEmailData::class.java, "getEmailData"),
             ).add(
                 PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, "stepType")
                     .withSubtype(ScanStepActions::class.java, "scan")
