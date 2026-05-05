@@ -293,7 +293,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyNativeStyling() {
-        setBackgroundColor(Color.TRANSPARENT)
+        if (!isWidgetBottom()){
+            setBackgroundColor(Color.TRANSPARENT)
+        }
         hideInputFieldBackground()
         removeMargins()
         applyTrailingButtonMargin()

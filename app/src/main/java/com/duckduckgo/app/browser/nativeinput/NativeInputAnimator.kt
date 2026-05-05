@@ -331,16 +331,18 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private fun animateCornerRadius(card: View, isBottom: Boolean, topRadius: Float) {
         val materialCard = card as? MaterialCardView ?: return
-        if (isBottom) {
-            materialCard.shapeAppearanceModel = materialCard.shapeAppearanceModel.toBuilder()
-                .setTopLeftCornerSize(topRadius)
-                .setTopRightCornerSize(topRadius)
-                .setBottomLeftCornerSize(0f)
-                .setBottomRightCornerSize(0f)
-                .build()
-        } else {
-            materialCard.radius = topRadius
-        }
+        materialCard.radius = topRadius
+
+        // if (isBottom) {
+        //     materialCard.shapeAppearanceModel = materialCard.shapeAppearanceModel.toBuilder()
+        //         .setTopLeftCornerSize(topRadius)
+        //         .setTopRightCornerSize(topRadius)
+        //         .setBottomLeftCornerSize(0f)
+        //         .setBottomRightCornerSize(0f)
+        //         .build()
+        // } else {
+        //     materialCard.radius = topRadius
+        // }
     }
 
     private fun restoreLayout(card: View, params: FrameLayout.LayoutParams, margins: Margins) {
