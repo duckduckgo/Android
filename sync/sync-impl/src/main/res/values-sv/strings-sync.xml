@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Radera serverdata?</string>
-    <string name="sync_delete_server_data_dialog_content">Alla enheter kopplas bort och dina synkroniserade data raderas från servern.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Radera data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
 
     <!-- Sync feature promo -->

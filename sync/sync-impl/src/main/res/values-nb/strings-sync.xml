@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Vil du slette serverdata?</string>
-    <string name="sync_delete_server_data_dialog_content">Alle enheter blir frakoblet og dine synkroniserte data blir slettet fra serveren.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Slett data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
 
     <!-- Sync feature promo -->

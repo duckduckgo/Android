@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ștergi datele serverului?</string>
-    <string name="sync_delete_server_data_dialog_content">Toate dispozitivele vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Șterge datele</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Anulare</string>
 
     <!-- Sync feature promo -->

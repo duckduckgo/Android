@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Sunucu Verileri Silinsin mi?</string>
-    <string name="sync_delete_server_data_dialog_content">Tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Verileri Sil</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Vazgeç</string>
 
     <!-- Sync feature promo -->

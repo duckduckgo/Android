@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Szerveradatok törlése?</string>
-    <string name="sync_delete_server_data_dialog_content">A rendszer minden eszközt lecsatlakoztat, és a szinkronizált adatokat törli a szerverről.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Adatok törlése</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Mégsem</string>
 
     <!-- Sync feature promo -->

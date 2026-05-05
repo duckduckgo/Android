@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Изтриване на данните от сървъра?</string>
-    <string name="sync_delete_server_data_dialog_content">Връзката на всички устройства ще бъде премахната, а синхронизираните данни ще бъдат изтрити от сървъра.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данни</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отмени</string>
 
     <!-- Sync feature promo -->

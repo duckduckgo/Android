@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Zmazať údaje servera?</string>
-    <string name="sync_delete_server_data_dialog_content">Všetky zariadenia budú odpojené a vaše synchronizované údaje budú zmazané zo servera.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Zmazať údaje</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Zrušiť</string>
 
     <!-- Sync feature promo -->

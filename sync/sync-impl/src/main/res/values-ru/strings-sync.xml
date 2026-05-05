@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Удалить данные с сервера?</string>
-    <string name="sync_delete_server_data_dialog_content">Привязка устройств будет отключена, а синхронизированные данные — удалены с сервера.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Удалить данные</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Отменить</string>
 
     <!-- Sync feature promo -->

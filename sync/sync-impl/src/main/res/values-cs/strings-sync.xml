@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Smazat data ze serveru?</string>
-    <string name="sync_delete_server_data_dialog_content">Dojde k odpojení všech zařízení a smazání synchronizovaných dat ze serveru.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Smazat data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Zrušit</string>
 
     <!-- Sync feature promo -->

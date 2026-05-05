@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Usunąć dane serwera?</string>
-    <string name="sync_delete_server_data_dialog_content">Wszystkie urządzenia zostaną odłączone, a zsynchronizowane dane usunięte z serwera.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Usuń dane</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Anuluj</string>
 
     <!-- Sync feature promo -->

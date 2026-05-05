@@ -175,8 +175,6 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Želite izbrisati podatke strežnika?</string>
-    <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
 
     <!-- Sync feature promo -->
