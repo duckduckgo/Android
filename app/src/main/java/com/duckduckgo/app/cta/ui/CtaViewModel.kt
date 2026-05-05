@@ -390,8 +390,21 @@ class CtaViewModel @Inject constructor(
         onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
 
     @WorkerThread
-    private suspend fun canShowSubscriptionCta(): Boolean =
-        daxOnboardingActive() && !hideTips() && !daxDialogSubscriptionShown() && isSubscriptionCtaAvailable()
+    private suspend fun canShowSubscriptionCta(): Boolean {
+        if (hideTips() || daxDialogSubscriptionShown() || !isSubscriptionCtaAvailable()) return false
+
+        return if (onboardingStore.isDuckAiOnboardingFlow()) {
+            // Duck.ai flow: the DAX_ONBOARDING stage completes right after the fire-button CTA
+            // (so the input-mode toggle can be enabled), which makes daxOnboardingActive() false
+            // on home. Gate on the duck.ai end CTA having been shown to preserve ordering:
+            // fire button -> end CTA -> privacy pro.
+            duckAiEndShown()
+        } else {
+            // Regular search flow: privacy pro is part of requiredDaxOnboardingCtas, so the stage
+            // stays active until it's dismissed and daxOnboardingActive() carries the gating.
+            daxOnboardingActive()
+        }
+    }
 
     @WorkerThread
     private suspend fun canShowSubscriptionCtaForSkippedOnboarding(): Boolean =

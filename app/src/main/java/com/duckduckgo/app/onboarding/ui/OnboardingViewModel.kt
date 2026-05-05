@@ -84,7 +84,6 @@ class OnboardingViewModel @Inject constructor(
                         CtaId.DAX_DIALOG_TRACKERS_FOUND,
                         CtaId.DAX_FIRE_BUTTON,
                         CtaId.DAX_END,
-                        CtaId.DAX_INTRO_PRIVACY_PRO,
                     ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
                 }
                 DEFAULT_WITHOUT_INTRO_CTA -> {
