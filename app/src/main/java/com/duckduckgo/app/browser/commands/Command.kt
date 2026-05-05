@@ -24,8 +24,10 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -456,10 +458,8 @@ sealed class Command {
 
     class SetBrowserBackground(
         @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetBrowserBackgroundColor(
-        @ColorRes val colorRes: Int,
+        val useRebrandBackground: Boolean = false,
+        @AttrRes val backgroundColorAttr: Int = 0,
     ) : Command()
 
     class SetOnboardingDialogBackground(
@@ -516,4 +516,13 @@ sealed class Command {
         val tabId: String,
         val pageContext: String,
     ) : Command()
+
+    data class ShowToast(@param:StringRes val textResId: Int) : Command()
+
+    data class ShowPdfInTab(
+        val url: String,
+        val cachedFileUri: Uri,
+    ) : Command()
+
+    data object ExpandOmnibar : Command()
 }

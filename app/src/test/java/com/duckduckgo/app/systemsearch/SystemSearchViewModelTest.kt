@@ -852,36 +852,26 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun `when onDigitalAssistOpened and digital assist and voice search enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
+    fun `when onDigitalAssistOpened and digital assist enabled and duck chat enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(true)
-
-        testee.onDigitalAssistOpened(mock())
-
-        verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
-    }
-
-    @Test
-    fun `when onDigitalAssistOpened and digital assist enabled and voice search disabled then LaunchDuckAi command sent`() = runTest {
-        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(false)
         whenever(mockDuckChat.isEnabled()).thenReturn(true)
 
         testee.onDigitalAssistOpened(mock())
 
-        verify(commandObserver).onChanged(Command.LaunchDuckAi)
+        verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
+        verify(mockPixel).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
     fun `when onDigitalAssistOpened and duck chat disabled then LaunchAssistSearch command sent`() = runTest {
         whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
-        whenever(mockDuckChat.isVoiceChatEnabled()).thenReturn(false)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
         val intent = mock<Intent>()
 
         testee.onDigitalAssistOpened(intent)
 
         verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     @Test
@@ -892,6 +882,7 @@ class SystemSearchViewModelTest {
         testee.onDigitalAssistOpened(intent)
 
         verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     companion object {

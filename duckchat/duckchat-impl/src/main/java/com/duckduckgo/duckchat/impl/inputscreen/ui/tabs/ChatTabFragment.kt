@@ -82,7 +82,6 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!duckChatFeature.aiChatSuggestions().isEnabled()) return
         configureChatSuggestions()
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             configureChatUrlSuggestions()
@@ -111,6 +110,15 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
                 updatePadding(top = 8f.toPx(context).roundToInt(), bottom = bottomSpacing)
             }
         }
+        chatSuggestionsRecyclerView?.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        parentFragment.dismissKeyboard()
+                    }
+                }
+            },
+        )
     }
 
     private fun configureObservers() {

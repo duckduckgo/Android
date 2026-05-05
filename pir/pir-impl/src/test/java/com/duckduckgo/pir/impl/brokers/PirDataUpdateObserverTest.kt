@@ -42,7 +42,7 @@ class PirDataUpdateObserverTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val lifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
+    private lateinit var lifecycleOwner: TestLifecycleOwner
     private val brokerJsonUpdater: BrokerJsonUpdater = mock()
     private val pirWorkHandler: PirWorkHandler = mock()
     private val pirFeatureDataCleaner: PirFeatureDataCleaner = mock()
@@ -55,6 +55,7 @@ class PirDataUpdateObserverTest {
 
     @Before
     fun setUp() = runTest {
+        lifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
         whenever(pirWorkHandler.canRunPir()).thenReturn(canRunPirFlow)
         whenever(pirRepository.getFeatureReceivedMs()).thenReturn(0L)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1000L)

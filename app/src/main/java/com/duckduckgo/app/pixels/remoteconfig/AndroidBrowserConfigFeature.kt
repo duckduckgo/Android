@@ -376,4 +376,12 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabStateRestorationFix(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "pdfViewer" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun pdfViewer(): Toggle
 }

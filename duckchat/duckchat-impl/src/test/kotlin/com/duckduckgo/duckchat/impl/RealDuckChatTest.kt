@@ -33,7 +33,6 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
-import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -48,14 +47,12 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
-import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -106,9 +103,6 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
-    private val mockDuckChatDeleter: DuckChatDeleter = mock()
-    private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
-    private val mockSyncEngine: SyncEngine = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
@@ -120,6 +114,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
@@ -131,6 +126,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
@@ -149,9 +145,6 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDeviceSyncState,
                 cookiesManager,
-                mockDuckChatDeleter,
-                mockDuckChatSyncRepository,
-                mockSyncEngine,
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
@@ -306,20 +299,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenAiChatSuggestionsFeatureEnabledThenIsChatSuggestionsFeatureAvailableReturnsTrue() {
-        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
-
-        assertTrue(testee.isChatSuggestionsFeatureAvailable())
-    }
-
-    @Test
-    fun whenAiChatSuggestionsFeatureDisabledThenIsChatSuggestionsFeatureAvailableReturnsFalse() {
-        duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = false))
-
-        assertFalse(testee.isChatSuggestionsFeatureAvailable())
-    }
-
-    @Test
     fun whenFeatureEnabledThenShowPopupMenuShortcutReturnsValueFromRepository() {
         assertTrue(testee.showPopupMenuShortcut.value)
     }
@@ -373,6 +352,109 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isVoiceSearchEntryPointEnabled())
+    }
+
+    @Test
+    fun whenDuckChatEnabledAndVoiceEntryPointEnabledThenShowVoiceChatEntryIsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertTrue(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenVoiceEntryPointDisabledThenShowVoiceChatEntryIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenDuckChatFeatureDisabledThenShowVoiceChatEntryIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenDuckChatUserDisabledThenShowVoiceChatEntryIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenShouldShowInVoiceSearchSettingFalseThenShowVoiceChatEntryStillTrue() = runTest {
+        // showVoiceChatEntry must be independent of the in-voice-search toggle user setting
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertTrue(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenShouldShowInVoiceChatSettingFalseThenShowVoiceChatEntryIsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.showVoiceChatEntry.value)
+    }
+
+    @Test
+    fun whenSetShowInVoiceChatUserSettingThenRepositorySetCalled() = runTest {
+        testee.setShowInVoiceChatUserSetting(true)
+        verify(mockDuckChatFeatureRepository).setShowInVoiceChat(true)
+    }
+
+    @Test
+    fun whenSetShowInVoiceChatUserSettingThenShowVoiceChatEntryReflectsChange() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(true)
+        testee.setShowInVoiceChatUserSetting(true)
+        assertTrue(testee.showVoiceChatEntry.value)
+
+        whenever(mockDuckChatFeatureRepository.shouldShowInVoiceChat()).thenReturn(false)
+        testee.setShowInVoiceChatUserSetting(false)
+        assertFalse(testee.showVoiceChatEntry.value)
     }
 
     @Test
@@ -1455,64 +1537,6 @@ class RealDuckChatTest {
         assertFalse(testee.isStandaloneMigrationCompleted())
     }
 
-    @Test
-    fun `when duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
-        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
-
-        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
-
-        assertTrue(result)
-        verify(mockDuckChatDeleter).deleteChat("abc-123")
-        verify(mockDuckChatSyncRepository).recordSingleChatDeletion("abc-123")
-        verify(mockSyncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-    }
-
-    @Test
-    fun `when duck ai url without chatID then deleteChat returns false`() = runTest {
-        val result = testee.deleteChat("https://duck.ai/chat")
-
-        assertFalse(result)
-        verify(mockDuckChatDeleter, never()).deleteChat(any())
-    }
-
-    @Test
-    fun `when non duck ai url with chatID param then deleteChat returns false`() = runTest {
-        val result = testee.deleteChat("https://example.com/?chatID=abc-123")
-
-        assertFalse(result)
-        verify(mockDuckChatDeleter, never()).deleteChat(any())
-    }
-
-    @Test
-    fun `when duck ai url with blank chatID then deleteChat returns false`() = runTest {
-        val result = testee.deleteChat("https://duck.ai/chat?chatID=")
-
-        assertFalse(result)
-        verify(mockDuckChatDeleter, never()).deleteChat(any())
-    }
-
-    @Test
-    fun `when legacy duckduckgo duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
-        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
-
-        val result = testee.deleteChat("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc-123")
-
-        assertTrue(result)
-        verify(mockDuckChatDeleter).deleteChat("abc-123")
-    }
-
-    @Test
-    fun `when deleteChat and deleter returns false then deleteChat returns false`() = runTest {
-        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(false)
-
-        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
-
-        assertFalse(result)
-        verify(mockDuckChatDeleter).deleteChat("abc-123")
-        verify(mockDuckChatSyncRepository, never()).recordSingleChatDeletion(any())
-        verify(mockSyncEngine, never()).triggerSync(any())
-    }
-
     companion object {
         val SETTINGS_JSON = """
         {
@@ -1650,36 +1674,6 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
-    }
-
-    @Test
-    fun `when duck chat enabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns true`() = runTest {
-        duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-        testee.onPrivacyConfigDownloaded()
-
-        assertTrue(testee.isVoiceChatEnabled())
-    }
-
-    @Test
-    fun `when duck chat enabled and duckAiVoiceSearch disabled then isVoiceChatEnabled returns false`() = runTest {
-        duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.isVoiceChatEnabled())
-    }
-
-    @Test
-    fun `when duck chat disabled and duckAiVoiceSearch enabled then isVoiceChatEnabled returns false`() = runTest {
-        duckChatFeature.self().setRawStoredState(State(enable = false))
-        duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = true))
-        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.isVoiceChatEnabled())
     }
 
     @Test

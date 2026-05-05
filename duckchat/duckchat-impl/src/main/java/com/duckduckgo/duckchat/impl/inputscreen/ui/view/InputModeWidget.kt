@@ -78,6 +78,7 @@ open class InputModeWidget @JvmOverloads constructor(
     val inputField: EditText
     private val inputFieldClearText: View
     private val inputModeWidgetBack: View
+    private val inputModeWidgetUnifiedBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
     private val inputScreenButtonsContainer: FrameLayout
@@ -86,12 +87,13 @@ open class InputModeWidget @JvmOverloads constructor(
     val tabSwitcherButton: TabSwitcherButton
     private val menuButton: View
     private val menuIconImageView: ImageView
+    private val browserMenuHighlight: View
     private val fireButton: View
     private val voiceInputButton: View
     private var bottomButtonsMode: Boolean = false
 
     private val inputModeCardExtendedEndMargin: Int by lazy {
-        resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardExtendedMarginHorizontal)
+        resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
     }
 
     private val inputModeCardEndMargin: Int by lazy {
@@ -159,11 +161,13 @@ open class InputModeWidget @JvmOverloads constructor(
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
-        inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
+        inputModeWidgetBack = findViewById(R.id.inputModeWidgetBack)
+        inputModeWidgetUnifiedBack = findViewById(R.id.inputModeUnifiedBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
         inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
         menuButton = findViewById(R.id.inputFieldBrowserMenu)
         menuIconImageView = findViewById(R.id.browserMenuImageView)
+        browserMenuHighlight = findViewById(R.id.browserMenuHighlight)
         fireButton = findViewById(R.id.inputFieldFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
@@ -219,6 +223,12 @@ open class InputModeWidget @JvmOverloads constructor(
         return inputModeSwitch.selectedTabPosition
     }
 
+    fun onBackPressed() {
+        onBack?.invoke()
+        val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
+    }
+
     private fun configureClickListeners() {
         inputFieldClearText.setOnClickListener {
             inputField.text.clear()
@@ -227,12 +237,9 @@ open class InputModeWidget @JvmOverloads constructor(
 
             onClearTextTapped?.invoke()
         }
-        inputModeWidgetBack.setOnClickListener {
-            onBack?.invoke()
+        inputModeWidgetBack.setOnClickListener { onBackPressed() }
+        inputModeWidgetUnifiedBack.setOnClickListener { onBackPressed() }
 
-            val params = inputScreenPixelsModeParam(isSearchMode = inputModeSwitch.selectedTabPosition == 0)
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_BACK_BUTTON_PRESSED, parameters = params)
-        }
         inputField.setOnClickListener {
             onInputFieldClicked?.invoke()
         }
@@ -435,6 +442,13 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun submitAsChat(): Boolean {
+        val textToSubmit = inputField.text.getTextToSubmit()?.toString() ?: return false
+        onChatSent?.invoke(textToSubmit)
+        inputField.clearFocus()
+        return true
+    }
+
     fun selectTab(index: Int) {
         inputModeSwitch.post {
             inputModeSwitch.getTabAt(index)?.select()
@@ -515,6 +529,10 @@ open class InputModeWidget @JvmOverloads constructor(
 
     fun setVoiceButtonVisible(visible: Boolean) {
         voiceInputButton.isVisible = visible
+    }
+
+    fun setBrowserMenuHighlightVisible(visible: Boolean) {
+        browserMenuHighlight.isVisible = visible
     }
 
     fun setMenuIcon(@DrawableRes resId: Int) {

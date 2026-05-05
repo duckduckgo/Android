@@ -170,8 +170,6 @@ class SystemSearchViewModel @Inject constructor(
 
         data object LaunchDuckAiVoiceChat : Command()
 
-        data object LaunchDuckAi : Command()
-
         data class LaunchAssistSearch(val intent: Intent) : Command()
     }
 
@@ -318,8 +316,10 @@ class SystemSearchViewModel @Inject constructor(
     fun onDigitalAssistOpened(intent: Intent) {
         viewModelScope.launch {
             command.value = when {
-                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isVoiceChatEnabled() -> Command.LaunchDuckAiVoiceChat
-                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> Command.LaunchDuckAi
+                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> {
+                    pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+                    Command.LaunchDuckAiVoiceChat
+                }
                 else -> Command.LaunchAssistSearch(intent)
             }
         }

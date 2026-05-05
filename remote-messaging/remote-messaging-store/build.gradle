@@ -42,8 +42,8 @@ android {
 }
 
 dependencies {
-    implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
     implementation "com.squareup.logcat:logcat:_"
     implementation project(path: ':common-utils')

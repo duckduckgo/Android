@@ -189,6 +189,7 @@
     <string name="subscriptionSettingManagePaymentOrCancel">Zahlung verwalten oder stornieren</string>
 
     <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Dein Abo wird am %2$s auf %1$s herabgestuft.</string>
     <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s hochgestuft.</string>
     <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s herabgestuft.</string>
     <string name="planNamePlusMonthly">Plus monatlich</string>

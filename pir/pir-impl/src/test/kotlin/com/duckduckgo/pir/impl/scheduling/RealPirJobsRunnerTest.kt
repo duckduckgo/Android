@@ -33,7 +33,8 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
-import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_EDIT_PROFILE
+import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -43,6 +44,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -168,12 +170,12 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockPirSchedulingRepository)
@@ -189,12 +191,12 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         // When
-        val result = testee.runEligibleJobs(mockContext, MANUAL)
+        val result = testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         assertTrue(result.isSuccess)
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
@@ -209,12 +211,12 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockPirSchedulingRepository)
@@ -260,13 +262,13 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(0L, 2)
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
@@ -311,19 +313,50 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         // we just dont attempt what the mock for time provider is giving us
-        verify(mockPixelSender).reportInitialScanDuration(0L, 2)
+        verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
             RunType.MANUAL,
         )
         verifyNoMoreInteractions(mockPixelSender)
+    }
+
+    @Test
+    fun whenManualEditProfileExecutionTypeThenForwardsTriggerToPixelSender() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE)
+
+        // Then
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
+        verify(mockPixelSender).reportInitialScanDuration(any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_EDIT_PROFILE), any())
     }
 
     @Test
@@ -365,8 +398,8 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, SCHEDULED)
 
         // Then
-        verify(mockPixelSender).reportScheduledScanStarted()
-        verify(mockPixelSender).reportScheduledScanCompleted(any())
+        verify(mockPixelSender).reportScheduledScanStarted(any(), any())
+        verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any())
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
@@ -398,7 +431,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
@@ -427,7 +460,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository).saveScanJobRecords(
@@ -456,7 +489,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveScanJobRecords(any())
@@ -488,12 +521,12 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirScan).stop()
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(
             listOf(
                 OptOutJobRecord(
@@ -531,7 +564,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository).saveOptOutJobRecords(
@@ -571,7 +604,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
@@ -606,7 +639,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(any())
@@ -641,11 +674,11 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirOptOut, never()).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
     }
 
@@ -678,7 +711,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirOptOut).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
@@ -708,7 +741,7 @@ class RealPirJobsRunnerTest {
             whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
             // When
-            testee.runEligibleJobs(mockContext, MANUAL)
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
             // Then
             verify(mockPirOptOut, never()).executeOptOutForJobs(
@@ -757,7 +790,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         // Verify all major operations are called
@@ -801,7 +834,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirScan).stop()
@@ -834,7 +867,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         // Should create opt-out job even for deprecated profile if it has extracted profiles
@@ -880,7 +913,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         // Should not create new opt-out job if one already exists
@@ -928,7 +961,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         // Should create scan job only for non-deprecated profile
@@ -984,7 +1017,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(0L)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirRepository).setLatestBackgroundScanRunInMs(any())
@@ -1071,7 +1104,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
@@ -1085,7 +1118,7 @@ class RealPirJobsRunnerTest {
         whenever(mockBrokerJsonUpdater.update()).thenReturn(true)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockBrokerJsonUpdater).update()
@@ -1123,7 +1156,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then - scan should proceed (scan jobs attempted, not just completing with empty brokers)
         verify(mockBrokerJsonUpdater).update()
@@ -1138,12 +1171,12 @@ class RealPirJobsRunnerTest {
         whenever(mockBrokerJsonUpdater.update()).thenReturn(false)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verify(mockBrokerJsonUpdater).update()
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockEligibleScanJobProvider)
     }
@@ -1177,7 +1210,7 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
@@ -1191,12 +1224,12 @@ class RealPirJobsRunnerTest {
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         // When
-        testee.runEligibleJobs(mockContext, MANUAL)
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
-        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
     }
 }

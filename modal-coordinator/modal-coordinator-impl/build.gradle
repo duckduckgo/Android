@@ -46,7 +46,7 @@ dependencies {
 
     implementation project(':common-utils')
 
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':di')
     api AndroidX.dataStore.preferences

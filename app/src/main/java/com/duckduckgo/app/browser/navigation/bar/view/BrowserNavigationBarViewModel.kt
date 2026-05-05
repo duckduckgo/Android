@@ -21,10 +21,12 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
+import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.DuckAI
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.TabManager
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -46,7 +48,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -58,23 +63,32 @@ class BrowserNavigationBarViewModel @Inject constructor(
     private val pixel: Pixel,
     tabRepository: TabRepository,
     dispatcherProvider: DispatcherProvider,
-    browserMenuHighlightState: BrowserMenuHighlightState,
+    browserMenuHighlight: BrowserMenuHighlight,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = combine(
-        _viewState.asStateFlow(),
-        tabRepository.flowTabs,
-        browserMenuHighlightState.shouldHighlight,
-    ) { state, tabs, shouldHighlightMenu ->
-        state.copy(
-            tabsCount = tabs.size,
-            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = shouldHighlightMenu,
-        )
+    val viewState = _viewState.map { it.viewMode.toBrowserViewMode() }.distinctUntilChanged().flatMapLatest { mode ->
+        combine(
+            _viewState.asStateFlow(),
+            tabRepository.flowTabs,
+            browserMenuHighlight.shouldShowHighlightForMode(mode),
+        ) { state, tabs, showHighlight ->
+            state.copy(
+                tabsCount = tabs.size,
+                hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+                showBrowserMenuHighlight = showHighlight,
+            )
+        }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
+
+    private fun ViewMode.toBrowserViewMode(): BrowserViewMode = when (this) {
+        Browser -> BrowserViewMode.Browser
+        NewTab, TabManager -> BrowserViewMode.NewTab
+        CustomTab -> BrowserViewMode.CustomTab
+        DuckAI -> BrowserViewMode.DuckAi
+    }
 
     fun onFireButtonClicked() {
         pixel.fire(
@@ -121,6 +135,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = false,
                         autofillButtonVisible = true,
+                        viewMode = viewMode,
                     )
                 }
             }
@@ -130,6 +145,17 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
+                        viewMode = viewMode,
+                    )
+                }
+            }
+
+            DuckAI -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        viewMode = viewMode,
                     )
                 }
             }
@@ -142,6 +168,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         tabsButtonVisible = false,
                         bookmarksButtonVisible = false,
                         showShadow = false,
+                        viewMode = viewMode,
                     )
                 }
             }
@@ -149,6 +176,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                 _viewState.update {
                     it.copy(
                         isVisible = false,
+                        viewMode = viewMode,
                     )
                 }
             }
@@ -184,6 +212,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
         val showBrowserMenuHighlight: Boolean = false,
+        val viewMode: ViewMode = Browser,
         val showShadow: Boolean = true,
     )
 }

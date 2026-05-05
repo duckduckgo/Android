@@ -19,16 +19,23 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,6 +57,8 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
+    private lateinit var showOnAppLaunchOptionDataStore: FakeShowOnAppLaunchOptionDataStore
+    private val appBuildConfig: AppBuildConfig = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
@@ -65,18 +74,22 @@ class FirstScreenHandlerImplTest {
 
     @Before
     fun setup() {
+        showOnAppLaunchOptionDataStore = FakeShowOnAppLaunchOptionDataStore()
         whenever(androidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(idleReturnToggle)
         whenever(showOnAppLaunchFeature.self()).thenReturn(showOnAppLaunchToggle)
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
         whenever(duckChat.isVoiceSessionActive()).thenReturn(false)
         whenever(customTabDetector.isCustomTab()).thenReturn(false)
         whenever(tabRepository.liveSelectedTab).thenReturn(liveSelectedTab)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
 
         testee = FirstScreenHandlerImpl(
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             showOnAppLaunchFeature = showOnAppLaunchFeature,
             settingsDataStore = settingsDataStore,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
+            appBuildConfig = appBuildConfig,
             duckChat = duckChat,
             tabRepository = tabRepository,
             ntpAfterIdleManager = ntpAfterIdleManager,
@@ -85,6 +98,60 @@ class FirstScreenHandlerImplTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = testScope,
         )
+    }
+
+    // --- new-user default is persisted on onOpen when conditions are met ---
+
+    @Test
+    fun whenOnOpenWithIdleReturnEnabledAndNewInstallAndNoOptionThenPersistsNewTabPage() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(NewTabPage, showOnAppLaunchOptionDataStore.optionFlow.firstOrNull())
+    }
+
+    @Test
+    fun whenOnOpenWithIdleReturnDisabledThenDoesNotPersistDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(showOnAppLaunchOptionDataStore.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOnOpenAndNotNewInstallThenDoesNotPersistDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(showOnAppLaunchOptionDataStore.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOnOpenAndOptionAlreadySelectedThenDoesNotOverwrite() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(LastOpenedTab, showOnAppLaunchOptionDataStore.optionFlow.firstOrNull())
     }
 
     // --- Idle return enabled (covers both fresh and non-fresh launches) ---

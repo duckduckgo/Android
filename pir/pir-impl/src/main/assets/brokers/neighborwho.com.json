@@ -1,7 +1,7 @@
 {
   "name": "NeighborWho",
   "url": "neighborwho.com",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "parent": "beenverified.com",
   "optOutUrl": "https://www.neighborwho.com/svc/optout/search/optouts",
   "mirrorSites": [
@@ -22,6 +22,17 @@
           "actionType": "navigate",
           "url": "https://www.neighborwho.com/svc/optout/search/optouts",
           "id": "777df3ca-c08b-4261-9d19-6b6463865677"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-b925d36d-ce04-418e-871f-b6787fdc0ffb"
         },
         {
           "actionType": "expectation",
@@ -52,6 +63,17 @@
             }
           ],
           "id": "777a01d9-630f-42e4-a8b8-4c87ddab91e3"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-f464162f-bdcb-459f-a348-c832ee8dd49f"
         },
         {
           "actionType": "click",
@@ -142,7 +164,7 @@
                   "parent": "//*[@id='comprehensive-form']"
                 }
               ],
-              "id": "86642ccf-0273-4523-ad03-a90260e9f47b"
+              "id": "cft-86642ccf-0273-4523-ad03-a90260e9f47b"
             },
             {
               "actionType": "click",

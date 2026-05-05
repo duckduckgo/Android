@@ -30,6 +30,7 @@ ext {
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
@@ -51,7 +52,6 @@ dependencies {
     implementation project(':saved-sites-api')
     implementation project(':cookies-api')
 
-    anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
     implementation AndroidX.security.crypto
@@ -81,8 +81,8 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.biometric
 
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
-    implementation AndroidX.room.ktx
 
     implementation "net.zetetic:sqlcipher-android:_"
     implementation "com.facebook.shimmer:shimmer:_"

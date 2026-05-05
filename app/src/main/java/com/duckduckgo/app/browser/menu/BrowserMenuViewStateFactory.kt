@@ -151,7 +151,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canChangeBrowsingMode = browserViewState.canChangeBrowsingMode,
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             hasPreviousAppLink = browserViewState.previousAppLink != null,
-            canFindInPage = browserViewState.canFindInPage,
+            canFindInPage = browserViewState.canFindInPage && browserViewState.currentPdfCachedUri == null,
             addToHomeVisible = browserViewState.addToHomeVisible,
             addToHomeEnabled = browserViewState.addToHomeEnabled,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
@@ -160,6 +160,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
+            showDownloadPdfMenuItem = browserViewState.currentPdfCachedUri != null,
             pageContextHeader = createBrowserHeaderContextState(browserViewState, title, tabId, shortUrl, omnibarText, serpLogoUrl, siteUrl),
         )
     }

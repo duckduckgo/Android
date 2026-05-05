@@ -18,12 +18,6 @@ package com.duckduckgo.app.browser.nativeinput
 
 import android.graphics.Color
 import android.os.Build
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.TextPaint
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -125,6 +119,7 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+            omnibarView.findViewById<View?>(R.id.duckAIFreePill)?.gone()
             omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
             omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
         }
@@ -161,62 +156,35 @@ class RealNativeInputOmnibarController(
 
     private fun showDuckAiTitle(omnibarView: View) {
         val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
-        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
         omnibarView.findViewById<View?>(R.id.aiIcon)?.gone()
         header?.show()
         header?.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         header?.setBackgroundColor(Color.TRANSPARENT)
-        aiTitle?.show()
-        aiTitle?.textSize = 16f
-        applyTierText(aiTitle)
+        applyTierText(omnibarView)
     }
 
     override fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit) {
         currentTier = tier
         currentUpgradeClick = onUpgradeClicked
         val omnibarView = omnibar.omnibarView as? View ?: return
-        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
-        applyTierText(aiTitle)
+        applyTierText(omnibarView)
     }
 
-    private fun applyTierText(aiTitle: TextView?) {
-        aiTitle ?: return
+    private fun applyTierText(omnibarView: View) {
+        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
+        val freePill = omnibarView.findViewById<View?>(R.id.duckAIFreePill)
         when (currentTier) {
             is DuckAiTier.Free -> {
-                val context = aiTitle.context
-                val freePlan = context.getString(R.string.duckAiHeaderFreePlan)
-                val upgrade = context.getString(R.string.duckAiHeaderUpgrade)
-                val full = "$freePlan · $upgrade ↑"
-                val spannable = SpannableStringBuilder(full)
-                val upgradeStart = full.indexOf(upgrade)
-                val upgradeEnd = full.length
-                val accentColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
-                spannable.setSpan(
-                    object : ClickableSpan() {
-                        override fun onClick(widget: View) {
-                            currentUpgradeClick?.invoke()
-                        }
-                        override fun updateDrawState(ds: TextPaint) {
-                            ds.isUnderlineText = false
-                        }
-                    },
-                    upgradeStart,
-                    upgradeEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                spannable.setSpan(
-                    ForegroundColorSpan(accentColor),
-                    upgradeStart,
-                    upgradeEnd,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-                aiTitle.text = spannable
-                aiTitle.movementMethod = LinkMovementMethod.getInstance()
-                aiTitle.highlightColor = Color.TRANSPARENT
+                aiTitle?.gone()
+                freePill?.show()
+                freePill?.setOnClickListener { currentUpgradeClick?.invoke() }
             }
             is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
-                aiTitle.text = aiTitle.context.getString(R.string.duckAiHeaderPaidTitle)
-                aiTitle.movementMethod = null
+                freePill?.gone()
+                freePill?.setOnClickListener(null)
+                aiTitle?.show()
+                aiTitle?.text = aiTitle?.context?.getString(R.string.duckAiHeaderPaidTitle)
+                aiTitle?.textSize = 16f
             }
         }
     }
@@ -260,6 +228,7 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
         omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+        omnibarView.findViewById<View?>(R.id.duckAIFreePill)?.gone()
         if (isSplitMode()) {
             hideOmnibarButtons(omnibarView)
         }

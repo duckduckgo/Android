@@ -1,7 +1,7 @@
 {
   "name": "BeenVerified",
   "url": "beenverified.com",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts",
   "mirrorSites": [
     {
@@ -80,6 +80,17 @@
         },
         {
           "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-31402247-3777-4887-8958-5e5fbe1fa227"
+        },
+        {
+          "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
@@ -107,6 +118,17 @@
             }
           ],
           "id": "444a01d9-630f-42e4-a8b8-4c87ddab91e3"
+        },
+        {
+          "_comment": "Turnstile auto-completes. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-ede2413a-f55e-417a-a1e0-871b6a37dc61"
         },
         {
           "actionType": "click",
@@ -197,7 +219,7 @@
                   "parent": "//*[@id='comprehensive-form']"
                 }
               ],
-              "id": "380a8326-fb41-4ba3-8721-f1e437d3ee43"
+              "id": "cft-fb884f1a-49d5-4f69-ba48-170347aa3f2d"
             },
             {
               "actionType": "click",

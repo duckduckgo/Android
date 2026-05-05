@@ -142,7 +142,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `when popup menu opened, then remove the highlight`() = runTest {
+    fun `when browser menu opened, then remove the highlight`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialHighlightPopupMenuIcon = true,
         )
@@ -160,7 +160,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         }
         assertEquals(2, actualUpdates.size) // initial values expected immediately
 
-        testee.onPopupMenuLaunched()
+        testee.onBrowserMenuLaunched()
 
         assertEquals(expectedUpdates, actualUpdates)
     }

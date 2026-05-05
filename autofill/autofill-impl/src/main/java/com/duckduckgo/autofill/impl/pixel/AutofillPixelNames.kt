@@ -155,6 +155,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     AUTOFILL_DEVICE_CAPABILITY_CAPABLE("m_autofill_device_capability_capable"),
     AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE("m_autofill_device_capability_secure_storage_unavailable"),
+    AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_DAILY("autofill_device_capability_secure_storage_unavailable_daily"),
     AUTOFILL_DEVICE_CAPABILITY_DEVICE_AUTH_DISABLED("m_autofill_device_capability_device_auth_disabled"),
     AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED(
         "m_autofill_device_capability_secure_storage_unavailable_and_device_auth_disabled",
@@ -243,6 +244,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED("autofill_harmony_update_key_rollback_failed"),
     AUTOFILL_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_preferences_get_key_decode_failed"),
     AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_harmony_preferences_get_key_decode_failed"),
+    AUTOFILL_DECRYPT_DATA_FAILED("autofill_decrypt_failed"),
+    AUTOFILL_ENCRYPT_DATA_FAILED("autofill_encrypt_failed"),
 }
 
 object AutofillPixelParameters {

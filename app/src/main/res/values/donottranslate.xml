@@ -74,6 +74,10 @@
     <string name="duckAiHeaderUpgrade">Upgrade</string>
     <string name="duckAiHeaderPaidTitle">Duck.ai</string>
 
+    <!-- Onboarding search options (need escaped quotes for "duck") -->
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate 'duck' too.">how to say \"duck\" in english</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate 'duck' too. Don't add question mark">how to say \"duck\" in spanish</string>
+
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 
@@ -87,12 +91,6 @@
         }
       }]
     </string>
-
-    <!-- Sync Restore (onboarding) -->
-    <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
-    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
-    <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
-    <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
     <!--Onboarding Rebrand Design Update-->
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>

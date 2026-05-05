@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -47,6 +48,7 @@ class RealSyncAutoRestoreTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val manager: SyncAutoRestoreManager = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private lateinit var testee: RealSyncAutoRestore
 
@@ -57,6 +59,7 @@ class RealSyncAutoRestoreTest {
             manager = manager,
             syncFeature = syncFeature,
             syncAccountRepository = syncAccountRepository,
+            syncPixels = syncPixels,
             appScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )

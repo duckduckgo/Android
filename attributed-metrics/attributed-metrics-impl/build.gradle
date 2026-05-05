@@ -24,7 +24,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
+    ksp project(':anvil-ksp')
 
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':attributed-metrics-api')
@@ -43,7 +43,7 @@ dependencies {
     api AndroidX.dataStore.preferences
 
     // Room
-    implementation AndroidX.room.ktx
+    implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
 
     implementation "com.squareup.logcat:logcat:_"

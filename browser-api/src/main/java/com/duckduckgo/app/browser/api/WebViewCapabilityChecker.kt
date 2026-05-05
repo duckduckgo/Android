@@ -49,5 +49,11 @@ interface WebViewCapabilityChecker {
          * The ability to delete browsing data for specific sites via WebStorageCompat
          */
         data object DeleteBrowsingData : WebViewCapability
+
+        /**
+         * MultiProfile
+         * The ability to use named WebView Profiles to isolate cookies, storage and cache.
+         */
+        data object MultiProfile : WebViewCapability
     }
 }

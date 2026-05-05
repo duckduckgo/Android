@@ -26,7 +26,6 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchO
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -52,20 +51,13 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
-    private val appBuildConfig: AppBuildConfig,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
-        // new users see New Tab
         logcat { "FirstScreen: Inactivity Timer passed" }
-        if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
-            logcat { "FirstScreen: setting New Tab for new users" }
-            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
-        }
-        // existing users see whatever they had selected
         applyShowOnAppLaunchOption(fromInactivity = wasIdle)
     }
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!--
+      Theme overlay for PdfViewerFragmentV2.
+
+      The pdf-viewer library references Material3 color attributes that are
+      absent from the DuckDuckGo theme. This overlay provides them by extending
+      Theme.Material3.DayNight (which supplies text appearances and defaults)
+      and mapping color attributes to DDG design system equivalents.
+
+      The overlay is applied via ContextThemeWrapper in DdgPdfViewerFragment,
+      so ?attr/daxColor* references resolve from the underlying activity context.
+    -->
+    <style name="Widget.DuckDuckGo.PdfViewer" parent="Theme.Material3.DayNight">
+        <!-- Text and icon colors -->
+        <item name="colorOnSurface">?attr/daxColorPrimaryText</item>
+        <item name="colorOnSurfaceVariant">?attr/daxColorSecondaryText</item>
+
+        <!-- Surface variants used by search bar, page indicator, scrollbar -->
+        <item name="colorSurfaceContainer">?attr/daxColorSurface</item>
+        <item name="colorSurfaceBright">?attr/daxColorBackground</item>
+        <item name="colorSurfaceContainerHigh">?attr/daxColorSurface</item>
+
+        <!-- Annotation FAB -->
+        <item name="colorPrimaryContainer">?attr/daxColorAccentBlue</item>
+        <item name="colorOnPrimaryContainer">?attr/daxColorWhite</item>
+
+        <!-- Loading progress indicator track -->
+        <item name="colorSecondaryContainer">?attr/daxColorContainer</item>
+    </style>
+</resources>

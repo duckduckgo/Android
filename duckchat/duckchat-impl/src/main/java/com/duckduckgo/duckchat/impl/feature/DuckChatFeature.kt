@@ -177,13 +177,6 @@ interface DuckChatFeature {
     fun supportsSyncChatsDeletion(): Toggle
 
     /**
-     * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun aiChatSuggestions(): Toggle
-
-    /**
      * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
      * If the remote feature is not present defaults to `false`
      */
@@ -234,4 +227,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun digitalAssistantDuckAi(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai voice chat foreground service (microphone) should be started
+     * and stopped during a voice session.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceChatService(): Toggle
 }

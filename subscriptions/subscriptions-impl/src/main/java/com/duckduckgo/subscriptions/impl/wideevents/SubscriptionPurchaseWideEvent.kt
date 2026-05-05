@@ -28,8 +28,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
 
 interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFlowStarted(
@@ -213,7 +213,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         wideEventClient.intervalStart(
             wideEventId = wideEventId,
             key = KEY_ACTIVATION_LATENCY_MS_BUCKETED,
-            timeout = Duration.ofHours(4),
+            timeout = 4.hours,
         )
 
         wideEventClient.flowStep(

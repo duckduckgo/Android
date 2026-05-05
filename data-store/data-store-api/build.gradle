@@ -33,7 +33,7 @@ dependencies {
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
-    implementation AndroidX.room.ktx
+    api AndroidX.room.runtime
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

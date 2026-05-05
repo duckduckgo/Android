@@ -23,6 +23,8 @@ import com.duckduckgo.sync.api.SyncAutoRestore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +42,7 @@ class RealSyncAutoRestore @Inject constructor(
     private val manager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SyncAutoRestore, SyncOnboardingRestoreState {
@@ -75,9 +78,17 @@ class RealSyncAutoRestore @Inject constructor(
                     is Result.Success -> {
                         logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
                         restoreTimestamp = System.currentTimeMillis()
+                        syncPixels.fireAutoRestoreSuccess(SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING)
                         manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
                     }
-                    is Result.Error -> logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
+                    is Result.Error -> {
+                        logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
+                        syncPixels.fireAutoRestoreFailure(
+                            source = SyncPixelParameters.AUTO_RESTORE_SOURCE_ONBOARDING,
+                            errorCode = result.code.toString(),
+                            errorMessage = result.reason,
+                        )
+                    }
                 }
             } catch (t: Throwable) {
                 coroutineContext.ensureActive()

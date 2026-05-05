@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
  */
 class FakeDuckChat(
     private var enabled: Boolean = true,
-    private var voiceChatEnabled: Boolean = false,
 ) : DuckChat {
 
     private val openDuckChatCalls = mutableListOf<Unit>()
@@ -42,8 +41,6 @@ class FakeDuckChat(
     var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
-
-    override suspend fun isVoiceChatEnabled(): Boolean = voiceChatEnabled
 
     override fun openDuckChat() {
         openDuckChatCalls.add(Unit)
@@ -68,8 +65,6 @@ class FakeDuckChat(
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }
-
-    override suspend fun deleteChat(url: String): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
@@ -111,8 +106,6 @@ class FakeDuckChat(
         chatSuggestionsUserSettingEnabled.value = enabled
     }
 
-    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
-
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
@@ -120,9 +113,5 @@ class FakeDuckChat(
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled
-    }
-
-    fun setVoiceChatEnabled(enabled: Boolean) {
-        this.voiceChatEnabled = enabled
     }
 }

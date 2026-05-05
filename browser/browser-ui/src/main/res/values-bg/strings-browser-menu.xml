@@ -36,6 +36,7 @@
     <string name="browserMenuPrintSite">Отпечатване</string>
     <string name="browserMenuOpenAppLink">Отваряне в приложението</string>
     <string name="browserMenuAddToHome">Добавете към Начална Страница</string>
+    <string name="browserMenuDownloadPdf">Изтегляне на PDF</string>
     <string name="browserMenuReportBrokenSite">Подаване на сигнал за повреден сайт</string>
     <string name="browserMenuAutofill">Пароли</string>
     <string name="browserMenuDownloads">Изтеглени файлове</string>
