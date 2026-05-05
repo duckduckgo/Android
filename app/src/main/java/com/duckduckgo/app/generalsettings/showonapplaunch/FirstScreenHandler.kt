@@ -19,9 +19,12 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -47,6 +50,8 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
     private val tabRepository: TabRepository,
@@ -73,8 +78,16 @@ class FirstScreenHandlerImpl @Inject constructor(
             // Persist the new-user default eagerly so screens that read optionFlow
             // (e.g. GeneralSettings) don't fall back to LastOpenedTab before the
             // after-inactivity flow has had a chance to run.
-            showOnAppLaunchOptionHandler.ensureNewUserDefault()
+            ensureNewUserDefault()
             handleFirstScreen(isFreshLaunch)
+        }
+    }
+
+    private suspend fun ensureNewUserDefault() {
+        val ntpAfterIdleEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()
+        if (ntpAfterIdleEnabled && appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
+            logcat { "FirstScreen: setting New Tab for new users" }
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
         }
     }
 
