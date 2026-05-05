@@ -396,6 +396,46 @@ class RealBrowserMenuViewStateFactoryTest {
     }
 
     @Test
+    fun `when an inline PDF is showing then canChangeBrowsingMode is hidden even if the underlying state allows it`() = runTest {
+        val browserViewState = BrowserViewState(
+            canChangeBrowsingMode = true,
+            currentPdfCachedUri = mock(),
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/doc.pdf"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertFalse((result as BrowserMenuViewState.Browser).canChangeBrowsingMode)
+    }
+
+    @Test
+    fun `when no inline PDF is showing then canChangeBrowsingMode propagates from the underlying state`() = runTest {
+        val browserViewState = BrowserViewState(
+            canChangeBrowsingMode = true,
+            currentPdfCachedUri = null,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://example.com/page"),
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertTrue((result as BrowserMenuViewState.Browser).canChangeBrowsingMode)
+    }
+
+    @Test
     fun `when site has url and title then page context header is Visible`() = runTest {
         val result = testee.create(
             omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
