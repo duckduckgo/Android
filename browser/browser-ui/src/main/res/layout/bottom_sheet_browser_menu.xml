@@ -140,6 +140,14 @@
                 layout="@layout/view_menu_item_default_browser_medium" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/downloadPdfMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_document_download_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuDownloadPdf" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/refreshMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -170,14 +178,6 @@
                 app:iconDrawable="@drawable/ic_add_to_home_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuAddToHome" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/downloadPdfMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_document_download_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuDownloadPdf" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/findInPageMenuItem"
