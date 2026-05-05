@@ -217,7 +217,7 @@ class RealPirJobsRunner @Inject constructor(
             val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
             pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount, executionType)
         } else {
-            pixelSender.reportScheduledScanStarted()
+            pixelSender.reportScheduledScanStarted(profileQueryCount, brokerCount)
         }
     }
 
@@ -244,7 +244,7 @@ class RealPirJobsRunner @Inject constructor(
                 executionType = executionType,
             )
         } else {
-            pixelSender.reportScheduledScanCompleted(totalTimeMillis)
+            pixelSender.reportScheduledScanCompleted(totalTimeMillis, profileQueryCount, brokerCount)
         }
     }
 

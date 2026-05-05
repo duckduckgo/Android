@@ -150,14 +150,26 @@ interface PirPixelSender {
 
     /**
      * Emits a pixel to signal that s scheduled scan run has started.
+     *
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
-    fun reportScheduledScanStarted()
+    fun reportScheduledScanStarted(
+        profileQueryCount: Int,
+        brokerCount: Int,
+    )
 
     /**
      * Emits a pixel to signal that a scheduled scan run has been completed.
+     *
+     * @param totalTimeInMillis - how long it took for the scan to complete
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        profileQueryCount: Int,
+        brokerCount: Int,
     )
 
     /**
@@ -683,15 +695,26 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCHEDULED_RUN_SCHEDULED)
     }
 
-    override fun reportScheduledScanStarted() {
-        fire(PIR_SCHEDULED_RUN_STARTED)
+    override fun reportScheduledScanStarted(
+        profileQueryCount: Int,
+        brokerCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+        )
+        fire(PIR_SCHEDULED_RUN_STARTED, params)
     }
 
     override fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        profileQueryCount: Int,
+        brokerCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
         )
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }

@@ -200,7 +200,10 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScheduledScanStartedThenFiresCorrectPixel() = runTest {
-        testee.reportScheduledScanStarted()
+        testee.reportScheduledScanStarted(
+            profileQueryCount = 3,
+            brokerCount = 10,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -210,14 +213,21 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test
     fun whenReportScheduledScanCompletedThenFiresPixelWithTotalTime() = runTest {
         val totalTimeInMillis = 54321L
 
-        testee.reportScheduledScanCompleted(totalTimeInMillis)
+        testee.reportScheduledScanCompleted(
+            totalTimeInMillis = totalTimeInMillis,
+            profileQueryCount = 3,
+            brokerCount = 10,
+        )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -229,6 +239,10 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "54321")
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test

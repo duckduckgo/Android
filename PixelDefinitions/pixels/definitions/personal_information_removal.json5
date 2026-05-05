@@ -1475,6 +1475,16 @@
                     "asus",
                     "other"
                 ]
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
@@ -1512,6 +1522,16 @@
                     "asus",
                     "other"
                 ]
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
