@@ -23,7 +23,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
+import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalEvaluator
@@ -67,7 +68,8 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (isEnabled() && isEligible()) {
             val intent = globalActivityStarter
-                .startIntent(applicationContext, DaxPromptBrowserComparisonNoParams) ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
+                .startIntent(applicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK))
+                ?: return@withContext ModalEvaluator.EvaluationResult.Skipped
 
             delay(MODAL_DISPLAY_DELAY)
             appCoroutineScope.launch(dispatchers.main()) {

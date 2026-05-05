@@ -23,7 +23,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.OnboardingFlowChecker
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
+import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -146,7 +147,8 @@ class WinBackPromptEvaluatorImplTest {
         givenTogglesEnabled()
         givenUserIsEligible()
         whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
-        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonNoParams)).thenReturn(null)
+        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK)))
+            .thenReturn(null)
 
         val result = testee.evaluate()
 
@@ -159,7 +161,8 @@ class WinBackPromptEvaluatorImplTest {
         givenTogglesEnabled()
         givenUserIsEligible()
         whenever(mockDaxPromptsRepository.getDaxPromptsBrowserComparisonShown()).thenReturn(false)
-        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonNoParams)).thenReturn(mockIntent)
+        whenever(mockGlobalActivityStarter.startIntent(mockApplicationContext, DaxPromptBrowserComparisonParams(LaunchSource.WIN_BACK)))
+            .thenReturn(mockIntent)
 
         val result = testee.evaluate()
 
