@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -46,7 +45,7 @@ class StartChatViewModel @Inject constructor(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
-        duckChatInputModeState.displayedMode
+        duckChatInputModeState.displayedMode,
     ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, displayedMode ->
         isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled && displayedMode == InputMode.SEARCH
     }
