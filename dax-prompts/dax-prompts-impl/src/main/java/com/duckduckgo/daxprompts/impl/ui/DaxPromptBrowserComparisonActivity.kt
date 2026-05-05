@@ -23,34 +23,49 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.provider.Settings
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
+import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonParams
+import com.duckduckgo.daxprompts.api.LaunchSource
 import com.duckduckgo.daxprompts.impl.R
 import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserComparisonBinding
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DaxPromptBrowserComparisonNoParams::class)
+@ContributeToActivityStarter(DaxPromptBrowserComparisonParams::class)
 class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
-    private val viewModel: DaxPromptBrowserComparisonViewModel by bindViewModel()
+
+    @Inject
+    lateinit var daxPromptBrowserComparisonViewModelFactory: DaxPromptBrowserComparisonViewModel.Factory
+
+    private val viewModel: DaxPromptBrowserComparisonViewModel by lazy {
+        val launchSource = intent.getActivityParams(DaxPromptBrowserComparisonParams::class.java)?.launchSource
+            ?: LaunchSource.REACTIVATE_USERS
+        getDaxPromptBrowserComparisonViewModel(launchSource)
+    }
+
     private val binding: ActivityDaxPromptBrowserComparisonBinding by viewBinding()
 
     private var lockedInPortraitMode: Boolean = false
@@ -64,6 +79,12 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
                 logcat { "Received non-OK result from BrowserComparisonChart" }
                 viewModel.onDefaultBrowserNotSet()
             }
+        }
+
+    private val startSystemDefaultAppsSettingsForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            logcat { "Returned from system default apps settings" }
+            viewModel.onSystemDefaultAppsSettingsReturned()
         }
 
     @Inject
@@ -133,6 +154,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             is Command.BrowserComparisonChart -> {
                 startBrowserComparisonChartActivityForResult.launch(command.intent)
             }
+
+            is Command.LaunchSystemDefaultAppsSettings -> {
+                startSystemDefaultAppsSettingsForResult.launch(systemDefaultAppsSettingsIntent())
+            }
         }
     }
 
@@ -173,7 +198,26 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun getDaxPromptBrowserComparisonViewModel(launchSource: LaunchSource): DaxPromptBrowserComparisonViewModel = ViewModelProvider(
+        owner = this,
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                daxPromptBrowserComparisonViewModelFactory.create(launchSource) as T
+        },
+    )[DaxPromptBrowserComparisonViewModel::class.java]
+
+    private fun systemDefaultAppsSettingsIntent(): Intent =
+        Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS).apply {
+            putExtra(SETTINGS_SELECT_OPTION_KEY, DEFAULT_BROWSER_APP_OPTION)
+            putExtra(SETTINGS_SHOW_FRAGMENT_ARGS, bundleOf(SETTINGS_SELECT_OPTION_KEY to DEFAULT_BROWSER_APP_OPTION))
+        }
+
     companion object {
         const val DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA = "DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA"
+
+        private const val SETTINGS_SELECT_OPTION_KEY = ":settings:fragment_args_key"
+        private const val SETTINGS_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args"
+        private const val DEFAULT_BROWSER_APP_OPTION = "default_browser"
     }
 }
