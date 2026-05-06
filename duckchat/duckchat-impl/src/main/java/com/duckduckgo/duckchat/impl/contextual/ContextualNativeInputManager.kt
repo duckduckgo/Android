@@ -43,7 +43,7 @@ interface ContextualNativeInputManager {
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
-        onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
     )
 
@@ -67,14 +67,14 @@ class RealContextualNativeInputManager @Inject constructor(
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
-        onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted, onImagePickerRequested, onFilePickerRequested)
+        setupWidget(widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -101,13 +101,13 @@ class RealContextualNativeInputManager @Inject constructor(
     private fun setupWidget(
         widget: NativeInputModeWidget,
         onSearchSubmitted: (String) -> Unit,
-        onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
-        widget.onImagePickerRequested = { callback -> onImagePickerRequested(callback) }
+        widget.onCameraCaptureRequested = { callback -> onCameraCaptureRequested(callback) }
         widget.onFilePickerRequested = { callback, mimeTypes -> onFilePickerRequested(callback, mimeTypes) }
         widget.onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
         widget.bindInputEvents(

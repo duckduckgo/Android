@@ -86,7 +86,7 @@ interface NativeInputWidget {
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
-    var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
+    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)?
     var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
     val isModelMenuVisible: Boolean
@@ -209,7 +209,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             field = value
             if (value != null && isAttachedToWindow) observeTier()
         }
-    override var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    override var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     override var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     override var onAttachmentChooserStateChanged: ((Boolean) -> Unit)? = null
     override var isModelMenuVisible: Boolean = false
@@ -312,7 +312,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun wirePluginView(pluginView: View) {
         (pluginView as? AttachmentButtonView)?.attachmentHandler?.let { handler ->
-            handler.onImagePickerRequested = { callback -> onImagePickerRequested?.invoke(callback) }
+            handler.onCameraCaptureRequested = { callback -> onCameraCaptureRequested?.invoke(callback) }
             handler.onFilePickerRequested = { callback, mimeTypes -> onFilePickerRequested?.invoke(callback, mimeTypes) }
             handler.onChooserStateChanged = { showing -> onAttachmentChooserStateChanged?.invoke(showing) }
             handler.onRequestFocus = { focusInput(context as? Activity) }

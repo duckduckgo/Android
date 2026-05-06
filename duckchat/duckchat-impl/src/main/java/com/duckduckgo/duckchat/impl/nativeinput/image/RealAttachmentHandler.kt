@@ -45,7 +45,7 @@ interface AttachmentHandler {
     var onImageAttachmentAdded: ((ImageAttachment) -> Unit)?
     var onImageLimitError: ((String) -> Unit)?
     var onImageLimitErrorClear: (() -> Unit)?
-    var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
+    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)?
     var onChooserStateChanged: ((Boolean) -> Unit)?
     var onRequestFocus: (() -> Unit)?
@@ -74,7 +74,7 @@ class RealAttachmentHandler(
     override var onImageAttachmentAdded: ((ImageAttachment) -> Unit)? = null
     override var onImageLimitError: ((String) -> Unit)? = null
     override var onImageLimitErrorClear: (() -> Unit)? = null
-    override var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    override var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     override var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     override var onChooserStateChanged: ((Boolean) -> Unit)? = null
     override var onRequestFocus: (() -> Unit)? = null
@@ -169,7 +169,7 @@ class RealAttachmentHandler(
                         uris?.toList()?.let { handlePickedImages(it) }
                             ?: onRequestFocus?.invoke()
                     }
-                    onImagePickerRequested?.invoke(callback)
+                    onCameraCaptureRequested?.invoke(callback)
                 }
 
                 override fun onBottomSheetDismissed() {

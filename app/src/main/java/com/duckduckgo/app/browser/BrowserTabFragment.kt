@@ -1366,7 +1366,7 @@ class BrowserTabFragment :
                     hideKeyboard()
                     voiceSearchLauncher.launch(requireActivity(), mode)
                 },
-                onImagePickerRequested = { callback ->
+                onCameraCaptureRequested = { callback ->
                     launchCameraCapture(callback)
                 },
                 onFilePickerRequested = { callback, mimeTypes ->

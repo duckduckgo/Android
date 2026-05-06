@@ -60,7 +60,7 @@ class NativeInputCallbacks(
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
-    val onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+    val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
 )
 
@@ -434,7 +434,7 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
-            onImagePickerRequested = { callback -> callbacks.onImagePickerRequested(callback) }
+            onCameraCaptureRequested = { callback -> callbacks.onCameraCaptureRequested(callback) }
             onFilePickerRequested = { callback, mimeTypes -> callbacks.onFilePickerRequested(callback, mimeTypes) }
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
             onPaidTierChanged = { isPaid ->

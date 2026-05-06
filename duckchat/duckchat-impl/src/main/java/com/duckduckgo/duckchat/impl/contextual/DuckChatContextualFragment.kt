@@ -433,7 +433,7 @@ class DuckChatContextualFragment :
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
-            onImagePickerRequested = { callback ->
+            onCameraCaptureRequested = { callback ->
                 launchNativeImagePicker(callback)
             },
             onFilePickerRequested = { callback, mimeTypes ->
