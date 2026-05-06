@@ -114,6 +114,7 @@ interface OnboardingDaxCta {
         onTypingAnimationFinished: () -> Unit,
         onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
         onDismissCtaClicked: () -> Unit,
+        instantShow: Boolean = false,
     )
 
     fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
@@ -227,6 +228,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -266,6 +268,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -331,6 +334,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -388,6 +392,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -425,6 +430,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -463,6 +469,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingInContextDaxDialog
@@ -529,6 +536,7 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -649,7 +657,9 @@ sealed class OnboardingDaxDialogCta(
         }
 
         override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
-            binding.includeOnboardingInContextDaxDialogBrandDesign.contextualBrandDesignTitle.cancelAnimation()
+            binding.includeOnboardingInContextDaxDialogBrandDesign.root
+                .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+                ?.cancelAnimation()
             binding.includeOnboardingInContextDaxDialogBrandDesign.root.gone()
             ctaView = null
         }
@@ -661,10 +671,23 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
+            instantShow: Boolean,
         ) {
             val container = binding.includeOnboardingInContextDaxDialogBrandDesign.root
             val isContentTransition = isContentTransition(container)
             ctaView = container
+
+            if (instantShow) {
+                showInstantly(
+                    container = container,
+                    onPrimaryCtaClicked = onPrimaryCtaClicked,
+                    onSecondaryCtaClicked = onSecondaryCtaClicked,
+                    onSuggestedOptionClicked = onSuggestedOptionClicked,
+                    onDismissCtaClicked = onDismissCtaClicked,
+                    onTypingAnimationFinished = onTypingAnimationFinished,
+                )
+                return
+            }
 
             var animationsSettled = false
             var contentFadeInAnimator: AnimatorSet? = null
@@ -743,26 +766,14 @@ sealed class OnboardingDaxDialogCta(
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            resetSharedViewState(container, isContentTransition = true)
-                            resetAllIncludesExcept(container, activeInclude)
-                            applyPrimaryCtaText(container)
-                            configureContentViews(container)
-                            hiddenTitle.text = titleView.text
-                            applyTitleSlotVisibility(container, titleView)
-                            applyBackground(container)
+                            applyContent(container, isContentTransition = true)
                             typeAndFadeIn()
                         }
                     })
                     start()
                 }
             } else {
-                resetSharedViewState(container, isContentTransition = false)
-                resetAllIncludesExcept(container, activeInclude)
-                applyPrimaryCtaText(container)
-                configureContentViews(container)
-                hiddenTitle.text = titleView.text
-                applyTitleSlotVisibility(container, titleView)
-                applyBackground(container)
+                applyContent(container, isContentTransition = false)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
@@ -793,6 +804,71 @@ sealed class OnboardingDaxDialogCta(
             setOnSecondaryCtaClicked(onSecondaryCtaClicked)
             setOnOptionClicked(onSuggestedOptionClicked)
             setOnDismissCtaClicked(onDismissCtaClicked)
+        }
+
+        private fun showInstantly(
+            container: View,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+            val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
+            val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
+            val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
+            val activeInclude = container.findViewById<View>(activeIncludeId)
+
+            applyContent(container, isContentTransition = false)
+            container.alpha = 1f
+            container.show()
+
+            if (backgroundRes != 0) {
+                // applyBackground registers a doOnPreDraw that pushes the banner off-screen for
+                // the slide-in animator; this second listener fires after it in the same pre-draw
+                // pass and resets to 0 so the banner lands in its final position on the first frame.
+                container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
+                    ?.doOnPreDraw { it.translationY = 0f }
+            }
+
+            // No animation to skip — clear any stale tap-to-skip listener from a prior animated show.
+            container.setOnClickListener(null)
+            setOnPrimaryCtaClicked(onPrimaryCtaClicked)
+            setOnSecondaryCtaClicked(onSecondaryCtaClicked)
+            setOnOptionClicked(onSuggestedOptionClicked)
+            setOnDismissCtaClicked(onDismissCtaClicked)
+
+            snapToFinished(
+                container = container,
+                titleView = titleView,
+                descriptionView = descriptionView,
+                dismissButton = dismissButton,
+                activeInclude = activeInclude,
+                cardContainer = cardContainer,
+                alreadySettled = false,
+                contentFadeInAnimator = null,
+                onSettled = { onTypingAnimationSettled(onTypingAnimationFinished) },
+            )
+        }
+
+        /**
+         * Per-show content setup: reset shared state, populate text via [configureContentViews],
+         * and stage the background. Used by all three show paths (first-show, content transition,
+         * rotation re-inflate). What follows is path-specific: animate, snap, or animate-after-fadeout.
+         */
+        private fun applyContent(container: View, isContentTransition: Boolean) {
+            val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+            val hiddenTitle = container.findViewById<DaxTextView>(R.id.contextualBrandDesignHiddenTitle)
+            val activeInclude = container.findViewById<View>(activeIncludeId)
+
+            resetSharedViewState(container, isContentTransition = isContentTransition)
+            resetAllIncludesExcept(container, activeInclude)
+            applyPrimaryCtaText(container)
+            configureContentViews(container)
+            hiddenTitle.text = titleView.text
+            applyTitleSlotVisibility(container, titleView)
+            applyBackground(container)
         }
 
         /**

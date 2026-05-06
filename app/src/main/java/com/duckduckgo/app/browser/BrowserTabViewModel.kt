@@ -275,6 +275,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
@@ -553,6 +554,7 @@ class BrowserTabViewModel @Inject constructor(
     private val cachedFileDownloader: CachedFileDownloader,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4161,11 +4163,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onConfigurationChanged() {
+    fun onConfigurationChanged(orientationChanged: Boolean = false) {
         browserViewState.value =
             currentBrowserViewState().copy(
                 forceRenderingTicker = System.currentTimeMillis(),
             )
+        if (!orientationChanged) return
+        viewModelScope.launch(dispatchers.io()) {
+            if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
+                command.postValue(Command.ReinflateBrandDesignContextualDialog)
+            }
+        }
     }
 
     fun onMessageReceived() {

@@ -43,9 +43,11 @@ import android.provider.MediaStore
 import android.text.Spanned
 import android.view.ContextMenu
 import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -78,6 +80,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -212,6 +215,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -761,6 +765,8 @@ class BrowserTabFragment :
     private val daxDialogInContextBrandDesign
         get() = binding.includeOnboardingInContextDaxDialogBrandDesign
 
+    private var lastOrientation: Int = Configuration.ORIENTATION_UNDEFINED
+
     private val newTabReturnHatchView
         get() = binding.includeNewBrowserTab.newTabReturnHatchView
 
@@ -1033,6 +1039,7 @@ class BrowserTabFragment :
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
 
+        lastOrientation = resources.configuration.orientation
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
@@ -2845,6 +2852,7 @@ class BrowserTabFragment :
             }
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
+            is Command.ReinflateBrandDesignContextualDialog -> renderer.reinflateContextualBrandDesignDialog()
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
@@ -4802,9 +4810,12 @@ class BrowserTabFragment :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
+        val orientationChanged = lastOrientation != newConfig.orientation
+        lastOrientation = newConfig.orientation
+
         renderer.renderHomeCta()
         recreateBrowserMenu()
-        viewModel.onConfigurationChanged()
+        viewModel.onConfigurationChanged(orientationChanged)
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -5847,12 +5858,51 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showCta(configuration: Cta) {
+        fun reinflateContextualBrandDesignDialog() {
+            if (!isAdded) return
+            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ?: return
+
+            val existingRoot = daxDialogInContextBrandDesign.root
+            if (!existingRoot.isVisible) return
+            val parent = existingRoot.parent as? ViewGroup ?: return
+            val fresh = LayoutInflater.from(requireContext())
+                .inflate(R.layout.include_onboarding_in_context_dax_dialog_brand_design_update, parent, false)
+                as? ViewGroup ?: return
+
+            existingRoot.setPadding(fresh.paddingLeft, fresh.paddingTop, fresh.paddingRight, fresh.paddingBottom)
+
+            existingRoot.setOnClickListener(null)
+            existingRoot.removeAllViews()
+            while (fresh.childCount > 0) {
+                val child = fresh.getChildAt(0)
+                fresh.removeViewAt(0)
+                existingRoot.addView(child)
+            }
+
+            applyContextualOptionsHeight(cta)
+            showCta(cta, instantShow = true)
+        }
+
+        private fun applyContextualOptionsHeight(cta: OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta) {
+            if (cta.activeIncludeId != R.id.contextualBrandDesignOptionsContent) return
+            val capHeight = resources.getBoolean(R.bool.capContextualOptionsHeight)
+            daxDialogInContextBrandDesign.root
+                .findViewById<View>(R.id.contextualBrandDesignOptionsContent)
+                ?.updateLayoutParams {
+                    height = if (capHeight) {
+                        resources.getDimensionPixelSize(R.dimen.contextualOptionsCappedHeight)
+                    } else {
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    }
+                }
+        }
+
+        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
+                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration, instantShow = instantShow)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
@@ -5937,7 +5987,7 @@ class BrowserTabFragment :
         }
 
         @SuppressLint("ClickableViewAccessibility")
-        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
+        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta, instantShow: Boolean = false) {
             hideNewTab()
             if (configuration is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta) {
                 binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
@@ -5946,6 +5996,7 @@ class BrowserTabFragment :
                 }
                 // Both layouts live in the tree; only one should be visible at a time.
                 daxDialogInContext.root.gone()
+                applyContextualOptionsHeight(configuration)
                 configuration.showOnboardingCta(
                     binding,
                     { viewModel.onUserClickCtaOkButton(configuration) },
@@ -5956,6 +6007,7 @@ class BrowserTabFragment :
                     { viewModel.onOnboardingDaxTypingAnimationFinished() },
                     { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
                     { viewModel.onUserClickCtaDismissButton(configuration) },
+                    instantShow = instantShow,
                 )
             } else {
                 // Brand-design path disables APPEARING/DISAPPEARING on this container; the legacy
@@ -5988,10 +6040,13 @@ class BrowserTabFragment :
                     {
                         viewModel.onUserClickCtaDismissButton(configuration)
                     },
+                    instantShow = false,
                 )
             }
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
+            if (!instantShow) {
+                viewModel.onCtaShown()
+            }
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -6132,7 +6187,9 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             daxDialogInContext.dialogTextCta.cancelAnimation()
             daxDialogInContext.daxCtaContainer.gone()
-            daxDialogInContextBrandDesign.contextualBrandDesignTitle.cancelAnimation()
+            daxDialogInContextBrandDesign.root
+                .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+                ?.cancelAnimation()
             daxDialogInContextBrandDesign.root.gone()
         }
 

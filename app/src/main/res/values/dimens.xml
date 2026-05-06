@@ -26,4 +26,5 @@
          The container's bottom padding equals the banner's negative bottom margin; both must move together. -->
     <dimen name="onboardingContextualBackgroundOverlap">56dp</dimen>
     <dimen name="onboardingContextualBackgroundOverlapNegative">-56dp</dimen>
+    <dimen name="contextualOptionsCappedHeight">100dp</dimen>
 </resources>

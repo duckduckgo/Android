@@ -973,6 +973,7 @@ class BrowserTabViewModelTest {
                 cachedFileDownloader = mockCachedFileDownloader,
                 downloadMenuStateProvider = mockDownloadMenuStateProvider,
                 downloadsRepository = mockDownloadsRepository,
+                onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             )
 
         testee.loadData("abc", null, false, false)
@@ -5235,6 +5236,47 @@ class BrowserTabViewModelTest {
         testee.onConfigurationChanged()
 
         assertTrue(oldForceRenderingTicker != browserViewState().forceRenderingTicker)
+    }
+
+    @Test
+    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleEnabledThenReinflateCommandIsEmitted() = runTest {
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+
+        testee.onConfigurationChanged(orientationChanged = true)
+        advanceUntilIdle()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Command.ReinflateBrandDesignContextualDialog })
+    }
+
+    @Test
+    fun whenOnConfigurationChangedAndOrientationChangedAndBrandDesignToggleDisabledThenNoReinflateCommandIsEmitted() = runTest {
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+
+        testee.onConfigurationChanged(orientationChanged = true)
+        advanceUntilIdle()
+
+        verify(mockCommandObserver, never()).onChanged(any<Command.ReinflateBrandDesignContextualDialog>())
+    }
+
+    @Test
+    fun whenOnConfigurationChangedAndOrientationUnchangedAndBrandDesignToggleEnabledThenNoReinflateCommandIsEmitted() = runTest {
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
+
+        testee.onConfigurationChanged(orientationChanged = false)
+        advanceUntilIdle()
+
+        verify(mockCommandObserver, never()).onChanged(any<Command.ReinflateBrandDesignContextualDialog>())
+    }
+
+    @Test
+    fun whenOnConfigurationChangedThenForceRenderingTickerUpdatedRegardlessOfToggleOrOrientation() = runTest {
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+        val tickerBefore = testee.browserViewState.value?.forceRenderingTicker
+
+        testee.onConfigurationChanged(orientationChanged = false)
+
+        assertNotEquals(tickerBefore, testee.browserViewState.value?.forceRenderingTicker)
     }
 
     @Test
