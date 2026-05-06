@@ -67,6 +67,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
@@ -77,6 +78,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -88,6 +90,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -241,6 +244,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
+        val isDuckAiBackAvailable: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
     ) {
@@ -287,12 +291,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled ->
-            inputScreenEnabled || nativeInputEnabled
-        }.onEach { showClickCatcher ->
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled, aiToggleEnabled ->
             _viewState.update {
                 it.copy(
-                    showTextInputClickCatcher = showClickCatcher,
+                    showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
+                    isDuckAiBackAvailable = nativeInputEnabled && !aiToggleEnabled
                 )
             }
         }.launchIn(viewModelScope)
@@ -561,6 +565,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             false
         }
     }
+
+    private fun shouldShowDuckAiBack(
+        isEnabled: Boolean,
+        isInputScreenUserSettingEnabled: Boolean,
+    ): Boolean =
+        !(isEnabled && isInputScreenUserSettingEnabled)
 
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode

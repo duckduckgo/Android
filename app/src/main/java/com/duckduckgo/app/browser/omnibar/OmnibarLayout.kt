@@ -164,6 +164,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showChatMenu: Boolean,
         val showSpacer: Boolean,
         val showDuckSidebar: Boolean,
+        val showDuckBack: Boolean,
     )
 
     @Inject
@@ -236,6 +237,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
+    private val duckAIBack: View by lazy { findViewById(R.id.dackAiBack) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -334,6 +336,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
                     addTarget(duckAISidebar)
+                    addTarget(duckAIBack)
                 },
             )
         }
@@ -592,6 +595,9 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
+        duckAIBack.setOnClickListener {
+            omnibarItemPressedListener?.onDuckAIBackButtonPressed()
+        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -655,6 +661,13 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             duckAISidebar.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    topMargin = omnibarCardMarginBottom
+                    bottomMargin = omnibarCardMarginTop
+                }
+            }
+
+            duckAIBack.updateLayoutParams {
                 (this as MarginLayoutParams).apply {
                     topMargin = omnibarCardMarginBottom
                     bottomMargin = omnibarCardMarginTop
@@ -822,6 +835,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
+                showDuckBack = viewState.showDuckAISidebar && viewState.isDuckAiBackAvailable,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
@@ -844,6 +858,7 @@ class OmnibarLayout @JvmOverloads constructor(
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
         duckAISidebar.isVisible = newTransitionState.showDuckSidebar
+        duckAIBack.isVisible = newTransitionState.showDuckBack
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
