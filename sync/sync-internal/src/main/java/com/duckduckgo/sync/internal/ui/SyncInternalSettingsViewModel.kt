@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.internal.ui
 
 import android.annotation.SuppressLint
 import android.app.KeyguardManager
@@ -42,10 +42,10 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
