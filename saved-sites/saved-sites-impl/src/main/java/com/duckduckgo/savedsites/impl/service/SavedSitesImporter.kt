@@ -68,7 +68,7 @@ class RealSavedSitesImporter(
             val savedSites = contentResolver.openInputStream(uri)?.use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
                 savedSitesParser.parseHtml(document, savedSitesRepository, destination)
-            } ?: return ImportSavedSitesResult.Success(emptyList())
+            } ?: return ImportSavedSitesResult.Error(IllegalArgumentException("Failed to open input stream for $uri"))
 
             val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
             val bookmarksAndFolders = savedSites.filterNot { it is SavedSite.Favorite }
