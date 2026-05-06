@@ -24,9 +24,11 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 @AutoService(SymbolProcessorProvider::class)
 class ContributesSubComponentProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+        val diFramework = environment.options["ddg.di"] ?: "AnvilDagger"
         return ContributesSubComponentProcessor(
             codeGenerator = environment.codeGenerator,
             logger = environment.logger,
+            isMetro = diFramework == "Metro",
         )
     }
 }
