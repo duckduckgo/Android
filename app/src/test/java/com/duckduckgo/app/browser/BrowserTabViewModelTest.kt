@@ -3397,12 +3397,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedBrowserModalSubscriptionPromoCtaThenLaunchSubscriptionWithBrowserModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_browsermodal_android")
+    fun whenUserClickedPromoModalSubscriptionPromoCtaThenLaunchSubscriptionWithPromoModalOrigin() {
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_newusermodal_android")
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
-            assertEquals("funnel_browsermodal_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_newusermodal_android", uri.getQueryParameter("origin"))
         }
     }
 
