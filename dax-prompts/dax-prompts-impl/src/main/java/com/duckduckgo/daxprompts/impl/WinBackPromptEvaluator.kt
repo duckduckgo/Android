@@ -91,6 +91,6 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
         !defaultBrowserDetector.isDefaultBrowser()
 
     companion object {
-        private const val MODAL_DISPLAY_DELAY = 1500L
+        private const val MODAL_DISPLAY_DELAY = 250L
     }
 }
