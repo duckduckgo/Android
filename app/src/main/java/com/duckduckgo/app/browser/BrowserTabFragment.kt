@@ -1323,7 +1323,7 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, imagesJson ->
+                onDuckAiChatSubmitted = { query, modelId, imagesJson, filesJson ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -1342,6 +1342,9 @@ class BrowserTabFragment :
                                         // }
                                         if (imagesJson != null) {
                                             put("images", imagesJson)
+                                        }
+                                        if (filesJson != null) {
+                                            put("files", filesJson)
                                         }
                                     },
                                 )
@@ -1370,7 +1373,7 @@ class BrowserTabFragment :
                     launchCameraCapture(callback)
                 },
                 onFilePickerRequested = { callback, mimeTypes ->
-                    launchFilePicker(callback, mimeTypes)
+                    launchNativeFileAttachmentChooser(callback, mimeTypes)
                 },
             ),
         )
@@ -4939,7 +4942,7 @@ class BrowserTabFragment :
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
-    private fun launchFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+    private fun launchNativeFileAttachmentChooser(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
         nativeInputManager.setPickingImage(true)
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,

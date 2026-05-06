@@ -34,6 +34,8 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachment
+import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachmentsContainerView
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import kotlinx.coroutines.CoroutineScope
@@ -52,6 +54,7 @@ class AttachmentView(
     private var viewModel: AttachmentViewModel? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
+    private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -72,7 +75,11 @@ class AttachmentView(
 
     fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
 
+    fun getFileAttachments(): List<FileAttachment> = viewModel?.getFileAttachments() ?: emptyList()
+
     fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
+
+    fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
 
     fun clearAttachments() = viewModel?.clearAttachments()
 
@@ -105,6 +112,7 @@ class AttachmentView(
         thumbnailsLayout = layout
 
         addScrollableImageContainer(layout, vm)
+        addFileAttachmentsContainer(layout, vm)
         limitErrorView = buildLimitErrorView(layout)
     }
 
@@ -125,6 +133,14 @@ class AttachmentView(
         imageAttachmentsContainer = imagesContainer
     }
 
+    private fun addFileAttachmentsContainer(parent: LinearLayout, vm: AttachmentViewModel) {
+        val filesContainer = FileAttachmentsContainerView(context).also {
+            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
+        }
+        parent.addView(filesContainer)
+        fileAttachmentsContainer = filesContainer
+    }
+
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
             setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
@@ -138,6 +154,7 @@ class AttachmentView(
     private fun applyState(state: AttachmentViewModel.AttachmentState, container: FrameLayout) {
         val imagesView = imageAttachmentsContainer ?: return
         syncImages(imagesView, state)
+        syncFiles(state)
         container.isVisible = state.hasAttachments
         updateLimitError(state.imageLimitError)
         notifyStateChanged(state)
@@ -149,6 +166,18 @@ class AttachmentView(
         (containerIds - stateIds).forEach { id -> imagesView.removeAttachmentById(id) }
         (stateIds - containerIds).forEach { id ->
             state.images.find { it.id == id }?.let { imagesView.addAttachment(it) }
+        }
+    }
+
+    private fun syncFiles(state: AttachmentViewModel.AttachmentState) {
+        val filesView = fileAttachmentsContainer ?: return
+        val stateFileIds = state.files.map { it.id }.toSet()
+        val containerFileIds = filesView.getAttachments().map { it.id }.toSet()
+        (containerFileIds - stateFileIds).forEach { id ->
+            filesView.getAttachments().find { it.id == id }?.let { filesView.removeAttachment(it) }
+        }
+        (stateFileIds - containerFileIds).forEach { id ->
+            state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
         }
     }
 

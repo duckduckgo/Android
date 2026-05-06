@@ -416,6 +416,22 @@ class RealDuckChatJSHelper @Inject constructor(
                                 },
                             )
                         }
+                        if (pending.files.isNotEmpty()) {
+                            put(
+                                "files",
+                                JSONArray().apply {
+                                    pending.files.forEach { file ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", file.base64Data)
+                                                put("fileName", file.fileName)
+                                                put("mimeType", file.mimeType)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
                     },
                 )
             }

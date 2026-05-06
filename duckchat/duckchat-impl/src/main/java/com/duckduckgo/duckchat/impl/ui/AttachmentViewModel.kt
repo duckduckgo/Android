@@ -27,6 +27,7 @@ import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.ActivityContext
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -35,6 +36,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachment
+import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,42 +55,48 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
 
-@SuppressLint("StaticFieldLeak")
 @ContributesViewModel(ViewScope::class)
 class AttachmentViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val dispatchers: DispatcherProvider,
     modelManager: DuckAiModelManager,
     private val limitsHandler: LimitsHandler,
-    private val context: Context,
+    private val fileAttachmentProcessor: FileAttachmentProcessor,
+    @ActivityContext context: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
+    // applicationContext has no lifecycle — safe to hold in a ViewModel.
+    @SuppressLint("StaticFieldLeak")
+    private val context: Context = context.applicationContext
 
     data class AttachmentState(
         val images: List<ImageAttachment> = emptyList(),
+        val files: List<FileAttachment> = emptyList(),
         val imageLimitError: String? = null,
         val supportsUpload: Boolean = false,
         val isAtCapacity: Boolean = false,
     ) {
-        val hasAttachments: Boolean get() = images.isNotEmpty()
+        val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
     }
 
     @VisibleForTesting
     internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
+    private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
     private val _isDuckAiMode = MutableStateFlow(false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
-        imageAttachments,
+        combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
         limitsHandler.conversationImagesSent,
         _isDuckAiMode,
-    ) { images, modelState, conversationSent, isDuckAiMode ->
+    ) { (images, files), modelState, conversationSent, isDuckAiMode ->
         val supportsUpload = computeSupportsUpload(modelState)
         val limits = modelState.attachmentLimits.images
         val currentCount = images.size
         val totalImages = currentCount + if (isDuckAiMode) conversationSent else 0
         AttachmentState(
             images = images,
+            files = files,
             imageLimitError = computeImageLimitError(currentCount, totalImages, limits),
             supportsUpload = supportsUpload,
             isAtCapacity = currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation,
@@ -103,6 +112,17 @@ class AttachmentViewModel @Inject constructor(
         }
     }
 
+    fun onFilesPicked(uris: List<Uri>) {
+        viewModelScope.launch {
+            val limits = modelManager.modelState.value.attachmentLimits.files
+            for (uri in uris) {
+                if (_fileAttachments.value.size >= limits.maxPerConversation) break
+                val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
+                _fileAttachments.update { it + attachment }
+            }
+        }
+    }
+
     fun removeImageAttachment(id: String) {
         var toRecycle: Bitmap? = null
         imageAttachments.update { list ->
@@ -112,9 +132,14 @@ class AttachmentViewModel @Inject constructor(
         viewModelScope.launch { toRecycle?.recycle() }
     }
 
+    fun removeFileAttachment(id: String) {
+        _fileAttachments.update { list -> list.filter { it.id != id } }
+    }
+
     fun clearAttachments() {
         val toRecycle = imageAttachments.value
         imageAttachments.value = emptyList()
+        _fileAttachments.value = emptyList()
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
@@ -128,6 +153,8 @@ class AttachmentViewModel @Inject constructor(
     }
 
     fun getImageAttachments(): List<ImageAttachment> = imageAttachments.value
+
+    fun getFileAttachments(): List<FileAttachment> = _fileAttachments.value
 
     fun getImageAttachmentsJson(): JSONArray? {
         val images = imageAttachments.value
@@ -144,10 +171,27 @@ class AttachmentViewModel @Inject constructor(
         }
     }
 
+    fun getFileAttachmentsJson(): JSONArray? {
+        val files = _fileAttachments.value
+        if (files.isEmpty()) return null
+        return JSONArray().apply {
+            files.forEach { attachment ->
+                put(
+                    JSONObject().apply {
+                        put("data", attachment.base64Data)
+                        put("fileName", attachment.fileName)
+                        put("mimeType", attachment.mimeType)
+                    },
+                )
+            }
+        }
+    }
+
     private fun computeSupportsUpload(modelState: ModelState): Boolean {
         if (modelState.models.isEmpty()) return true
         val model = modelState.models.find { it.id == modelState.selectedModelId }
-        return model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled()
+        return (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled()) ||
+            model?.supportsFileUpload == true
     }
 
     private fun computeImageLimitError(

@@ -118,8 +118,10 @@ class RealContextualNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
+                val filesJson = widget.getFileAttachmentsJson()
                 widget.clearImageAttachments()
-                sendPrompt(prompt, widget.getSelectedModelId(), imagesJson)
+                widget.clearFileAttachments()
+                sendPrompt(prompt, widget.getSelectedModelId(), imagesJson, filesJson)
                 widget.text = ""
             },
         )
@@ -131,7 +133,7 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String, modelId: String? = null, imagesJson: JSONArray? = null) {
+    private fun sendPrompt(prompt: String, modelId: String? = null, imagesJson: JSONArray? = null, filesJson: JSONArray? = null) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -145,6 +147,9 @@ class RealContextualNativeInputManager @Inject constructor(
                     }
                     if (imagesJson != null) {
                         put("images", imagesJson)
+                    }
+                    if (filesJson != null) {
+                        put("files", filesJson)
                     }
                 },
             )

@@ -52,6 +52,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
@@ -108,8 +109,10 @@ interface NativeInputWidget {
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun getImageAttachmentsJson(): JSONArray?
+    fun getFileAttachmentsJson(): JSONArray?
     fun clearImageAttachments()
-    fun storePendingPrompt(query: String)
+    fun clearFileAttachments()
+    fun storePendingPromptWithAttachments(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual()
     fun isWidgetBottom(): Boolean
@@ -596,15 +599,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
+    override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
+
     override fun clearImageAttachments() {
         attachmentView?.clearAttachments()
     }
 
-    override fun storePendingPrompt(query: String) {
+    override fun clearFileAttachments() {
+        // files are cleared together with images via clearAttachments()
+    }
+
+    override fun storePendingPromptWithAttachments(query: String) {
         val images = attachmentView?.getImageAttachments()?.map {
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), images)
+        val files = attachmentView?.getFileAttachments()?.map {
+            PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
+        } ?: emptyList()
+        viewModel.storePendingPrompt(query, getSelectedModelId(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
     }
 
