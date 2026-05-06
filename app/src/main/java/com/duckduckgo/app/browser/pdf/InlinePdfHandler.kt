@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
+import android.os.Parcel
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -146,7 +147,10 @@ class RealInlinePdfHandler @Inject constructor(
                 // Bump mtime so LRU eviction treats this file as recently *used*,
                 // not just recently *written*.
                 targetFile.setLastModified(System.currentTimeMillis())
-                return@withContext PdfDownloadResult.Success(Uri.fromFile(targetFile))
+                return@withContext PdfDownloadResult.Success(
+                    uri = Uri.fromFile(targetFile),
+                    certificate = readCertSidecar(targetFile),
+                )
             }
 
             val requestBuilder = Request.Builder().url(url)
@@ -191,6 +195,8 @@ class RealInlinePdfHandler @Inject constructor(
                 targetFile.delete()
                 return@withContext PdfDownloadResult.Failure(PdfErrorType.UNKNOWN)
             }
+
+            certificate?.let { saveCertSidecar(targetFile, it) }
 
             enforceCacheBudget(keepFile = targetFile, maxFiles = MAX_CACHED_FILES)
 
@@ -246,21 +252,71 @@ class RealInlinePdfHandler @Inject constructor(
     /**
      * Cap the PDF cache at [maxFiles] entries using LRU eviction.
      *
-     * Counts all files in the cache directory (including [keepFile]) and, if the
-     * total exceeds [maxFiles], deletes the oldest non-keep files until exactly
-     * [maxFiles] remain. [keepFile] is never evicted, so a freshly-written entry
-     * always survives even when it's the one that pushed the cache over the cap.
+     * Counts only PDF files (cert sidecars are paired data, not independent entries).
+     * If the total exceeds [maxFiles], deletes the oldest non-keep PDFs and their
+     * matching sidecars until exactly [maxFiles] remain. [keepFile] is never evicted,
+     * so a freshly-written entry always survives even when it's the one that pushed
+     * the cache over the cap.
      */
     @VisibleForTesting
     internal fun enforceCacheBudget(keepFile: File, maxFiles: Int) {
         val dir = cacheDir
         val keepName = keepFile.name
-        val candidates = dir.listFiles()?.filter { it.isFile && it.name != keepName } ?: return
+        val candidates = dir.listFiles()
+            ?.filter { it.isFile && !it.name.endsWith(CERT_SIDECAR_SUFFIX) && it.name != keepName }
+            ?: return
         val totalFiles = candidates.size + 1
         if (totalFiles <= maxFiles) return
 
         val toEvict = totalFiles - maxFiles
-        candidates.sortedBy { it.lastModified() }.take(toEvict).forEach { it.delete() }
+        candidates.sortedBy { it.lastModified() }.take(toEvict).forEach { evicted ->
+            evicted.delete()
+            certSidecarFile(evicted).delete()
+        }
+    }
+
+    private fun certSidecarFile(targetFile: File): File =
+        File(targetFile.parentFile, "${targetFile.name}$CERT_SIDECAR_SUFFIX")
+
+    /**
+     * Marshals the [certificate] via [SslCertificate.saveState] and writes the resulting
+     * Bundle's bytes to a sidecar next to [targetFile].
+     */
+    private fun saveCertSidecar(targetFile: File, certificate: SslCertificate) {
+        val bundle = SslCertificate.saveState(certificate) ?: return
+        val parcel = Parcel.obtain()
+        try {
+            parcel.writeBundle(bundle)
+            certSidecarFile(targetFile).writeBytes(parcel.marshall())
+        } catch (e: IOException) {
+            logcat { "PDF cert sidecar write failed: ${e.message}" }
+        } finally {
+            parcel.recycle()
+        }
+    }
+
+    /**
+     * Inverse of [saveCertSidecar]. Returns null if the sidecar is missing or unreadable
+     */
+    private fun readCertSidecar(targetFile: File): SslCertificate? {
+        val sidecar = certSidecarFile(targetFile)
+        if (!sidecar.exists()) return null
+        return try {
+            val bytes = sidecar.readBytes()
+            val parcel = Parcel.obtain()
+            try {
+                parcel.unmarshall(bytes, 0, bytes.size)
+                parcel.setDataPosition(0)
+                val bundle = parcel.readBundle(SslCertificate::class.java.classLoader)
+                bundle?.let { SslCertificate.restoreState(it) }
+            } finally {
+                parcel.recycle()
+            }
+        } catch (t: Throwable) {
+            logcat { "PDF cert sidecar read failed: ${t.message}" }
+            sidecar.delete()
+            null
+        }
     }
 
     override fun extractFileName(url: String): String {
@@ -277,5 +333,6 @@ class RealInlinePdfHandler @Inject constructor(
         private const val PDF_CACHE_DIR = "pdf_cache"
         private val PDF_MAGIC_BYTES = "%PDF-".toByteArray()
         private const val MAX_CACHED_FILES = 10
+        private const val CERT_SIDECAR_SUFFIX = ".cert"
     }
 }
