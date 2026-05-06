@@ -359,10 +359,19 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
+    fun whenShouldInterceptRequestForPostThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("POST")
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+    }
+
+    @Test
+    fun whenShouldInterceptRequestForNonPostThenEventNotSentToLoginDetector() {
+        val webResourceRequest = mock<WebResourceRequest>()
+        whenever(webResourceRequest.method).thenReturn("GET")
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+        verify(loginDetector, never()).onEvent(any())
     }
 
     @Test

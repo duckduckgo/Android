@@ -673,8 +673,10 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? =
         runBlocking {
             val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-            withContext(dispatcherProvider.main()) {
-                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            if (request.method == "POST") {
+                withContext(dispatcherProvider.main()) {
+                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                }
             }
             logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldIntercept(
