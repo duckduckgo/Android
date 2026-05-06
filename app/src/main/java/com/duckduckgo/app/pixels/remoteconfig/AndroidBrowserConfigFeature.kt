@@ -274,25 +274,6 @@ interface AndroidBrowserConfigFeature {
     fun granularFireDialog(): Toggle
 
     /**
-     * Controls the experimental browsing menu in appearance settings.
-     * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun experimentalBrowsingMenu(): Toggle
-
-    /**
-     * Controls the rollout of the new browser bottom-sheet menu to 100% of users.
-     * Independent of the Settings visibility toggle ("experimentalBrowsingMenu").
-     * @return `true` when the remote config has the global "rolloutBrowsingMenu" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun rolloutBrowsingMenu(): Toggle
-
-    /**
      * Controls whether verified install/update pixels are sent.
      * @return `true` when the remote config has the global "sendVerifiedInstallPixels" androidBrowserConfig
      * sub-feature flag enabled

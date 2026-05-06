@@ -105,11 +105,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
             viewModel.onShowTrackersCountInAddressBarChanged(isChecked)
         }
 
-    private val useBottomSheetMenuToggleListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onUseBottomSheetMenuChanged(isChecked)
-        }
-
     private val changeIconFlow =
         registerForActivityResult(ChangeIconContract()) { resultOk ->
             if (resultOk) {
@@ -187,12 +182,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.showTrackersCountInAddressBar.quietlySetIsChecked(
                         viewState.isAddressBarTrackersAnimationEnabled,
                         showTrackersCountInAddressBar,
-                    )
-                    binding.bottomSheetMenuSettingDivider.isVisible = viewState.hasExperimentalBrowserMenuOption
-                    binding.useBottomSheetMenuSetting.isVisible = viewState.hasExperimentalBrowserMenuOption
-                    binding.useBottomSheetMenuSetting.quietlySetIsChecked(
-                        viewState.useBottomSheetMenuEnabled,
-                        useBottomSheetMenuToggleListener,
                     )
                     configureOmnibarSettings(it)
                 }
