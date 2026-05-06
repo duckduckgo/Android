@@ -52,7 +52,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.image.ImageAttachmentsContainerView
-import com.duckduckgo.duckchat.impl.nativeinput.image.RealAttachmentHandler
+import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.AttachmentButtonView
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
@@ -213,7 +213,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var isModelMenuVisible: Boolean = false
         private set
 
-    private val attachmentHandler: RealAttachmentHandler?
+    private val attachmentHandler: AttachmentHandler?
         get() {
             val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return null
             return (0 until container.childCount)
@@ -335,10 +335,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
             picker.onMenuDismissed = { isModelMenuVisible = false }
+            picker.onModelSelected = { updateAttachmentState() }
         }
     }
 
-    private fun observeImageUploadLimit(handler: RealAttachmentHandler) {
+    private fun observeImageUploadLimit(handler: AttachmentHandler) {
         imageUploadLimitJob?.cancel()
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         imageUploadLimitJob = handler.imageUploadLimitReached
@@ -449,8 +450,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return
         for (i in 0 until container.childCount) {
             val buttonView = container.getChildAt(i) as? AttachmentButtonView ?: continue
-            val atMax = buttonView.attachmentHandler.isAtMaxCapacity()
-            buttonView.isEnabled = !atMax
+            buttonView.isVisible = buttonView.attachmentHandler.supportsImageUpload()
         }
     }
 

@@ -16,20 +16,24 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput.image
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.util.Base64
 import android.webkit.ValueCallback
 import androidx.core.graphics.scale
+import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import javax.inject.Inject
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import kotlin.math.max
@@ -38,6 +42,25 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+interface AttachmentHandler {
+    var onImageAttachmentAdded: ((ImageAttachment) -> Unit)?
+    var onImageLimitError: ((String) -> Unit)?
+    var onImageLimitErrorClear: (() -> Unit)?
+    var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
+    var onChooserStateChanged: ((Boolean) -> Unit)?
+    var onRequestFocus: (() -> Unit)?
+    var conversationImageLimitReached: Boolean
+    val imageUploadLimitReached: Flow<Boolean>
+
+    fun supportsImageUpload(): Boolean
+    fun handlePickedImages(uris: List<Uri>)
+    fun onImagesSubmitted(count: Int)
+    fun resetConversationCounts()
+    fun updateImageCount(count: Int)
+    fun isAtMaxCapacity(): Boolean
+    fun showAttachmentChooser()
+}
+
 class RealAttachmentHandler(
     private val context: Context,
     private val scope: CoroutineScope,
@@ -45,31 +68,33 @@ class RealAttachmentHandler(
     private val dispatcherProvider: DispatcherProvider,
     private val modelManager: DuckAiModelManager,
     private val duckChatJSHelper: DuckChatJSHelper,
-) {
+    private val appBuildConfig: AppBuildConfig,
+) : AttachmentHandler {
 
-    var onImageAttachmentAdded: ((ImageAttachment) -> Unit)? = null
-    var onImageLimitError: ((String) -> Unit)? = null
-    var onImageLimitErrorClear: (() -> Unit)? = null
-    var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
-    var onChooserStateChanged: ((Boolean) -> Unit)? = null
-    var onRequestFocus: (() -> Unit)? = null
+    override var onImageAttachmentAdded: ((ImageAttachment) -> Unit)? = null
+    override var onImageLimitError: ((String) -> Unit)? = null
+    override var onImageLimitErrorClear: (() -> Unit)? = null
+    override var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    override var onChooserStateChanged: ((Boolean) -> Unit)? = null
+    override var onRequestFocus: (() -> Unit)? = null
 
     private var imageCount: Int = 0
     private var conversationImagesSent: Int = 0
-    var conversationImageLimitReached: Boolean = false
+    override var conversationImageLimitReached: Boolean = false
 
     private val contentResolver: ContentResolver get() = context.contentResolver
 
-    val imageUploadLimitReached: Flow<Boolean>
+    override val imageUploadLimitReached: Flow<Boolean>
         get() = duckChatJSHelper.imageUploadLimitReached
 
-    fun supportsImageUpload(): Boolean {
+    override fun supportsImageUpload(): Boolean {
         val state = modelManager.modelState.value
+        if (state.models.isEmpty()) return true
         val model = state.models.find { it.id == state.selectedModelId }
         return model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled()
     }
 
-    fun handlePickedImages(uris: List<Uri>) {
+    override fun handlePickedImages(uris: List<Uri>) {
         scope.launch(dispatcherProvider.main()) {
             uris.forEach { uri ->
                 withContext(dispatcherProvider.io()) { processImage(uri) }?.let { attachment ->
@@ -80,15 +105,15 @@ class RealAttachmentHandler(
         }
     }
 
-    fun onImagesSubmitted(count: Int) {
+    override fun onImagesSubmitted(count: Int) {
         conversationImagesSent += count
     }
 
-    fun resetConversationCounts() {
+    override fun resetConversationCounts() {
         conversationImagesSent = 0
     }
 
-    fun updateImageCount(count: Int) {
+    override fun updateImageCount(count: Int) {
         imageCount = count
         val limits = modelManager.modelState.value.attachmentLimits.images
         val totalImages = imageCount + conversationImagesSent
@@ -105,18 +130,17 @@ class RealAttachmentHandler(
         }
     }
 
-    fun isAtMaxCapacity(): Boolean {
+    override fun isAtMaxCapacity(): Boolean {
         if (!supportsImageUpload()) return true
         val limits = modelManager.modelState.value.attachmentLimits.images
         val totalImages = imageCount + conversationImagesSent
         return conversationImageLimitReached || imageCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
     }
 
-    fun showAttachmentChooser() {
+    override fun showAttachmentChooser() {
         if (!supportsImageUpload() || isAtMaxCapacity()) return
 
         onChooserStateChanged?.invoke(true)
-        var pickerLaunched = false
 
         val chooseFileString = context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption)
         val chooseFileIcon = com.duckduckgo.mobile.android.R.drawable.ic_image_24
@@ -128,6 +152,8 @@ class RealAttachmentHandler(
             .setPrimaryItem(chooseFileString, chooseFileIcon)
             .setSecondaryItem(takePhotoString, takePhotoIcon)
             .addEventListener(object : com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog.EventListener() {
+                private var pickerLaunched = false
+
                 override fun onPrimaryItemClicked() {
                     pickerLaunched = true
                     val callback = ValueCallback<Array<Uri>> { uris ->
@@ -154,21 +180,12 @@ class RealAttachmentHandler(
             }).show()
     }
 
-    private suspend fun processImage(uri: Uri): ImageAttachment? {
+    private fun processImage(uri: Uri): ImageAttachment? {
         val original = decodeBitmap(uri) ?: return null
         val resized = resizeIfNeeded(original, MAX_DIMENSION_PX)
         val format = resolveFormat(uri)
 
-        @Suppress("DEPRECATION")
-        val compressFormat = when (format) {
-            "jpeg" -> Bitmap.CompressFormat.JPEG
-            "webp" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Bitmap.CompressFormat.WEBP_LOSSY
-            } else {
-                Bitmap.CompressFormat.WEBP
-            }
-            else -> Bitmap.CompressFormat.PNG
-        }
+        val compressFormat = getCompressFormat(format)
         val base64 = encodeBitmapToBase64(resized, compressFormat)
         if (resized !== original) original.recycle()
         return ImageAttachment(
@@ -177,6 +194,19 @@ class RealAttachmentHandler(
             base64Data = base64,
             format = format,
         )
+    }
+    @SuppressLint("NewApi")
+    private fun getCompressFormat(format: String): Bitmap.CompressFormat {
+        val compressFormat = when (format) {
+            "jpeg" -> Bitmap.CompressFormat.JPEG
+            "webp" -> if (appBuildConfig.sdkInt >= 30) {
+                Bitmap.CompressFormat.WEBP_LOSSY
+            } else {
+                Bitmap.CompressFormat.WEBP
+            }
+            else -> Bitmap.CompressFormat.PNG
+        }
+        return compressFormat
     }
 
     private fun decodeBitmap(uri: Uri): Bitmap? {
@@ -216,4 +246,28 @@ class RealAttachmentHandler(
         private const val COMPRESSION_QUALITY = 85
         private const val MAX_DIMENSION_PX = 512
     }
+}
+
+interface AttachmentHandlerFactory {
+    fun create(context: Context, scope: CoroutineScope): AttachmentHandler
+}
+
+@ContributesBinding(AppScope::class)
+class RealAttachmentHandlerFactory @Inject constructor(
+    private val duckChatInternal: DuckChatInternal,
+    private val dispatcherProvider: DispatcherProvider,
+    private val modelManager: DuckAiModelManager,
+    private val duckChatJSHelper: DuckChatJSHelper,
+    private val appBuildConfig: AppBuildConfig,
+) : AttachmentHandlerFactory {
+
+    override fun create(context: Context, scope: CoroutineScope): AttachmentHandler = RealAttachmentHandler(
+        context = context,
+        scope = scope,
+        duckChatInternal = duckChatInternal,
+        dispatcherProvider = dispatcherProvider,
+        modelManager = modelManager,
+        duckChatJSHelper = duckChatJSHelper,
+        appBuildConfig = appBuildConfig,
+    )
 }

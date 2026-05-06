@@ -19,15 +19,11 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
-import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
-import com.duckduckgo.duckchat.impl.nativeinput.image.RealAttachmentHandler
+import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandlerFactory
 import javax.inject.Inject
 import kotlinx.coroutines.MainScope
 
@@ -38,23 +34,13 @@ import kotlinx.coroutines.MainScope
     parentFeatureName = "pluginPointNativeInput",
 )
 class AttachmentButtonNativeInputPlugin @Inject constructor(
-    private val duckChatInternal: DuckChatInternal,
-    private val dispatcherProvider: DispatcherProvider,
-    private val modelManager: DuckAiModelManager,
-    private val duckChatJSHelper: DuckChatJSHelper,
+    private val attachmentHandlerFactory: AttachmentHandlerFactory,
 ) : NativeInputPlugin {
 
     override val containerId: Int = R.id.attachButtonContainer
 
     override fun createView(context: Context): View {
-        val handler = RealAttachmentHandler(
-            context = context,
-            scope = MainScope(),
-            duckChatInternal = duckChatInternal,
-            dispatcherProvider = dispatcherProvider,
-            modelManager = modelManager,
-            duckChatJSHelper = duckChatJSHelper,
-        )
+        val handler = attachmentHandlerFactory.create(context, MainScope())
         return AttachmentButtonView(context, handler)
     }
 

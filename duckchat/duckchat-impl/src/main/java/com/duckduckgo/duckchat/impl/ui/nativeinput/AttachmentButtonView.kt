@@ -21,12 +21,12 @@ import android.content.Context
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.image.RealAttachmentHandler
+import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandler
 
 @SuppressLint("ViewConstructor")
 class AttachmentButtonView(
     context: Context,
-    val attachmentHandler: RealAttachmentHandler,
+    val attachmentHandler: AttachmentHandler,
 ) : FrameLayout(context) {
 
     init {

@@ -53,6 +53,7 @@ import javax.inject.Inject
 interface ModelPicker {
     var onMenuShown: (() -> Unit)?
     var onMenuDismissed: (() -> Unit)?
+    var onModelSelected: (() -> Unit)?
     fun getSelectedModelId(): String?
     fun setPickerEnabled(enabled: Boolean)
 }
@@ -74,6 +75,7 @@ class ModelPickerView @JvmOverloads constructor(
     private var popupWindow: PopupWindow? = null
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
+    override var onModelSelected: (() -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
@@ -110,6 +112,7 @@ class ModelPickerView @JvmOverloads constructor(
             .onEach { state ->
                 state.selectedModelShortName?.let { chip.text = it }
                 updateVisibility()
+                onModelSelected?.invoke()
             }
             .launchIn(scope)
     }
