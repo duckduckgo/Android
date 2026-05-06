@@ -237,7 +237,7 @@ class OmnibarLayout @JvmOverloads constructor(
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
     private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
     private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
-    private val duckAIBack: View by lazy { findViewById(R.id.dackAiBack) }
+    private val duckAIBack: View by lazy { findViewById(R.id.duckAiBack) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =

@@ -563,12 +563,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowDuckAiBack(
-        isEnabled: Boolean,
-        isInputScreenUserSettingEnabled: Boolean,
-    ): Boolean =
-        !(isEnabled && isInputScreenUserSettingEnabled)
-
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
         val hasFocus = _viewState.value.hasFocus
