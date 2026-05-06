@@ -74,11 +74,13 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
@@ -91,6 +93,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -123,6 +126,9 @@ class AppSyncAccountRepositoryTest {
 
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper = mock()
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
+    private val syncJweCrypto: SyncJweCrypto = mock()
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager = mock()
+    private val protectedKeyManager: ProtectedKeyManager = mock()
 
     @Before
     fun before() {
@@ -140,6 +146,9 @@ class AppSyncAccountRepositoryTest {
             deviceKeyGenerator,
             syncCodeUrlWrapper = syncCodeUrlWrapper,
             syncSetupWideEvent = syncSetupWideEvent,
+            syncJweCrypto = syncJweCrypto,
+            thirdPartyCredentialManager = thirdPartyCredentialManager,
+            protectedKeyManager = protectedKeyManager,
         )
 
         // passthrough by default (no modifications)
@@ -178,7 +187,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
             .thenReturn(accountCreatedFailDupUser)
 
         val result = syncRepo.createAccount() as Error
@@ -190,7 +199,7 @@ class AppSyncAccountRepositoryTest {
     fun whenCreateAccountGenerateKeysFailsThenReturnCreateAccountError() {
         prepareToProvideDeviceIds()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeysFailed)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
             .thenReturn(accountCreatedSuccess)
 
         val result = syncRepo.createAccount() as Error
@@ -993,7 +1002,7 @@ class AppSyncAccountRepositoryTest {
     private fun prepareForCreateAccountSuccess() {
         prepareForEncryption()
         whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
-        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+        whenever(syncApi.createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyOrNull()))
             .thenReturn(Success(AccountCreatedResponse(userId, token)))
     }
 
@@ -1016,5 +1025,156 @@ class AppSyncAccountRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(Success(listOfDevices))
 
         syncRepo.getConnectedDevices() as Success
+    }
+
+    // A3: Login with scoped access credentials flag
+
+    @Test
+    fun whenLoginWithScopedCredentialsFlagOffThenV2DataNotStored() {
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+
+        val loginResponseWithV2 = LoginResponse(
+            token = token,
+            protected_encryption_key = protectedEncryptionKey,
+            devices = emptyList(),
+            accessCredentials = listOf(AccessCredentialEntry(id = "ddg", scope = null)),
+            keys = listOf(ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "ddg", encryptedPrivateKey = "jwe_data")),
+        )
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(Success(loginResponseWithV2))
+
+        val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+
+        assertEquals(Success(true), result)
+        verify(syncStore, times(0)).credentialId = any()
+        verify(syncStore, times(0)).protectedKeysJson = any()
+    }
+
+    @Test
+    fun whenLoginWithScopedCredentialsFlagOnThenV2DataStored() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        // The decrypted SP arrives base64url-encoded and must be re-encoded as standard base64
+        // for local storage. Fixture chosen so wire form ("_-__") and stored form ("/+//") differ
+        // in every character — catches bugs that skip the URL-safe character substitution.
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), any(), any())).thenReturn(ByteArray(32))
+        whenever(syncJweCrypto.jweDecryptSymmetric(eq("encrypted_sp"), any())).thenReturn("_-__".toByteArray(Charsets.UTF_8))
+
+        val loginResponseWithV2 = LoginResponse(
+            token = token,
+            protected_encryption_key = protectedEncryptionKey,
+            devices = emptyList(),
+            accessCredentials = listOf(
+                AccessCredentialEntry(id = "ddg", scope = null),
+                AccessCredentialEntry(id = "3party", scope = "ai_chats", encryptedCredential = "encrypted_sp"),
+            ),
+            keys = listOf(
+                ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "ddg", encryptedPrivateKey = "jwe_ddg"),
+                ProtectedKeyEntry(kid = "k1", purpose = "ai_chats", encryptedWith = "3party", encryptedPrivateKey = "jwe_3p"),
+            ),
+        )
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(Success(loginResponseWithV2))
+
+        val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+
+        assertEquals(Success(true), result)
+        verify(syncStore).credentialId = "ddg"
+        verify(syncStore).scopedPassword = ScopedPassword("/+//")
+        verify(syncStore).protectedKeysJson = any()
+    }
+
+    @Test
+    fun whenLoginWithScopedCredentialsFlagOnButNoV2DataThenOnlyCredentialIdStored() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.prepareForLogin(primaryKey)).thenReturn(validLoginKeys)
+        whenever(syncApi.login(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(loginSuccess)
+
+        val result = syncRepo.processCode(SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId)))
+
+        assertEquals(Success(true), result)
+        verify(syncStore).credentialId = "ddg"
+        verify(syncStore, times(0)).scopedPassword = any()
+    }
+
+    // A3: Signup with scoped access credentials flag
+
+    @Test
+    fun whenCreateAccountWithScopedCredentialsFlagOnThenCredentialIdIncluded() {
+        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+
+        syncRepo.createAccount()
+
+        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq("ddg"))
+    }
+
+    @Test
+    fun whenCreateAccountWithScopedCredentialsFlagOffThenCredentialIdNull() {
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+
+        syncRepo.createAccount()
+
+        verify(syncApi).createAccount(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), eq(null))
+    }
+
+    // ---- Delegation to ThirdPartyCredentialManager / ProtectedKeyManager ----
+    // Per-manager logic is covered in ThirdPartyCredentialManagerTest and ProtectedKeyManagerTest.
+
+    @Test
+    fun whenCreateThirdPartyCredentialThenDelegatesToManager() {
+        whenever(thirdPartyCredentialManager.create()).thenReturn(Success(true))
+
+        val result = syncRepo.createThirdPartyCredential()
+
+        assertEquals(Success(true), result)
+        verify(thirdPartyCredentialManager).create()
+    }
+
+    @Test
+    fun whenRefreshThirdPartyCredentialThenDelegatesToManager() {
+        whenever(thirdPartyCredentialManager.refresh()).thenReturn(Success(false))
+
+        val result = syncRepo.refreshThirdPartyCredential()
+
+        assertEquals(Success(false), result)
+        verify(thirdPartyCredentialManager).refresh()
+    }
+
+    @Test
+    fun whenGetThirdPartyRecoveryCodeThenWrapsManagerStringInAuthCode() {
+        whenever(thirdPartyCredentialManager.getRecoveryCode()).thenReturn(Success("the-code"))
+
+        val result = syncRepo.getThirdPartyRecoveryCode() as Success<*>
+        val authCode = result.data as AuthCode
+
+        assertEquals("the-code", authCode.qrCode)
+        assertEquals("the-code", authCode.rawCode)
+    }
+
+    @Test
+    fun whenGetThirdPartyRecoveryCodeManagerErrorsThenForwarded() {
+        val managerError = Error(code = 1, reason = "boom")
+        whenever(thirdPartyCredentialManager.getRecoveryCode()).thenReturn(managerError)
+
+        val result = syncRepo.getThirdPartyRecoveryCode()
+
+        assertEquals(managerError, result)
+    }
+
+    @Test
+    fun whenCreateProtectedKeyThenDelegatesToManager() {
+        whenever(protectedKeyManager.create("ai_chats")).thenReturn(Success(true))
+
+        val result = syncRepo.createProtectedKey("ai_chats")
+
+        assertEquals(Success(true), result)
+        verify(protectedKeyManager).create("ai_chats")
     }
 }

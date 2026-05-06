@@ -80,4 +80,18 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendSyncSetupWideEvent(): Toggle
+
+    /**
+     * Global switch for the v2 connect/exchange stack. When disabled, the device uses the
+     * v1 stack only — no v2 keys, no v2 channel, no scoped credentials.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canUseV2ConnectFlow(): Toggle
+
+    /**
+     * When enabled, this device displays a v2 QR code. No effect unless [canUseV2ConnectFlow]
+     * is also enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun canShowV2ConnectCode(): Toggle
 }

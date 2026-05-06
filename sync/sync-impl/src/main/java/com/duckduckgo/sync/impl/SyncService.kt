@@ -130,6 +130,30 @@ interface SyncService {
         @Body request: TokenRescopeRequest,
     ): Call<TokenRescopeResponse>
 
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/keys")
+    fun getProtectedKeys(
+        @Header("Authorization") token: String,
+    ): Call<ProtectedKeysResponse>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/keys/purpose/{purpose}/set-if-absent")
+    fun setProtectedKeyIfAbsent(
+        @Header("Authorization") token: String,
+        @Path("purpose") purpose: String,
+        @Body request: SetProtectedKeyIfAbsentRequest,
+    ): Call<Void>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/access-credentials")
+    fun getAccessCredentials(
+        @Header("Authorization") token: String,
+    ): Call<AccessCredentialsResponse>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/access-credentials/{id}")
+    fun createAccessCredential(
+        @Header("Authorization") token: String,
+        @Path("id") credentialId: String,
+        @Body request: CreateAccessCredentialRequest,
+    ): Call<Void>
+
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
         const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
@@ -151,6 +175,7 @@ data class Signup(
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "device_name") val deviceName: String,
     @field:Json(name = "device_type") val deviceType: String,
+    @field:Json(name = "credential_id") val credentialId: String? = null,
 )
 
 data class Logout(
@@ -180,6 +205,8 @@ data class LoginResponse(
     val token: String,
     val protected_encryption_key: String,
     val devices: List<Device>,
+    @field:Json(name = "access_credentials") val accessCredentials: List<AccessCredentialEntry>? = null,
+    val keys: List<ProtectedKeyEntry>? = null,
 )
 
 data class DeviceResponse(
@@ -208,6 +235,66 @@ data class TokenRescopeRequest(
 
 data class TokenRescopeResponse(
     val token: String,
+)
+
+/** Response from GET /sync/keys — the account's protected keys for all purposes. */
+data class ProtectedKeysResponse(
+    val keys: List<ProtectedKeyEntry>,
+)
+
+/** Body for POST /sync/keys/purpose/{purpose}/set-if-absent — adds a protected key only if no key exists for that purpose. */
+data class SetProtectedKeyIfAbsentRequest(
+    val key: ProtectedKeyEntry,
+)
+
+data class AccessCredentialsResponse(
+    @field:Json(name = "access_credentials") val accessCredentials: List<AccessCredentialEntry>,
+)
+
+/**
+ * One entry in GET /sync/access-credentials. Each entry represents an access credential the
+ * account holds (id "ddg" for the native credential, "3party" for the scoped-access one shared
+ * with browser surfaces). `encryptedCredential` is the credential's secret encrypted with the
+ * companion credential's MEK (e.g. for id="3party", encrypted with the DDG MEK).
+ *
+ */
+data class AccessCredentialEntry(
+    val id: String,
+    val scope: String? = null,
+    @field:Json(name = "encrypted_3party_credential") val encryptedCredential: String? = null,
+)
+
+data class CreateAccessCredentialRequest(
+    @field:Json(name = "hashed_password") val hashedPassword: String,
+    @field:Json(name = "credential_hashed_password") val credentialHashedPassword: String,
+    @field:Json(name = "protected_encryption_key") val protectedEncryptionKey: String? = null,
+    @field:Json(name = "encrypted_3party_credential") val encrypted3partyCredential: String? = null,
+    val keys: List<ProtectedKeyEntry>? = null,
+)
+
+/**
+ * A protected RSA keypair stored against the account for a specific [purpose] (e.g. "ai_chats").
+ * [encryptedPrivateKey] is wrapped with the credential identified by [encryptedWith] ("ddg" or
+ * "3party"); each purpose can have one entry per credential. [publicKey] is sent in JWK form so
+ * clients without the private key can still use it for asymmetric encryption.
+ */
+data class ProtectedKeyEntry(
+    val kid: String,
+    val purpose: String,
+    @field:Json(name = "encrypted_with") val encryptedWith: String,
+    @field:Json(name = "encrypted_private_key") val encryptedPrivateKey: String,
+    @field:Json(name = "public_key") val publicKey: RsaJwk? = null,
+)
+
+/** RSA-OAEP-256 public key in JWK format (RFC 7517) for sync protected key entries. */
+data class RsaJwk(
+    val alg: String = "RSA-OAEP-256",
+    val e: String,
+    val ext: Boolean = true,
+    @field:Json(name = "key_ops") val keyOps: List<String> = listOf("encrypt"),
+    val kty: String = "RSA",
+    val n: String,
+    val use: String = "enc",
 )
 
 @Suppress("ktlint:standard:class-naming")

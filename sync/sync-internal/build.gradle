@@ -40,6 +40,7 @@ dependencies {
     implementation project(':design-system')
     implementation project(':persistent-storage-api')
     implementation project(':app-build-config-api')
+    implementation project(':browser-api')
 
     ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')

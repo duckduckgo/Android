@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
@@ -86,6 +87,42 @@ interface SyncAccountRepository {
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
 
+    /**
+     * Ensures the `3party` credential exists for this account, so [getThirdPartyRecoveryCode]
+     * can later produce a code shareable with a 3rd-party browser.
+     *
+     * If another device on the account has already created it, the existing credential is
+     * adopted locally; otherwise a new one is created on the server. Either path leaves the
+     * local store ready for [getThirdPartyRecoveryCode].
+     */
+    fun createThirdPartyCredential(): Result<Boolean>
+
+    /**
+     * Fetches the 3party credential from the server, decrypts the SP using the account's secretKey,
+     * and stores it locally in [SyncStore.scopedPassword]. Used to recover the SP on a device that
+     * didn't create the credential (e.g. a different device on the same account).
+     *
+     * Returns [Result.Success] with `true` if the credential was fetched and stored, or `false` if
+     * no 3party credential exists on the server. Returns [Result.Error] only for actual failures
+     * (network errors, decrypt failures, etc.).
+     */
+    fun refreshThirdPartyCredential(): Result<Boolean>
+
+    /**
+     * Returns a recovery code that a 3rd-party browser can use to sign in and access this
+     * account's scoped data. Requires the 3party credential to already exist locally — call
+     * [createThirdPartyCredential] (or [refreshThirdPartyCredential]) first.
+     */
+    fun getThirdPartyRecoveryCode(): Result<AuthCode>
+
+    /**
+     * Creates a protected RSA keypair for the given purpose (e.g. "ai_chats") and uploads it
+     * to the server, encrypted with the ddg credential's stretchedPrimaryKey.
+     *
+     * No-op (returns existing key) if a key for the purpose already exists.
+     */
+    fun createProtectedKey(purpose: String): Result<Boolean>
+
     data class AuthCode(
         /**
          * A code that is suitable for displaying in a QR code.
@@ -116,6 +153,9 @@ class AppSyncAccountRepository @Inject constructor(
     private val deviceKeyGenerator: DeviceKeyGenerator,
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
     private val syncSetupWideEvent: SyncSetupWideEvent,
+    private val syncJweCrypto: SyncJweCrypto,
+    private val thirdPartyCredentialManager: ThirdPartyCredentialManager,
+    private val protectedKeyManager: ProtectedKeyManager,
 ) : SyncAccountRepository {
 
     /**
@@ -354,6 +394,13 @@ class AppSyncAccountRepository @Inject constructor(
         return Success(AuthCode(qrCode = b64Encoded, rawCode = b64Encoded))
     }
 
+    override fun getThirdPartyRecoveryCode(): Result<AuthCode> {
+        return when (val result = thirdPartyCredentialManager.getRecoveryCode()) {
+            is Success -> Success(AuthCode(qrCode = result.data, rawCode = result.data))
+            is Error -> result
+        }
+    }
+
     override fun generateExchangeInvitationCode(): Result<AuthCode> {
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
         logcat { "Sync-exchange: InviteFlow - A. Generating invitation code" }
@@ -537,6 +584,12 @@ class AppSyncAccountRepository @Inject constructor(
             }
         }
     }
+
+    override fun createThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.create()
+
+    override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
+
+    override fun createProtectedKey(purpose: String): Result<Boolean> = protectedKeyManager.create(purpose)
 
     override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
@@ -734,6 +787,8 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
+        val credentialId = if (syncFeature.canUseV2ConnectFlow().isEnabled()) CREDENTIAL_ID_DDG else null
+
         val result = try {
             runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
             syncApi.createAccount(
@@ -743,6 +798,7 @@ class AppSyncAccountRepository @Inject constructor(
                 deviceId,
                 encryptedDeviceName,
                 encryptedDeviceType,
+                credentialId,
             )
         } finally {
             runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
@@ -755,6 +811,10 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
+                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+                    logcat { "Sync-ScopedToken: setting credentialId=ddg after account creation" }
+                    syncStore.credentialId = CREDENTIAL_ID_DDG
+                }
                 try {
                     runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
                     syncEngine.triggerSync(ACCOUNT_CREATION)
@@ -811,6 +871,37 @@ class AppSyncAccountRepository @Inject constructor(
                 }
 
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
+
+                if (syncFeature.canUseV2ConnectFlow().isEnabled()) {
+                    logcat { "Sync-ScopedToken: login response has v2 data, storing" }
+                    syncStore.credentialId = CREDENTIAL_ID_DDG
+                    result.data.accessCredentials?.let { credentials ->
+                        logcat { "Sync-ScopedToken: ${credentials.size} access credential(s) in response" }
+                        val thirdParty = credentials.find { it.id == CREDENTIAL_ID_3PARTY }
+                        val encryptedSp = thirdParty?.encryptedCredential
+                        if (encryptedSp != null) {
+                            // Decrypt with the DDG MEK; convert wire base64url to standard base64 for storage.
+                            val decryptedSp = kotlin.runCatching {
+                                val ddgMek = syncJweCrypto.hkdfDeriveBytes(preLogin.primaryKey, userId.toByteArray(Charsets.UTF_8), "Main Key", 32)
+                                val b64Url = String(syncJweCrypto.jweDecryptSymmetric(encryptedSp, ddgMek), Charsets.UTF_8)
+                                base64UrlStringToStandardBase64(b64Url)
+                            }.getOrElse {
+                                logcat(ERROR) { "Sync-ScopedToken: failed to decrypt SP from server: ${it.message}" }
+                                null
+                            }
+                            if (decryptedSp != null) {
+                                syncStore.scopedPassword = ScopedPassword(decryptedSp)
+                            }
+                        }
+                    }
+                    result.data.keys?.let { keys ->
+                        logcat { "Sync-ScopedToken: ${keys.size} protected key(s) in response" }
+                        val ddgKeys = keys.filter { it.encryptedWith == CREDENTIAL_ID_DDG }
+                        val keysJson = Adapters.protectedKeysAdapter.toJson(ddgKeys)
+                        syncStore.protectedKeysJson = keysJson
+                    }
+                }
+
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     syncEngine.triggerSync(ACCOUNT_LOGIN)
                 }
@@ -878,27 +969,41 @@ class AppSyncAccountRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
+            val thirdPartyRecoveryCodeAdapter: JsonAdapter<ThirdPartyRecoveryCodeWrapper> = moshi.adapter(ThirdPartyRecoveryCodeWrapper::class.java)
 
             val invitationCodeAdapter: JsonAdapter<InvitationCodeWrapper> = moshi.adapter(InvitationCodeWrapper::class.java)
             val invitedDeviceAdapter: JsonAdapter<InvitedDeviceDetails> = moshi.adapter(InvitedDeviceDetails::class.java)
+            val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
+                moshi.adapter(Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java))
         }
     }
 }
 
-private fun SyncCryptoResult.checkResult(errorMessage: String) {
+// Credential IDs known to the Sync API. Used in URL paths (e.g. POST /access-credentials/3party),
+// as the local credentialId marker in SyncStore, and as the credential_id field in 3party
+// recovery codes.
+internal const val CREDENTIAL_ID_DDG = "ddg"
+internal const val CREDENTIAL_ID_3PARTY = "3party"
+
+// Recovery code version emitted in v2 recovery codes per the Recovery Payload Shape RFC
+// (Asana 1214804486778180). Format is "major.minor" — clients in major version 2 accept 2.x
+// codes (ignoring unknown fields) and must reject codes with major version >2.
+internal const val RECOVERY_CODE_V2 = "2.0"
+
+internal fun SyncCryptoResult.checkResult(errorMessage: String) {
     if (result != 0) {
         throw SyncAccountException(this.result, errorMessage)
     }
 }
 
-private fun Throwable.asErrorResult(): Error {
+internal fun Throwable.asErrorResult(): Error {
     return when (this) {
         is SyncAccountException -> Error(code = this.code, reason = this.message.toString())
         else -> Error(reason = this.message.toString())
     }
 }
 
-private class SyncAccountException(
+internal class SyncAccountException(
     val code: Int,
     message: String,
 ) : Exception(message)
@@ -920,6 +1025,25 @@ data class LinkCode(
 data class RecoveryCode(
     @field:Json(name = "primary_key") val primaryKey: String,
     @field:Json(name = "user_id") val userId: String,
+)
+
+/**
+ * 3party recovery code envelope. Shares the `recovery` top-level key with [LinkCode];
+ * versions are disambiguated by the inner `v` field per Asana 1214804486778180.
+ */
+data class ThirdPartyRecoveryCodeWrapper(
+    val recovery: ThirdPartyRecoveryCode,
+)
+
+/**
+ * 3party recovery code v2 payload per Asana 1214804486778180. Outer JSON is base64url-encoded
+ * for transport; `secret` is base64url of the 32 raw SP bytes.
+ */
+data class ThirdPartyRecoveryCode(
+    @field:Json(name = "user_id") val userId: String,
+    val secret: String,
+    val cid: String,
+    val v: String,
 )
 
 data class InvitationCodeWrapper(

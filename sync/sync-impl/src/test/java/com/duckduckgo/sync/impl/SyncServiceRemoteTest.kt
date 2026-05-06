@@ -384,4 +384,28 @@ class SyncServiceRemoteTest {
 
         assertEquals(Result.Error(reason = "internal error"), result)
     }
+
+    // A 200 with `{"access_credentials":[]}` is valid — the account simply has no credentials yet.
+    // The "empty body" Error path only fires when retrofit returns a null body, which is distinct.
+    @Test
+    fun whenGetAccessCredentialsReturnsEmptyListThenReturnSuccessWithEmptyList() {
+        val call: Call<AccessCredentialsResponse> = mock()
+        whenever(syncService.getAccessCredentials(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(retrofit2.Response.success(AccessCredentialsResponse(accessCredentials = emptyList())))
+
+        val result = syncRemote.getAccessCredentials(token)
+
+        assertEquals(Result.Success(emptyList<AccessCredentialEntry>()), result)
+    }
+
+    @Test
+    fun whenGetAccessCredentialsReturnsNullBodyThenReturnError() {
+        val call: Call<AccessCredentialsResponse> = mock()
+        whenever(syncService.getAccessCredentials(anyString())).thenReturn(call)
+        whenever(call.execute()).thenReturn(retrofit2.Response.success(null))
+
+        val result = syncRemote.getAccessCredentials(token)
+
+        assertEquals(Result.Error(reason = "GetAccessCredentials: empty body"), result)
+    }
 }
