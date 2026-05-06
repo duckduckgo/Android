@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -126,10 +125,9 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
-        if (!duckChat.isVoiceSessionActive()) return@withContext false
         val selectedTab = tabRepository.getSelectedTab()
-        return@withContext selectedTab?.url?.toUri()?.let {
-            duckChat.isDuckChatUrl(it)
+        return@withContext selectedTab?.tabId?.let {
+            duckChat.isVoiceSessionActive(it)
         } == true
     }
 

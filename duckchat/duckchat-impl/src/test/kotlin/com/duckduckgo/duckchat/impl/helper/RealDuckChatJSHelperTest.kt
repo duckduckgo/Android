@@ -1691,16 +1691,18 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenVoiceSessionEndedThenNoPixelFiredAndStateUpdated() = runTest {
+        val tabId = "test-tab-id"
         val result = testee.processJsCallbackMessage(
             "aiChat",
             "voiceSessionEnded",
             null,
             null,
             pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
         )
 
         assertNull(result)
-        verify(mockVoiceSessionStateManager).onVoiceSessionEnded()
+        verify(mockVoiceSessionStateManager).onVoiceSessionEnded(tabId)
         verifyNoInteractions(mockDuckChatPixels)
     }
 

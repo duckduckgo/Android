@@ -243,7 +243,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_ENDED -> {
-                voiceSessionStateManager.onVoiceSessionEnded()
+                voiceSessionStateManager.onVoiceSessionEnded(tabId)
                 null
             }
 

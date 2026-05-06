@@ -80,7 +80,7 @@ class DuckChatVoiceMicrophoneService : Service() {
     }
 
     private fun buildNotification(): Notification {
-        val tabId = voiceSessionStateManager.activeSessionTabId
+        val tabId = voiceSessionStateManager.
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.duckAiVoiceNotificationTitle))
             .setContentText(getString(R.string.duckAiVoiceNotificationMessage))

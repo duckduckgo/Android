@@ -804,7 +804,7 @@ class RealDuckChat @Inject constructor(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()
 
-    override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
+    override fun isVoiceSessionActive(tabId: String): Boolean = voiceSessionStateManager.isVoiceSessionActive(tabId)
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 

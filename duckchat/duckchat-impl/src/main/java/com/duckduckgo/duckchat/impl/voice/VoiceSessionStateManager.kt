@@ -37,25 +37,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface VoiceSessionStateManager {
-    val isVoiceSessionActive: Boolean
-        get() = false
-
-    /**
-     * The tab id bound to the active voice session, or null if there is no active session
-     * or the session is a standalone (non-tab) session.
-     */
-    val activeSessionTabId: String?
-        get() = null
-
+    fun isVoiceSessionActive(tabId: String): Boolean = false
+    fun onVoiceSessionStarted(tabId: String)
+    fun onVoiceSessionEnded(tabId: String)
     /**
      * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
      * foreground service notification). Tabs should collect this flow and dispatch the
      * end-voice-session JS event when their id is emitted.
      */
     fun observeTriggerVoiceSessionEnd(): Flow<String>
-
-    fun onVoiceSessionStarted(tabId: String)
-    fun onVoiceSessionEnded()
     fun triggerVoiceSessionEnd(tabId: String)
 }
 
@@ -71,21 +61,15 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     private val listenJob = ConflatedJob()
 
-    // null = no session, STANDALONE_SESSION_ID = session without a browser tab, non-empty = tab session
-    @Volatile
-    private var _activeSessionTabId: String? = null
-
+    private val activeSessionTabIds = mutableSetOf<String>()
     private val _voiceSessionEndTrigger = MutableSharedFlow<String>(
         replay = 0,
         extraBufferCapacity = 8,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    override val activeSessionTabId: String?
-        get() = _activeSessionTabId?.takeUnless { it == STANDALONE_SESSION_ID }
-
-    override val isVoiceSessionActive: Boolean
-        get() = _activeSessionTabId != null
+    @Synchronized
+    override fun isVoiceSessionActive(tabId: String): Boolean = tabId.isNotBlank() && tabId in activeSessionTabIds
 
     override fun observeTriggerVoiceSessionEnd(): Flow<String> = _voiceSessionEndTrigger.asSharedFlow()
 
@@ -96,44 +80,54 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {
-        _activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
+        if (tabId.isBlank()) return
+        activeSessionTabIds += tabId
         if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
             DuckChatVoiceMicrophoneService.start(context)
         }
-        if (tabId.isNotBlank()) {
+        if (!listenJob.isActive) {
             listenToTabRemoval()
         }
     }
 
     @Synchronized
-    override fun onVoiceSessionEnded() {
-        listenJob.cancel()
-        _activeSessionTabId = null
-        DuckChatVoiceMicrophoneService.stop(context)
+    override fun onVoiceSessionEnded(tabId: String) {
+        if (tabId.isBlank()) return
+        activeSessionTabIds -= tabId
+        if (activeSessionTabIds.isEmpty()) {
+            endAllSessions()
+        }
     }
 
     override fun onOpen(isFreshLaunch: Boolean) {
         if (isFreshLaunch) {
-            onVoiceSessionEnded()
+            endAllSessions()
         }
     }
 
     override fun onExit() {
-        onVoiceSessionEnded()
+        endAllSessions()
+    }
+
+    @Synchronized
+    private fun endAllSessions() {
+        listenJob.cancel()
+        activeSessionTabIds.clear()
+        DuckChatVoiceMicrophoneService.stop(context)
     }
 
     private fun listenToTabRemoval() {
         listenJob += appCoroutineScope.launch {
             tabRepository.flowTabs.drop(1).collect { tabs ->
-                val tabId = _activeSessionTabId ?: return@collect
-                if (tabs.none { it.tabId == tabId }) {
-                    onVoiceSessionEnded()
+                val existingTabIds = tabs.mapTo(mutableSetOf()) { it.tabId }
+                val becameEmpty = synchronized(this@RealVoiceSessionStateManager) {
+                    activeSessionTabIds.removeAll { it !in existingTabIds }
+                    activeSessionTabIds.isEmpty()
+                }
+                if (becameEmpty) {
+                    endAllSessions()
                 }
             }
         }
-    }
-
-    companion object {
-        private const val STANDALONE_SESSION_ID = "__duck_ai_standalone__"
     }
 }
