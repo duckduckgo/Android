@@ -30,7 +30,7 @@
         android:layout_marginStart="@dimen/keyline_1"
         android:layout_marginEnd="@dimen/keyline_1"
         android:layout_marginBottom="@dimen/keyline_1"
-        app:cardBackgroundColor="?attr/daxColorSurface"
+        app:cardBackgroundColor="?attr/daxColorInputPrimary"
         app:cardElevation="3dp"
         app:cardUseCompatPadding="true">
 
