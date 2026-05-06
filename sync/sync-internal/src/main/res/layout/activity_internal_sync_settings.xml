@@ -32,6 +32,13 @@
             android:id="@+id/includeToolbar"
             layout="@layout/include_default_toolbar" />
 
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/launchSyncSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Launch Sync Settings" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,6 +51,204 @@
             app:showSwitch="true"
             app:primaryText="@string/sync_internal_environment_title"
             tools:secondaryText="@string/sync_internal_environment_subtitle_prod" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Duck.ai Environment" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openDuckAiDevScreenButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Open Duck.ai Dev Screen" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/openDuckAiSetupUrlButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Open Duck.ai Setup URL" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="V2 Connect Flow flags" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canUseV2ConnectFlowToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canUseV2ConnectFlow (master kill switch)" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/canShowV2ConnectCodeToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showSwitch="true"
+            app:primaryText="canShowV2ConnectCode (display, requires canUseV2ConnectFlow)" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/fetchAccessCredentialsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Fetch Access Credentials" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/accessCredentialsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/requestScopedTokenButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Request Scoped Token (ai_chats)" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/scopedTokenResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Protected Keys" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/fetchKeysButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Fetch Keys" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/keysTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/createProtectedKeyPurposeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:hint="Purpose (e.g. ai_chats, sync)"
+            android:text="ai_chats"
+            app:editable="true"
+            app:type="single_line" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/createProtectedKeyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Create Protected Key" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="3party Credential Management" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/createThirdPartyCredentialButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Create 3party Credential" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/refreshThirdPartyCredentialButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Refresh 3party Credential from Server" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/v2StoreFieldsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="3party Recovery Code" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/showThirdPartyRecoveryQrButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Show 3party Recovery QR" />
+
+        <ImageView
+            android:id="@+id/thirdPartyRecoveryQrImageView"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/copyThirdPartyRecoveryCodeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Copy 3party Recovery Code" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/thirdPartyRecoveryCodeTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:ellipsize="end"
+            android:maxLines="3"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/thirdPartyRecoveryCodeDecodedTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:ellipsize="end"
+            android:maxLines="10"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/sync_recovery_code"
@@ -333,6 +538,17 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/recoveryCodeDecodedTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="5"
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/connectedDevicesSectionHeader"

@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.sync.api.DeviceSyncState.Type
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
+import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.emptyFlow
 import org.junit.Assert.assertEquals
@@ -109,6 +110,9 @@ class AppSyncDeviceIdsTest {
             override var token: String? = "token"
             override var primaryKey: String? = "primaryKey"
             override var secretKey: String? = "secretKey"
+            override var credentialId: String? = null
+            override var scopedPassword: ScopedPassword? = null
+            override var protectedKeysJson: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
@@ -141,6 +145,9 @@ class AppSyncDeviceIdsTest {
             override var token: String? = null
             override var primaryKey: String? = null
             override var secretKey: String? = null
+            override var credentialId: String? = null
+            override var scopedPassword: ScopedPassword? = null
+            override var protectedKeysJson: String? = null
             override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()

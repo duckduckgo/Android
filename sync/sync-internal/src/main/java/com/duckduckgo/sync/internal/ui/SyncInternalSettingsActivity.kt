@@ -22,17 +22,21 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Base64
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.ui.SyncActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
@@ -51,11 +55,22 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.LogPriority
+import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     private val binding: ActivityInternalSyncSettingsBinding by viewBinding()
     private val viewModel: SyncInternalSettingsViewModel by bindViewModel()
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     private val barcodeLauncher = registerForActivityResult(
         ScanContract(),
@@ -92,6 +107,20 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
+        binding.launchSyncSettingsButton.setOnClickListener {
+            startActivity(Intent(this, SyncActivity::class.java))
+        }
+        binding.openDuckAiDevScreenButton.setOnClickListener {
+            // Launch via class name so sync-internal doesn't need a direct dependency on duckchat-internal.
+            val intent = Intent().setClassName(packageName, "com.duckduckgo.duckchat.internal.DuckAiDevActivity")
+            runCatching { startActivity(intent) }.onFailure {
+                Toast.makeText(this, "Duck.ai dev screen not available in this build", Toast.LENGTH_LONG).show()
+            }
+        }
+        // this is temporary while testing
+        binding.openDuckAiSetupUrlButton.setOnClickListener {
+            startActivity(browserNav.openInNewTab(this, "https://euw-serp-dev-testing18.duck.ai/setup-aichat"))
+        }
         binding.showQRCode.setOnClickListener {
             viewModel.onShowQRClicked()
         }
@@ -128,6 +157,27 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
         binding.blockStoreWriteRecoveryCodeButton.setOnClickListener { viewModel.onBlockStoreWriteRecoveryCode() }
         binding.recoveryCodeTextView.setOnClickListener { copyToClipboard("Recovery Code", binding.recoveryCodeTextView.text.toString()) }
+        binding.recoveryCodeDecodedTextView.setOnClickListener {
+            copyToClipboard("Recovery Code (decoded JSON)", binding.recoveryCodeDecodedTextView.text.toString())
+        }
+        binding.fetchAccessCredentialsButton.setOnClickListener { viewModel.onFetchAccessCredentialsClicked() }
+        binding.requestScopedTokenButton.setOnClickListener { viewModel.onRequestScopedTokenClicked() }
+        binding.fetchKeysButton.setOnClickListener { viewModel.onFetchKeysClicked() }
+        binding.createProtectedKeyButton.setOnClickListener {
+            viewModel.onCreateProtectedKeyClicked(binding.createProtectedKeyPurposeInput.text)
+        }
+        binding.createThirdPartyCredentialButton.setOnClickListener { viewModel.onCreateThirdPartyCredentialClicked() }
+        binding.refreshThirdPartyCredentialButton.setOnClickListener { viewModel.onRefreshThirdPartyCredentialClicked() }
+        binding.showThirdPartyRecoveryQrButton.setOnClickListener { viewModel.onShowThirdPartyRecoveryQrClicked() }
+        binding.thirdPartyRecoveryCodeTextView.setOnClickListener {
+            copyToClipboard("3party Recovery Code", binding.thirdPartyRecoveryCodeTextView.text.toString())
+        }
+        binding.copyThirdPartyRecoveryCodeButton.setOnClickListener {
+            copyToClipboard("3party Recovery Code", binding.thirdPartyRecoveryCodeTextView.text.toString())
+        }
+        binding.thirdPartyRecoveryCodeDecodedTextView.setOnClickListener {
+            copyToClipboard("3party Recovery Code (decoded JSON)", binding.thirdPartyRecoveryCodeDecodedTextView.text.toString())
+        }
     }
 
     private fun observeUiEvents() {
@@ -155,13 +205,19 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             }
 
             is ShowQR -> {
-                try {
-                    val barcodeEncoder = BarcodeEncoder()
-                    val bitmap: Bitmap = barcodeEncoder.encodeBitmap(command.string, QR_CODE, 400, 400)
+                lifecycleScope.launch {
+                    val bitmap = encodeQrAsync(command.string) ?: return@launch
                     binding.qrCodeImageView.show()
                     binding.qrCodeImageView.setImageBitmap(bitmap)
                     binding.showQRCode.hide()
-                } catch (e: Exception) {
+                }
+            }
+
+            is Command.ShowThirdPartyRecoveryQR -> {
+                lifecycleScope.launch {
+                    val bitmap = encodeQrAsync(command.string) ?: return@launch
+                    binding.thirdPartyRecoveryQrImageView.show()
+                    binding.thirdPartyRecoveryQrImageView.setImageBitmap(bitmap)
                 }
             }
 
@@ -189,6 +245,29 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         Toast.makeText(this, "$label copied", Toast.LENGTH_SHORT).show()
     }
 
+    private fun decodeThirdPartyRecoveryCode(b64UrlEncoded: String): String {
+        if (b64UrlEncoded.isEmpty()) return "(no 3party credential yet)"
+        return runCatching {
+            String(Base64.decode(b64UrlEncoded, Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP), Charsets.UTF_8)
+        }.getOrElse { "(decode failed: ${it.message})" }
+    }
+
+    private fun decodeStandardBase64(encoded: String, emptyPlaceholder: String): String {
+        if (encoded.isEmpty()) return emptyPlaceholder
+        return runCatching {
+            String(Base64.decode(encoded, Base64.NO_WRAP), Charsets.UTF_8)
+        }.getOrElse { "(decode failed: ${it.message})" }
+    }
+
+    private suspend fun encodeQrAsync(contents: String): Bitmap? = withContext(dispatcherProvider.io()) {
+        runCatching {
+            BarcodeEncoder().encodeBitmap(contents, QR_CODE, 400, 400)
+        }.getOrElse { e ->
+            logcat(LogPriority.ERROR) { "Sync-ScopedToken: failed to encode QR: ${e.message}" }
+            null
+        }
+    }
+
     private fun getScanOptions(): ScanOptions {
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
@@ -209,6 +288,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
         binding.recoveryCodeTextView.text = viewState.recoveryCode.ifEmpty { "(not signed in)" }
+        binding.recoveryCodeDecodedTextView.text = decodeStandardBase64(viewState.recoveryCode, emptyPlaceholder = "(not signed in)")
+        binding.thirdPartyRecoveryCodeTextView.text = viewState.thirdPartyRecoveryCode.ifEmpty { "(no 3party credential yet)" }
+        binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
         binding.connectedDevicesList.removeAllViews()
         binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
@@ -222,6 +304,17 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             viewModel.onEnvironmentChanged(enabled)
         }
         binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
+
+        binding.canUseV2ConnectFlowToggle.quietlySetIsChecked(viewState.canUseV2ConnectFlowEnabled) { _, enabled ->
+            viewModel.onCanUseV2ConnectFlowFlagChanged(enabled)
+        }
+        binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
+            viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
+        }
+        binding.accessCredentialsTextView.text = viewState.accessCredentialsText
+        binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
+        binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText
+        binding.keysTextView.text = viewState.keysText
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)
