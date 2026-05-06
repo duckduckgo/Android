@@ -2,9 +2,11 @@
 
 ## Overview
 
-Promote the linear-onboarding state machine that today lives inside `BrandDesignUpdatePageViewModel` (and `WelcomePageViewModel`) to an `AppScope` orchestrator that both `OnboardingActivity` and `BrowserActivity` can observe. This unblocks a future requirement to interleave linear-onboarding steps across the two activities (Welcome → linear-in-browser → linear-in-browser → DefaultBrowser → rest), a shape today's fragment-scoped state machine cannot express.
+Promote the linear-onboarding state machine that today lives inside `BrandDesignUpdatePageViewModel` (and `WelcomePageViewModel`) to an `AppScope` orchestrator. This will unblock interleaving of linear-onboarding steps across multiple activities/fragments.
 
-The proximate motivation is the L→C→L→C interleaving requirement. The structural payoff is that step composition becomes one readable function, each step is a self-contained descriptor, and the team's expected workload (experiment-driven step variation) lands as small additions instead of growing `when` arms.
+This is in response to a requirement in [Android: AI onboarding for custom store listings](https://app.asana.com/1/137249556945/project/1208671518894266/task/1213551217308374?focus=true) where the goal is to show a subset of onboarding steps from the existing `OnboardingActivity`, move on to some Duck.ai onboarding steps in `BrowserActivity` before eventually coming back to the `OnboardingActivity` to finish the remaining steps. Check out [this Figma flow](https://www.figma.com/design/5QvJbyUBbeonblsjViDIkf/Mobile-Onboarding-AI-First?node-id=173-50969&t=w51SVY4Lvfst0gyJ-1) for reference.
+
+The proximate motivation is the interleaving requirement. At the same time, the Tech Design proposes a structural investment where each step is a self-contained descriptor, and the future investment in reorganizing step's order, adding experiment-driven variations are easier to implement and cheaper to maintain, instead of growing `when` arms of the existing state machine.
 
 ## Files Changed
 
@@ -21,23 +23,21 @@ The proximate motivation is the L→C→L→C interleaving requirement. The stru
 | `app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt` | Add `shouldSuppressForLinearOnboarding()` gate at the top of `refreshCta`, `getFireDialogCta`, `getSiteSuggestionsDialogCta`, `getEndStaticDialogCta` |
 | `app/src/main/java/com/duckduckgo/app/launch/LaunchViewModel.kt` | When `isNewUser()`, route to host indicated by `orchestrator.currentStepHost()` instead of unconditionally to `OnboardingActivity` |
 
-`WelcomePageViewModel` and `WelcomePage` are **not** migrated. They stay on the legacy in-VM state machine until removed in a separate workstream.
-
 ## Goals
 
-- Lift the linear-onboarding state machine to AppScope so it survives activity transitions
+- Lift the linear-onboarding state machine to `AppScope` so it survives activity transitions
 - Provide a single readable place where plan composition expresses itself
 - Make each step a self-contained descriptor (precondition, params, transition rules) that can be added, removed, or experiment-gated locally
-- Keep today's user-visible behavior (dialog sequence, pixels, side effects) unchanged for the rollout phase
-- Land a structural seam for the future L→C→L→C requirement without specifying the rendering details of `BrowserContext` steps
+- Keep today's user-visible behavior (dialog sequence, pixels, side effects) unchanged
+- Land a structural seam for the future step transitions between the isolated onboarding context and browser onboarding context
 
 ## Non-goals
 
 - Persistence of orchestrator state across process death — today's flow restarts from scratch on process death; that behavior is preserved deliberately
-- Designing the `BrowserContext` step renderer or `BrowserConstraintMode` descriptor — deferred to whichever project introduces the first such step
-- Migrating `WelcomePageViewModel` / `WelcomePage` — separate deprecation workstream
-- Changing reactive-phase CTA logic in `CtaViewModel.getHomeCta()` / `getBrowserCta()` — those continue to gate on `AppStage` as today
-- Cross-host back-button navigation (e.g., back from a `IsolatedContext` step to a previous `BrowserContext` step) — back during linear closes the app
+- Designing the `BrowserContext` step renderer or `BrowserConstraintMode` descriptor — deferred to a follow-up TD
+- Migrating `WelcomePageViewModel` / `WelcomePage` — they are about to be superseded by the brand-design variant of the onboarding anyway, so they stay on the legacy in-VM state machine until removed. Only `BrandDesignUpdatePageViewModel` / `BrandDesignUpdateWelcomePage` get migrated.
+- Changing reactive-phase CTA logic from `CtaViewModel.getHomeCta()` / `getBrowserCta()` that's presented in the `BrowserTabFragment` — those continue to gate on `AppStage` as today
+- Cross-host back-button navigation (e.g., back from a `IsolatedContext` step to a previous `BrowserContext` step) — back during linear closes the app, regardless of the current host
 - Introducing analytics beyond the existing pixels — orchestrator must fire the same pixels in the same order as today's flow
 
 ## Architecture summary
@@ -107,7 +107,7 @@ sealed interface LinearStep {
         override val id: StepId,
         override val precondition: suspend () -> Boolean = { true },
         override val transition: suspend (StepEvent) -> StepTransition,
-        // descriptor field deliberately omitted — the first project to introduce
+        // descriptor field deliberately omitted — the follow-up task to introduce
         // a BrowserContext step adds the renderer descriptor type here
     ) : LinearStep
 }
@@ -146,7 +146,6 @@ data class LinearOnboardingPlan(
 - **`precondition` and `resolveParams` are `suspend` and read fresh state at call time.** This is the load-bearing decision for the config-staleness story — see [State and persistence](#state-and-persistence).
 - **`transition` is a per-step function returning a `StepTransition`.** Each step's flow-control logic is local to its descriptor instead of co-mingled in a giant centralised `when`.
 - **Plan is `Map` + ordered `List`.** Side branches (`SKIP_ONBOARDING_OPTION`) live in the map for `GotoStep` lookup but not in `forwardOrder`, so `Advance` never lands on them. Cleaner than overloading `precondition` to mean both "off the main path" and "ineligible right now".
-- **No `Dismissed` event.** Back during linear closes the app; there is no orchestrator-level "user wants out" event. The only escape from the linear flow is the explicit `SKIP_ONBOARDING_OPTION` side branch.
 
 ### Today's flow expressed in this model
 
@@ -294,7 +293,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
         type = PreOnboardingDialogType.INPUT_SCREEN,
         precondition = {
             defaultRoleBrowserDialog.shouldShowDialog() &&
-                androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
+                    androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
         },
         resolveParams = { PreOnboardingParams(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
@@ -322,9 +321,9 @@ class LinearOnboardingPlanProvider @Inject constructor(
         type = PreOnboardingDialogType.INPUT_SCREEN_PREVIEW,
         precondition = {
             onboardingStore.getInputScreenSelection() == true &&
-                duckAiOnboardingExperimentManager.enroll() in setOf(
-                    TREATMENT_WITH_DUCK_AI_DEFAULT, TREATMENT_WITH_SEARCH_DEFAULT,
-                )
+                    duckAiOnboardingExperimentManager.enroll() in setOf(
+                TREATMENT_WITH_DUCK_AI_DEFAULT, TREATMENT_WITH_SEARCH_DEFAULT,
+            )
         },
         resolveParams = {
             val variant = duckAiOnboardingExperimentManager.enroll()
@@ -355,7 +354,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     )
 
     private suspend fun isDuckAiCopyEnabled(): Boolean = /* same logic as today's WelcomePageViewModel */
-    private suspend fun isSplitOmnibarEnabled(): Boolean = /* same logic as today */
+        private suspend fun isSplitOmnibarEnabled(): Boolean = /* same logic as today */
 }
 ```
 
@@ -378,12 +377,6 @@ sealed interface OnboardingPlanState {
 
 State lives entirely in a `MutableStateFlow<OnboardingPlanState>` inside the orchestrator. **No DataStore, no Room table, no persistence of `currentStepId`.** Today's flow restarts from scratch on process death; that behavior is preserved.
 
-### Why no persistence
-
-- Today's `BrandDesignUpdatePageViewModel` is `FragmentScope`; its in-memory `currentDialog` doesn't survive process death. The user redoes onboarding from the first dialog after a kill. Adding persistence here would be a new feature, not a requirement of this project.
-- AppScope `@SingleInstanceIn` survives activity transitions for free — the process is alive across `OnboardingActivity → BrowserActivity` (and back, for L→C→L→C). Persistence is unnecessary for that.
-- If product asks for "preserve user's mid-flow position across process kills" later, it's a follow-up — DataStore-backed `OnboardingPlanState` + reconciliation rules. Not in scope now.
-
 ### `AppStage` migration
 
 `AppStage` (Room-backed enum: `NEW` / `DAX_ONBOARDING` / `ESTABLISHED`) stays as today's source of truth for "phase of onboarding". Existing readers (`LaunchViewModel.isNewUser`, `SystemSearchViewModel`, `BrowserAdditionalPixelParams`, `CtaViewModel.daxOnboardingActive`, `OnboardingFlowCheckerImpl`) don't change.
@@ -396,7 +389,7 @@ The orchestrator becomes a *writer* of `AppStage` on terminal transitions:
 | `InProgress → Completed` | `userStageStore.stageCompleted(AppStage.NEW)` → moves to `DAX_ONBOARDING` |
 | `InProgress → Skipped` | `userStageStore.stageCompleted(AppStage.NEW)` then `userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)` → reaches `ESTABLISHED`; plus `settingsDataStore.hideTips = true` (matching `FullOnboardingSkipper.markOnboardingAsCompleted`) |
 
-Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` continues to write `DAX_ONBOARDING → ESTABLISHED`. The orchestrator never writes that transition itself.
+Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` continues to write `DAX_ONBOARDING → ESTABLISHED`. The orchestrator never writes that transition itself, it is only handling the linear portion of the onboarding flow.
 
 ### Process / lifecycle behavior
 
@@ -413,7 +406,7 @@ Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` cont
 - Walk `plan.forwardOrder`, evaluate each `precondition()` until the first eligible step is found.
 - Set `InProgress(firstEligibleStepId)`.
 
-**On activity transitions mid-flow (L→C→L→C):**
+**On activity transitions mid-flow:**
 
 - AppScope orchestrator stays alive across `OnboardingActivity ↔ BrowserActivity`.
 - Each activity has a host-transition observer (see [Activity transitions](#activity-transitions-and-reactive-phase-handoff)) that finishes the current activity and launches the other when the current step's host doesn't match.
@@ -428,11 +421,7 @@ Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` cont
 
 Plan registry is **synchronous and config-independent** at build time. This is the central design choice that addresses config-loading-during-onboarding without introducing an explicit "wait for config" state.
 
-The privacy config feature flags (`androidBrowserConfigFeature.*`, `duckAiOnboardingExperimentManager.enroll()`) are read inside the `precondition` and `resolveParams` lambdas of each step. These lambdas execute `suspend` at advance time — i.e., the moment the orchestrator is about to land on the step. By that point the user has already interacted with several earlier dialogs (welcome → notification permission → INITIAL → COMPARISON_CHART → DEFAULT_BROWSER → ADDRESS_BAR_POSITION), giving config the same multi-second window it has today.
-
-**Notably, `enroll()` (the highest-stakes config-dependent decision) is read at the moment the user is about to enter `INPUT_SCREEN_PREVIEW` — the deepest point in the flow. No staleness regression vs. today's behavior for cohort assignment.**
-
-This eliminates the need for an `Initializing` state or a startup config-wait timeout. The welcome animation continues to cover whatever startup latency exists, exactly as today.
+The privacy config feature flags (`androidBrowserConfigFeature.*`, `duckAiOnboardingExperimentManager.enroll()`) are read inside the `precondition` and `resolveParams` lambdas of each step. These lambdas execute `suspend` at advance time — i.e., the moment the orchestrator is about to land on the step. This is matching the existing behavior.
 
 ## Activity transitions and reactive-phase handoff
 
@@ -440,7 +429,7 @@ This eliminates the need for an `Initializing` state or a startup config-wait ti
 
 Finish-and-relaunch on every host change. Each activity observes orchestrator state and self-terminates when the current step's host doesn't match its own. No central transition controller.
 
-Reasoning: matches today's `OnboardingActivity → BrowserActivity` pattern; no new component; state-derived (recoverable under activity recreation); on `BrowserContext` steps the user has not accumulated meaningful tab state, so finish-and-relaunch loses nothing.
+Reasoning: matches today's `OnboardingActivity → BrowserActivity` pattern; no new component; state-derived (recoverable under activity recreation); on `BrowserContext` steps we don't expect users to accumulat any meaningful state, so finish-and-relaunch loses nothing.
 
 ```kotlin
 // OnboardingActivity
@@ -499,16 +488,6 @@ suspend fun refreshCta(...): Cta? = withContext(dispatcher) {
 
 `BrowserTabFragment` is unchanged regarding orchestrator awareness. It calls `viewModel.refreshCta()` as today; the suppression is opaque to it. Today's `daxOnboardingActive()` checks inside `getHomeCta` / `getBrowserCta` continue to work — they return `false` while `AppStage == NEW`, naturally suppressing the dax CTAs. The new `shouldSuppressForLinearOnboarding()` gate covers the cases `daxOnboardingActive()` doesn't (widget CTA, per-site CTAs in `getBrowserCta`).
 
-### `BrowserContext` rendering — deferred
-
-The renderer hook for `BrowserContext` steps (whatever observes orchestrator state and applies the constrained mode to the browser surface) is **not designed in this spec**. The first project to introduce a `BrowserContext` step owns:
-
-- The descriptor type (currently `BrowserContext` has no descriptor field; that project adds it)
-- The renderer location (could live in `BrowserActivity`, `BrowserTabFragment`, or a new component — that project decides)
-- The completion criteria for what counts as a step's "primary action" in the constrained surface
-
-Today's spec only declares the structural seam: `BrowserContext` exists in the sealed class hierarchy, the host-transition observer in `BrowserActivity` accommodates it, `CtaViewModel.shouldSuppressForLinearOnboarding()` accommodates it. With zero `BrowserContext` instances in the initial orchestrator plan, this infrastructure is exercised end-to-end only when L→C→L→C lands.
-
 ### Back button
 
 Back during the linear flow closes the app. No exception, no dismiss event, no abort. The only escape from the linear flow is the explicit `SKIP_ONBOARDING_OPTION` side branch (entered via secondary CTA from `INITIAL_REINSTALL_USER` or `SYNC_RESTORE`).
@@ -525,7 +504,7 @@ onBackPressedDispatcher.addCallback(this) {
 }
 ```
 
-When `OnboardingPlanState` is `NotStarted` / `Completed` / `Skipped`, the callback disables and the host's normal back behavior applies. `OnboardingActivity` today has a "rewind ViewPager" `onBackPressed` override — that becomes moot (the brand-design pager only ever has one page) and is removed in phase 4 cleanup.
+When `OnboardingPlanState` is `NotStarted` / `Completed` / `Skipped`, the callback disables and the host's normal back behavior applies. `OnboardingActivity` today has a "rewind ViewPager" `onBackPressed` override — that becomes moot (the brand-design pager only ever has one page).
 
 ## Renderer adapter
 
