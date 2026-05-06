@@ -112,6 +112,7 @@
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Počisti podatke</string>
     <string name="duckChatBrowserMenuContentDescription">Več možnosti</string>
+    <string name="duckAiInputScreenSearchInNewTabContentDescription">Iskanje v novem zavihku</string>
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Glasovni klepet</string>
