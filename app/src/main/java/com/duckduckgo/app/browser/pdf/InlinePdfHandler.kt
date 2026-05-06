@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.pdf
 import android.content.Context
 import android.net.Uri
 import android.net.http.SslCertificate
+import android.os.BadParcelableException
 import android.os.Build
 import android.os.Parcel
 import androidx.annotation.VisibleForTesting
@@ -290,6 +291,10 @@ class RealInlinePdfHandler @Inject constructor(
             certSidecarFile(targetFile).writeBytes(parcel.marshall())
         } catch (e: IOException) {
             logcat { "PDF cert sidecar write failed: ${e.message}" }
+        } catch (e: BadParcelableException) {
+            logcat { "PDF cert parcelable not conform: ${e.message}" }
+        } catch (e: Throwable) {
+            logcat { "PDF cert unexpected error: ${e.message}" }
         } finally {
             parcel.recycle()
         }
