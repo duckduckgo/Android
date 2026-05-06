@@ -1369,6 +1369,9 @@ class BrowserTabFragment :
                 onImagePickerRequested = { callback ->
                     launchNativeImageAttachmentChooser(callback)
                 },
+                onFilePickerRequested = { callback, mimeTypes ->
+                    launchNativeFileAttachmentPicker(callback, mimeTypes)
+                },
             ),
         )
     }
@@ -4934,6 +4937,15 @@ class BrowserTabFragment :
             acceptMimeTypes = listOf("image/*"),
         )
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    private fun launchNativeFileAttachmentPicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        nativeInputManager.setPickingImage(true)
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = mimeTypes.ifEmpty { listOf("*/*") },
+        )
+        launchFilePicker(callback, fileChooserParams)
     }
 
     private fun minSdk30(): Boolean = appBuildConfig.sdkInt >= Build.VERSION_CODES.R

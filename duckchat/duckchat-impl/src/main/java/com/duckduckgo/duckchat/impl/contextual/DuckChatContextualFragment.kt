@@ -436,6 +436,9 @@ class DuckChatContextualFragment :
             onImagePickerRequested = { callback ->
                 launchNativeImagePicker(callback)
             },
+            onFilePickerRequested = { callback, mimeTypes ->
+                launchNativeFilePicker(callback, mimeTypes)
+            },
         )
         observeViewModel()
 
@@ -709,6 +712,14 @@ class DuckChatContextualFragment :
             acceptMimeTypes = listOf("image/*"),
         )
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    private fun launchNativeFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = mimeTypes.ifEmpty { listOf("*/*") },
+        )
+        launchFilePicker(callback, fileChooserParams)
     }
 
     data class FileChooserRequestedParams(

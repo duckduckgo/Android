@@ -31,7 +31,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import javax.inject.Inject
 import java.io.ByteArrayOutputStream
@@ -47,6 +46,7 @@ interface AttachmentHandler {
     var onImageLimitError: ((String) -> Unit)?
     var onImageLimitErrorClear: (() -> Unit)?
     var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
+    var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)?
     var onChooserStateChanged: ((Boolean) -> Unit)?
     var onRequestFocus: (() -> Unit)?
     var conversationImageLimitReached: Boolean
@@ -67,7 +67,7 @@ class RealAttachmentHandler(
     private val duckChatInternal: DuckChatInternal,
     private val dispatcherProvider: DispatcherProvider,
     private val modelManager: DuckAiModelManager,
-    private val duckChatJSHelper: DuckChatJSHelper,
+    private val limitsHandler: LimitsHandler,
     private val appBuildConfig: AppBuildConfig,
 ) : AttachmentHandler {
 
@@ -75,17 +75,17 @@ class RealAttachmentHandler(
     override var onImageLimitError: ((String) -> Unit)? = null
     override var onImageLimitErrorClear: (() -> Unit)? = null
     override var onImagePickerRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    override var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     override var onChooserStateChanged: ((Boolean) -> Unit)? = null
     override var onRequestFocus: (() -> Unit)? = null
 
     private var imageCount: Int = 0
-    private var conversationImagesSent: Int = 0
     override var conversationImageLimitReached: Boolean = false
 
     private val contentResolver: ContentResolver get() = context.contentResolver
 
     override val imageUploadLimitReached: Flow<Boolean>
-        get() = duckChatJSHelper.imageUploadLimitReached
+        get() = limitsHandler.imageUploadLimitReached
 
     override fun supportsImageUpload(): Boolean {
         val state = modelManager.modelState.value
@@ -106,17 +106,17 @@ class RealAttachmentHandler(
     }
 
     override fun onImagesSubmitted(count: Int) {
-        conversationImagesSent += count
+        limitsHandler.addConversationImagesSent(count)
     }
 
     override fun resetConversationCounts() {
-        conversationImagesSent = 0
+        limitsHandler.resetConversationImagesSent()
     }
 
     override fun updateImageCount(count: Int) {
         imageCount = count
         val limits = modelManager.modelState.value.attachmentLimits.images
-        val totalImages = imageCount + conversationImagesSent
+        val totalImages = imageCount + limitsHandler.conversationImagesSent.value
         if (totalImages > limits.maxPerConversation) {
             onImageLimitError?.invoke(
                 context.getString(R.string.duckChatImageAttachmentLimitPerConversation, limits.maxPerConversation),
@@ -133,12 +133,12 @@ class RealAttachmentHandler(
     override fun isAtMaxCapacity(): Boolean {
         if (!supportsImageUpload()) return true
         val limits = modelManager.modelState.value.attachmentLimits.images
-        val totalImages = imageCount + conversationImagesSent
+        val totalImages = imageCount + limitsHandler.conversationImagesSent.value
         return conversationImageLimitReached || imageCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
     }
 
     override fun showAttachmentChooser() {
-        if (!supportsImageUpload() || isAtMaxCapacity()) return
+        if (!supportsImageUpload()) return
 
         onChooserStateChanged?.invoke(true)
 
@@ -160,7 +160,7 @@ class RealAttachmentHandler(
                         uris?.toList()?.let { handlePickedImages(it) }
                             ?: onRequestFocus?.invoke()
                     }
-                    onImagePickerRequested?.invoke(callback)
+                    onFilePickerRequested?.invoke(callback, listOf("image/*"))
                 }
 
                 override fun onSecondaryItemClicked() {
@@ -257,7 +257,7 @@ class RealAttachmentHandlerFactory @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val dispatcherProvider: DispatcherProvider,
     private val modelManager: DuckAiModelManager,
-    private val duckChatJSHelper: DuckChatJSHelper,
+    private val limitsHandler: LimitsHandler,
     private val appBuildConfig: AppBuildConfig,
 ) : AttachmentHandlerFactory {
 
@@ -267,7 +267,7 @@ class RealAttachmentHandlerFactory @Inject constructor(
         duckChatInternal = duckChatInternal,
         dispatcherProvider = dispatcherProvider,
         modelManager = modelManager,
-        duckChatJSHelper = duckChatJSHelper,
+        limitsHandler = limitsHandler,
         appBuildConfig = appBuildConfig,
     )
 }

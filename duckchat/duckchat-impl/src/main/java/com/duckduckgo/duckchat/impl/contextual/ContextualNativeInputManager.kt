@@ -44,6 +44,7 @@ interface ContextualNativeInputManager {
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
         onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
     )
 
     fun onWebViewMode()
@@ -67,12 +68,13 @@ class RealContextualNativeInputManager @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
         onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted, onImagePickerRequested)
+        setupWidget(widget, onSearchSubmitted, onImagePickerRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -100,11 +102,13 @@ class RealContextualNativeInputManager @Inject constructor(
         widget: NativeInputModeWidget,
         onSearchSubmitted: (String) -> Unit,
         onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onImagePickerRequested = { callback -> onImagePickerRequested(callback) }
+        widget.onFilePickerRequested = { callback, mimeTypes -> onFilePickerRequested(callback, mimeTypes) }
         widget.onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
         widget.bindInputEvents(
             onSearchTextChanged = { },

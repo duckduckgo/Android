@@ -31,15 +31,13 @@ import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.nativeinput.image.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
@@ -58,8 +56,6 @@ interface DuckChatJSHelper {
         pageContext: String = "",
         tabId: String = "",
     ): JsCallbackData?
-
-    val imageUploadLimitReached: StateFlow<Boolean>
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
 
@@ -102,10 +98,8 @@ class RealDuckChatJSHelper @Inject constructor(
     private val faviconManager: FaviconManager,
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val limitsHandler: LimitsHandler,
 ) : DuckChatJSHelper {
-
-    private val _imageUploadLimitReached = MutableStateFlow(false)
-    override val imageUploadLimitReached: StateFlow<Boolean> = _imageUploadLimitReached.asStateFlow()
 
     private val registerOpenedJob = ConflatedJob()
 
@@ -245,12 +239,13 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_IMAGE_UPLOAD_LIMIT_REACHED -> {
-                _imageUploadLimitReached.value = true
+                limitsHandler.setImageUploadLimitReached(true)
                 null
             }
 
             METHOD_IMAGE_UPLOAD_LIMIT_RESET -> {
-                _imageUploadLimitReached.value = false
+                limitsHandler.setImageUploadLimitReached(false)
+                limitsHandler.resetConversationImagesSent()
                 null
             }
 

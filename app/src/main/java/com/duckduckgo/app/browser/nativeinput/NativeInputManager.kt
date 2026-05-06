@@ -61,6 +61,7 @@ class NativeInputCallbacks(
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onImagePickerRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+    val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
 )
 
 interface NativeInputManager {
@@ -434,6 +435,7 @@ class RealNativeInputManager @Inject constructor(
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
             onImagePickerRequested = { callback -> callbacks.onImagePickerRequested(callback) }
+            onFilePickerRequested = { callback, mimeTypes -> callbacks.onFilePickerRequested(callback, mimeTypes) }
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
