@@ -38,6 +38,7 @@ interface SyncApi {
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        credentialId: String? = null,
     ): Result<AccountCreatedResponse>
 
     fun login(
@@ -113,6 +114,20 @@ interface SyncApi {
         token: String,
         scope: String,
     ): Result<String>
+
+    /** List this account's protected keys across all purposes. */
+    fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>>
+
+    /** Atomically claim [purpose] with [key] or no-op if one already exists. */
+    fun setProtectedKeyIfAbsent(token: String, purpose: String, key: ProtectedKeyEntry): Result<Boolean>
+
+    fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>>
+
+    fun createAccessCredential(
+        token: String,
+        credentialId: String,
+        request: CreateAccessCredentialRequest,
+    ): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -127,6 +142,7 @@ class SyncServiceRemote @Inject constructor(
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        credentialId: String?,
     ): Result<AccountCreatedResponse> {
         val response = runCatching {
             val call = syncService.signup(
@@ -137,6 +153,7 @@ class SyncServiceRemote @Inject constructor(
                     deviceId = deviceId,
                     deviceName = deviceName,
                     deviceType = deviceType,
+                    credentialId = credentialId,
                 ),
             )
             call.execute()
@@ -294,15 +311,18 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val token = response.body()?.token ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
+            val body = response.body() ?: return@onSuccess Result.Error(reason = "Login: empty body")
+            val token = body.token.takeUnless { it.isEmpty() } ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
             val protectedEncryptionKey =
-                response.body()?.protected_encryption_key ?: return@onSuccess Result.Error(reason = "Login: empty PEK in Body")
+                body.protected_encryption_key.takeUnless { it.isEmpty() } ?: return@onSuccess Result.Error(reason = "Login: empty PEK in Body")
 
             Result.Success(
                 LoginResponse(
                     token = token,
                     protected_encryption_key = protectedEncryptionKey,
-                    devices = emptyList(),
+                    devices = body.devices,
+                    accessCredentials = body.accessCredentials,
+                    keys = body.keys,
                 ),
             )
         }
@@ -500,6 +520,66 @@ class SyncServiceRemote @Inject constructor(
             val result = Result.Error(response.code(), reason = response.message())
             result.removeKeysIfInvalid()
             return result
+        }
+    }
+
+    override fun setProtectedKeyIfAbsent(token: String, purpose: String, key: ProtectedKeyEntry): Result<Boolean> {
+        val response = runCatching {
+            val call = syncService.setProtectedKeyIfAbsent("Bearer $token", purpose, SetProtectedKeyIfAbsentRequest(key))
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
+        }
+    }
+
+    override fun getProtectedKeys(token: String): Result<List<ProtectedKeyEntry>> {
+        val response = runCatching {
+            val call = syncService.getProtectedKeys("Bearer $token")
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val keys = response.body()?.keys ?: emptyList()
+            Result.Success(keys)
+        }
+    }
+
+    override fun getAccessCredentials(token: String): Result<List<AccessCredentialEntry>> {
+        val response = runCatching {
+            val call = syncService.getAccessCredentials("Bearer $token")
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val credentials = response.body()?.accessCredentials
+                ?: return@onSuccess Result.Error(reason = "GetAccessCredentials: empty body")
+            Result.Success(credentials)
+        }
+    }
+
+    override fun createAccessCredential(
+        token: String,
+        credentialId: String,
+        request: CreateAccessCredentialRequest,
+    ): Result<Boolean> {
+        val response = runCatching {
+            logcat { "Sync-ScopedToken: createAccessCredential for credentialId=$credentialId" }
+            val call = syncService.createAccessCredential("Bearer $token", credentialId, request)
+            call.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(true)
         }
     }
 
