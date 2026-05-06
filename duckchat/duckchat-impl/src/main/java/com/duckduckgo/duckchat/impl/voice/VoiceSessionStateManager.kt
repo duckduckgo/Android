@@ -35,6 +35,14 @@ import javax.inject.Inject
 interface VoiceSessionStateManager {
     val isVoiceSessionActive: Boolean
         get() = false
+
+    /**
+     * The tab id bound to the active voice session, or null if there is no active session
+     * or the session is a standalone (non-tab) session.
+     */
+    val activeSessionTabId: String?
+        get() = null
+
     fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded()
 }
@@ -53,14 +61,17 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     // null = no session, STANDALONE_SESSION_ID = session without a browser tab, non-empty = tab session
     @Volatile
-    private var activeSessionTabId: String? = null
+    private var _activeSessionTabId: String? = null
+
+    override val activeSessionTabId: String?
+        get() = _activeSessionTabId?.takeUnless { it == STANDALONE_SESSION_ID }
 
     override val isVoiceSessionActive: Boolean
-        get() = activeSessionTabId != null
+        get() = _activeSessionTabId != null
 
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {
-        activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
+        _activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
         if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
             DuckChatVoiceMicrophoneService.start(context)
         }
@@ -72,7 +83,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     override fun onVoiceSessionEnded() {
         listenJob.cancel()
-        activeSessionTabId = null
+        _activeSessionTabId = null
         DuckChatVoiceMicrophoneService.stop(context)
     }
 
@@ -89,7 +100,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     private fun listenToTabRemoval() {
         listenJob += appCoroutineScope.launch {
             tabRepository.flowTabs.drop(1).collect { tabs ->
-                val tabId = activeSessionTabId ?: return@collect
+                val tabId = _activeSessionTabId ?: return@collect
                 if (tabs.none { it.tabId == tabId }) {
                     onVoiceSessionEnded()
                 }
