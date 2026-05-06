@@ -84,6 +84,8 @@ class Omnibar(
         fun onBackButtonPressed()
 
         fun onDuckAISidebarButtonPressed()
+
+        fun onDuckAIBackButtonPressed()
     }
 
     interface FindInPageListener {

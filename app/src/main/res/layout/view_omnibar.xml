@@ -39,6 +39,21 @@
             android:background="?attr/daxColorToolbar">
 
             <ImageView
+                android:id="@+id/duckAiBack"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/keyline_3"
+                android:layout_marginTop="@dimen/omnibarCardMarginTop"
+                android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/back"
+                android:padding="@dimen/keyline_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_arrow_left_24" />
+
+            <ImageView
                 android:id="@+id/duckAiSidebar"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -49,7 +64,7 @@
                 android:contentDescription="@string/browserMenuChatHistory"
                 android:padding="@dimen/keyline_1"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/duckAiBack"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_chats_24" />
 
