@@ -216,7 +216,7 @@ class RealNativeInputManager @Inject constructor(
         if (isVisible) {
             onKeyboardShown(widgetRoot)
         } else {
-            onKeyboardHidden(widget, widgetRoot)
+            onKeyboardHidden(widget)
         }
     }
 
@@ -226,19 +226,9 @@ class RealNativeInputManager @Inject constructor(
         widgetRoot?.translationZ = 0f
     }
 
-    private fun onKeyboardHidden(
-        widget: NativeInputWidget,
-        widgetRoot: View?,
-    ) {
+    private fun onKeyboardHidden(widget: NativeInputWidget) {
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
-        } else {
-            omnibarController.showTransparentOmnibar()
-            widgetRoot?.let {
-                it.bringToFront()
-                it.translationZ = WIDGET_ELEVATION_DP.toPx()
-            }
-            rootView.post { hideNativeInput() }
         }
     }
 

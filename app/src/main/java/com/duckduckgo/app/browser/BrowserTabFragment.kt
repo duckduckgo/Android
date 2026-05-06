@@ -673,7 +673,11 @@ class BrowserTabFragment :
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    hideKeyboardRetainFocus()
+                    if (nativeInputManager.isNativeInputEnabled()) {
+                        hideKeyboardImmediatelyRetainFocus()
+                    } else {
+                        hideKeyboardRetainFocus()
+                    }
                 }
             }
         }
@@ -4647,6 +4651,13 @@ class BrowserTabFragment :
         if (!isHidden) {
             logcat(VERBOSE) { "Keyboard now hiding" }
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput.hideKeyboard() }
+        }
+    }
+
+    private fun hideKeyboardImmediatelyRetainFocus() {
+        if (!isHidden) {
+            logcat(VERBOSE) { "Keyboard now hiding" }
+            omnibar.omnibarTextInput.hideKeyboard()
         }
     }
 
