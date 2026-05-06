@@ -1199,6 +1199,7 @@ class CtaViewModelTest {
         assertTrue(value is DaxBubbleCta.DaxSubscriptionCta)
     }
 
+    @Test
     fun whenPrepareDuckAiEndCtaAndEligibleThenReturnsTrue() = runTest {
         givenCanShowDuckAiEndCta()
 
