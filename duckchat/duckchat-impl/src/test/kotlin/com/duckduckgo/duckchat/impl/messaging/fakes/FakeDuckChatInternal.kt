@@ -58,6 +58,8 @@ class FakeDuckChatInternal(
 
     override fun openDuckChat() { }
 
+    override fun openDuckChatHistory() { }
+
     override fun openDuckChatWithAutoPrompt(query: String) { }
 
     override fun openDuckChatWithPrefill(query: String) { }

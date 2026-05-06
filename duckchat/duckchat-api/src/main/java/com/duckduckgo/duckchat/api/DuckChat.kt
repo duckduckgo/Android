@@ -38,6 +38,12 @@ interface DuckChat {
     fun openDuckChat()
 
     /**
+     * Opens DuckChat with the chat history sidebar visible. The sidebar is toggled open as soon
+     * as the Duck.ai frontend completes its native handshake.
+     */
+    fun openDuckChatHistory()
+
+    /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
     fun openDuckChatWithAutoPrompt(query: String)

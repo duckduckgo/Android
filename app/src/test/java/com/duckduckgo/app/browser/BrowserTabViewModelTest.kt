@@ -9546,6 +9546,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenDuckChatSidebarFromNewTabPageThenOpenDuckChatHistoryIsCalled() = runTest {
+        testee.openDuckChatSidebar(ViewMode.NewTab)
+
+        verify(mockDuckChat).openDuckChatHistory()
+    }
+
+    @Test
     fun whenDuckChatNativeSettingsRequested() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "event1",

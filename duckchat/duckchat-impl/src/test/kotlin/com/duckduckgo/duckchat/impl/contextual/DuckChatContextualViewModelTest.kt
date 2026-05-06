@@ -1411,6 +1411,7 @@ class DuckChatContextualViewModelTest {
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
+        override fun openDuckChatHistory() = Unit
         override fun openDuckChatWithAutoPrompt(query: String) = Unit
         override fun openDuckChatWithPrefill(query: String) = Unit
         override fun getDuckChatUrl(

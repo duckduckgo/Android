@@ -188,6 +188,24 @@ class BrowserMenuBottomSheetTest {
     }
 
     @Test
+    fun whenRenderNewTabPageMenuWithDuckChatHistoryOptionEnabledThenChatHistoryMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.NewTabPage(showDuckChatHistoryOption = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithDuckChatHistoryOptionDisabledThenChatHistoryMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.NewTabPage(showDuckChatHistoryOption = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.duckChatHistoryMenuItem.isVisible)
+    }
+
+    @Test
     fun whenRenderCustomTabsModeThenMenuActionItemsShouldBeUpdated() {
         val viewState = BrowserMenuViewState.CustomTabs()
 

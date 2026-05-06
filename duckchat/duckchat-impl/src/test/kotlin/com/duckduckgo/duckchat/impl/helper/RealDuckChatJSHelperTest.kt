@@ -70,6 +70,7 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChatPixels: DuckChatPixels = mock()
     private val mockPendingTabContextStore: PendingTabContextStore = mock()
     private val mockPendingNativePromptStore: PendingNativePromptStore = mock()
+    private val mockPendingDuckChatOpenActionStore: PendingDuckChatOpenActionStore = mock()
     private val mockFaviconManager: FaviconManager = mock()
     private val mockDuckChatFeature: DuckChatFeature =
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
@@ -82,6 +83,7 @@ class RealDuckChatJSHelperTest {
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         pendingTabContextStore = mockPendingTabContextStore,
         pendingNativePromptStore = mockPendingNativePromptStore,
+        pendingDuckChatOpenActionStore = mockPendingDuckChatOpenActionStore,
         faviconManager = mockFaviconManager,
         duckChatFeature = mockDuckChatFeature,
         voiceSessionStateManager = mockVoiceSessionStateManager,
@@ -1565,6 +1567,38 @@ class RealDuckChatJSHelperTest {
 
         assertNull(result)
         verify(mockPendingTabContextStore, never()).consume()
+    }
+
+    // endregion
+
+    // region open sidebar on handoff
+
+    @Test
+    fun whenConsumeOpenSidebarOnHandoffWithHandoffMethodAndPendingActionThenReturnsToggleSidebarEvent() {
+        whenever(mockPendingDuckChatOpenActionStore.consumeOpenSidebar()).thenReturn(true)
+
+        val result = testee.consumeOpenSidebarOnHandoff("getAIChatNativeHandoffData")
+
+        assertNotNull(result)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
+        assertEquals("submitToggleSidebarAction", result.subscriptionName)
+    }
+
+    @Test
+    fun whenConsumeOpenSidebarOnHandoffWithNoPendingActionThenReturnsNull() {
+        whenever(mockPendingDuckChatOpenActionStore.consumeOpenSidebar()).thenReturn(false)
+
+        val result = testee.consumeOpenSidebarOnHandoff("getAIChatNativeHandoffData")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenConsumeOpenSidebarOnHandoffWithOtherMethodThenReturnsNullAndDoesNotConsume() {
+        val result = testee.consumeOpenSidebarOnHandoff("getAIChatNativeConfigValues")
+
+        assertNull(result)
+        verify(mockPendingDuckChatOpenActionStore, never()).consumeOpenSidebar()
     }
 
     // endregion

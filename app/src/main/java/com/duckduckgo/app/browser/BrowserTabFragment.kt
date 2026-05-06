@@ -1737,7 +1737,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
-                viewModel.openDuckChatSidebar()
+                viewModel.openDuckChatSidebar(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
                 viewModel.openDuckChatSettings()
@@ -1868,7 +1868,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
-                viewModel.openDuckChatSidebar()
+                viewModel.openDuckChatSidebar(omnibar.viewMode)
             }
             onMenuItemClicked(duckChatSettingsMenuItem) {
                 viewModel.openDuckChatSettings()

@@ -4525,6 +4525,12 @@ class BrowserTabViewModel @Inject constructor(
                             _subscriptionEventDataChannel.send(event)
                         }
                     }
+                    duckChatJSHelper.consumeOpenSidebarOnHandoff(method)?.let { event ->
+                        // The user requested chat history before this Duck.ai tab was opened — toggle sidebar now
+                        withContext(dispatchers.main()) {
+                            _subscriptionEventDataChannel.send(event)
+                        }
+                    }
                 }
             }
 
@@ -5046,10 +5052,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun openDuckChatSidebar() {
-        viewModelScope.launch {
-            val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
-            _subscriptionEventDataChannel.send(subscriptionEvent)
+    fun openDuckChatSidebar(viewMode: ViewMode = ViewMode.DuckAI) {
+        if (viewMode == ViewMode.DuckAI) {
+            viewModelScope.launch {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        } else {
+            duckChat.openDuckChatHistory()
         }
     }
 

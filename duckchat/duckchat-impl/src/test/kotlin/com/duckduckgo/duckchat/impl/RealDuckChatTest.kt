@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.PendingDuckChatOpenActionStore
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
@@ -107,6 +108,7 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val mockPendingDuckChatOpenActionStore: PendingDuckChatOpenActionStore = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -149,6 +151,7 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
+                mockPendingDuckChatOpenActionStore,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -481,6 +484,19 @@ class RealDuckChatTest {
     fun whenOpenDuckChatCalledThenOpenDuckChat() = runTest {
         testee.openDuckChat()
 
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatHistoryCalledThenOpenDuckChatAndMarkSidebarPending() = runTest {
+        testee.openDuckChatHistory()
+
+        verify(mockPendingDuckChatOpenActionStore).markOpenSidebar()
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,

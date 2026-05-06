@@ -64,6 +64,7 @@ sealed class BrowserMenuViewState {
     data class NewTabPage(
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
+        val showDuckChatHistoryOption: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,

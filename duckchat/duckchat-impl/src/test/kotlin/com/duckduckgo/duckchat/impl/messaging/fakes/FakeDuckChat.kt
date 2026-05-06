@@ -30,6 +30,7 @@ class FakeDuckChat(
 ) : DuckChat {
 
     private val openDuckChatCalls = mutableListOf<Unit>()
+    private val openDuckChatHistoryCalls = mutableListOf<Unit>()
     private val openDuckChatWithAutoPromptCalls = mutableListOf<String>()
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
@@ -44,6 +45,10 @@ class FakeDuckChat(
 
     override fun openDuckChat() {
         openDuckChatCalls.add(Unit)
+    }
+
+    override fun openDuckChatHistory() {
+        openDuckChatHistoryCalls.add(Unit)
     }
 
     override fun openDuckChatWithAutoPrompt(query: String) {

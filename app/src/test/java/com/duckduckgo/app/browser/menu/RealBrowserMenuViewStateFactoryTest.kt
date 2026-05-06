@@ -193,8 +193,30 @@ class RealBrowserMenuViewStateFactoryTest {
         val viewState = result as BrowserMenuViewState.NewTabPage
 
         assertTrue(viewState.showDuckChatOption)
+        assertTrue(viewState.showDuckChatHistoryOption)
         assertTrue(viewState.showAutofill)
         assertTrue(viewState.vpnMenuState == VpnMenuState.Hidden)
+    }
+
+    @Test
+    fun `when creating menu in new tab mode with duck chat disabled then chat history option is hidden`() = runTest {
+        val browserViewState = BrowserViewState(
+            showDuckChatOption = false,
+        )
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.NewTab,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+        val viewState = result as BrowserMenuViewState.NewTabPage
+
+        assertFalse(viewState.showDuckChatOption)
+        assertFalse(viewState.showDuckChatHistoryOption)
     }
 
     @Test

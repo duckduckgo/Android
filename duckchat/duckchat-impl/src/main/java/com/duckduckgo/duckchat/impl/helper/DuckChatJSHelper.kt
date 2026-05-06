@@ -71,6 +71,8 @@ interface DuckChatJSHelper {
     fun clearTabContextPromptEvent()
 
     fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
+
+    fun consumeOpenSidebarOnHandoff(method: String): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -93,6 +95,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pendingTabContextStore: PendingTabContextStore,
     private val pendingNativePromptStore: PendingNativePromptStore,
+    private val pendingDuckChatOpenActionStore: PendingDuckChatOpenActionStore,
     private val faviconManager: FaviconManager,
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
@@ -291,6 +294,16 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun clearTabContextPromptEvent() {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         pendingTabContextStore.clear()
+    }
+
+    override fun consumeOpenSidebarOnHandoff(method: String): SubscriptionEventData? {
+        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
+        if (!pendingDuckChatOpenActionStore.consumeOpenSidebar()) return null
+        return SubscriptionEventData(
+            featureName = DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = SUBSCRIPTION_TOGGLE_SIDEBAR,
+            params = JSONObject(),
+        )
     }
 
     override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {

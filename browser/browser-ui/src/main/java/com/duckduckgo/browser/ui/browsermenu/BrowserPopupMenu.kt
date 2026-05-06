@@ -436,6 +436,7 @@ class BrowserPopupMenu(
 
         forwardMenuItem.isEnabled = viewState.canGoForward
         duckChatMenuItem.isVisible = viewState.showDuckChatOption
+        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
         autofillMenuItem.isVisible = viewState.showAutofill
 
         when (viewState.vpnMenuState) {

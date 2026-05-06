@@ -310,7 +310,7 @@ class BrowserMenuBottomSheet(
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
-        duckChatHistoryMenuItem.isVisible = false
+        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 

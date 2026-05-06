@@ -42,6 +42,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.PendingDuckChatOpenActionStore
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
@@ -368,6 +369,7 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val pendingDuckChatOpenActionStore: PendingDuckChatOpenActionStore,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -610,6 +612,12 @@ class RealDuckChat @Inject constructor(
 
     override fun openDuckChat() {
         logcat { "Duck.ai: openDuckChat" }
+        openDuckChat(emptyMap())
+    }
+
+    override fun openDuckChatHistory() {
+        logcat { "Duck.ai: openDuckChatHistory" }
+        pendingDuckChatOpenActionStore.markOpenSidebar()
         openDuckChat(emptyMap())
     }
 
