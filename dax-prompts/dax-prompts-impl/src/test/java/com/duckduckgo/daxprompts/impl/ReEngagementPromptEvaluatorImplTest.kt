@@ -183,7 +183,7 @@ class ReEngagementPromptEvaluatorImplTest {
 
     @Test
     fun evaluatorHasCorrectPriority() {
-        assertEquals(2, testee.priority)
+        assertEquals(3, testee.priority)
     }
 
     @Test
