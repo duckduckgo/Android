@@ -25,6 +25,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -44,6 +45,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -301,12 +303,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
+        configureBottomRowFocusVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
             if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
             }
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
+        }
+    }
+
+    private fun configureBottomRowFocusVisibility() {
+        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
+        bottomRow.isVisible = inputField.hasFocus()
+        inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            bottomRow.isVisible = hasFocus
         }
     }
 
@@ -333,6 +344,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyState(state: NativeInputState) {
+        val previousContext = nativeInputState.inputContext
         nativeInputState = state
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         setToggleMatchParent()
@@ -340,6 +352,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBackButtons(state)
         if (!state.toggleVisible) {
             minimize()
+        }
+        applyInputFieldMinHeight(state.toggleVisible)
+        if (previousContext != state.inputContext && isChatTabSelected()) {
+            with(inputField) { applyChatInputType() }
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
+        }
+    }
+
+    private fun applyInputFieldMinHeight(toggleVisible: Boolean) {
+        inputField.minHeight = if (toggleVisible) {
+            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
+        } else {
+            52.toPx(context)
         }
     }
 
@@ -455,10 +480,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
-        setRawInputType(
-            InputType.TYPE_CLASS_TEXT or
-                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
-        )
+        val baseFlags = InputType.TYPE_CLASS_TEXT or
+            InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
+            InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+        val isDuckAiPage = nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
+            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+        setRawInputType(if (isDuckAiPage) baseFlags or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseFlags)
         setHorizontallyScrolling(false)
     }
 
