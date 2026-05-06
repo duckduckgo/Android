@@ -434,7 +434,7 @@ class DuckChatContextualFragment :
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
             onCameraCaptureRequested = { callback ->
-                launchNativeImagePicker(callback)
+                launchCameraCapture(callback)
             },
             onFilePickerRequested = { callback, mimeTypes ->
                 launchNativeFilePicker(callback, mimeTypes)
@@ -706,7 +706,7 @@ class DuckChatContextualFragment :
         }
     }
 
-    private fun launchNativeImagePicker(callback: ValueCallback<Array<Uri>>) {
+    private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
             acceptMimeTypes = listOf("image/*"),
