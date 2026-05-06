@@ -22,6 +22,7 @@
     android:layout_height="wrap_content"
     android:alpha="0"
     android:background="?attr/onboardingSurfaceBackdrop"
+    android:foreground="@drawable/bg_contextual_brand_design_dialog_shadow"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingTop="@dimen/keyline_4"
