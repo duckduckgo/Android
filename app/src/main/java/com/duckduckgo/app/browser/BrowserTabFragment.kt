@@ -1367,10 +1367,10 @@ class BrowserTabFragment :
                     voiceSearchLauncher.launch(requireActivity(), mode)
                 },
                 onImagePickerRequested = { callback ->
-                    launchNativeImageAttachmentChooser(callback)
+                    launchCameraCapture(callback)
                 },
                 onFilePickerRequested = { callback, mimeTypes ->
-                    launchNativeFileAttachmentPicker(callback, mimeTypes)
+                    launchFilePicker(callback, mimeTypes)
                 },
             ),
         )
@@ -4930,7 +4930,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchNativeImageAttachmentChooser(callback: ValueCallback<Array<Uri>>) {
+    private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {
         nativeInputManager.setPickingImage(true)
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
@@ -4939,7 +4939,7 @@ class BrowserTabFragment :
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
-    private fun launchNativeFileAttachmentPicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+    private fun launchFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
         nativeInputManager.setPickingImage(true)
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
