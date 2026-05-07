@@ -180,6 +180,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+
+    // Set by configure()/configureContextual() before the view attaches; always non-empty post-configure.
     private var tabId: String = ""
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
