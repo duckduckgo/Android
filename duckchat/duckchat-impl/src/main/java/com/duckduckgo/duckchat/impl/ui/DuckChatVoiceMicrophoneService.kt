@@ -29,6 +29,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
@@ -48,6 +49,9 @@ class DuckChatVoiceMicrophoneService : Service() {
 
     @Inject
     lateinit var voiceSessionStateManager: VoiceSessionStateManager
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -98,8 +102,10 @@ class DuckChatVoiceMicrophoneService : Service() {
     }
 
     private fun openChatPendingIntent(tabId: String): PendingIntent {
-        val intent = DuckChatVoiceNotificationActionReceiver.openChatIntent(this, tabId)
-        return PendingIntent.getBroadcast(
+        val intent = browserNav.openExistingTab(this, tabId).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        return PendingIntent.getActivity(
             this,
             REQUEST_CODE_OPEN_CHAT,
             intent,

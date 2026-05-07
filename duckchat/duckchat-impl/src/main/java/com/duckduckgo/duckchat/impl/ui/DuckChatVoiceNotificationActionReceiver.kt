@@ -22,7 +22,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
@@ -37,7 +36,6 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DuckChatVoiceNotificationActionReceiver @Inject constructor(
     private val context: Context,
-    private val browserNav: BrowserNav,
     private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
@@ -58,38 +56,12 @@ class DuckChatVoiceNotificationActionReceiver @Inject constructor(
         if (intent.action != INTENT_VOICE_NOTIFICATION_ACTION) return
         val tabId = intent.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() } ?: return
 
-        when (intent.getStringExtra(EXTRA_ACTION)) {
-            ACTION_OPEN_CHAT -> openExistingTab(context, tabId)
-            ACTION_END_SESSION -> {
-                openExistingTab(context, tabId)
-                voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
-            }
-        }
-    }
-
-    private fun openExistingTab(context: Context, tabId: String) {
-        val intent = browserNav.openExistingTab(context, tabId).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        context.startActivity(intent)
+        voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
     }
 
     companion object {
         private const val INTENT_VOICE_NOTIFICATION_ACTION = "com.duckduckgo.duckchat.voice.notification.action"
-        private const val EXTRA_ACTION = "EXTRA_ACTION"
         private const val EXTRA_TAB_ID = "EXTRA_TAB_ID"
-        private const val ACTION_OPEN_CHAT = "ACTION_OPEN_CHAT"
-        private const val ACTION_END_SESSION = "ACTION_END_SESSION"
-
-        fun openChatIntent(
-            context: Context,
-            tabId: String,
-        ): Intent =
-            Intent(INTENT_VOICE_NOTIFICATION_ACTION).apply {
-                setPackage(context.packageName)
-                putExtra(EXTRA_ACTION, ACTION_OPEN_CHAT)
-                putExtra(EXTRA_TAB_ID, tabId)
-            }
 
         fun endSessionIntent(
             context: Context,
@@ -97,7 +69,6 @@ class DuckChatVoiceNotificationActionReceiver @Inject constructor(
         ): Intent =
             Intent(INTENT_VOICE_NOTIFICATION_ACTION).apply {
                 setPackage(context.packageName)
-                putExtra(EXTRA_ACTION, ACTION_END_SESSION)
                 putExtra(EXTRA_TAB_ID, tabId)
             }
     }
