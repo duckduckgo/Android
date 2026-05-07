@@ -28,6 +28,9 @@ sealed class PromptContribution {
 
 sealed class Action {
     data object StartChat : Action()
+    data class AttachmentChooserShowing(val showing: Boolean) : Action()
+    data object RequestFocusInput : Action()
+    data class AttachmentStateChanged(val hasAttachments: Boolean, val limitExceeded: Boolean) : Action()
 }
 
 interface NativeInputPlugin : ActivePlugin {

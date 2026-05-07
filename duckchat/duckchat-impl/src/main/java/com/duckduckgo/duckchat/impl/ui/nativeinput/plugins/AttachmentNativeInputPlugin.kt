@@ -21,11 +21,10 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.Action
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AttachmentHandlerFactory
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AttachmentView
-import kotlinx.coroutines.MainScope
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -34,16 +33,12 @@ import javax.inject.Inject
     featureName = "pluginAttachButtonNativeInput",
     parentFeatureName = "pluginPointNativeInput",
 )
-class AttachmentNativeInputPlugin @Inject constructor(
-    private val attachmentHandlerFactory: AttachmentHandlerFactory,
-) : NativeInputPlugin {
+class AttachmentNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.attachButtonContainer
 
-    override fun createView(context: Context): View {
-        val handler = attachmentHandlerFactory.create(context, MainScope())
-        return AttachmentView(context, handler)
-    }
+    override fun createView(context: Context, onAction: (Action) -> Unit): View =
+        AttachmentView(context).also { it.onAction = onAction }
 
     override fun getPromptContribution(): PromptContribution? = null
 }

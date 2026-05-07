@@ -19,26 +19,42 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
+import android.net.Uri
 import android.view.View
+import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.json.JSONArray
 
 @SuppressLint("ViewConstructor")
 class AttachmentView(
     context: Context,
-    private val attachmentHandler: AttachmentHandler,
 ) : FrameLayout(context) {
 
-    private var attachmentsLayout: LinearLayout? = null
+    var onAction: ((Action) -> Unit)? = null
+    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
+    var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+
+    private var viewModel: AttachmentViewModel? = null
+    private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
+    private var limitErrorView: TextView? = null
 
     init {
-        setTag(R.id.attachButtonContainer, attachmentHandler)
         val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
         val icon = ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
@@ -48,26 +64,28 @@ class AttachmentView(
             setImageResource(R.drawable.ic_attach_16)
         }
         addView(icon)
-        setOnClickListener { attachmentHandler.showAttachmentChooser() }
+        setOnClickListener { showChooserDialog() }
     }
 
-    override fun setEnabled(enabled: Boolean) {
-        super.setEnabled(enabled)
-        alpha = if (enabled) 1.0f else 0.4f
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        val attachmentsContainer = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer)
-        if (attachmentsContainer != null) {
-            setupAttachmentViews(attachmentsContainer)
-            wireHandlerCallbacks(attachmentsContainer)
+    fun bind(scope: CoroutineScope, factory: ViewViewModelFactory) {
+        val owner = findViewTreeViewModelStoreOwner() ?: return
+        val vm = ViewModelProvider(owner, factory)[AttachmentViewModel::class.java]
+        viewModel = vm
+        val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
+        setupContainerViews(container, vm)
+        scope.launch {
+            vm.attachmentState.collect { state -> applyState(state, container) }
         }
     }
 
-    private fun setupAttachmentViews(attachmentsContainer: FrameLayout) {
-        if (attachmentsLayout != null) return
+    fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
+
+    fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
+
+    fun clearAttachments() = viewModel?.clearAttachments()
+
+    private fun setupContainerViews(container: FrameLayout, viewModel: AttachmentViewModel) {
+        if (thumbnailsLayout != null) return
 
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -76,8 +94,8 @@ class AttachmentView(
                 LayoutParams.WRAP_CONTENT,
             )
         }
-        attachmentsContainer.addView(layout)
-        attachmentsLayout = layout
+        container.addView(layout)
+        thumbnailsLayout = layout
 
         val scroll = HorizontalScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
@@ -90,56 +108,87 @@ class AttachmentView(
 
         val imagesContainer = ImageAttachmentsContainerView(context)
         scroll.addView(imagesContainer)
-        imagesContainer.onAttachmentRemoved = { attachment ->
-            attachmentHandler.removeAttachment(attachment.id)
-            attachmentHandler.updateImageCount(attachmentHandler.getImageAttachments().size)
-            if (!attachmentHandler.hasAttachments()) {
-                attachmentsContainer.isVisible = false
-            }
-        }
+        imagesContainer.onAttachmentRemoved = { id -> viewModel.removeImageAttachment(id) }
         imageAttachmentsContainer = imagesContainer
+
+        val dp = resources.displayMetrics.density
+        val errorView = TextView(context).apply {
+            val pad = (12 * dp).toInt()
+            setPadding(pad, (4 * dp).toInt(), pad, (4 * dp).toInt())
+            setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+            textSize = 13f
+            setTypeface(typeface, Typeface.BOLD)
+            visibility = View.GONE
+        }
+        layout.addView(errorView)
+        limitErrorView = errorView
     }
 
-    private fun wireHandlerCallbacks(attachmentsContainer: FrameLayout) {
-        attachmentHandler.onImageAttachmentAdded = { attachment ->
-            imageAttachmentsContainer?.addAttachment(attachment)
-            attachmentsContainer.isVisible = true
-            attachmentHandler.updateImageCount(attachmentHandler.getImageAttachments().size)
+    private fun applyState(state: AttachmentViewModel.AttachmentState, container: FrameLayout) {
+        val imagesView = imageAttachmentsContainer ?: return
+
+        val stateIds = state.images.map { it.id }.toSet()
+        val containerIds = imagesView.getAttachmentIds().toSet()
+        (containerIds - stateIds).forEach { id -> imagesView.removeAttachmentById(id) }
+        (stateIds - containerIds).forEach { id ->
+            state.images.find { it.id == id }?.let { imagesView.addAttachment(it) }
         }
-        val existingOnLimitError = attachmentHandler.onImageLimitError
-        attachmentHandler.onImageLimitError = { message ->
-            showAttachmentLimitError(message)
-            existingOnLimitError?.invoke(message)
-        }
-        val existingOnLimitClear = attachmentHandler.onImageLimitErrorClear
-        attachmentHandler.onImageLimitErrorClear = {
-            hideAttachmentLimitError()
-            existingOnLimitClear?.invoke()
-        }
-        attachmentHandler.onAttachmentsCleared = {
-            imageAttachmentsContainer?.clearAttachments()
-            attachmentsContainer.isVisible = false
-        }
+
+        container.isVisible = state.hasAttachments
+
+        limitErrorView?.text = state.imageLimitError
+        limitErrorView?.visibility = if (state.imageLimitError != null) VISIBLE else GONE
+
+        onAction?.invoke(Action.AttachmentStateChanged(state.hasAttachments, state.imageLimitError != null))
     }
 
-    private fun showAttachmentLimitError(message: String) {
-        val layout = attachmentsLayout ?: return
-        (layout.parent as? View)?.isVisible = true
-        val errorView = layout.findViewWithTag<TextView>("attachmentError")
-            ?: TextView(context).apply {
-                tag = "attachmentError"
-                val dp = resources.displayMetrics.density
-                setPadding((12 * dp).toInt(), (4 * dp).toInt(), (12 * dp).toInt(), (4 * dp).toInt())
-                setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
-                textSize = 13f
-                setTypeface(typeface, Typeface.BOLD)
-                layout.addView(this)
-            }
-        errorView.text = message
-        errorView.visibility = VISIBLE
-    }
+    private fun showChooserDialog() {
+        onAction?.invoke(Action.AttachmentChooserShowing(true))
 
-    private fun hideAttachmentLimitError() {
-        attachmentsLayout?.findViewWithTag<TextView>("attachmentError")?.visibility = GONE
+        ActionBottomSheetDialog.Builder(context)
+            .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
+            .setPrimaryItem(
+                context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption),
+                com.duckduckgo.mobile.android.R.drawable.ic_image_24,
+            )
+            .setSecondaryItem(
+                context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
+                com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
+            )
+            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
+                private var pickerLaunched = false
+
+                override fun onPrimaryItemClicked() {
+                    pickerLaunched = true
+                    val callback = ValueCallback<Array<Uri>> { uris ->
+                        val list = uris?.toList()
+                        if (list.isNullOrEmpty()) {
+                            onAction?.invoke(Action.RequestFocusInput)
+                        } else {
+                            viewModel?.onImagesPicked(list)
+                        }
+                    }
+                    onFilePickerRequested?.invoke(callback, listOf("image/*"))
+                }
+
+                override fun onSecondaryItemClicked() {
+                    pickerLaunched = true
+                    val callback = ValueCallback<Array<Uri>> { uris ->
+                        val list = uris?.toList()
+                        if (list.isNullOrEmpty()) {
+                            onAction?.invoke(Action.RequestFocusInput)
+                        } else {
+                            viewModel?.onImagesPicked(list)
+                        }
+                    }
+                    onCameraCaptureRequested?.invoke(callback)
+                }
+
+                override fun onBottomSheetDismissed() {
+                    if (!pickerLaunched) {
+                        onAction?.invoke(Action.AttachmentChooserShowing(false))
+                    }
+                }
+            }).show()
     }
 }

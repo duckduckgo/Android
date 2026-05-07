@@ -31,7 +31,7 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val attachments = mutableListOf<ImageAttachment>()
-    var onAttachmentRemoved: ((ImageAttachment) -> Unit)? = null
+    var onAttachmentRemoved: ((id: String) -> Unit)? = null
 
     init {
         orientation = HORIZONTAL
@@ -44,18 +44,15 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
         addThumbnailView(attachment)
     }
 
-    fun removeAttachment(attachment: ImageAttachment) {
-        val index = attachments.indexOfFirst { it.id == attachment.id }
+    fun removeAttachmentById(id: String) {
+        val index = attachments.indexOfFirst { it.id == id }
         if (index >= 0) {
             attachments.removeAt(index)
             removeViewAt(index)
         }
     }
 
-    fun clearAttachments() {
-        attachments.clear()
-        removeAllViews()
-    }
+    fun getAttachmentIds(): List<String> = attachments.map { it.id }
 
     private fun addThumbnailView(attachment: ImageAttachment) {
         val thumbnailView = LayoutInflater.from(context).inflate(R.layout.view_image_attachment_thumbnail, this, false)
@@ -63,8 +60,9 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
         val removeButton = thumbnailView.findViewById<ImageView>(R.id.thumbnailRemove)
         image.setImageBitmap(attachment.bitmap)
         removeButton.setOnClickListener {
-            removeAttachment(attachment)
-            onAttachmentRemoved?.invoke(attachment)
+            val id = attachment.id
+            removeAttachmentById(id)
+            onAttachmentRemoved?.invoke(id)
         }
         addView(thumbnailView)
     }
