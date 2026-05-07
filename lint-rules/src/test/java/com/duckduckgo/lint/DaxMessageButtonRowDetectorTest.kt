@@ -104,7 +104,7 @@ class DaxMessageButtonRowDetectorTest {
             .run()
             .expect(
                 """
-                src/com/duckduckgo/example/test.kt:11: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside the buttonRow slot. [DaxMessageButtonRowContent]
+                src/com/duckduckgo/example/test.kt:11: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside a DaxMessageButtonRowScope slot. [DaxMessageButtonRowContent]
                             Text("error")
                             ~~~~~~~~~~~~~
                 1 errors, 0 warnings
@@ -140,7 +140,7 @@ class DaxMessageButtonRowDetectorTest {
             .run()
             .expect(
                 """
-                src/com/duckduckgo/example/test.kt:11: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside the buttonRow slot. [DaxMessageButtonRowContent]
+                src/com/duckduckgo/example/test.kt:11: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside a DaxMessageButtonRowScope slot. [DaxMessageButtonRowContent]
                             Row {}
                             ~~~~~~
                 1 errors, 0 warnings
@@ -173,9 +173,50 @@ class DaxMessageButtonRowDetectorTest {
             .run()
             .expect(
                 """
-                src/com/duckduckgo/example/test.kt:9: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside the buttonRow slot. [DaxMessageButtonRowContent]
+                src/com/duckduckgo/example/test.kt:9: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside a DaxMessageButtonRowScope slot. [DaxMessageButtonRowContent]
                         Text("oops")
                         ~~~~~~~~~~~~
+                1 errors, 0 warnings
+                """.trimIndent(),
+            )
+    }
+
+    @Test
+    fun whenButtonRowUsesHelperFromWrongPackageThenFail() {
+        lint()
+            .files(
+                daxMessageStub,
+                kt(
+                    """
+                    package com.duckduckgo.example
+                    import com.duckduckgo.common.ui.compose.message.DaxAction
+                    import com.duckduckgo.common.ui.compose.message.DaxMessage
+                    import com.duckduckgo.example.RightAlignButtons
+
+                    fun RightAlignButtons(primary: DaxAction, secondary: DaxAction) {}
+
+                    fun render() {
+                        DaxMessage(
+                            title = "title",
+                            body = "body",
+                            buttonRow = {
+                                RightAlignButtons(
+                                    primary = DaxAction(text = "p", onClick = {}),
+                                    secondary = DaxAction(text = "s", onClick = {}),
+                                )
+                            },
+                        )
+                    }
+                    """,
+                ).indented(),
+            )
+            .issues(DaxMessageButtonRowDetector.INVALID_BUTTON_ROW_CONTENT)
+            .run()
+            .expect(
+                """
+                src/com/duckduckgo/example/test.kt:13: Error: Only DaxMessageButtonRowScope helpers (RightAlignButtons, CenterAlignedButtons, FullWidthSingleButton, SmallSingleButton) are allowed inside a DaxMessageButtonRowScope slot. [DaxMessageButtonRowContent]
+                            RightAlignButtons(
+                            ^
                 1 errors, 0 warnings
                 """.trimIndent(),
             )

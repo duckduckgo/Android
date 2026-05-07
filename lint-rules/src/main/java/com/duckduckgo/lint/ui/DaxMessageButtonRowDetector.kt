@@ -65,7 +65,7 @@ class DaxMessageButtonRowDetector : Detector(), SourceCodeScanner {
                                 location = context.getLocation(call),
                                 message = "Only DaxMessageButtonRowScope helpers " +
                                     "(${ALLOWED_HELPERS.joinToString()}) " +
-                                    "are allowed inside the buttonRow slot.",
+                                    "are allowed inside a DaxMessageButtonRowScope slot.",
                             )
                         }
                         // Do not descend into the call's arguments — nested expressions in helper
@@ -113,11 +113,12 @@ class DaxMessageButtonRowDetector : Detector(), SourceCodeScanner {
 
         val INVALID_BUTTON_ROW_CONTENT: Issue = Issue.create(
             id = "DaxMessageButtonRowContent",
-            briefDescription = "Only DaxMessageButtonRowScope helpers are allowed in buttonRow",
+            briefDescription = "Only DaxMessageButtonRowScope helpers are allowed in this slot",
             explanation = """
-                The `buttonRow` slot on `DaxMessage` accepts only the four approved helpers: \
-                `RightAlignButtons`, `CenterAlignedButtons`, `FullWidthSingleButton`, and \
-                `SmallSingleButton`. Other composables (raw `Text`, `Row`, custom buttons, \
+                Any slot typed `DaxMessageButtonRowScope.() -> Unit` (on `DaxMessage` or any \
+                wrapper that forwards it, e.g. `RemoteMessage`) accepts only the four approved \
+                helpers: `RightAlignButtons`, `CenterAlignedButtons`, `FullWidthSingleButton`, \
+                and `SmallSingleButton`. Other composables (raw `Text`, `Row`, custom buttons, \
                 etc.) bypass the design-system constraints and must not be used here.
             """.trimIndent(),
             moreInfo = "",
