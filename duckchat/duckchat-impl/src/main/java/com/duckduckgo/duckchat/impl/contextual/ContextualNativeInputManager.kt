@@ -57,7 +57,6 @@ class RealContextualNativeInputManager @Inject constructor(
 ) : ContextualNativeInputManager {
 
     private var isNativeInputEnabled = false
-    private var isPickingImage = false
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
 
@@ -107,7 +106,6 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
-        widget.onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
         widget.bindAttachmentCallbacks(
             onCameraCaptureRequested = onCameraCaptureRequested,
             onFilePickerRequested = onFilePickerRequested,

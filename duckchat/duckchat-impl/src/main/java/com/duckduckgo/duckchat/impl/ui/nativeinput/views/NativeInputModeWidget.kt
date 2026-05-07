@@ -373,7 +373,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
         val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
-        submitButtons?.setSendButtonEnabled(!attachmentLimitExceeded)
+        if (!isStreaming) {
+            submitButtons?.setSendButtonEnabled(!attachmentLimitExceeded)
+        }
     }
 
     private fun applyState(state: NativeInputState) {
@@ -824,7 +826,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 hasAttachments = action.hasAttachments
                 supportsUpload = action.supportsUpload
                 setImageButtonVisible(isChatTabSelected() && supportsUpload)
-                if (hadLimitError != attachmentLimitExceeded) {
+                if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
                     floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
                 }
                 updateSendButtonVisibility()

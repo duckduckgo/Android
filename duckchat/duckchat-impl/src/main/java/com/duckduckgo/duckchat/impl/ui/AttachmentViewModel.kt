@@ -190,7 +190,9 @@ class AttachmentViewModel @Inject constructor(
         val maxSide = max(bitmap.width, bitmap.height)
         if (maxSide <= maxDimension) return bitmap
         val scale = maxDimension.toFloat() / maxSide
-        return bitmap.scale((bitmap.width * scale).toInt(), (bitmap.height * scale).toInt())
+        val scaledWidth = (bitmap.width * scale).toInt().coerceAtLeast(1)
+        val scaledHeight = (bitmap.height * scale).toInt().coerceAtLeast(1)
+        return bitmap.scale(scaledWidth, scaledHeight)
     }
 
     private fun resolveFormat(uri: Uri): String {
