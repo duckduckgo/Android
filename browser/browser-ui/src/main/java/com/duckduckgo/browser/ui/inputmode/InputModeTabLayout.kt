@@ -21,29 +21,18 @@ import android.graphics.Color
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.ViewOutlineProvider
-import android.widget.ImageView
-import androidx.core.content.ContextCompat
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.R
-import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 
-@InjectWith(scope = ViewScope::class)
 class InputModeTabLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.tabStyle,
 ) : TabLayout(context, attrs, defStyleAttr) {
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     init {
         setSelectedTabIndicator(
@@ -57,20 +46,6 @@ class InputModeTabLayout @JvmOverloads constructor(
         )
         outlineProvider = ViewOutlineProvider.BACKGROUND
         clipToOutline = true
-    }
-    override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
-        super.onAttachedToWindow()
-
-        val searchTabView = getTabAt(0)!!.view
-        val searchTabIcon = searchTabView.findViewById<ImageView>(R.id.tab_icon)
-        // We're changing the selector to ensure that the right icon is used even if user manually changes the theme,
-        // without relying on the system theme. For these cases, using "drawable-night" directory is not sufficient.
-        if (appTheme.isLightModeEnabled()) {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector))
-        } else {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
-        }
     }
 
     private fun buildShadowedTabIndicator(
