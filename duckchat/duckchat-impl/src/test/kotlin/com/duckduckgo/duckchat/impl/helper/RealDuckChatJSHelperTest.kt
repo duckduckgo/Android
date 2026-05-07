@@ -33,6 +33,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -74,6 +75,7 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChatFeature: DuckChatFeature =
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
+    private val mockLimitsHandler: LimitsHandler = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
@@ -85,6 +87,7 @@ class RealDuckChatJSHelperTest {
         faviconManager = mockFaviconManager,
         duckChatFeature = mockDuckChatFeature,
         voiceSessionStateManager = mockVoiceSessionStateManager,
+        limitsHandler = mockLimitsHandler,
     )
     private val viewModel =
         object {

@@ -39,7 +39,5 @@
 
     <!-- Image attachment -->
     <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
-    <string name="duckChatImageAttachmentLimitPerMessage">You can only attach %d images at a time.</string>
-    <string name="duckChatImageAttachmentLimitPerConversation">You can only attach %d images per conversation.</string>
 
 </resources>
