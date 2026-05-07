@@ -114,8 +114,4 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Voice Chat</string>
-
-    <!-- Image attachment limits -->
-    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%d is the maximum number of images allowed per message.">You can only attach %d images at a time.</string>
-    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%d is the maximum number of images allowed in a single conversation.">You can only attach %d images per conversation.</string>
 </resources>
