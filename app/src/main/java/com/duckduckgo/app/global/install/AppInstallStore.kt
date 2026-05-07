@@ -37,8 +37,9 @@ interface AppInstallStore : MainProcessLifecycleObserver {
 
     var widgetInstalled: Boolean
 
+    /** Setting to `true` also flips [wasEverDefaultBrowser] to `true` permanently. */
     var defaultBrowser: Boolean
-    var wasEverDefaultBrowser: Boolean
+    val wasEverDefaultBrowser: Boolean
 
     var defaultBrowserChangedSurveyDone: Boolean
 
@@ -66,11 +67,15 @@ class AppInstallSharedPreferences @Inject constructor(
 
     override var defaultBrowser: Boolean
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
-        set(defaultBrowser) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser) }
+        set(defaultBrowser) = preferences.edit {
+            putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser)
+            if (defaultBrowser) {
+                putBoolean(KEY_WAS_EVER_DEFAULT_BROWSER, true)
+            }
+        }
 
-    override var wasEverDefaultBrowser: Boolean
+    override val wasEverDefaultBrowser: Boolean
         get() = preferences.getBoolean(KEY_WAS_EVER_DEFAULT_BROWSER, false)
-        set(value) = preferences.edit { putBoolean(KEY_WAS_EVER_DEFAULT_BROWSER, value) }
 
     override var defaultBrowserChangedSurveyDone: Boolean
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER_CHANGED_SURVEY_DONE, false)

@@ -460,10 +460,18 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun updateVoiceButtons(widget: NativeInputWidget) {
-        val isDuckAiTabSelected = widget.isChatTabSelected()
+        val isOnActiveDuckChat = omnibarController.isDuckAiMode()
         val voiceSearchAvailable = voiceSearchAvailability.isVoiceSearchAvailable
         val voiceSearchDuckAiAvailable = duckAiFeatureState.showVoiceSearchToggle.value
         val voiceChatEntryAvailable = duckAiFeatureState.showVoiceChatEntry.value
+
+        if (isOnActiveDuckChat) {
+            widget.setVoiceSearchAvailable(voiceSearchAvailable && voiceSearchDuckAiAvailable)
+            widget.setVoiceChatAvailable(false)
+            return
+        }
+
+        val isDuckAiTabSelected = widget.isChatTabSelected()
         val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
         widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
         widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)

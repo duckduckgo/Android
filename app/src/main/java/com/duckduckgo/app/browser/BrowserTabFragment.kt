@@ -158,7 +158,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.BubbleTooltipDrawable
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipPopup
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
@@ -662,6 +664,7 @@ class BrowserTabFragment :
 
     private var popupMenu: BrowserPopupMenu? = null
     private var bottomSheetMenu: BrowserMenuBottomSheet? = null
+    private var pdfDownloadTooltipPopup: PdfDownloadTooltipPopup? = null
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: HomeScreenWidgetBottomSheetDialog
     private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
@@ -2049,6 +2052,8 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
+        pdfDownloadTooltipPopup?.dismiss()
+        pdfDownloadTooltipPopup = null
         dismissDownloadFragment()
         super.onPause()
     }
@@ -2277,6 +2282,25 @@ class BrowserTabFragment :
         hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun showPdfDownloadTooltip() {
+        val omnibarType = omnibarRepository.omnibarType
+        val isBottomAnchored = omnibarType == OmnibarType.SPLIT || omnibarType == OmnibarType.SINGLE_BOTTOM
+        val anchor: View = if (omnibarType == OmnibarType.SPLIT) {
+            browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
+        } else {
+            view?.findViewById(R.id.browserMenu) ?: return
+        }
+        val wavePosition = if (isBottomAnchored) {
+            BubbleTooltipDrawable.WavePosition.BOTTOM
+        } else {
+            BubbleTooltipDrawable.WavePosition.TOP
+        }
+        pdfDownloadTooltipPopup?.dismiss()
+        pdfDownloadTooltipPopup = PdfDownloadTooltipPopup(requireContext(), wavePosition).also { popup ->
+            popup.show(anchor)
+        }
     }
 
     private fun showPdf(url: String, cachedFileUri: Uri) {
@@ -2992,6 +3016,8 @@ class BrowserTabFragment :
             is Command.ShowPdfInTab -> {
                 showPdf(it.url, it.cachedFileUri)
             }
+
+            is Command.ShowPdfDownloadTooltip -> showPdfDownloadTooltip()
 
             is Command.ExpandOmnibar -> {
                 omnibar.setExpanded(true)

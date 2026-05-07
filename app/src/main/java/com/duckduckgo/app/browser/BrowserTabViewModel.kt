@@ -207,6 +207,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
@@ -539,6 +540,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val inlinePdfHandler: InlinePdfHandler,
+    private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
@@ -1617,6 +1619,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRefreshRequested(triggeredByUser: Boolean) {
+        if (currentBrowserViewState().currentPdfCachedUri != null) {
+            url?.let {
+                handlePdfUrl(
+                    it,
+                    contentDisposition = null,
+                    mimeType = "application/pdf",
+                    requestUserConfirmation = false,
+                    forceRefresh = true,
+                )
+            }
+            return
+        }
         val omnibarContent = currentOmnibarViewState().queryOrFullUrl
         if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
             fireQueryChangedPixel(omnibarContent)
@@ -3695,26 +3709,38 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun handlePdfUrl(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
-        command.value = Command.ExpandOmnibar
+    private fun handlePdfUrl(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
+        requestUserConfirmation: Boolean,
+        forceRefresh: Boolean = false,
+    ) {
+        if (!forceRefresh) command.value = Command.ExpandOmnibar
         loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
-            val result = inlinePdfHandler.downloadToCache(url)
+            val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh)
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
             when (result) {
                 is PdfDownloadResult.Success -> {
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
                     val pdfTitle = inlinePdfHandler.extractFileName(url)
-                    pageChanged(url, pdfTitle)
+                    if (!forceRefresh) {
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
+                        pageChanged(url, pdfTitle)
+                    }
                     browserViewState.value = currentBrowserViewState().copy(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,
                     )
                     command.value = ShowPdfInTab(url, result.uri)
+                    if (!isCustomTabScreen && pdfDownloadTooltipDataStore.canShow()) {
+                        pdfDownloadTooltipDataStore.incrementShownCount()
+                        command.value = Command.ShowPdfDownloadTooltip
+                    }
                 }
                 is PdfDownloadResult.Failure -> {
                     pixel.fire(

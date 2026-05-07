@@ -148,7 +148,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showFireMenuItem = browserViewState.fireButton is HighlightableButton.Visible,
             showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
             isEmailSignedIn = browserViewState.isEmailSignedIn,
-            canChangeBrowsingMode = browserViewState.canChangeBrowsingMode,
+            canChangeBrowsingMode = browserViewState.canChangeBrowsingMode && browserViewState.currentPdfCachedUri == null,
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             hasPreviousAppLink = browserViewState.previousAppLink != null,
             canFindInPage = browserViewState.canFindInPage && browserViewState.currentPdfCachedUri == null,
