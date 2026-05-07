@@ -162,7 +162,7 @@ data class LinearOnboardingPlan(
 
 ### Why this shape
 
-- **Host encoded by-construction**, not as a separate field. `IsolatedContext` is rendered against an isolated full-screen surface (today: `OnboardingActivity`); `BrowserContext` is rendered against the live browser. The variant carries that distinction at compile time.
+- **Two step subtypes, one per host.** `IsolatedContext` steps run full-screen (today: rendered by `OnboardingActivity`). `BrowserContext` steps render against the live browser. The author picks the subtype that fits; the orchestrator infers which activity should host the step from the subtype, with no separate `host` field to keep in sync.
 - **`precondition` and `resolveDialog` are `suspend` and read fresh state at call time.** This is the load-bearing decision for the config-staleness story — see [State and persistence](#state-and-persistence).
 - **`PreOnboardingDialog` is one sealed type, not enum + parallel params.** Each variant carries the data its renderer needs (e.g. `Initial(showDuckAiCopy)`, `DefaultBrowser(intent)`). The orchestrator-side `PreOnboardingDialogType` enum is *not* used on the orchestrator path; it stays in place only for the legacy `WelcomePage` path until that path is removed.
 - **`transition` is a per-step function returning a `StepTransition`.** Each step's flow-control logic is local to its descriptor instead of co-mingled in a giant centralised `when`.
@@ -183,209 +183,16 @@ When a step's `transition(event)` returns:
 
 ### Today's flow expressed in this model
 
-```kotlin
-@SingleInstanceIn(AppScope::class)
-class LinearOnboardingPlanProvider @Inject constructor(
-    private val syncAutoRestore: SyncAutoRestore,
-    private val appBuildConfig: AppBuildConfig,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
-    private val onboardingStore: OnboardingStore,
-    private val settingsDataStore: SettingsDataStore,
-    private val appInstallStore: AppInstallStore,
-    private val duckChat: DuckChat,
-    private val pixel: Pixel,
-    private val context: Context,
-) {
-    fun buildPlan(): LinearOnboardingPlan = LinearOnboardingPlan(
-        mainPath = listOf(
-            syncRestoreStep(),
-            initialReinstallUserStep(),
-            initialStep(),
-            comparisonChartStep(),
-            defaultBrowserStep(),
-            addressBarPositionStep(),
-            inputScreenStep(),
-            inputScreenPreviewStep(),
-        ),
-        sideBranches = listOf(
-            skipOnboardingOptionStep(),
-        ),
-    )
+The current brand-design flow maps onto **eight `mainPath` steps and one `sideBranches` step**:
 
-    private fun syncRestoreStep() = IsolatedContext(
-        id = ID_SYNC_RESTORE,
-        precondition = { syncAutoRestore.canRestore() },
-        resolveDialog = { PreOnboardingDialog.SyncRestore },
-        transition = { event -> when (event) {
-            PrimaryClicked -> {
-                pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
-                syncAutoRestore.restoreSyncAccount()
-                Advance
-            }
-            SecondaryClicked -> {
-                pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                Branch(ID_SKIP_ONBOARDING_OPTION)
-            }
-            else -> Stay
-        }},
-    )
+- `mainPath` (in order): `SyncRestore`, `InitialReinstallUser`, `Initial`, `ComparisonChart`, `DefaultBrowser`, `AddressBarPosition`, `InputScreen`, `InputScreenPreview`
+- `sideBranches`: `SkipOnboardingOption`
 
-    private fun initialReinstallUserStep() = IsolatedContext(
-        id = ID_INITIAL_REINSTALL_USER,
-        precondition = { !syncAutoRestore.canRestore() && appBuildConfig.isAppReinstall() },
-        resolveDialog = { PreOnboardingDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
-        transition = { event -> when (event) {
-            PrimaryClicked -> Advance
-            SecondaryClicked -> {
-                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-                Branch(ID_SKIP_ONBOARDING_OPTION)
-            }
-            else -> Stay
-        }},
-    )
+Mutual exclusion between the three "first dialog" candidates (`SyncRestore` / `InitialReinstallUser` / `Initial`) is expressed as preconditions on each step, not as plan-level branching — `mainPath` stays a flat, readable list, and ineligible steps are skipped during forward walking. The full plan-provider code with all step factories (preconditions, transitions, side effects) is in [Appendix A: Plan provider code](#appendix-a-plan-provider-code).
 
-    private fun initialStep() = IsolatedContext(
-        id = ID_INITIAL,
-        precondition = { !syncAutoRestore.canRestore() && !appBuildConfig.isAppReinstall() },
-        resolveDialog = { PreOnboardingDialog.Initial(showDuckAiCopy = isDuckAiCopyEnabled()) },
-        transition = { event -> when (event) {
-            PrimaryClicked -> Advance
-            else -> Stay
-        }},
-    )
+Two architectural points worth surfacing here, since they're easy to miss in the per-step factory code:
 
-    private fun comparisonChartStep() = IsolatedContext(
-        id = ID_COMPARISON_CHART,
-        resolveDialog = { PreOnboardingDialog.ComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()) },
-        transition = { event -> when (event) {
-            PrimaryClicked -> {
-                val isDefault = !defaultRoleBrowserDialog.shouldShowDialog()
-                pixel.fire(PREONBOARDING_CHOOSE_BROWSER_PRESSED, mapOf(DEFAULT_BROWSER to isDefault.toString()))
-                Advance  // forward walk skips DEFAULT_BROWSER and ADDRESS_BAR_POSITION via their preconditions
-            }
-            else -> Stay
-        }},
-    )
-
-    private fun defaultBrowserStep() = IsolatedContext(
-        id = ID_DEFAULT_BROWSER,
-        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
-        resolveDialog = {
-            // Today the system intent is launched from inside COMPARISON_CHART's primary;
-            // here it becomes a discrete step whose dialog carries the intent.
-            PreOnboardingDialog.DefaultBrowser(intent = defaultRoleBrowserDialog.createIntent(context)!!)
-        },
-        transition = { event -> when (event) {
-            is SystemResult -> {
-                defaultRoleBrowserDialog.dialogShown()
-                appInstallStore.defaultBrowser = event.ok
-                if (event.ok) appInstallStore.wasEverDefaultBrowser = true
-                pixel.fire(
-                    if (event.ok) DEFAULT_BROWSER_SET else DEFAULT_BROWSER_NOT_SET,
-                    mapOf(DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
-                )
-                Advance
-            }
-            else -> Stay
-        }},
-    )
-
-    private fun addressBarPositionStep() = IsolatedContext(
-        id = ID_ADDRESS_BAR_POSITION,
-        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },  // matches today's "skip if shouldShowDialog == false"
-        resolveDialog = { PreOnboardingDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
-        transition = { event -> when (event) {
-            is OmnibarTypeSelected -> {
-                settingsDataStore.omnibarType = event.type
-                when (event.type) {
-                    SINGLE_BOTTOM -> pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-                    SPLIT -> pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
-                    SINGLE_TOP -> { /* default, no pixel */ }
-                }
-                Stay  // selection alone doesn't advance; PrimaryClicked does
-            }
-            PrimaryClicked -> Advance
-            else -> Stay
-        }},
-    )
-
-    private fun inputScreenStep() = IsolatedContext(
-        id = ID_INPUT_SCREEN,
-        precondition = {
-            defaultRoleBrowserDialog.shouldShowDialog() &&
-                androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-        },
-        resolveDialog = { PreOnboardingDialog.InputScreen(showDuckAiCopy = isDuckAiCopyEnabled()) },
-        transition = { event -> when (event) {
-            is InputModeSelected -> {
-                onboardingStore.storeInputScreenSelection(event.withAi)
-                duckChat.setCosmeticInputScreenUserSetting(event.withAi)
-                Stay
-            }
-            PrimaryClicked -> {
-                val withAi = onboardingStore.getInputScreenSelection() == true
-                if (withAi) {
-                    pixel.fire(PREONBOARDING_AICHAT_SELECTED)
-                    inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = appBuildConfig.isAppReinstall())
-                } else {
-                    pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
-                }
-                Advance
-            }
-            else -> Stay
-        }},
-    )
-
-    private fun inputScreenPreviewStep() = IsolatedContext(
-        id = ID_INPUT_SCREEN_PREVIEW,
-        precondition = {
-            onboardingStore.getInputScreenSelection() == true &&
-                duckAiOnboardingExperimentManager.enroll() in setOf(
-                    TREATMENT_WITH_DUCK_AI_DEFAULT,
-                    TREATMENT_WITH_SEARCH_DEFAULT,
-                )
-        },
-        resolveDialog = {
-            val variant = duckAiOnboardingExperimentManager.enroll()
-            PreOnboardingDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
-        },
-        transition = { event -> when (event) {
-            PrimaryClicked -> Advance
-            else -> Stay
-        }},
-    )
-
-    private fun skipOnboardingOptionStep() = IsolatedContext(
-        id = ID_SKIP_ONBOARDING_OPTION,
-        resolveDialog = { PreOnboardingDialog.SkipOnboardingOption },
-        transition = { event -> when (event) {
-            PrimaryClicked -> {
-                pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                duckChat.setInputScreenUserSetting(true)
-                AbortPlan
-            }
-            SecondaryClicked -> {
-                // Advance from a side-branch walks mainPath from branchEntry+1.
-                // For a reinstall user: branchEntry=INITIAL_REINSTALL_USER, walk skips
-                // INITIAL (precondition false), lands on COMPARISON_CHART. Same destination
-                // for a canRestore user (branchEntry=SYNC_RESTORE walks past the same gates).
-                pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-                Advance
-            }
-            else -> Stay
-        }},
-    )
-
-    private suspend fun isDuckAiCopyEnabled(): Boolean = /* same logic as today's WelcomePageViewModel */
-    private suspend fun isSplitOmnibarEnabled(): Boolean = /* same logic as today */
-}
-```
-
-Two notes on this mapping:
-
-1. **`DEFAULT_BROWSER` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `PreOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `SystemResult` event. The fragment-side rendering is unchanged (no visible separate "step"); it's only an architectural unit. This becomes important when the future BrowserContext steps land and `DEFAULT_BROWSER` is the isolated phase the user re-enters.
+1. **`DefaultBrowser` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `PreOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `SystemResult` event. The fragment-side rendering is unchanged (no visible separate "step" to the user); it's only an architectural unit. This becomes important when the future `BrowserContext` steps land and `DefaultBrowser` is the isolated phase the user re-enters.
 
 2. **Pixel firing has moved into `transition` lambdas.** Today's `BrandDesignUpdatePageViewModel` has pixel calls scattered across `onPrimaryCtaClicked`, `onSecondaryCtaClicked`, `fireDialogShownPixel`, etc. In the orchestrator model, decision-time pixels live with the decision (in `transition`); show-time pixels (`fireDialogShownPixel` equivalents) stay in the renderer (the viewmodel observing `state` transitions emits the show pixel for the new step). The pixel sequence is preserved.
 
@@ -701,3 +508,208 @@ Specifically:
 2. **`SYNC_RESTORE` coverage in `BrandDesignUpdatePageViewModel`.** The brand-design viewmodel imports `SYNC_RESTORE` and handles it in `fireDialogShownPixel`, but its `loadDaxDialog` never dispatches to it, `onPrimaryCtaClicked(SYNC_RESTORE)` has a `// TODO`, and `onSecondaryCtaClicked(SYNC_RESTORE)` is a no-op. The orchestrator spec includes a `SYNC_RESTORE` step. If the product team is intentionally dropping `SYNC_RESTORE` with the brand-design migration, the orchestrator's `syncRestoreStep()` factory is removed in one place (drop it from `mainPath`). If `SYNC_RESTORE` is being kept, the brand-design viewmodel needs the missing rendering paths backfilled before phase 4 cleanup.
 3. **Persistence as a follow-up.** If product later wants "preserve user's mid-flow position across process kills", it's a one-day add: DataStore-backed `OnboardingPlanState` + the reconciliation rule "if persisted `currentStepId` no longer in rebuilt plan, treat as `Completed`".
 4. **Plugin-extensible plan.** If the team's experiment-churn workload ever grows to multiple modules wanting to inject onboarding steps, `LinearStep` plugin contributions via `@ContributesPluginPoint` would cleanly extend the registry. Out of scope for now (one customer, monolithic plan).
+
+
+## Appendix A: Plan provider code
+
+The full step factories for today's brand-design flow, mapped onto the orchestrator model. Each factory captures the same preconditions, params, and transitions that `BrandDesignUpdatePageViewModel`'s `when (currentDialog)` blocks express today.
+
+```kotlin
+@SingleInstanceIn(AppScope::class)
+class LinearOnboardingPlanProvider @Inject constructor(
+    private val syncAutoRestore: SyncAutoRestore,
+    private val appBuildConfig: AppBuildConfig,
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val onboardingStore: OnboardingStore,
+    private val settingsDataStore: SettingsDataStore,
+    private val appInstallStore: AppInstallStore,
+    private val duckChat: DuckChat,
+    private val pixel: Pixel,
+    private val context: Context,
+) {
+    fun buildPlan(): LinearOnboardingPlan = LinearOnboardingPlan(
+        mainPath = listOf(
+            syncRestoreStep(),
+            initialReinstallUserStep(),
+            initialStep(),
+            comparisonChartStep(),
+            defaultBrowserStep(),
+            addressBarPositionStep(),
+            inputScreenStep(),
+            inputScreenPreviewStep(),
+        ),
+        sideBranches = listOf(
+            skipOnboardingOptionStep(),
+        ),
+    )
+
+    private fun syncRestoreStep() = IsolatedContext(
+        id = ID_SYNC_RESTORE,
+        precondition = { syncAutoRestore.canRestore() },
+        resolveDialog = { PreOnboardingDialog.SyncRestore },
+        transition = { event -> when (event) {
+            PrimaryClicked -> {
+                pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+                syncAutoRestore.restoreSyncAccount()
+                Advance
+            }
+            SecondaryClicked -> {
+                pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+                Branch(ID_SKIP_ONBOARDING_OPTION)
+            }
+            else -> Stay
+        }},
+    )
+
+    private fun initialReinstallUserStep() = IsolatedContext(
+        id = ID_INITIAL_REINSTALL_USER,
+        precondition = { !syncAutoRestore.canRestore() && appBuildConfig.isAppReinstall() },
+        resolveDialog = { PreOnboardingDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        transition = { event -> when (event) {
+            PrimaryClicked -> Advance
+            SecondaryClicked -> {
+                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                Branch(ID_SKIP_ONBOARDING_OPTION)
+            }
+            else -> Stay
+        }},
+    )
+
+    private fun initialStep() = IsolatedContext(
+        id = ID_INITIAL,
+        precondition = { !syncAutoRestore.canRestore() && !appBuildConfig.isAppReinstall() },
+        resolveDialog = { PreOnboardingDialog.Initial(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        transition = { event -> when (event) {
+            PrimaryClicked -> Advance
+            else -> Stay
+        }},
+    )
+
+    private fun comparisonChartStep() = IsolatedContext(
+        id = ID_COMPARISON_CHART,
+        resolveDialog = { PreOnboardingDialog.ComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        transition = { event -> when (event) {
+            PrimaryClicked -> {
+                val isDefault = !defaultRoleBrowserDialog.shouldShowDialog()
+                pixel.fire(PREONBOARDING_CHOOSE_BROWSER_PRESSED, mapOf(DEFAULT_BROWSER to isDefault.toString()))
+                Advance  // forward walk skips DEFAULT_BROWSER and ADDRESS_BAR_POSITION via their preconditions
+            }
+            else -> Stay
+        }},
+    )
+
+    private fun defaultBrowserStep() = IsolatedContext(
+        id = ID_DEFAULT_BROWSER,
+        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
+        resolveDialog = {
+            // Today the system intent is launched from inside COMPARISON_CHART's primary;
+            // here it becomes a discrete step whose dialog carries the intent.
+            PreOnboardingDialog.DefaultBrowser(intent = defaultRoleBrowserDialog.createIntent(context)!!)
+        },
+        transition = { event -> when (event) {
+            is SystemResult -> {
+                defaultRoleBrowserDialog.dialogShown()
+                appInstallStore.defaultBrowser = event.ok
+                if (event.ok) appInstallStore.wasEverDefaultBrowser = true
+                pixel.fire(
+                    if (event.ok) DEFAULT_BROWSER_SET else DEFAULT_BROWSER_NOT_SET,
+                    mapOf(DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+                )
+                Advance
+            }
+            else -> Stay
+        }},
+    )
+
+    private fun addressBarPositionStep() = IsolatedContext(
+        id = ID_ADDRESS_BAR_POSITION,
+        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },  // matches today's "skip if shouldShowDialog == false"
+        resolveDialog = { PreOnboardingDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
+        transition = { event -> when (event) {
+            is OmnibarTypeSelected -> {
+                settingsDataStore.omnibarType = event.type
+                when (event.type) {
+                    SINGLE_BOTTOM -> pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                    SPLIT -> pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
+                    SINGLE_TOP -> { /* default, no pixel */ }
+                }
+                Stay  // selection alone doesn't advance; PrimaryClicked does
+            }
+            PrimaryClicked -> Advance
+            else -> Stay
+        }},
+    )
+
+    private fun inputScreenStep() = IsolatedContext(
+        id = ID_INPUT_SCREEN,
+        precondition = {
+            defaultRoleBrowserDialog.shouldShowDialog() &&
+                androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
+        },
+        resolveDialog = { PreOnboardingDialog.InputScreen(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        transition = { event -> when (event) {
+            is InputModeSelected -> {
+                onboardingStore.storeInputScreenSelection(event.withAi)
+                duckChat.setCosmeticInputScreenUserSetting(event.withAi)
+                Stay
+            }
+            PrimaryClicked -> {
+                val withAi = onboardingStore.getInputScreenSelection() == true
+                if (withAi) {
+                    pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+                    inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = appBuildConfig.isAppReinstall())
+                } else {
+                    pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
+                }
+                Advance
+            }
+            else -> Stay
+        }},
+    )
+
+    private fun inputScreenPreviewStep() = IsolatedContext(
+        id = ID_INPUT_SCREEN_PREVIEW,
+        precondition = {
+            onboardingStore.getInputScreenSelection() == true &&
+                duckAiOnboardingExperimentManager.enroll() in setOf(
+                    TREATMENT_WITH_DUCK_AI_DEFAULT,
+                    TREATMENT_WITH_SEARCH_DEFAULT,
+                )
+        },
+        resolveDialog = {
+            val variant = duckAiOnboardingExperimentManager.enroll()
+            PreOnboardingDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
+        },
+        transition = { event -> when (event) {
+            PrimaryClicked -> Advance
+            else -> Stay
+        }},
+    )
+
+    private fun skipOnboardingOptionStep() = IsolatedContext(
+        id = ID_SKIP_ONBOARDING_OPTION,
+        resolveDialog = { PreOnboardingDialog.SkipOnboardingOption },
+        transition = { event -> when (event) {
+            PrimaryClicked -> {
+                pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                duckChat.setInputScreenUserSetting(true)
+                AbortPlan
+            }
+            SecondaryClicked -> {
+                // Advance from a side-branch walks mainPath from branchEntry+1.
+                // For a reinstall user: branchEntry=INITIAL_REINSTALL_USER, walk skips
+                // INITIAL (precondition false), lands on COMPARISON_CHART. Same destination
+                // for a canRestore user (branchEntry=SYNC_RESTORE walks past the same gates).
+                pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+                Advance
+            }
+            else -> Stay
+        }},
+    )
+
+    private suspend fun isDuckAiCopyEnabled(): Boolean = /* same logic as today's WelcomePageViewModel */
+    private suspend fun isSplitOmnibarEnabled(): Boolean = /* same logic as today */
+}
+```
