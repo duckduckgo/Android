@@ -23,6 +23,9 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -33,7 +36,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -44,6 +50,8 @@ class ModelPickerViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val modelManager: DuckAiModelManager = mock()
+    private val nativeInputStateProvider: NativeInputStateProvider = mock()
+    private val mutableNativeInputStateProvider: MutableNativeInputStateProvider = mock()
     private val stateFlow = MutableStateFlow(ModelState())
 
     private lateinit var testee: ModelPickerViewModel
@@ -51,7 +59,8 @@ class ModelPickerViewModelTest {
     @Before
     fun setUp() {
         whenever(modelManager.modelState).thenReturn(stateFlow)
-        testee = ModelPickerViewModel(modelManager)
+        whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
+        testee = ModelPickerViewModel(modelManager, nativeInputStateProvider, mutableNativeInputStateProvider)
     }
 
     @Test
@@ -253,6 +262,50 @@ class ModelPickerViewModelTest {
         val model = freeModel(id = "some-other-model", shortName = "Other", provider = ModelProvider.UNKNOWN)
 
         assertNull(testee.getIconResForModel(model))
+    }
+
+    @Test
+    fun whenInitWithTabIdThenStateForTabObserved() = runTest {
+        val tabStateFlow = MutableStateFlow(NativeInputState.zero().copy(selectedModelId = "claude-3"))
+        whenever(nativeInputStateProvider.stateForTab("tab-1")).thenReturn(tabStateFlow)
+
+        testee.init("tab-1")
+
+        assertEquals("claude-3", testee.selectedModel.value)
+    }
+
+    @Test
+    fun whenSelectModelThenPushesSelectedModelIdToProvider() = runTest {
+        whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
+        testee.init("tab-1")
+        val model = testee.state.value.models.firstOrNull() ?: return@runTest
+
+        testee.selectModel(model)
+
+        verify(mutableNativeInputStateProvider).update(eq("tab-1"), any())
+    }
+
+    @Test
+    fun whenSelectModelThenAlsoDelegatesToModelManager() = runTest {
+        whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
+        testee.init("tab-1")
+        val model = testee.state.value.models.firstOrNull() ?: return@runTest
+
+        testee.selectModel(model)
+
+        verify(modelManager).selectModel(model)
+    }
+
+    @Test
+    fun whenInitWithNoPersistedModelThenDoesNotSeedFromGlobal() = runTest {
+        whenever(nativeInputStateProvider.stateForTab("tab-1")).thenReturn(
+            MutableStateFlow(NativeInputState.zero()), // null selectedModelId
+        )
+
+        testee.init("tab-1")
+
+        // No call to update — seeding from global is not the ViewModel's job
+        verify(mutableNativeInputStateProvider, never()).update(any(), any())
     }
 
     private fun freeModel(id: String, shortName: String, provider: ModelProvider = ModelProvider.UNKNOWN) = AIChatModel(

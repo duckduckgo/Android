@@ -28,7 +28,15 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,13 +45,28 @@ data class ModelSection(@StringRes val headerRes: Int?, val models: List<AIChatM
 @ContributesViewModel(ViewScope::class)
 class ModelPickerViewModel @Inject constructor(
     private val modelManager: DuckAiModelManager,
+    private val nativeInputStateProvider: NativeInputStateProvider,
+    private val mutableNativeInputStateProvider: MutableNativeInputStateProvider,
 ) : ViewModel() {
 
     val state: StateFlow<ModelState> = modelManager.modelState
 
     var menuShowing = false
 
-    fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
+    private val _tabId = MutableStateFlow<String?>(null)
+
+    val selectedModel: StateFlow<String?> = _tabId
+        .filterNotNull()
+        .flatMapLatest { tabId -> nativeInputStateProvider.stateForTab(tabId).map { it.selectedModelId } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    fun init(tabId: String) {
+        _tabId.value = tabId
+    }
+
+    fun getSelectedModelId(): String? = _tabId.value?.let {
+        nativeInputStateProvider.stateForTab(it).value.selectedModelId
+    } ?: modelManager.getSelectedModelId()
 
     fun fetchModels() {
         viewModelScope.launch {
@@ -54,6 +77,9 @@ class ModelPickerViewModel @Inject constructor(
     fun selectModel(model: AIChatModel) {
         viewModelScope.launch {
             modelManager.selectModel(model)
+            _tabId.value?.let { tabId ->
+                mutableNativeInputStateProvider.update(tabId) { copy(selectedModelId = model.id) }
+            }
         }
     }
 
