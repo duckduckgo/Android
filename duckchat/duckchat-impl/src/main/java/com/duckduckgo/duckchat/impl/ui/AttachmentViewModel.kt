@@ -118,19 +118,11 @@ class AttachmentViewModel @Inject constructor(
 
     fun clearAttachments() {
         val toRecycle = _imageAttachments.value
-        val sentCount = toRecycle.size
         _imageAttachments.value = emptyList()
-        if (sentCount > 0) limitsHandler.addConversationImagesSent(sentCount)
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
-    fun clearAttachmentsForNewChat() {
-        val toRecycle = _imageAttachments.value
-        val pendingCount = toRecycle.size
-        _imageAttachments.value = emptyList()
-        limitsHandler.prepareForNewChat(pendingCount)
-        viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
-    }
+    fun clearAttachmentsForNewChat() = clearAttachments()
 
     fun getImageAttachments(): List<ImageAttachment> = _imageAttachments.value
 
@@ -147,10 +139,6 @@ class AttachmentViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    fun resetConversationCounts() {
-        limitsHandler.resetConversationImagesSent()
     }
 
     private fun computeSupportsUpload(modelState: ModelState): Boolean {
