@@ -48,6 +48,6 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
         }
     }
 
-    @Deprecated("Contributions are now pushed directly to NativeInputStateProvider. Will be removed once all plugins migrate.")
+    @Deprecated("Push contributions to MutableNativeInputStateProvider instead")
     override fun getPromptContribution() = null
 }
