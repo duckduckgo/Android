@@ -237,7 +237,7 @@ class CtaViewModel @Inject constructor(
                 )
                 canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_browsermodal_android",
+                    origin = "funnel_newusermodal_android",
                 )
                 else -> null
             }
