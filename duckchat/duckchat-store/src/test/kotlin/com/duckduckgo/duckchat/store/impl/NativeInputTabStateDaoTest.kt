@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.store.impl
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateDao
 import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateEntity
@@ -28,6 +27,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(AndroidJUnit4::class)
 class NativeInputTabStateDaoTest {
@@ -38,7 +38,7 @@ class NativeInputTabStateDaoTest {
     @Before
     fun setUp() {
         db = Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
+            RuntimeEnvironment.getApplication().baseContext,
             DuckAiBridgeDatabase::class.java,
         ).allowMainThreadQueries().build()
         dao = db.nativeInputTabStateDao()

@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
+import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -48,6 +49,9 @@ object DuckAiBridgeModule {
 
     @Provides
     fun provideFileMetaDao(db: DuckAiBridgeDatabase): DuckAiBridgeFileMetaDao = db.fileMetaDao()
+
+    @Provides
+    fun provideNativeInputTabStateDao(db: DuckAiBridgeDatabase): NativeInputTabStateDao = db.nativeInputTabStateDao()
 
     @Provides
     @DuckAiBridgeFilesDir
