@@ -44,14 +44,14 @@ class RealNativeInputStateProvider @Inject constructor(
     private val tabFlows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
     private val _displayedState = MutableStateFlow(NativeInputState.zero())
     override val displayedState: StateFlow<NativeInputState> = _displayedState.asStateFlow()
-    private var activeTabId: String? = null
+    @Volatile private var activeTabId: String? = null
 
     override fun stateForTab(tabId: String): StateFlow<NativeInputState> =
         tabFlows.getOrPut(tabId) { MutableStateFlow(NativeInputState.zero()) }.asStateFlow()
 
     override fun setActiveTab(tabId: String, structural: NativeInputState) {
-        activeTabId = tabId
         appScope.launch(dispatchers.io()) {
+            activeTabId = tabId
             val persisted = dao.getTab(tabId)
             val merged = structural.copy(selectedModelId = persisted?.selectedModelId)
             tabFlows.getOrPut(tabId) { MutableStateFlow(NativeInputState.zero()) }.value = merged

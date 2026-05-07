@@ -38,7 +38,6 @@ import org.mockito.kotlin.whenever
 class RealNativeInputStateProviderTest {
 
     @get:Rule
-    @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
     private val dao: NativeInputTabStateDao = mock()
