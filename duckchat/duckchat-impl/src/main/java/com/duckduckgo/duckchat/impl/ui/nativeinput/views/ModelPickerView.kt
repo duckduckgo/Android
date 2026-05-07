@@ -28,6 +28,7 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
@@ -51,6 +52,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
+    fun init(tabId: String)
     var onMenuShown: (() -> Unit)?
     var onMenuDismissed: (() -> Unit)?
     var onModelSelected: (() -> Unit)?
@@ -80,6 +82,10 @@ class ModelPickerView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_model_picker, this)
+    }
+
+    override fun init(tabId: String) {
+        doOnAttach { viewModel.init(tabId) }
     }
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()

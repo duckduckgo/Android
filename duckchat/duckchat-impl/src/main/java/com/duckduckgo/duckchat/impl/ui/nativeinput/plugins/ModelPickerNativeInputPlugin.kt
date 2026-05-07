@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPicker
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerView
 import java.lang.ref.WeakReference
@@ -44,12 +43,11 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override fun createView(context: Context, host: NativeInputHost): View {
         return ModelPickerView(context).also { picker ->
             modelPicker = WeakReference(picker)
+            picker.init(host.getTabId())
             picker.setPickerEnabled(true)
         }
     }
 
-    override fun getPromptContribution(): PromptContribution? {
-        val modelId = modelPicker.get()?.getSelectedModelId() ?: return null
-        return PromptContribution.ModelSelection(modelId)
-    }
+    @Deprecated("Contributions are now pushed directly to NativeInputStateProvider. Will be removed once all plugins migrate.")
+    override fun getPromptContribution() = null
 }
