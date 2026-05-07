@@ -27,6 +27,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -35,7 +36,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.duckduckgo.pir.impl.wideevents.PirInitialScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
@@ -75,7 +76,7 @@ class RealPirJobsRunner @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val pirRemoteFeatures: PirRemoteFeatures,
-    private val pirInitialScanWideEvent: PirInitialScanWideEvent,
+    private val pirScanWideEvent: PirScanWideEvent,
     private val networkProtectionState: NetworkProtectionState,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
@@ -141,25 +142,22 @@ class RealPirJobsRunner @Inject constructor(
             emptyList()
         }
 
-        if (executionType.isManual) {
-            pirInitialScanWideEvent.onRunStarted(
-                executionType = executionType,
-                profileQueriesCount = profileQueries.size,
-                brokerCount = activeBrokers.size,
-                totalScanJobs = eligibleJobs.size,
-                isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
-                isVpnConnected = networkProtectionState.safeIsVpnRunning(),
-                batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations(),
-                notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
-                isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled(),
-            )
-        }
+        pirScanWideEvent.onRunStarted(
+            executionType = executionType,
+            profileQueriesCount = profileQueries.size,
+            brokerCount = activeBrokers.size,
+            totalScanJobs = eligibleJobs.size,
+            webViewCount = minOf(eligibleJobs.size, MAX_DETACHED_WEBVIEW_COUNT),
+            isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
+            isVpnConnected = networkProtectionState.safeIsVpnRunning(),
+            batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations(),
+            notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+            isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled(),
+        )
 
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onRunFailed(reason = REASON_NO_ACTIVE_BROKERS)
-            }
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = REASON_NO_ACTIVE_BROKERS)
             emitCompletedPixel(
                 context = context,
                 executionType = executionType,
@@ -175,16 +173,14 @@ class RealPirJobsRunner @Inject constructor(
         try {
             storeScanStats(startTimeInMillis, executionType)
 
-            val onJobCompletedCallback: (suspend () -> Unit)? = if (executionType.isManual) {
-                { pirInitialScanWideEvent.onScanJobCompleted() }
-            } else {
-                null
+            val onJobCompletedCallback: suspend () -> Unit = {
+                pirScanWideEvent.onScanJobCompleted(executionType)
             }
             val totalScanJobs = executeScanJobs(context, executionType, eligibleJobs, onJobCompletedCallback)
 
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onScanCompleted()
+            pirScanWideEvent.onScanCompleted(executionType)
 
+            if (executionType.isManual) {
                 val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
                 pixelSender.reportInitialScanDuration(
                     durationMs = currentTimeProvider.currentTimeMillis() - startTimeInMillis,
@@ -202,9 +198,7 @@ class RealPirJobsRunner @Inject constructor(
 
             if (activeFormOptOutBrokers.isEmpty()) {
                 logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
-                if (executionType.isManual) {
-                    pirInitialScanWideEvent.onOptOutSkipped()
-                }
+                pirScanWideEvent.onOptOutSkipped(executionType)
                 emitCompletedPixel(
                     context = context,
                     executionType = executionType,
@@ -217,16 +211,12 @@ class RealPirJobsRunner @Inject constructor(
                 return@withContext Result.success(Unit)
             }
 
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onOptOutStarted()
-            }
+            pirScanWideEvent.onOptOutStarted(executionType)
 
             attemptCreateOptOutJobs(activeFormOptOutBrokers)
             val totalOptOutJobs = executeOptOutJobs(context, activeFormOptOutBrokers)
 
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onOptOutCompleted(totalOptOutJobs = totalOptOutJobs)
-            }
+            pirScanWideEvent.onOptOutCompleted(executionType = executionType, totalOptOutJobs = totalOptOutJobs)
 
             logcat { "PIR-JOB-RUNNER: Completed." }
             emitCompletedPixel(
@@ -240,14 +230,10 @@ class RealPirJobsRunner @Inject constructor(
             )
             return@withContext Result.success(Unit)
         } catch (e: CancellationException) {
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onRunCancelled()
-            }
+            pirScanWideEvent.onRunCancelled(executionType)
             throw e
         } catch (e: Exception) {
-            if (executionType.isManual) {
-                pirInitialScanWideEvent.onRunFailed(reason = e.javaClass.simpleName)
-            }
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = e.javaClass.simpleName)
             throw e
         }
     }

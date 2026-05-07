@@ -39,7 +39,7 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import com.duckduckgo.pir.impl.wideevents.PirInitialScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -79,7 +79,7 @@ class RealPirJobsRunnerTest {
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockEnsureBrokerDataToggle: Toggle = mock()
     private val mockTrackerBlockingToggle: Toggle = mock()
-    private val mockPirInitialScanWideEvent: PirInitialScanWideEvent = mock()
+    private val mockPirScanWideEvent: PirScanWideEvent = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
 
     @Before
@@ -106,7 +106,7 @@ class RealPirJobsRunnerTest {
             pixelSender = mockPixelSender,
             brokerJsonUpdater = mockBrokerJsonUpdater,
             pirRemoteFeatures = mockPirRemoteFeatures,
-            pirInitialScanWideEvent = mockPirInitialScanWideEvent,
+            pirScanWideEvent = mockPirScanWideEvent,
             networkProtectionState = mockNetworkProtectionState,
         )
     }
@@ -1285,23 +1285,24 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
-        verify(mockPirInitialScanWideEvent).onRunStarted(
+        verify(mockPirScanWideEvent).onRunStarted(
             executionType = MANUAL_INITIAL,
             profileQueriesCount = 1,
             brokerCount = 1,
             totalScanJobs = 1,
+            webViewCount = 1,
             isPowerSavingEnabled = false,
             isVpnConnected = false,
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirInitialScanWideEvent).onScanCompleted()
-        verify(mockPirInitialScanWideEvent).onOptOutStarted()
-        verify(mockPirInitialScanWideEvent).onOptOutCompleted(any())
-        verify(mockPirInitialScanWideEvent, never()).onOptOutSkipped()
-        verify(mockPirInitialScanWideEvent, never()).onRunFailed(any())
-        verify(mockPirInitialScanWideEvent, never()).onRunCancelled()
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutStarted(any())
+        verify(mockPirScanWideEvent).onOptOutCompleted(any(), any())
+        verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
     }
 
     @Test
@@ -1324,25 +1325,26 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE)
 
         // Then
-        verify(mockPirInitialScanWideEvent).onRunStarted(
+        verify(mockPirScanWideEvent).onRunStarted(
             executionType = MANUAL_EDIT_PROFILE,
             profileQueriesCount = 1,
             brokerCount = 1,
             totalScanJobs = 0,
+            webViewCount = 0,
             isPowerSavingEnabled = false,
             isVpnConnected = false,
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirInitialScanWideEvent).onScanCompleted()
-        verify(mockPirInitialScanWideEvent).onOptOutSkipped()
-        verify(mockPirInitialScanWideEvent, never()).onOptOutStarted()
-        verify(mockPirInitialScanWideEvent, never()).onOptOutCompleted(any())
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutSkipped(any())
+        verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
     }
 
     @Test
-    fun whenScheduledRunThenWideEventNotCalled() = runTest {
+    fun whenScheduledRunThenWideEventLifecycleCalled() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
@@ -1368,8 +1370,22 @@ class RealPirJobsRunnerTest {
         // When
         testee.runEligibleJobs(mockContext, SCHEDULED)
 
-        // Then
-        verifyNoInteractions(mockPirInitialScanWideEvent)
+        // Then - scheduled runs now also drive the wide-event lifecycle (sampling is handled
+        // inside the wide-event impl, not at the call site).
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = SCHEDULED,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 1,
+            webViewCount = 1,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onScanCompleted(SCHEDULED)
+        verify(mockPirScanWideEvent).onOptOutSkipped(SCHEDULED)
     }
 
     @Test
@@ -1386,21 +1402,22 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
 
         // Then
-        verify(mockPirInitialScanWideEvent).onRunStarted(
+        verify(mockPirScanWideEvent).onRunStarted(
             executionType = MANUAL_INITIAL,
             profileQueriesCount = 1,
             brokerCount = 0,
             totalScanJobs = 0,
+            webViewCount = 0,
             isPowerSavingEnabled = false,
             isVpnConnected = false,
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirInitialScanWideEvent).onRunFailed("no_active_brokers")
-        verify(mockPirInitialScanWideEvent, never()).onScanCompleted()
-        verify(mockPirInitialScanWideEvent, never()).onOptOutStarted()
-        verify(mockPirInitialScanWideEvent, never()).onOptOutSkipped()
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq("no_active_brokers"))
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
     }
 
     @Test
@@ -1433,20 +1450,21 @@ class RealPirJobsRunnerTest {
         }
 
         // Then
-        verify(mockPirInitialScanWideEvent).onRunStarted(
+        verify(mockPirScanWideEvent).onRunStarted(
             executionType = MANUAL_INITIAL,
             profileQueriesCount = 1,
             brokerCount = 1,
             totalScanJobs = 1,
+            webViewCount = 1,
             isPowerSavingEnabled = false,
             isVpnConnected = false,
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirInitialScanWideEvent).onRunCancelled()
-        verify(mockPirInitialScanWideEvent, never()).onScanCompleted()
-        verify(mockPirInitialScanWideEvent, never()).onRunFailed(any())
+        verify(mockPirScanWideEvent).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
     }
 
     @Test
@@ -1479,19 +1497,20 @@ class RealPirJobsRunnerTest {
         }
 
         // Then
-        verify(mockPirInitialScanWideEvent).onRunStarted(
+        verify(mockPirScanWideEvent).onRunStarted(
             executionType = MANUAL_INITIAL,
             profileQueriesCount = 1,
             brokerCount = 1,
             totalScanJobs = 1,
+            webViewCount = 1,
             isPowerSavingEnabled = false,
             isVpnConnected = false,
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirInitialScanWideEvent).onRunFailed("IllegalStateException")
-        verify(mockPirInitialScanWideEvent, never()).onScanCompleted()
-        verify(mockPirInitialScanWideEvent, never()).onRunCancelled()
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq("IllegalStateException"))
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
     }
 }
