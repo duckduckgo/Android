@@ -251,60 +251,12 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenClearAttachmentsCalledWithImagesThenAddsToConversationSent() = runTest {
-        addImages(3)
-
-        viewModel.clearAttachments()
-
-        assertEquals(3, limitsHandler.conversationImagesAdded)
-    }
-
-    @Test
-    fun whenClearAttachmentsCalledWithNoImagesThenDoesNotAddToConversationSent() = runTest {
-        viewModel.clearAttachments()
-
-        assertEquals(0, limitsHandler.conversationImagesAdded)
-    }
-
-    @Test
     fun whenClearAttachmentsForNewChatCalledThenImagesAreEmpty() = runTest {
         addImages(2)
 
         viewModel.clearAttachmentsForNewChat()
 
         assertTrue(viewModel.attachmentState.value.images.isEmpty())
-    }
-
-    @Test
-    fun whenClearAttachmentsForNewChatCalledThenPrepareForNewChatCalledWithCount() = runTest {
-        addImages(3)
-
-        viewModel.clearAttachmentsForNewChat()
-
-        assertEquals(3, limitsHandler.preparedPendingImages)
-    }
-
-    @Test
-    fun whenClearAttachmentsForNewChatCalledWithNoImagesThenPrepareForNewChatCalledWithZero() = runTest {
-        viewModel.clearAttachmentsForNewChat()
-
-        assertEquals(0, limitsHandler.preparedPendingImages)
-    }
-
-    @Test
-    fun whenClearAttachmentsForNewChatCalledThenDoesNotAddToConversationSent() = runTest {
-        addImages(2)
-
-        viewModel.clearAttachmentsForNewChat()
-
-        assertEquals(0, limitsHandler.conversationImagesAdded)
-    }
-
-    @Test
-    fun whenResetConversationCountsCalledThenDelegatesToLimitsHandler() = runTest {
-        viewModel.resetConversationCounts()
-
-        assertTrue(limitsHandler.conversationWasReset)
     }
 
     @Test
@@ -417,31 +369,21 @@ class AttachmentViewModelTest {
         private val _conversationImagesSent = MutableStateFlow(0)
         override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
-        var conversationImagesAdded = 0
-            private set
-        var preparedPendingImages = -1
-            private set
-        var conversationWasReset = false
-            private set
-
         override fun setImageUploadLimitReached(reached: Boolean) {
             _imageUploadLimitReached.value = reached
         }
 
-        override fun addConversationImagesSent(count: Int) {
-            conversationImagesAdded += count
-            _conversationImagesSent.value += count
+        override fun setConversationImagesUsed(count: Int) {
+            _conversationImagesSent.value = count
         }
 
         override fun resetConversationImagesSent() {
-            conversationWasReset = true
             _conversationImagesSent.value = 0
         }
 
-        override fun prepareForNewChat(pendingImages: Int) {
-            preparedPendingImages = pendingImages
+        /** Test helper: increments the conversation-sent counter directly. */
+        fun addConversationImagesSent(count: Int) {
+            _conversationImagesSent.value += count
         }
-
-        override fun onNewChatStarted() {}
     }
 }

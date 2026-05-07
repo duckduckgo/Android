@@ -1703,4 +1703,140 @@ class RealDuckChatJSHelperTest {
         verify(mockVoiceSessionStateManager).onVoiceSessionEnded()
         verifyNoInteractions(mockDuckChatPixels)
     }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataThenImageUploadLimitReachedIsReset() = runTest {
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "getAIChatNativeHandoffData",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        verify(mockLimitsHandler).setImageUploadLimitReached(false)
+    }
+
+    @Test
+    fun whenImageUploadLimitReachedThenLimitsHandlerSetToTrue() = runTest {
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "imageUploadLimitReached",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+        verify(mockLimitsHandler).setImageUploadLimitReached(true)
+    }
+
+    @Test
+    fun whenImageUploadLimitResetThenLimitsHandlerResetAndConversationImagesReset() = runTest {
+        val result = testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "imageUploadLimitReset",
+            id = "123",
+            data = null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+        verify(mockLimitsHandler).setImageUploadLimitReached(false)
+        verify(mockLimitsHandler).resetConversationImagesSent()
+    }
+
+    @Test
+    fun whenResponseStateWithAttachmentsThenConversationImagesUsedUpdated() = runTest {
+        val data = JSONObject().apply {
+            put("status", "streaming")
+            put(
+                "attachments",
+                JSONObject().apply {
+                    put("imagesUsed", 2)
+                    put("filesUsed", 0)
+                    put("fileSizeBytesUsed", 0)
+                },
+            )
+        }
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseState",
+            id = "123",
+            data = data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        verify(mockLimitsHandler).setConversationImagesUsed(2)
+    }
+
+    @Test
+    fun whenResponseStateWithoutAttachmentsThenConversationImagesUsedNotUpdated() = runTest {
+        val data = JSONObject(mapOf("status" to "streaming"))
+
+        testee.processJsCallbackMessage(
+            featureName = "aiChat",
+            method = "responseState",
+            id = "123",
+            data = data,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        verify(mockLimitsHandler, never()).setConversationImagesUsed(any())
+    }
+
+    @Test
+    fun whenResetConversationLimitsThenLimitsHandlerReset() {
+        testee.resetConversationLimits()
+
+        verify(mockLimitsHandler).resetConversationImagesSent()
+        verify(mockLimitsHandler).setImageUploadLimitReached(false)
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithImagesThenImagesIncludedInResponse() = runTest {
+        val images = listOf(
+            PendingNativeImage(base64Data = "base64data1", format = "jpeg"),
+            PendingNativeImage(base64Data = "base64data2", format = "png"),
+        )
+        val pending = PendingNativePrompt("test prompt", "model-id", images)
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertTrue(query.has("images"))
+        val imagesArray = query.getJSONArray("images")
+        assertEquals(2, imagesArray.length())
+        assertEquals("base64data1", imagesArray.getJSONObject(0).getString("data"))
+        assertEquals("jpeg", imagesArray.getJSONObject(0).getString("format"))
+        assertEquals("base64data2", imagesArray.getJSONObject(1).getString("data"))
+        assertEquals("png", imagesArray.getJSONObject(1).getString("format"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoImagesThenImagesKeyAbsent() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model-id", emptyList())
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("images"))
+    }
 }

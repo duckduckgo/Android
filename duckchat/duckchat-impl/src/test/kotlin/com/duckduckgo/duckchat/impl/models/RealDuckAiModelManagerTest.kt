@@ -542,6 +542,42 @@ class RealDuckAiModelManagerTest {
         assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN, limits.images.maxPerTurn)
     }
 
+    @Test
+    fun whenModelSupportsImageUploadThenResolvedModelHasImageUploadEnabledAndNativeFormats() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("id", supportsImageUpload = true)),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val model = testee.modelState.value.models[0]
+        assertTrue(model.supportsImageUpload)
+        assertEquals(AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS, model.supportedImageFormats)
+    }
+
+    @Test
+    fun whenModelDoesNotSupportImageUploadThenResolvedModelHasImageUploadDisabledAndEmptyFormats() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("id", supportsImageUpload = false)),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val model = testee.modelState.value.models[0]
+        assertFalse(model.supportsImageUpload)
+        assertTrue(model.supportedImageFormats.isEmpty())
+    }
+
     private fun remoteModel(
         id: String,
         displayName: String? = null,
@@ -549,6 +585,7 @@ class RealDuckAiModelManagerTest {
         accessTier: List<String> = listOf("free"),
         entityHasAccess: Boolean = true,
         provider: String? = null,
+        supportsImageUpload: Boolean = false,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -557,5 +594,6 @@ class RealDuckAiModelManagerTest {
         accessTier = accessTier,
         entityHasAccess = entityHasAccess,
         provider = provider,
+        supportsImageUpload = supportsImageUpload,
     )
 }
