@@ -19,21 +19,37 @@ package com.duckduckgo.duckchat.impl.ui
 import android.content.Context
 import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -44,10 +60,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.IOException
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -63,6 +80,12 @@ class NativeInputModeWidgetViewModelTest {
     private val subscriptions: Subscriptions = mock()
     private val pendingNativePromptStore: PendingNativePromptStore = mock()
     private val chatSuggestionsReader: ChatSuggestionsReader = mock()
+    private val autoCompleteFactory: AutoCompleteFactory = mock()
+    private val autoComplete: AutoComplete = mock()
+    private val autoCompleteSettings: AutoCompleteSettings = mock()
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
+    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
+    private val pixel: Pixel = mock()
 
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
@@ -86,6 +109,9 @@ class NativeInputModeWidgetViewModelTest {
         whenever(duckChatInternal.observeChatSuggestionsUserSettingEnabled()).thenReturn(chatSuggestionsUserEnabledFlow)
         whenever(duckChatInternal.chatState).thenReturn(chatStateFlow)
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementsFlow)
+        whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+        whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
         testee = createViewModel()
     }
@@ -99,6 +125,13 @@ class NativeInputModeWidgetViewModelTest {
             pendingNativePromptStore = pendingNativePromptStore,
             chatSuggestionsReader = chatSuggestionsReader,
             nativeInputPlugins = fakePluginPoint,
+            autoCompleteFactory = autoCompleteFactory,
+            autoCompleteSettings = autoCompleteSettings,
+            duckAiChatHistoryFeature = duckAiChatHistoryFeature,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            inputScreenConfigResolver = inputScreenConfigResolver,
+            pixel = pixel,
+            appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
 
@@ -325,27 +358,6 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenFetchChatSuggestionsThenReturnsReaderSuggestions() = runTest {
-        val suggestions = listOf(
-            ChatSuggestion(chatId = "id-1", title = "Title", lastEdit = LocalDateTime.now(), pinned = false),
-        )
-        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
-
-        val result = testee.fetchChatSuggestions("query")
-
-        assertEquals(suggestions, result)
-    }
-
-    @Test
-    fun whenFetchChatSuggestionsFailsThenReturnsEmptyList() = runTest {
-        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenAnswer { throw IOException("boom") }
-
-        val result = testee.fetchChatSuggestions("query")
-
-        assertTrue(result.isEmpty())
-    }
-
-    @Test
     fun whenBuildChatSuggestionUrlThenAppendsChatIdParam() {
         whenever(duckChatInternal.getDuckChatUrl("", false)).thenReturn("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
         val suggestion = ChatSuggestion(
@@ -420,15 +432,6 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenFetchChatSuggestionsThenDelegatesQueryToReader() = runTest {
-        whenever(chatSuggestionsReader.fetchSuggestions("hello world")).thenReturn(emptyList())
-
-        testee.fetchChatSuggestions("hello world")
-
-        verify(chatSuggestionsReader).fetchSuggestions("hello world")
-    }
-
-    @Test
     fun whenNoPluginsThenPluginsStateIsEmpty() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
@@ -490,4 +493,187 @@ class NativeInputModeWidgetViewModelTest {
                 modelId?.let { PromptContribution.ModelSelection(it) }
         }
     }
+
+    // region fetchChatTabSuggestions
+
+    @Test
+    fun whenFetchChatTabSuggestionsThenReturnsBothFetchResults() = runTest {
+        val chat = ChatSuggestion(chatId = "id", title = "t", lastEdit = LocalDateTime.now(), pinned = false)
+        val url = AutoCompleteBookmarkSuggestion(phrase = "ddg", title = "DDG", url = "https://duckduckgo.com")
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions("query")).thenReturn(listOf(chat))
+        whenever(autoComplete.autoComplete("query")).thenReturn(flowOf(AutoCompleteResult("query", listOf(url))))
+
+        val result = testee.fetchChatTabSuggestions(query = "query", chatSuggestionsEnabled = true)
+
+        assertEquals(listOf(chat), result.chatHistory)
+        assertEquals(listOf(url), result.urlSuggestions.suggestions)
+    }
+
+    @Test
+    fun whenChatSuggestionsDisabledThenChatHistoryEmpty() = runTest {
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(autoComplete.autoComplete(any())).thenReturn(flowOf(AutoCompleteResult("q", emptyList())))
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = false)
+
+        assertTrue(result.chatHistory.isEmpty())
+    }
+
+    @Test
+    fun whenAutoCompleteSettingDisabledThenUrlSuggestionsEmpty() = runTest {
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        assertTrue(result.urlSuggestions.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenQueryEmptyThenUrlSuggestionsEmpty() = runTest {
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+        val result = testee.fetchChatTabSuggestions(query = "", chatSuggestionsEnabled = true)
+
+        assertTrue(result.urlSuggestions.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenAutoCompleteFetchFailsThenUrlSuggestionsEmpty() = runTest {
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenThrow(RuntimeException("boom"))
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        assertTrue(result.urlSuggestions.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenChatHistoryFetchFailsThenChatHistoryEmpty() = runTest {
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenAnswer { throw RuntimeException("boom") }
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        assertTrue(result.chatHistory.isEmpty())
+    }
+
+    @Test
+    fun whenFetchChatTabSuggestionsThenFiltersOutDisallowedTypes() = runTest {
+        // Three allowed types kept under the default maxUrlSuggestions cap (3) so this test
+        // exercises the filter without conflating with the cap (covered separately below).
+        val bookmark = AutoCompleteBookmarkSuggestion(phrase = "b", title = "B", url = "https://b")
+        val switchToTab = AutoCompleteSwitchToTabSuggestion(phrase = "s", title = "S", url = "https://s", tabId = "1")
+        val historyUrl = AutoCompleteHistorySuggestion(phrase = "h", title = "H", url = "https://h", isAllowedInTopHits = true)
+        val phraseSearchSuggestion = AutoCompleteSearchSuggestion(phrase = "phrase", isUrl = false, isAllowedInTopHits = true)
+        val historySearchSuggestion = AutoCompleteHistorySearchSuggestion(phrase = "hs", isAllowedInTopHits = true)
+        val rawSuggestions = listOf(bookmark, switchToTab, historyUrl, phraseSearchSuggestion, historySearchSuggestion)
+
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenReturn(flowOf(AutoCompleteResult("q", rawSuggestions)))
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        // search-phrase and history-search are filtered out; bookmark, switch-to-tab, and history-url remain.
+        assertEquals(listOf(bookmark, switchToTab, historyUrl), result.urlSuggestions.suggestions)
+    }
+
+    @Test
+    fun whenFetchChatTabSuggestionsThenSearchSuggestionMarkedAsUrlIsAllowed() = runTest {
+        val searchAsUrl = AutoCompleteSearchSuggestion(phrase = "https://x", isUrl = true, isAllowedInTopHits = true)
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenReturn(flowOf(AutoCompleteResult("q", listOf(searchAsUrl))))
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        assertEquals(listOf(searchAsUrl), result.urlSuggestions.suggestions)
+    }
+
+    @Test
+    fun whenFetchChatTabSuggestionsThenAppliesMaxUrlSuggestionsCap() = runTest {
+        // Default cap from DuckAiChatHistoryFeature is 3.
+        val urls = (1..10).map {
+            AutoCompleteBookmarkSuggestion(phrase = "p$it", title = "t$it", url = "https://x$it")
+        }
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenReturn(flowOf(AutoCompleteResult("q", urls)))
+
+        val result = testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        assertEquals(3, result.urlSuggestions.suggestions.size)
+        assertEquals(urls.take(3), result.urlSuggestions.suggestions)
+    }
+
+    // endregion
+
+    // region fireChatUrlSuggestionPixel
+
+    @Test
+    fun whenFireChatUrlSuggestionPixelThenFiresWithLastChatUrlListAndExperimentalFlag() = runTest {
+        val url = AutoCompleteBookmarkSuggestion(phrase = "u", title = "U", url = "https://u")
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenReturn(flowOf(AutoCompleteResult("q", listOf(url))))
+        // Drive a fetch first so lastChatUrlSuggestions is populated.
+        testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        testee.fireChatUrlSuggestionPixel(url)
+
+        verify(autoComplete).fireAutocompletePixel(eq(listOf(url)), eq(url), eq(true))
+    }
+
+    @Test
+    fun whenFireChatUrlSuggestionPixelWithoutPriorFetchThenFiresWithEmptyList() = runTest {
+        val url = AutoCompleteBookmarkSuggestion(phrase = "u", title = "U", url = "https://u")
+
+        testee.fireChatUrlSuggestionPixel(url)
+
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+    }
+
+    @Test
+    fun whenCancelChatSuggestionsThenLastChatUrlListIsReset() = runTest {
+        val url = AutoCompleteBookmarkSuggestion(phrase = "u", title = "U", url = "https://u")
+        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+        whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+        whenever(autoComplete.autoComplete("q")).thenReturn(flowOf(AutoCompleteResult("q", listOf(url))))
+        testee.fetchChatTabSuggestions(query = "q", chatSuggestionsEnabled = true)
+
+        testee.cancelChatSuggestions()
+        testee.fireChatUrlSuggestionPixel(url)
+
+        verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+    }
+
+    // endregion
+
+    // region fireChatHistorySelectedPixel
+
+    @Test
+    fun whenFireChatHistorySelectedPixelPinnedThenFiresPinnedPixels() {
+        testee.fireChatHistorySelectedPixel(pinned = true)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenFireChatHistorySelectedPixelNotPinnedThenFiresRegularPixels() {
+        testee.fireChatHistorySelectedPixel(pinned = false)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+    }
+
+    // endregion
 }

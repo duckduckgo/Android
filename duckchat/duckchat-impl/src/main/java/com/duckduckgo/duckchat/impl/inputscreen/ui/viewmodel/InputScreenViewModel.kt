@@ -48,6 +48,7 @@ import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -86,6 +87,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.ui.internal.debounceExceptFirst
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -293,7 +295,7 @@ class InputScreenViewModel @AssistedInject constructor(
                                         it is AutoCompleteSwitchToTabSuggestion ||
                                         it is AutoCompleteHistorySuggestion ||
                                         (it is AutoCompleteSearchSuggestion && it.isUrl)
-                                }.take(getMaxUrlSuggestionsCount()),
+                                }.take(duckAiChatHistoryFeature.maxUrlSuggestions()),
                             )
                         }
                     } else {
@@ -1035,29 +1037,12 @@ class InputScreenViewModel @AssistedInject constructor(
         fun create(currentOmnibarText: String): InputScreenViewModel
     }
 
-    private fun getMaxUrlSuggestionsCount(): Int {
-        return runCatching {
-            duckAiChatHistoryFeature.self().getSettings()?.let {
-                JSONObject(it).optInt(MAX_URL_SUGGESTIONS_KEY, DEFAULT_MAX_URL_SUGGESTIONS)
-            }
-        }.getOrNull() ?: DEFAULT_MAX_URL_SUGGESTIONS
-    }
-
     companion object {
         const val DUCK_SCHEME = "duck"
         private const val CHAT_SUGGESTIONS_DEBOUNCE_MS = 150L
         private const val MAX_TAG_TITLE_LENGTH = 20
-        private const val MAX_URL_SUGGESTIONS_KEY = "maxUrlSuggestions"
-        private const val DEFAULT_MAX_URL_SUGGESTIONS = 3
 
         // TODO Read this from the privacy configs once the frontend defines it
         private const val MAX_POPUP_TABS = 5
     }
 }
-
-@OptIn(FlowPreview::class)
-private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> =
-    merge(
-        take(1),
-        drop(1).debounce(timeoutMillis),
-    )

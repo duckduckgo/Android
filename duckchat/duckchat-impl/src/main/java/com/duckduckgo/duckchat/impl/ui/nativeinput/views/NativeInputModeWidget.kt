@@ -40,7 +40,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -49,7 +51,6 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -119,7 +120,9 @@ interface NativeInputWidget {
     fun bindChatSuggestions(
         lifecycleOwner: LifecycleOwner,
         onChatSuggestionSelected: (String) -> Unit,
-        onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
+        onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
+        onSearchForQuerySubmitted: (String) -> Unit,
+        onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     )
 
@@ -146,6 +149,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
+
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
@@ -162,8 +168,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputMode = NativeInputState.InputMode.SEARCH_ONLY,
         inputContext = NativeInputState.InputContext.BROWSER,
     )
-    private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
-    private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
+    private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
+    private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     private var voiceSearchAvailable: Boolean = false
     private var voiceChatAvailable: Boolean = false
@@ -595,22 +601,32 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun bindChatSuggestions(
         lifecycleOwner: LifecycleOwner,
         onChatSuggestionSelected: (String) -> Unit,
-        onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
+        onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
+        onSearchForQuerySubmitted: (String) -> Unit,
+        onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     ) {
         this.onShowSuggestions = onShowSuggestions
         this.onClearSuggestions = onClearSuggestions
 
-        val adapter = ChatSuggestionsAdapter { suggestion ->
-            onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
-        }.also { chatSuggestionsAdapter = it }
+        // Lazy: bindChatSuggestions runs before attach, so @Inject fields and the ViewModel
+        // aren't ready yet. showSuggestions() only fires post-attach.
+        fun ensureBinding(): NativeInputChatSuggestionsBinder.Binding {
+            return chatSuggestionsBinding ?: chatSuggestionsBinder.create(
+                onChatSuggestionSelected = { suggestion ->
+                    viewModel.fireChatHistorySelectedPixel(suggestion.pinned)
+                    onChatSuggestionSelected(viewModel.buildChatSuggestionUrl(suggestion))
+                },
+                onChatUrlSuggestionClicked = { suggestion ->
+                    viewModel.fireChatUrlSuggestionPixel(suggestion)
+                    onChatUrlSuggestionClicked(suggestion)
+                },
+                onSearchForQuerySubmitted = onSearchForQuerySubmitted,
+            ).also { chatSuggestionsBinding = it }
+        }
 
         fun showSuggestions(query: String) {
-            if (!chatSuggestionsUserEnabled) {
-                hideChatSuggestions(hideList = true)
-                return
-            }
-            fetchChatSuggestions(lifecycleOwner, query, adapter)
+            fetchChatTabSuggestions(lifecycleOwner, query, ensureBinding())
         }
 
         val previousOnSearchSelected = this.onSearchSelected
@@ -632,7 +648,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun tearDownChatSuggestions() {
         hideChatSuggestions(hideList = true)
-        chatSuggestionsAdapter = null
+        chatSuggestionsBinding = null
         onShowSuggestions = null
         onClearSuggestions = null
     }
@@ -665,27 +681,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
-    private fun fetchChatSuggestions(
+    private fun fetchChatTabSuggestions(
         lifecycleOwner: LifecycleOwner,
         query: String,
-        adapter: ChatSuggestionsAdapter,
+        binding: NativeInputChatSuggestionsBinder.Binding,
     ) {
         chatSuggestionsJob?.cancel()
         chatSuggestionsJob = lifecycleOwner.lifecycleScope.launch {
-            val suggestions = viewModel.fetchChatSuggestions(query)
-            if (suggestions.isNotEmpty()) {
-                onShowSuggestions?.invoke(adapter)
-            }
-            adapter.submitList(suggestions)
-            if (suggestions.isEmpty()) {
-                onClearSuggestions?.invoke(true)
+            val result = viewModel.fetchChatTabSuggestions(query, chatSuggestionsUserEnabled)
+            // Defer the adapter swap until the chat history arrives, so the RecyclerView
+            // lays out from position 0 with chat history on top and avoids repositioning.
+            binding.submit(result, query) { hasContent ->
+                if (hasContent) {
+                    onShowSuggestions?.invoke(binding.adapter)
+                } else {
+                    onClearSuggestions?.invoke(true)
+                }
             }
         }
     }
 
     private fun hideChatSuggestions(hideList: Boolean) {
         chatSuggestionsJob?.cancel()
-        chatSuggestionsAdapter?.submitList(emptyList())
+        chatSuggestionsBinding?.clear()
         viewModel.cancelChatSuggestions()
         onClearSuggestions?.invoke(hideList)
     }
