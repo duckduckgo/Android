@@ -775,7 +775,7 @@ sealed class OnboardingDaxDialogCta(
             } else {
                 applyContent(container, isContentTransition = false)
                 container.show()
-                container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
+                container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(DIALOG_FADE_IN_START_DELAY)
                     .withEndAction {
                         if (!animationsSettled) {
                             typeAndFadeIn()
@@ -1049,6 +1049,7 @@ sealed class OnboardingDaxDialogCta(
 
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
+            private const val DIALOG_FADE_IN_START_DELAY = 200L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
             private const val BACKGROUND_SLIDE_DURATION = 300L
             private const val TYPING_DELAY_MS = 20L
