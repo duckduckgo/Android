@@ -29,7 +29,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.Space
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
@@ -295,7 +294,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyNativeStyling() {
-        if (!isWidgetBottom()){
+        if (!isWidgetBottom()) {
             setBackgroundColor(Color.TRANSPARENT)
         }
         hideInputFieldBackground()
@@ -314,12 +313,33 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun configureBottomRowFocusVisibility() {
-        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        bottomRow.isVisible = inputField.hasFocus()
+        updateBottomRowVisibility()
+        updateToggleVisibilityForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            bottomRow.isVisible = hasFocus
+            updateBottomRowVisibility()
+            updateToggleVisibilityForFocus()
+            if (!hasFocus && isDuckAiPageContext()) {
+                hideKeyboard()
+            }
         }
     }
+
+    private fun updateBottomRowVisibility() {
+        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
+        val rowSpacer = findViewById<View?>(R.id.rowSpacer)
+        val visible = inputField.hasFocus() && isDuckAiPageContext()
+        bottomRow.isVisible = visible
+        rowSpacer?.isVisible = visible
+    }
+
+    private fun updateToggleVisibilityForFocus() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        toggle.visibility = if (nativeInputState.toggleVisible && inputField.hasFocus()) VISIBLE else GONE
+    }
+
+    private fun isDuckAiPageContext(): Boolean =
+        nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
+            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
@@ -353,19 +373,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             minimize()
         }
-        applyInputFieldMinHeight(state.toggleVisible)
+        applyInputFieldMinHeight()
+        updateBottomRowVisibility()
         if (previousContext != state.inputContext && isChatTabSelected()) {
             with(inputField) { applyChatInputType() }
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
     }
 
-    private fun applyInputFieldMinHeight(toggleVisible: Boolean) {
-        inputField.minHeight = if (toggleVisible) {
-            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
-        } else {
-            52.toPx(context)
-        }
+    private fun applyInputFieldMinHeight() {
+        inputField.minHeight = 44.toPx(context)
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
@@ -379,7 +396,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             updateSelectedTab(toggle, state)
         }
-        toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+        toggle.visibility = if (state.toggleVisible && inputField.hasFocus()) VISIBLE else GONE
     }
 
     private fun updateBackButtons(state: NativeInputState) {
@@ -393,11 +410,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun minimize() {
-        if (floatingSubmitContainer == null) return
-        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
-        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
         findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
-        getActionBarSize()?.let { minimumHeight = it }
+        if (floatingSubmitContainer != null) {
+            getActionBarSize()?.let { minimumHeight = it }
+        }
     }
 
     private fun removeMargins() {
@@ -414,7 +430,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyTrailingButtonMargin() {
         findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
+            marginEnd = 0
         }
     }
 
@@ -538,6 +554,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun hideMainButtons() {
         setMainButtonsVisible(false)
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = 0
+        }
     }
 
     override fun setToggleVisible(visible: Boolean) {

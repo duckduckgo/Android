@@ -385,6 +385,8 @@
                                     android:layout_gravity="center"
                                     android:background="@drawable/selectable_item_rounded_corner_background"
                                     android:contentDescription="@string/browserPopupMenu"
+                                    android:paddingStart="@dimen/keyline_2"
+                                    android:paddingEnd="@dimen/keyline_empty"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_ai_chat_down_24"
                                     android:visibility="gone"

@@ -21,8 +21,6 @@ import android.graphics.Color
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.ViewOutlineProvider
-import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.common.ui.store.AppTheme

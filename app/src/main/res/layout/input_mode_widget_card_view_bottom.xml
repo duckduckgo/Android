@@ -27,16 +27,21 @@
         android:id="@+id/inputModeWidgetCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_1"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/keyline_1"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:layout_marginTop="@dimen/keyline_2"
         app:cardBackgroundColor="?attr/daxColorInputPrimary"
+        app:cardCornerRadius="26dp"
         app:cardElevation="3dp"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="false">
 
         <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
             android:id="@+id/inputModeWidget"
-            android:paddingHorizontal="8dp"
+            android:paddingStart="@dimen/keyline_2"
+            android:paddingTop="@dimen/keyline_1"
+            android:paddingEnd="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.card.MaterialCardView>
