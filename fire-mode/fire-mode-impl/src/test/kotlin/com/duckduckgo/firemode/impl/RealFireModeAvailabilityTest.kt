@@ -29,6 +29,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verifyBlocking
 
 @SuppressLint("DenyListedApi")
 class RealFireModeAvailabilityTest {
@@ -62,5 +64,15 @@ class RealFireModeAvailabilityTest {
         webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
 
         assertTrue(testee.isAvailable())
+    }
+
+    @Test
+    fun `multi-profile capability check is cached across calls`() = runTest {
+        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
+        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
+
+        repeat(5) { testee.isAvailable() }
+
+        verifyBlocking(webViewCapabilityChecker, times(1)) { isSupported(MultiProfile) }
     }
 }
