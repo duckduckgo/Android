@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.nativeinput.Action
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -488,7 +489,7 @@ class NativeInputModeWidgetViewModelTest {
     private fun fakePlugin(containerId: Int, modelId: String?): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
-            override fun createView(context: Context): View = View(context)
+            override fun createView(context: Context, onAction: (Action) -> Unit): View = View(context)
             override fun getPromptContribution(): PromptContribution? =
                 modelId?.let { PromptContribution.ModelSelection(it) }
         }

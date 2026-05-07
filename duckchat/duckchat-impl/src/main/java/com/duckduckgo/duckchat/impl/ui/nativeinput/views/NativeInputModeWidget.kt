@@ -53,6 +53,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
+import com.duckduckgo.duckchat.impl.nativeinput.Action
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
@@ -214,7 +215,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 viewModel.plugins.collect { plugins ->
                     for (plugin in plugins) {
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
-                        val pluginView = plugin.createView(context)
+                        val pluginView = plugin.createView(context, onPluginAction)
                         container.removeAllViews()
                         container.addView(pluginView)
                         // The start-chat container drives its own visibility from input mode.
@@ -744,6 +745,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun setFloatingSubmitContainer(container: ViewGroup) {
         floatingSubmitContainer = container
+    }
+
+    private val onPluginAction = fun(action: Action) {
+        when (action) {
+            Action.StartChat -> if (!submitAsChat()) viewModel.openNewChat()
+        }
     }
 
     private fun configureSubmitButtons() {
