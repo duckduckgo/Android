@@ -43,6 +43,9 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun subscriptionPromoModalCta(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionPromoModalCtaExistingUsers(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
     fun freeTrialCopy(): Toggle

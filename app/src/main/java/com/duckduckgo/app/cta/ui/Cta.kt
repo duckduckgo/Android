@@ -1230,6 +1230,7 @@ class BrokenSitePromptDialogCta : Cta {
 
 class SubscriptionPromoModalCta(
     val isFreeTrialCopy: Boolean,
+    val origin: String,
 ) : Cta {
     override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
     override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
