@@ -28,22 +28,19 @@ class TdsClient(
     override val name: Client.ClientName,
     private val trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
-    private val optimizeTrackerEvaluation: Boolean,
+    private val optimizeTrackerEvaluationV3: Boolean,
 ) : Client {
+
+    private val trackerByDomain: Map<String, TdsTracker> by lazy {
+        trackers.associateBy { it.domain.value }
+    }
 
     override fun matches(
         url: String,
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = if (optimizeTrackerEvaluation) {
-            val domain = host(url)?.let { Domain(it) }
-            trackers.firstOrNull {
-                domain?.let { domain -> sameOrSubdomain(domain, it.domain) } ?: false
-            } ?: return Client.Result(matches = false, isATracker = false)
-        } else {
-            trackers.firstOrNull { sameOrSubdomain(url, it.domain.value) } ?: return Client.Result(matches = false, isATracker = false)
-        }
+        val tracker = findTracker(host(url)) ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -59,12 +56,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = if (optimizeTrackerEvaluation) {
-            val domain = url.host?.let { Domain(it) }
-            trackers.firstOrNull { sameOrSubdomain(domain, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
-        } else {
-            trackers.firstOrNull { sameOrSubdomain(url, it.domain.value) } ?: return Client.Result(matches = false, isATracker = false)
-        }
+        val tracker = findTracker(url.host) ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -73,6 +65,26 @@ class TdsClient(
             surrogate = matches.surrogate,
             isATracker = matches.isATracker,
         )
+    }
+
+    private fun findTracker(host: String?): TdsTracker? {
+        if (host.isNullOrEmpty()) return null
+        return if (optimizeTrackerEvaluationV3) {
+            findTrackerByLabelWalk(host)
+        } else {
+            val domain = Domain(host)
+            trackers.firstOrNull { sameOrSubdomain(domain, it.domain) }
+        }
+    }
+
+    private fun findTrackerByLabelWalk(host: String): TdsTracker? {
+        var candidate: String = host
+        while (true) {
+            trackerByDomain[candidate]?.let { return it }
+            val dot = candidate.indexOf('.')
+            if (dot < 0) return null
+            candidate = candidate.substring(dot + 1)
+        }
     }
 
     private fun matchesTrackerEntry(
