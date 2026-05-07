@@ -68,6 +68,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.firemode.api.BrowserMode
+import com.duckduckgo.firemode.api.BrowserModeStateHolder
+import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -76,6 +79,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -111,7 +115,24 @@ class BrowserViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val fireModeAvailability: FireModeAvailability,
 ) : ViewModel(), CoroutineScope {
+
+    val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
+
+    suspend fun switchToMode(mode: BrowserMode): Boolean {
+        if (mode == BrowserMode.FIRE && !fireModeAvailability.isAvailable()) return false
+        browserModeStateHolder.switchTo(mode)
+        return true
+    }
+
+    /**
+     * Returns true when an incoming external intent must trigger a switch to REGULAR before being
+     * processed.
+     */
+    fun shouldSwitchToRegularModeBeforeProcessingIntent(isExternal: Boolean): Boolean =
+        isExternal && currentMode.value == BrowserMode.FIRE
 
     init {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {

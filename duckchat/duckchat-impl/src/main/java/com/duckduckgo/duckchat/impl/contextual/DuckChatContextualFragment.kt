@@ -86,6 +86,7 @@ import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.firemode.api.BrowserMode
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -120,6 +121,8 @@ class DuckChatContextualFragment :
     }
 
     private val sharedContextualViewModel: DuckChatContextualSharedViewModel by viewModels({ requireParentFragment() })
+
+    val browserMode: BrowserMode? get() = arguments?.getString(KEY_DUCK_AI_BROWSER_MODE)?.let(BrowserMode::valueOf)
 
     private val duckChatSharedViewModel: DuckChatSharedViewModel by lazy {
         ViewModelProvider(requireActivity())[DuckChatSharedViewModel::class.java]
@@ -999,5 +1002,6 @@ class DuckChatContextualFragment :
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_CONTEXTUAL_RESULT: String = "KEY_DUCK_AI_CONTEXTUAL_RESULT"
         const val KEY_DUCK_AI_CONTEXTUAL_TAB_ID: String = "KEY_DUCK_AI_CONTEXTUAL_TAB_ID"
+        const val KEY_DUCK_AI_BROWSER_MODE: String = "KEY_DUCK_AI_BROWSER_MODE"
     }
 }

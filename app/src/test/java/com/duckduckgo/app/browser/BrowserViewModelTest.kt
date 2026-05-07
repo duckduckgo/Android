@@ -45,6 +45,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.firemode.api.BrowserMode
+import com.duckduckgo.firemode.api.BrowserModeStateHolder
+import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import junit.framework.TestCase
 import kotlinx.coroutines.channels.Channel
@@ -66,7 +69,9 @@ import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -100,6 +105,12 @@ class BrowserViewModelTest {
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
+
+    private val browserModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+    private val mockBrowserModeStateHolder: BrowserModeStateHolder = mock {
+        on { currentMode } doReturn browserModeFlow
+    }
+    private val mockFireModeAvailability: FireModeAvailability = mock()
 
     private val selectedTabFlow = MutableSharedFlow<TabEntity?>(replay = 1)
 
@@ -685,6 +696,66 @@ class BrowserViewModelTest {
         }
     }
 
+    // --- Fire mode: switchToMode ---
+
+    @Test
+    fun whenSwitchToRegularThenHolderUpdatedAndReturnsTrue() = runTest {
+        val result = testee.switchToMode(BrowserMode.REGULAR)
+
+        assertTrue(result)
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun whenSwitchToRegularThenAvailabilityNotConsulted() = runTest {
+        testee.switchToMode(BrowserMode.REGULAR)
+
+        verifyNoInteractions(mockFireModeAvailability)
+    }
+
+    @Test
+    fun whenSwitchToFireAndAvailableThenHolderUpdatedAndReturnsTrue() = runTest {
+        mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(true) }
+
+        val result = testee.switchToMode(BrowserMode.FIRE)
+
+        assertTrue(result)
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun whenSwitchToFireAndUnavailableThenHolderNotUpdatedAndReturnsFalse() = runTest {
+        mockFireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(false) }
+
+        val result = testee.switchToMode(BrowserMode.FIRE)
+
+        assertFalse(result)
+        verify(mockBrowserModeStateHolder, never()).switchTo(any())
+    }
+
+    // --- Fire mode: external-intent gate ---
+
+    @Test
+    fun whenIntentIsNotExternalThenShouldNotSwitchToRegularEvenInFire() {
+        browserModeFlow.value = BrowserMode.FIRE
+
+        assertFalse(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = false))
+    }
+
+    @Test
+    fun whenIntentIsExternalAndModeIsRegularThenShouldNotSwitch() {
+        browserModeFlow.value = BrowserMode.REGULAR
+
+        assertFalse(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = true))
+    }
+
+    @Test
+    fun whenIntentIsExternalAndModeIsFireThenShouldSwitchToRegular() {
+        browserModeFlow.value = BrowserMode.FIRE
+
+        assertTrue(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = true))
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -701,6 +772,8 @@ class BrowserViewModelTest {
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            browserModeStateHolder = mockBrowserModeStateHolder,
+            fireModeAvailability = mockFireModeAvailability,
         )
     }
 
@@ -724,6 +797,8 @@ class BrowserViewModelTest {
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            browserModeStateHolder = mockBrowserModeStateHolder,
+            fireModeAvailability = mockFireModeAvailability,
         )
     }
 

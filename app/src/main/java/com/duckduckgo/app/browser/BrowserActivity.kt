@@ -663,7 +663,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // External intents always open in REGULAR mode. The recreate observer picks up the mode
         // change and the new REGULAR-bound activity re-processes this intent via getIntent().
         val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
-        if (viewModel.shouldSwitchToRegularBeforeProcessingIntent(isExternal)) {
+        if (viewModel.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal)) {
             logcat(INFO) { "External intent received in FIRE — switching to REGULAR before processing" }
             setIntent(intent)
             lifecycleScope.launch { viewModel.switchToMode(BrowserMode.REGULAR) }

@@ -87,6 +87,7 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
+import com.duckduckgo.firemode.api.BrowserMode
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -120,6 +121,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     private val browseSharedViewModel: DuckChatSharedViewModel by activityViewModels()
+
+    val browserMode: BrowserMode? get() = arguments?.getString(KEY_DUCK_AI_BROWSER_MODE)?.let(BrowserMode::valueOf)
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -745,5 +748,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_TABS: String = "KEY_DUCK_AI_TABS"
+        const val KEY_DUCK_AI_BROWSER_MODE: String = "KEY_DUCK_AI_BROWSER_MODE"
     }
 }

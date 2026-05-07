@@ -49,6 +49,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':cookies-api')
     implementation project(':duckchat-store')
+    implementation project(':fire-mode-api')
 
     implementation project(':app-build-config-api')
     implementation project(path: ':anvil-annotations')
