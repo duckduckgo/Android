@@ -278,7 +278,7 @@ class ModelPickerViewModelTest {
     fun whenSelectModelThenPushesSelectedModelIdToProvider() = runTest {
         whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
         testee.init("tab-1")
-        val model = testee.state.value.models.firstOrNull() ?: return@runTest
+        val model = freeModel("gpt-4o", "GPT-4o")
 
         testee.selectModel(model)
 
@@ -289,7 +289,7 @@ class ModelPickerViewModelTest {
     fun whenSelectModelThenAlsoDelegatesToModelManager() = runTest {
         whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
         testee.init("tab-1")
-        val model = testee.state.value.models.firstOrNull() ?: return@runTest
+        val model = freeModel("gpt-4o", "GPT-4o")
 
         testee.selectModel(model)
 
