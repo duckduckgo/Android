@@ -1331,6 +1331,7 @@ class BrowserTabFragment :
             layoutInflater = layoutInflater,
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
+            tabId = tabId,
             query = query,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
