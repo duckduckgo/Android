@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput.image
+package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
 import com.squareup.anvil.annotations.ContributesBinding
 import com.duckduckgo.di.scopes.AppScope

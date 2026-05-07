@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput.image
+package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver
@@ -27,11 +27,14 @@ import android.webkit.ValueCallback
 import androidx.core.graphics.scale
 import com.squareup.anvil.annotations.ContributesBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import javax.inject.Inject
 import java.io.ByteArrayOutputStream
 import java.util.UUID
@@ -195,11 +198,11 @@ class RealAttachmentHandler(
         val takePhotoString = context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
         val takePhotoIcon = com.duckduckgo.mobile.android.R.drawable.ic_camera_24
 
-        com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog.Builder(context)
+        ActionBottomSheetDialog.Builder(context)
             .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
             .setPrimaryItem(chooseFileString, chooseFileIcon)
             .setSecondaryItem(takePhotoString, takePhotoIcon)
-            .addEventListener(object : com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog.EventListener() {
+            .addEventListener(object : ActionBottomSheetDialog.EventListener() {
                 private var pickerLaunched = false
 
                 override fun onPrimaryItemClicked() {

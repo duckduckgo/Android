@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.nativeinput
+package com.duckduckgo.duckchat.impl.ui.nativeinput.plugins
 
 import android.content.Context
 import android.view.View
@@ -23,9 +23,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
-import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandlerFactory
-import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AttachmentHandlerFactory
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AttachmentView
 import kotlinx.coroutines.MainScope
+import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,
@@ -33,7 +34,7 @@ import kotlinx.coroutines.MainScope
     featureName = "pluginAttachButtonNativeInput",
     parentFeatureName = "pluginPointNativeInput",
 )
-class AttachmentButtonNativeInputPlugin @Inject constructor(
+class AttachmentNativeInputPlugin @Inject constructor(
     private val attachmentHandlerFactory: AttachmentHandlerFactory,
 ) : NativeInputPlugin {
 
@@ -41,7 +42,7 @@ class AttachmentButtonNativeInputPlugin @Inject constructor(
 
     override fun createView(context: Context): View {
         val handler = attachmentHandlerFactory.create(context, MainScope())
-        return AttachmentButtonView(context, handler)
+        return AttachmentView(context, handler)
     }
 
     override fun getPromptContribution(): PromptContribution? = null

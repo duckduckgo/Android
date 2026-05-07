@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput.image
+package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
 import android.graphics.Bitmap
 

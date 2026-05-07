@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.nativeinput
+package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
@@ -28,14 +29,13 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandler
-import com.duckduckgo.duckchat.impl.nativeinput.image.ImageAttachmentsContainerView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ImageAttachmentsContainerView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @SuppressLint("ViewConstructor")
-class AttachmentButtonView(
+class AttachmentView(
     context: Context,
     private val attachmentHandler: AttachmentHandler,
 ) : FrameLayout(context) {
@@ -155,15 +155,15 @@ class AttachmentButtonView(
                 setPadding((12 * dp).toInt(), (4 * dp).toInt(), (12 * dp).toInt(), (4 * dp).toInt())
                 setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
                 textSize = 13f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setTypeface(typeface, Typeface.BOLD)
                 layout.addView(this)
             }
         errorView.text = message
-        errorView.visibility = View.VISIBLE
+        errorView.visibility = VISIBLE
     }
 
     private fun hideAttachmentLimitError() {
-        attachmentsLayout?.findViewWithTag<TextView>("attachmentError")?.visibility = View.GONE
+        attachmentsLayout?.findViewWithTag<TextView>("attachmentError")?.visibility = GONE
     }
 
     override fun onDetachedFromWindow() {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput.image
+package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 
 class ImageAttachmentsContainerView @JvmOverloads constructor(
     context: Context,
