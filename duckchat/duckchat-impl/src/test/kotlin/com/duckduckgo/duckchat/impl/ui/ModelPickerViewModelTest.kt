@@ -25,7 +25,6 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest

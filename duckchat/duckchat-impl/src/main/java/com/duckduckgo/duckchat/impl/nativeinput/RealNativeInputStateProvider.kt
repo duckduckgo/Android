@@ -24,13 +24,13 @@ import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateDao
 import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = NativeInputStateProvider::class)
@@ -44,6 +44,7 @@ class RealNativeInputStateProvider @Inject constructor(
     private val tabFlows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
     private val _displayedState = MutableStateFlow(NativeInputState.zero())
     override val displayedState: StateFlow<NativeInputState> = _displayedState.asStateFlow()
+
     @Volatile private var activeTabId: String? = null
 
     override fun stateForTab(tabId: String): StateFlow<NativeInputState> =

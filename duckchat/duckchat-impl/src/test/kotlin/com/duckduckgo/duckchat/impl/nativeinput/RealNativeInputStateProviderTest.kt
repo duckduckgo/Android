@@ -196,6 +196,6 @@ class RealNativeInputStateProviderTest {
         testee.setActiveTab("tab-1", structural)
         testee.update("tab-1") { copy(selectedModelId = "llama-3") }
 
-        assertEquals("llama-3", testee.stateForTab("tab-1").first().selectedModelId)
+        assertEquals("llama-3", testee.stateForTab("tab-1").firstOrNull()?.selectedModelId)
     }
 }
