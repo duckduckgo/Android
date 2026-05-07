@@ -54,17 +54,19 @@ class NtpAfterIdleManagerImpl @Inject constructor(
     override val isAfterIdleReturn: StateFlow<Boolean> = _isAfterIdleReturn.asStateFlow()
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        // pendingAfterIdle is intentionally NOT reset here. FirstScreenHandlerImpl.onOpen
-        // synchronously calls onIdleReturnTriggered() when appropriate, and BrowserLifecycleObserver
-        // callbacks run in a non-deterministic multibinding order — clearing here could wipe a
-        // just-set value. The flag is consumed by onNtpShown() (getAndSet(false)), and any residual
-        // stale state is cleared in onClose() when the app backgrounds.
-        _isAfterIdleReturn.value = false
+        // No-op. Neither pendingAfterIdle nor _isAfterIdleReturn is reset here:
+        // - pendingAfterIdle: FirstScreenHandlerImpl.onOpen may synchronously call
+        //   onIdleReturnTriggered(), and BrowserLifecycleObserver callbacks fire in a
+        //   non-deterministic multibinding order. Clearing would risk wiping a just-set value.
+        //   The flag is consumed by onNtpShown() via getAndSet(false).
+        // - _isAfterIdleReturn: must survive background+resume on the same auto-NTP.
+        //   BrowserViewModel.flowSelectedTab won't re-emit when the NTP tab hasn't changed, so
+        //   onNtpShown() doesn't fire to restore it; resetting here would leave the hatch hidden.
     }
 
     override fun onClose() {
         pendingAfterIdle.set(false)
-        _isAfterIdleReturn.value = false
+        // _isAfterIdleReturn is intentionally preserved across background; see onOpen() comment.
     }
 
     override fun onIdleReturnTriggered() {

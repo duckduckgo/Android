@@ -118,7 +118,7 @@ class NtpAfterIdleManagerImplTest {
         verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
     }
 
-    // --- onClose resets transient state across sessions ---
+    // --- onClose / onOpen lifecycle behaviour ---
 
     @Test
     fun whenOnCloseThenPendingAfterIdleIsCleared() {
@@ -132,14 +132,16 @@ class NtpAfterIdleManagerImplTest {
     }
 
     @Test
-    fun whenOnCloseThenCurrentAfterIdleIsCleared() {
+    fun whenOnCloseThenCurrentAfterIdleIsPreserved() {
+        // When the auto-NTP is still selected on resume, BrowserViewModel.flowSelectedTab won't
+        // re-emit and onNtpShown() won't fire — so the state must survive the background.
         testee.onIdleReturnTriggered()
         testee.onNtpShown() // currentAfterIdle = true
 
         testee.onClose()
         testee.onReturnToPageTapped()
 
-        verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
     }
 
     @Test
@@ -157,14 +159,29 @@ class NtpAfterIdleManagerImplTest {
     }
 
     @Test
-    fun whenOnOpenThenCurrentAfterIdleIsCleared() {
+    fun whenOnOpenThenCurrentAfterIdleIsPreserved() {
         testee.onIdleReturnTriggered()
         testee.onNtpShown() // currentAfterIdle = true
 
         testee.onOpen(isFreshLaunch = false)
         testee.onReturnToPageTapped()
 
-        verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
+    }
+
+    @Test
+    fun whenBackgroundedAndResumedOnSameAutoNtpThenAfterIdleStateSurvives() {
+        // Regression: hatch was disappearing on the second background+resume because the manager
+        // cleared currentAfterIdle on every onClose/onOpen and BrowserViewModel's flowSelectedTab
+        // doesn't re-emit when the same NTP tab stays selected.
+        testee.onIdleReturnTriggered()
+        testee.onNtpShown() // auto-NTP shown, currentAfterIdle = true
+
+        testee.onClose()
+        testee.onOpen(isFreshLaunch = false)
+        testee.onReturnToPageTapped()
+
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
     }
 
     // --- onNtpSearchSubmitted classification ---
