@@ -178,9 +178,10 @@ data class DaxAction(
 fun DaxMessageButtonRowScope.RightAlignButtons(
     primary: DaxAction,
     secondary: DaxAction,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
     ) {
         DaxPrimaryButton(
@@ -204,9 +205,10 @@ fun DaxMessageButtonRowScope.RightAlignButtons(
 fun DaxMessageButtonRowScope.CenterAlignedButtons(
     primary: DaxAction,
     secondary: DaxAction,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
     ) {
         DaxGhostButton(
@@ -229,8 +231,9 @@ fun DaxMessageButtonRowScope.CenterAlignedButtons(
 @Composable
 fun DaxMessageButtonRowScope.FullWidthSingleButton(
     primary: DaxAction,
+    modifier: Modifier = Modifier,
 ) {
-    Box {
+    Box(modifier = modifier) {
         DaxPrimaryButton(
             text = primary.text,
             onClick = primary.onClick,
@@ -245,11 +248,13 @@ fun DaxMessageButtonRowScope.FullWidthSingleButton(
 @Composable
 fun DaxMessageButtonRowScope.SmallSingleButton(
     primary: DaxAction,
+    modifier: Modifier = Modifier,
 ) {
     DaxPrimaryButton(
         text = primary.text,
         size = DaxButtonSize.Small,
         onClick = primary.onClick,
+        modifier = modifier,
     )
 }
 

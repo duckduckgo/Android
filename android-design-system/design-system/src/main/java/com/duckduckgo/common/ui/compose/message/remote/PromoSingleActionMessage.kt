@@ -102,9 +102,7 @@ fun PromoSingleActionMessage(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = ripple(bounded = true),
                     )
-                    .padding(
-                        horizontal = dimensionResource(R.dimen.keyline_2),
-                    ),
+                    .padding(dimensionResource(R.dimen.keyline_2)),
             )
             DaxText(
                 text = title,
