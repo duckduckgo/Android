@@ -206,7 +206,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
 
     private val voiceActiveOnSelectedTab: StateFlow<Boolean> = combine(
-        duckChat.activeVoiceSessions,
+        duckChat.activeVoiceChatSessions,
         tabRepository.flowSelectedTab,
     ) { activeSessions, selectedTab ->
         selectedTab?.tabId?.let { it in activeSessions } == true

@@ -109,8 +109,8 @@ class FakeDuckChat(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
-    override fun isVoiceSessionActive(tabId: String): Boolean = false
-    override val activeVoiceSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
+    override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+    override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
 
     fun setEnabled(enabled: Boolean) {

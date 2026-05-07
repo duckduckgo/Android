@@ -127,7 +127,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private suspend fun isVoiceSessionActiveOnCurrentTab(): Boolean = withContext(dispatcherProvider.io()) {
         val selectedTab = tabRepository.getSelectedTab()
         return@withContext selectedTab?.tabId?.let {
-            duckChat.isVoiceSessionActive(it)
+            duckChat.isVoiceChatSessionActive(it)
         } == true
     }
 

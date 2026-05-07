@@ -78,7 +78,7 @@ class FirstScreenHandlerImplTest {
         whenever(androidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(idleReturnToggle)
         whenever(showOnAppLaunchFeature.self()).thenReturn(showOnAppLaunchToggle)
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
-        whenever(duckChat.isVoiceSessionActive(any())).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
         whenever(customTabDetector.isCustomTab()).thenReturn(false)
         whenever(tabRepository.liveSelectedTab).thenReturn(liveSelectedTab)
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
@@ -341,7 +341,7 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
-        whenever(duckChat.isVoiceSessionActive(any())).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
         whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
@@ -358,8 +358,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
-        whenever(duckChat.isVoiceSessionActive("tab1")).thenReturn(false)
-        whenever(duckChat.isVoiceSessionActive("tab2")).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive("tab1")).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive("tab2")).thenReturn(true)
         val selectedTab = TabEntity(tabId = "tab1", url = "https://example.com")
         whenever(tabRepository.getSelectedTab()).thenReturn(selectedTab)
 
@@ -375,7 +375,7 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
-        whenever(duckChat.isVoiceSessionActive(any())).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -389,7 +389,7 @@ class FirstScreenHandlerImplTest {
     fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndVoiceSessionActiveOnDuckAiTabThenDoesNothing() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-        whenever(duckChat.isVoiceSessionActive(any())).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
         whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
@@ -404,8 +404,8 @@ class FirstScreenHandlerImplTest {
     fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndNoVoiceSessionOnSelectedTabThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-        whenever(duckChat.isVoiceSessionActive("tab1")).thenReturn(false)
-        whenever(duckChat.isVoiceSessionActive("tab2")).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive("tab1")).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive("tab2")).thenReturn(true)
         val selectedTab = TabEntity(tabId = "tab1", url = "https://example.com")
         whenever(tabRepository.getSelectedTab()).thenReturn(selectedTab)
 
@@ -419,7 +419,7 @@ class FirstScreenHandlerImplTest {
     fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndNoVoiceSessionActiveThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-        whenever(duckChat.isVoiceSessionActive(any())).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()

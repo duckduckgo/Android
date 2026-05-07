@@ -128,14 +128,13 @@ class RealVoiceSessionStateManager @Inject constructor(
         listenJob += appCoroutineScope.launch {
             tabRepository.flowTabs.drop(1).collect { tabs ->
                 val existingTabIds = tabs.mapTo(mutableSetOf()) { it.tabId }
-                val becameEmpty = synchronized(this@RealVoiceSessionStateManager) {
+                synchronized(this@RealVoiceSessionStateManager) {
                     _activeVoiceSessions.update { current ->
                         current.filterTo(mutableSetOf()) { it in existingTabIds }
                     }
-                    _activeVoiceSessions.value.isEmpty()
-                }
-                if (becameEmpty) {
-                    endAllSessions()
+                    if (_activeVoiceSessions.value.isEmpty()) {
+                        endAllSessions()
+                    }
                 }
             }
         }

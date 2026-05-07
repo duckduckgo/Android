@@ -1436,8 +1436,8 @@ class DuckChatContextualViewModelTest {
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
-        override fun isVoiceSessionActive(tabId: String): Boolean = false
-        override val activeVoiceSessions: Flow<Set<String>> = flowOf(emptySet())
+        override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+        override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
     }
 

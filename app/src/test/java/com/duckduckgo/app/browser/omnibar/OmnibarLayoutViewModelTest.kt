@@ -139,7 +139,7 @@ class OmnibarLayoutViewModelTest {
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
-        whenever(duckChat.activeVoiceSessions).thenReturn(activeVoiceSessionsFlow)
+        whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
