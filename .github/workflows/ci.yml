@@ -69,7 +69,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -141,7 +141,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle
         if: needs.check_changes.outputs.should_run == 'true'
@@ -189,7 +189,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Set up Go
         if: needs.check_changes.outputs.should_run == 'true'
@@ -247,7 +247,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Set up Go
         if: needs.check_changes.outputs.should_run == 'true'

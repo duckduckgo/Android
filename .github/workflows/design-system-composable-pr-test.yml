@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Create folder
         run: mkdir apk
