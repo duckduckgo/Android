@@ -367,9 +367,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyState(state: NativeInputState) {
         val previousContext = nativeInputState.inputContext
         nativeInputState = state
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        setToggleMatchParent()
-        updateToggleVisibility(toggle, state)
+        findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
+            setToggleMatchParent()
+            updateToggleVisibility(toggle, state)
+        }
         updateBackButtons(state)
         if (!state.toggleVisible) {
             minimize()
@@ -494,9 +495,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val baseFlags = InputType.TYPE_CLASS_TEXT or
             InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
             InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-        val isDuckAiPage = nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
-            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
-        setRawInputType(if (isDuckAiPage) baseFlags or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseFlags)
+        setRawInputType(if (isDuckAiPageContext()) baseFlags or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseFlags)
         setHorizontallyScrolling(false)
     }
 

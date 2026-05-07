@@ -21,27 +21,18 @@ import android.graphics.Color
 import android.graphics.drawable.InsetDrawable
 import android.util.AttributeSet
 import android.view.ViewOutlineProvider
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.ui.R
-import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.di.scopes.ViewScope
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 
-@InjectWith(scope = ViewScope::class)
 class InputModeTabLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.tabStyle,
 ) : TabLayout(context, attrs, defStyleAttr) {
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     init {
         setSelectedTabIndicator(
@@ -55,10 +46,6 @@ class InputModeTabLayout @JvmOverloads constructor(
         )
         outlineProvider = ViewOutlineProvider.BACKGROUND
         clipToOutline = true
-    }
-    override fun onAttachedToWindow() {
-        AndroidSupportInjection.inject(this)
-        super.onAttachedToWindow()
     }
 
     private fun buildShadowedTabIndicator(
