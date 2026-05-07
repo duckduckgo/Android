@@ -16,10 +16,16 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.net.Uri
+
 data class NativeInputState(
     val inputMode: InputMode,
     val inputContext: InputContext,
     val inputPosition: InputPosition = InputPosition.TOP,
+    /** Model explicitly chosen by the user for this tab. Null = use global default. */
+    val selectedModelId: String? = null,
+    /** Images attached to the current message. Not persisted across restarts. */
+    val attachedImages: List<Uri> = emptyList(),
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
@@ -41,4 +47,11 @@ data class NativeInputState(
             InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> ToggleSelection.DUCK_AI
             InputContext.BROWSER -> ToggleSelection.SEARCH
         }
+
+    companion object {
+        fun zero() = NativeInputState(
+            inputMode = InputMode.SEARCH_ONLY,
+            inputContext = InputContext.BROWSER,
+        )
+    }
 }
