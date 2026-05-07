@@ -30,7 +30,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
-import com.duckduckgo.common.ui.view.toDp
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.Action
@@ -127,7 +127,7 @@ class AttachmentView(
 
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
         return TextView(context).apply {
-            setPadding(12.toDp(), 4.toDp(), 12.toDp(), 4.toDp())
+            setPadding(12.toPx(), 4.toPx(), 12.toPx(), 4.toPx())
             setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
             textSize = 13f
             setTypeface(typeface, Typeface.BOLD)
