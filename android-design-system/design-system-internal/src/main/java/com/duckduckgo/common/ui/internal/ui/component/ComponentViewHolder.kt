@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.infopannel.DaxInfoPanel
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -110,7 +111,23 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class InfoPanelComponentViewHolder(
         parent: ViewGroup,
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel)) {
+
+        init {
+            view.setupThemedComposeView(R.id.info_panel_tooltip_compose, isDarkTheme = isDarkTheme) {
+                DaxInfoPanel(
+                    body = "This is a Tooltip Compose Info Panel, interesting information can be shown here",
+                )
+            }
+
+            view.setupThemedComposeView(R.id.info_panel_alert_compose, isDarkTheme = isDarkTheme) {
+                DaxInfoPanel(
+                    body = "This is an Alert Compose Info Panel, warning information can be shown here",
+                )
+            }
+        }
+    }
 
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
@@ -455,7 +472,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
-                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent, isDarkTheme)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)

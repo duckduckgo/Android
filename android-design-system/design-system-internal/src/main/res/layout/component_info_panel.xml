@@ -40,9 +40,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         app:panelBackground="@drawable/info_panel_tooltip_background"
-        app:panelDrawable="@drawable/ic_info_panel_link"
+        app:panelDrawable="@drawable/ic_info_panel_info"
         app:panelText="This is a Tooltip Info Panel, interesting information can be shown here"
         app:layout_constraintTop_toBottomOf="@+id/label"
+        tools:layout_editor_absoluteX="@dimen/keyline_4"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/info_panel_tooltip_compose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        app:layout_constraintTop_toBottomOf="@+id/info_panel_tooltip"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>
 
     <com.duckduckgo.common.ui.view.InfoPanel
@@ -50,10 +58,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
-        app:layout_constraintTop_toBottomOf="@+id/info_panel_tooltip"
+        app:layout_constraintTop_toBottomOf="@+id/info_panel_tooltip_compose"
         app:panelBackground="@drawable/info_panel_alert_background"
         app:panelDrawable="@drawable/ic_exclamation_yellow_16"
         app:panelText="This is an Alert Info Panel, warning information can be shown here"
+        tools:layout_editor_absoluteX="@dimen/keyline_4"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/info_panel_alert_compose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        app:layout_constraintTop_toBottomOf="@+id/info_panel_alert"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
