@@ -193,7 +193,7 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v2" to "true",
+                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "true",
                 "active_requests_on_load_start" to "5",
                 "concurrent_requests_on_finish" to "2",
@@ -233,7 +233,7 @@ class PageLoadWideEventTest {
             metadata = mapOf(
                 "webview_version" to "120",
                 "cpm_enabled" to "true",
-                "tracker_optimization_enabled_v2" to "true",
+                "tracker_optimization_enabled_v3" to "true",
                 "is_tab_in_foreground_on_finish" to "false",
                 "active_requests_on_load_start" to "3",
                 "concurrent_requests_on_finish" to "0",
