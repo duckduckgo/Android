@@ -65,8 +65,14 @@ interface NativeInputPlugin : ActivePlugin {
     /** Build the plugin view. Called once at widget setup. The [host] lets the plugin trigger a submit or read widget state. */
     fun createView(context: Context, host: NativeInputHost): View
 
-    /** State to append to the prompt when the user submits, or null if the plugin has nothing to contribute. */
-    fun getPromptContribution(): PromptContribution?
+    /**
+     * State to append to the prompt when the user submits, or null if the plugin has nothing to contribute.
+     *
+     * @deprecated Push contributions to [MutableNativeInputStateProvider] directly instead.
+     * Default implementation returns null. Will be removed once all plugins migrate.
+     */
+    @Deprecated("Push contributions to MutableNativeInputStateProvider instead")
+    fun getPromptContribution(): PromptContribution? = null
 }
 
 @ContributesActivePluginPoint(
