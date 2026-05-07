@@ -1352,9 +1352,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.inputScreenContent.root.isVisible = false
                     binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = true
 
-                    if (android.os.Build.VERSION.SDK_INT >= 28) {
-                        binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
-                    }
+                    binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
 
                     binding.daxDialogCta.inputScreenPreviewContent.inputModeToggle.alpha = 0f
                     binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.alpha = 0f
@@ -1966,9 +1964,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.inputScreenPreviewContent.root.isVisible = true
 
-                if (android.os.Build.VERSION.SDK_INT >= 28) {
-                    binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
-                }
+                binding.daxDialogCta.inputScreenPreviewContent.inputModeDemoCard.addBottomShadow()
 
                 binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
                 val title = if (isCustomAiOnboardingFlow) {

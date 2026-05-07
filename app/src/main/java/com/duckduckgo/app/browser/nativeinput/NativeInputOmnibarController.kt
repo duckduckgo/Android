@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.graphics.Color
-import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -137,10 +136,8 @@ class RealNativeInputOmnibarController(
     private fun View.removeCustomShadow() {
         outlineProvider = ViewOutlineProvider.BACKGROUND
         elevation = 0f
-        if (Build.VERSION.SDK_INT >= 28) {
-            outlineAmbientShadowColor = Color.BLACK
-            outlineSpotShadowColor = Color.BLACK
-        }
+        outlineAmbientShadowColor = Color.BLACK
+        outlineSpotShadowColor = Color.BLACK
     }
 
     private fun hideOmnibarContent(omnibarView: View) {
