@@ -289,4 +289,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             NativeInputState.InputMode.SEARCH_ONLY
         }
+
+    fun onSubmit() {
+        // in Duck,ai mode we treat this as submitting prompts
+        // in Non Duck.ai mode we treat this as starting a chat with or without a prompt
+
+        openNewChat()
+
+    }
 }

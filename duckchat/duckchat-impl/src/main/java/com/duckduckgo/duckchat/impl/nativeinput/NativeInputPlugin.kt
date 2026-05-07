@@ -51,6 +51,7 @@ interface NativeInputPlugin : ActivePlugin {
     fun createView(context: Context, host: NativeInputHost): View
 
     fun getPromptContribution(): PromptContribution?
+
 }
 
 @ContributesActivePluginPoint(

@@ -244,6 +244,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
+
+
+                        // The start-chat container drives its own visibility from input mode.
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected()
                         }
@@ -876,12 +879,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingSubmitContainer = container
     }
 
-    override fun submit() {
-        // in Duck.ai mode we treat this as submitting prompts.
-        // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
-        if (!submitAsChat()) viewModel.openNewChat()
-    }
-
     override fun showAttachmentChooser(showing: Boolean) {
         onAttachmentChooserStateChanged?.invoke(showing)
     }
@@ -928,6 +925,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         container.addView(buttons)
         submitButtons = buttons
         updateVoiceButtonVisibility()
+    }
+
+    override fun submit() {
+        // in Duck.ai mode we treat this as submitting prompts.
+        // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
+        if (!submitAsChat()) viewModel.openNewChat()
     }
 
     companion object {
