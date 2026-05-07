@@ -159,7 +159,7 @@ class NtpAfterIdleManagerImplTest {
     }
 
     @Test
-    fun whenOnOpenThenCurrentAfterIdleIsPreserved() {
+    fun whenOnOpenNotFreshLaunchThenCurrentAfterIdleIsPreserved() {
         testee.onIdleReturnTriggered()
         testee.onNtpShown() // currentAfterIdle = true
 
@@ -167,6 +167,20 @@ class NtpAfterIdleManagerImplTest {
         testee.onReturnToPageTapped()
 
         verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
+    }
+
+    @Test
+    fun whenOnOpenFreshLaunchThenCurrentAfterIdleIsCleared() {
+        // The singleton can carry stale _isAfterIdleReturn=true from a previous session in the
+        // same process. A fresh launch must reset it so the next onNtpShown() classification
+        // doesn't inherit the previous session's state.
+        testee.onIdleReturnTriggered()
+        testee.onNtpShown() // currentAfterIdle = true (stale from prior session)
+
+        testee.onOpen(isFreshLaunch = true)
+        testee.onReturnToPageTapped()
+
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
     }
 
     @Test
