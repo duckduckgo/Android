@@ -28,6 +28,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,8 +47,16 @@ interface VoiceSessionStateManager {
     val activeSessionTabId: String?
         get() = null
 
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceSessionEnd(): Flow<String>
+
     fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded()
+    fun triggerVoiceSessionEnd(tabId: String)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -63,11 +75,24 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Volatile
     private var _activeSessionTabId: String? = null
 
+    private val _voiceSessionEndTrigger = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 8,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
     override val activeSessionTabId: String?
         get() = _activeSessionTabId?.takeUnless { it == STANDALONE_SESSION_ID }
 
     override val isVoiceSessionActive: Boolean
         get() = _activeSessionTabId != null
+
+    override fun observeTriggerVoiceSessionEnd(): Flow<String> = _voiceSessionEndTrigger.asSharedFlow()
+
+    override fun triggerVoiceSessionEnd(tabId: String) {
+        if (tabId.isBlank()) return
+        _voiceSessionEndTrigger.tryEmit(tabId)
+    }
 
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {

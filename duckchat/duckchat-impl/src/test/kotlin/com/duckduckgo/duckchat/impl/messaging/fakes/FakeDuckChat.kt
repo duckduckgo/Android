@@ -110,6 +110,7 @@ class FakeDuckChat(
 
     override fun openVoiceDuckChat() { }
     override fun isVoiceSessionActive(): Boolean = false
+    override fun observeTriggerVoiceSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

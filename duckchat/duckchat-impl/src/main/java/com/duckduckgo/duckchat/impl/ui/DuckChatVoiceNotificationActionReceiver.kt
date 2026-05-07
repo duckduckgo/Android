@@ -25,6 +25,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class DuckChatVoiceNotificationActionReceiver @Inject constructor(
     private val context: Context,
     private val browserNav: BrowserNav,
+    private val voiceSessionStateManager: VoiceSessionStateManager,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -58,7 +60,10 @@ class DuckChatVoiceNotificationActionReceiver @Inject constructor(
 
         when (intent.getStringExtra(EXTRA_ACTION)) {
             ACTION_OPEN_CHAT -> openExistingTab(context, tabId)
-            ACTION_END_SESSION -> Unit // intentional no-op for now
+            ACTION_END_SESSION -> {
+                openExistingTab(context, tabId)
+                voiceSessionStateManager.triggerVoiceSessionEnd(tabId)
+            }
         }
     }
 
