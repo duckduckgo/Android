@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.message
+package com.duckduckgo.common.ui.compose.message.remote
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.button.DaxButtonSize
-import com.duckduckgo.common.ui.compose.button.DaxGhostButton
-import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.message.CenterAlignedButtons
+import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -39,7 +34,7 @@ import com.duckduckgo.mobile.android.R
  *
  * @param title The message title.
  * @param body The message body text.
- * @param topIllustration The illustration shown above the title. Use [androidx.compose.ui.res.painterResource]
+ * @param topIllustration The illustration shown above the title. Use [painterResource]
  *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
  * @param primaryActionText The label of the primary action button.
  * @param onPrimaryActionClick Called when the user taps the primary action.
@@ -67,25 +62,16 @@ fun BigTwoActionsMessage(
         modifier = modifier,
         onDismissClicked = onDismissed,
         bottomContent = {
-            Row(
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
-                    .align(Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                DaxGhostButton(
-                    text = secondaryActionText,
-                    onClick = onSecondaryActionClick,
-                    size = DaxButtonSize.Small,
-                )
-                DaxPrimaryButton(
+            CenterAlignedButtons(
+                primary = DaxAction(
                     text = primaryActionText,
                     onClick = onPrimaryActionClick,
-                    size = DaxButtonSize.Small,
-                    modifier = Modifier
-                        .padding(start = dimensionResource(R.dimen.keyline_2)),
-                )
-            }
+                ),
+                secondary = DaxAction(
+                    text = secondaryActionText,
+                    onClick = onSecondaryActionClick,
+                ),
+            )
         },
     )
 }

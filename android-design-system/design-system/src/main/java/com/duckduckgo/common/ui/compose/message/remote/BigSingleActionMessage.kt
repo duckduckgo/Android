@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.message
+package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.button.DaxButtonSize
-import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.message.DaxAction
+import com.duckduckgo.common.ui.compose.message.SmallSingleButton
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -52,7 +49,7 @@ import com.duckduckgo.mobile.android.R
 fun BigSingleActionMessage(
     title: String,
     body: String,
-    topIllustration: @Composable ColumnScope.() -> Unit,
+    topIllustration: @Composable () -> Unit,
     actionText: String,
     onActionClick: () -> Unit,
     onDismissed: () -> Unit,
@@ -65,13 +62,11 @@ fun BigSingleActionMessage(
         modifier = modifier,
         topIllustration = topIllustration,
         bottomContent = {
-            DaxPrimaryButton(
-                text = actionText,
-                onClick = onActionClick,
-                size = DaxButtonSize.Small,
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
-                    .align(Alignment.CenterHorizontally),
+            SmallSingleButton(
+                primary = DaxAction(
+                    text = actionText,
+                    onClick = onActionClick,
+                ),
             )
         },
     )
@@ -85,7 +80,7 @@ fun BigSingleActionMessage(
  *
  * @param title The message title.
  * @param body The message body text.
- * @param topIllustration The illustration shown above the title. Use [androidx.compose.ui.res.painterResource]
+ * @param topIllustration The illustration shown above the title. Use [painterResource]
  *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
  * @param actionText The label of the primary action button.
  * @param onActionClick Called when the user taps the primary action.
@@ -109,13 +104,11 @@ fun BigSingleActionMessage(
         topIllustration = topIllustration,
         onDismissClicked = onDismissed,
         bottomContent = {
-            DaxPrimaryButton(
-                text = actionText,
-                onClick = onActionClick,
-                size = DaxButtonSize.Small,
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.keyline_1), bottom = dimensionResource(R.dimen.keyline_2))
-                    .align(Alignment.CenterHorizontally),
+            SmallSingleButton(
+                primary = DaxAction(
+                    text = actionText,
+                    onClick = onActionClick,
+                ),
             )
         },
     )

@@ -14,45 +14,53 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.message
+package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 
 /**
- * DuckDuckGo small remote message card.
+ * DuckDuckGo medium remote message card.
  *
- * Compact variant with title, body, and a dismiss button. No illustration, no actions.
+ * Variant with a top illustration, title, body, and a dismiss button. No actions.
  *
  * @param title The message title.
  * @param body The message body text.
+ * @param topIllustration The illustration shown above the title. Use [painterResource]
+ *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  */
 @Composable
-fun SmallMessage(
+fun MediumMessage(
     title: String,
     body: String,
+    topIllustration: Painter,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessage(
+    RemoteMessageWithIllustration(
         title = title,
         body = body,
         modifier = modifier,
         onDismissClicked = onDismissed,
+        topIllustration = topIllustration,
     )
 }
 
 @PreviewLightDark
 @Composable
-private fun SmallMessagePreview() {
+private fun MediumMessagePreview() {
     PreviewBox {
-        SmallMessage(
-            title = "Small Message",
+        MediumMessage(
+            title = "Medium message",
             body = "Body text goes here. This component doesn't have buttons",
+            topIllustration = painterResource(R.drawable.ic_critical_update),
             onDismissed = {},
         )
     }

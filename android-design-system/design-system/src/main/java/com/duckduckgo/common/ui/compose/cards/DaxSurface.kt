@@ -21,6 +21,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -47,14 +48,16 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 fun DaxSurface(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
+    shape: Shape = DaxSurfaceDefaults.shape,
+    shadowElevation: Dp = DaxSurfaceDefaults.elevation,
     content: @Composable () -> Unit,
 ) {
     Surface(
         modifier = modifier,
-        shape = DaxSurfaceDefaults.shape,
+        shape = shape,
         color = DaxSurfaceDefaults.color,
         contentColor = DaxSurfaceDefaults.contentColor,
-        shadowElevation = DaxSurfaceDefaults.elevation,
+        shadowElevation = shadowElevation,
         border = border,
         content = content,
     )
@@ -80,6 +83,8 @@ fun DaxSurface(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     border: BorderStroke? = null,
+    shape: Shape = DaxSurfaceDefaults.shape,
+    shadowElevation: Dp = DaxSurfaceDefaults.elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
 ) {
@@ -87,10 +92,10 @@ fun DaxSurface(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        shape = DaxSurfaceDefaults.shape,
+        shape = shape,
         color = DaxSurfaceDefaults.color,
         contentColor = DaxSurfaceDefaults.contentColor,
-        shadowElevation = DaxSurfaceDefaults.elevation,
+        shadowElevation = shadowElevation,
         border = border,
         interactionSource = interactionSource,
         content = content,

@@ -44,11 +44,11 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
-import com.duckduckgo.common.ui.compose.message.BigSingleActionMessage
-import com.duckduckgo.common.ui.compose.message.BigTwoActionsMessage
-import com.duckduckgo.common.ui.compose.message.MediumMessage
-import com.duckduckgo.common.ui.compose.message.PromoSingleActionMessage
-import com.duckduckgo.common.ui.compose.message.SmallMessage
+import com.duckduckgo.common.ui.compose.message.remote.BigSingleActionMessage
+import com.duckduckgo.common.ui.compose.message.remote.BigTwoActionsMessage
+import com.duckduckgo.common.ui.compose.message.remote.MediumMessage
+import com.duckduckgo.common.ui.compose.message.remote.PromoSingleActionMessage
+import com.duckduckgo.common.ui.compose.message.remote.SmallMessage
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -249,7 +249,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                         LottieAnimation(
                             composition = composition,
                             progress = { progress },
-                            modifier = Modifier.heightIn(max = 96.dp),
+                            modifier = Modifier
+                                .heightIn(max = 96.dp)
+                                .padding(top = 8.dp),
                         )
                     },
                     title = "Bring your passwords from Google to DuckDuckGo",

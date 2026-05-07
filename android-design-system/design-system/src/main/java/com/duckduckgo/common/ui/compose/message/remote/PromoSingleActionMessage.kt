@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose.message
+package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
+import com.duckduckgo.common.ui.compose.cards.DaxCardElevation
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -57,8 +57,8 @@ import com.duckduckgo.mobile.android.R
  * @param title The message title.
  * @param body The message body text.
  * @param illustration The illustration shown between title and body. Drawn at its
- *   intrinsic size with [androidx.compose.ui.layout.ContentScale.Fit]. Use
- *   [androidx.compose.ui.res.painterResource] for a local drawable, or
+ *   intrinsic size with [ContentScale.Fit]. Use
+ *   [painterResource] for a local drawable, or
  *   `coil3.compose.rememberAsyncImagePainter` for a remote URL.
  * @param actionText The label of the primary action button.
  * @param onActionClick Called when the user taps the primary action.
@@ -81,7 +81,7 @@ fun PromoSingleActionMessage(
             end = dimensionResource(R.dimen.keyline_4),
             bottom = dimensionResource(R.dimen.keyline_4),
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = DaxCardElevation(4.dp),
         shape = DuckDuckGoTheme.shapes.large,
     ) {
         Column(
