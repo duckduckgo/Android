@@ -18,18 +18,35 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandler
+import com.duckduckgo.duckchat.impl.nativeinput.image.ImageAttachmentsContainerView
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @SuppressLint("ViewConstructor")
 class AttachmentButtonView(
     context: Context,
-    val attachmentHandler: AttachmentHandler,
+    private val attachmentHandler: AttachmentHandler,
 ) : FrameLayout(context) {
 
+    private var attachmentsLayout: LinearLayout? = null
+    private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
+    private var imageUploadLimitJob: Job? = null
+    private var wired = false
+
     init {
+        setTag(R.id.attachButtonContainer, attachmentHandler)
         val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
         val icon = ImageView(context).apply {
             layoutParams = LayoutParams(iconSize, iconSize)
@@ -45,5 +62,113 @@ class AttachmentButtonView(
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
         alpha = if (enabled) 1.0f else 0.4f
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (!wired) {
+            val attachmentsContainer = (parent as? View)?.rootView
+                ?.findViewById<FrameLayout>(R.id.attachmentsContainer)
+            if (attachmentsContainer != null) {
+                wireToAttachmentsContainer(attachmentsContainer)
+                wired = true
+            }
+        }
+    }
+
+    private fun wireToAttachmentsContainer(attachmentsContainer: FrameLayout) {
+        setupAttachmentViews(attachmentsContainer)
+        wireHandlerCallbacks(attachmentsContainer)
+        observeImageUploadLimit()
+    }
+
+    private fun setupAttachmentViews(attachmentsContainer: FrameLayout) {
+        if (attachmentsLayout != null) return
+
+        val layout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT,
+            )
+        }
+        attachmentsContainer.addView(layout)
+        attachmentsLayout = layout
+
+        val scroll = HorizontalScrollView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            )
+            isHorizontalScrollBarEnabled = false
+        }
+        layout.addView(scroll)
+
+        val imagesContainer = ImageAttachmentsContainerView(context)
+        scroll.addView(imagesContainer)
+        imagesContainer.onAttachmentRemoved = { attachment ->
+            attachmentHandler.removeAttachment(attachment.id)
+            attachmentHandler.updateImageCount(attachmentHandler.getImageAttachments().size)
+            if (!attachmentHandler.hasAttachments()) {
+                attachmentsContainer.isVisible = false
+            }
+        }
+        imageAttachmentsContainer = imagesContainer
+    }
+
+    private fun wireHandlerCallbacks(attachmentsContainer: FrameLayout) {
+        attachmentHandler.onImageAttachmentAdded = { attachment ->
+            imageAttachmentsContainer?.addAttachment(attachment)
+            attachmentsContainer.isVisible = true
+            attachmentHandler.updateImageCount(attachmentHandler.getImageAttachments().size)
+        }
+        attachmentHandler.onImageLimitError = { message ->
+            showAttachmentLimitError(message)
+        }
+        attachmentHandler.onImageLimitErrorClear = {
+            hideAttachmentLimitError()
+        }
+        attachmentHandler.onAttachmentsCleared = {
+            imageAttachmentsContainer?.clearAttachments()
+            attachmentsContainer.isVisible = false
+        }
+    }
+
+    private fun observeImageUploadLimit() {
+        imageUploadLimitJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        imageUploadLimitJob = attachmentHandler.imageUploadLimitReached
+            .onEach { reached ->
+                attachmentHandler.conversationImageLimitReached = reached
+                if (!reached) attachmentHandler.resetConversationCounts()
+            }
+            .launchIn(scope)
+    }
+
+    private fun showAttachmentLimitError(message: String) {
+        val layout = attachmentsLayout ?: return
+        (layout.parent as? View)?.isVisible = true
+        val errorView = layout.findViewWithTag<TextView>("attachmentError")
+            ?: TextView(context).apply {
+                tag = "attachmentError"
+                val dp = resources.displayMetrics.density
+                setPadding((12 * dp).toInt(), (4 * dp).toInt(), (12 * dp).toInt(), (4 * dp).toInt())
+                setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
+                textSize = 13f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                layout.addView(this)
+            }
+        errorView.text = message
+        errorView.visibility = View.VISIBLE
+    }
+
+    private fun hideAttachmentLimitError() {
+        attachmentsLayout?.findViewWithTag<TextView>("attachmentError")?.visibility = View.GONE
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        imageUploadLimitJob?.cancel()
+        imageUploadLimitJob = null
     }
 }

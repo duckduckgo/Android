@@ -434,9 +434,11 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
-            onCameraCaptureRequested = { callback -> callbacks.onCameraCaptureRequested(callback) }
-            onFilePickerRequested = { callback, mimeTypes -> callbacks.onFilePickerRequested(callback, mimeTypes) }
             onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
+            bindAttachmentCallbacks(
+                onCameraCaptureRequested = callbacks.onCameraCaptureRequested,
+                onFilePickerRequested = callbacks.onFilePickerRequested,
+            )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }

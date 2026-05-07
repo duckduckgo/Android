@@ -19,8 +19,6 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
-import android.net.Uri
-import android.webkit.ValueCallback
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -51,9 +49,7 @@ import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.image.ImageAttachmentsContainerView
 import com.duckduckgo.duckchat.impl.nativeinput.image.AttachmentHandler
-import com.duckduckgo.duckchat.impl.ui.nativeinput.AttachmentButtonView
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
@@ -86,8 +82,6 @@ interface NativeInputWidget {
     var onVoiceChatClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
     var onPaidTierChanged: ((Boolean) -> Unit)?
-    var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)?
-    var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)?
     var onAttachmentChooserStateChanged: ((Boolean) -> Unit)?
     val isModelMenuVisible: Boolean
 
@@ -119,6 +113,11 @@ interface NativeInputWidget {
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
+
+    fun bindAttachmentCallbacks(
+        onCameraCaptureRequested: (android.webkit.ValueCallback<Array<android.net.Uri>>) -> Unit,
+        onFilePickerRequested: (android.webkit.ValueCallback<Array<android.net.Uri>>, List<String>) -> Unit,
+    )
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -176,7 +175,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
-    private var imageUploadLimitJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -209,63 +207,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
             field = value
             if (value != null && isAttachedToWindow) observeTier()
         }
-    override var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
-    override var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     override var onAttachmentChooserStateChanged: ((Boolean) -> Unit)? = null
     override var isModelMenuVisible: Boolean = false
         private set
 
-    private val attachmentHandler: AttachmentHandler?
-        get() {
-            val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return null
-            return (0 until container.childCount)
-                .mapNotNull { (container.getChildAt(it) as? AttachmentButtonView)?.attachmentHandler }
-                .firstOrNull()
-        }
+    private var pendingCameraCaptureCallback: ((android.webkit.ValueCallback<Array<android.net.Uri>>) -> Unit)? = null
+    private var pendingFilePickerCallback: ((android.webkit.ValueCallback<Array<android.net.Uri>>, List<String>) -> Unit)? = null
 
-    private lateinit var attachmentsLayout: android.widget.LinearLayout
-    private lateinit var imageAttachmentsScroll: android.widget.HorizontalScrollView
-    private lateinit var imageAttachmentsContainer: ImageAttachmentsContainerView
-    private var attachmentViewsInitialized = false
-
-    private fun initAttachmentViews() {
-        if (attachmentViewsInitialized) return
-        attachmentViewsInitialized = true
-        val container = findViewById<FrameLayout>(R.id.attachmentsContainer)
-
-        attachmentsLayout = android.widget.LinearLayout(context).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-            )
-        }
-        container.addView(attachmentsLayout)
-
-        imageAttachmentsScroll = android.widget.HorizontalScrollView(context).apply {
-            layoutParams = android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-            )
-            isHorizontalScrollBarEnabled = false
-        }
-        attachmentsLayout.addView(imageAttachmentsScroll)
-
-        imageAttachmentsContainer = ImageAttachmentsContainerView(context)
-        imageAttachmentsScroll.addView(imageAttachmentsContainer)
-        imageAttachmentsContainer.onAttachmentRemoved = { _ ->
-            val count = imageAttachmentsContainer.attachmentCount()
-            attachmentHandler?.updateImageCount(count)
-            if (count == 0) {
-                container.isVisible = false
-            }
-            updateAttachmentState()
-        }
-    }
+    private var attachmentHandler: AttachmentHandler? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        initAttachmentViews()
         setupPlugins()
         applyNativeStyling()
         observeChatState()
@@ -300,9 +252,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
                                 if (containerId == R.id.startChatContainer) continue
                                 findViewById<FrameLayout?>(containerId)?.isVisible = command.visible
                             }
-                            val hasImages = imageAttachmentsContainer.attachmentCount() > 0
                             findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible =
-                                command.visible && hasImages
+                                command.visible && hasAttachments
                         }
                     }
                 }
@@ -311,29 +262,29 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun wirePluginView(pluginView: View) {
-        (pluginView as? AttachmentButtonView)?.attachmentHandler?.let { handler ->
-            handler.onCameraCaptureRequested = { callback -> onCameraCaptureRequested?.invoke(callback) }
-            handler.onFilePickerRequested = { callback, mimeTypes -> onFilePickerRequested?.invoke(callback, mimeTypes) }
+        (pluginView.getTag(R.id.attachButtonContainer) as? AttachmentHandler)?.let { handler ->
+            attachmentHandler = handler
             handler.onChooserStateChanged = { showing -> onAttachmentChooserStateChanged?.invoke(showing) }
             handler.onRequestFocus = { focusInput(context as? Activity) }
-            handler.onImageAttachmentAdded = { attachment ->
-                imageAttachmentsContainer.addAttachment(attachment)
-                findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible = true
-                handler.updateImageCount(imageAttachmentsContainer.attachmentCount())
-                updateAttachmentState()
+
+            pluginView.post {
+                handler.onAttachmentCountChanged = { updateAttachmentState() }
+                val viewOnLimitError = handler.onImageLimitError
+                handler.onImageLimitError = { message ->
+                    viewOnLimitError?.invoke(message)
+                    attachmentLimitExceeded = true
+                    floatingSubmitContainer?.visibility = GONE
+                }
+                val viewOnLimitClear = handler.onImageLimitErrorClear
+                handler.onImageLimitErrorClear = {
+                    viewOnLimitClear?.invoke()
+                    attachmentLimitExceeded = false
+                    floatingSubmitContainer?.visibility = VISIBLE
+                    updateSendButtonVisibility()
+                }
+                pendingCameraCaptureCallback?.let { handler.onCameraCaptureRequested = it }
+                pendingFilePickerCallback?.let { handler.onFilePickerRequested = it }
             }
-            handler.onImageLimitError = { message ->
-                showAttachmentLimitError(message)
-                attachmentLimitExceeded = true
-                floatingSubmitContainer?.visibility = View.GONE
-            }
-            handler.onImageLimitErrorClear = {
-                hideAttachmentLimitError()
-                attachmentLimitExceeded = false
-                floatingSubmitContainer?.visibility = View.VISIBLE
-                updateSendButtonVisibility()
-            }
-            observeImageUploadLimit(handler)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -342,16 +293,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun observeImageUploadLimit(handler: AttachmentHandler) {
-        imageUploadLimitJob?.cancel()
-        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
-        imageUploadLimitJob = handler.imageUploadLimitReached
-            .onEach { reached ->
-                handler.conversationImageLimitReached = reached
-                if (!reached) handler.resetConversationCounts()
-                updateAttachmentState()
-            }
-            .launchIn(scope)
+    override fun bindAttachmentCallbacks(
+        onCameraCaptureRequested: (android.webkit.ValueCallback<Array<android.net.Uri>>) -> Unit,
+        onFilePickerRequested: (android.webkit.ValueCallback<Array<android.net.Uri>>, List<String>) -> Unit,
+    ) {
+        pendingCameraCaptureCallback = onCameraCaptureRequested
+        pendingFilePickerCallback = onFilePickerRequested
+        attachmentHandler?.let { handler ->
+            handler.onCameraCaptureRequested = onCameraCaptureRequested
+            handler.onFilePickerRequested = onFilePickerRequested
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -366,8 +317,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         nativeInputStateJob = null
         pluginsJob?.cancel()
         pluginsJob = null
-        imageUploadLimitJob?.cancel()
-        imageUploadLimitJob = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -447,14 +396,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateAttachmentState() {
-        hasAttachments = imageAttachmentsContainer.attachmentCount() > 0
+        hasAttachments = attachmentHandler?.hasAttachments() ?: false
         updateSendButtonVisibility()
         submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
+        val handler = attachmentHandler ?: return
         val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return
-        for (i in 0 until container.childCount) {
-            val buttonView = container.getChildAt(i) as? AttachmentButtonView ?: continue
-            buttonView.isVisible = buttonView.attachmentHandler.supportsImageUpload()
-        }
+        container.isVisible = handler.supportsImageUpload()
     }
 
     private fun applyState(state: NativeInputState) {
@@ -659,57 +606,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
     override fun getImageAttachmentsJson(): JSONArray? {
-        val attachments = imageAttachmentsContainer.getAttachments()
-        if (attachments.isEmpty()) return null
-        return JSONArray().apply {
-            attachments.forEach { attachment ->
-                put(org.json.JSONObject().apply {
-                    put("data", attachment.base64Data)
-                    put("format", attachment.format)
-                })
-            }
-        }
+        return attachmentHandler?.getImageAttachmentsJson()
     }
 
     override fun clearImageAttachments() {
-        val sentCount = imageAttachmentsContainer.attachmentCount()
-        imageAttachmentsContainer.clearAttachments()
-        findViewById<FrameLayout?>(R.id.attachmentsContainer)?.isVisible = false
-        if (sentCount > 0) attachmentHandler?.onImagesSubmitted(sentCount)
-        attachmentHandler?.updateImageCount(0)
+        attachmentHandler?.clearAttachments()
         updateAttachmentState()
     }
 
-    private fun showAttachmentLimitError(message: String) {
-        val container = findViewById<FrameLayout?>(R.id.attachmentsContainer) ?: return
-        container.isVisible = true
-        val layout = attachmentsLayout
-        val errorView = layout.findViewWithTag<android.widget.TextView>("attachmentError")
-            ?: android.widget.TextView(context).apply {
-                tag = "attachmentError"
-                setPadding(
-                    (12 * resources.displayMetrics.density).toInt(),
-                    (4 * resources.displayMetrics.density).toInt(),
-                    (12 * resources.displayMetrics.density).toInt(),
-                    (4 * resources.displayMetrics.density).toInt(),
-                )
-                setTextColor(resources.getColor(com.duckduckgo.mobile.android.R.color.red50, null))
-                textSize = 13f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                layout.addView(this)
-            }
-        errorView.text = message
-        errorView.visibility = VISIBLE
-    }
-
-    private fun hideAttachmentLimitError() {
-        attachmentsLayout.findViewWithTag<android.widget.TextView>("attachmentError")?.visibility = GONE
-    }
-
     override fun storePendingPromptWithAttachments(query: String) {
-        val images = imageAttachmentsContainer.getAttachments().map {
+        val images = attachmentHandler?.getImageAttachments()?.map {
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
-        }
+        } ?: emptyList()
         viewModel.storePendingPrompt(query, getSelectedModelId(), images)
         clearImageAttachments()
     }

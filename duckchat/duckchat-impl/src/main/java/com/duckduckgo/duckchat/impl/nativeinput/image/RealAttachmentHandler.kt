@@ -40,6 +40,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 
 interface AttachmentHandler {
     var onImageAttachmentAdded: ((ImageAttachment) -> Unit)?
@@ -49,12 +51,19 @@ interface AttachmentHandler {
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)?
     var onChooserStateChanged: ((Boolean) -> Unit)?
     var onRequestFocus: (() -> Unit)?
+    var onAttachmentCountChanged: (() -> Unit)?
+    var onAttachmentsCleared: (() -> Unit)?
     var conversationImageLimitReached: Boolean
     val imageUploadLimitReached: Flow<Boolean>
 
     fun supportsImageUpload(): Boolean
     fun handlePickedImages(uris: List<Uri>)
-    fun onImagesSubmitted(count: Int)
+    fun addAttachment(attachment: ImageAttachment)
+    fun removeAttachment(id: String)
+    fun hasAttachments(): Boolean
+    fun getImageAttachments(): List<ImageAttachment>
+    fun getImageAttachmentsJson(): JSONArray?
+    fun clearAttachments()
     fun resetConversationCounts()
     fun updateImageCount(count: Int)
     fun isAtMaxCapacity(): Boolean
@@ -78,8 +87,10 @@ class RealAttachmentHandler(
     override var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     override var onChooserStateChanged: ((Boolean) -> Unit)? = null
     override var onRequestFocus: (() -> Unit)? = null
+    override var onAttachmentCountChanged: (() -> Unit)? = null
+    override var onAttachmentsCleared: (() -> Unit)? = null
 
-    private var imageCount: Int = 0
+    private val attachments = mutableListOf<ImageAttachment>()
     override var conversationImageLimitReached: Boolean = false
 
     private val contentResolver: ContentResolver get() = context.contentResolver
@@ -98,15 +109,52 @@ class RealAttachmentHandler(
         scope.launch(dispatcherProvider.main()) {
             uris.forEach { uri ->
                 withContext(dispatcherProvider.io()) { processImage(uri) }?.let { attachment ->
-                    onImageAttachmentAdded?.invoke(attachment)
+                    addAttachment(attachment)
                 }
             }
             onRequestFocus?.invoke()
         }
     }
 
-    override fun onImagesSubmitted(count: Int) {
-        limitsHandler.addConversationImagesSent(count)
+    override fun addAttachment(attachment: ImageAttachment) {
+        attachments.add(attachment)
+        onImageAttachmentAdded?.invoke(attachment)
+        onAttachmentCountChanged?.invoke()
+    }
+
+    override fun removeAttachment(id: String) {
+        val index = attachments.indexOfFirst { it.id == id }
+        if (index >= 0) {
+            attachments[index].bitmap.recycle()
+            attachments.removeAt(index)
+        }
+        onAttachmentCountChanged?.invoke()
+    }
+
+    override fun hasAttachments(): Boolean = attachments.isNotEmpty()
+
+    override fun getImageAttachments(): List<ImageAttachment> = attachments.toList()
+
+    override fun getImageAttachmentsJson(): JSONArray? {
+        if (attachments.isEmpty()) return null
+        return JSONArray().apply {
+            attachments.forEach { attachment ->
+                put(JSONObject().apply {
+                    put("data", attachment.base64Data)
+                    put("format", attachment.format)
+                })
+            }
+        }
+    }
+
+    override fun clearAttachments() {
+        val sentCount = attachments.size
+        attachments.forEach { it.bitmap.recycle() }
+        attachments.clear()
+        if (sentCount > 0) limitsHandler.addConversationImagesSent(sentCount)
+        updateImageCount(0)
+        onAttachmentsCleared?.invoke()
+        onAttachmentCountChanged?.invoke()
     }
 
     override fun resetConversationCounts() {
@@ -114,14 +162,13 @@ class RealAttachmentHandler(
     }
 
     override fun updateImageCount(count: Int) {
-        imageCount = count
         val limits = modelManager.modelState.value.attachmentLimits.images
-        val totalImages = imageCount + limitsHandler.conversationImagesSent.value
+        val totalImages = count + limitsHandler.conversationImagesSent.value
         if (totalImages > limits.maxPerConversation) {
             onImageLimitError?.invoke(
                 context.getString(R.string.duckChatImageAttachmentLimitPerConversation, limits.maxPerConversation),
             )
-        } else if (imageCount > limits.maxPerTurn) {
+        } else if (count > limits.maxPerTurn) {
             onImageLimitError?.invoke(
                 context.getString(R.string.duckChatImageAttachmentLimitPerMessage, limits.maxPerTurn),
             )
@@ -133,8 +180,9 @@ class RealAttachmentHandler(
     override fun isAtMaxCapacity(): Boolean {
         if (!supportsImageUpload()) return true
         val limits = modelManager.modelState.value.attachmentLimits.images
-        val totalImages = imageCount + limitsHandler.conversationImagesSent.value
-        return conversationImageLimitReached || imageCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
+        val currentCount = attachments.size
+        val totalImages = currentCount + limitsHandler.conversationImagesSent.value
+        return conversationImageLimitReached || currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
     }
 
     override fun showAttachmentChooser() {

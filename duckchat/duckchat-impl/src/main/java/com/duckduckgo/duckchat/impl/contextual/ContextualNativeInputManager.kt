@@ -107,9 +107,11 @@ class RealContextualNativeInputManager @Inject constructor(
         widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
-        widget.onCameraCaptureRequested = { callback -> onCameraCaptureRequested(callback) }
-        widget.onFilePickerRequested = { callback, mimeTypes -> onFilePickerRequested(callback, mimeTypes) }
         widget.onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
+        widget.bindAttachmentCallbacks(
+            onCameraCaptureRequested = onCameraCaptureRequested,
+            onFilePickerRequested = onFilePickerRequested,
+        )
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
