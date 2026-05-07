@@ -53,7 +53,7 @@ interface PirRemoteFeatures {
     fun ensureBrokerDataBeforeScan(): Toggle
 
     @DefaultValue(DefaultFeatureValue.TRUE)
-    fun sendInitialScanWideEvent(): Toggle
+    fun sendScanWideEvent(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)

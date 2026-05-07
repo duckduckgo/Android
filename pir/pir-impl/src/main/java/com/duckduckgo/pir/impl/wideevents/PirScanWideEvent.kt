@@ -151,7 +151,7 @@ class PirScanWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        pirRemoteFeatures.sendInitialScanWideEvent().isEnabled()
+        pirRemoteFeatures.sendScanWideEvent().isEnabled()
     }
 
     /**

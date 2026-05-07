@@ -74,7 +74,7 @@ class PirScanWideEventTest {
     @SuppressLint("DenyListedApi")
     private val pirRemoteFeatures: PirRemoteFeatures =
         FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java).apply {
-            sendInitialScanWideEvent().setRawStoredState(Toggle.State(true))
+            sendScanWideEvent().setRawStoredState(Toggle.State(true))
         }
 
     private lateinit var testee: PirScanWideEventImpl
@@ -120,7 +120,7 @@ class PirScanWideEventTest {
     @Test
     fun whenFeatureFlagDisabledThenNothingIsSent() = runTest {
         // Given
-        pirRemoteFeatures.sendInitialScanWideEvent().setRawStoredState(Toggle.State(false))
+        pirRemoteFeatures.sendScanWideEvent().setRawStoredState(Toggle.State(false))
 
         // When
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 5)
