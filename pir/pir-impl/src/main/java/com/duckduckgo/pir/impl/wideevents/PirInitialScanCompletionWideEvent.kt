@@ -32,6 +32,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Long-lived wide event that measures the wall-clock duration from the very first time a user
@@ -127,7 +129,11 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                     pirDataStore.hasInitialScanEverStarted = true
                     pirDataStore.initialScanCompletionForegroundRunCount = 0
                     pirDataStore.initialScanCompletionScheduledRunCount = 0
-                    wideEventClient.intervalStart(wideEventId = newFlowId, key = INTERVAL_TOTAL_DURATION)
+                    wideEventClient.intervalStart(
+                        wideEventId = newFlowId,
+                        key = INTERVAL_TOTAL_DURATION,
+                        buckets = COMPLETION_INTERVAL_BUCKETS,
+                    )
                 }
 
                 when (executionType) {
@@ -189,6 +195,29 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         val COMPLETION_FLOW_TIMEOUT = 30.days
 
         const val INTERVAL_TOTAL_DURATION = "total_duration_ms_bucketed"
+
+        /**
+         * Bucket boundaries for the total-duration interval. The default `DEFAULT_INTERVAL_BUCKETS`
+         * caps at 10 minutes, which would collapse this multi-day metric into a single "10m+" bucket.
+         * This set spans 1 minute up to 30 days (matching the [COMPLETION_FLOW_TIMEOUT] cleanup
+         * window) and aligns with the enum in `PixelDefinitions/.../personal_information_removal.json5`.
+         * Durations below 1 minute are recorded as "0".
+         */
+        val COMPLETION_INTERVAL_BUCKETS = setOf(
+            1.minutes,
+            5.minutes,
+            10.minutes,
+            30.minutes,
+            1.hours,
+            3.hours,
+            6.hours,
+            12.hours,
+            1.days,
+            3.days,
+            7.days,
+            14.days,
+            30.days,
+        )
 
         const val KEY_PROFILE_QUERIES_COUNT = "profile_queries_count"
         const val KEY_BROKER_COUNT = "broker_count"

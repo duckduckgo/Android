@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_FLOW_TIMEOUT
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_INTERVAL_BUCKETS
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.ENTRY_POINT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.INTERVAL_TOTAL_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_BATTERY_OPTIMIZATIONS
@@ -158,7 +159,11 @@ class PirInitialScanCompletionWideEventTest {
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = COMPLETION_FLOW_TIMEOUT, flowStatus = FlowStatus.Unknown),
         )
-        verify(wideEventClient).intervalStart(wideEventId = 42L, key = INTERVAL_TOTAL_DURATION)
+        verify(wideEventClient).intervalStart(
+            wideEventId = 42L,
+            key = INTERVAL_TOTAL_DURATION,
+            buckets = COMPLETION_INTERVAL_BUCKETS,
+        )
         assertTrue(dataStore.hasInitialScanEverStarted)
         assertEquals(42L, dataStore.initialScanCompletionFlowId)
         assertEquals(1, dataStore.initialScanCompletionForegroundRunCount)
