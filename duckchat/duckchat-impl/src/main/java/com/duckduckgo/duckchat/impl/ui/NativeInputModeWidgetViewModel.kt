@@ -47,7 +47,9 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -93,7 +95,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val nativeInputStateProvider: NativeInputStateProvider,
+    private val mutableNativeInputStateProvider: MutableNativeInputStateProvider,
 ) : ViewModel() {
+
+    private var tabId: String = ""
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
@@ -128,9 +134,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun getSelectedModelId(): String? {
-        return _plugins.value.firstNotNullOfOrNull { plugin ->
-            (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
-        }
+        if (tabId.isEmpty()) return null
+        return nativeInputStateProvider.stateForTab(tabId).value.selectedModelId
+            ?: _plugins.value.firstNotNullOfOrNull { plugin ->
+                @Suppress("DEPRECATION")
+                (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
+            }
     }
 
     fun getResolvedReasoningEffort(): String? {
@@ -192,10 +201,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.update { it.copy(inputPosition = position) }
     }
 
-    fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+        this.tabId = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
+        val currentMode = state.replayCache.lastOrNull()?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY
+        val structural = NativeInputState(inputMode = currentMode, inputContext = context, inputPosition = position)
+        mutableNativeInputStateProvider.setActiveTab(tabId, structural)
     }
 
     fun storePendingPrompt(
@@ -208,8 +221,17 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         pendingNativePromptStore.store(query, modelId, reasoningEffort, images, files)
     }
 
-    fun configureContextual() {
+    fun configureContextual(tabId: String) {
+        this.tabId = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
+        val currentMode = state.replayCache.lastOrNull()?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY
+        val currentPosition = state.replayCache.lastOrNull()?.inputPosition ?: NativeInputState.InputPosition.TOP
+        val structural = NativeInputState(
+            inputMode = currentMode,
+            inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
+            inputPosition = currentPosition,
+        )
+        mutableNativeInputStateProvider.setActiveTab(tabId, structural)
     }
 
     fun cancelChatSuggestions() {

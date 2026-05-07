@@ -40,8 +40,10 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.subscriptions.api.Product
@@ -61,6 +63,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -87,6 +90,8 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
+    private val nativeInputStateProvider: NativeInputStateProvider = mock()
+    private val mutableNativeInputStateProvider: MutableNativeInputStateProvider = mock()
 
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
@@ -113,6 +118,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
         whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
+        whenever(nativeInputStateProvider.stateForTab(any())).thenReturn(MutableStateFlow(NativeInputState.zero()))
 
         testee = createViewModel()
     }
@@ -133,6 +139,8 @@ class NativeInputModeWidgetViewModelTest {
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
+            nativeInputStateProvider = nativeInputStateProvider,
+            mutableNativeInputStateProvider = mutableNativeInputStateProvider,
         )
     }
 
@@ -248,7 +256,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureContextualThenContextIsDuckAiContextual() = runTest {
-        testee.configureContextual()
+        testee.configureContextual("tab-1")
 
         assertEquals(NativeInputState.InputContext.DUCK_AI_CONTEXTUAL, testee.state.firstOrNull()!!.inputContext)
     }
@@ -257,14 +265,14 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiContextualAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
-        testee.configureContextual()
+        testee.configureContextual("tab-1")
 
         assertFalse(testee.state.firstOrNull()!!.toggleVisible)
     }
 
     @Test
     fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
-        testee.configureContextual()
+        testee.configureContextual("tab-1")
 
         assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
     }
@@ -325,7 +333,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureThenBothContextAndPositionSetAtomically() = runTest {
-        testee.configure(isDuckAiMode = true, isBottom = true)
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = true)
 
         val state = testee.state.firstOrNull()!!
         assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
@@ -333,9 +341,44 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenConfigureCalledThenSetActiveTabCalledOnProvider() = runTest {
+        testee.configure("tab-abc", isDuckAiMode = false, isBottom = false)
+
+        verify(mutableNativeInputStateProvider).setActiveTab(
+            eq("tab-abc"),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenConfigureWithDuckAiModeThenSetActiveTabWithDuckAiContext() = runTest {
+        testee.configure("tab-abc", isDuckAiMode = true, isBottom = false)
+
+        verify(mutableNativeInputStateProvider).setActiveTab(
+            eq("tab-abc"),
+            argThat { inputContext == NativeInputState.InputContext.DUCK_AI },
+        )
+    }
+
+    @Test
+    fun whenGetSelectedModelIdFromProviderThenReturnsProviderValue() = runTest {
+        val stateFlow = MutableStateFlow(NativeInputState.zero().copy(selectedModelId = "claude-3"))
+        whenever(nativeInputStateProvider.stateForTab("tab-abc")).thenReturn(stateFlow)
+        testee.configure("tab-abc", isDuckAiMode = false, isBottom = false)
+
+        assertEquals("claude-3", testee.getSelectedModelId())
+    }
+
+    @Test
+    fun whenGetSelectedModelIdAndNoTabConfiguredThenReturnsNull() = runTest {
+        assertNull(testee.getSelectedModelId())
+    }
+
+    @Test
     fun whenStorePendingPromptThenDelegatesToStoreWithModelId() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
+        viewModel.configure("tab-1", isDuckAiMode = false, isBottom = false)
 
         viewModel.storePendingPrompt("hello", "model-1", null)
 
@@ -345,6 +388,7 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
+        viewModel.configure("tab-1", isDuckAiMode = false, isBottom = false)
 
         viewModel.storePendingPrompt("hello", null, null)
 
@@ -461,6 +505,7 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenNoPluginsThenGetSelectedModelIdReturnsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
+        viewModel.configure("tab-1", isDuckAiMode = false, isBottom = false)
 
         assertNull(viewModel.getSelectedModelId())
     }
@@ -469,6 +514,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsModelSelectionThenGetSelectedModelIdReturnsIt() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
         val viewModel = createViewModel(plugins = listOf(plugin))
+        viewModel.configure("tab-1", isDuckAiMode = false, isBottom = false)
 
         assertEquals("claude-3", viewModel.getSelectedModelId())
     }
@@ -477,6 +523,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenPluginReturnsNullContributionThenGetSelectedModelIdReturnsNull() = runTest {
         val plugin = fakePlugin(containerId = 1, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
+        viewModel.configure("tab-1", isDuckAiMode = false, isBottom = false)
 
         assertNull(viewModel.getSelectedModelId())
     }

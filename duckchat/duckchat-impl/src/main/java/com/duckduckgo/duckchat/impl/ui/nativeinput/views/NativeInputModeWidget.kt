@@ -667,7 +667,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.tabId = tabId
         pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
-            viewModel.configure(isDuckAiMode, isBottom)
+            viewModel.configure(tabId, isDuckAiMode, isBottom)
             viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
             if (isDuckAiMode) selectChatTab()
             applyOmnibarShape(isBottom)
@@ -679,7 +679,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.tabId = tabId
         pendingIsDuckAiMode = true
         doOnAttach {
-            viewModel.configureContextual()
+            viewModel.configureContextual(tabId)
             selectChatTab()
             attachmentView?.setDuckAiMode(true)
         }
