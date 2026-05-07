@@ -2542,22 +2542,22 @@
             {
                 "key": "feature.data.ext.profile_queries_count",
                 "description": "Number of user profile queries at the moment the flow started (first MANUAL_INITIAL run)",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.broker_count",
                 "description": "Number of active brokers at the moment the flow started",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_scan_jobs",
                 "description": "Total number of (broker x profile) scan jobs eligible for execution at the moment the flow started",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.web_view_count",
                 "description": "Number of parallel WebView runners used at the start of the flow. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "manufacturer",
@@ -2610,17 +2610,17 @@
             {
                 "key": "feature.data.ext.total_scan_jobs_at_finish",
                 "description": "Total number of valid scan jobs at the moment the flow completed. Can differ from total_scan_jobs because the user may edit their profile or brokers may be added/removed during the multi-day journey. Only present on Success events.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.foreground_run_count",
                 "description": "Number of foreground service runs (MANUAL_INITIAL or MANUAL_EDIT_PROFILE) that contributed to the journey. Higher counts indicate the user re-opened the app multiple times to make progress. Only present on Success events.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.scheduled_run_count",
                 "description": "Number of scheduled WorkManager runs that contributed to the journey. Higher counts indicate the foreground service was killed by the system and the work was picked up by background workers. Only present on Success events.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_duration_ms_bucketed",
