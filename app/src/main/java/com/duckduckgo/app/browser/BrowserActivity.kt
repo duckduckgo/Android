@@ -121,8 +121,10 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.firemode.api.BrowserMode
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -133,6 +135,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -272,7 +275,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this)
+        TabPagerAdapter(this, viewModel.currentMode.value)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -370,6 +373,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
+        observeBrowserModeChanges()
 
         viewModel.awaitClearDataFinishedNotification()
         initializeServiceWorker()
@@ -575,7 +579,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
+        val mode = if (isExternal) BrowserMode.REGULAR else viewModel.currentMode.value
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, mode)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
@@ -652,6 +657,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
         logcat(INFO) { "launchNewSearchOrQuery: $intent" }
 
         if (intent == null) {
+            return
+        }
+
+        // External intents always open in REGULAR mode. The recreate observer picks up the mode
+        // change and the new REGULAR-bound activity re-processes this intent via getIntent().
+        val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
+        if (viewModel.shouldSwitchToRegularBeforeProcessingIntent(isExternal)) {
+            logcat(INFO) { "External intent received in FIRE — switching to REGULAR before processing" }
+            setIntent(intent)
+            lifecycleScope.launch { viewModel.switchToMode(BrowserMode.REGULAR) }
             return
         }
 
@@ -1026,15 +1041,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
+        val mode = viewModel.currentMode.value
         val fragment =
             DuckChatWebViewFragment().apply {
-                duckChatUrl?.let {
-                    arguments =
-                        Bundle().apply {
+                arguments =
+                    Bundle().apply {
+                        duckChatUrl?.let {
                             putString(KEY_DUCK_AI_URL, duckChatUrl)
                             putInt(KEY_DUCK_AI_TABS, tabs)
                         }
-                }
+                        putString(KEY_DUCK_AI_BROWSER_MODE, mode.name)
+                    }
             }
 
         duckAiFragment = fragment
@@ -1175,6 +1192,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Recreates the activity whenever the user switches browser mode. The activity is built for
+     * one mode at a time (single adapter, single currentTab, single lastActiveTabs); a fresh
+     * instance reads the new mode from the AppScope state holder at onCreate. The initial
+     * StateFlow value is dropped so the first emission — which matches the mode this activity
+     * was already created for — doesn't trigger a self-recreate loop.
+     */
+    private fun observeBrowserModeChanges() {
+        lifecycleScope.launch {
+            viewModel.currentMode.drop(1).collect { recreate() }
         }
     }
 
