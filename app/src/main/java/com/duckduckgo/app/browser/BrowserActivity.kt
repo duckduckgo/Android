@@ -1197,10 +1197,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
-     * one mode at a time (single adapter, single currentTab, single lastActiveTabs); a fresh
-     * instance reads the new mode from the AppScope state holder at onCreate. The initial
-     * StateFlow value is dropped so the first emission — which matches the mode this activity
-     * was already created for — doesn't trigger a self-recreate loop.
+     * one mode at a time (single adapter, single currentTab, single lastActiveTabs)
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
