@@ -457,7 +457,7 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun submitMessage(message: String? = null) {
+    open fun submitMessage(message: String? = null) {
         val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
         if (textToSubmit != null) {

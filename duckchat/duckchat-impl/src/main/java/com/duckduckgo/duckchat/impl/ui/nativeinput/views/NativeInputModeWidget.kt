@@ -345,10 +345,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
-        inputField.doOnTextChanged { text, _, _, _ ->
-            if (isChatTabSelected() && !isStreaming) {
-                submitButtons?.setSendButtonEnabled(!text.isNullOrBlank() || hasAttachments)
-            }
+        configureBottomRowFocusVisibility()
+        inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
         }
@@ -373,8 +371,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateSendButtonVisibility() {
         val hasContent = isStreaming || inputField.text.isNotBlank() || hasAttachments
-        val visible = isChatTabSelected() && hasContent && !attachmentLimitExceeded
+        val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
+        submitButtons?.setSendButtonEnabled(!attachmentLimitExceeded)
     }
 
     private fun applyState(state: NativeInputState) {
@@ -505,6 +504,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
         )
         setHorizontallyScrolling(false)
+    }
+
+    override fun submitMessage(message: String?) {
+        if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected() && !attachmentLimitExceeded) {
+            onChatSent?.invoke("")
+            inputField.clearFocus()
+        } else {
+            super.submitMessage(message)
+        }
     }
 
     override fun focusInput(activity: Activity?) {
@@ -779,7 +787,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showStopButton()
         } else {
             submitButtons?.showSendButton()
-            submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
         }
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
@@ -791,9 +798,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setImageButtonVisible(isChatTab && supportsUpload)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
-            if (!isStreaming) {
-                submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
-            }
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
         } else {
@@ -822,11 +826,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 setImageButtonVisible(isChatTabSelected() && supportsUpload)
                 if (hadLimitError != attachmentLimitExceeded) {
                     floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
-                    if (!attachmentLimitExceeded) updateSendButtonVisibility()
                 }
                 updateSendButtonVisibility()
                 updateVoiceButtonVisibility()
-                submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank() || hasAttachments)
             }
         }
     }
@@ -840,14 +842,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
         }
         val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
-            onSendClick = {
-                if (inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
-                    onChatSent?.invoke("")
-                    inputField.clearFocus()
-                } else {
-                    submitMessage()
-                }
-            }
+            onSendClick = { submitMessage() }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
             onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
             onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
