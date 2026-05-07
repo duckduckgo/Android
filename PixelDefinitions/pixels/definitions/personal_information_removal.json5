@@ -2514,5 +2514,134 @@
                 "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
             }
         ]
+    },
+    "wide_pir-time-to-first-scan-complete": {
+        "description": "Long-lived wide event measuring the wall-clock duration from the first time the user starts the initial PIR scan (MANUAL_INITIAL) to the moment every broker has at least one completed scan job (the dashboard's 'all done' state). Spans multiple foreground service runs and scheduled worker runs since the foreground service is frequently killed and the worker resumes the work later. One-shot per install (cleared only via PIR data reset). 30-day cleanup timeout records abandoned journeys as Unknown.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["pir-time-to-first-scan-complete"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point that triggered the time-to-first-scan-complete flow",
+                "enum": ["funnel_pir_time_to_first_scan_complete_android"]
+            },
+            {
+                "key": "feature.data.ext.profile_queries_count",
+                "description": "Number of user profile queries at the moment the flow started (first MANUAL_INITIAL run)",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.broker_count",
+                "description": "Number of active brokers at the moment the flow started",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs",
+                "description": "Total number of (broker x profile) scan jobs eligible for execution at the moment the flow started",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.web_view_count",
+                "description": "Number of parallel WebView runners used at the start of the flow. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
+                "type": "string"
+            },
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device. Injected by PirPixelInterceptor.",
+                "type": "string",
+                "enum": [
+                    "samsung",
+                    "google",
+                    "xiaomi",
+                    "huawei",
+                    "honor",
+                    "oneplus",
+                    "oppo",
+                    "vivo",
+                    "motorola",
+                    "realme",
+                    "sony",
+                    "lg",
+                    "nokia",
+                    "lenovo",
+                    "asus",
+                    "other"
+                ]
+            },
+            {
+                "key": "feature.data.ext.power_saving",
+                "description": "Whether the device was in power saving mode at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.battery_optimizations",
+                "description": "Whether battery optimizations were enabled for the app at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.vpn_connection_state",
+                "description": "Reported VPN connection state at the moment the flow started",
+                "enum": ["connected", "disconnected"]
+            },
+            {
+                "key": "feature.data.ext.notifications_permission_granted",
+                "description": "Whether the user had granted the POST_NOTIFICATIONS runtime permission at the moment the flow started",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.total_scan_jobs_at_finish",
+                "description": "Total number of valid scan jobs at the moment the flow completed. Can differ from total_scan_jobs because the user may edit their profile or brokers may be added/removed during the multi-day journey. Only present on Success events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.foreground_run_count",
+                "description": "Number of foreground service runs (MANUAL_INITIAL or MANUAL_EDIT_PROFILE) that contributed to the journey. Higher counts indicate the user re-opened the app multiple times to make progress. Only present on Success events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.scheduled_run_count",
+                "description": "Number of scheduled WorkManager runs that contributed to the journey. Higher counts indicate the foreground service was killed by the system and the work was picked up by background workers. Only present on Success events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.total_duration_ms_bucketed",
+                "description": "Total wall-clock duration from the first MANUAL_INITIAL run starting to the moment every broker had a completed scan job. Bucketed using the lower bucket boundary. Only present on Success events.",
+                "enum": [
+                    "0",
+                    "60000",
+                    "300000",
+                    "600000",
+                    "1800000",
+                    "3600000",
+                    "10800000",
+                    "21600000",
+                    "43200000",
+                    "86400000",
+                    "259200000",
+                    "604800000",
+                    "1209600000",
+                    "2592000000"
+                ]
+            }
+        ]
     }
 }
