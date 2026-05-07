@@ -6,7 +6,7 @@ import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 buildscript {
 
     ext {
-        min_sdk = 26
+        min_sdk = 28
         target_sdk = 35
         compile_sdk = 35
 
