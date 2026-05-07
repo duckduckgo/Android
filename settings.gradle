@@ -28,6 +28,11 @@ develocity {
             username { name -> "dax" }
             externalProcessName { processName -> 'non-build-process' }
         }
+        // Tag scans with the active DI framework so cache hits are queryable per-variant
+        // and Anvil/Metro builds remain visibly distinct on Develocity.
+        def diFrameworkTag = settings.startParameter.projectProperties.get('ddg.di') ?: 'AnvilDagger'
+        tag(diFrameworkTag)
+        value('ddg.di', diFrameworkTag)
     }
 }
 
