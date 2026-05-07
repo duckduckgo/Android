@@ -105,6 +105,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -369,6 +370,7 @@ class PirEndToEndTest {
             },
             pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
             pirScanWideEvent = NoOpPirScanWideEvent,
+            pirInitialScanCompletionWideEvent = NoOpPirInitialScanCompletionWideEvent,
             networkProtectionState = fakeNetworkProtectionState,
         )
 
@@ -1015,5 +1017,22 @@ class PirEndToEndTest {
         override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) = Unit
         override suspend fun onRunCancelled(executionType: PirExecutionType) = Unit
         override suspend fun onUserReset() = Unit
+    }
+
+    private object NoOpPirInitialScanCompletionWideEvent : PirInitialScanCompletionWideEvent {
+        override suspend fun onRunStarted(
+            executionType: PirExecutionType,
+            profileQueriesCount: Int,
+            brokerCount: Int,
+            totalScanJobs: Int,
+            webViewCount: Int,
+            isPowerSavingEnabled: Boolean,
+            isVpnConnected: Boolean,
+            batteryOptimizationsEnabled: Boolean,
+            notificationsPermissionGranted: Boolean,
+            isTrackerBlockingEnabled: Boolean,
+        ) = Unit
+
+        override suspend fun onScanCompleted() = Unit
     }
 }

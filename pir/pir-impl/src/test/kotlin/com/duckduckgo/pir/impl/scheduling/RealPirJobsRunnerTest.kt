@@ -39,6 +39,7 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import kotlinx.coroutines.CancellationException
@@ -82,6 +83,7 @@ class RealPirJobsRunnerTest {
     private val mockEnsureBrokerDataToggle: Toggle = mock()
     private val mockTrackerBlockingToggle: Toggle = mock()
     private val mockPirScanWideEvent: PirScanWideEvent = mock()
+    private val mockPirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
 
     @Before
@@ -109,6 +111,7 @@ class RealPirJobsRunnerTest {
             brokerJsonUpdater = mockBrokerJsonUpdater,
             pirRemoteFeatures = mockPirRemoteFeatures,
             pirScanWideEvent = mockPirScanWideEvent,
+            pirInitialScanCompletionWideEvent = mockPirInitialScanCompletionWideEvent,
             networkProtectionState = mockNetworkProtectionState,
         )
     }
