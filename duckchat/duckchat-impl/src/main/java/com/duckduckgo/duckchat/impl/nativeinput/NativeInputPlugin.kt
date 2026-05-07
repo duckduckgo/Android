@@ -26,11 +26,15 @@ sealed class PromptContribution {
     data class ModelSelection(val modelId: String) : PromptContribution()
 }
 
+sealed class Action {
+    data object StartChat : Action()
+}
+
 interface NativeInputPlugin : ActivePlugin {
 
     val containerId: Int
 
-    fun createView(context: Context): View
+    fun createView(context: Context, onAction: (Action) -> Unit): View
 
     fun getPromptContribution(): PromptContribution?
 }

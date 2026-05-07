@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.Action
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.StartChatView
@@ -36,7 +37,9 @@ class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.startChatContainer
 
-    override fun createView(context: Context): View = StartChatView(context)
+    override fun createView(context: Context, onAction: (Action) -> Unit): View = StartChatView(context).apply {
+        onIconClicked = { onAction(Action.StartChat) }
+    }
 
     override fun getPromptContribution(): PromptContribution? = null
 }

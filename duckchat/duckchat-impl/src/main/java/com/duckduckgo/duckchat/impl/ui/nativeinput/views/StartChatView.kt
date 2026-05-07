@@ -52,6 +52,8 @@ class StartChatView @JvmOverloads constructor(
     private val icon: ImageView by lazy { findViewById(R.id.aiChatIconMenu) }
     private var visibilityJob: Job? = null
 
+    var onIconClicked: (() -> Unit)? = null
+
     init {
         inflate(context, R.layout.view_start_chat, this)
     }
@@ -59,10 +61,7 @@ class StartChatView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        icon.setOnClickListener {
-            val submitted = findNativeInputWidget()?.submitAsChat() == true
-            if (!submitted) viewModel.openNewChat()
-        }
+        icon.setOnClickListener { onIconClicked?.invoke() }
         observeVisibility()
     }
 
@@ -81,14 +80,5 @@ class StartChatView @JvmOverloads constructor(
                 (parent as? View)?.isVisible = visible
             }
             .launchIn(scope)
-    }
-
-    private fun findNativeInputWidget(): NativeInputWidget? {
-        var node: View? = this
-        while (node != null) {
-            if (node is NativeInputWidget) return node
-            node = node.parent as? View
-        }
-        return null
     }
 }

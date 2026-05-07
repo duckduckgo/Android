@@ -128,6 +128,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatInternal.saveLastUsedTogglePosition(position)
     }
 
+    fun openNewChat() {
+        duckChatInternal.openNewDuckChatSession()
+    }
+
     fun setDuckAiMode(isDuckAiMode: Boolean) {
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         widgetConfig.update { it.copy(inputContext = context) }

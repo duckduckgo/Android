@@ -30,8 +30,8 @@ import javax.inject.Inject
 @ContributesViewModel(ViewScope::class)
 class StartChatViewModel @Inject constructor(
     duckAiFeatureState: DuckAiFeatureState,
-    private val duckChatInternal: DuckChatInternal,
-    private val duckChatInputModeState: DuckChatInputModeState,
+    duckChatInternal: DuckChatInternal,
+    duckChatInputModeState: DuckChatInputModeState,
 ) : ViewModel() {
 
     /**
@@ -48,9 +48,5 @@ class StartChatViewModel @Inject constructor(
         duckChatInputModeState.displayedMode,
     ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, displayedMode ->
         isFeatureEnabled && isUserEnabled && !isInputScreenUserSettingEnabled && displayedMode == InputMode.SEARCH
-    }
-
-    fun openNewChat() {
-        duckChatInternal.openNewDuckChatSession()
     }
 }
