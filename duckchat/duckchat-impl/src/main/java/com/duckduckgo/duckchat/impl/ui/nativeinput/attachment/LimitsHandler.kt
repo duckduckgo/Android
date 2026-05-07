@@ -16,12 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,20 +34,17 @@ interface LimitsHandler {
 
     fun setImageUploadLimitReached(reached: Boolean)
     fun addConversationImagesSent(count: Int)
+    fun setConversationImagesUsed(count: Int)
     fun resetConversationImagesSent()
     fun prepareForNewChat(pendingImages: Int)
     fun onNewChatStarted()
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
-)
+@ContributesBinding(AppScope::class, boundType = LimitsHandler::class)
 class RealLimitsHandler @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
-) : LimitsHandler, MainProcessLifecycleObserver {
+) : LimitsHandler {
 
     private val _imageUploadLimitReached = MutableStateFlow(false)
     override val imageUploadLimitReached: StateFlow<Boolean> = _imageUploadLimitReached
@@ -66,19 +60,17 @@ class RealLimitsHandler @Inject constructor(
 
     @Volatile private var pendingNewChatImages: Int = 0
 
-    override fun onStart(owner: LifecycleOwner) {
-        _imageUploadLimitReached.value = false
-        _hasActiveChat.value = false
-        _rawConversationImagesSent.value = 0
-        pendingNewChatImages = 0
-    }
-
     override fun setImageUploadLimitReached(reached: Boolean) {
         _imageUploadLimitReached.value = reached
     }
 
     override fun addConversationImagesSent(count: Int) {
         _rawConversationImagesSent.value += count
+    }
+
+    override fun setConversationImagesUsed(count: Int) {
+        _rawConversationImagesSent.value = count
+        if (count > 0) _hasActiveChat.value = true
     }
 
     override fun resetConversationImagesSent() {

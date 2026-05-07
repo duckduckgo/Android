@@ -161,7 +161,7 @@ class AttachmentView(
         onAction?.invoke(
             Action.AttachmentStateChanged(
                 hasAttachments = state.hasAttachments,
-                limitExceeded = state.imageLimitError != null,
+                limitExceeded = state.imageLimitError != null && state.hasAttachments,
                 supportsUpload = state.supportsUpload,
             ),
         )
