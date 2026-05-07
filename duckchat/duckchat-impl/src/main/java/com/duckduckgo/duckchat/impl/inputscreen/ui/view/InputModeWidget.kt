@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
 import android.content.Context
-import android.os.Build
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -573,9 +572,7 @@ open class InputModeWidget @JvmOverloads constructor(
     }
 
     private fun configureShadow() {
-        if (Build.VERSION.SDK_INT >= 28) {
-            inputModeWidgetCard.addBottomShadow()
-        }
+        inputModeWidgetCard.addBottomShadow()
     }
 
     fun setVoiceButtonVisible(visible: Boolean) {

@@ -22,7 +22,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.text.Editable
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -285,9 +284,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         renderPosition()
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow()
-        }
+        omnibarCardShadow.addBottomShadow()
     }
 
     override val findInPage: IncludeFindInPageBinding by lazy {
@@ -666,11 +663,7 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPosition() {
-        if (omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT) {
-            if (Build.VERSION.SDK_INT < 28) {
-                omnibarCardShadow.cardElevation = 2f.toPx(context)
-            }
-        } else {
+        if (omnibarType == OmnibarType.SINGLE_BOTTOM) {
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
                 flipOmnibarMargins()
@@ -704,11 +697,6 @@ class OmnibarLayout @JvmOverloads constructor(
                 shieldIconPulseAnimationContainer.paddingRight,
                 6.toPx(),
             )
-
-            // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-            if (Build.VERSION.SDK_INT < 28) {
-                omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-            }
         }
     }
 
