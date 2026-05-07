@@ -629,6 +629,10 @@ sealed class OnboardingDaxDialogCta(
 
         protected var ctaView: View? = null
 
+        private var runningFadeIn: AnimatorSet? = null
+        private var runningFadeOut: AnimatorSet? = null
+        private var animationsSettled: Boolean = false
+
         /** Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]). */
         abstract val activeIncludeId: Int
 
@@ -657,11 +661,23 @@ sealed class OnboardingDaxDialogCta(
         }
 
         override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+            cancelRunningAnimations()
             binding.includeOnboardingInContextDaxDialogBrandDesign.root
                 .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
                 ?.cancelAnimation()
             binding.includeOnboardingInContextDaxDialogBrandDesign.root.gone()
             ctaView = null
+        }
+
+        private fun cancelRunningAnimations() {
+            animationsSettled = true
+            runningFadeIn?.removeAllListeners()
+            runningFadeIn?.cancel()
+            runningFadeIn = null
+            runningFadeOut?.removeAllListeners()
+            runningFadeOut?.cancel()
+            runningFadeOut = null
+            ctaView?.animate()?.cancel()
         }
 
         override fun showOnboardingCta(
@@ -677,6 +693,8 @@ sealed class OnboardingDaxDialogCta(
             val isContentTransition = isContentTransition(container)
             ctaView = container
 
+            cancelRunningAnimations()
+
             if (instantShow) {
                 showInstantly(
                     container = container,
@@ -689,8 +707,7 @@ sealed class OnboardingDaxDialogCta(
                 return
             }
 
-            var animationsSettled = false
-            var contentFadeInAnimator: AnimatorSet? = null
+            animationsSettled = false
 
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
@@ -724,7 +741,7 @@ sealed class OnboardingDaxDialogCta(
                         animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
-                    contentFadeInAnimator = AnimatorSet().apply {
+                    runningFadeIn = AnimatorSet().apply {
                         playTogether(animators.toList())
                         addListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator) {
@@ -762,7 +779,7 @@ sealed class OnboardingDaxDialogCta(
                     }
                 }
                 buildBackgroundSlideOutAnimator(container)?.let { fadeOutAnimators += it }
-                AnimatorSet().apply {
+                runningFadeOut = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
@@ -795,7 +812,7 @@ sealed class OnboardingDaxDialogCta(
                     activeInclude = activeInclude,
                     cardContainer = cardContainer,
                     alreadySettled = animationsSettled,
-                    contentFadeInAnimator = contentFadeInAnimator,
+                    contentFadeInAnimator = runningFadeIn,
                     onSettled = { notifySettled() },
                 )
             }
@@ -1351,6 +1368,9 @@ sealed class DaxBubbleCta(
                 cardContainer?.interceptChildTouches = value
             }
 
+        private var contentFadeInAnimator: AnimatorSet? = null
+        private var fadeOutAnimator: AnimatorSet? = null
+
         protected fun resolveOnboardingContext(context: Context): Context {
             val themeRes = if (isLightTheme) {
                 DesignSystemR.style.Theme_DuckDuckGo_Light_Onboarding
@@ -1396,8 +1416,7 @@ sealed class DaxBubbleCta(
         ) {
             ctaView = container
 
-            var contentFadeInAnimator: AnimatorSet? = null
-            var fadeOutAnimator: AnimatorSet? = null
+            cancelRunningAnimations()
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val daxTitle = container.context.getString(title)
@@ -1549,9 +1568,10 @@ sealed class DaxBubbleCta(
                 isAnimating = false
                 titleView.finishAnimation()
                 headerImage?.animate()?.cancel()
-                if (fadeOutAnimator?.isRunning == true) {
+                val pendingFadeOut = fadeOutAnimator
+                if (pendingFadeOut?.isRunning == true) {
                     // cancel() fires onAnimationEnd synchronously, which applies settled state via the branch above.
-                    fadeOutAnimator.cancel()
+                    pendingFadeOut.cancel()
                 } else {
                     applySettledState()
                 }
@@ -1561,6 +1581,17 @@ sealed class DaxBubbleCta(
                 }
             }
             cardContainer?.setOnClickListener { snapToFinished() }
+        }
+
+        fun cancelRunningAnimations() {
+            isAnimating = false
+            contentFadeInAnimator?.removeAllListeners()
+            contentFadeInAnimator?.cancel()
+            contentFadeInAnimator = null
+            fadeOutAnimator?.removeAllListeners()
+            fadeOutAnimator?.cancel()
+            fadeOutAnimator = null
+            ctaView?.animate()?.cancel()
         }
 
         override fun clearDialog() {

@@ -2823,7 +2823,7 @@ class BrowserTabFragment :
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
-            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta()
+            is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)
@@ -4096,8 +4096,8 @@ class BrowserTabFragment :
         brokenSitePromptDialogCta.hideOnboardingCta(binding)
     }
 
-    private fun hideOnboardingDaxBubbleCta() {
-        hideDaxBubbleCta()
+    private fun hideOnboardingDaxBubbleCta(cta: DaxBubbleCta?) {
+        hideDaxBubbleCta(cta)
         renderer.showNewTab()
         // When the input-screen feature is on, the omnibar's click catcher disables the text
         // input, so requestFocus() can't succeed. Showing the IME there leaves the keyboard up
@@ -4108,7 +4108,8 @@ class BrowserTabFragment :
         }
     }
 
-    private fun hideDaxBubbleCta() {
+    private fun hideDaxBubbleCta(cta: DaxBubbleCta?) {
+        (cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta)?.cancelRunningAnimations()
         newBrowserTab.browserBackground.setImageResource(0)
         val wasBrandDesign = newBrowserTab.rebrandBrowserBackground.isVisible
         newBrowserTab.rebrandBrowserBackground.apply {
@@ -5839,6 +5840,7 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                val previousCta = lastSeenCtaViewState?.cta
                 lastSeenCtaViewState = viewState
                 when {
                     viewState.cta != null -> {
@@ -5851,7 +5853,7 @@ class BrowserTabFragment :
                     }
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
-                        hideDaxBubbleCta()
+                        hideDaxBubbleCta(previousCta as? DaxBubbleCta)
                         showNewTab()
                     }
                 }
@@ -6187,6 +6189,8 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             daxDialogInContext.dialogTextCta.cancelAnimation()
             daxDialogInContext.daxCtaContainer.gone()
+            (lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta)
+                ?.hideOnboardingCta(binding)
             daxDialogInContextBrandDesign.root
                 .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
                 ?.cancelAnimation()
