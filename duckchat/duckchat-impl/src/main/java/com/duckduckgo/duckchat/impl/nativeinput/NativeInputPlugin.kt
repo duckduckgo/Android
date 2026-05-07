@@ -23,7 +23,9 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
 
+/** State a plugin appends to the prompt at send time. Returned by [NativeInputPlugin.getPromptContribution]; null if it has nothing to add. */
 sealed class PromptContribution {
+    /** Model selected by the user (e.g. via a model picker plugin). */
     data class ModelSelection(val modelId: String) : PromptContribution()
     data class ReasoningEffortSelection(val effort: String) : PromptContribution()
 }
@@ -38,20 +40,30 @@ interface NativeInputHost {
     fun submit()
 
     fun showAttachmentChooser(showing: Boolean)
+
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /** Current input state of the host widget (mode, context, position). */
     fun getInputState(): NativeInputState
 }
 
+/**
+ * Contributes a view to the native-input widget and, optionally, state to be appended to the prompt at send time.
+ *
+ * Each plugin targets a specific [containerId] (a `FrameLayout` slot in the widget layout) and owns all click
+ * behaviour for the view it returns. The plugin point is gated by `pluginPointNativeInput`, and individual plugins
+ * are gated by their own `@ContributesActivePlugin` feature toggle, so only enabled plugins are emitted.
+ */
 interface NativeInputPlugin : ActivePlugin {
 
+    /** ID of the `FrameLayout` slot in the widget layout this plugin renders into. */
     val containerId: Int
 
+    /** Build the plugin view. Called once at widget setup. The [host] lets the plugin trigger a submit or read widget state. */
     fun createView(context: Context, host: NativeInputHost): View
 
+    /** State to append to the prompt when the user submits, or null if the plugin has nothing to contribute. */
     fun getPromptContribution(): PromptContribution?
-
 }
 
 @ContributesActivePluginPoint(
