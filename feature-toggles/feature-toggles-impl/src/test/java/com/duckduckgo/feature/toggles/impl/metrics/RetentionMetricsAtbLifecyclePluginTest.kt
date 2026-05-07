@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.impl.metrics
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
@@ -35,6 +36,7 @@ import org.junit.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+@SuppressLint("DenyListedApi")
 class RetentionMetricsAtbLifecyclePluginTest {
     @get:Rule
     @Suppress("unused")
