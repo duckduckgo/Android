@@ -18,11 +18,11 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/OnboardingPlanState.kt` | **New** — `NotStarted` / `InProgress` / `Completed` / `Skipped` |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/PreOnboardingDialog.kt` | **New** — sealed `PreOnboardingDialog` carrying both the dialog identity and its data (replaces the parallel `PreOnboardingDialogType` enum + per-step params for the orchestrator path) |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestratorFeature.kt` | **New** — `@ContributesRemoteFeature` toggle gating rollout |
-| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag. Expose `dialogState: StateFlow<PreOnboardingDialog?>` for dialog rendering and shrink `Command` to non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SetAddressBarPositionOptions`, `SkipDialogAnimation`). Legacy `when (currentDialog)` retained until phase 4 cleanup. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag. Expose `dialogState: StateFlow<PreOnboardingDialog?>` for dialog rendering and shrink `Command` to non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SkipDialogAnimation`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`). Legacy `when (currentDialog)` retained until phase 4 cleanup. |
 | `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt` | Refactor `configureDaxCta` to take a `PreOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)`. Split the existing `commands` observer into a `dialogState` observer (renders the current dialog) and a slimmer `commands` observer (handles transient signals only). Legacy `WelcomePage.kt` is untouched. |
 | `app/src/main/java/com/duckduckgo/app/onboarding/ui/OnboardingActivity.kt` | Add host-transition observer (launches `BrowserActivity` and self-finishes when current step's host is `BrowserContext`) |
 | `app/src/main/java/com/duckduckgo/app/browser/BrowserActivity.kt` | Add host-transition observer (launches `OnboardingActivity` and self-finishes when current step's host is `IsolatedContext`); add back-press intercept that closes app while linear flow is active |
-| `app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt` | Add `shouldSuppressForLinearOnboarding()` gate at the top of `refreshCta`, `getFireDialogCta`, `getSiteSuggestionsDialogCta`, `getEndStaticDialogCta` |
+| `app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt` | Add `isOnLinearBrowserStep()` gate at the top of `refreshCta`, `getFireDialogCta`, `getSiteSuggestionsDialogCta`, `getEndStaticDialogCta` |
 | `app/src/main/java/com/duckduckgo/app/launch/LaunchViewModel.kt` | When `isNewUser()`, route to host indicated by `orchestrator.currentStepHost()` instead of unconditionally to `OnboardingActivity` |
 
 ## Goals
@@ -56,7 +56,7 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 │         │   onEvent(StepEvent)                                       │
 │         │   requestFirstStep()    (called once by welcome page)      │
 │         │   currentStepHost(): Host                                  │
-│         │   shouldSuppressForLinearOnboarding(): Boolean             │
+│         │   isOnLinearBrowserStep(): Boolean                         │
 │         │                                                            │
 │         └──► AppStage facade (Room, unchanged)                       │
 │              writes stageCompleted(NEW)/(DAX_ONBOARDING) on          │
@@ -128,9 +128,10 @@ sealed interface PreOnboardingDialog {
 sealed interface StepEvent {
     data object PrimaryClicked : StepEvent
     data object SecondaryClicked : StepEvent
-    data class SystemResult(val ok: Boolean) : StepEvent
+    data class SystemResult(val ok: Boolean) : StepEvent           // role-manager intent result
     data class OmnibarTypeSelected(val type: OmnibarType) : StepEvent
     data class InputModeSelected(val withAi: Boolean) : StepEvent
+    data class InputDemoQuerySubmitted(val query: String, val isChat: Boolean) : StepEvent
 }
 
 sealed interface StepTransition {
@@ -209,6 +210,8 @@ sealed interface OnboardingPlanState {
 
 State lives entirely in a `MutableStateFlow<OnboardingPlanState>` inside the orchestrator. **No DataStore, no Room table, no persistence of `currentStepId`.** Today's flow restarts from scratch on process death; that behavior is preserved.
 
+The full state lifecycle, including the orchestrator's `AppStage` writes on terminal transitions and the `branchEntry` field used during side-branches, is in [`2026-05-06-linear-onboarding-orchestrator-design-state.puml`](2026-05-06-linear-onboarding-orchestrator-design-state.puml).
+
 ### `AppStage` migration
 
 `AppStage` (Room-backed enum: `NEW` / `DAX_ONBOARDING` / `ESTABLISHED`) stays as today's source of truth for "phase of onboarding". Existing readers (`LaunchViewModel.isNewUser`, `SystemSearchViewModel`, `BrowserAdditionalPixelParams`, `CtaViewModel.daxOnboardingActive`, `OnboardingFlowCheckerImpl`) don't change.
@@ -263,6 +266,8 @@ Finish-and-relaunch on every host change. Each activity observes orchestrator st
 
 Reasoning: matches today's `OnboardingActivity → BrowserActivity` pattern; no new component; state-derived (recoverable under activity recreation); on `BrowserContext` steps we don't expect users to accumulate any meaningful state, so finish-and-relaunch loses nothing.
 
+The full handoff for a `Isolated → Browser → Isolated` round-trip is in [`2026-05-06-linear-onboarding-orchestrator-design-host-transition.puml`](2026-05-06-linear-onboarding-orchestrator-design-host-transition.puml).
+
 ```kotlin
 // OnboardingActivity
 private var hostTransitionInitiated = false
@@ -303,7 +308,7 @@ Inside `BrowserActivity`, the reactive CTA path takes over via existing `CtaView
 
 ```kotlin
 // in CtaViewModel
-private suspend fun shouldSuppressForLinearOnboarding(): Boolean {
+private suspend fun isOnLinearBrowserStep(): Boolean {
     val state = orchestrator.state.value
     if (state !is InProgress) return false
     val step = orchestrator.planRegistry.allStepsById[state.currentStepId] ?: return false
@@ -311,14 +316,32 @@ private suspend fun shouldSuppressForLinearOnboarding(): Boolean {
 }
 
 suspend fun refreshCta(...): Cta? = withContext(dispatcher) {
-    if (shouldSuppressForLinearOnboarding()) return@withContext null
+    if (isOnLinearBrowserStep()) return@withContext null
     if (isBrowserShowing) getBrowserCta(site, detectedRefreshPatterns) else getHomeCta()
 }
 
 // same gate added to getFireDialogCta, getSiteSuggestionsDialogCta, getEndStaticDialogCta
 ```
 
-`BrowserTabFragment` is unchanged regarding orchestrator awareness. It calls `viewModel.refreshCta()` as today; the suppression is opaque to it. Today's `daxOnboardingActive()` checks inside `getHomeCta` / `getBrowserCta` continue to work — they return `false` while `AppStage == NEW`, naturally suppressing the dax CTAs. The new `shouldSuppressForLinearOnboarding()` gate covers the cases `daxOnboardingActive()` doesn't (widget CTA, per-site CTAs in `getBrowserCta`).
+`BrowserTabFragment` is unchanged regarding orchestrator awareness. It calls `viewModel.refreshCta()` as today; the suppression is opaque to it. Today's `daxOnboardingActive()` checks inside `getHomeCta` / `getBrowserCta` continue to work — they return `false` while `AppStage == NEW`, naturally suppressing the dax CTAs. The new `isOnLinearBrowserStep()` gate covers the cases `daxOnboardingActive()` doesn't (widget CTA, per-site CTAs in `getBrowserCta`).
+
+### `LaunchViewModel` routing
+
+`LaunchViewModel.showOnboardingOrHome()` today routes `isNewUser` users unconditionally to `Command.Onboarding`. The orchestrator adds a host indirection: when the orchestrator's first eligible step is a `BrowserContext` (only possible once the L→C→L→C follow-up lands, but the seam is in place now), launch routes directly to the browser instead.
+
+```kotlin
+suspend fun showOnboardingOrHome() {
+    command.value = if (userStageStore.isNewUser() && orchestrator.firstStepHost() == Host.BrowserContext) {
+        Command.Home()
+    } else if (userStageStore.isNewUser()) {
+        Command.Onboarding
+    } else {
+        Command.Home()
+    }
+}
+```
+
+`firstStepHost()` is a one-shot helper on the orchestrator that builds the plan if needed and returns the host of the first eligible main-path step, reading fresh config at call time. **Today's plan starts with an `IsolatedContext` step in every cohort, so this routing change is a no-op until a `BrowserContext` first step exists.** It's wired in now so the L→C→L→C follow-up only has to add the step descriptor and not also touch `LaunchViewModel`.
 
 ### Back button
 
@@ -343,7 +366,9 @@ When `OnboardingPlanState` is `NotStarted` / `Completed` / `Skipped`, the callba
 `BrandDesignUpdatePageViewModel` becomes a thin adapter that exposes two surfaces to the fragment:
 
 - **`dialogState: StateFlow<PreOnboardingDialog?>`** — the dialog the fragment should currently render (or `null` for "no dialog yet"). Replaces the family of `Show*Dialog` commands that exist today.
-- **`commands: Flow<Command>`** — transient, non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SetAddressBarPositionOptions`, `SkipDialogAnimation`). Channel-based as today.
+- **`commands: Flow<Command>`** — transient, non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SkipDialogAnimation`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`). Channel-based as today.
+
+  *Correction from earlier drafts:* `SetAddressBarPositionOptions` is **not** a command on `BrandDesignUpdatePageViewModel` — it lives on the legacy `WelcomePageViewModel` only. The brand-design fragment reads `selectedAddressBarPosition` from `viewState`, and with the new `dialogState` carrying `AddressBarPosition(showSplitOption)` the fragment renders straight off the dialog payload. No separate command is needed.
 
 The split eliminates a duplicated dispatch — without it, the same dialog identity would be encoded once into a `Show*Dialog` command and immediately decoded back in the fragment to call `configureDaxCta`. With the state-flow surface, the fragment's render path is a single dispatch on `PreOnboardingDialog`.
 
@@ -390,6 +415,7 @@ class BrandDesignUpdatePageViewModel ... {
     fun onSecondaryCtaClicked() = orchestrator.onEvent(StepEvent.SecondaryClicked)
     fun onAddressBarPositionOptionSelected(type: OmnibarType) = orchestrator.onEvent(StepEvent.OmnibarTypeSelected(type))
     fun onInputScreenOptionSelected(withAi: Boolean) = orchestrator.onEvent(StepEvent.InputModeSelected(withAi))
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) = orchestrator.onEvent(StepEvent.InputDemoQuerySubmitted(query, isChat))
     fun onDefaultBrowserSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = true))
     fun onDefaultBrowserNotSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = false))
 
@@ -417,7 +443,8 @@ viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { command ->
         OnboardingSkipped -> onSkipPressed()
         RequestNotificationPermissions -> requestNotificationsPermissions()
         SkipDialogAnimation -> skipDialogAnimations()
-        is SetAddressBarPositionOptions -> setAddressBarPositionOptions(command.selectedOption)
+        is FinishAndSubmitSearchQuery -> (activity as OnboardingActivity).finishAndSubmitSearchQuery(command.query)
+        is FinishAndSubmitChatPrompt -> (activity as OnboardingActivity).finishAndSubmitChatPrompt(command.prompt)
         // Show*Dialog cases removed — those are now in dialogState
     }
 }.launchIn(lifecycleScope)
@@ -438,7 +465,7 @@ private fun configureDaxCta(dialog: PreOnboardingDialog) {
 
 - **One dispatch, not three.** The orchestrator emits a step ID; the adapter resolves it to a `PreOnboardingDialog`; the fragment renders. No round-trip through a parallel `Show*Dialog` command vocabulary.
 - **State-flow semantics for the dialog.** A reader can ask "what dialog is the user looking at?" via `viewModel.dialogState.value`. Activity recreation re-renders the current dialog automatically; we don't need the channel to replay missed `Show*` commands.
-- **`Command` shrinks to genuinely transient signals.** Terminal events (`Finish`, `OnboardingSkipped`), system signals (`RequestNotificationPermissions`), and UI side-effects (`SetAddressBarPositionOptions`, `SkipDialogAnimation`). These remain channel-based because they're one-shots that should fire exactly once.
+- **`Command` shrinks to genuinely transient signals.** Terminal events (`Finish`, `OnboardingSkipped`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`), system signals (`RequestNotificationPermissions`), and UI side-effects (`SkipDialogAnimation`). These remain channel-based because they're one-shots that should fire exactly once.
 - **DefaultBrowser stays a dialog state, not a command.** Even though its rendering is a system intent rather than a custom view, it's still "what's currently active in the linear flow". Putting it in `dialogState` keeps the surface uniform.
 
 ## Rollout
@@ -450,7 +477,7 @@ private fun configureDaxCta(dialog: PreOnboardingDialog) {
 When the flag is off:
 - `BrandDesignUpdatePageViewModel` runs its existing in-VM `when (currentDialog)` path verbatim
 - `LinearOnboardingOrchestrator.state` stays at `NotStarted`
-- `CtaViewModel.shouldSuppressForLinearOnboarding()` returns false (state never leaves `NotStarted`)
+- `CtaViewModel.isOnLinearBrowserStep()` returns false (state never leaves `NotStarted`)
 - Activity host-transition observers never trigger (always see `NotStarted`)
 
 So the flag controls one thing: which codepath the brand-design viewmodel runs. Everything else is no-op-by-construction when disabled. Killswitch-safe.
@@ -548,8 +575,10 @@ Specifically:
 
 1. **`BrowserContext` step descriptor and renderer.** Owned by the first project to introduce a `BrowserContext` step. This spec only declares the structural seam.
 2. **`SYNC_RESTORE` coverage in `BrandDesignUpdatePageViewModel`.** The brand-design viewmodel imports `SYNC_RESTORE` and handles it in `fireDialogShownPixel`, but its `loadDaxDialog` never dispatches to it, `onPrimaryCtaClicked(SYNC_RESTORE)` has a `// TODO`, and `onSecondaryCtaClicked(SYNC_RESTORE)` is a no-op. The orchestrator spec includes a `SYNC_RESTORE` step. If the product team is intentionally dropping `SYNC_RESTORE` with the brand-design migration, the orchestrator's `syncRestoreStep()` factory is removed in one place (drop it from `mainPath`). If `SYNC_RESTORE` is being kept, the brand-design viewmodel needs the missing rendering paths backfilled before phase 4 cleanup.
-3. **Persistence as a follow-up.** If product later wants "preserve user's mid-flow position across process kills", it's a one-day add: DataStore-backed `OnboardingPlanState` + the reconciliation rule "if persisted `currentStepId` no longer in rebuilt plan, treat as `Completed`".
-4. **Plugin-extensible plan.** If the team's experiment-churn workload ever grows to multiple modules wanting to inject onboarding steps, `LinearStep` plugin contributions via `@ContributesPluginPoint` would cleanly extend the registry. Out of scope for now (one customer, monolithic plan).
+3. **`DefaultBrowser` intent nullability.** `defaultRoleBrowserDialog.createIntent(context)` is nullable today and the legacy VM falls through to `ADDRESS_BAR_POSITION` when it returns null while `shouldShowDialog()` is true. The orchestrator handles this by checking both in `defaultBrowserStep.precondition` (see Appendix A). Worth confirming with the team that this fall-through is the intended behaviour to preserve, since the legacy code also fires `DEFAULT_BROWSER_DIALOG_NOT_SHOWN` in that case — that pixel needs to keep firing on the orchestrator path too.
+4. **`expectedHost == null` while `NotStarted`.** `expectedHost(plan)` returns `null` when `OnboardingPlanState == NotStarted` — neither activity should redirect during that window. Today this is safe because `OnboardingActivity` is the only entry point during the welcome-animation phase before `requestFirstStep()` is called. If a future code path can hand the user to `BrowserActivity` *before* `requestFirstStep()`, the activity would silently linger; the `null` return is intentional to keep both activities passive during that window.
+5. **Persistence as a follow-up.** If product later wants "preserve user's mid-flow position across process kills", it's a one-day add: DataStore-backed `OnboardingPlanState` + the reconciliation rule "if persisted `currentStepId` no longer in rebuilt plan, treat as `Completed`".
+6. **Plugin-extensible plan.** If the team's experiment-churn workload ever grows to multiple modules wanting to inject onboarding steps, `LinearStep` plugin contributions via `@ContributesPluginPoint` would cleanly extend the registry. Out of scope for now (one customer, monolithic plan).
 
 
 ## Appendix A: Plan provider code
@@ -644,7 +673,13 @@ class LinearOnboardingPlanProvider @Inject constructor(
 
     private fun defaultBrowserStep() = IsolatedContext(
         id = ID_DEFAULT_BROWSER,
-        precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
+        // Both checks needed: createIntent(context) is nullable today, and the legacy code falls
+        // through to ADDRESS_BAR_POSITION when shouldShowDialog() is true but createIntent returns null
+        // (firing DEFAULT_BROWSER_DIALOG_NOT_SHOWN). Encoding both here preserves that behaviour.
+        precondition = {
+            defaultRoleBrowserDialog.shouldShowDialog() &&
+                defaultRoleBrowserDialog.createIntent(context) != null
+        },
         resolveDialog = {
             // Today the system intent is launched from inside COMPARISON_CHART's primary;
             // here it becomes a discrete step whose dialog carries the intent.
