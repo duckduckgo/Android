@@ -424,7 +424,9 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         setupBackPressHandling()
+        val contextualTabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID).orEmpty()
         contextualNativeInputManager.init(
+            tabId = contextualTabId,
             card = binding.contextualNativeInputCard,
             widget = binding.contextualNativeInputWidget,
             jsMessaging = contentScopeScripts,

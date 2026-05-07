@@ -113,8 +113,8 @@ interface NativeInputWidget {
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
     fun storePendingPrompt(query: String)
-    fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
-    fun configureContextual()
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
+    fun configureContextual(tabId: String)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -180,6 +180,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+    private var tabId: String = ""
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -244,7 +245,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
-
 
                         // The start-chat container drives its own visibility from input mode.
                         if (plugin.containerId != R.id.startChatContainer) {
@@ -661,7 +661,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         attachmentView?.clearAttachmentsForNewChat()
     }
 
-    override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+        this.tabId = tabId
         pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
             viewModel.configure(isDuckAiMode, isBottom)
@@ -672,7 +673,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun configureContextual() {
+    override fun configureContextual(tabId: String) {
+        this.tabId = tabId
         pendingIsDuckAiMode = true
         doOnAttach {
             viewModel.configureContextual()
@@ -900,8 +902,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    override fun getInputState(): NativeInputState = nativeInputState
-
     private fun configureSubmitButtons() {
         if (submitButtons != null) return
         val floating = floatingSubmitContainer
@@ -932,6 +932,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
         if (!submitAsChat()) viewModel.openNewChat()
     }
+
+    override fun getInputState(): NativeInputState {
+        return nativeInputState
+    }
+
+    override fun getTabId(): String = tabId
 
     companion object {
         private const val MAX_LINES = 5

@@ -45,6 +45,9 @@ interface NativeInputHost {
 
     /** Current input state of the host widget (mode, context, position). */
     fun getInputState(): NativeInputState
+
+    /** The tab ID this widget instance is currently attached to. */
+    fun getTabId(): String
 }
 
 /**
