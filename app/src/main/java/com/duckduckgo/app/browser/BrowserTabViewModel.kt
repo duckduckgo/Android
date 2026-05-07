@@ -4171,7 +4171,9 @@ class BrowserTabViewModel @Inject constructor(
         if (!orientationChanged) return
         viewModelScope.launch(dispatchers.io()) {
             if (onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()) {
-                command.postValue(Command.ReinflateBrandDesignContextualDialog)
+                withContext(dispatchers.main()) {
+                    command.value = Command.ReinflateBrandDesignContextualDialog
+                }
             }
         }
     }
