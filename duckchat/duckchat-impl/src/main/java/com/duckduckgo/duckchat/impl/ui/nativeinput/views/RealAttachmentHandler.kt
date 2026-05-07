@@ -25,7 +25,6 @@ import android.net.Uri
 import android.util.Base64
 import android.webkit.ValueCallback
 import androidx.core.graphics.scale
-import com.squareup.anvil.annotations.ContributesBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,16 +34,17 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
-import javax.inject.Inject
-import java.io.ByteArrayOutputStream
-import java.util.UUID
-import kotlin.math.max
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.util.UUID
+import javax.inject.Inject
+import kotlin.math.max
 
 interface AttachmentHandler {
     var onImageAttachmentAdded: ((ImageAttachment) -> Unit)?
@@ -142,10 +142,12 @@ class RealAttachmentHandler(
         if (attachments.isEmpty()) return null
         return JSONArray().apply {
             attachments.forEach { attachment ->
-                put(JSONObject().apply {
-                    put("data", attachment.base64Data)
-                    put("format", attachment.format)
-                })
+                put(
+                    JSONObject().apply {
+                        put("data", attachment.base64Data)
+                        put("format", attachment.format)
+                    },
+                )
             }
         }
     }
@@ -246,6 +248,7 @@ class RealAttachmentHandler(
             format = format,
         )
     }
+
     @SuppressLint("NewApi")
     private fun getCompressFormat(format: String): Bitmap.CompressFormat {
         val compressFormat = when (format) {

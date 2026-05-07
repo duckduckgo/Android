@@ -16,13 +16,13 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.attachment
 
-import com.squareup.anvil.annotations.ContributesBinding
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 interface LimitsHandler {
     val imageUploadLimitReached: StateFlow<Boolean>

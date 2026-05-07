@@ -51,7 +51,6 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.duckduckgo.duckchat.impl.nativeinput.Action
@@ -60,13 +59,13 @@ import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
-import org.json.JSONArray
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import javax.inject.Inject
 
 interface NativeInputWidget {

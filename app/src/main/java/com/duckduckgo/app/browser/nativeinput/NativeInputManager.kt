@@ -47,8 +47,8 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
-import org.json.JSONArray
 import kotlinx.coroutines.flow.onEach
+import org.json.JSONArray
 import javax.inject.Inject
 
 class NativeInputCallbacks(
