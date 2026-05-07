@@ -51,6 +51,9 @@ interface PirRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun ensureBrokerDataBeforeScan(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendInitialScanWideEvent(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)

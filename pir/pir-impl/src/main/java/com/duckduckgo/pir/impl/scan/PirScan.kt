@@ -57,6 +57,7 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        onJobCompleted: (suspend () -> Unit)? = null,
     ): Result<Unit>
 
     /**
@@ -128,6 +129,7 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        onJobCompleted: (suspend () -> Unit)?,
     ) = withContext(dispatcherProvider.io()) {
         logcat { "PIR-SCAN: Running scan on the following records: $jobRecords on ${Thread.currentThread().name}" }
         onJobStarted()
@@ -182,6 +184,7 @@ class RealPirScan @Inject constructor(
                     logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
                     runners[index].start(profile, listOf(step))
                     runners[index].stop()
+                    onJobCompleted?.invoke()
                     logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
                 }
             }
