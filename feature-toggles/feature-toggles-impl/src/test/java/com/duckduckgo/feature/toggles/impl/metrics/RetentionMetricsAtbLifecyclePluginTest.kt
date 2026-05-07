@@ -45,6 +45,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var searchMetricPixelsPlugin: SearchMetricPixelsPlugin
     private lateinit var appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin
+    private lateinit var duckAiPromptSentMetricPixelsPlugin: DuckAiPromptSentMetricPixelsPlugin
     private lateinit var atbLifecyclePlugin: RetentionMetricsAtbLifecyclePlugin
 
     @Before
@@ -70,10 +71,12 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         searchMetricPixelsPlugin = SearchMetricPixelsPlugin(inventory)
         appUseMetricPixelsPlugin = AppUseMetricPixelsPlugin(inventory)
+        duckAiPromptSentMetricPixelsPlugin = DuckAiPromptSentMetricPixelsPlugin(inventory)
 
         atbLifecyclePlugin = RetentionMetricsAtbLifecyclePlugin(
             searchMetricPixelsPlugin = searchMetricPixelsPlugin,
             appUseMetricPixelsPlugin = appUseMetricPixelsPlugin,
+            duckAiPromptSentMetricPixelsPlugin = duckAiPromptSentMetricPixelsPlugin,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
@@ -169,6 +172,43 @@ class RetentionMetricsAtbLifecyclePluginTest {
         )
 
         atbLifecyclePlugin.onAppRetentionAtbRefreshed("", "")
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.none { it.toggle.featureName().name == "experimentFooFeature" })
+        assertFalse(fakeMetricsPixelExtension.sentMetrics.none { it.toggle.featureName().name == "fooFeature" })
+    }
+
+    @Test
+    fun `when duck ai atb refreshed and cohorts assigned, send is called for all duck ai prompt sent metrics`() = runTest {
+        setCohorts(ZonedDateTime.now(ZoneId.of("America/New_York")).toString())
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
+
+        val expected = duckAiPromptSentMetricPixelsPlugin.getMetrics()
+        assertEquals(expected.size, fakeMetricsPixelExtension.sentMetrics.size)
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.all { it.metric == "duck_ai_prompt_sent" })
+    }
+
+    @Test
+    fun `when duck ai atb refreshed, only send metrics for active experiments`() = runTest {
+        val today = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
+        testFeature.experimentFooFeature().setRawStoredState(
+            State(
+                remoteEnableState = false,
+                enable = false,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+            ),
+        )
+        testFeature.fooFeature().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
+                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+            ),
+        )
+
+        atbLifecyclePlugin.onDuckAiRetentionAtbRefreshed("", "", emptyMap())
 
         assertTrue(fakeMetricsPixelExtension.sentMetrics.none { it.toggle.featureName().name == "experimentFooFeature" })
         assertFalse(fakeMetricsPixelExtension.sentMetrics.none { it.toggle.featureName().name == "fooFeature" })

@@ -29,6 +29,7 @@ import javax.inject.Inject
 class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     private val searchMetricPixelsPlugin: SearchMetricPixelsPlugin,
     private val appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin,
+    private val duckAiPromptSentMetricPixelsPlugin: DuckAiPromptSentMetricPixelsPlugin,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AtbLifecyclePlugin {
 
@@ -41,6 +42,12 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     override fun onAppRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         appCoroutineScope.launch {
             appUseMetricPixelsPlugin.getMetrics().forEach { it.send() }
+        }
+    }
+
+    override fun onDuckAiRetentionAtbRefreshed(oldAtb: String, newAtb: String, metadata: Map<String, String?>) {
+        appCoroutineScope.launch {
+            duckAiPromptSentMetricPixelsPlugin.getMetrics().forEach { it.send() }
         }
     }
 }
