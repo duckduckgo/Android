@@ -145,6 +145,9 @@
     <!-- Dax Switch -->
     <dimen name="daxSwitchThumbSize">32dp</dimen>
 
+    <!-- Dax Remote Message -->
+    <dimen name="remoteMessageCardImageSize">48dp</dimen>
+
     <!-- Slider -->
     <dimen name="sliderTrackHeight">6dp</dimen>
 

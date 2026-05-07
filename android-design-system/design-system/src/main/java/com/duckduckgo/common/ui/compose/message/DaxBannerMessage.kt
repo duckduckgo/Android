@@ -27,7 +27,7 @@ fun DaxBannerMessage(
     body: String,
     primaryAction: DaxAction,
     secondaryAction: DaxAction,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     DaxMessage(
         title = title,

@@ -51,9 +51,9 @@ import com.duckduckgo.mobile.android.R
 internal fun RemoteMessageWithIllustration(
     title: String,
     body: String,
-    topIllustration: @Composable () -> Unit = {},
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    topIllustration: @Composable () -> Unit = {},
     bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
 ) {
     RemoteMessage(
@@ -86,8 +86,8 @@ internal fun RemoteMessageWithIllustration(
     body: String,
     topIllustration: Painter,
     onDismissClicked: () -> Unit,
-    bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
     modifier: Modifier = Modifier,
+    bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
 ) {
     RemoteMessage(
         title = title,
@@ -106,7 +106,7 @@ internal fun RemoteMessageWithIllustration(
                             bottom = dimensionResource(R.dimen.keyline_2),
                         )
                         .align(Alignment.Center)
-                        .size(48.dp),
+                        .size(dimensionResource(R.dimen.remoteMessageCardImageSize)),
                 )
             }
         },
@@ -134,9 +134,9 @@ internal fun RemoteMessage(
     title: String,
     body: String,
     onDismissClicked: () -> Unit,
+    modifier: Modifier = Modifier,
     topIllustration: (@Composable () -> Unit)? = null,
     bottomActions: (@Composable DaxMessageButtonRowScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     DaxMessage(
         title = title,

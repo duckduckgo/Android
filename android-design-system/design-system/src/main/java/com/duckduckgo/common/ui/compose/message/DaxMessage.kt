@@ -56,6 +56,7 @@ import com.duckduckgo.mobile.android.R
 fun DaxMessage(
     title: String,
     body: String,
+    modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(0.dp),
     elevation: Dp = 0.dp,
     contentAlignment: ContentAlignment = ContentAlignment.Center,
@@ -63,7 +64,6 @@ fun DaxMessage(
     buttonRow: (@Composable DaxMessageButtonRowScope.() -> Unit)? = null,
     isDismissable: Boolean = false,
     onDismiss: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     val alignment = if (contentAlignment == ContentAlignment.Start) {
         Alignment.Start
@@ -168,7 +168,7 @@ internal object DaxMessageButtonRowScopeImpl : DaxMessageButtonRowScope
 /** A single button entry passed to a [DaxMessageButtonRowScope] helper. */
 data class DaxAction(
     val text: String,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
 )
 
 /**
