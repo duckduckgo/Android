@@ -99,6 +99,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val mutableNativeInputStateProvider: MutableNativeInputStateProvider,
 ) : ViewModel() {
 
+    // Empty until configure()/configureContextual() is called; callers should check isEmpty().
     private var tabId: String = ""
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -224,12 +225,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun configureContextual(tabId: String) {
         this.tabId = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
-        val currentMode = state.replayCache.lastOrNull()?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY
-        val currentPosition = state.replayCache.lastOrNull()?.inputPosition ?: NativeInputState.InputPosition.TOP
+        val snapshot = state.replayCache.lastOrNull()
         val structural = NativeInputState(
-            inputMode = currentMode,
+            inputMode = snapshot?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY,
             inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
-            inputPosition = currentPosition,
+            inputPosition = snapshot?.inputPosition ?: NativeInputState.InputPosition.TOP,
         )
         mutableNativeInputStateProvider.setActiveTab(tabId, structural)
     }
