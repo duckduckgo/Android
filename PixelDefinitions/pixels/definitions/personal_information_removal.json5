@@ -2031,27 +2031,27 @@
             {
                 "key": "feature.data.ext.profile_queries_count",
                 "description": "Number of user profile queries used in the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.broker_count",
                 "description": "Number of active brokers at the start of the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_scan_jobs",
                 "description": "Total number of (broker x profile) scan jobs eligible for execution at the start of the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.web_view_count",
                 "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_opt_out_jobs",
                 "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "manufacturer",
@@ -2265,27 +2265,27 @@
             {
                 "key": "feature.data.ext.profile_queries_count",
                 "description": "Number of user profile queries used in the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.broker_count",
                 "description": "Number of active brokers at the start of the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_scan_jobs",
                 "description": "Total number of (broker x profile) scan jobs eligible for execution at the start of the run",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.web_view_count",
                 "description": "Number of parallel WebView runners used during the scan portion. Equals min(total_scan_jobs, MAX_DETACHED_WEBVIEW_COUNT=20). 0 when there are no eligible scan jobs.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "feature.data.ext.total_opt_out_jobs",
                 "description": "Total number of opt-out jobs executed during the run. 0 when opt-out was skipped (no eligible form-opt-out brokers). Only populated on terminal events.",
-                "type": "string"
+                "type": "integer"
             },
             {
                 "key": "manufacturer",
