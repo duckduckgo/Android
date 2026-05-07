@@ -379,7 +379,13 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
-        val testee = TdsClient(TDS, listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = false)
+        val testee =
+            TdsClient(
+                TDS,
+                listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
+                mockUrlToTypeMapper,
+                optimizeTrackerEvaluationV3 = false,
+            )
 
         assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
         assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
