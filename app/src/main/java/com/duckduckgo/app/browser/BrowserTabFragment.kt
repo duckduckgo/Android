@@ -3779,7 +3779,6 @@ class BrowserTabFragment :
         val fragment = DuckChatContextualFragment()
         val args = Bundle()
         args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
-        args.putString(DuckChatContextualFragment.KEY_DUCK_AI_BROWSER_MODE, browserMode.name)
         fragment.arguments = args
 
         duckAiContextualFragment = fragment
