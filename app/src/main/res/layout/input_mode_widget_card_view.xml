@@ -35,7 +35,6 @@
         <com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
             android:id="@+id/inputModeWidget"
             android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.card.MaterialCardView>

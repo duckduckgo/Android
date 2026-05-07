@@ -16,6 +16,6 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="?attr/daxColorControlRaisedBackdrop" />
+    <solid android:color="?attr/daxColorBackdrop" />
     <corners android:radius="19dp" />
 </shape>

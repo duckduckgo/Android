@@ -370,7 +370,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 val iconResource =
                     when (iconState.icon) {
                         SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
-                        SEND -> R.drawable.ic_arrow_right_24_inverted
+                        SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
                     }
                 inputScreenButtons.setSendButtonIcon(iconResource)
             }.launchIn(lifecycleScope)
