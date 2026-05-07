@@ -181,6 +181,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
+    private var supportsUpload: Boolean = true
     private var nativeInputState: NativeInputState = NativeInputState(
         inputMode = NativeInputState.InputMode.SEARCH_ONLY,
         inputContext = NativeInputState.InputContext.BROWSER,
@@ -787,7 +788,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateDuckAiSubmitButton() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
-        setImageButtonVisible(isChatTab)
+        setImageButtonVisible(isChatTab && supportsUpload)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             if (!isStreaming) {
@@ -812,12 +813,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private val onPluginAction = fun(action: Action) {
         when (action) {
             Action.StartChat -> if (!submitAsChat()) viewModel.openNewChat()
-            is Action.AttachmentChooserShowing -> onAttachmentChooserStateChanged?.invoke(action.showing)
-            Action.RequestFocusInput -> focusInput(context as? Activity)
+            is Action.ShowAttachmentChooser -> onAttachmentChooserStateChanged?.invoke(action.showing)
             is Action.AttachmentStateChanged -> {
                 val hadLimitError = attachmentLimitExceeded
                 attachmentLimitExceeded = action.limitExceeded
                 hasAttachments = action.hasAttachments
+                supportsUpload = action.supportsUpload
+                setImageButtonVisible(isChatTabSelected() && supportsUpload)
                 if (hadLimitError != attachmentLimitExceeded) {
                     floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
                     if (!attachmentLimitExceeded) updateSendButtonVisibility()

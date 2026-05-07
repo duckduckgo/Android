@@ -143,11 +143,11 @@ class AttachmentView(
         limitErrorView?.text = state.imageLimitError
         limitErrorView?.visibility = if (state.imageLimitError != null) VISIBLE else GONE
 
-        onAction?.invoke(Action.AttachmentStateChanged(state.hasAttachments, state.imageLimitError != null))
+        onAction?.invoke(Action.AttachmentStateChanged(state.hasAttachments, state.imageLimitError != null, state.supportsUpload))
     }
 
     private fun showChooserDialog() {
-        onAction?.invoke(Action.AttachmentChooserShowing(true))
+        onAction?.invoke(Action.ShowAttachmentChooser(true))
 
         ActionBottomSheetDialog.Builder(context)
             .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
@@ -166,9 +166,7 @@ class AttachmentView(
                     pickerLaunched = true
                     val callback = ValueCallback<Array<Uri>> { uris ->
                         val list = uris?.toList()
-                        if (list.isNullOrEmpty()) {
-                            onAction?.invoke(Action.RequestFocusInput)
-                        } else {
+                        if (!list.isNullOrEmpty()) {
                             viewModel?.onImagesPicked(list)
                         }
                     }
@@ -179,9 +177,7 @@ class AttachmentView(
                     pickerLaunched = true
                     val callback = ValueCallback<Array<Uri>> { uris ->
                         val list = uris?.toList()
-                        if (list.isNullOrEmpty()) {
-                            onAction?.invoke(Action.RequestFocusInput)
-                        } else {
+                        if (!list.isNullOrEmpty()) {
                             viewModel?.onImagesPicked(list)
                         }
                     }
@@ -190,7 +186,7 @@ class AttachmentView(
 
                 override fun onBottomSheetDismissed() {
                     if (!pickerLaunched) {
-                        onAction?.invoke(Action.AttachmentChooserShowing(false))
+                        onAction?.invoke(Action.ShowAttachmentChooser(false))
                     }
                 }
             }).show()
