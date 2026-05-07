@@ -16,13 +16,10 @@
 
 package com.duckduckgo.verifiedinstallation.certificate
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,39 +36,17 @@ class SigningCertificateHashExtractorImpl @Inject constructor(
     private val context: Context,
 ) : SigningCertificateHashExtractor {
 
-    @SuppressLint("NewApi")
     override fun sha256Hash(): String? {
         return kotlin.runCatching {
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
-                getSigningCertHashesModern()
-            } else {
-                getSigningCertHashesLegacy()
+            val info: PackageInfo? = context.packageManager.getPackageInfo(appBuildConfig.applicationId, PackageManager.GET_SIGNING_CERTIFICATES)
+            val signingInfo = info?.signingInfo ?: return@runCatching null
+
+            if (signingInfo.signingCertificateHistory.size != 1) {
+                return@runCatching null
             }
+
+            signingInfo.signingCertificateHistory?.lastOrNull()?.sha256()
         }.getOrNull()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun getSigningCertHashesLegacy(): String? {
-        val info: PackageInfo? = context.packageManager.getPackageInfo(appBuildConfig.applicationId, PackageManager.GET_SIGNATURES)
-        val signatures = info?.signatures ?: return null
-
-        if (signatures.size != 1) {
-            return null
-        }
-
-        return signatures.firstOrNull()?.sha256()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.P)
-    private fun getSigningCertHashesModern(): String? {
-        val info: PackageInfo? = context.packageManager.getPackageInfo(appBuildConfig.applicationId, PackageManager.GET_SIGNING_CERTIFICATES)
-        val signingInfo = info?.signingInfo ?: return null
-
-        if (signingInfo.signingCertificateHistory.size != 1) {
-            return null
-        }
-
-        return signingInfo.signingCertificateHistory?.lastOrNull()?.sha256()
     }
 
     private fun Signature.sha256(): String {
