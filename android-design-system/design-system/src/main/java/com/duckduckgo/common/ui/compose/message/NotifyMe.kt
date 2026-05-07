@@ -31,7 +31,8 @@ fun NotifyMe(
     title: String,
     body: String,
     primaryAction: DaxAction,
-    secondaryAction: DaxAction
+    secondaryAction: DaxAction,
+    modifier: Modifier = Modifier,
 ) {
     DaxMessage(
         title = title,
@@ -39,7 +40,7 @@ fun NotifyMe(
         elevation = 4.dp,
         shape = DuckDuckGoTheme.shapes.large,
         contentAlignment = ContentAlignment.Start,
-        modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
+        modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
         buttonRow = {
             RightAlignButtons(
                 primary = primaryAction,

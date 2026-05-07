@@ -86,8 +86,8 @@ internal fun RemoteMessageWithIllustration(
     body: String,
     topIllustration: Painter,
     onDismissClicked: () -> Unit,
-    modifier: Modifier = Modifier,
     bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     RemoteMessage(
         title = title,
@@ -134,9 +134,9 @@ internal fun RemoteMessage(
     title: String,
     body: String,
     onDismissClicked: () -> Unit,
-    modifier: Modifier = Modifier,
     topIllustration: (@Composable () -> Unit)? = null,
     bottomActions: (@Composable DaxMessageButtonRowScope.() -> Unit)? = null,
+    modifier: Modifier = Modifier,
 ) {
     DaxMessage(
         title = title,

@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.compose.message
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
@@ -25,7 +26,8 @@ fun DaxBannerMessage(
     title: String,
     body: String,
     primaryAction: DaxAction,
-    secondaryAction: DaxAction
+    secondaryAction: DaxAction,
+    modifier: Modifier = Modifier
 ) {
     DaxMessage(
         title = title,
@@ -37,6 +39,7 @@ fun DaxBannerMessage(
                 secondary = secondaryAction,
             )
         },
+        modifier = modifier,
     )
 }
 
