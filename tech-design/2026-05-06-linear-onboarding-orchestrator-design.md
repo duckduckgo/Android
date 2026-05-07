@@ -18,8 +18,8 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/OnboardingPlanState.kt` | **New** — `NotStarted` / `InProgress` / `Completed` / `Skipped` |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/PreOnboardingDialog.kt` | **New** — sealed `PreOnboardingDialog` carrying both the dialog identity and its data (replaces the parallel `PreOnboardingDialogType` enum + per-step params for the orchestrator path) |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestratorFeature.kt` | **New** — `@ContributesRemoteFeature` toggle gating rollout |
-| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag; legacy `when (currentDialog)` retained until phase 4 cleanup |
-| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt` | Refactor `configureDaxCta` to take a `PreOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)`. Per-branch bodies unchanged except they read fields off the variant. Legacy `WelcomePage.kt` is untouched. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag. Expose `dialogState: StateFlow<PreOnboardingDialog?>` for dialog rendering and shrink `Command` to non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SetAddressBarPositionOptions`, `SkipDialogAnimation`). Legacy `when (currentDialog)` retained until phase 4 cleanup. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt` | Refactor `configureDaxCta` to take a `PreOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)`. Split the existing `commands` observer into a `dialogState` observer (renders the current dialog) and a slimmer `commands` observer (handles transient signals only). Legacy `WelcomePage.kt` is untouched. |
 | `app/src/main/java/com/duckduckgo/app/onboarding/ui/OnboardingActivity.kt` | Add host-transition observer (launches `BrowserActivity` and self-finishes when current step's host is `BrowserContext`) |
 | `app/src/main/java/com/duckduckgo/app/browser/BrowserActivity.kt` | Add host-transition observer (launches `OnboardingActivity` and self-finishes when current step's host is `IsolatedContext`); add back-press intercept that closes app while linear flow is active |
 | `app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt` | Add `shouldSuppressForLinearOnboarding()` gate at the top of `refreshCta`, `getFireDialogCta`, `getSiteSuggestionsDialogCta`, `getEndStaticDialogCta` |
@@ -76,8 +76,8 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 │                                 │      │                               │
 │  BrandDesignUpdatePageVM        │      │  CtaViewModel.refreshCta() &  │
 │   (flag-gated): observe         │      │   friends suppress while      │
-│   orchestrator.state, emit      │      │   on a BrowserContext step    │
-│   ShowXxxDialog commands        │      │                               │
+│   orchestrator.state, expose    │      │   on a BrowserContext step    │
+│   PreOnboardingDialog state     │      │                               │
 │                                 │      │  BrowserContext renderer:     │
 │  WelcomePage / BrandDesign      │      │   DEFERRED (first project to  │
 │  page Fragment unchanged:       │      │   introduce a BrowserContext  │
@@ -340,64 +340,106 @@ When `OnboardingPlanState` is `NotStarted` / `Completed` / `Skipped`, the callba
 
 ## Renderer adapter
 
-`BrandDesignUpdatePageViewModel` becomes a thin adapter between the orchestrator's state and the fragment's existing `Show*Dialog` commands. Conceptually:
+`BrandDesignUpdatePageViewModel` becomes a thin adapter that exposes two surfaces to the fragment:
+
+- **`dialogState: StateFlow<PreOnboardingDialog?>`** — the dialog the fragment should currently render (or `null` for "no dialog yet"). Replaces the family of `Show*Dialog` commands that exist today.
+- **`commands: Flow<Command>`** — transient, non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SetAddressBarPositionOptions`, `SkipDialogAnimation`). Channel-based as today.
+
+The split eliminates a duplicated dispatch — without it, the same dialog identity would be encoded once into a `Show*Dialog` command and immediately decoded back in the fragment to call `configureDaxCta`. With the state-flow surface, the fragment's render path is a single dispatch on `PreOnboardingDialog`.
 
 ```kotlin
-init {
-    if (linearOnboardingOrchestratorFeature.self().isEnabled()) {
-        observeOrchestratorState()
-    } else {
-        // existing in-VM state machine path (unchanged)
-    }
-}
+class BrandDesignUpdatePageViewModel ... {
+    private val _dialogState = MutableStateFlow<PreOnboardingDialog?>(null)
+    val dialogState: StateFlow<PreOnboardingDialog?> = _dialogState
 
-private fun observeOrchestratorState() {
-    orchestrator.state.onEach { state ->
-        when (state) {
-            is InProgress -> emitShowDialogForCurrentStep(state.currentStepId)
-            Completed, Skipped -> _commands.send(Command.Finish)  // (or OnboardingSkipped)
-            NotStarted -> { /* welcome animation playing — no action */ }
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    init {
+        if (linearOnboardingOrchestratorFeature.self().isEnabled()) {
+            observeOrchestratorState()
+        } else {
+            // existing in-VM state machine path (unchanged)
         }
-    }.launchIn(viewModelScope)
-}
-
-private suspend fun emitShowDialogForCurrentStep(stepId: StepId) {
-    val step = orchestrator.planRegistry.allStepsById[stepId] as? IsolatedContext ?: return
-    val dialog = step.resolveDialog()
-    val command = when (dialog) {
-        SyncRestore -> Command.ShowSyncRestoreDialog
-        is Initial -> Command.ShowInitialDialog(showDuckAiCopy = dialog.showDuckAiCopy)
-        is InitialReinstallUser -> Command.ShowInitialReinstallUserDialog(showDuckAiCopy = dialog.showDuckAiCopy)
-        is ComparisonChart -> Command.ShowComparisonChart(showDuckAiCopy = dialog.showDuckAiCopy)
-        is DefaultBrowser -> Command.ShowDefaultBrowserDialog(intent = dialog.intent)
-        is AddressBarPosition -> Command.ShowAddressBarPositionDialog(showSplitOption = dialog.showSplitOption)
-        is InputScreen -> Command.ShowInputScreenDialog(showDuckAiCopy = dialog.showDuckAiCopy)
-        is InputScreenPreview -> Command.ShowInputScreenPreviewDialog(isSearchDefault = dialog.isSearchDefault)
-        SkipOnboardingOption -> Command.ShowSkipOnboardingOption
     }
-    _commands.send(command)
-    fireDialogShownPixel(dialog)  // existing show-time pixel logic, dispatched on sealed variant
-}
 
-// fragment-callback routing
-fun onPrimaryCtaClicked() = orchestrator.onEvent(StepEvent.PrimaryClicked)
-fun onSecondaryCtaClicked() = orchestrator.onEvent(StepEvent.SecondaryClicked)
-fun onAddressBarPositionOptionSelected(type: OmnibarType) = orchestrator.onEvent(StepEvent.OmnibarTypeSelected(type))
-fun onInputScreenOptionSelected(withAi: Boolean) = orchestrator.onEvent(StepEvent.InputModeSelected(withAi))
-fun onDefaultBrowserSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = true))
-fun onDefaultBrowserNotSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = false))
+    private fun observeOrchestratorState() {
+        orchestrator.state.onEach { state ->
+            when (state) {
+                is InProgress -> {
+                    val step = orchestrator.planRegistry.allStepsById[state.currentStepId] as? IsolatedContext
+                    val dialog = step?.resolveDialog()
+                    _dialogState.value = dialog
+                    if (dialog != null) fireDialogShownPixel(dialog)  // show-time pixel
+                }
+                Completed -> {
+                    _dialogState.value = null
+                    _commands.send(Command.Finish)
+                }
+                Skipped -> {
+                    _dialogState.value = null
+                    _commands.send(Command.OnboardingSkipped)
+                }
+                NotStarted -> _dialogState.value = null  // welcome animation playing
+            }
+        }.launchIn(viewModelScope)
+    }
 
-// trigger the first step after welcome animation completes (called by the fragment, replaces today's loadDaxDialog logic)
-fun loadDaxDialog() {
-    if (linearOnboardingOrchestratorFeature.self().isEnabled()) {
-        viewModelScope.launch { orchestrator.requestFirstStep() }
-    } else {
-        // existing in-VM logic (unchanged)
+    // fragment-callback routing
+    fun onPrimaryCtaClicked() = orchestrator.onEvent(StepEvent.PrimaryClicked)
+    fun onSecondaryCtaClicked() = orchestrator.onEvent(StepEvent.SecondaryClicked)
+    fun onAddressBarPositionOptionSelected(type: OmnibarType) = orchestrator.onEvent(StepEvent.OmnibarTypeSelected(type))
+    fun onInputScreenOptionSelected(withAi: Boolean) = orchestrator.onEvent(StepEvent.InputModeSelected(withAi))
+    fun onDefaultBrowserSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = true))
+    fun onDefaultBrowserNotSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = false))
+
+    // called by the fragment after the welcome animation completes (replaces today's loadDaxDialog logic)
+    fun loadDaxDialog() {
+        if (linearOnboardingOrchestratorFeature.self().isEnabled()) {
+            viewModelScope.launch { orchestrator.requestFirstStep() }
+        } else {
+            // existing in-VM logic (unchanged)
+        }
     }
 }
 ```
 
-The fragment (`BrandDesignUpdateWelcomePage`) keeps calling `viewModel.onPrimaryCtaClicked()` etc. and observing the same `Command` flow. The only fragment-side change is that `configureDaxCta` is refactored to take the unified `PreOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)` — see the Files Changed table.
+Fragment-side, the observer splits in two:
+
+```kotlin
+viewModel.dialogState.flowWithLifecycle(lifecycle, STARTED).onEach { dialog ->
+    dialog?.let { configureDaxCta(it) }
+}.launchIn(lifecycleScope)
+
+viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { command ->
+    when (command) {
+        Finish -> onContinuePressed()
+        OnboardingSkipped -> onSkipPressed()
+        RequestNotificationPermissions -> requestNotificationsPermissions()
+        SkipDialogAnimation -> skipDialogAnimations()
+        is SetAddressBarPositionOptions -> setAddressBarPositionOptions(command.selectedOption)
+        // Show*Dialog cases removed — those are now in dialogState
+    }
+}.launchIn(lifecycleScope)
+```
+
+`configureDaxCta(dialog: PreOnboardingDialog)` becomes the single fragment-side rendering entry point — including handling `DefaultBrowser` by launching the system role-manager intent rather than rendering a dax dialog:
+
+```kotlin
+private fun configureDaxCta(dialog: PreOnboardingDialog) {
+    when (dialog) {
+        is DefaultBrowser -> startActivityForResult(dialog.intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+        else -> renderDaxDialog(dialog)  // existing per-variant rendering, dispatched on the sealed type
+    }
+}
+```
+
+### Why this shape
+
+- **One dispatch, not three.** The orchestrator emits a step ID; the adapter resolves it to a `PreOnboardingDialog`; the fragment renders. No round-trip through a parallel `Show*Dialog` command vocabulary.
+- **State-flow semantics for the dialog.** A reader can ask "what dialog is the user looking at?" via `viewModel.dialogState.value`. Activity recreation re-renders the current dialog automatically; we don't need the channel to replay missed `Show*` commands.
+- **`Command` shrinks to genuinely transient signals.** Terminal events (`Finish`, `OnboardingSkipped`), system signals (`RequestNotificationPermissions`), and UI side-effects (`SetAddressBarPositionOptions`, `SkipDialogAnimation`). These remain channel-based because they're one-shots that should fire exactly once.
+- **DefaultBrowser stays a dialog state, not a command.** Even though its rendering is a system intent rather than a custom view, it's still "what's currently active in the linear flow". Putting it in `dialogState` keeps the surface uniform.
 
 ## Rollout
 
