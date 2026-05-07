@@ -352,7 +352,7 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
-                    widget.storePendingPromptWithAttachments(query)
+                    widget.storePendingPrompt(query)
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()

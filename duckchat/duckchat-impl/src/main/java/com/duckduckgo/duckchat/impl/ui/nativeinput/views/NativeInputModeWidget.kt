@@ -109,7 +109,7 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun getImageAttachmentsJson(): JSONArray?
     fun clearImageAttachments()
-    fun storePendingPromptWithAttachments(query: String)
+    fun storePendingPrompt(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual()
     fun isWidgetBottom(): Boolean
@@ -592,7 +592,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         attachmentView?.clearAttachments()
     }
 
-    override fun storePendingPromptWithAttachments(query: String) {
+    override fun storePendingPrompt(query: String) {
         val images = attachmentView?.getImageAttachments()?.map {
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
         } ?: emptyList()
