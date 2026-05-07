@@ -26,13 +26,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ImageAttachmentsContainerView
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @SuppressLint("ViewConstructor")
 class AttachmentView(
@@ -42,8 +36,6 @@ class AttachmentView(
 
     private var attachmentsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
-    private var imageUploadLimitJob: Job? = null
-    private var wired = false
 
     init {
         setTag(R.id.attachButtonContainer, attachmentHandler)
@@ -66,20 +58,12 @@ class AttachmentView(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        if (!wired) {
-            val attachmentsContainer = (parent as? View)?.rootView
-                ?.findViewById<FrameLayout>(R.id.attachmentsContainer)
-            if (attachmentsContainer != null) {
-                wireToAttachmentsContainer(attachmentsContainer)
-                wired = true
-            }
-        }
-    }
 
-    private fun wireToAttachmentsContainer(attachmentsContainer: FrameLayout) {
-        setupAttachmentViews(attachmentsContainer)
-        wireHandlerCallbacks(attachmentsContainer)
-        observeImageUploadLimit()
+        val attachmentsContainer = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer)
+        if (attachmentsContainer != null) {
+            setupAttachmentViews(attachmentsContainer)
+            wireHandlerCallbacks(attachmentsContainer)
+        }
     }
 
     private fun setupAttachmentViews(attachmentsContainer: FrameLayout) {
@@ -122,27 +106,20 @@ class AttachmentView(
             attachmentsContainer.isVisible = true
             attachmentHandler.updateImageCount(attachmentHandler.getImageAttachments().size)
         }
+        val existingOnLimitError = attachmentHandler.onImageLimitError
         attachmentHandler.onImageLimitError = { message ->
             showAttachmentLimitError(message)
+            existingOnLimitError?.invoke(message)
         }
+        val existingOnLimitClear = attachmentHandler.onImageLimitErrorClear
         attachmentHandler.onImageLimitErrorClear = {
             hideAttachmentLimitError()
+            existingOnLimitClear?.invoke()
         }
         attachmentHandler.onAttachmentsCleared = {
             imageAttachmentsContainer?.clearAttachments()
             attachmentsContainer.isVisible = false
         }
-    }
-
-    private fun observeImageUploadLimit() {
-        imageUploadLimitJob?.cancel()
-        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
-        imageUploadLimitJob = attachmentHandler.imageUploadLimitReached
-            .onEach { reached ->
-                attachmentHandler.conversationImageLimitReached = reached
-                if (!reached) attachmentHandler.resetConversationCounts()
-            }
-            .launchIn(scope)
     }
 
     private fun showAttachmentLimitError(message: String) {
@@ -164,11 +141,5 @@ class AttachmentView(
 
     private fun hideAttachmentLimitError() {
         attachmentsLayout?.findViewWithTag<TextView>("attachmentError")?.visibility = GONE
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        imageUploadLimitJob?.cancel()
-        imageUploadLimitJob = null
     }
 }

@@ -614,6 +614,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
+        duckChatJSHelper.resetConversationLimits()
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {

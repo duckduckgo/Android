@@ -174,6 +174,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+    private var imageUploadLimitJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -265,25 +266,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
             attachmentHandler = handler
             handler.onChooserStateChanged = { showing -> onAttachmentChooserStateChanged?.invoke(showing) }
             handler.onRequestFocus = { focusInput(context as? Activity) }
-
-            pluginView.post {
-                handler.onAttachmentCountChanged = { updateAttachmentState() }
-                val viewOnLimitError = handler.onImageLimitError
-                handler.onImageLimitError = { message ->
-                    viewOnLimitError?.invoke(message)
-                    attachmentLimitExceeded = true
-                    floatingSubmitContainer?.visibility = GONE
-                }
-                val viewOnLimitClear = handler.onImageLimitErrorClear
-                handler.onImageLimitErrorClear = {
-                    viewOnLimitClear?.invoke()
-                    attachmentLimitExceeded = false
-                    floatingSubmitContainer?.visibility = VISIBLE
-                    updateSendButtonVisibility()
-                }
-                pendingCameraCaptureCallback?.let { handler.onCameraCaptureRequested = it }
-                pendingFilePickerCallback?.let { handler.onFilePickerRequested = it }
+            handler.onAttachmentCountChanged = { updateAttachmentState() }
+            val viewOnLimitError = handler.onImageLimitError
+            handler.onImageLimitError = { message ->
+                viewOnLimitError?.invoke(message)
+                attachmentLimitExceeded = true
+                floatingSubmitContainer?.visibility = GONE
             }
+            val viewOnLimitClear = handler.onImageLimitErrorClear
+            handler.onImageLimitErrorClear = {
+                viewOnLimitClear?.invoke()
+                attachmentLimitExceeded = false
+                floatingSubmitContainer?.visibility = VISIBLE
+                updateSendButtonVisibility()
+            }
+            pendingCameraCaptureCallback?.let { handler.onCameraCaptureRequested = it }
+            pendingFilePickerCallback?.let { handler.onFilePickerRequested = it }
+            observeImageUploadLimit(handler)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -304,6 +303,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun observeImageUploadLimit(handler: AttachmentHandler) {
+        imageUploadLimitJob?.cancel()
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        imageUploadLimitJob = handler.imageUploadLimitReached
+            .onEach { reached ->
+                handler.conversationImageLimitReached = reached
+                updateAttachmentState()
+            }
+            .launchIn(scope)
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
@@ -316,6 +326,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         nativeInputStateJob = null
         pluginsJob?.cancel()
         pluginsJob = null
+        imageUploadLimitJob?.cancel()
+        imageUploadLimitJob = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -401,6 +413,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val handler = attachmentHandler ?: return
         val container = findViewById<FrameLayout?>(R.id.attachButtonContainer) ?: return
         container.isVisible = handler.supportsImageUpload()
+        container.isEnabled = !handler.isAtMaxCapacity()
     }
 
     private fun applyState(state: NativeInputState) {

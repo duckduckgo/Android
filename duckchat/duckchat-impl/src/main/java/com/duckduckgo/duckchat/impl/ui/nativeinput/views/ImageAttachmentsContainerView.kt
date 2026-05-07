@@ -52,15 +52,10 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
         }
     }
 
-    fun getAttachments(): List<ImageAttachment> = attachments.toList()
-
     fun clearAttachments() {
-        attachments.forEach { it.bitmap.recycle() }
         attachments.clear()
         removeAllViews()
     }
-
-    fun attachmentCount(): Int = attachments.size
 
     private fun addThumbnailView(attachment: ImageAttachment) {
         val thumbnailView = LayoutInflater.from(context).inflate(R.layout.view_image_attachment_thumbnail, this, false)

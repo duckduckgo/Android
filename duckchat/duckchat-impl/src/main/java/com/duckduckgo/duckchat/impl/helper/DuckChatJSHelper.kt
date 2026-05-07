@@ -72,6 +72,8 @@ interface DuckChatJSHelper {
     fun clearTabContextPromptEvent()
 
     fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
+
+    fun resetConversationLimits()
 }
 
 enum class Mode {
@@ -125,7 +127,10 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also { registerDuckChatIsOpenDebounced() }
+                }.also {
+                    registerDuckChatIsOpenDebounced()
+                    limitsHandler.setImageUploadLimitReached(false)
+                }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -306,6 +311,11 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun clearTabContextPromptEvent() {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         pendingTabContextStore.clear()
+    }
+
+    override fun resetConversationLimits() {
+        limitsHandler.resetConversationImagesSent()
+        limitsHandler.setImageUploadLimitReached(false)
     }
 
     override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
