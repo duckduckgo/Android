@@ -1006,6 +1006,7 @@ class PirEndToEndTest {
             isTrackerBlockingEnabled: Boolean,
         ) = Unit
 
+        override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) = Unit
         override suspend fun onScanJobCompleted(executionType: PirExecutionType) = Unit
         override suspend fun onScanCompleted(executionType: PirExecutionType) = Unit
         override suspend fun onOptOutStarted(executionType: PirExecutionType) = Unit

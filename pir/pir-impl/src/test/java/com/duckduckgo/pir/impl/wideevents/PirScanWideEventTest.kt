@@ -297,6 +297,58 @@ class PirScanWideEventTest {
     }
 
     @Test
+    fun whenScanJobsResolvedToLowerCountThenDecileMathUsesActualCount() = runTest {
+        // Given - PirJobsRunner says 100 eligible jobs, but PirScan filters down to 5.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(42L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 100)
+
+        // When - PirScan reports the resolved count, then runs only 5 jobs.
+        testee.onScanJobsResolved(PirExecutionType.MANUAL_INITIAL, actualScanJobs = 5)
+        repeat(5) { testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) }
+
+        // Then - decile math uses the actual count (5), so progress_90 fires on the last job
+        // (5/5 = 100% → clamped to 90). Without the resolved-count update, completedScanJobs/100
+        // would only reach 5%, and no progress step would fire — that's the bug being fixed.
+        verify(wideEventClient).flowStep(wideEventId = 42L, stepName = "progress_90", success = true)
+    }
+
+    @Test
+    fun whenScanJobsResolvedToZeroThenOpenDecileIntervalIsClosed() = runTest {
+        // Given - PirJobsRunner says 10 eligible jobs (so onRunStarted opened decile_0_10),
+        // but PirScan filters all of them out.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(43L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
+
+        // When
+        testee.onScanJobsResolved(PirExecutionType.MANUAL_INITIAL, actualScanJobs = 0)
+
+        // Then - the decile_0_10 interval opened in onRunStarted is closed so it doesn't carry
+        // through to scan_completed.
+        verify(wideEventClient).intervalEnd(wideEventId = 43L, key = "decile_0_10_duration_ms_bucketed")
+    }
+
+    @Test
+    fun whenScanJobsResolvedToSameCountThenNoStateChange() = runTest {
+        // Given - resolved count matches the pre-filter estimate (the common case).
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(44L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
+
+        // When
+        testee.onScanJobsResolved(PirExecutionType.MANUAL_INITIAL, actualScanJobs = 10)
+        repeat(10) { testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) }
+
+        // Then - decile math still works as expected with the unchanged total. No spurious
+        // intervalEnd call (the interval is closed only when crossing a decile, not on resolution).
+        for (decile in 1..9) {
+            verify(wideEventClient).flowStep(
+                wideEventId = 44L,
+                stepName = "progress_${decile * 10}",
+                success = true,
+            )
+        }
+    }
+
+    @Test
     fun whenRunStartedWithZeroTotalScanJobsThenNoIntervalStarted() = runTest {
         // Given
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(789L))

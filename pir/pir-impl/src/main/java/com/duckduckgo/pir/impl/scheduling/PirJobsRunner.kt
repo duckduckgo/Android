@@ -176,7 +176,16 @@ class RealPirJobsRunner @Inject constructor(
             val onJobCompletedCallback: suspend () -> Unit = {
                 pirScanWideEvent.onScanJobCompleted(executionType)
             }
-            val totalScanJobs = executeScanJobs(context, executionType, eligibleJobs, onJobCompletedCallback)
+            val onScanJobsResolvedCallback: suspend (Int) -> Unit = { actual ->
+                pirScanWideEvent.onScanJobsResolved(executionType, actual)
+            }
+            val totalScanJobs = executeScanJobs(
+                context = context,
+                executionType = executionType,
+                eligibleJobs = eligibleJobs,
+                onJobCompleted = onJobCompletedCallback,
+                onScanJobsResolved = onScanJobsResolvedCallback,
+            )
 
             pirScanWideEvent.onScanCompleted(executionType)
 
@@ -350,6 +359,7 @@ class RealPirJobsRunner @Inject constructor(
         executionType: PirExecutionType,
         eligibleJobs: List<ScanJobRecord>,
         onJobCompleted: (suspend () -> Unit)? = null,
+        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
     ): Int {
         val runType = if (executionType.isManual) {
             RunType.MANUAL
@@ -358,9 +368,10 @@ class RealPirJobsRunner @Inject constructor(
         }
         if (eligibleJobs.isNotEmpty()) {
             logcat { "PIR-JOB-RUNNER: Executing scan for ${eligibleJobs.size} eligible scan jobs." }
-            pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted)
+            pirScan.executeScanForJobs(eligibleJobs, context, runType, onJobCompleted, onScanJobsResolved)
         } else {
             logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+            onScanJobsResolved?.invoke(0)
         }
         return eligibleJobs.size
     }

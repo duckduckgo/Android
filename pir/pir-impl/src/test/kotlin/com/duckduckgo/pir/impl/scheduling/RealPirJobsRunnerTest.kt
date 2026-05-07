@@ -272,6 +272,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.MANUAL),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -288,6 +289,7 @@ class RealPirJobsRunnerTest {
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            anyOrNull(),
             anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
@@ -325,6 +327,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.MANUAL),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -341,6 +344,7 @@ class RealPirJobsRunnerTest {
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            anyOrNull(),
             anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
@@ -409,6 +413,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.SCHEDULED),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -423,6 +428,7 @@ class RealPirJobsRunnerTest {
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.SCHEDULED),
+            anyOrNull(),
             anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
@@ -800,6 +806,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.MANUAL),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(
@@ -830,6 +837,7 @@ class RealPirJobsRunnerTest {
             eq(listOf(testScanJobRecord)),
             eq(mockContext),
             eq(RunType.MANUAL),
+            anyOrNull(),
             anyOrNull(),
         )
         verify(mockPirRepository).getAllExtractedProfiles()
@@ -1275,6 +1283,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.MANUAL),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirOptOut.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext))
@@ -1363,6 +1372,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.SCHEDULED),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -1438,6 +1448,7 @@ class RealPirJobsRunnerTest {
                 eq(mockContext),
                 eq(RunType.MANUAL),
                 anyOrNull(),
+                anyOrNull(),
             ),
         ).thenThrow(CancellationException("cancelled"))
 
@@ -1484,6 +1495,7 @@ class RealPirJobsRunnerTest {
                 eq(listOf(testScanJobRecord)),
                 eq(mockContext),
                 eq(RunType.MANUAL),
+                anyOrNull(),
                 anyOrNull(),
             ),
         ).thenThrow(IllegalStateException("boom"))

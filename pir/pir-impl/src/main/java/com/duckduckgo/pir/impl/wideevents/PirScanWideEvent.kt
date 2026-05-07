@@ -47,6 +47,15 @@ interface PirScanWideEvent {
         isTrackerBlockingEnabled: Boolean,
     )
 
+    /**
+     * Called once after [com.duckduckgo.pir.impl.scan.PirScan] has resolved which scan jobs will
+     * actually run (i.e. after its internal `processJobRecords` filtering for missing broker steps
+     * / unresolved profiles). The wide event uses [actualScanJobs] to drive decile math so progress
+     * steps reflect real progress against jobs that will actually execute, not the pre-filter
+     * estimate that `onRunStarted` was given.
+     */
+    suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int)
+
     suspend fun onScanJobCompleted(executionType: PirExecutionType)
 
     suspend fun onScanCompleted(executionType: PirExecutionType)
@@ -108,6 +117,11 @@ class PirScanWideEventImpl @Inject constructor(
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
         )
+    }
+
+    override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) {
+        if (!isFeatureEnabled()) return
+        stateFor(executionType).onScanJobsResolved(actualScanJobs)
     }
 
     override suspend fun onScanJobCompleted(executionType: PirExecutionType) {
@@ -225,6 +239,25 @@ class PirScanWideEventImpl @Inject constructor(
                     val key = decileIntervalKey(0, 10)
                     wideEventClient.intervalStart(wideEventId = newFlowId, key = key)
                     currentDecileIntervalKey = key
+                }
+            }
+        }
+
+        suspend fun onScanJobsResolved(actualScanJobs: Int) {
+            mutex.withLock {
+                val flowId = cachedFlowId ?: return@withLock
+                if (actualScanJobs == totalScanJobs) return@withLock
+
+                totalScanJobs = actualScanJobs
+
+                // If the resolved count is 0, no scan jobs will run. Close any open decile
+                // interval (we opened decile_0_10 in onRunStarted when the pre-filter estimate
+                // was non-zero) so we don't carry it through to scan_completed.
+                if (actualScanJobs == 0) {
+                    currentDecileIntervalKey?.let {
+                        wideEventClient.intervalEnd(wideEventId = flowId, key = it)
+                        currentDecileIntervalKey = null
+                    }
                 }
             }
         }
