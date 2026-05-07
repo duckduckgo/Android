@@ -299,7 +299,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         hideInputFieldBackground()
         removeMargins()
-        applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         configureBottomRowFocusVisibility()
@@ -425,12 +424,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         findViewById<AppCompatImageView?>(R.id.inputFieldImageButton)?.updateLayoutParams<MarginLayoutParams> {
             marginStart = 0
-        }
-    }
-
-    private fun applyTrailingButtonMargin() {
-        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = 0
         }
     }
 
