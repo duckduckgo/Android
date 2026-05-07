@@ -126,6 +126,11 @@ interface DuckChat {
     fun isVoiceSessionActive(tabId: String): Boolean
 
     /**
+     * Emits the set of tab IDs that currently have an active voice session.
+     */
+    val activeVoiceSessions: Flow<Set<String>>
+
+    /**
      * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
      * foreground service notification). Tabs should collect this flow and dispatch the
      * end-voice-session JS event when their id is emitted.

@@ -806,6 +806,8 @@ class RealDuckChat @Inject constructor(
 
     override fun isVoiceSessionActive(tabId: String): Boolean = voiceSessionStateManager.isVoiceSessionActive(tabId)
 
+    override val activeVoiceSessions: Flow<Set<String>> get() = voiceSessionStateManager.activeVoiceSessions
+
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

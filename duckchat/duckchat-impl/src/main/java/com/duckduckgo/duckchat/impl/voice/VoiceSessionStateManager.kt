@@ -31,12 +31,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface VoiceSessionStateManager {
+    val activeVoiceSessions: Flow<Set<String>>
+        get() = flowOf(emptySet())
     fun isVoiceSessionActive(tabId: String): Boolean = false
     fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded(tabId: String)
@@ -61,15 +67,17 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     private val listenJob = ConflatedJob()
 
-    private val activeSessionTabIds = mutableSetOf<String>()
     private val _voiceSessionEndTrigger = MutableSharedFlow<String>(
         replay = 0,
         extraBufferCapacity = 8,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    private val _activeVoiceSessions = MutableStateFlow<Set<String>>(emptySet())
+    override val activeVoiceSessions: Flow<Set<String>> = _activeVoiceSessions.asStateFlow()
+
     @Synchronized
-    override fun isVoiceSessionActive(tabId: String): Boolean = tabId.isNotBlank() && tabId in activeSessionTabIds
+    override fun isVoiceSessionActive(tabId: String): Boolean = tabId.isNotBlank() && tabId in _activeVoiceSessions.value
 
     override fun observeTriggerVoiceSessionEnd(): Flow<String> = _voiceSessionEndTrigger.asSharedFlow()
 
@@ -81,7 +89,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {
         if (tabId.isBlank()) return
-        activeSessionTabIds += tabId
+        _activeVoiceSessions.update { it + tabId }
         if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
             DuckChatVoiceMicrophoneService.start(context)
         }
@@ -93,8 +101,8 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     override fun onVoiceSessionEnded(tabId: String) {
         if (tabId.isBlank()) return
-        activeSessionTabIds -= tabId
-        if (activeSessionTabIds.isEmpty()) {
+        _activeVoiceSessions.update { it - tabId }
+        if (_activeVoiceSessions.value.isEmpty()) {
             endAllSessions()
         }
     }
@@ -112,7 +120,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     private fun endAllSessions() {
         listenJob.cancel()
-        activeSessionTabIds.clear()
+        _activeVoiceSessions.value = emptySet()
         DuckChatVoiceMicrophoneService.stop(context)
     }
 
@@ -121,8 +129,10 @@ class RealVoiceSessionStateManager @Inject constructor(
             tabRepository.flowTabs.drop(1).collect { tabs ->
                 val existingTabIds = tabs.mapTo(mutableSetOf()) { it.tabId }
                 val becameEmpty = synchronized(this@RealVoiceSessionStateManager) {
-                    activeSessionTabIds.removeAll { it !in existingTabIds }
-                    activeSessionTabIds.isEmpty()
+                    _activeVoiceSessions.update { current ->
+                        current.filterTo(mutableSetOf()) { it in existingTabIds }
+                    }
+                    _activeVoiceSessions.value.isEmpty()
                 }
                 if (becameEmpty) {
                     endAllSessions()
