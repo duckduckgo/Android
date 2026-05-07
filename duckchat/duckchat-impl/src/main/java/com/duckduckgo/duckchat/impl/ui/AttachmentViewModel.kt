@@ -108,27 +108,28 @@ class AttachmentViewModel @Inject constructor(
     }
 
     fun removeImageAttachment(id: String) {
+        var toRecycle: Bitmap? = null
         _imageAttachments.update { list ->
-            val removed = list.find { it.id == id }
-            removed?.bitmap?.recycle()
+            toRecycle = list.find { it.id == id }?.bitmap
             list.filter { it.id != id }
         }
+        viewModelScope.launch { toRecycle?.recycle() }
     }
 
     fun clearAttachments() {
-        val current = _imageAttachments.value
-        val sentCount = current.size
-        current.forEach { it.bitmap.recycle() }
+        val toRecycle = _imageAttachments.value
+        val sentCount = toRecycle.size
         _imageAttachments.value = emptyList()
         if (sentCount > 0) limitsHandler.addConversationImagesSent(sentCount)
+        viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
     fun clearAttachmentsForNewChat() {
-        val current = _imageAttachments.value
-        val pendingCount = current.size
-        current.forEach { it.bitmap.recycle() }
+        val toRecycle = _imageAttachments.value
+        val pendingCount = toRecycle.size
         _imageAttachments.value = emptyList()
         limitsHandler.prepareForNewChat(pendingCount)
+        viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
     fun getImageAttachments(): List<ImageAttachment> = _imageAttachments.value
@@ -209,7 +210,6 @@ class AttachmentViewModel @Inject constructor(
         return when {
             mimeType.contains("jpeg") || mimeType.contains("jpg") -> "jpeg"
             mimeType.contains("webp") -> "webp"
-            mimeType.contains("gif") -> "gif"
             else -> "png"
         }
     }
