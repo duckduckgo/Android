@@ -130,6 +130,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 }.also {
                     registerDuckChatIsOpenDebounced()
                     limitsHandler.setImageUploadLimitReached(false)
+                    limitsHandler.onNewChatStarted()
                 }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->

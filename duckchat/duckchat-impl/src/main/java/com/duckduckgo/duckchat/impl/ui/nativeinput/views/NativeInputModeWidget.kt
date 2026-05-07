@@ -588,12 +588,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
         } ?: emptyList()
         viewModel.storePendingPrompt(query, getSelectedModelId(), images)
-        attachmentView?.clearAttachments()
+        attachmentView?.clearAttachmentsForNewChat()
     }
 
     override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
         doOnAttach {
             viewModel.configure(isDuckAiMode, isBottom)
+            attachmentView?.setDuckAiMode(isDuckAiMode)
             viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
             if (isDuckAiMode) selectChatTab()
             applyOmnibarShape(isBottom)
@@ -603,6 +604,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun configureContextual() {
         doOnAttach {
             viewModel.configureContextual()
+            attachmentView?.setDuckAiMode(true)
             selectChatTab()
         }
     }

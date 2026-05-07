@@ -41,7 +41,7 @@
     <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
 
     <!-- Image attachment limits -->
-    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%d is the maximum number of images allowed per message.">You can only attach %d images at a time.</string>
-    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%d is the maximum number of images allowed in a single conversation.">You can only attach %d images per conversation.</string>
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">You can only attach %1$d images at a time.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">You can only attach %1$d images per conversation.</string>
 
 </resources>

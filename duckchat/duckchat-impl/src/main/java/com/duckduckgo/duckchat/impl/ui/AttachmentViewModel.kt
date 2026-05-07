@@ -72,17 +72,23 @@ class AttachmentViewModel @Inject constructor(
     }
 
     private val _imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
+    private val _isDuckAiMode = MutableStateFlow(false)
+
+    fun setDuckAiMode(enabled: Boolean) {
+        _isDuckAiMode.value = enabled
+    }
 
     val attachmentState: StateFlow<AttachmentState> = combine(
-        _imageAttachments,
+        combine(_imageAttachments, _isDuckAiMode) { images, duck -> Pair(images, duck) },
         modelManager.modelState,
         limitsHandler.conversationImagesSent,
         limitsHandler.imageUploadLimitReached,
-    ) { images, modelState, conversationSent, limitReached ->
+    ) { (images, isDuckAiMode), modelState, conversationSent, limitReached ->
         val supportsUpload = computeSupportsUpload(modelState)
         val limits = modelState.attachmentLimits.images
         val currentCount = images.size
-        val totalImages = currentCount + conversationSent
+        val effectiveSent = if (isDuckAiMode) conversationSent else 0
+        val totalImages = currentCount + effectiveSent
         val isAtCapacity = limitReached || currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
         AttachmentState(
             images = images,
@@ -115,6 +121,14 @@ class AttachmentViewModel @Inject constructor(
         current.forEach { it.bitmap.recycle() }
         _imageAttachments.value = emptyList()
         if (sentCount > 0) limitsHandler.addConversationImagesSent(sentCount)
+    }
+
+    fun clearAttachmentsForNewChat() {
+        val current = _imageAttachments.value
+        val pendingCount = current.size
+        current.forEach { it.bitmap.recycle() }
+        _imageAttachments.value = emptyList()
+        limitsHandler.prepareForNewChat(pendingCount)
     }
 
     fun getImageAttachments(): List<ImageAttachment> = _imageAttachments.value

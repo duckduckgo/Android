@@ -84,6 +84,10 @@ class AttachmentView(
 
     fun clearAttachments() = viewModel?.clearAttachments()
 
+    fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
+
+    fun setDuckAiMode(enabled: Boolean) = viewModel?.setDuckAiMode(enabled)
+
     private fun setupContainerViews(container: FrameLayout, viewModel: AttachmentViewModel) {
         if (thumbnailsLayout != null) return
 
