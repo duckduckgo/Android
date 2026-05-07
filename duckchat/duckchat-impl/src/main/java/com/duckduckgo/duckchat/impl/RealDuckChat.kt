@@ -806,7 +806,7 @@ class RealDuckChat @Inject constructor(
 
     override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
 
-    override fun observeTriggerVoiceSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)

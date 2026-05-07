@@ -130,5 +130,5 @@ interface DuckChat {
      * foreground service notification). Tabs should collect this flow and dispatch the
      * end-voice-session JS event when their id is emitted.
      */
-    fun observeTriggerVoiceSessionEnd(): Flow<String>
+    fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 }

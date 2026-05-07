@@ -599,7 +599,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val voiceSessionEndTriggerFlow = MutableSharedFlow<String>(extraBufferCapacity = 8)
     private val mockDuckChat: DuckChat = mock {
-        on { observeTriggerVoiceSessionEnd() } doReturn voiceSessionEndTriggerFlow
+        on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()

@@ -184,7 +184,7 @@ class FakeDuckChatInternal(
 
     override fun openVoiceDuckChat() { }
     override fun isVoiceSessionActive(): Boolean = false
-    override fun observeTriggerVoiceSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

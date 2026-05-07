@@ -900,7 +900,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun observePendingVoiceSessionEnd(tabId: String) {
         pendingVoiceSessionEndJob?.cancel()
         pendingVoiceSessionEndJob = viewModelScope.launch {
-            duckChat.observeTriggerVoiceSessionEnd()
+            duckChat.observeTriggerVoiceChatSessionEnd()
                 .filter { it == tabId }
                 .collect {
                     val event = duckChatJSHelper.onNativeAction(NativeAction.END_VOICE_SESSION)
