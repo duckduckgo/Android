@@ -23,8 +23,6 @@
 
     <ImageView
         android:id="@+id/actionVoiceSearch"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
@@ -36,8 +34,6 @@
 
     <ImageView
         android:id="@+id/actionVoiceChat"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
@@ -52,8 +48,6 @@
 
     <ImageView
         android:id="@+id/actionNewLine"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
@@ -65,18 +59,15 @@
 
     <ImageView
         android:id="@+id/actionSend"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/background_input_screen_button"
-        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+        android:backgroundTint="?attr/daxColorAccentAltContentPrimary"
         android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_find_search_24"
-        android:visibility="gone"
-        app:tint="?attr/daxColorWhite" />
+        android:visibility="gone" />
 
 </LinearLayout>

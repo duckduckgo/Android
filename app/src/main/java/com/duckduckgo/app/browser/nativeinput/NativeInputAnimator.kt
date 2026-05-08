@@ -75,7 +75,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
         shrinkCardToMatchOmnibar(params, omnibarWidth, omnibarHeight, isBottom)
 
-        animateCornerRadius(widgetCard, isBottom, omnibarCornerRadius)
+        animateCornerRadius(widgetCard, omnibarCornerRadius)
         widgetCard.visibility = View.INVISIBLE
 
         return margins
@@ -287,7 +287,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             onEnd = {
                 widgetContent?.alpha = 1f
                 omnibarCard.alpha = 1f
-                animateCornerRadius(card, isBottomCard, widgetCornerRadius)
+                animateCornerRadius(card, widgetCornerRadius)
                 restoreLayout(card, params, margins)
                 card.post { applyLayoutTransitions(widgetView) }
                 onComplete()
@@ -329,18 +329,9 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         return Bounds(visibleWidth, visibleHeight)
     }
 
-    private fun animateCornerRadius(card: View, isBottom: Boolean, topRadius: Float) {
+    private fun animateCornerRadius(card: View, topRadius: Float) {
         val materialCard = card as? MaterialCardView ?: return
-        if (isBottom) {
-            materialCard.shapeAppearanceModel = materialCard.shapeAppearanceModel.toBuilder()
-                .setTopLeftCornerSize(topRadius)
-                .setTopRightCornerSize(topRadius)
-                .setBottomLeftCornerSize(0f)
-                .setBottomRightCornerSize(0f)
-                .build()
-        } else {
-            materialCard.radius = topRadius
-        }
+        materialCard.radius = topRadius
     }
 
     private fun restoreLayout(card: View, params: FrameLayout.LayoutParams, margins: Margins) {
