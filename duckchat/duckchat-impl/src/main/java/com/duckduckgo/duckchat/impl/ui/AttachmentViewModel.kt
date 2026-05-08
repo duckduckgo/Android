@@ -123,7 +123,9 @@ class AttachmentViewModel @Inject constructor(
             supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
             supportsImageUpload = supportsImageUpload,
             supportedFileTypes = supportedFileTypes,
-            isAtCapacity = currentImageCount >= imageLimits.maxPerTurn || totalImages >= imageLimits.maxPerConversation,
+            isAtCapacity = currentImageCount >= imageLimits.maxPerTurn ||
+                totalImages >= imageLimits.maxPerConversation ||
+                totalFiles >= fileLimits.maxPerConversation,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
 

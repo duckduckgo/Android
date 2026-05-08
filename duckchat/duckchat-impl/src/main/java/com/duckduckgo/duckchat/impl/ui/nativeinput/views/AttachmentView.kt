@@ -222,10 +222,14 @@ class AttachmentView(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_image_24,
             )
-            .setSecondaryItem(
-                context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
-                com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
-            )
+            .apply {
+                if (supportsImages) {
+                    setSecondaryItem(
+                        context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
+                        com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
+                    )
+                }
+            }
             .addEventListener(buildDialogListener(supportsImages, supportedFileTypes, mimeTypes))
             .show()
     }
