@@ -76,6 +76,12 @@ class AttachmentViewModel @Inject constructor(
         val isAtCapacity: Boolean = false,
     ) {
         val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
+        val acceptedMimeTypes: List<String> get() {
+            val types = mutableListOf<String>()
+            if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)
+            if (supportsImageUpload) types.add("image/*")
+            return types.ifEmpty { listOf("image/*") }
+        }
     }
 
     @VisibleForTesting

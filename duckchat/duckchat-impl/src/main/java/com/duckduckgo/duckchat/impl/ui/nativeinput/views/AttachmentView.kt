@@ -206,6 +206,7 @@ class AttachmentView(
         val state = viewModel?.attachmentState?.value
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
+        val mimeTypes = state?.acceptedMimeTypes ?: listOf("image/*")
 
         onAction?.invoke(Action.ShowAttachmentChooser(true))
         ActionBottomSheetDialog.Builder(context)
@@ -218,19 +219,19 @@ class AttachmentView(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
             )
-            .addEventListener(buildDialogListener(supportsImages, supportedFileTypes))
+            .addEventListener(buildDialogListener(supportsImages, supportedFileTypes, mimeTypes))
             .show()
     }
 
     private fun buildDialogListener(
         supportsImages: Boolean,
         supportedFileTypes: List<String>,
+        mimeTypes: List<String>,
     ) = object : ActionBottomSheetDialog.EventListener() {
         private var pickerLaunched = false
 
         override fun onPrimaryItemClicked() {
             pickerLaunched = true
-            val mimeTypes = buildMimeTypes(supportsImages, supportedFileTypes)
             val callback = if (supportsImages && supportedFileTypes.isNotEmpty()) {
                 buildCombinedPickerCallback()
             } else if (supportedFileTypes.isNotEmpty()) {
@@ -249,13 +250,6 @@ class AttachmentView(
         override fun onBottomSheetDismissed() {
             if (!pickerLaunched) onAction?.invoke(Action.ShowAttachmentChooser(false))
         }
-    }
-
-    private fun buildMimeTypes(supportsImages: Boolean, supportedFileTypes: List<String>): List<String> {
-        val types = mutableListOf<String>()
-        if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)
-        if (supportsImages) types.add("image/*")
-        return types.ifEmpty { listOf("image/*") }
     }
 
     private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
