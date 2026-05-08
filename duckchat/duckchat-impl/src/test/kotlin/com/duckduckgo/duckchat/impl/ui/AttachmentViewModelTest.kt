@@ -177,40 +177,6 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenNoAttachmentsAndNoLimitsReachedThenIsAtCapacityIsFalse() = runTest {
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenAttachmentsAtPerTurnLimitThenIsAtCapacityIsTrue() = runTest {
-        val limits = ImageLimits(maxPerTurn = 2, maxPerConversation = 10)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        addImages(2)
-
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenAttachmentsBelowPerTurnLimitThenIsAtCapacityIsFalse() = runTest {
-        val limits = ImageLimits(maxPerTurn = 3, maxPerConversation = 10)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        addImages(2)
-
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenTotalImagesAtConversationLimitThenIsAtCapacityIsTrue() = runTest {
-        val limits = ImageLimits(maxPerTurn = 5, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
-        limitsHandler.addConversationImagesSent(3)
-        addImages(2)
-
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
     fun whenUnderAllLimitsThenImageLimitErrorIsNull() = runTest {
         assertNull(viewModel.attachmentState.value.imageLimitError)
     }
@@ -244,43 +210,6 @@ class AttachmentViewModelTest {
         addImages(2)
 
         assertNotNull(viewModel.attachmentState.value.imageLimitError)
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenFilesAtConversationLimitThenIsAtCapacityIsTrue() = runTest {
-        val limits = FileLimits(maxPerConversation = 2)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
-        advanceUntilIdle()
-        addFiles(aFileAttachment(), aFileAttachment())
-        advanceUntilIdle()
-
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenFilesBelowConversationLimitThenIsAtCapacityIsFalse() = runTest {
-        val limits = FileLimits(maxPerConversation = 3)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
-        advanceUntilIdle()
-        addFiles(aFileAttachment())
-        advanceUntilIdle()
-
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenConversationFilesSentPushesTotalToLimitThenIsAtCapacityIsTrue() = runTest {
-        val limits = FileLimits(maxPerConversation = 3)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
-        limitsHandler.addConversationFilesSent(2)
-        addFiles(aFileAttachment())
-        advanceUntilIdle()
-
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
     }
 
     @Test
