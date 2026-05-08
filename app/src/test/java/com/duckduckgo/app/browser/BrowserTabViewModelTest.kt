@@ -8347,7 +8347,7 @@ class BrowserTabViewModelTest {
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
-        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+        assertFalse((viewState!!.fireButton as HighlightableButton.Visible).highlighted)
     }
 
     @Test
@@ -8358,7 +8358,7 @@ class BrowserTabViewModelTest {
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
-        assertFalse((viewState.fireButton as HighlightableButton.Visible).highlighted)
+        assertFalse((viewState!!.fireButton as HighlightableButton.Visible).highlighted)
     }
 
     @Test
