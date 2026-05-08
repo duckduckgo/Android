@@ -86,8 +86,11 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
             cached
         } else {
             val persisted = withContext(dispatchers.io()) { getLastCompletionTimestamp() ?: NO_COMPLETION }
-            lastCompletionTimestamp.compareAndSet(UNINITIALIZED, persisted)
-            persisted
+            if (lastCompletionTimestamp.compareAndSet(UNINITIALIZED, persisted)) {
+                persisted
+            } else {
+                lastCompletionTimestamp.get()
+            }
         }
         if (timestamp == NO_COMPLETION) return false
         return System.currentTimeMillis() - timestamp < TWENTY_FOUR_HOURS_MILLIS
