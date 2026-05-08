@@ -163,6 +163,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
+import com.duckduckgo.app.cta.ui.DaxSubscriptionBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
@@ -8081,6 +8082,55 @@ class BrowserTabViewModelTest {
             }
             verify(mockPixel).fire(ONBOARDING_DAX_CTA_DISMISS_BUTTON, mapOf(PixelParameter.CTA_SHOWN to DAX_INITIAL_CTA))
         }
+
+    @Test
+    fun whenUserDismissesDaxSubscriptionCtaAndInputScreenAutoLaunchEnabledThenLaunchInputScreenCommandIssued() = runTest {
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.value = true
+        val cta = DaxBubbleCta.DaxSubscriptionCta(mockOnboardingStore, mockAppInstallStore, isFreeTrialCopy = false)
+
+        testee.onUserClickCtaDismissButton(cta)
+
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        assertCommandIssued<Command.LaunchInputScreen>()
+    }
+
+    @Test
+    fun whenUserDismissesDaxSubscriptionCtaAndInputScreenAutoLaunchDisabledThenLaunchInputScreenCommandNotIssued() = runTest {
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.value = false
+        val cta = DaxBubbleCta.DaxSubscriptionCta(mockOnboardingStore, mockAppInstallStore, isFreeTrialCopy = false)
+
+        testee.onUserClickCtaDismissButton(cta)
+
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        assertCommandNotIssued<Command.LaunchInputScreen>()
+    }
+
+    @Test
+    fun whenUserDismissesDaxSubscriptionBrandDesignUpdateCtaAndInputScreenAutoLaunchEnabledThenLaunchInputScreenCommandIssued() = runTest {
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.value = true
+        val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            isLightTheme = true,
+            isFreeTrialCopy = false,
+        )
+
+        testee.onUserClickCtaDismissButton(cta)
+
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        assertCommandIssued<Command.LaunchInputScreen>()
+    }
+
+    @Test
+    fun whenUserDismissesNonSubscriptionDaxBubbleCtaAndInputScreenAutoLaunchEnabledThenLaunchInputScreenCommandNotIssued() = runTest {
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.value = true
+        val cta = DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+
+        testee.onUserClickCtaDismissButton(cta)
+
+        assertCommandIssued<HideOnboardingDaxBubbleCta>()
+        assertCommandNotIssued<Command.LaunchInputScreen>()
+    }
 
     @Test
     fun whenUserClicksDaxSerpCtaDismissButtonThenHideOnboardingDaxDialogCommandIssuedAndPixelFired() =
