@@ -72,6 +72,12 @@ interface PirScanWideEvent {
 
     suspend fun onRunCancelled(executionType: PirExecutionType)
 
+    /**
+     * Aborts any open manual or scheduled flow so they are discarded rather than eventually
+     * emitting a stale `FlowStatus.Unknown` record via the cleanup-on-timeout policy.
+     */
+    suspend fun onUserReset()
+
     enum class FailureReason(val value: String) {
         NO_ACTIVE_BROKERS("no_active_brokers"),
         ILLEGAL_STATE_EXCEPTION("illegal_state_exception"),
@@ -186,6 +192,11 @@ class PirScanWideEventImpl @Inject constructor(
     override suspend fun onRunCancelled(executionType: PirExecutionType) {
         if (!isFeatureEnabled()) return
         stateFor(executionType).onRunCancelled()
+    }
+
+    override suspend fun onUserReset() {
+        manualState.onUserReset()
+        scheduledState.onUserReset()
     }
 
     private fun stateFor(executionType: PirExecutionType): RunState = when (executionType) {
@@ -405,6 +416,14 @@ class PirScanWideEventImpl @Inject constructor(
                     status = FlowStatus.Cancelled,
                     metadata = mapOf(KEY_LAST_STEP to finalStep),
                 )
+                clearStateLocked()
+            }
+        }
+
+        suspend fun onUserReset() {
+            mutex.withLock {
+                val flowId = cachedFlowId ?: return@withLock
+                wideEventClient.flowAbort(flowId)
                 clearStateLocked()
             }
         }
