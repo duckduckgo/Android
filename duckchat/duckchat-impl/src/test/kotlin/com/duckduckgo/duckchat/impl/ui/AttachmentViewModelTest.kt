@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,6 +58,10 @@ class AttachmentViewModelTest {
     private val duckChatInternal: DuckChatInternal = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val limitsHandler: FakeLimitsHandler = FakeLimitsHandler()
+    private val fileAttachmentProcessor: FileAttachmentProcessor = mock<FileAttachmentProcessor>().also {
+        whenever(it.getMaxFileSizeBytes()).thenReturn(5L * 1024 * 1024)
+        whenever(it.getMaxTotalFileSizeBytes()).thenReturn(5L * 1024 * 1024)
+    }
     private val modelStateFlow = MutableStateFlow(ModelState())
     private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
         whenever(it.modelState).thenReturn(modelStateFlow)
@@ -77,6 +82,7 @@ class AttachmentViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             modelManager = modelManager,
             limitsHandler = limitsHandler,
+            fileAttachmentProcessor = fileAttachmentProcessor,
             context = context,
             appBuildConfig = appBuildConfig,
         )
@@ -315,8 +321,19 @@ class AttachmentViewModelTest {
         private val _conversationImagesSent = MutableStateFlow(0)
         override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
+        private val _conversationFilesSent = MutableStateFlow(0)
+        override val conversationFilesSent: StateFlow<Int> = _conversationFilesSent
+
+        private val _conversationFileSizeSentBytes = MutableStateFlow(0L)
+        override val conversationFileSizeSentBytes: StateFlow<Long> = _conversationFileSizeSentBytes
+
         override fun setConversationImagesUsed(count: Int) {
             _conversationImagesSent.value = count
+        }
+
+        override fun setConversationFilesUsed(count: Int, sizeBytes: Long) {
+            _conversationFilesSent.value = count
+            _conversationFileSizeSentBytes.value = sizeBytes
         }
 
         /** Test helper: increments the conversation-sent counter directly. */
