@@ -2104,12 +2104,36 @@
             {
                 "key": "feature.data.ext.last_step",
                 "description": "The last recorded step name when the flow terminated. Useful for understanding where flows drop off when status is FAILURE, CANCELLED, or UNKNOWN.",
-                "type": "string"
+                "enum": [
+                    "started",
+                    "progress_10",
+                    "progress_20",
+                    "progress_30",
+                    "progress_40",
+                    "progress_50",
+                    "progress_60",
+                    "progress_70",
+                    "progress_80",
+                    "progress_90",
+                    "scan_completed",
+                    "opt_out_started",
+                    "opt_out_completed",
+                    "opt_out_skipped"
+                ]
             },
             {
                 "key": "feature.data.ext.failure_reason",
-                "description": "Reason a run failed. Only present on FAILURE events.",
-                "type": "string"
+                "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
+                "enum": [
+                    "no_active_brokers",
+                    "illegal_state_exception",
+                    "illegal_argument_exception",
+                    "null_pointer_exception",
+                    "io_exception",
+                    "sqlite_exception",
+                    "timeout_cancellation_exception",
+                    "unknown_error"
+                ]
             },
             {
                 "key": "feature.data.ext.step.started",
@@ -2338,12 +2362,36 @@
             {
                 "key": "feature.data.ext.last_step",
                 "description": "The last recorded step name when the flow terminated. Useful for understanding where flows drop off when status is FAILURE, CANCELLED, or UNKNOWN.",
-                "type": "string"
+                "enum": [
+                    "started",
+                    "progress_10",
+                    "progress_20",
+                    "progress_30",
+                    "progress_40",
+                    "progress_50",
+                    "progress_60",
+                    "progress_70",
+                    "progress_80",
+                    "progress_90",
+                    "scan_completed",
+                    "opt_out_started",
+                    "opt_out_completed",
+                    "opt_out_skipped"
+                ]
             },
             {
                 "key": "feature.data.ext.failure_reason",
-                "description": "Reason a run failed. Only present on FAILURE events.",
-                "type": "string"
+                "description": "Reason a run failed. Only present on FAILURE events. Specific exception types are mapped to bounded values; anything not in the known set falls back to unknown_error. The phase the run was in when it failed is recoverable from last_step.",
+                "enum": [
+                    "no_active_brokers",
+                    "illegal_state_exception",
+                    "illegal_argument_exception",
+                    "null_pointer_exception",
+                    "io_exception",
+                    "sqlite_exception",
+                    "timeout_cancellation_exception",
+                    "unknown_error"
+                ]
             },
             {
                 "key": "feature.data.ext.step.started",

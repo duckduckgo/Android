@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.wideevents
 
+import android.database.sqlite.SQLiteException
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
@@ -26,9 +27,11 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
@@ -66,9 +69,34 @@ interface PirScanWideEvent {
 
     suspend fun onOptOutSkipped(executionType: PirExecutionType)
 
-    suspend fun onRunFailed(executionType: PirExecutionType, reason: String)
+    suspend fun onRunFailed(executionType: PirExecutionType, reason: FailureReason)
 
     suspend fun onRunCancelled(executionType: PirExecutionType)
+
+    enum class FailureReason(val value: String) {
+        NO_ACTIVE_BROKERS("no_active_brokers"),
+        ILLEGAL_STATE_EXCEPTION("illegal_state_exception"),
+        ILLEGAL_ARGUMENT_EXCEPTION("illegal_argument_exception"),
+        NULL_POINTER_EXCEPTION("null_pointer_exception"),
+        IO_EXCEPTION("io_exception"),
+        SQLITE_EXCEPTION("sqlite_exception"),
+        TIMEOUT_CANCELLATION_EXCEPTION("timeout_cancellation_exception"),
+        UNKNOWN_ERROR("unknown_error"),
+        ;
+
+        companion object {
+            // Order is intentional: more specific subclasses must come before their supertypes.
+            fun fromException(e: Exception): FailureReason = when (e) {
+                is SQLiteException -> SQLITE_EXCEPTION
+                is TimeoutCancellationException -> TIMEOUT_CANCELLATION_EXCEPTION
+                is IOException -> IO_EXCEPTION
+                is IllegalStateException -> ILLEGAL_STATE_EXCEPTION
+                is IllegalArgumentException -> ILLEGAL_ARGUMENT_EXCEPTION
+                is NullPointerException -> NULL_POINTER_EXCEPTION
+                else -> UNKNOWN_ERROR
+            }
+        }
+    }
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -149,7 +177,7 @@ class PirScanWideEventImpl @Inject constructor(
         stateFor(executionType).onOptOutSkipped()
     }
 
-    override suspend fun onRunFailed(executionType: PirExecutionType, reason: String) {
+    override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) {
         if (!isFeatureEnabled()) return
         stateFor(executionType).onRunFailed(reason)
     }
@@ -348,13 +376,13 @@ class PirScanWideEventImpl @Inject constructor(
             }
         }
 
-        suspend fun onRunFailed(reason: String) {
+        suspend fun onRunFailed(reason: PirScanWideEvent.FailureReason) {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
                 val finalStep = lastStep
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
-                    status = FlowStatus.Failure(reason = reason),
+                    status = FlowStatus.Failure(reason = reason.value),
                     metadata = mapOf(KEY_LAST_STEP to finalStep),
                 )
                 clearStateLocked()

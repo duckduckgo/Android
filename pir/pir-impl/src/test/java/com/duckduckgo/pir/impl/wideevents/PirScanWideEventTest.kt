@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.wideevents
 
 import android.annotation.SuppressLint
+import android.database.sqlite.SQLiteException
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -25,6 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_EDIT_PROFILE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_MANUAL_INITIAL
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.ENTRY_POINT_SCHEDULED
@@ -63,6 +65,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.IOException
 import kotlin.time.Duration.Companion.hours
 
 class PirScanWideEventTest {
@@ -557,7 +560,7 @@ class PirScanWideEventTest {
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 0, 0)
 
         // When
-        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, "no_active_brokers")
+        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, FailureReason.NO_ACTIVE_BROKERS)
 
         // Then
         verify(wideEventClient).flowFinish(
@@ -582,6 +585,56 @@ class PirScanWideEventTest {
             wideEventId = 8L,
             status = FlowStatus.Cancelled,
             metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+        )
+    }
+
+    @Test
+    fun fromExceptionMapsKnownTypesToBoundedReasonsAndOtherwiseUnknown() {
+        org.junit.Assert.assertEquals(
+            FailureReason.SQLITE_EXCEPTION,
+            FailureReason.fromException(SQLiteException("boom")),
+        )
+        org.junit.Assert.assertEquals(
+            FailureReason.IO_EXCEPTION,
+            FailureReason.fromException(IOException("boom")),
+        )
+        // FileNotFoundException is a subclass of IOException — must map to IO_EXCEPTION.
+        org.junit.Assert.assertEquals(
+            FailureReason.IO_EXCEPTION,
+            FailureReason.fromException(java.io.FileNotFoundException("boom")),
+        )
+        org.junit.Assert.assertEquals(
+            FailureReason.ILLEGAL_STATE_EXCEPTION,
+            FailureReason.fromException(IllegalStateException("boom")),
+        )
+        org.junit.Assert.assertEquals(
+            FailureReason.ILLEGAL_ARGUMENT_EXCEPTION,
+            FailureReason.fromException(IllegalArgumentException("boom")),
+        )
+        org.junit.Assert.assertEquals(
+            FailureReason.NULL_POINTER_EXCEPTION,
+            FailureReason.fromException(NullPointerException("boom")),
+        )
+        org.junit.Assert.assertEquals(
+            FailureReason.UNKNOWN_ERROR,
+            FailureReason.fromException(RuntimeException("boom")),
+        )
+    }
+
+    @Test
+    fun whenRunFailedWithMappedExceptionThenFlowFinishedWithMappedReasonValue() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(99L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
+
+        // When - simulating PirJobsRunner mapping an IOException via fromException.
+        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, FailureReason.fromException(IOException("net")))
+
+        // Then
+        verify(wideEventClient).flowFinish(
+            wideEventId = 99L,
+            status = FlowStatus.Failure(reason = "io_exception"),
+            metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
         )
     }
 

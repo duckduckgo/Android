@@ -37,6 +37,7 @@ import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
@@ -157,7 +158,7 @@ class RealPirJobsRunner @Inject constructor(
 
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            pirScanWideEvent.onRunFailed(executionType = executionType, reason = REASON_NO_ACTIVE_BROKERS)
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.NO_ACTIVE_BROKERS)
             emitCompletedPixel(
                 context = context,
                 executionType = executionType,
@@ -242,7 +243,7 @@ class RealPirJobsRunner @Inject constructor(
             pirScanWideEvent.onRunCancelled(executionType)
             throw e
         } catch (e: Exception) {
-            pirScanWideEvent.onRunFailed(executionType = executionType, reason = e.javaClass.simpleName)
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.fromException(e))
             throw e
         }
     }
@@ -437,9 +438,5 @@ class RealPirJobsRunner @Inject constructor(
 
     private suspend fun NetworkProtectionState.safeIsVpnRunning(): Boolean {
         return runCatching { isRunning() }.getOrDefault(false)
-    }
-
-    private companion object {
-        const val REASON_NO_ACTIVE_BROKERS = "no_active_brokers"
     }
 }

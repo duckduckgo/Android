@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -1424,7 +1425,7 @@ class RealPirJobsRunnerTest {
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq("no_active_brokers"))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS))
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
         verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
         verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
@@ -1479,7 +1480,7 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
-    fun whenScanThrowsOtherExceptionThenWideEventOnRunFailedWithSimpleName() = runTest {
+    fun whenScanThrowsIllegalStateExceptionThenWideEventOnRunFailedWithIllegalStateException() = runTest {
         // Given
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
@@ -1521,8 +1522,46 @@ class RealPirJobsRunnerTest {
             notificationsPermissionGranted = false,
             isTrackerBlockingEnabled = false,
         )
-        verify(mockPirScanWideEvent).onRunFailed(any(), eq("IllegalStateException"))
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+    }
+
+    @Test
+    fun whenOptOutThrowsIllegalStateExceptionThenWideEventOnRunFailedWithIllegalStateException() = runTest {
+        // Given - scan completes, then opt-out execution throws.
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(emptyList())
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime))
+            .thenReturn(listOf(testOptOutJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirOptOut.executeOptOutForJobs(
+                listOf(testOptOutJobRecord),
+                mockContext,
+            ),
+        ).thenThrow(IllegalStateException("opt-out boom"))
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected IllegalStateException to propagate")
+        } catch (e: IllegalStateException) {
+            assertEquals("opt-out boom", e.message)
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutStarted(any())
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
+        verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
         verify(mockPirScanWideEvent, never()).onRunCancelled(any())
     }
 }
