@@ -345,7 +345,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
-        configureBottomRowFocusVisibility()
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
