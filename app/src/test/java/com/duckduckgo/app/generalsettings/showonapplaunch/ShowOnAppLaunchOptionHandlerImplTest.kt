@@ -852,16 +852,18 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnIsNotified() = runTest {
-        // Even when no new tab is added because the user is already on an NTP, the handler should
-        // still notify — the currently-shown NTP counts as an after-idle shown event.
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnNotNotified() = runTest {
+        // When the user is already on an NTP, no new tab is added — and we deliberately don't
+        // call onIdleReturnTriggered(): NtpAfterIdleManager has preserved the prior session's
+        // classification across the background, and a stale pending flag here would leak onto
+        // the next NTP shown (e.g. a manually-opened new tab).
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = null, position = 0)
 
         testee.handleAfterInactivityOption(wasIdle = true)
 
-        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     @Test

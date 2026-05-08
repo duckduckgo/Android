@@ -62,12 +62,18 @@ class FirstScreenHandlerImpl @Inject constructor(
 ) : BrowserLifecycleObserver {
 
     override fun onOpen(isFreshLaunch: Boolean) {
-        // Notify the NtpAfterIdleManager synchronously when the currently selected tab is already
-        // an NTP: BrowserViewModel's flowSelectedTab subscription can fire onNtpShown immediately
-        // on activity recreation, and the async handler path below doesn't run in time to classify
-        // it. Gated on "already on NTP" so LastOpenedTab/SpecificPage users on a URL tab don't
-        // leave a stale pendingAfterIdle flag behind for a later user-initiated NTP.
-        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
+        // Notify the NtpAfterIdleManager synchronously on a fresh launch when the currently
+        // selected tab is already an NTP: BrowserViewModel's flowSelectedTab subscription will
+        // fire onNtpShown immediately on activity recreation, and the async handler path below
+        // doesn't run in time to classify it.
+        //
+        // Restricted to isFreshLaunch=true: on plain background+resume, NtpAfterIdleManager
+        // preserves the prior session's classification, so the existing _isAfterIdleReturn value
+        // is correct without a fresh trigger. Setting pendingAfterIdle here would leak — no
+        // onNtpShown fires (same NTP tab), and the next user action that DOES show an NTP
+        // (e.g. opening a new tab manually) would incorrectly consume the stale pending flag.
+        if (isFreshLaunch &&
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled() &&
             computeWasIdle() &&
             isCurrentSelectedTabNtp()
         ) {

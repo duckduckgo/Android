@@ -427,68 +427,84 @@ class FirstScreenHandlerImplTest {
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
-    // --- Synchronous onIdleReturnTriggered (only when current tab is already an NTP) ---
+    // --- Synchronous onIdleReturnTriggered (only on fresh launch when current tab is already an NTP) ---
 
     @Test
-    fun whenIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenNotifiesNtpAfterIdleManagerSynchronously() {
+    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenNotifiesNtpAfterIdleManagerSynchronously() {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
         liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
 
-        testee.onOpen(isFreshLaunch = false)
+        testee.onOpen(isFreshLaunch = true)
 
         // Called synchronously from onOpen, before any coroutine advances.
         verify(ntpAfterIdleManager).onIdleReturnTriggered()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndIdleAndCurrentTabHasUrlThenDoesNotNotifyNtpAfterIdleManager() {
+    fun whenNotFreshLaunchAndIdleAndCurrentTabIsNtpThenDoesNotNotifyNtpAfterIdleManager() {
+        // On plain background+resume (non-fresh) with the same NTP still selected, no new
+        // onNtpShown will fire to consume the pending flag, so triggering would leak the
+        // classification onto the next manually-shown NTP.
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabHasUrlThenDoesNotNotifyNtpAfterIdleManager() {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
         liveSelectedTab.value = TabEntity(tabId = "web", url = "https://example.com")
 
-        testee.onOpen(isFreshLaunch = false)
+        testee.onOpen(isFreshLaunch = true)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNotNotifyNtpAfterIdleManager() {
+    fun whenFreshLaunchAndIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNotNotifyNtpAfterIdleManager() {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
         liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
 
-        testee.onOpen(isFreshLaunch = false)
+        testee.onOpen(isFreshLaunch = true)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndNoPriorTimestampThenDoesNotNotifyNtpAfterIdleManager() {
+    fun whenFreshLaunchAndIdleReturnEnabledAndNoPriorTimestampThenDoesNotNotifyNtpAfterIdleManager() {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
         liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
 
-        testee.onOpen(isFreshLaunch = false)
+        testee.onOpen(isFreshLaunch = true)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     @Test
-    fun whenIdleReturnDisabledThenDoesNotNotifyNtpAfterIdleManager() {
+    fun whenFreshLaunchAndIdleReturnDisabledThenDoesNotNotifyNtpAfterIdleManager() {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
         liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
 
-        testee.onOpen(isFreshLaunch = false)
+        testee.onOpen(isFreshLaunch = true)
 
         verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
