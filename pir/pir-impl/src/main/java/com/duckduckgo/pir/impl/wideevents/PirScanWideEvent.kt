@@ -208,6 +208,7 @@ class PirScanWideEventImpl @Inject constructor(
         private var completedScanJobs: Int = 0
         private var lastReportedDecile: Int = 0
         private var currentDecileIntervalKey: String? = null
+        private var optOutIntervalOpen: Boolean = false
         private var lastStep: String = STEP_STARTED
 
         suspend fun onRunStarted(
@@ -226,6 +227,7 @@ class PirScanWideEventImpl @Inject constructor(
                 // Finish any stale in-memory flow with Cancelled so we don't leave two open flows of
                 // the same name in the wide-events DB.
                 cachedFlowId?.let { staleId ->
+                    closeOpenIntervalsLocked(staleId)
                     wideEventClient.flowFinish(
                         wideEventId = staleId,
                         status = FlowStatus.Cancelled,
@@ -340,6 +342,7 @@ class PirScanWideEventImpl @Inject constructor(
                 val flowId = cachedFlowId ?: return@withLock
                 wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_STARTED, success = true)
                 wideEventClient.intervalStart(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
+                optOutIntervalOpen = true
                 lastStep = STEP_OPT_OUT_STARTED
             }
         }
@@ -348,6 +351,7 @@ class PirScanWideEventImpl @Inject constructor(
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
                 wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
+                optOutIntervalOpen = false
                 wideEventClient.flowStep(wideEventId = flowId, stepName = STEP_OPT_OUT_COMPLETED, success = true)
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
@@ -380,6 +384,7 @@ class PirScanWideEventImpl @Inject constructor(
         suspend fun onRunFailed(reason: PirScanWideEvent.FailureReason) {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
+                closeOpenIntervalsLocked(flowId)
                 val finalStep = lastStep
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
@@ -393,6 +398,7 @@ class PirScanWideEventImpl @Inject constructor(
         suspend fun onRunCancelled() {
             mutex.withLock {
                 val flowId = cachedFlowId ?: return@withLock
+                closeOpenIntervalsLocked(flowId)
                 val finalStep = lastStep
                 wideEventClient.flowFinish(
                     wideEventId = flowId,
@@ -403,12 +409,29 @@ class PirScanWideEventImpl @Inject constructor(
             }
         }
 
+        /**
+         * Closes any intervals left open by the in-progress flow before it terminates abnormally
+         * (failure, cancellation, or stale-flow cleanup on a re-run). Without this, dangling open
+         * intervals would corrupt timing analytics for non-success runs.
+         */
+        private suspend fun closeOpenIntervalsLocked(flowId: Long) {
+            currentDecileIntervalKey?.let {
+                wideEventClient.intervalEnd(wideEventId = flowId, key = it)
+                currentDecileIntervalKey = null
+            }
+            if (optOutIntervalOpen) {
+                wideEventClient.intervalEnd(wideEventId = flowId, key = INTERVAL_OPT_OUT_DURATION)
+                optOutIntervalOpen = false
+            }
+        }
+
         private fun clearStateLocked() {
             cachedFlowId = null
             totalScanJobs = 0
             completedScanJobs = 0
             lastReportedDecile = 0
             currentDecileIntervalKey = null
+            optOutIntervalOpen = false
             lastStep = STEP_STARTED
         }
     }

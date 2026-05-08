@@ -375,8 +375,11 @@ class PirScanWideEventTest {
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
         runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 1)
 
-        // Then
-        verify(wideEventClient).flowFinish(
+        // Then - the stale flow had decile_0_10 open from its onRunStarted; it must be ended
+        // before flowFinish so dangling intervals don't pollute timing analytics.
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 100L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
             wideEventId = 100L,
             status = FlowStatus.Cancelled,
             metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
@@ -585,6 +588,87 @@ class PirScanWideEventTest {
             wideEventId = 8L,
             status = FlowStatus.Cancelled,
             metadata = mapOf(KEY_LAST_STEP to "progress_90"),
+        )
+    }
+
+    @Test
+    fun whenRunFailedDuringScanThenOpenDecileIntervalIsClosedBeforeFlowFinish() = runTest {
+        // Given - 10 jobs total, only 2 completed -> still inside decile_20_30 when failure fires.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(60L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
+        repeat(2) { testee.onScanJobCompleted(PirExecutionType.MANUAL_INITIAL) } // progress_20 fires, decile_20_30 opens
+
+        // When
+        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, FailureReason.UNKNOWN_ERROR)
+
+        // Then - the open decile interval must be ended before the flow is finished.
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 60L, key = "decile_20_30_duration_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 60L,
+            status = FlowStatus.Failure(reason = "unknown_error"),
+            metadata = mapOf(KEY_LAST_STEP to "progress_20"),
+        )
+    }
+
+    @Test
+    fun whenRunFailedDuringOptOutThenOpenOptOutIntervalIsClosedBeforeFlowFinish() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(61L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0) // zero scan jobs, no decile interval
+        testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL)
+        testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL) // opens INTERVAL_OPT_OUT_DURATION
+
+        // When
+        testee.onRunFailed(PirExecutionType.MANUAL_INITIAL, FailureReason.UNKNOWN_ERROR)
+
+        // Then - the open opt-out interval must be ended before flowFinish.
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 61L, key = INTERVAL_OPT_OUT_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 61L,
+            status = FlowStatus.Failure(reason = "unknown_error"),
+            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_STARTED),
+        )
+    }
+
+    @Test
+    fun whenRunCancelledDuringScanThenOpenDecileIntervalIsClosedBeforeFlowFinish() = runTest {
+        // Given - cancellation fires while scan is in progress (decile_0_10 still open).
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(62L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 10)
+
+        // When
+        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL)
+
+        // Then
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 62L, key = "decile_0_10_duration_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 62L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_LAST_STEP to STEP_STARTED),
+        )
+    }
+
+    @Test
+    fun whenRunCancelledDuringOptOutThenOpenOptOutIntervalIsClosedBeforeFlowFinish() = runTest {
+        // Given
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(63L))
+        runStarted(PirExecutionType.MANUAL_INITIAL, 1, 1, 0)
+        testee.onScanCompleted(PirExecutionType.MANUAL_INITIAL)
+        testee.onOptOutStarted(PirExecutionType.MANUAL_INITIAL)
+
+        // When
+        testee.onRunCancelled(PirExecutionType.MANUAL_INITIAL)
+
+        // Then
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 63L, key = INTERVAL_OPT_OUT_DURATION)
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 63L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf(KEY_LAST_STEP to STEP_OPT_OUT_STARTED),
         )
     }
 

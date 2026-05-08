@@ -1533,10 +1533,12 @@ class RealPirJobsRunnerTest {
         // Given - TimeoutCancellationException extends CancellationException, so the runner has to
         // match it BEFORE the generic cancellation catch, otherwise timeouts get silently
         // misclassified as user cancellations. Its constructor is internal in kotlinx.coroutines,
-        // so we instantiate via reflection to drive the test deterministically.
-        val constructor = TimeoutCancellationException::class.java.declaredConstructors.first()
-        constructor.isAccessible = true
-        val timeoutException = constructor.newInstance("test timeout", null) as TimeoutCancellationException
+        // so we capture a real instance by triggering an actual timeout.
+        val timeoutException = runCatching {
+            kotlinx.coroutines.runBlocking {
+                kotlinx.coroutines.withTimeout(1L) { kotlinx.coroutines.delay(1000L) }
+            }
+        }.exceptionOrNull() as TimeoutCancellationException
 
         whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
@@ -1561,8 +1563,8 @@ class RealPirJobsRunnerTest {
         try {
             testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
             fail("Expected TimeoutCancellationException to propagate")
-        } catch (e: TimeoutCancellationException) {
-            assertEquals("test timeout", e.message)
+        } catch (_: TimeoutCancellationException) {
+            // expected
         }
 
         // Then
