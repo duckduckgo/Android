@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.EnabledState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
@@ -120,9 +121,9 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
-    fun setLockedForOnboarding(locked: Boolean) {
+    fun setLocked(locked: Boolean) {
         doOnAttach {
-            viewModel.setLockedForOnboarding(locked)
+            viewModel.setLocked(locked)
         }
     }
 
@@ -214,29 +215,24 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.shadowView.isVisible = viewState.showShadow
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
-        applyOnboardingLock(viewState)
+        applyEnabledState(viewState.enabledState)
     }
 
-    private fun applyOnboardingLock(viewState: ViewState) {
-        val locked = viewState.isLockedForOnboarding
-        val alpha = if (locked) 0.4f else 1.0f
+    private fun applyEnabledState(state: EnabledState) {
+        val enabled = state == EnabledState.ALL
+        val fireEnabled = enabled || state == EnabledState.FIRE_BUTTON_ONLY
 
-        binding.newTabButton.isEnabled = !locked
-        binding.newTabButton.alpha = alpha
-        binding.autofillButton.isEnabled = !locked
-        binding.autofillButton.alpha = alpha
-        binding.bookmarksButton.isEnabled = !locked
-        binding.bookmarksButton.alpha = alpha
-        binding.tabsButton.isEnabled = !locked
-        binding.tabsButton.alpha = alpha
-        binding.menuButton.isEnabled = !locked
-        binding.menuButton.alpha = alpha
+        applyEnabled(binding.newTabButton, enabled)
+        applyEnabled(binding.autofillButton, enabled)
+        applyEnabled(binding.bookmarksButton, enabled)
+        applyEnabled(binding.tabsButton, enabled)
+        applyEnabled(binding.menuButton, enabled)
+        applyEnabled(binding.fireButton, fireEnabled)
+    }
 
-        // Fire button is exempt from the lock
-        val fireButtonLocked = locked && !viewState.fireButtonHighlighted
-        val fireButtonAlpha = if (fireButtonLocked) 0.4f else 1.0f
-        binding.fireButton.isEnabled = !fireButtonLocked
-        binding.fireButton.alpha = fireButtonAlpha
+    private fun applyEnabled(view: View, enabled: Boolean) {
+        view.isEnabled = enabled
+        view.alpha = if (enabled) 1.0f else 0.4f
     }
 
     private fun processCommands(command: Command) {

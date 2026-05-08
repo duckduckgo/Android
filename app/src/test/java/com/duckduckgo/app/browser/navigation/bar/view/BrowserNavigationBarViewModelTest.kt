@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.EnabledState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -281,24 +282,49 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when setLockedForOnboarding true then viewState is locked`() = runTest {
+    fun `when setLocked true and fire button is not highlighted then enabledState is NONE`() = runTest {
         testee.viewState.test {
             awaitItem() // initial
-            testee.setLockedForOnboarding(true)
+            testee.setLocked(true)
             val updated = awaitItem()
-            Assert.assertTrue(updated.isLockedForOnboarding)
+            Assert.assertEquals(EnabledState.NONE, updated.enabledState)
         }
     }
 
     @Test
-    fun `when setLockedForOnboarding false then viewState is unlocked`() = runTest {
+    fun `when setLocked true and fire button is highlighted then enabledState is FIRE_BUTTON_ONLY`() = runTest {
         testee.viewState.test {
             awaitItem() // initial
-            testee.setLockedForOnboarding(true)
-            awaitItem() // locked
-            testee.setLockedForOnboarding(false)
+            testee.setFireButtonHighlight(true)
+            awaitItem()
+            testee.setLocked(true)
             val updated = awaitItem()
-            Assert.assertFalse(updated.isLockedForOnboarding)
+            Assert.assertEquals(EnabledState.FIRE_BUTTON_ONLY, updated.enabledState)
+        }
+    }
+
+    @Test
+    fun `when setLocked false then enabledState is ALL`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setLocked(true)
+            awaitItem() // locked
+            testee.setLocked(false)
+            val updated = awaitItem()
+            Assert.assertEquals(EnabledState.ALL, updated.enabledState)
+        }
+    }
+
+    @Test
+    fun `when setFireButtonHighlight changes while locked then enabledState transitions accordingly`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setLocked(true)
+            Assert.assertEquals(EnabledState.NONE, awaitItem().enabledState)
+            testee.setFireButtonHighlight(true)
+            Assert.assertEquals(EnabledState.FIRE_BUTTON_ONLY, awaitItem().enabledState)
+            testee.setFireButtonHighlight(false)
+            Assert.assertEquals(EnabledState.NONE, awaitItem().enabledState)
         }
     }
 }

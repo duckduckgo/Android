@@ -69,6 +69,10 @@ class BrowserNavigationBarViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private val _viewState = MutableStateFlow(ViewState())
+
+    // Tracked separately from ViewState so the derived enabledState can be recomputed
+    // whenever either the lock or the fire-button highlight changes.
+    private var locked: Boolean = false
     val viewState = _viewState.map { it.viewMode.toBrowserViewMode() }.distinctUntilChanged().flatMapLatest { mode ->
         combine(
             _viewState.asStateFlow(),
@@ -187,16 +191,22 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 fireButtonHighlighted = highlighted,
+                enabledState = enabledStateFor(locked = locked, fireButtonHighlighted = highlighted),
             )
         }
     }
 
-    fun setLockedForOnboarding(locked: Boolean) {
+    fun setLocked(locked: Boolean) {
+        this.locked = locked
         _viewState.update {
-            it.copy(
-                isLockedForOnboarding = locked,
-            )
+            it.copy(enabledState = enabledStateFor(locked = locked, fireButtonHighlighted = it.fireButtonHighlighted))
         }
+    }
+
+    private fun enabledStateFor(locked: Boolean, fireButtonHighlighted: Boolean): EnabledState = when {
+        !locked -> EnabledState.ALL
+        fireButtonHighlighted -> EnabledState.FIRE_BUTTON_ONLY
+        else -> EnabledState.NONE
     }
 
     sealed class Command {
@@ -208,6 +218,14 @@ class BrowserNavigationBarViewModel @Inject constructor(
         data object NotifyAutofillButtonClicked : Command()
         data object NotifyBookmarksButtonClicked : Command()
     }
+
+    /**
+     * Which buttons are enabled in the navigation bar.
+     * - [ALL]: every button is enabled (default).
+     * - [NONE]: every button is disabled.
+     * - [FIRE_BUTTON_ONLY]: only the fire button is enabled; other buttons are disabled.
+     */
+    enum class EnabledState { ALL, NONE, FIRE_BUTTON_ONLY }
 
     data class ViewState(
         val isVisible: Boolean = true,
@@ -222,6 +240,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val showBrowserMenuHighlight: Boolean = false,
         val viewMode: ViewMode = Browser,
         val showShadow: Boolean = true,
-        val isLockedForOnboarding: Boolean = false,
+        val enabledState: EnabledState = EnabledState.ALL,
     )
 }
