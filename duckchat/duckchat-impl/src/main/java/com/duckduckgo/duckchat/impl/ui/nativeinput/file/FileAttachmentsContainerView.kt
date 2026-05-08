@@ -21,7 +21,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 
 class FileAttachmentsContainerView @JvmOverloads constructor(
@@ -65,7 +65,7 @@ class FileAttachmentsContainerView @JvmOverloads constructor(
 
     private fun addFileItemView(attachment: FileAttachment) {
         val itemView = LayoutInflater.from(context).inflate(R.layout.view_file_attachment_item, this, false)
-        val fileNameText = itemView.findViewById<TextView>(R.id.fileName)
+        val fileNameText = itemView.findViewById<DaxTextView>(R.id.fileName)
         val removeButton = itemView.findViewById<ImageView>(R.id.fileRemove)
         fileNameText.text = attachment.fileName
         removeButton.setOnClickListener {

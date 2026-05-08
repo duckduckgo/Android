@@ -50,7 +50,7 @@
                 app:srcCompat="@drawable/ic_attach_16"
                 app:tint="?attr/daxColorPrimaryIcon" />
 
-            <TextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/fileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,8 +58,8 @@
                 android:ellipsize="middle"
                 android:maxWidth="120dp"
                 android:maxLines="1"
-                android:textColor="?attr/daxColorPrimaryText"
-                android:textSize="12sp" />
+                app:textType="primary"
+                app:typography="caption" />
 
         </LinearLayout>
 
