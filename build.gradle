@@ -29,7 +29,7 @@ buildscript {
         // in the individual module build.gradle files
 
         // Metro DI plugin (requires JVM 21+ to load)
-        classpath "dev.zacsweers.metro:gradle-plugin:1.1.0-SNAPSHOT"
+        classpath "dev.zacsweers.metro:gradle-plugin:_"
     }
 }
 
