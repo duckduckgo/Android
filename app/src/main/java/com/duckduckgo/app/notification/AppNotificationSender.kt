@@ -33,6 +33,7 @@ class AppNotificationSender(
     private val factory: NotificationFactory,
     private val notificationDao: NotificationDao,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
+    private val launchIntentBuilder: NotificationLaunchIntentBuilder,
 ) : NotificationSender {
 
     override suspend fun sendNotification(notification: SchedulableNotification) {
@@ -52,7 +53,7 @@ class AppNotificationSender(
             return
         }
 
-        val launchIntent = notificationPlugin.getLaunchIntent()
+        val launchIntent = launchIntentBuilder.build(notificationPlugin.getLaunchIntent())
         val cancelIntent = NotificationHandlerService.pendingCancelNotificationHandlerIntent(context, notification.javaClass)
         val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
         notificationDao.insert(Notification(notification.id))

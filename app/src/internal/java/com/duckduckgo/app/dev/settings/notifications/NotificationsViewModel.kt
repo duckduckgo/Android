@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.notifications.NotificationViewModel.ViewState.NotificationItem
 import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationLaunchIntentBuilder
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
@@ -48,6 +49,7 @@ class NotificationViewModel @Inject constructor(
     private val dispatcher: DispatcherProvider,
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val factory: NotificationFactory,
+    private val launchIntentBuilder: NotificationLaunchIntentBuilder,
     private val surveyRepository: SurveyRepository,
     private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
 ) : ViewModel() {
@@ -87,7 +89,8 @@ class NotificationViewModel @Inject constructor(
                 }
 
                 // the survey intent hits the DB, so we need to do this on IO
-                val launchIntent = withContext(dispatcher.io()) { plugin.getLaunchIntent() }
+                val rawLaunchIntent = withContext(dispatcher.io()) { plugin.getLaunchIntent() }
+                val launchIntent = launchIntentBuilder.build(rawLaunchIntent)
 
                 NotificationItem(
                     id = plugin.getSpecification().systemId,

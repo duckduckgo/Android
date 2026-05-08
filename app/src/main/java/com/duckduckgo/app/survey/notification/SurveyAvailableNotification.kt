@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.survey.notification
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -81,7 +80,6 @@ class SurveyAvailableSpecification(context: Context) : NotificationSpec {
 class AvailableSurveyNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: SurveyAvailableNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -109,18 +107,13 @@ class AvailableSurveyNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
-        val intent = SurveyActivity.intent(
+    override fun getLaunchIntent(): Intent {
+        return SurveyActivity.intent(
             context,
             surveyRepository.getScheduledSurvey(),
             SurveySource.PUSH,
             pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName),
         )
-        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-        return pendingIntent
     }
 
     private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"

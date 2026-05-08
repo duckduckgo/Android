@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -78,7 +77,6 @@ class DefaultBrowserChangedSurveyNotificationSpec(context: Context) : Notificati
 class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: DefaultBrowserChangedSurveyNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
@@ -99,21 +97,17 @@ class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
         return runBlocking { deferred.await() }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
+    override fun getLaunchIntent(): Intent {
         val survey = Survey(
             surveyId = DefaultBrowserChangedSurveyManager.SURVEY_ID_PUSH,
             url = defaultBrowserChangedSurveyManager.buildSurveyUrl("push"),
             daysInstalled = null,
             status = Survey.Status.SCHEDULED,
         )
-        val intent = SurveyActivity.intent(
+        return SurveyActivity.intent(
             context,
             survey,
             SurveySource.PUSH,
         )
-        return taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
     }
 }

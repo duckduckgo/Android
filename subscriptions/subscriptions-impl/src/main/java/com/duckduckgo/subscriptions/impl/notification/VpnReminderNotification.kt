@@ -16,12 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl.notification
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -107,7 +106,6 @@ class VpnReminderNotificationSpecification(context: Context) : NotificationSpec 
 class VpnReminderNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: VpnReminderNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -137,15 +135,11 @@ class VpnReminderNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
-        val intent = globalActivityStarter.startIntent(
+    override fun getLaunchIntent(): Intent? {
+        return globalActivityStarter.startIntent(
             context,
             NetworkProtectionManagementScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),
-        ) ?: return null
-        return taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
+        )
     }
 
     companion object {

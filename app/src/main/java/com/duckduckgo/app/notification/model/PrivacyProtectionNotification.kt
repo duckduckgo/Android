@@ -16,14 +16,13 @@
 
 package com.duckduckgo.app.notification.model
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -96,7 +95,6 @@ class PrivacyProtectionNotificationSpecification(
 class PrivacyProtectionNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: PrivacyProtectionNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -123,15 +121,10 @@ class PrivacyProtectionNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
-        val intent = BrowserActivity.intent(context, newSearch = true, interstitialScreen = true).apply {
+    override fun getLaunchIntent(): Intent {
+        return BrowserActivity.intent(context, newSearch = true, interstitialScreen = true).apply {
             putExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
         }
-        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-        return pendingIntent
     }
 
     private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"
