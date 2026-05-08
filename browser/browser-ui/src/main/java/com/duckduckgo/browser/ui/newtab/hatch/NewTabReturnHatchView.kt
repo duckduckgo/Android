@@ -30,6 +30,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -40,6 +41,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -64,6 +66,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
@@ -90,7 +95,18 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
+        viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
         initPopupMenu()
+    }
+
+    private fun processCommand(command: NewTabReturnHatchViewModel.Command) {
+        when (command) {
+            NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
+                globalActivityStarter.start(context, TabSwitcherScreenNoParams)
+        }
     }
 
     override fun onDetachedFromWindow() {
