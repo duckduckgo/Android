@@ -19,6 +19,8 @@ package com.duckduckgo.browser.ui.newtab.hatch
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -106,6 +108,10 @@ class NewTabReturnHatchView @JvmOverloads constructor(
                     faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
                 }
             }
+
+            binding.returnHatchTabsMenu.count = state.tabs
+            binding.returnHatchTabsMenu.isVisible = state.shouldShowTabs
+
             binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()

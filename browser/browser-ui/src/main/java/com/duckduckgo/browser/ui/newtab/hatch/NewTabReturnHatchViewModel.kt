@@ -23,6 +23,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -43,6 +45,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val omnibarRepository: OmnibarRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -53,12 +56,15 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val shouldShow: Boolean = false,
         val isDuckChat: Boolean = false,
         val isSerp: Boolean = false,
+        val tabs: Int = 0,
+        val shouldShowTabs: Boolean = false,
     )
 
     val viewState = combine(
         tabRepository.flowLastAccessedTab,
+        tabRepository.flowTabs,
         ntpAfterIdleManager.isAfterIdleReturn,
-    ) { lastTab, afterIdle ->
+    ) { lastTab, tabs, afterIdle ->
         if (lastTab != null && afterIdle) {
             val url = lastTab.url.orEmpty()
             ViewState(
@@ -69,6 +75,8 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 shouldShow = true,
                 isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                 isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
+                tabs = tabs.size,
+                shouldShowTabs = omnibarRepository.omnibarType == OmnibarType.SPLIT
             )
         } else {
             ViewState(shouldShow = false)
