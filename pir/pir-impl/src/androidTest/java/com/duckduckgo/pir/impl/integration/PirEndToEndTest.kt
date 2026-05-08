@@ -1034,5 +1034,6 @@ class PirEndToEndTest {
         ) = Unit
 
         override suspend fun onScanCompleted() = Unit
+        override suspend fun onUserReset() = Unit
     }
 }

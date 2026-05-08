@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,6 +34,7 @@ class PirFeatureDataCleanerTest {
     private val pirSchedulingRepository: PirSchedulingRepository = mock()
     private val pirEventsRepository: PirEventsRepository = mock()
     private val pirScanWideEvent: PirScanWideEvent = mock()
+    private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent = mock()
 
     private lateinit var testee: RealPirFeatureDataCleaner
 
@@ -43,6 +45,7 @@ class PirFeatureDataCleanerTest {
             pirSchedulingRepository = pirSchedulingRepository,
             pirEventsRepository = pirEventsRepository,
             pirScanWideEvent = pirScanWideEvent,
+            pirInitialScanCompletionWideEvent = pirInitialScanCompletionWideEvent,
         )
     }
 
@@ -50,8 +53,9 @@ class PirFeatureDataCleanerTest {
     fun whenRemoveAllDataThenWideEventResetCalledBeforeRepositoryClear() = runTest {
         testee.removeAllData()
 
-        inOrder(pirScanWideEvent, pirRepository).run {
+        inOrder(pirScanWideEvent, pirInitialScanCompletionWideEvent, pirRepository).run {
             verify(pirScanWideEvent).onUserReset()
+            verify(pirInitialScanCompletionWideEvent).onUserReset()
             verify(pirRepository).clearAllData()
         }
         verify(pirSchedulingRepository).clearAllData()
@@ -62,8 +66,9 @@ class PirFeatureDataCleanerTest {
     fun whenRemoveUserDataThenWideEventResetCalledBeforeRepositoryClear() = runTest {
         testee.removeUserData()
 
-        inOrder(pirScanWideEvent, pirRepository).run {
+        inOrder(pirScanWideEvent, pirInitialScanCompletionWideEvent, pirRepository).run {
             verify(pirScanWideEvent).onUserReset()
+            verify(pirInitialScanCompletionWideEvent).onUserReset()
             verify(pirRepository).clearUserData()
         }
         verify(pirSchedulingRepository).clearAllData()
