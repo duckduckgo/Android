@@ -37,9 +37,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -100,6 +102,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(TabSwitcherScreenNoParams::class, screenName = "tabSwitcher")
 class TabSwitcherActivity :
     DuckDuckGoActivity(),
     TabSwitcherListener,

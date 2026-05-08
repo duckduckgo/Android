@@ -30,9 +30,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,6 +63,13 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val tabs: Int = 0,
         val shouldShowTabs: Boolean = false,
     )
+
+    sealed class Command {
+        data object LaunchTabSwitcher : Command()
+    }
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
     val viewState = combine(
         tabRepository.flowLastAccessedTab,
@@ -101,7 +112,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
     }
 
     fun onTabManagerPressed() {
-
-
+        commandChannel.trySend(Command.LaunchTabSwitcher)
     }
 }
