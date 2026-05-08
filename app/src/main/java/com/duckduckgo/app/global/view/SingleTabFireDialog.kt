@@ -66,6 +66,7 @@ import com.google.android.material.R as MaterialR
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
+private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
 
 @InjectWith(FragmentScope::class)
@@ -327,6 +328,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun hideDialog() {
         binding.fireDialogRootView.gone()
+        // lift the 640dp cap so the burn animation fills the screen on tablets
+        (dialog as? BottomSheetDialog)?.behavior?.maxWidth = NO_MAX_WIDTH
     }
 
     private fun playAnimation() {

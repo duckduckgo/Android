@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Rétablir mes données</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorer</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Télécharger le PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Copier le texte du lien</string>
     <string name="linkTextCopied">Texte du lien copié</string>

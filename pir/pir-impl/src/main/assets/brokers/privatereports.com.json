@@ -1,7 +1,7 @@
 {
   "name": "PrivateReports",
   "url": "privatereports.com",
-  "version": "0.996.0",
+  "version": "0.996.1",
   "optOutUrl": "https://www.privatereports.com/api/helper/optOutLight/search",
   "steps": [
     {
@@ -149,6 +149,9 @@
             "addressCityStateList": {
               "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
               "separator": "/(?<=, [A-Z]{2}), /"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "9d919f33-30f6-4433-9eb4-6e3139a13a08"

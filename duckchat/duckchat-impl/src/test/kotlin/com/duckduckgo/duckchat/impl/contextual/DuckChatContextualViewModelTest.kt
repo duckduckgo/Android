@@ -1437,6 +1437,7 @@ class DuckChatContextualViewModelTest {
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
         override fun openVoiceDuckChat() { }
         override fun isVoiceSessionActive(): Boolean = false
+        override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

@@ -385,6 +385,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_voice_session_digital-assistant_started": {
+        "description": "Fires when Duck.ai voice chat is launched as the digital assistant (e.g. via Google Assistant ACTION_ASSIST intent)",
+        "owners": ["karlenDimla"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_settings_default_toggle_position_changed": {
         "description": "User changed the default toggle position setting in AI Features settings",
         "owners": ["YoussefKeyrouz"],

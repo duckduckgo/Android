@@ -1,7 +1,7 @@
 {
   "name": "MugshotLook",
   "url": "mugshotlook.com",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.mugshotlook.com/api/helper/optOutLight/search",
   "steps": [
@@ -149,6 +149,9 @@
             "addressCityStateList": {
               "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
               "separator": "/(?<=, [A-Z]{2}), /"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "3ecc7abc-8bfc-40db-80b0-e7087b99bcef"

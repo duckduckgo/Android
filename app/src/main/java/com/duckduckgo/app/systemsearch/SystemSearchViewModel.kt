@@ -316,7 +316,10 @@ class SystemSearchViewModel @Inject constructor(
     fun onDigitalAssistOpened(intent: Intent) {
         viewModelScope.launch {
             command.value = when {
-                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> Command.LaunchDuckAiVoiceChat
+                duckAiFeatureState.allowDuckAiAsDigitalAssistant.value && duckChat.isEnabled() -> {
+                    pixel.fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+                    Command.LaunchDuckAiVoiceChat
+                }
                 else -> Command.LaunchAssistSearch(intent)
             }
         }

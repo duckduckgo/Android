@@ -56,6 +56,8 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentTagSpan
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -63,9 +65,11 @@ import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+@HasMemberInjections
 @InjectWith(ViewScope::class)
 open class InputModeWidget @JvmOverloads constructor(
     context: Context,
@@ -74,6 +78,9 @@ open class InputModeWidget @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var duckChatInternal: DuckChatInternal
 
     val inputField: EditText
     private val inputFieldClearText: View
@@ -156,6 +163,18 @@ open class InputModeWidget @JvmOverloads constructor(
     private var isDeletingTag = false
     private val knownTagTabIds = mutableSetOf<String>()
 
+    // Installed in onAttachedToWindow (after DI) and removed in onDetachedFromWindow, so we
+    // never have to guard against pre-DI invocation.
+    private val duckChatTabSelectedListener =
+        object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val mode = if (tab.position == 0) InputMode.SEARCH else InputMode.DUCK_AI
+                duckChatInternal.setSelectedMode(mode)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
 
@@ -185,6 +204,15 @@ open class InputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        inputModeSwitch.addOnTabSelectedListener(duckChatTabSelectedListener)
+        val mode = if (inputModeSwitch.selectedTabPosition == 0) InputMode.SEARCH else InputMode.DUCK_AI
+        duckChatInternal.setSelectedMode(mode)
+    }
+
+    override fun onDetachedFromWindow() {
+        inputModeSwitch.removeOnTabSelectedListener(duckChatTabSelectedListener)
+        duckChatInternal.setSelectedMode(InputMode.SEARCH)
+        super.onDetachedFromWindow()
     }
 
     private fun provideInitialText(text: String) {
@@ -429,7 +457,7 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun submitMessage(message: String? = null) {
+    open fun submitMessage(message: String? = null) {
         val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
         if (textToSubmit != null) {
@@ -440,6 +468,13 @@ open class InputModeWidget @JvmOverloads constructor(
             }
             inputField.clearFocus()
         }
+    }
+
+    fun submitAsChat(): Boolean {
+        val textToSubmit = inputField.text.getTextToSubmit()?.toString() ?: return false
+        onChatSent?.invoke(textToSubmit)
+        inputField.clearFocus()
+        return true
     }
 
     fun selectTab(index: Int) {

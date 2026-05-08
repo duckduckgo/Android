@@ -175,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Delete server data?</string>
-    <string name="sync_delete_server_data_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Delete Data</string>
+    <string name="sync_delete_server_data_dialog_content">Your backup will be deleted from the server. All devices will be disconnected from sync, but nothing will be deleted from any device.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Delete Server Data</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Cancel</string>
 
     <!-- Sync feature promo -->

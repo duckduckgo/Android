@@ -26,7 +26,6 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchO
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -52,20 +51,13 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
-    private val appBuildConfig: AppBuildConfig,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
-        // new users see New Tab
         logcat { "FirstScreen: Inactivity Timer passed" }
-        if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
-            logcat { "FirstScreen: setting New Tab for new users" }
-            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
-        }
-        // existing users see whatever they had selected
         applyShowOnAppLaunchOption(fromInactivity = wasIdle)
     }
 
@@ -80,19 +72,21 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> {
-                if (fromInactivity) {
-                    // Fires regardless of whether we add a new tab: when the user is already on
-                    // an NTP, no new tab is added but the current NTP still counts as an after-idle
-                    // shown event. Gating on "new tab added" would leave that case unclassified.
-                    ntpAfterIdleManager.onIdleReturnTriggered()
-                }
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
                     if (fromInactivity) {
+                        // Set pendingAfterIdle BEFORE adding the tab so BrowserViewModel's
+                        // flowSelectedTab emit consumes it via onNtpShown for the new NTP.
+                        ntpAfterIdleManager.onIdleReturnTriggered()
                         notifyAutofillIdleReturn("new_tab_page")
                     }
                     tabRepository.add()
                 }
+                // When the user is already on an NTP we deliberately don't trigger here:
+                // - If the prior session classified this NTP as auto-initiated, NtpAfterIdleManager
+                //   has preserved the state across the background; the hatch is still correct.
+                // - Setting pendingAfterIdle here would leak to the next NTP shown (e.g. a
+                //   manually-opened new tab), incorrectly classifying it as auto-initiated.
             }
             is SpecificPage -> {
                 if (fromInactivity) {

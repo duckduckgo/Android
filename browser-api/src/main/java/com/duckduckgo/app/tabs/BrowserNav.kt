@@ -28,4 +28,10 @@ interface BrowserNav {
     fun openInCurrentTab(context: Context, url: String): Intent
     fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
     fun closeDuckChat(context: Context): Intent
+
+    /**
+     * Returns an Intent that brings the browser to the foreground and switches to the tab
+     * identified by [tabId].
+     */
+    fun openExistingTab(context: Context, tabId: String): Intent
 }

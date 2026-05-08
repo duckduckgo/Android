@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Herstel mijn gegevens</string>
     <string name="syncRestoreDialogSecondaryCta">Overslaan</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">PDF downloaden</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Linktekst kopiëren</string>
     <string name="linkTextCopied">Linktekst gekopieerd</string>

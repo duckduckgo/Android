@@ -22,8 +22,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
@@ -40,8 +38,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -73,9 +69,6 @@ internal class AppearanceViewModelTest {
     private lateinit var mockUrlDisplayRepository: UrlDisplayRepository
 
     @Mock
-    private lateinit var mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -100,8 +93,6 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
-        whenever(mockBrowserMenuDisplayRepository.browserMenuState)
-            .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
         runTest {
@@ -117,7 +108,6 @@ internal class AppearanceViewModelTest {
                 mockThemeSettingsDataStore,
                 mockAppSettingsDataStore,
                 mockUrlDisplayRepository,
-                mockBrowserMenuDisplayRepository,
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
@@ -652,130 +642,4 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
         initializeViewModel()
     }
-
-    @Test
-    fun whenBrowserMenuOptionDisabledThenViewStateHasOptionFalse() =
-        runTest {
-            // Given
-            whenever(mockBrowserMenuDisplayRepository.browserMenuState)
-                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
-
-            // When
-            initializeViewModel()
-
-            // Then
-            testee.viewState().test {
-                val state = awaitItem()
-                assertFalse(state.hasExperimentalBrowserMenuOption)
-                assertFalse(state.useBottomSheetMenuEnabled)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun whenBrowserMenuEnabledThenViewStateReflectsIt() =
-        runTest {
-            // Given
-            whenever(mockBrowserMenuDisplayRepository.browserMenuState)
-                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = true, isEnabled = true)))
-
-            // When
-            initializeViewModel()
-
-            // Then
-            testee.viewState().test {
-                val state = awaitItem()
-                assertTrue(state.hasExperimentalBrowserMenuOption)
-                assertTrue(state.useBottomSheetMenuEnabled)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun whenBrowserMenuStateChangesThenViewStateUpdates() =
-        runTest {
-            // Given
-            val stateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
-            whenever(mockBrowserMenuDisplayRepository.browserMenuState).thenReturn(stateFlow)
-
-            initializeViewModel()
-
-            // When/Then
-            testee.viewState().test {
-                val initialState = awaitItem()
-                assertFalse(initialState.useBottomSheetMenuEnabled)
-
-                // When state changes
-                stateFlow.value = BrowserMenuDisplayState(hasOption = true, isEnabled = true)
-
-                val updatedState = awaitItem()
-                assertTrue(updatedState.useBottomSheetMenuEnabled)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun whenOnUseBottomSheetMenuChangedThenRepositoryUpdated() =
-        runTest {
-            // Given
-            initializeViewModel()
-
-            // When
-            testee.onUseBottomSheetMenuChanged(true)
-
-            // Then
-            verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(true)
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Daily(),
-            )
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Unique(),
-            )
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Count,
-            )
-        }
-
-    @Test
-    fun whenOnUseBottomSheetMenuChangedToFalseThenRepositoryUpdated() =
-        runTest {
-            // Given
-            initializeViewModel()
-
-            // When
-            testee.onUseBottomSheetMenuChanged(false)
-
-            // Then
-            verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(false)
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Daily(),
-            )
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Unique(),
-            )
-            verify(mockPixel).fire(
-                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
-                parameters = emptyMap(),
-                encodedParameters = emptyMap(),
-                type = Pixel.PixelType.Count,
-            )
-        }
 }

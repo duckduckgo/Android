@@ -17,10 +17,12 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.net.Uri
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -31,13 +33,14 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -45,17 +48,20 @@ import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.json.JSONArray
 import javax.inject.Inject
 
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (query: String, modelId: String?) -> Unit,
+    val onDuckAiChatSubmitted: (query: String, modelId: String?, imagesJson: JSONArray?) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
+    val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
-    val onImageButtonPressed: () -> Unit = {},
+    val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+    val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
 )
 
 interface NativeInputManager {
@@ -67,6 +73,10 @@ interface NativeInputManager {
     )
 
     fun isNativeInputEnabled(): Boolean
+
+    /** True when the widget is shown with the chat tab selected. */
+    fun isChatTabSelected(): Boolean
+
     fun showNativeInput(
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
@@ -77,6 +87,7 @@ interface NativeInputManager {
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
+    fun setPickingImage(picking: Boolean)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -93,6 +104,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
+    private var isPickingImage: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
 
@@ -118,6 +130,16 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
+
+    override fun isChatTabSelected(): Boolean {
+        if (!::rootView.isInitialized) return false
+        val widget = widgetFrom(rootView) ?: return false
+        return widget.isChatTabSelected()
+    }
+
+    override fun setPickingImage(picking: Boolean) {
+        isPickingImage = picking
+    }
 
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
@@ -214,9 +236,10 @@ class RealNativeInputManager @Inject constructor(
         }
 
         if (isVisible) {
+            isPickingImage = false
             onKeyboardShown(widgetRoot)
         } else {
-            onKeyboardHidden(widget, widgetRoot)
+            onKeyboardHidden(widget)
         }
     }
 
@@ -226,19 +249,11 @@ class RealNativeInputManager @Inject constructor(
         widgetRoot?.translationZ = 0f
     }
 
-    private fun onKeyboardHidden(
-        widget: NativeInputWidget,
-        widgetRoot: View?,
-    ) {
+    private fun onKeyboardHidden(widget: NativeInputWidget) {
+        if (widget.isModelMenuVisible) return
+        if (isPickingImage) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
-        } else {
-            omnibarController.showTransparentOmnibar()
-            widgetRoot?.let {
-                it.bringToFront()
-                it.translationZ = WIDGET_ELEVATION_DP.toPx()
-            }
-            rootView.post { hideNativeInput() }
         }
     }
 
@@ -330,9 +345,11 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onSearchSubmitted(query)
                 } else if (omnibarController.isDuckAiMode()) {
                     widget.saveLastUsedTogglePosition(isChat = true)
+                    val imagesJson = widget.getImageAttachmentsJson()
                     widget.text = ""
+                    widget.clearImageAttachments()
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
+                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson)
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
@@ -417,7 +434,11 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
-            onImageClick = { callbacks.onImageButtonPressed() }
+            onAttachmentChooserStateChanged = { showing -> isPickingImage = showing }
+            bindAttachmentCallbacks(
+                onCameraCaptureRequested = callbacks.onCameraCaptureRequested,
+                onFilePickerRequested = callbacks.onFilePickerRequested,
+            )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
                 omnibarController.updateTierTitle(tier) { launchUpgrade() }
@@ -428,7 +449,7 @@ class RealNativeInputManager @Inject constructor(
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
-        bindChatSuggestions(widgetView, lifecycleOwner, callbacks.onChatSuggestionSelected)
+        bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
         layoutCoordinator.applyBottomCardShape(widgetView, isBottom)
@@ -460,10 +481,18 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun updateVoiceButtons(widget: NativeInputWidget) {
-        val isDuckAiTabSelected = widget.isChatTabSelected()
+        val isOnActiveDuckChat = omnibarController.isDuckAiMode()
         val voiceSearchAvailable = voiceSearchAvailability.isVoiceSearchAvailable
         val voiceSearchDuckAiAvailable = duckAiFeatureState.showVoiceSearchToggle.value
         val voiceChatEntryAvailable = duckAiFeatureState.showVoiceChatEntry.value
+
+        if (isOnActiveDuckChat) {
+            widget.setVoiceSearchAvailable(voiceSearchAvailable && voiceSearchDuckAiAvailable)
+            widget.setVoiceChatAvailable(false)
+            return
+        }
+
+        val isDuckAiTabSelected = widget.isChatTabSelected()
         val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
         widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
         widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)
@@ -559,7 +588,7 @@ class RealNativeInputManager @Inject constructor(
     private fun bindChatSuggestions(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
-        onChatSuggestionSelected: (String) -> Unit,
+        callbacks: NativeInputCallbacks,
     ) {
         if (omnibarController.isDuckAiMode()) return
         val widget = widgetFrom(widgetView) ?: return
@@ -571,12 +600,27 @@ class RealNativeInputManager @Inject constructor(
             lifecycleOwner = lifecycleOwner,
             onChatSuggestionSelected = { query ->
                 hideNativeInput(animate = false, isNavigation = true)
-                onChatSuggestionSelected(query)
+                callbacks.onChatSuggestionSelected(query)
+            },
+            onChatUrlSuggestionClicked = { suggestion ->
+                hideNativeInput(isNavigation = true)
+                callbacks.onChatUrlSuggestionClicked(suggestion)
+            },
+            onSearchForQuerySubmitted = { query ->
+                hideNativeInput(isNavigation = true)
+                callbacks.onSearchSubmitted(query)
             },
             onShowSuggestions = { chatAdapter ->
-                adapter = adapter ?: autoCompleteList.adapter
-                autoCompleteList.adapter = chatAdapter
-                autoCompleteList.itemAnimator = null
+                if (autoCompleteList.adapter === chatAdapter) {
+                    // Force a fresh layout pass so the adapter behaviour
+                    // doesn't leave the user scrolled to a stale position when
+                    // URL items appear at position 0.
+                    autoCompleteList.swapAdapter(chatAdapter, true)
+                } else {
+                    adapter = adapter ?: autoCompleteList.adapter
+                    autoCompleteList.adapter = chatAdapter
+                    autoCompleteList.itemAnimator = null
+                }
                 autoCompleteList.show()
                 focusedView?.gone()
             },

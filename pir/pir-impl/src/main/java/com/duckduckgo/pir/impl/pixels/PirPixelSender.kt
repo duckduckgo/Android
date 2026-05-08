@@ -102,12 +102,14 @@ interface PirPixelSender {
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
+     * @param notificationsPermissionGranted - whether notifications are enabled for the app
      */
-    fun reportManualScanStarted(
+    suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
         brokerCount: Int,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     )
 
     /**
@@ -121,8 +123,9 @@ interface PirPixelSender {
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
+     * @param notificationsPermissionGranted - whether notifications are enabled for the app
      */
-    fun reportManualScanCompleted(
+    suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
@@ -131,6 +134,7 @@ interface PirPixelSender {
         brokerCount: Int,
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     )
 
     /**
@@ -150,14 +154,30 @@ interface PirPixelSender {
 
     /**
      * Emits a pixel to signal that s scheduled scan run has started.
+     *
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
-    fun reportScheduledScanStarted()
+    fun reportScheduledScanStarted(
+        profileQueryCount: Int,
+        brokerCount: Int,
+    )
 
     /**
      * Emits a pixel to signal that a scheduled scan run has been completed.
+     *
+     * @param totalTimeInMillis - how long it took for the scan to complete
+     * @param totalScanJobs - the number of scan jobs executed during the run
+     * @param totalOptOutJobs - the number of opt-out jobs executed during the run
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
+        profileQueryCount: Int,
+        brokerCount: Int,
     )
 
     /**
@@ -601,13 +621,14 @@ interface PirPixelSender {
 
     fun reportInitialScanIncomplete()
 
-    fun reportInitialScanDuration(
+    suspend fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
         isPowerSavingEnabled: Boolean,
         batteryOptimizationsEnabled: Boolean,
         brokerCount: Int,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     )
 
     fun reportBackgroundScanStats(
@@ -633,22 +654,25 @@ class RealPirPixelSender @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val pirRemoteFeatures: PirRemoteFeatures,
 ) : PirPixelSender {
-    override fun reportManualScanStarted(
+    override suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
         brokerCount: Int,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
+            PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
 
-    override fun reportManualScanCompleted(
+    override suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
         totalScanJobs: Int,
@@ -657,6 +681,7 @@ class RealPirPixelSender @Inject constructor(
         brokerCount: Int,
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
@@ -666,7 +691,9 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
+            PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -683,15 +710,30 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCHEDULED_RUN_SCHEDULED)
     }
 
-    override fun reportScheduledScanStarted() {
-        fire(PIR_SCHEDULED_RUN_STARTED)
+    override fun reportScheduledScanStarted(
+        profileQueryCount: Int,
+        brokerCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+        )
+        fire(PIR_SCHEDULED_RUN_STARTED, params)
     }
 
     override fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
+        profileQueryCount: Int,
+        brokerCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_TOTAL_SCAN to totalScanJobs.toString(),
+            PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
         )
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
@@ -1424,13 +1466,14 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_INITIAL_SCAN_INCOMPLETE)
     }
 
-    override fun reportInitialScanDuration(
+    override suspend fun reportInitialScanDuration(
         durationMs: Long,
         profileQueryCount: Int,
         isPowerSavingEnabled: Boolean,
         batteryOptimizationsEnabled: Boolean,
         brokerCount: Int,
         executionType: PirExecutionType,
+        notificationsPermissionGranted: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_DURATION_MS to durationMs.toString(),
@@ -1440,6 +1483,8 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
@@ -1565,5 +1610,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_BROKER_COUNT = "broker_count"
         private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
         private const val PARAM_KEY_SCAN_TRIGGER = "scan_trigger"
+        private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
     }
 }

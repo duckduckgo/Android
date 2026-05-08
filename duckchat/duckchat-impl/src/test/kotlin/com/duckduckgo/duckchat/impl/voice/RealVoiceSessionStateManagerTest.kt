@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.voice
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -233,6 +235,47 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted(TAB_ID)
 
         testee.onVoiceSessionEnded()
+
+        assertFalse(testee.isVoiceSessionActive)
+    }
+
+    @Test
+    fun whenTriggerVoiceSessionEndCalledThenTabIdIsEmittedOnObserveFlow() = coroutineTestRule.testScope.runTest {
+        testee.observeTriggerVoiceSessionEnd().test {
+            testee.triggerVoiceSessionEnd(TAB_ID)
+
+            assertEquals(TAB_ID, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTriggerVoiceSessionEndCalledWithBlankTabIdThenNoEmission() = coroutineTestRule.testScope.runTest {
+        testee.observeTriggerVoiceSessionEnd().test {
+            testee.triggerVoiceSessionEnd("")
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTriggerVoiceSessionEndCalledMultipleTimesThenAllTabIdsEmitted() = coroutineTestRule.testScope.runTest {
+        testee.observeTriggerVoiceSessionEnd().test {
+            testee.triggerVoiceSessionEnd(TAB_ID)
+            testee.triggerVoiceSessionEnd(OTHER_TAB_ID)
+
+            assertEquals(TAB_ID, awaitItem())
+            assertEquals(OTHER_TAB_ID, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTriggerVoiceSessionEndCalledThenIsVoiceSessionActiveUnchanged() {
+        assertFalse(testee.isVoiceSessionActive)
+
+        testee.triggerVoiceSessionEnd(TAB_ID)
 
         assertFalse(testee.isVoiceSessionActive)
     }

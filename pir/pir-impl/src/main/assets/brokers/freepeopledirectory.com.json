@@ -1,7 +1,7 @@
 {
   "name": "FreePeopleDirectory",
   "url": "freepeopledirectory.com",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "parent": "spokeo.com",
   "addedDatetime": 1674540000000,
   "optOutUrl": "https://freepeopledirectory.com/contact",
@@ -54,6 +54,9 @@
                 },
                 "phone": {
                   "selector": "//p[a[span[normalize-space(text())='Phone']]]/following-sibling::div[contains(@class, 'content-elements')]//p"
+                },
+                "profileUrl": {
+                  "identifierType": "hash"
                 }
               }
             }

@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -36,6 +37,7 @@ import javax.inject.Inject
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
+@HasMemberInjections
 open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWidgetProvider() {
 
     @Inject

@@ -97,6 +97,7 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
+    private val inputScreenUserSettingFlow = MutableStateFlow(false)
     private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
     private val urlDisplayRepository: UrlDisplayRepository = mock()
@@ -135,6 +136,7 @@ class OmnibarLayoutViewModelTest {
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
+        whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
@@ -693,6 +695,40 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.Browser)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToPdfThenLeadingIconIsPrivacyShield() = runTest {
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
+            assertTrue(viewState.viewMode is ViewMode.Pdf)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToPdfBeforeUrlPropagatedThenLeadingIconIsPrivacyShield() = runTest {
+        // No prior loading state means _viewState.value.url is empty — the shield must still appear.
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
+        }
+    }
+
+    @Test
+    fun whenViewModeChangedToPdfAndFocusThenLeadingIconIsSearch() = runTest {
+        testee.onOmnibarFocusChanged(true, RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Pdf(RANDOM_URL))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
+            assertTrue(viewState.viewMode is ViewMode.Pdf)
         }
     }
 
@@ -1486,6 +1522,69 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndAiToggleDisabledThenIsDuckAiBackAvailableTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputScreenUserSettingFlow.value = false
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.isDuckAiBackAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputScreenUserSettingFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.isDuckAiBackAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputDisabledAndAiToggleDisabledThenIsDuckAiBackAvailableFalse() = runTest {
+        nativeInputFieldSettingFlow.value = false
+        inputScreenUserSettingFlow.value = false
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.isDuckAiBackAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputDisabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
+        nativeInputFieldSettingFlow.value = false
+        inputScreenUserSettingFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.isDuckAiBackAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAiToggleFlipsOffWhileNativeInputEnabledThenIsDuckAiBackAvailableBecomesTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+        inputScreenUserSettingFlow.value = true
+
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isDuckAiBackAvailable)
+
+            inputScreenUserSettingFlow.value = false
+
+            assertTrue(expectMostRecentItem().isDuckAiBackAvailable)
             cancelAndIgnoreRemainingEvents()
         }
     }

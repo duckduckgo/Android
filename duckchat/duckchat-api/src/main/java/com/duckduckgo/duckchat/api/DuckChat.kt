@@ -124,4 +124,11 @@ interface DuckChat {
      * Returns `true` if a voice session is currently active.
      */
     fun isVoiceSessionActive(): Boolean
+
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 }

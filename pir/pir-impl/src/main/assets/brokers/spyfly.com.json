@@ -1,7 +1,7 @@
 {
   "name": "SpyFly",
   "url": "spyfly.com",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "addedDatetime": 1775214750818,
   "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
   "steps": [
@@ -121,6 +121,9 @@
           "profile": {
             "name": {
               "selector": "h2"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "bab84c87-785a-427d-b38b-add9dba0aa3d"

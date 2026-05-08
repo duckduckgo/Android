@@ -63,7 +63,6 @@ import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -99,8 +98,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.app.survey.ui.SurveyActivity
-import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -131,6 +128,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVE
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
+import dev.zacsweers.metro.HasMemberInjections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -148,13 +146,11 @@ import logcat.logcat
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
+@HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var browserMenuDisplayRepository: BrowserMenuDisplayRepository
 
     @Inject
     lateinit var clearDataAction: ClearDataAction
@@ -501,11 +497,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 delay(DUCK_AI_ANIM_READY_DELAY_MS)
                 duckAiShouldAnimate = true
             }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.checkForDefaultBrowserChangedSurvey()
     }
 
     override fun onStop() {
@@ -903,11 +894,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             )
 
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
-            is Command.LaunchSurvey -> {
-                Handler(Looper.getMainLooper()).postDelayed(200L) {
-                    startActivity(SurveyActivity.intent(this, command.survey, SurveySource.IN_APP))
-                }
-            }
         }
     }
 
@@ -1651,11 +1637,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        val mockupBrowserMenuIcon = if (browserMenuDisplayRepository.isBottomSheetMenuEnabled()) {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-        } else {
-            com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
-        }
+        val mockupBrowserMenuIcon = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
         binding.topMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.bottomMockupToolbar.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)
         binding.navigationBarMockup.browserMenuImageView.setImageResource(mockupBrowserMenuIcon)

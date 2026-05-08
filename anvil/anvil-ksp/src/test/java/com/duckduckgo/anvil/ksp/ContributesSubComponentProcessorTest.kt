@@ -23,7 +23,6 @@ import com.tschuchort.compiletesting.configureKsp
 import com.tschuchort.compiletesting.sourcesGeneratedBySymbolProcessor
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalCompilerApi::class)
@@ -114,27 +113,7 @@ class ContributesSubComponentProcessorTest {
     }
 
     @Test
-    fun `FragmentScope with delayGeneration true fails because parent is ActivityScope`() {
-        val source = SourceFile.kotlin(
-            "MyFragment.kt",
-            """
-            package com.test
-            import com.duckduckgo.anvil.annotations.InjectWith
-            import com.duckduckgo.di.scopes.FragmentScope
-
-            @InjectWith(scope = FragmentScope::class, delayGeneration = true)
-            class MyFragment
-            """.trimIndent(),
-        )
-
-        val result = compile(source, fragmentScopeStub, activityScopeStub, appScopeStub)
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("delayGeneration = true"))
-        assertTrue(result.messages.contains("AppScope"))
-    }
-
-    @Test
-    fun `ServiceScope with delayGeneration true uses ContributesSubcomponent`() {
+    fun `ServiceScope generates SubComponent with ContributesSubcomponent`() {
         val source = SourceFile.kotlin(
             "MyService.kt",
             """
@@ -142,18 +121,18 @@ class ContributesSubComponentProcessorTest {
             import com.duckduckgo.anvil.annotations.InjectWith
             import com.duckduckgo.di.scopes.ServiceScope
 
-            @InjectWith(scope = ServiceScope::class, delayGeneration = true)
+            @InjectWith(scope = ServiceScope::class)
             class MyService
             """.trimIndent(),
         )
 
         val result = compile(source, serviceScopeStub, appScopeStub)
         val generatedSubComponent = result.findGeneratedSource("MyService_SubComponent.kt")
-        val goldenSubComponent = loadGolden("SubComponent_ServiceScope_Delayed.kt")
+        val goldenSubComponent = loadGolden("SubComponent_ServiceScope.kt")
         assertEquals(goldenSubComponent, generatedSubComponent)
 
         val generatedModule = result.findGeneratedSource("MyService_SubComponent_Module.kt")
-        val goldenModule = loadGolden("SubComponent_ServiceScope_Delayed_Module.kt")
+        val goldenModule = loadGolden("SubComponent_ServiceScope_Module.kt")
         assertEquals(goldenModule, generatedModule)
     }
 

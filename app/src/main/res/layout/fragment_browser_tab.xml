@@ -124,6 +124,7 @@
                     android:id="@+id/pdfViewerContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="?attr/daxColorBackdrop"
                     android:visibility="gone" />
 
                 <include

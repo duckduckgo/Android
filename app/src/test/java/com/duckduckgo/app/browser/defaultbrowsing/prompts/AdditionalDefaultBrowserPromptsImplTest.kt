@@ -42,7 +42,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -100,8 +99,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Mock private lateinit var stageEvaluatorMock: DefaultBrowserPromptsFlowStageEvaluator
 
     @Mock private lateinit var userBrowserPropertiesMock: UserBrowserProperties
-
-    @Mock private lateinit var daxPromptsMock: DaxPrompts
 
     @Mock private lateinit var moshiMock: Moshi
 
@@ -283,17 +280,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if a dax dialog was shown recently or will be shown then don't enroll`() = runTest {
-        val testee = createTestee()
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT)
-
-        testee.evaluate()
-
-        verify(dataStoreMock, never()).storeStage(any())
-        assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
-    }
-
-    @Test
     fun `evaluate - if feature not enabled then don't enroll`() = runTest {
         val testee = createTestee()
         whenever(featureTogglesMock.self()).thenReturn(selfToggleMock)
@@ -338,7 +324,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
@@ -358,7 +343,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(5)
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(0))
@@ -408,7 +392,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
 
         mockFeatureSettings()
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(1))
@@ -488,7 +471,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(3))
         val action = DefaultBrowserPromptsFlowStageAction(
@@ -517,7 +499,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
             )
             whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
             whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-            whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
             mockFeatureSettings()
             whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(4))
             val action = DefaultBrowserPromptsFlowStageAction(
@@ -545,7 +526,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
@@ -570,7 +550,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
@@ -595,7 +574,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
 
         testee.evaluate()
 
@@ -613,7 +591,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
@@ -640,7 +617,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
@@ -669,7 +645,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
@@ -698,7 +673,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         mockFeatureSettings()
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceStart()).thenReturn(Result.success(3))
         whenever(stageEvaluatorMock.evaluate(any())).thenReturn(mock())
@@ -797,7 +771,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `when resumed and user established, record app usage`() = runTest {
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-        whenever(daxPromptsMock.evaluate()).thenReturn(DaxPrompts.ActionType.NONE)
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
@@ -825,7 +798,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluator: DefaultBrowserPromptsFlowStageEvaluator = stageEvaluatorMock,
         userBrowserProperties: UserBrowserProperties = userBrowserPropertiesMock,
-        daxPrompts: DaxPrompts = daxPromptsMock,
         pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
     ) = AdditionalDefaultBrowserPromptsImpl(
@@ -840,7 +812,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         stageEvaluator = experimentStageEvaluator,
         userBrowserProperties = userBrowserProperties,
-        daxPrompts = daxPrompts,
         pixel = pixel,
         moshi = moshi,
     )

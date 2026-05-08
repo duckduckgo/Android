@@ -241,6 +241,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showFindInPage: Boolean = false,
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
+        val isDuckAiBackAvailable: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
     ) {
@@ -287,12 +288,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         combine(
             duckAiFeatureState.showInputScreen,
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { inputScreenEnabled, nativeInputEnabled ->
-            inputScreenEnabled || nativeInputEnabled
-        }.onEach { showClickCatcher ->
+            duckChat.observeInputScreenUserSettingEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled, aiToggleEnabled ->
             _viewState.update {
                 it.copy(
-                    showTextInputClickCatcher = showClickCatcher,
+                    showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
+                    isDuckAiBackAvailable = nativeInputEnabled && !aiToggleEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -486,6 +487,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         return when (viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
+            is ViewMode.Pdf -> if (hasFocus) Search else PrivacyShield
             else -> {
                 when {
                     hasFocus -> Search

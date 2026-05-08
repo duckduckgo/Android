@@ -984,6 +984,9 @@
     <string name="syncRestoreDialogPrimaryCta">Επαναφορά των στοιχείων μου</string>
     <string name="syncRestoreDialogSecondaryCta">Παράλειψη</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Λήψη PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Αντιγραφή κειμένου συνδέσμου</string>
     <string name="linkTextCopied">Το κείμενο του συνδέσμου αντιγράφηκε</string>

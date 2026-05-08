@@ -164,24 +164,35 @@
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
 
+                    <FrameLayout
+                        android:id="@id/startChatContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
                 </LinearLayout>
 
                 <FrameLayout
+                    android:id="@+id/attachmentsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <FrameLayout
+                    android:id="@+id/inputModeWidgetBottomRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipChildren="false"
                     android:clipToPadding="false">
 
-                    <ImageView
-                        android:id="@+id/inputFieldImageButton"
-                        android:layout_width="@dimen/toolbarIcon"
-                        android:layout_height="@dimen/toolbarIcon"
+                    <FrameLayout
+                        android:id="@id/attachButtonContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
-                        android:background="@drawable/selectable_item_rounded_corner_background"
-                        android:importantForAccessibility="no"
-                        android:scaleType="center"
                         android:visibility="gone"
-                        app:srcCompat="@drawable/ic_image_24"
                         tools:visibility="visible" />
 
                     <LinearLayout

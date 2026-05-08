@@ -28,6 +28,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,8 +39,24 @@ import javax.inject.Inject
 interface VoiceSessionStateManager {
     val isVoiceSessionActive: Boolean
         get() = false
+
+    /**
+     * The tab id bound to the active voice session, or null if there is no active session
+     * or the session is a standalone (non-tab) session.
+     */
+    val activeSessionTabId: String?
+        get() = null
+
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceSessionEnd(): Flow<String>
+
     fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded()
+    fun triggerVoiceSessionEnd(tabId: String)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -53,14 +73,30 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     // null = no session, STANDALONE_SESSION_ID = session without a browser tab, non-empty = tab session
     @Volatile
-    private var activeSessionTabId: String? = null
+    private var _activeSessionTabId: String? = null
+
+    private val _voiceSessionEndTrigger = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 8,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
+    override val activeSessionTabId: String?
+        get() = _activeSessionTabId?.takeUnless { it == STANDALONE_SESSION_ID }
 
     override val isVoiceSessionActive: Boolean
-        get() = activeSessionTabId != null
+        get() = _activeSessionTabId != null
+
+    override fun observeTriggerVoiceSessionEnd(): Flow<String> = _voiceSessionEndTrigger.asSharedFlow()
+
+    override fun triggerVoiceSessionEnd(tabId: String) {
+        if (tabId.isBlank()) return
+        _voiceSessionEndTrigger.tryEmit(tabId)
+    }
 
     @Synchronized
     override fun onVoiceSessionStarted(tabId: String) {
-        activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
+        _activeSessionTabId = tabId.ifBlank { STANDALONE_SESSION_ID }
         if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
             DuckChatVoiceMicrophoneService.start(context)
         }
@@ -72,7 +108,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     @Synchronized
     override fun onVoiceSessionEnded() {
         listenJob.cancel()
-        activeSessionTabId = null
+        _activeSessionTabId = null
         DuckChatVoiceMicrophoneService.stop(context)
     }
 
@@ -89,7 +125,7 @@ class RealVoiceSessionStateManager @Inject constructor(
     private fun listenToTabRemoval() {
         listenJob += appCoroutineScope.launch {
             tabRepository.flowTabs.drop(1).collect { tabs ->
-                val tabId = activeSessionTabId ?: return@collect
+                val tabId = _activeSessionTabId ?: return@collect
                 if (tabs.none { it.tabId == tabId }) {
                     onVoiceSessionEnded()
                 }

@@ -41,6 +41,7 @@ data class ModelState(
     val selectedModelId: String? = null,
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
+    val attachmentLimits: AttachmentLimits = AttachmentLimits(),
 )
 
 interface DuckAiModelManager {
@@ -91,7 +92,9 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
-                val models = fetchRemoteModels(userTier)
+                val response = fetchModelsResponse()
+                val models = response.models.map { resolveModel(it, userTier) }
+                val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 val selectedModelId = validateAndPersistSelection(models)
 
                 _modelState.value = ModelState(
@@ -99,6 +102,7 @@ class RealDuckAiModelManager @Inject constructor(
                     selectedModelId = selectedModelId,
                     selectedModelShortName = models.find { it.id == selectedModelId }?.shortName,
                     userTier = userTier,
+                    attachmentLimits = attachmentLimits,
                 )
                 logcat { "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=$selectedModelId" }
             } catch (e: Exception) {
@@ -107,9 +111,9 @@ class RealDuckAiModelManager @Inject constructor(
         }
     }
 
-    private suspend fun fetchRemoteModels(userTier: UserTier): List<AIChatModel> {
+    private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url).models.map { resolveModel(it, userTier) }
+        return modelsService.getModels(url)
     }
 
     private suspend fun validateAndPersistSelection(models: List<AIChatModel>): String? {
@@ -156,6 +160,24 @@ class RealDuckAiModelManager @Inject constructor(
         }
     }
 
+    private fun resolveAttachmentLimits(
+        remoteLimits: Map<String, RemoteTierAttachmentLimits>?,
+        userTier: UserTier,
+    ): AttachmentLimits {
+        if (remoteLimits.isNullOrEmpty()) return AttachmentLimits()
+        val tierLimits = remoteLimits[userTier.rawValue] ?: return AttachmentLimits()
+        return AttachmentLimits(
+            images = tierLimits.images?.let { remote ->
+                ImageLimits(
+                    maxPerTurn = remote.maxPerTurn ?: ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN,
+                    maxPerConversation = remote.maxPerConversation ?: ImageLimits.DEFAULT_IMAGE_MAX_PER_CONVERSATION,
+                    maxInputCharsWithAttachments = remote.maxInputCharsWithAttachments
+                        ?: ImageLimits.DEFAULT_MAX_INPUT_CHARS_WITH_ATTACHMENTS,
+                )
+            } ?: ImageLimits(),
+        )
+    }
+
     private fun resolveModel(remote: RemoteAIChatModel, userTier: UserTier): AIChatModel {
         val accessTier = remote.accessTier.orEmpty()
         val isAccessible = if (accessTier.isEmpty()) {
@@ -171,6 +193,8 @@ class RealDuckAiModelManager @Inject constructor(
             accessTier = accessTier,
             isAccessible = isAccessible,
             provider = ModelProvider.from(id = remote.id, providerString = remote.provider),
+            supportsImageUpload = remote.supportsImageUpload,
+            supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
         )
     }
 

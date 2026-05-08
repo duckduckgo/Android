@@ -188,8 +188,6 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
-import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStateProvider
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -207,6 +205,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pdf.CachedFileDownloader
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.PdfDownloadResult
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipDataStore
 import com.duckduckgo.app.browser.pdf.PdfErrorType
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfRenderDecision
@@ -481,7 +480,6 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadCallback: DownloadStateListener,
     private val settingsDataStore: SettingsDataStore,
     private val urlDisplayRepository: UrlDisplayRepository,
-    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
@@ -539,6 +537,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val inlinePdfHandler: InlinePdfHandler,
+    private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
@@ -549,6 +548,7 @@ class BrowserTabViewModel @Inject constructor(
     UrlExtractionListener,
     NavigationHistoryListener {
     private var buildingSiteFactoryJob: Job? = null
+    private var pendingVoiceSessionEndJob: Job? = null
     private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
@@ -670,13 +670,6 @@ class BrowserTabViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = true,
-        )
-
-    private val browserMenuState = browserMenuDisplayRepository.browserMenuState
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = BrowserMenuDisplayState(hasOption = false, isEnabled = browserMenuDisplayRepository.isBottomSheetMenuEnabled()),
         )
 
     private val fireproofWebsitesObserver =
@@ -880,15 +873,6 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = Command.RefreshOmnibar
             }
             .launchIn(viewModelScope)
-
-        browserMenuState
-            .onEach { state ->
-                val currentState = currentBrowserViewState()
-                browserViewState.value = currentState.copy(
-                    useBottomSheetMenu = state.isEnabled,
-                )
-            }
-            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -902,12 +886,26 @@ class BrowserTabViewModel @Inject constructor(
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
+        observePendingVoiceSessionEnd(tabId)
+
         initialUrl?.let {
             // initialUrl is the previousUrl from previous session unless it's launched from an external app
             if (androidBrowserConfig.disableTrackerAnimationOnRestart().isEnabled() && !isExternal) {
                 previousUrl = it
             }
             buildSiteFactory(it, stillExternal = isExternal)
+        }
+    }
+
+    private fun observePendingVoiceSessionEnd(tabId: String) {
+        pendingVoiceSessionEndJob?.cancel()
+        pendingVoiceSessionEndJob = viewModelScope.launch {
+            duckChat.observeTriggerVoiceChatSessionEnd()
+                .filter { it == tabId }
+                .collect {
+                    val event = duckChatJSHelper.onNativeAction(NativeAction.END_VOICE_SESSION)
+                    _subscriptionEventDataChannel.send(event)
+                }
         }
     }
 
@@ -1175,11 +1173,15 @@ class BrowserTabViewModel @Inject constructor(
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
             viewModelScope.launch {
+                if (checkSubscriptionPromoOnForeground()) return@launch
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
             }
         } else {
             command.value = HideKeyboard
+            if (currentBrowserViewState().browserShowing && !currentBrowserViewState().maliciousSiteBlocked) {
+                viewModelScope.launch { checkSubscriptionPromoOnForeground() }
+            }
         }
 
         browserViewState.value =
@@ -1215,7 +1217,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun userSelectedAutocomplete(
+        suggestion: AutoCompleteSuggestion,
+        firePixel: Boolean = true,
+    ) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch(dispatchers.io()) {
             val autoCompleteViewState = currentAutoCompleteViewState()
@@ -1233,7 +1238,9 @@ class BrowserTabViewModel @Inject constructor(
                     }
                 }
             }
-            autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
+            if (firePixel) {
+                autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
+            }
         }
     }
 
@@ -1617,6 +1624,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRefreshRequested(triggeredByUser: Boolean) {
+        if (currentBrowserViewState().currentPdfCachedUri != null) {
+            url?.let {
+                handlePdfUrl(
+                    it,
+                    contentDisposition = null,
+                    mimeType = "application/pdf",
+                    requestUserConfirmation = false,
+                    forceRefresh = true,
+                )
+            }
+            return
+        }
         val omnibarContent = currentOmnibarViewState().queryOrFullUrl
         if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
             fireQueryChangedPixel(omnibarContent)
@@ -3139,7 +3158,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeDefaultViewStates() {
         globalLayoutState.value = Browser()
-        browserViewState.value = BrowserViewState(useBottomSheetMenu = browserMenuState.value.isEnabled)
+        browserViewState.value = BrowserViewState()
         loadingViewState.value = LoadingViewState()
         autoCompleteViewState.value = AutoCompleteViewState()
         omnibarViewState.value = OmnibarViewState()
@@ -3348,6 +3367,23 @@ class BrowserTabViewModel @Inject constructor(
         return null
     }
 
+    private suspend fun checkSubscriptionPromoOnForeground(): Boolean {
+        if (currentGlobalLayoutState() !is Browser) return false
+        val currentUrl = url
+        if (currentUrl != null && duckChat.isDuckChatUrl(currentUrl.toUri())) return false
+        val cta = withContext(dispatchers.io()) { ctaViewModel.getPromoCtaOnForeground() }
+        if (cta != null) {
+            ctaViewState.value = currentCtaViewState().copy(
+                cta = cta,
+                isBrowserShowing = currentBrowserViewState().browserShowing,
+                isErrorShowing = currentBrowserViewState().maliciousSiteBlocked,
+            )
+            ctaChangedTicker.emit(System.currentTimeMillis().toString())
+            return true
+        }
+        return false
+    }
+
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard =
@@ -3380,8 +3416,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        val origin = "funnel_skippedonboarding_android"
-                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.origin}".toUri())
                     }
                     null
                 }
@@ -3695,26 +3730,40 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun handlePdfUrl(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
-        command.value = Command.ExpandOmnibar
+    private fun handlePdfUrl(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
+        requestUserConfirmation: Boolean,
+        forceRefresh: Boolean = false,
+    ) {
+        if (!forceRefresh) command.value = Command.ExpandOmnibar
         loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
         pdfDownloadJob += viewModelScope.launch {
             // downloadToCache wraps its own work in withContext(io); viewModelScope.launch
             // defaults to Main, so we stay on Main for the LiveData updates below.
-            val result = inlinePdfHandler.downloadToCache(url)
+            val result = inlinePdfHandler.downloadToCache(url, forceRefresh = forceRefresh)
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
             when (result) {
                 is PdfDownloadResult.Success -> {
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
-                    pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
                     val pdfTitle = inlinePdfHandler.extractFileName(url)
-                    pageChanged(url, pdfTitle)
+                    if (!forceRefresh) {
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED)
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_DAILY, type = Daily())
+                        pixel.fire(PdfPixelName.PDF_VIEWER_OPENED_UNIQUE, type = Unique())
+                        pageChanged(url, pdfTitle)
+                    }
+                    onCertificateReceived(result.certificate)
+                    onSiteChanged()
                     browserViewState.value = currentBrowserViewState().copy(
                         currentPdfCachedUri = result.uri,
                         currentPdfFileName = pdfTitle,
                     )
                     command.value = ShowPdfInTab(url, result.uri)
+                    if (!isCustomTabScreen && pdfDownloadTooltipDataStore.canShow()) {
+                        pdfDownloadTooltipDataStore.incrementShownCount()
+                        command.value = Command.ShowPdfDownloadTooltip
+                    }
                 }
                 is PdfDownloadResult.Failure -> {
                     pixel.fire(
@@ -3737,13 +3786,29 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     /**
+     * Re-publishes the current site's privacy state when the user toggles protections
+     * while a PDF is showing. The WebView path relies on `webView.reload()` re-firing
+     * `pageChanged`, which doesn't work for PDFs (the WebView is hidden + paused and
+     * the cached PDF doesn't need to be re-fetched). [Site.privacyProtection] re-reads
+     * the user allow list on every call, so [onSiteChanged] alone is enough to refresh
+     * the shield variant.
+     */
+    fun onPrivacyProtectionToggledForPdf() {
+        onSiteChanged()
+    }
+
+    /**
      * Called by the fragment when the inline PDF is hidden (back press, navigation).
      * Clears the cached PDF state so the "Download PDF" menu item disappears, and
      * re-runs [pageChanged] for the WebView's actual URL/title so the omnibar,
      * page header, and tab title revert from the PDF entry to the underlying page —
      * the same path that fires when the WebView itself navigates back.
      */
-    fun onPdfHidden(currentWebViewUrl: String?, currentWebViewTitle: String?) {
+    fun onPdfHidden(
+        currentWebViewUrl: String?,
+        currentWebViewTitle: String?,
+        currentWebViewCertificate: SslCertificate? = null,
+    ) {
         if (currentBrowserViewState().currentPdfCachedUri == null) return
         browserViewState.value = currentBrowserViewState().copy(
             currentPdfCachedUri = null,
@@ -3751,6 +3816,7 @@ class BrowserTabViewModel @Inject constructor(
         )
         if (!currentWebViewUrl.isNullOrBlank() && currentWebViewUrl != ABOUT_BLANK) {
             pageChanged(currentWebViewUrl, currentWebViewTitle)
+            onCertificateReceived(currentWebViewCertificate)
         }
     }
 
