@@ -24,9 +24,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface FileAttachmentProcessor {
     suspend fun processFile(context: Context, uri: Uri): FileAttachment?

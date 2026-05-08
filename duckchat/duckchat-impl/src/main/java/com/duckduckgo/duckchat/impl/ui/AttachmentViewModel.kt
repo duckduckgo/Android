@@ -114,9 +114,8 @@ class AttachmentViewModel @Inject constructor(
 
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
-            val limits = modelManager.modelState.value.attachmentLimits.files
             for (uri in uris) {
-                if (_fileAttachments.value.size >= limits.maxPerConversation) break
+                if (_fileAttachments.value.size >= fileAttachmentProcessor.getMaxPerConversation()) break
                 val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
                 _fileAttachments.update { it + attachment }
             }
