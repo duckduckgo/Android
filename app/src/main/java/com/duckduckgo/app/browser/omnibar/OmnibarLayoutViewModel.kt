@@ -78,6 +78,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -204,6 +205,13 @@ class OmnibarLayoutViewModel @Inject constructor(
             initialValue = true,
         )
 
+    private val voiceActiveOnSelectedTab: StateFlow<Boolean> = combine(
+        duckChat.activeVoiceChatSessions,
+        tabRepository.flowSelectedTab,
+    ) { activeSessions, selectedTab ->
+        selectedTab?.tabId?.let { it in activeSessions } == true
+    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -304,6 +312,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
+        voiceActiveOnSelectedTab.onEach { voiceActive ->
+            _viewState.update {
+                it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, it.hasFocus, voiceActive))
+            }
+        }.launchIn(viewModelScope)
+
         viewState.map {
             NewTabPixelParams(
                 isNtp = it.viewMode == NewTab,
@@ -389,7 +403,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
+                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, true),
                 )
             }
         } else {
@@ -453,7 +467,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
+                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, false),
                 )
             }
 
@@ -563,6 +577,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    private fun shouldShowDuckAiSidebar(
+        viewMode: ViewMode,
+        hasFocus: Boolean,
+        voiceActive: Boolean = voiceActiveOnSelectedTab.value,
+    ): Boolean = shouldShowDuckAiHeader(viewMode, hasFocus) && !voiceActive
+
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
         val hasFocus = _viewState.value.hasFocus
@@ -598,7 +618,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             omnibarText = "",
                             updateOmnibarText = true,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
                         )
                     }
                 }
@@ -637,7 +657,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             ),
                             showShadows = false,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
                         )
                     }
                 }

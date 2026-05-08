@@ -98,6 +98,8 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val inputScreenUserSettingFlow = MutableStateFlow(false)
+    private val activeVoiceSessionsFlow = MutableStateFlow<Set<String>>(emptySet())
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
     private val urlDisplayRepository: UrlDisplayRepository = mock()
@@ -129,6 +131,7 @@ class OmnibarLayoutViewModelTest {
     @Before
     fun before() {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(tabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
@@ -136,6 +139,7 @@ class OmnibarLayoutViewModelTest {
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
         whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
+        whenever(duckChat.activeVoiceChatSessions).thenReturn(activeVoiceSessionsFlow)
         whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenUserSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
@@ -2392,6 +2396,67 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showDuckAISidebar)
             assertFalse(viewState.showDuckAISidebar)
+        }
+    }
+
+    @Test
+    fun whenDuckAILoadedAndVoiceSessionActiveOnSelectedTabThenSidebarHiddenButHeaderShown() = runTest {
+        selectedTabFlow.value = TabEntity(tabId = "tab1", position = 0)
+        activeVoiceSessionsFlow.value = setOf("tab1")
+        initializeViewModel()
+
+        givenDuckAILoaded()
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showDuckAISidebar)
+            assertTrue(viewState.showDuckAIHeader)
+        }
+    }
+
+    @Test
+    fun whenDuckAILoadedAndVoiceSessionActiveOnDifferentTabThenSidebarShown() = runTest {
+        selectedTabFlow.value = TabEntity(tabId = "tab1", position = 0)
+        activeVoiceSessionsFlow.value = setOf("other-tab")
+        initializeViewModel()
+
+        givenDuckAILoaded()
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showDuckAISidebar)
+            assertTrue(viewState.showDuckAIHeader)
+        }
+    }
+
+    @Test
+    fun whenDuckAILoadedAndVoiceSessionStartsOnSelectedTabThenSidebarHides() = runTest {
+        selectedTabFlow.value = TabEntity(tabId = "tab1", position = 0)
+        initializeViewModel()
+        givenDuckAILoaded()
+
+        activeVoiceSessionsFlow.value = setOf("tab1")
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.showDuckAISidebar)
+            assertTrue(viewState.showDuckAIHeader)
+        }
+    }
+
+    @Test
+    fun whenDuckAILoadedAndVoiceSessionEndsOnSelectedTabThenSidebarReappears() = runTest {
+        selectedTabFlow.value = TabEntity(tabId = "tab1", position = 0)
+        activeVoiceSessionsFlow.value = setOf("tab1")
+        initializeViewModel()
+        givenDuckAILoaded()
+
+        activeVoiceSessionsFlow.value = emptySet()
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showDuckAISidebar)
+            assertTrue(viewState.showDuckAIHeader)
         }
     }
 

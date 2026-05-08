@@ -369,6 +369,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -405,6 +406,8 @@ class BrowserTabFragment :
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
+
+    private var voiceActiveOnThisTab: Boolean = false
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
@@ -4364,11 +4367,18 @@ class BrowserTabFragment :
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
-            webView?.canScrollVertically(-1) ?: false
+            voiceActiveOnThisTab || (webView?.canScrollVertically(-1) ?: false)
         }
 
         // avoids progressView from showing under toolbar
         binding.swipeRefreshContainer.progressViewStartOffset -= 15
+
+        duckChat.activeVoiceChatSessions
+            .map { tabId in it }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { voiceActiveOnThisTab = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
