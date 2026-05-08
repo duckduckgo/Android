@@ -22,11 +22,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.di.ActivityContext
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -52,13 +52,14 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
 
+@SuppressLint("StaticFieldLeak")
 @ContributesViewModel(ViewScope::class)
 class AttachmentViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
     private val dispatchers: DispatcherProvider,
-    private val modelManager: DuckAiModelManager,
+    modelManager: DuckAiModelManager,
     private val limitsHandler: LimitsHandler,
-    @ActivityContext private val context: Context,
+    private val context: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
@@ -71,11 +72,12 @@ class AttachmentViewModel @Inject constructor(
         val hasAttachments: Boolean get() = images.isNotEmpty()
     }
 
-    private val _imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
+    @VisibleForTesting
+    internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
     private val _isDuckAiMode = MutableStateFlow(false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
-        _imageAttachments,
+        imageAttachments,
         modelManager.modelState,
         limitsHandler.conversationImagesSent,
         _isDuckAiMode,
@@ -96,14 +98,14 @@ class AttachmentViewModel @Inject constructor(
         viewModelScope.launch {
             uris.forEach { uri ->
                 val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
-                _imageAttachments.update { it + attachment }
+                imageAttachments.update { it + attachment }
             }
         }
     }
 
     fun removeImageAttachment(id: String) {
         var toRecycle: Bitmap? = null
-        _imageAttachments.update { list ->
+        imageAttachments.update { list ->
             toRecycle = list.find { it.id == id }?.bitmap
             list.filter { it.id != id }
         }
@@ -111,8 +113,8 @@ class AttachmentViewModel @Inject constructor(
     }
 
     fun clearAttachments() {
-        val toRecycle = _imageAttachments.value
-        _imageAttachments.value = emptyList()
+        val toRecycle = imageAttachments.value
+        imageAttachments.value = emptyList()
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
@@ -125,10 +127,10 @@ class AttachmentViewModel @Inject constructor(
         _isDuckAiMode.value = enabled
     }
 
-    fun getImageAttachments(): List<ImageAttachment> = _imageAttachments.value
+    fun getImageAttachments(): List<ImageAttachment> = imageAttachments.value
 
     fun getImageAttachmentsJson(): JSONArray? {
-        val images = _imageAttachments.value
+        val images = imageAttachments.value
         if (images.isEmpty()) return null
         return JSONArray().apply {
             images.forEach { attachment ->

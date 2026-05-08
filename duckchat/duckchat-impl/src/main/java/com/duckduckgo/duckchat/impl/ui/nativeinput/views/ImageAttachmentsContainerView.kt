@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.duckduckgo.duckchat.impl.R
@@ -45,10 +46,8 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
     }
 
     fun removeAttachmentById(id: String) {
-        val index = attachments.indexOfFirst { it.id == id }
-        if (index >= 0) {
-            attachments.removeAt(index)
-            removeViewAt(index)
+        if (attachments.removeIf { it.id == id }) {
+            findViewWithTag<View>(id)?.let { removeView(it) }
         }
     }
 
@@ -56,6 +55,7 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
 
     private fun addThumbnailView(attachment: ImageAttachment) {
         val thumbnailView = LayoutInflater.from(context).inflate(R.layout.view_image_attachment_thumbnail, this, false)
+        thumbnailView.tag = attachment.id
         val image = thumbnailView.findViewById<ImageView>(R.id.thumbnailImage)
         val removeButton = thumbnailView.findViewById<ImageView>(R.id.thumbnailRemove)
         image.setImageBitmap(attachment.bitmap)

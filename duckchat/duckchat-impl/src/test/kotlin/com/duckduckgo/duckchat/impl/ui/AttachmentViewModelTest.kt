@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -31,6 +32,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -265,16 +268,24 @@ class AttachmentViewModelTest {
         assertTrue(viewModel.attachmentState.value.isAtCapacity)
     }
 
+    @Test
+    fun whenContentResolverReturnsNullStreamThenAttachmentListRemainsUnchanged() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(contentResolver.openInputStream(any())).thenReturn(null)
+        val uri: Uri = mock()
+
+        viewModel.onImagesPicked(listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.images.isEmpty())
+    }
+
     private fun addImages(
         count: Int,
         base64: String = "data",
         format: String = "png",
     ) {
-        val field = AttachmentViewModel::class.java.getDeclaredField("_imageAttachments")
-        field.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val flow = field.get(viewModel) as MutableStateFlow<List<ImageAttachment>>
-        val existing = flow.value
         val bitmap: Bitmap = mock()
         val newImages = (1..count).map {
             ImageAttachment(
@@ -284,7 +295,7 @@ class AttachmentViewModelTest {
                 format = format,
             )
         }
-        flow.value = existing + newImages
+        viewModel.imageAttachments.value += newImages
     }
 
     private fun aModel(

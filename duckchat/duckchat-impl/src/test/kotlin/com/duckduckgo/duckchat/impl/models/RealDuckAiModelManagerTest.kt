@@ -540,6 +540,8 @@ class RealDuckAiModelManagerTest {
 
         val limits = testee.modelState.value.attachmentLimits
         assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN, limits.images.maxPerTurn)
+        assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_CONVERSATION, limits.images.maxPerConversation)
+        assertEquals(ImageLimits.DEFAULT_MAX_INPUT_CHARS_WITH_ATTACHMENTS, limits.images.maxInputCharsWithAttachments)
     }
 
     @Test

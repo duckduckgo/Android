@@ -68,6 +68,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -510,7 +511,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun submitMessage(message: String?) {
-        if (message == null && isChatTabSelected() && attachmentLimitExceeded) return
+        if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
+            logcat { "submitMessage: suppressed - attachment limit exceeded" }
+            return
+        }
         if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
             onChatSent?.invoke("")
             inputField.clearFocus()

@@ -73,6 +73,7 @@ class ModelPickerView @JvmOverloads constructor(
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
     private var popupWindow: PopupWindow? = null
+    private var lastObservedModelId: String? = null
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
     override var onModelSelected: (() -> Unit)? = null
@@ -108,11 +109,16 @@ class ModelPickerView @JvmOverloads constructor(
     private fun observeState() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         stateJob?.cancel()
+        lastObservedModelId = viewModel.state.value.selectedModelId
         stateJob = viewModel.state
             .onEach { state ->
                 state.selectedModelShortName?.let { chip.text = it }
                 updateVisibility()
-                onModelSelected?.invoke()
+                val newId = state.selectedModelId
+                if (newId != null && newId != lastObservedModelId) {
+                    lastObservedModelId = newId
+                    onModelSelected?.invoke()
+                }
             }
             .launchIn(scope)
     }
