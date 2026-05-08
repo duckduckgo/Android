@@ -19,6 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Intent
 
 interface SchedulableNotificationPlugin {
+
     fun getSchedulableNotification(): SchedulableNotification
 
     // TODO onNotificationLaunched is not used at the moment.

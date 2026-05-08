@@ -21,14 +21,14 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class RealModalShownNotifierTest {
+class RealModalShownReporterTest {
 
     private val completionStore: ModalEvaluatorCompletionStore = mock()
-    private val testee = RealModalShownNotifier(completionStore)
+    private val testee = RealModalShownReporter(completionStore)
 
     @Test
     fun whenNotifyExternalModalShownThenRecordCompletionSyncIsCalled() {
-        testee.notifyExternalModalShown()
+        testee.reportModalShown()
 
         verify(completionStore).recordCompletionSync()
     }

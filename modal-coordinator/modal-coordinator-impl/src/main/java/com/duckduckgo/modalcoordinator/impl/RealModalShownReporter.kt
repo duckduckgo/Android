@@ -17,7 +17,7 @@
 package com.duckduckgo.modalcoordinator.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalShownNotifier
+import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.duckduckgo.modalcoordinator.impl.store.ModalEvaluatorCompletionStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -25,11 +25,11 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealModalShownNotifier @Inject constructor(
+class RealModalShownReporter @Inject constructor(
     private val completionStore: ModalEvaluatorCompletionStore,
-) : ModalShownNotifier {
+) : ModalShownReporter {
 
-    override fun notifyExternalModalShown() {
+    override fun reportModalShown() {
         completionStore.recordCompletionSync()
     }
 }

@@ -17,15 +17,14 @@
 package com.duckduckgo.modalcoordinator.api
 
 /**
- * Allows callers outside the [ModalEvaluator] coordination path to inform the modal coordinator
- * that a modal-equivalent UI has just been shown (for example, when an activity is launched
- * directly from a notification tap), preventing two modals from appearing on top of each other
- * in the same session.
+ * Allows code outside the modal-coordinator to report that a modal-equivalent UI
+ * has just been surfaced to the user (for example, an Activity launched directly
+ * from a notification tap or deep link).
  */
-interface ModalShownNotifier {
+interface ModalShownReporter {
 
     /**
      * Records that a modal-equivalent UI has just been shown by an external source.
      */
-    fun notifyExternalModalShown()
+    fun reportModalShown()
 }

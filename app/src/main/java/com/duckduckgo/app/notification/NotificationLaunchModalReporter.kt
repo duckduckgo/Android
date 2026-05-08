@@ -20,7 +20,7 @@ import android.app.Activity
 import android.os.Bundle
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.modalcoordinator.api.ModalShownNotifier
+import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -31,7 +31,7 @@ import javax.inject.Inject
 )
 @SingleInstanceIn(AppScope::class)
 class NotificationLaunchModalReporter @Inject constructor(
-    private val modalShownNotifier: ModalShownNotifier,
+    private val modalShownReporter: ModalShownReporter,
 ) : ActivityLifecycleCallbacks {
 
     override fun onActivityPreCreated(
@@ -39,7 +39,7 @@ class NotificationLaunchModalReporter @Inject constructor(
         savedInstanceState: Bundle?,
     ) {
         if (activity.intent?.getBooleanExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, false) == true) {
-            modalShownNotifier.notifyExternalModalShown()
+            modalShownReporter.reportModalShown()
         }
     }
 }
