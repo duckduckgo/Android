@@ -111,12 +111,11 @@ class AttachmentView(
         container.addView(layout)
         thumbnailsLayout = layout
 
-        addScrollableImageContainer(layout, vm)
-        addFileAttachmentsContainer(layout, vm)
+        addScrollableAttachmentsRow(layout, vm)
         limitErrorView = buildLimitErrorView(layout)
     }
 
-    private fun addScrollableImageContainer(parent: LinearLayout, vm: AttachmentViewModel) {
+    private fun addScrollableAttachmentsRow(parent: LinearLayout, vm: AttachmentViewModel) {
         val scroll = HorizontalScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -126,18 +125,25 @@ class AttachmentView(
         }
         parent.addView(scroll)
 
+        val row = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            )
+        }
+        scroll.addView(row)
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
         }
-        scroll.addView(imagesContainer)
+        row.addView(imagesContainer)
         imageAttachmentsContainer = imagesContainer
-    }
 
-    private fun addFileAttachmentsContainer(parent: LinearLayout, vm: AttachmentViewModel) {
         val filesContainer = FileAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
         }
-        parent.addView(filesContainer)
+        row.addView(filesContainer)
         fileAttachmentsContainer = filesContainer
     }
 
@@ -156,7 +162,7 @@ class AttachmentView(
         syncImages(imagesView, state)
         syncFiles(state)
         container.isVisible = state.hasAttachments
-        updateLimitError(state.imageLimitError)
+        updateLimitError(state.imageLimitError ?: state.fileLimitError)
         notifyStateChanged(state)
     }
 
@@ -199,6 +205,7 @@ class AttachmentView(
     private fun showChooserDialog() {
         val state = viewModel?.attachmentState?.value
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
+        val supportsImages = state?.supportsImageUpload == true
 
         onAction?.invoke(Action.ShowAttachmentChooser(true))
         ActionBottomSheetDialog.Builder(context)
@@ -211,20 +218,27 @@ class AttachmentView(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
             )
-            .addEventListener(buildDialogListener(supportedFileTypes))
+            .addEventListener(buildDialogListener(supportsImages, supportedFileTypes))
             .show()
     }
 
-    private fun buildDialogListener(supportedFileTypes: List<String>) = object : ActionBottomSheetDialog.EventListener() {
+    private fun buildDialogListener(
+        supportsImages: Boolean,
+        supportedFileTypes: List<String>,
+    ) = object : ActionBottomSheetDialog.EventListener() {
         private var pickerLaunched = false
 
         override fun onPrimaryItemClicked() {
             pickerLaunched = true
-            if (supportedFileTypes.isNotEmpty()) {
-                onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+            val mimeTypes = buildMimeTypes(supportsImages, supportedFileTypes)
+            val callback = if (supportsImages && supportedFileTypes.isNotEmpty()) {
+                buildCombinedPickerCallback()
+            } else if (supportedFileTypes.isNotEmpty()) {
+                buildFilePickerCallback()
             } else {
-                onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+                buildImagePickerCallback()
             }
+            onFilePickerRequested?.invoke(callback, mimeTypes)
         }
 
         override fun onSecondaryItemClicked() {
@@ -237,6 +251,13 @@ class AttachmentView(
         }
     }
 
+    private fun buildMimeTypes(supportsImages: Boolean, supportedFileTypes: List<String>): List<String> {
+        val types = mutableListOf<String>()
+        if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)
+        if (supportsImages) types.add("image/*")
+        return types.ifEmpty { listOf("image/*") }
+    }
+
     private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list)
@@ -245,5 +266,13 @@ class AttachmentView(
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+    }
+
+    private fun buildCombinedPickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+        val list = uris?.toList() ?: return@ValueCallback
+        val imageUris = list.filter { context.contentResolver.getType(it)?.startsWith("image/") == true }
+        val fileUris = list - imageUris.toSet()
+        if (imageUris.isNotEmpty()) viewModel?.onImagesPicked(imageUris)
+        if (fileUris.isNotEmpty()) viewModel?.onFilesPicked(fileUris)
     }
 }

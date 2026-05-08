@@ -31,7 +31,6 @@ import javax.inject.Inject
 interface FileAttachmentProcessor {
     suspend fun processFile(context: Context, uri: Uri): FileAttachment?
     fun getMaxFileSizeBytes(): Long
-    fun getMaxPerConversation(): Int
     fun getMaxTotalFileSizeBytes(): Long
 }
 
@@ -62,9 +61,6 @@ class RealFileAttachmentProcessor @Inject constructor(
 
     override fun getMaxFileSizeBytes(): Long =
         modelManager.modelState.value.attachmentLimits.files.maxFileSizeBytes
-
-    override fun getMaxPerConversation(): Int =
-        modelManager.modelState.value.attachmentLimits.files.maxPerConversation
 
     override fun getMaxTotalFileSizeBytes(): Long =
         modelManager.modelState.value.attachmentLimits.files.maxTotalFileSizeBytes
