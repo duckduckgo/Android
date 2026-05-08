@@ -41,6 +41,7 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -239,6 +240,9 @@ class RealPirJobsRunner @Inject constructor(
                 brokerCount = activeBrokers.size,
             )
             return@withContext Result.success(Unit)
+        } catch (e: TimeoutCancellationException) {
+            pirScanWideEvent.onRunFailed(executionType = executionType, reason = FailureReason.TIMEOUT_CANCELLATION_EXCEPTION)
+            throw e
         } catch (e: CancellationException) {
             pirScanWideEvent.onRunCancelled(executionType)
             throw e

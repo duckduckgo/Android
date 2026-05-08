@@ -27,7 +27,6 @@ import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -86,9 +85,11 @@ interface PirScanWideEvent {
 
         companion object {
             // Order is intentional: more specific subclasses must come before their supertypes.
+            // TIMEOUT_CANCELLATION_EXCEPTION is intentionally not handled here — TimeoutCancellationException
+            // extends CancellationException, which the runner catches separately and routes via an
+            // explicit catch block ahead of the generic Exception catch that calls this helper.
             fun fromException(e: Exception): FailureReason = when (e) {
                 is SQLiteException -> SQLITE_EXCEPTION
-                is TimeoutCancellationException -> TIMEOUT_CANCELLATION_EXCEPTION
                 is IOException -> IO_EXCEPTION
                 is IllegalStateException -> ILLEGAL_STATE_EXCEPTION
                 is IllegalArgumentException -> ILLEGAL_ARGUMENT_EXCEPTION

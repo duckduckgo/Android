@@ -42,6 +42,7 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -1524,6 +1525,48 @@ class RealPirJobsRunnerTest {
         )
         verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
         verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+    }
+
+    @Test
+    fun whenScanThrowsTimeoutCancellationExceptionThenWideEventOnRunFailedWithTimeoutReason() = runTest {
+        // Given - TimeoutCancellationException extends CancellationException, so the runner has to
+        // match it BEFORE the generic cancellation catch, otherwise timeouts get silently
+        // misclassified as user cancellations. Its constructor is internal in kotlinx.coroutines,
+        // so we instantiate via reflection to drive the test deterministically.
+        val constructor = TimeoutCancellationException::class.java.declaredConstructors.first()
+        constructor.isAccessible = true
+        val timeoutException = constructor.newInstance("test timeout", null) as TimeoutCancellationException
+
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenThrow(timeoutException)
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected TimeoutCancellationException to propagate")
+        } catch (e: TimeoutCancellationException) {
+            assertEquals("test timeout", e.message)
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.TIMEOUT_CANCELLATION_EXCEPTION))
         verify(mockPirScanWideEvent, never()).onRunCancelled(any())
     }
 
