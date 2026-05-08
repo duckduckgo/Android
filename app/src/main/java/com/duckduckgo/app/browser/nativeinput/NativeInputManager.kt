@@ -348,8 +348,7 @@ class RealNativeInputManager @Inject constructor(
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
                     widget.text = ""
-                    widget.clearImageAttachments()
-                    widget.clearFileAttachments()
+                    widget.clearAttachments()
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson, filesJson)
                 } else {

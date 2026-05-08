@@ -119,8 +119,7 @@ class RealContextualNativeInputManager @Inject constructor(
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
-                widget.clearImageAttachments()
-                widget.clearFileAttachments()
+                widget.clearAttachments()
                 sendPrompt(prompt, widget.getSelectedModelId(), imagesJson, filesJson)
                 widget.text = ""
             },

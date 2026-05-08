@@ -110,8 +110,7 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
-    fun clearImageAttachments()
-    fun clearFileAttachments()
+    fun clearAttachments()
     fun storePendingPrompt(query: String)
     fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
     fun configureContextual()
@@ -601,12 +600,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
 
-    override fun clearImageAttachments() {
+    override fun clearAttachments() {
         attachmentView?.clearAttachments()
-    }
-
-    override fun clearFileAttachments() {
-        // files are cleared together with images via clearAttachments()
     }
 
     override fun storePendingPrompt(query: String) {
