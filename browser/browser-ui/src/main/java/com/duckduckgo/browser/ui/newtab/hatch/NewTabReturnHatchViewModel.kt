@@ -90,4 +90,18 @@ class NewTabReturnHatchViewModel @Inject constructor(
             tabRepository.select(viewState.value.currentTabId)
         }
     }
+
+    fun closeTab() {
+
+    }
+
+    fun burnTab() {
+
+
+    }
+
+    fun onTabManagerPressed() {
+
+
+    }
 }
