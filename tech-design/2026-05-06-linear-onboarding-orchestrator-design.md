@@ -14,7 +14,7 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 |---|---|
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestrator.kt` | **New** — `AppScope` `@SingleInstanceIn` class holding the plan, current step, transitions; writes `AppStage` on terminal transitions |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingPlanProvider.kt` | **New** — builds the step registry, contains all step factory methods |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearStep.kt` | **New** — sealed class hierarchy (`IsolatedContext`, `BrowserContext`), `StepEvent`, `StepTransition` |
+| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearStep.kt` | **New** — `LinearStep` sealed hierarchy (`IsolatedContext`, `BrowserContext`), `OnboardingPath`, `StepEvent`, `StepTransition` |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/OnboardingPlanState.kt` | **New** — `NotStarted` / `InProgress` / `Completed` / `Skipped` |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/PreOnboardingDialog.kt` | **New** — sealed `PreOnboardingDialog` carrying both the dialog identity and its data (replaces the parallel `PreOnboardingDialogType` enum + per-step params for the orchestrator path) |
 | `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestratorFeature.kt` | **New** — `@ContributesRemoteFeature` toggle gating rollout |
@@ -48,15 +48,16 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 ┌─ AppScope ───────────────────────────────────────────────────────────┐
 │                                                                       │
 │   LinearOnboardingPlanProvider                                        │
-│         │   buildPlan(): LinearOnboardingPlan                        │
-│         │   step factories with precondition + resolveDialog +       │
-│         │   transition lambdas (each reads fresh state at call time) │
-│         ▼                                                            │
-│   LinearOnboardingOrchestrator    ─── state: StateFlow<…>            │
-│         │   onEvent(StepEvent)                                       │
-│         │   requestFirstStep()    (called once by welcome page)      │
-│         │   currentStepHost(): Host                                  │
-│         │   isOnLinearBrowserStep(): Boolean                         │
+│         │   buildMainPath(): OnboardingPath                            │
+│         │   step factories with precondition + resolveDialog +        │
+│         │   transition lambdas (each reads fresh state at call time)  │
+│         │   side paths exposed as private vals (e.g. skipPath)        │
+│         ▼                                                             │
+│   LinearOnboardingOrchestrator    ─── state: StateFlow<…>             │
+│         │   onEvent(StepEvent)                                        │
+│         │   requestFirstStep()    (called once by welcome page)       │
+│         │   firstStepHost(): Host                                     │
+│         │   isOnLinearBrowserStep(): Boolean                          │
 │         │                                                            │
 │         └──► AppStage facade (Room, unchanged)                       │
 │              writes stageCompleted(NEW)/(DAX_ONBOARDING) on          │
@@ -135,61 +136,49 @@ sealed interface StepEvent {
 }
 
 sealed interface StepTransition {
-    data object Advance : StepTransition          // walk forward; semantics depend on whether current step is in mainPath or sideBranches (see below)
-    data class Branch(val target: StepId) : StepTransition  // enter a side-branch step; target MUST be in plan.sideBranches
-    data object AbortPlan : StepTransition        // terminates linear as Skipped
-    data object Stay : StepTransition             // explicit no-op
+    data object Advance : StepTransition                          // next step in current path
+    data class SwitchTo(val path: OnboardingPath) : StepTransition // push frame, run path from first eligible step
+    data object Return : StepTransition                            // pop frame, resume caller path past caller
+    data object AbortPlan : StepTransition                         // terminates linear as Skipped
+    data object Stay : StepTransition                              // explicit no-op
 }
 
-data class LinearOnboardingPlan(
-    val mainPath: List<LinearStep>,        // ordered canonical flow
-    val sideBranches: List<LinearStep>,    // conditional dialogs reachable via Branch
-) {
-    init {
-        val mainIds = mainPath.map { it.id }.toSet()
-        val sideIds = sideBranches.map { it.id }.toSet()
-        require(mainIds.intersect(sideIds).isEmpty()) {
-            "Step IDs must be unique across mainPath and sideBranches"
-        }
-    }
-
-    val allStepsById: Map<StepId, LinearStep> by lazy {
-        (mainPath + sideBranches).associateBy { it.id }
-    }
-    val mainPathIds: List<StepId> by lazy { mainPath.map { it.id } }
-    val sideBranchIds: Set<StepId> by lazy { sideBranches.map { it.id }.toSet() }
-}
+data class OnboardingPath(val steps: List<LinearStep>)
 ```
 
 ### Why this shape
 
 - **Two step subtypes, one per host.** `IsolatedContext` steps run full-screen (today: rendered by `OnboardingActivity`). `BrowserContext` steps render against the live browser. The author picks the subtype that fits; the orchestrator infers which activity should host the step from the subtype, with no separate `host` field to keep in sync.
 - **`precondition` and `resolveDialog` are `suspend` and read fresh state at call time.** This is the load-bearing decision for the config-staleness story — see [State and persistence](#state-and-persistence).
-- **`PreOnboardingDialog` is one sealed type, not enum + parallel params.** Each variant carries the data its renderer needs (e.g. `Initial(showDuckAiCopy)`, `DefaultBrowser(intent)`). The orchestrator-side `PreOnboardingDialogType` enum is *not* used on the orchestrator path; it stays in place only for the legacy `WelcomePage` path until that path is removed.
+- **`PreOnboardingDialog` is one sealed type, not enum + parallel params.** Each variant carries the data its renderer needs (e.g. `Initial(showDuckAiCopy)`, `DefaultBrowser(intent)`). The existing `PreOnboardingDialogType` enum is *deprecated; it stays in place only for the legacy `WelcomePage` path until that path is removed.
 - **`transition` is a per-step function returning a `StepTransition`.** Each step's flow-control logic is local to its descriptor instead of co-mingled in a giant centralised `when`.
-- **Plan separates `mainPath` from `sideBranches`.** The main path is one ordered list — reading it is the canonical way to understand the linear flow. Side branches (today only `SKIP_ONBOARDING_OPTION`) are an explicitly separate list. `Branch(target)` is constrained to side-branch targets, so a reader of the plan provider can rely on `mainPath` to describe the ordered flow without scanning every step's transitions for hidden jumps.
+- **Paths are first-class values, not registry-keyed.** `OnboardingPath` is a plain data class wrapping a list of steps. The plan provider returns the *main* path, and side paths (e.g. the skip-confirmation flow) are private `val`s in the provider, referenced by value from `SwitchTo(...)` calls inside step transitions. A step in any path can switch into any other path; transitions are local rather than coordinated through a central registry.
+- **Side flows are sequences, not single steps.** Multi-step side flows (e.g. confirm → feature-pitch → abort) fall out naturally — they're just a path with multiple steps. The "side branch" concept disappears; a side flow is just another `OnboardingPath` invoked via `SwitchTo`.
 
 ### Orchestrator advance algorithm
 
-The orchestrator tracks one transient piece of state besides `currentStepId`: `branchEntry: StepId?` — the main-path step ID that initiated the active side-branch (or `null` when not in a branch).
+The orchestrator's internal state tracks `currentPath: OnboardingPath`, `currentStepIndex: Int`, and a `callStack: ArrayDeque<Frame>` where each `Frame = (path, indexAtJump)`. External observers see only the public `OnboardingPlanState` (see next section) — the call stack is private.
 
 When a step's `transition(event)` returns:
 
-- **`Advance`** — depends on where we are:
-  - If `currentStepId ∈ mainPathIds`: walk `mainPathIds` from `currentStepId + 1`, skipping ineligible (precondition `false`). Terminate as `Completed` if we exhaust the list.
-  - If `currentStepId ∈ sideBranchIds`: walk `mainPathIds` from `branchEntry + 1`, skipping ineligible. Clear `branchEntry`. Terminate as `Completed` if exhausted.
-- **`Branch(target)`** — validate `target ∈ sideBranchIds` (otherwise error). Record `branchEntry = currentStepId` (only if we're currently in mainPath). Evaluate `target.precondition()`. If `true`, set current to target. If `false`, fall back: walk `mainPathIds` from `branchEntry + 1` (i.e., behave as `Advance` from the branch-entry).
-- **`AbortPlan`** — set state to `Skipped`, write `AppStage = ESTABLISHED` + `hideTips`. `branchEntry` is discarded.
+- **`Advance`** — walk `currentPath.steps` from `currentStepIndex + 1`, skipping ineligible (precondition `false`). If we land on an eligible step, become it. If we exhaust the list:
+  - If `callStack` is non-empty: pop a frame and resume the caller path at `frame.indexAtJump + 1` (which itself is an `Advance` walk). The caller's transition that triggered the original `SwitchTo` is now considered complete.
+  - If `callStack` is empty: terminate as `Completed`.
+- **`SwitchTo(path)`** — push `(currentPath, currentStepIndex)` onto the call stack. Set `currentPath = path`, walk to the first eligible step. If `path` has no eligible step, behave as if we'd already exhausted it: pop and resume caller (this is the "fallback" for an empty target).
+- **`Return`** — pop a frame and resume the caller at `frame.indexAtJump + 1`. With an empty call stack, `Return` is a programming error (a path designed to be returned-from should never be entered as `main`); fail loudly.
+- **`AbortPlan`** — set state to `Skipped`. Discard the entire call stack. Write `AppStage = ESTABLISHED` + `hideTips`.
 - **`Stay`** — no state change.
+
+The "advance from a side branch resumes main" rule from the old design is no longer special-cased — it's just `Advance` exhausting a path and popping the stack, which works the same regardless of whether the popped caller is on the main path or a deeper side path.
 
 ### Today's flow expressed in this model
 
-The current brand-design flow maps onto **eight `mainPath` steps and one `sideBranches` step**:
+The current brand-design flow maps onto **one main path of eight steps**, plus a **single-step side path** for the skip-confirmation:
 
-- `mainPath` (in order): `SyncRestore`, `InitialReinstallUser`, `Initial`, `ComparisonChart`, `DefaultBrowser`, `AddressBarPosition`, `InputScreen`, `InputScreenPreview`
-- `sideBranches`: `SkipOnboardingOption`
+- Main path (in order): `SyncRestore`, `InitialReinstallUser`, `Initial`, `ComparisonChart`, `DefaultBrowser`, `AddressBarPosition`, `InputScreen`, `InputScreenPreview`
+- Skip path: `SkipOnboardingOption`
 
-Mutual exclusion between the three "first dialog" candidates (`SyncRestore` / `InitialReinstallUser` / `Initial`) is expressed as preconditions on each step, not as plan-level branching — `mainPath` stays a flat, readable list, and ineligible steps are skipped during forward walking. The full plan-provider code with all step factories (preconditions, transitions, side effects) is in [Appendix A: Plan provider code](#appendix-a-plan-provider-code).
+Mutual exclusion between the three "first dialog" candidates (`SyncRestore` / `InitialReinstallUser` / `Initial`) is expressed as preconditions on each step, not as plan-level branching — the main path stays a flat, readable list, and ineligible steps are skipped during forward walking. `InitialReinstallUser` and `SyncRestore`'s secondary CTAs invoke `SwitchTo(skipPath)`. `SkipOnboardingOption`'s secondary returns `Advance` (which walks off the end of the single-step skip path → pops the call stack → resumes main from the caller's slot + 1). The full plan-provider code is in [Appendix A: Plan provider code](#appendix-a-plan-provider-code).
 
 Two architectural points worth surfacing here, since they're easy to miss in the per-step factory code:
 
@@ -202,15 +191,25 @@ Two architectural points worth surfacing here, since they're easy to miss in the
 ```kotlin
 sealed interface OnboardingPlanState {
     data object NotStarted : OnboardingPlanState
-    data class InProgress(val currentStepId: StepId) : OnboardingPlanState
+    data class InProgress(
+        val currentPath: OnboardingPath,
+        val currentStepIndex: Int,
+    ) : OnboardingPlanState {
+        val currentStep: LinearStep
+            get() = currentPath.steps[currentStepIndex]
+    }
     data object Completed : OnboardingPlanState
     data object Skipped : OnboardingPlanState
 }
 ```
 
-State lives entirely in a `MutableStateFlow<OnboardingPlanState>` inside the orchestrator. **No DataStore, no Room table, no persistence of `currentStepId`.** Today's flow restarts from scratch on process death; that behavior is preserved.
+The state surfaces the *current path + index* explicitly, with a computed `currentStep` getter for observers. `currentPath` disambiguates the case where the same step descriptor appears in multiple paths (uncommon but possible — sharing via `private val` is the natural pattern, but we don't enforce it). Index is the position-in-path, useful for tests and any future "step N of M" UI. The pair `(currentPath, currentStepIndex)` matches what the orchestrator tracks internally — single source of truth, no derivable redundancy in the state. Equality and `distinctUntilChanged` work as expected since the data class compares both fields.
 
-The full state lifecycle, including the orchestrator's `AppStage` writes on terminal transitions and the `branchEntry` field used during side-branches, is in [`2026-05-06-linear-onboarding-orchestrator-design-state.puml`](2026-05-06-linear-onboarding-orchestrator-design-state.puml).
+The orchestrator's call stack is **internal**: not exposed on `OnboardingPlanState`. Observers don't need it; if some future feature wants nesting depth, the orchestrator can expose `callStackDepth(): Int` separately.
+
+State lives entirely in a `MutableStateFlow<OnboardingPlanState>` inside the orchestrator. **No DataStore, no Room table, no persistence of `currentStepIndex` or the call stack.** Today's flow restarts from scratch on process death; that behavior is preserved.
+
+The full state lifecycle, including the orchestrator's `AppStage` writes on terminal transitions and the call-stack semantics for `SwitchTo` / `Return`, is in [`2026-05-06-linear-onboarding-orchestrator-design-state.puml`](2026-05-06-linear-onboarding-orchestrator-design-state.puml).
 
 ### `AppStage` migration
 
@@ -238,7 +237,7 @@ Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` cont
 **On `requestFirstStep()` (called by `BrandDesignUpdatePageViewModel` after the welcome animation and notification permission flow complete):**
 
 - Build the plan registry (synchronous, no config wait — preconditions evaluate fresh state lazily at advance time, see [Config staleness](#config-staleness)).
-- Walk `plan.mainPathIds`, evaluate each `precondition()` until the first eligible step is found.
+- Build the main path via `planProvider.buildMainPath()`. Walk its steps from index 0, evaluating each `precondition()` until the first eligible step is found. Set state to `InProgress(currentPath = mainPath, currentStepIndex = indexOfFirstEligible)`. Empty call stack.
 - Set `InProgress(firstEligibleStepId)`.
 
 **On activity transitions mid-flow:**
@@ -274,7 +273,7 @@ private var hostTransitionInitiated = false
 
 private fun observeOrchestratorForHostTransitions() {
     orchestrator.state.flowWithLifecycle(lifecycle, STARTED).onEach { state ->
-        val expectedHost = state.expectedHost(orchestrator.planRegistry)
+        val expectedHost = state.expectedHost()
         if (expectedHost != Host.IsolatedContext && !hostTransitionInitiated) {
             hostTransitionInitiated = true
             startActivity(BrowserActivity.intent(this))
@@ -287,8 +286,8 @@ private fun observeOrchestratorForHostTransitions() {
 `BrowserActivity` runs the symmetric observer. The `hostTransitionInitiated` guard prevents double-firing within a single activity's lifetime; the transient race during a transition (both activities briefly `STARTED`) resolves cleanly because Android's activity launch is idempotent at the task level.
 
 ```kotlin
-fun OnboardingPlanState.expectedHost(plan: LinearOnboardingPlan): Host? = when (this) {
-    is InProgress -> when (plan.allStepsById.getValue(currentStepId)) {
+fun OnboardingPlanState.expectedHost(): Host? = when (this) {
+    is InProgress -> when (currentStep) {
         is IsolatedContext -> Host.IsolatedContext
         is BrowserContext -> Host.BrowserContext
     }
@@ -308,11 +307,9 @@ Inside `BrowserActivity`, the reactive CTA path takes over via existing `CtaView
 
 ```kotlin
 // in CtaViewModel
-private suspend fun isOnLinearBrowserStep(): Boolean {
-    val state = orchestrator.state.value
-    if (state !is InProgress) return false
-    val step = orchestrator.planRegistry.allStepsById[state.currentStepId] ?: return false
-    return step is BrowserContext
+private fun isOnLinearBrowserStep(): Boolean {
+    val state = orchestrator.state.value as? InProgress ?: return false
+    return state.currentStep is BrowserContext
 }
 
 suspend fun refreshCta(...): Cta? = withContext(dispatcher) {
@@ -392,10 +389,10 @@ class BrandDesignUpdatePageViewModel ... {
         orchestrator.state.onEach { state ->
             when (state) {
                 is InProgress -> {
-                    val step = orchestrator.planRegistry.allStepsById[state.currentStepId] as? IsolatedContext
-                    val dialog = step?.resolveDialog()
+                    val step = state.currentStep as? IsolatedContext ?: return@onEach
+                    val dialog = step.resolveDialog()
                     _dialogState.value = dialog
-                    if (dialog != null) fireDialogShownPixel(dialog)  // show-time pixel
+                    fireDialogShownPixel(dialog)  // show-time pixel
                 }
                 Completed -> {
                     _dialogState.value = null
@@ -500,17 +497,17 @@ This work does not block, and is not blocked by, the `WelcomePage` deprecation w
 
 ### Unit tests on the orchestrator core
 
-- `LinearOnboardingPlanProvider.buildPlan()` produces the expected plan. Property assertion: `mainPath` and `sideBranches` have disjoint step IDs. `SKIP_ONBOARDING_OPTION` is in `sideBranches`, not `mainPath`.
+- `LinearOnboardingPlanProvider.buildMainPath()` produces the expected ordered list of steps; the private side paths (e.g. `skipPath`) contain the expected steps and transitions.
 - Each step's `precondition` evaluation under combinations of feature flags and stored state. Test fixtures parameterised by `canRestore` × `isReinstall` × `showInputScreen` × experiment variant.
 - Each step's `transition(event)` returns the expected `StepTransition` for each `StepEvent`; un-handled events return `Stay`.
-- `LinearOnboardingOrchestrator` advance walks past ineligible steps and lands on the first eligible — both for the initial step (walks `mainPathIds` from start) and for `Advance` from a side-branch (walks `mainPathIds` from `branchEntry + 1`).
-- `LinearOnboardingOrchestrator.onEvent()` dispatches to current step's transition. `Advance` walks forward (main or post-branch); `Branch(target)` validates target ∈ `sideBranchIds`, evaluates target's precondition with forward-walk fallback; `AbortPlan` writes `AppStage = ESTABLISHED` + `hideTips`; `Stay` is a no-op.
+- `LinearOnboardingOrchestrator` advance walks `currentPath.steps` past ineligible entries to the first eligible. When a path is exhausted, the call stack is popped and the caller resumes at `indexAtJump + 1`; if the stack is empty, state becomes `Completed`.
+- `LinearOnboardingOrchestrator.onEvent()` dispatches to the current step's transition. `Advance` walks forward (with stack-pop on path exhaustion); `SwitchTo(path)` pushes a frame and runs the new path; `Return` pops a frame; `AbortPlan` writes `AppStage = ESTABLISHED` + `hideTips` regardless of stack depth; `Stay` is a no-op.
 - `AppStage` writes happen exactly once per terminal transition; idempotent under repeat invocation.
 
 ### Behavioral / integration tests (the regression backstop)
 
-- Walk through the full plan for canonical user shapes (normal, canRestore, reinstall, no-input-screen, treatment cohorts). For each, assert the sequence of `currentStepId` values matches the dialog sequence in the legacy in-VM flow.
-- Skip-onboarding side branch: from `INITIAL_REINSTALL_USER` secondary, `Branch(SKIP_ONBOARDING_OPTION)` records `branchEntry` and lands on the side-branch step. Primary on skip → `Skipped` + `AppStage` writes. Secondary on skip → `Advance`, which walks `mainPath` from `branchEntry + 1` and lands on `COMPARISON_CHART` (the first eligible main step past the entry point).
+- Walk through the full plan for canonical user shapes (normal, canRestore, reinstall, no-input-screen, treatment cohorts). For each, assert the sequence of `state.currentStep.id` values matches the dialog sequence in the legacy in-VM flow.
+- Skip-onboarding side path: from `InitialReinstallUser` secondary, `SwitchTo(skipPath)` pushes the caller frame and lands on `SkipOnboardingOption`. Primary on skip → `AbortPlan` → `Skipped` + `AppStage` writes. Secondary on skip → `Advance`, which exhausts the single-step skip path → pops the call stack → resumes the main path past `InitialReinstallUser`, landing on `ComparisonChart` (the first eligible main step).
 - `CtaViewModel.refreshCta()` returns `null` while orchestrator state is `InProgress` on a `BrowserContext` step (synthetic plan with a `BrowserContext` step for the test).
 - `CtaViewModel.refreshCta()` returns the existing reactive CTA when orchestrator state is `Completed`.
 
@@ -574,7 +571,7 @@ Specifically:
 ## Open questions / deferred concerns
 
 1. **`BrowserContext` step descriptor and renderer.** Owned by the first project to introduce a `BrowserContext` step. This spec only declares the structural seam.
-2. **`SYNC_RESTORE` coverage in `BrandDesignUpdatePageViewModel`.** The brand-design viewmodel imports `SYNC_RESTORE` and handles it in `fireDialogShownPixel`, but its `loadDaxDialog` never dispatches to it, `onPrimaryCtaClicked(SYNC_RESTORE)` has a `// TODO`, and `onSecondaryCtaClicked(SYNC_RESTORE)` is a no-op. The orchestrator spec includes a `SYNC_RESTORE` step. If the product team is intentionally dropping `SYNC_RESTORE` with the brand-design migration, the orchestrator's `syncRestoreStep()` factory is removed in one place (drop it from `mainPath`). If `SYNC_RESTORE` is being kept, the brand-design viewmodel needs the missing rendering paths backfilled before phase 4 cleanup.
+2. **`SYNC_RESTORE` coverage in `BrandDesignUpdatePageViewModel`.** The brand-design viewmodel imports `SYNC_RESTORE` and handles it in `fireDialogShownPixel`, but its `loadDaxDialog` never dispatches to it, `onPrimaryCtaClicked(SYNC_RESTORE)` has a `// TODO`, and `onSecondaryCtaClicked(SYNC_RESTORE)` is a no-op. The orchestrator spec includes a `SYNC_RESTORE` step. If the product team is intentionally dropping `SYNC_RESTORE` with the brand-design migration, the orchestrator's `syncRestoreStep()` factory is removed from the main path in one place. If `SYNC_RESTORE` is being kept, the brand-design viewmodel needs the missing rendering paths backfilled before phase 4 cleanup.
 3. **`DefaultBrowser` intent nullability.** `defaultRoleBrowserDialog.createIntent(context)` is nullable today and the legacy VM falls through to `ADDRESS_BAR_POSITION` when it returns null while `shouldShowDialog()` is true. The orchestrator handles this by checking both in `defaultBrowserStep.precondition` (see Appendix A). Worth confirming with the team that this fall-through is the intended behaviour to preserve, since the legacy code also fires `DEFAULT_BROWSER_DIALOG_NOT_SHOWN` in that case — that pixel needs to keep firing on the orchestrator path too.
 4. **`expectedHost == null` while `NotStarted`.** `expectedHost(plan)` returns `null` when `OnboardingPlanState == NotStarted` — neither activity should redirect during that window. Today this is safe because `OnboardingActivity` is the only entry point during the welcome-animation phase before `requestFirstStep()` is called. If a future code path can hand the user to `BrowserActivity` *before* `requestFirstStep()`, the activity would silently linger; the `null` return is intentional to keep both activities passive during that window.
 5. **Persistence as a follow-up.** If product later wants "preserve user's mid-flow position across process kills", it's a one-day add: DataStore-backed `OnboardingPlanState` + the reconciliation rule "if persisted `currentStepId` no longer in rebuilt plan, treat as `Completed`".
@@ -600,21 +597,22 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private val pixel: Pixel,
     private val context: Context,
 ) {
-    fun buildPlan(): LinearOnboardingPlan = LinearOnboardingPlan(
-        mainPath = listOf(
-            syncRestoreStep(),
-            initialReinstallUserStep(),
-            initialStep(),
-            comparisonChartStep(),
-            defaultBrowserStep(),
-            addressBarPositionStep(),
-            inputScreenStep(),
-            inputScreenPreviewStep(),
-        ),
-        sideBranches = listOf(
-            skipOnboardingOptionStep(),
-        ),
-    )
+    fun buildMainPath(): OnboardingPath = OnboardingPath(steps = listOf(
+        syncRestoreStep(),
+        initialReinstallUserStep(),
+        initialStep(),
+        comparisonChartStep(),
+        defaultBrowserStep(),
+        addressBarPositionStep(),
+        inputScreenStep(),
+        inputScreenPreviewStep(),
+    ))
+
+    // Side path. Constructed once and shared across callers (both InitialReinstallUser
+    // and SyncRestore SwitchTo it). Steps inside have stable identity.
+    private val skipPath: OnboardingPath by lazy {
+        OnboardingPath(steps = listOf(skipOnboardingOptionStep()))
+    }
 
     private fun syncRestoreStep() = IsolatedContext(
         id = ID_SYNC_RESTORE,
@@ -628,7 +626,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
             }
             SecondaryClicked -> {
                 pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                Branch(ID_SKIP_ONBOARDING_OPTION)
+                SwitchTo(skipPath)
             }
             else -> Stay
         }},
@@ -642,7 +640,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
             PrimaryClicked -> Advance
             SecondaryClicked -> {
                 pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-                Branch(ID_SKIP_ONBOARDING_OPTION)
+                SwitchTo(skipPath)
             }
             else -> Stay
         }},
@@ -775,10 +773,11 @@ class LinearOnboardingPlanProvider @Inject constructor(
                 AbortPlan
             }
             SecondaryClicked -> {
-                // Advance from a side-branch walks mainPath from branchEntry+1.
-                // For a reinstall user: branchEntry=INITIAL_REINSTALL_USER, walk skips
-                // INITIAL (precondition false), lands on COMPARISON_CHART. Same destination
-                // for a canRestore user (branchEntry=SYNC_RESTORE walks past the same gates).
+                // Advance off the end of the single-step skip path → pops the call stack →
+                // resumes the main path at caller.indexAtJump + 1. For a reinstall user
+                // (caller = InitialReinstallUser): walk skips Initial (precondition false),
+                // lands on ComparisonChart. Same destination for a canRestore user (caller =
+                // SyncRestore walks past the same gates).
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
                 Advance
             }

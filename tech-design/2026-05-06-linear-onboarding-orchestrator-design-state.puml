@@ -1,0 +1,45 @@
+@startuml
+title Orchestrator state and AppStage writes
+
+state NotStarted
+state InProgress {
+  state "currentPath : OnboardingPath" as Cur
+  state "currentStepIndex : Int" as Idx
+  state "callStack : ArrayDeque<Frame>\n(internal — not in OnboardingPlanState)" as Stack
+}
+state Completed
+state Skipped
+
+[*] --> NotStarted : init when AppStage == NEW
+[*] --> Completed  : init when AppStage in {DAX_ONBOARDING, ESTABLISHED}
+
+NotStarted --> InProgress : requestFirstStep()\nfirst eligible step in main path
+
+InProgress --> InProgress : onEvent ->\nAdvance / SwitchTo(path) / Return / Stay
+InProgress --> Completed  : Advance exhausts main path\n(callStack empty)\n[stageCompleted(NEW)]
+InProgress --> Skipped    : AbortPlan\n[stageCompleted(NEW),\n stageCompleted(DAX_ONBOARDING),\n hideTips = true]
+
+note right of Completed
+  AppStage moves NEW -> DAX_ONBOARDING.
+  Reactive CTAs (CtaViewModel) take over.
+  CtaViewModel.completeStageIfDaxOnboardingCompleted
+  later writes DAX_ONBOARDING -> ESTABLISHED
+  (orchestrator never writes that one).
+end note
+
+note right of Skipped
+  AppStage forced to ESTABLISHED.
+  Matches FullOnboardingSkipper today.
+end note
+
+note left of InProgress
+  SwitchTo(path) pushes (currentPath, currentStepIndex)
+  to callStack and runs path from first eligible step.
+
+  Advance walks currentPath; off-end pops the stack
+  and resumes caller at indexAtJump + 1.
+
+  Return pops a frame and resumes caller similarly.
+  Empty-stack Return is a programming error.
+end note
+@enduml

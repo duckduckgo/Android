@@ -1,0 +1,32 @@
+@startuml
+title Host transition: Isolated -> Browser -> Isolated
+
+actor User
+participant "OnboardingActivity\n(host observer)" as OA
+participant "LinearOnboardingOrchestrator\n@AppScope" as Orch
+participant "BrowserActivity\n(host observer)" as BA
+
+User -> OA : taps primary on last\nIsolatedContext step
+OA -> Orch : onEvent(PrimaryClicked)
+Orch -> Orch : transition -> Advance\ncurrentStep = first BrowserContext step
+Orch --> OA : state emits InProgress(<browser step>)
+OA -> OA : expectedHost = BrowserContext\nstartActivity(BrowserActivity)\nfinish()
+
+User -> BA : (now foreground)
+BA -> Orch : observe state
+Orch --> BA : InProgress(<browser step>)
+BA -> BA : expectedHost = BrowserContext (matches)\nrender browser-context step
+
+User -> BA : completes browser-context step
+BA -> Orch : onEvent(...)
+Orch -> Orch : transition -> Advance\ncurrentStep = next IsolatedContext step
+Orch --> BA : state emits InProgress(<isolated step>)
+BA -> BA : expectedHost = IsolatedContext\nstartActivity(OnboardingActivity)\nfinish()
+
+note over OA, BA
+  hostTransitionInitiated guard prevents double-firing
+  within a single activity instance.
+  state-derived: activity recreation re-evaluates
+  expectedHost from current state.
+end note
+@enduml
