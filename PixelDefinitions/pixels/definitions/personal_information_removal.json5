@@ -1950,7 +1950,7 @@
             {
                 "key": "scanFrequencyWithinThreshold",
                 "description": "A background scan has run within 48 hours since the last one",
-                "enum": ["false", "true"]
+                "type": "boolean"
             }
         ]
     },

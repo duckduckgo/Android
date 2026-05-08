@@ -33,7 +33,7 @@
             {
                 "key": "feature.data.ext.is_first_setup",
                 "description": "true if the user is launching the VPN for the first time, false otherwise",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.cancellation_reason",
