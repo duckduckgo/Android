@@ -264,6 +264,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    // This function will be removed with the new plugin architecture
     private fun wirePluginView(pluginView: View, scope: CoroutineScope) {
         if (pluginView is AttachmentView) {
             attachmentView = pluginView
@@ -792,6 +793,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showStopButton()
         } else {
             submitButtons?.showSendButton()
+            floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
