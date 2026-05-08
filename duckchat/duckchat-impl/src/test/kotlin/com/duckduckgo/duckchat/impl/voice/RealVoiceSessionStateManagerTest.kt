@@ -345,11 +345,11 @@ class RealVoiceSessionStateManagerTest {
 
     @Test
     fun whenTriggerVoiceSessionEndCalledThenIsVoiceSessionActiveUnchanged() {
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
 
         testee.triggerVoiceSessionEnd(TAB_ID)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     private fun tabEntity(tabId: String) = TabEntity(tabId = tabId)

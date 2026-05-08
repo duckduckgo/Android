@@ -43,9 +43,11 @@ import javax.inject.Inject
 interface VoiceSessionStateManager {
     val activeVoiceSessions: Flow<Set<String>>
         get() = flowOf(emptySet())
+
     fun isVoiceSessionActive(tabId: String): Boolean = false
     fun onVoiceSessionStarted(tabId: String)
     fun onVoiceSessionEnded(tabId: String)
+
     /**
      * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
      * foreground service notification). Tabs should collect this flow and dispatch the
@@ -91,7 +93,7 @@ class RealVoiceSessionStateManager @Inject constructor(
         if (tabId.isBlank()) return
         _activeVoiceSessions.update { it + tabId }
         if (duckChatFeature.duckAiVoiceChatService().isEnabled()) {
-            DuckChatVoiceMicrophoneService.start(context)
+            DuckChatVoiceMicrophoneService.start(context, tabId)
         }
         if (!listenJob.isActive) {
             listenToTabRemoval()
