@@ -70,6 +70,7 @@ class AttachmentViewModel @Inject constructor(
         val files: List<FileAttachment> = emptyList(),
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
+        val fileSizeError: String? = null,
         val supportsUpload: Boolean = false,
         val supportsImageUpload: Boolean = false,
         val supportedFileTypes: List<String> = emptyList(),
@@ -87,14 +88,15 @@ class AttachmentViewModel @Inject constructor(
     @VisibleForTesting
     internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
     private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
+    private val _fileSizeError = MutableStateFlow<String?>(null)
     private val _isDuckAiMode = MutableStateFlow(false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesSent) { imgSent, fileSent -> Pair(imgSent, fileSent) },
-        _isDuckAiMode,
-    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent), isDuckAiMode ->
+        combine(_isDuckAiMode, _fileSizeError) { mode, sizeErr -> Pair(mode, sizeErr) },
+    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent), (isDuckAiMode, fileSizeError) ->
         val model = modelState.models.find { it.id == modelState.selectedModelId }
         val supportsImageUpload = modelState.models.isEmpty() ||
             (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
@@ -109,6 +111,7 @@ class AttachmentViewModel @Inject constructor(
             files = files,
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
+            fileSizeError = fileSizeError,
             supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
             supportsImageUpload = supportsImageUpload,
             supportedFileTypes = supportedFileTypes,
@@ -128,14 +131,26 @@ class AttachmentViewModel @Inject constructor(
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
             val maxFileSizeBytes = fileAttachmentProcessor.getMaxFileSizeBytes()
+            val maxFileSizeMb = (maxFileSizeBytes / (1024 * 1024)).toInt()
             val maxTotalFileSizeBytes = fileAttachmentProcessor.getMaxTotalFileSizeBytes()
+            var rejectedForSize = false
             for (uri in uris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
-                if (attachment.sizeBytes > maxFileSizeBytes) continue
+                if (attachment.sizeBytes > maxFileSizeBytes) {
+                    rejectedForSize = true
+                    continue
+                }
                 val stagedBytes = _fileAttachments.value.sumOf { it.sizeBytes }
                 val sentBytes = limitsHandler.conversationFileSizeSentBytes.value
                 if (stagedBytes + sentBytes + attachment.sizeBytes > maxTotalFileSizeBytes) continue
                 _fileAttachments.update { it + attachment }
+            }
+            if (rejectedForSize) {
+                _fileSizeError.value = context.getString(R.string.duckChatFileAttachmentTooLarge, maxFileSizeMb)
+                launch {
+                    kotlinx.coroutines.delay(4_000)
+                    _fileSizeError.value = null
+                }
             }
         }
     }
