@@ -34,7 +34,7 @@ class NotificationLaunchModalReporter @Inject constructor(
     private val modalShownReporter: ModalShownReporter,
 ) : ActivityLifecycleCallbacks {
 
-    override fun onActivityPreCreated(
+    override fun onActivityCreated(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
