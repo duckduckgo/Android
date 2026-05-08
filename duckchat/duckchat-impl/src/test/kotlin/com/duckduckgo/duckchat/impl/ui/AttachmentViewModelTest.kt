@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,10 +26,12 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.AttachmentLimits
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +50,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -58,19 +62,26 @@ class AttachmentViewModelTest {
     private val duckChatInternal: DuckChatInternal = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val limitsHandler: FakeLimitsHandler = FakeLimitsHandler()
-    private val fileAttachmentProcessor: FileAttachmentProcessor = mock<FileAttachmentProcessor>().also {
-        whenever(it.getMaxFileSizeBytes()).thenReturn(5L * 1024 * 1024)
-        whenever(it.getMaxTotalFileSizeBytes()).thenReturn(5L * 1024 * 1024)
-    }
+    private val fileAttachmentProcessor: FakeFileAttachmentProcessor = FakeFileAttachmentProcessor()
     private val modelStateFlow = MutableStateFlow(ModelState())
     private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
         whenever(it.modelState).thenReturn(modelStateFlow)
     }
-    private val context: android.content.Context = mock<android.content.Context>().also {
+    private val context: Context = mock<Context>().also {
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerConversation, 5))
             .thenReturn("Conversation limit reached")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatImageAttachmentLimitPerMessage, 3))
             .thenReturn("Per-message limit reached")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentLimitPerConversation, 2))
+            .thenReturn("File conversation limit reached")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentLimitPerConversation, 3))
+            .thenReturn("File conversation limit reached")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTooLarge, 5))
+            .thenReturn("File too large")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTooManyPages, 5))
+            .thenReturn("Too many pages")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTooManyPages, 10))
+            .thenReturn("Too many pages")
     }
 
     private lateinit var viewModel: AttachmentViewModel
@@ -120,6 +131,45 @@ class AttachmentViewModelTest {
         modelStateFlow.value = ModelState(models = listOf(model), selectedModelId = "m1")
 
         assertFalse(viewModel.attachmentState.value.supportsUpload)
+    }
+
+    @Test
+    fun whenModelHasSupportedFileTypesThenSupportsUploadIsTrue() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        val model = aModel(id = "m1", supportedFileTypes = listOf("application/pdf"))
+        modelStateFlow.value = ModelState(models = listOf(model), selectedModelId = "m1")
+
+        assertTrue(viewModel.attachmentState.value.supportsUpload)
+    }
+
+    @Test
+    fun whenModelHasSupportedFileTypesThenAcceptedMimeTypesContainsThem() = runTest {
+        val model = aModel(id = "m1", supportedFileTypes = listOf("application/pdf", "text/plain"))
+        modelStateFlow.value = ModelState(models = listOf(model), selectedModelId = "m1")
+
+        val mimeTypes = viewModel.attachmentState.value.acceptedMimeTypes
+        assertTrue(mimeTypes.contains("application/pdf"))
+        assertTrue(mimeTypes.contains("text/plain"))
+    }
+
+    @Test
+    fun whenModelSupportsImageUploadThenAcceptedMimeTypesContainsImageWildcard() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        val model = aModel(id = "m1", supportsImageUpload = true)
+        modelStateFlow.value = ModelState(models = listOf(model), selectedModelId = "m1")
+
+        assertTrue(viewModel.attachmentState.value.acceptedMimeTypes.contains("image/*"))
+    }
+
+    @Test
+    fun whenModelSupportsFilesAndImagesThenAcceptedMimeTypesContainsBoth() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        val model = aModel(id = "m1", supportsImageUpload = true, supportedFileTypes = listOf("application/pdf"))
+        modelStateFlow.value = ModelState(models = listOf(model), selectedModelId = "m1")
+
+        val mimeTypes = viewModel.attachmentState.value.acceptedMimeTypes
+        assertTrue(mimeTypes.contains("application/pdf"))
+        assertTrue(mimeTypes.contains("image/*"))
     }
 
     @Test
@@ -182,13 +232,32 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenNoImagesThenHasAttachmentsIsFalse() = runTest {
+    fun whenConversationImagesSentCountedInTotal() = runTest {
+        val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationImagesSent(4)
+        addImages(2)
+
+        assertNotNull(viewModel.attachmentState.value.imageLimitError)
+        assertTrue(viewModel.attachmentState.value.isAtCapacity)
+    }
+
+    @Test
+    fun whenNoAttachmentsThenHasAttachmentsIsFalse() = runTest {
         assertFalse(viewModel.attachmentState.value.hasAttachments)
     }
 
     @Test
     fun whenImagesAddedThenHasAttachmentsIsTrue() = runTest {
         addImages(1)
+
+        assertTrue(viewModel.attachmentState.value.hasAttachments)
+    }
+
+    @Test
+    fun whenFilesAddedThenHasAttachmentsIsTrue() = runTest {
+        addFiles(aFileAttachment())
 
         assertTrue(viewModel.attachmentState.value.hasAttachments)
     }
@@ -206,7 +275,7 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenRemovingNonExistentIdThenListUnchanged() = runTest {
+    fun whenRemovingNonExistentImageIdThenListUnchanged() = runTest {
         addImages(2)
 
         viewModel.removeImageAttachment("nonexistent-id")
@@ -230,6 +299,189 @@ class AttachmentViewModelTest {
         viewModel.clearAttachmentsForNewChat()
 
         assertTrue(viewModel.attachmentState.value.images.isEmpty())
+    }
+
+    @Test
+    fun whenFileRemovedByIdThenItIsNoLongerInState() = runTest {
+        val file = aFileAttachment(id = "file-1")
+        addFiles(file)
+
+        viewModel.removeFileAttachment("file-1")
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenRemovingNonExistentFileIdThenListUnchanged() = runTest {
+        addFiles(aFileAttachment(), aFileAttachment())
+
+        viewModel.removeFileAttachment("nonexistent-id")
+
+        assertEquals(2, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenClearAttachmentsCalledThenFilesAreEmpty() = runTest {
+        addFiles(aFileAttachment())
+
+        viewModel.clearAttachments()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenClearAttachmentsForNewChatCalledThenFilesAreEmpty() = runTest {
+        addFiles(aFileAttachment())
+
+        viewModel.clearAttachmentsForNewChat()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenProcessFileReturnsNullThenFileNotAdded() = runTest {
+        val uri: Uri = mock()
+
+        viewModel.onFilesPicked(listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenUnderFileLimitThenFileLimitErrorIsNull() = runTest {
+        val limits = FileLimits(maxPerConversation = 3)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(), aFileAttachment())
+
+        assertNull(viewModel.attachmentState.value.fileLimitError)
+    }
+
+    @Test
+    fun whenTotalFilesOverConversationLimitThenFileLimitErrorShown() = runTest {
+        val limits = FileLimits(maxPerConversation = 2)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationFilesSent(2)
+        addFiles(aFileAttachment())
+
+        assertEquals("File conversation limit reached", viewModel.attachmentState.value.fileLimitError)
+    }
+
+    @Test
+    fun whenConversationFilesSentCountedInTotal() = runTest {
+        val limits = FileLimits(maxPerConversation = 3)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationFilesSent(2)
+        addFiles(aFileAttachment(), aFileAttachment())
+
+        assertNotNull(viewModel.attachmentState.value.fileLimitError)
+    }
+
+    @Test
+    fun whenFileSizeWithinLimitThenFileSizeErrorIsNull() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        val limits = FileLimits(maxFileSizeBytes = maxBytes)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxBytes - 1))
+
+        assertNull(viewModel.attachmentState.value.fileSizeError)
+    }
+
+    @Test
+    fun whenFileSizeExceedsLimitThenFileSizeErrorShown() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        val limits = FileLimits(maxFileSizeBytes = maxBytes)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxBytes + 1))
+
+        assertEquals("File too large", viewModel.attachmentState.value.fileSizeError)
+    }
+
+    @Test
+    fun whenOversizedFileRemovedThenFileSizeErrorClears() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        val limits = FileLimits(maxFileSizeBytes = maxBytes)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        val file = aFileAttachment(id = "big-file", sizeBytes = maxBytes + 1)
+        addFiles(file)
+        assertNotNull(viewModel.attachmentState.value.fileSizeError)
+
+        viewModel.removeFileAttachment("big-file")
+
+        assertNull(viewModel.attachmentState.value.fileSizeError)
+    }
+
+    @Test
+    fun whenFilePageCountWithinLimitThenPageCountErrorIsNull() = runTest {
+        val limits = FileLimits(maxPagesPerFile = 10)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(pageCount = 10))
+
+        assertNull(viewModel.attachmentState.value.filePageCountError)
+    }
+
+    @Test
+    fun whenFilePageCountExceedsLimitThenPageCountErrorShown() = runTest {
+        val limits = FileLimits(maxPagesPerFile = 10)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(pageCount = 11))
+
+        assertEquals("Too many pages", viewModel.attachmentState.value.filePageCountError)
+    }
+
+    @Test
+    fun whenNonPdfFileHasNoPageCountThenPageCountErrorIsNull() = runTest {
+        val limits = FileLimits(maxPagesPerFile = 5)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(mimeType = "text/plain", pageCount = null))
+
+        assertNull(viewModel.attachmentState.value.filePageCountError)
+    }
+
+    @Test
+    fun whenTooManyPagesFileRemovedThenPageCountErrorClears() = runTest {
+        val limits = FileLimits(maxPagesPerFile = 5)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        val file = aFileAttachment(id = "big-pdf", pageCount = 100)
+        addFiles(file)
+        assertNotNull(viewModel.attachmentState.value.filePageCountError)
+
+        viewModel.removeFileAttachment("big-pdf")
+
+        assertNull(viewModel.attachmentState.value.filePageCountError)
+    }
+
+    @Test
+    fun whenNoFilesThenGetFileAttachmentsReturnsEmptyList() = runTest {
+        assertTrue(viewModel.getFileAttachments().isEmpty())
+    }
+
+    @Test
+    fun whenFilesAddedThenGetFileAttachmentsReturnsThem() = runTest {
+        addFiles(aFileAttachment(), aFileAttachment())
+
+        assertEquals(2, viewModel.getFileAttachments().size)
+    }
+
+    @Test
+    fun whenNoFilesThenGetFileAttachmentsJsonReturnsNull() = runTest {
+        assertNull(viewModel.getFileAttachmentsJson())
+    }
+
+    @Test
+    fun whenFilesAddedThenGetFileAttachmentsJsonContainsCorrectFields() = runTest {
+        addFiles(aFileAttachment(fileName = "doc.pdf", mimeType = "application/pdf", base64Data = "base64abc"))
+
+        val json = viewModel.getFileAttachmentsJson()
+
+        assertNotNull(json)
+        assertEquals(1, json!!.length())
+        val item = json.getJSONObject(0)
+        assertEquals("base64abc", item.getString("data"))
+        assertEquals("doc.pdf", item.getString("fileName"))
+        assertEquals("application/pdf", item.getString("mimeType"))
     }
 
     @Test
@@ -263,19 +515,7 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenConversationSentCountedInTotal() = runTest {
-        val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
-        limitsHandler.addConversationImagesSent(4)
-        addImages(2)
-
-        assertNotNull(viewModel.attachmentState.value.imageLimitError)
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenContentResolverReturnsNullStreamThenAttachmentListRemainsUnchanged() = runTest {
+    fun whenContentResolverReturnsNullStreamThenImageAttachmentListRemainsUnchanged() = runTest {
         val contentResolver: android.content.ContentResolver = mock()
         whenever(context.contentResolver).thenReturn(contentResolver)
         whenever(contentResolver.openInputStream(any())).thenReturn(null)
@@ -295,7 +535,7 @@ class AttachmentViewModelTest {
         val bitmap: Bitmap = mock()
         val newImages = (1..count).map {
             ImageAttachment(
-                id = java.util.UUID.randomUUID().toString(),
+                id = UUID.randomUUID().toString(),
                 bitmap = bitmap,
                 base64Data = base64,
                 format = format,
@@ -304,9 +544,35 @@ class AttachmentViewModelTest {
         viewModel.imageAttachments.value += newImages
     }
 
+    private fun addFiles(vararg attachments: FileAttachment) {
+        for (attachment in attachments) {
+            val uri: Uri = mock()
+            fileAttachmentProcessor.givenProcessFileReturns(uri, attachment)
+            viewModel.onFilesPicked(listOf(uri))
+        }
+    }
+
+    private fun aFileAttachment(
+        id: String = UUID.randomUUID().toString(),
+        fileName: String = "test.pdf",
+        mimeType: String = "application/pdf",
+        sizeBytes: Long = 1024L,
+        base64Data: String = "filedata",
+        pageCount: Int? = null,
+    ): FileAttachment = FileAttachment(
+        id = id,
+        uri = mock(),
+        fileName = fileName,
+        mimeType = mimeType,
+        sizeBytes = sizeBytes,
+        base64Data = base64Data,
+        pageCount = pageCount,
+    )
+
     private fun aModel(
         id: String,
         supportsImageUpload: Boolean = false,
+        supportedFileTypes: List<String> = emptyList(),
     ) = AIChatModel(
         id = id,
         name = id,
@@ -315,6 +581,7 @@ class AttachmentViewModelTest {
         accessTier = emptyList(),
         isAccessible = true,
         supportsImageUpload = supportsImageUpload,
+        supportedFileTypes = supportedFileTypes,
     )
 
     private class FakeLimitsHandler : LimitsHandler {
@@ -336,9 +603,22 @@ class AttachmentViewModelTest {
             _conversationFileSizeSentBytes.value = sizeBytes
         }
 
-        /** Test helper: increments the conversation-sent counter directly. */
         fun addConversationImagesSent(count: Int) {
             _conversationImagesSent.value += count
         }
+
+        fun addConversationFilesSent(count: Int) {
+            _conversationFilesSent.value += count
+        }
+    }
+
+    private class FakeFileAttachmentProcessor : FileAttachmentProcessor {
+        private val responses = mutableMapOf<Uri, FileAttachment?>()
+
+        fun givenProcessFileReturns(uri: Uri, attachment: FileAttachment?) {
+            responses[uri] = attachment
+        }
+
+        override suspend fun processFile(context: Context, uri: Uri): FileAttachment? = responses[uri]
     }
 }

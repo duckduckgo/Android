@@ -25,4 +25,5 @@ data class FileAttachment(
     val mimeType: String,
     val sizeBytes: Long,
     val base64Data: String,
+    val pageCount: Int? = null,
 )

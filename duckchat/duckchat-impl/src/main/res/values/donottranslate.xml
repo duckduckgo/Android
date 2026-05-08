@@ -48,4 +48,5 @@
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
     <string name="duckChatFileAttachmentLimitPerConversation">You can only attach %d files per conversation.</string>
     <string name="duckChatFileAttachmentTooLarge">File exceeds the maximum size of %d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages">One of the files attached has more pages than we support. Please upload files with %d pages or fewer.</string>
 </resources>

@@ -17,12 +17,12 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.file
 
 import android.content.Context
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Base64
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -30,13 +30,10 @@ import javax.inject.Inject
 
 interface FileAttachmentProcessor {
     suspend fun processFile(context: Context, uri: Uri): FileAttachment?
-    fun getMaxFileSizeBytes(): Long
-    fun getMaxTotalFileSizeBytes(): Long
 }
 
 @ContributesBinding(AppScope::class)
 class RealFileAttachmentProcessor @Inject constructor(
-    private val modelManager: DuckAiModelManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : FileAttachmentProcessor {
 
@@ -48,6 +45,16 @@ class RealFileAttachmentProcessor @Inject constructor(
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
             val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
 
+            val pageCount = if (mimeType == "application/pdf") {
+                runCatching {
+                    context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+                        PdfRenderer(pfd).use { it.pageCount }
+                    }
+                }.getOrNull()
+            } else {
+                null
+            }
+
             FileAttachment(
                 id = UUID.randomUUID().toString(),
                 uri = uri,
@@ -55,15 +62,10 @@ class RealFileAttachmentProcessor @Inject constructor(
                 mimeType = mimeType,
                 sizeBytes = fileSize,
                 base64Data = base64,
+                pageCount = pageCount,
             )
         }.getOrNull()
     }
-
-    override fun getMaxFileSizeBytes(): Long =
-        modelManager.modelState.value.attachmentLimits.files.maxFileSizeBytes
-
-    override fun getMaxTotalFileSizeBytes(): Long =
-        modelManager.modelState.value.attachmentLimits.files.maxTotalFileSizeBytes
 
     private fun resolveFileInfo(context: Context, uri: Uri): Pair<String, Long>? {
         return context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->

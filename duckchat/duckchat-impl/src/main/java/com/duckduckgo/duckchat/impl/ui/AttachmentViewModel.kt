@@ -71,6 +71,7 @@ class AttachmentViewModel @Inject constructor(
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
         val fileSizeError: String? = null,
+        val filePageCountError: String? = null,
         val supportsUpload: Boolean = false,
         val supportsImageUpload: Boolean = false,
         val supportedFileTypes: List<String> = emptyList(),
@@ -88,15 +89,14 @@ class AttachmentViewModel @Inject constructor(
     @VisibleForTesting
     internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
     private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
-    private val _fileSizeError = MutableStateFlow<String?>(null)
     private val _isDuckAiMode = MutableStateFlow(false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesSent) { imgSent, fileSent -> Pair(imgSent, fileSent) },
-        combine(_isDuckAiMode, _fileSizeError) { mode, sizeErr -> Pair(mode, sizeErr) },
-    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent), (isDuckAiMode, fileSizeError) ->
+        _isDuckAiMode,
+    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent), isDuckAiMode ->
         val model = modelState.models.find { it.id == modelState.selectedModelId }
         val supportsImageUpload = modelState.models.isEmpty() ||
             (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
@@ -111,7 +111,8 @@ class AttachmentViewModel @Inject constructor(
             files = files,
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
-            fileSizeError = fileSizeError,
+            fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
+            filePageCountError = computeFilePageCountError(files, fileLimits.maxPagesPerFile),
             supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
             supportsImageUpload = supportsImageUpload,
             supportedFileTypes = supportedFileTypes,
@@ -130,27 +131,9 @@ class AttachmentViewModel @Inject constructor(
 
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
-            val maxFileSizeBytes = fileAttachmentProcessor.getMaxFileSizeBytes()
-            val maxFileSizeMb = (maxFileSizeBytes / (1024 * 1024)).toInt()
-            val maxTotalFileSizeBytes = fileAttachmentProcessor.getMaxTotalFileSizeBytes()
-            var rejectedForSize = false
             for (uri in uris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
-                if (attachment.sizeBytes > maxFileSizeBytes) {
-                    rejectedForSize = true
-                    continue
-                }
-                val stagedBytes = _fileAttachments.value.sumOf { it.sizeBytes }
-                val sentBytes = limitsHandler.conversationFileSizeSentBytes.value
-                if (stagedBytes + sentBytes + attachment.sizeBytes > maxTotalFileSizeBytes) continue
                 _fileAttachments.update { it + attachment }
-            }
-            if (rejectedForSize) {
-                _fileSizeError.value = context.getString(R.string.duckChatFileAttachmentTooLarge, maxFileSizeMb)
-                launch {
-                    kotlinx.coroutines.delay(4_000)
-                    _fileSizeError.value = null
-                }
             }
         }
     }
@@ -238,6 +221,17 @@ class AttachmentViewModel @Inject constructor(
         } else {
             null
         }
+
+    private fun computeFileSizeError(files: List<FileAttachment>, maxFileSizeBytes: Long): String? {
+        if (files.none { it.sizeBytes > maxFileSizeBytes }) return null
+        val maxFileSizeMb = (maxFileSizeBytes / (1024 * 1024)).toInt()
+        return context.getString(R.string.duckChatFileAttachmentTooLarge, maxFileSizeMb)
+    }
+
+    private fun computeFilePageCountError(files: List<FileAttachment>, maxPagesPerFile: Int): String? {
+        if (files.none { (it.pageCount ?: 0) > maxPagesPerFile }) return null
+        return context.getString(R.string.duckChatFileAttachmentTooManyPages, maxPagesPerFile)
+    }
 
     private fun processImage(uri: Uri): ImageAttachment? {
         val original = decodeBitmap(uri) ?: return null
