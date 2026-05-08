@@ -122,6 +122,10 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
+    // Tracked separately from ViewState so the derived enabledState can be recomputed
+    // whenever either the lock or the fire-button highlight changes.
+    private var locked: Boolean = false
+
     private val _viewState = MutableStateFlow(
         ViewState(
             showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
@@ -252,7 +256,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isDuckAiBackAvailable: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
-        val isLockedForOnboarding: Boolean = false,
+        val enabledState: EnabledState = EnabledState.ALL,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -262,6 +266,14 @@ class OmnibarLayoutViewModel @Inject constructor(
             return updateOmnibarText && url.isNotEmpty()
         }
     }
+
+    /**
+     * Which interactive elements in the omnibar are enabled.
+     * - [ALL]: every button/input is enabled (default).
+     * - [NONE]: every button/input is disabled (omnibar locked).
+     * - [FIRE_BUTTON_ONLY]: only the fire button is enabled; everything else disabled.
+     */
+    enum class EnabledState { ALL, NONE, FIRE_BUTTON_ONLY }
 
     sealed class Command {
         data object CancelAnimations : Command()
@@ -454,6 +466,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
+                    enabledState = enabledStateFor(locked, fireButtonHighlighted = false),
                     showClearButton = false,
                     showTabsMenu = !isSplitOmnibarEnabled,
                     showFireIcon = !isSplitOmnibarEnabled,
@@ -704,7 +717,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
         logcat { "Omnibar: onFireIconPressed" }
-        if (_viewState.value.highlightFireButton.isHighlighted() && !_viewState.value.isLockedForOnboarding) {
+        if (_viewState.value.highlightFireButton.isHighlighted() && _viewState.value.enabledState == EnabledState.ALL) {
             _viewState.update {
                 it.copy(
                     highlightFireButton = HighlightableButton.Visible(
@@ -712,6 +725,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         highlighted = false,
                     ),
                     scrollingEnabled = true,
+                    enabledState = enabledStateFor(locked, fireButtonHighlighted = false),
                 )
             }
         }
@@ -807,14 +821,22 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                enabledState = enabledStateFor(locked, fireButtonHighlighted = decoration.fireButton),
             )
         }
     }
 
-    fun onLockForOnboarding(locked: Boolean) {
+    fun setLocked(locked: Boolean) {
+        this.locked = locked
         _viewState.update {
-            it.copy(isLockedForOnboarding = locked)
+            it.copy(enabledState = enabledStateFor(locked, it.highlightFireButton.isHighlighted()))
         }
+    }
+
+    private fun enabledStateFor(locked: Boolean, fireButtonHighlighted: Boolean): EnabledState = when {
+        !locked -> EnabledState.ALL
+        fireButtonHighlighted -> EnabledState.FIRE_BUTTON_ONLY
+        else -> EnabledState.NONE
     }
 
     fun onExternalStateChange(stateChange: StateChange) {

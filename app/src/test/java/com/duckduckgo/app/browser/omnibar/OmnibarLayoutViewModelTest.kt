@@ -12,6 +12,7 @@ import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
@@ -2877,30 +2878,41 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOnLockForOnboardingTrueThenViewStateIsLocked() = runTest {
-        testee.onLockForOnboarding(true)
+    fun whenSetLockedTrueAndFireButtonNotHighlightedThenEnabledStateIsNone() = runTest {
+        testee.setLocked(true)
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.isLockedForOnboarding)
+            assertEquals(EnabledState.NONE, viewState.enabledState)
         }
     }
 
     @Test
-    fun whenOnLockForOnboardingFalseThenViewStateIsUnlocked() = runTest {
-        testee.onLockForOnboarding(true)
-        testee.onLockForOnboarding(false)
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.isLockedForOnboarding)
-        }
-    }
-
-    @Test
-    fun whenFireIconPressedAndLockedForOnboardingThenHighlightPreserved() = runTest {
+    fun whenSetLockedTrueAndFireButtonHighlightedThenEnabledStateIsFireButtonOnly() = runTest {
         testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
-        testee.onLockForOnboarding(true)
+        testee.setLocked(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenSetLockedFalseThenEnabledStateIsAll() = runTest {
+        testee.setLocked(true)
+        testee.setLocked(false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.ALL, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndLockedThenHighlightPreserved() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.setLocked(true)
         testee.onFireIconPressed(true)
 
         testee.viewState.test {
@@ -2912,7 +2924,7 @@ class OmnibarLayoutViewModelTest {
                 ),
             )
             assertFalse(viewState.scrollingEnabled)
-            assertTrue(viewState.isLockedForOnboarding)
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
         }
     }
 
