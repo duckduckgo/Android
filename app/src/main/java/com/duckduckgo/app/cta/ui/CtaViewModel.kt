@@ -240,7 +240,6 @@ class CtaViewModel @Inject constructor(
             } else {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
             }
-            completeStageIfDaxOnboardingCompleted()
         }
     }
 
