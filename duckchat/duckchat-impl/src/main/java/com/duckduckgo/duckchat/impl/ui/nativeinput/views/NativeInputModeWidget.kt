@@ -55,7 +55,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
@@ -149,7 +149,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : InputModeWidget(context, attrs, defStyle), NativeInputWidget {
+) : InputModeWidget(context, attrs, defStyle), NativeInputWidget, NativeInputHost {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -238,7 +238,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 viewModel.plugins.collect { plugins ->
                     for (plugin in plugins) {
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
-                        val pluginView = plugin.createView(context, onPluginAction)
+                        val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
                         if (plugin.containerId != R.id.startChatContainer) {
@@ -825,24 +825,35 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingSubmitContainer = container
     }
 
-    private val onPluginAction = fun(action: Action) {
-        when (action) {
-            Action.StartChat -> if (!submitAsChat()) viewModel.openNewChat()
-            is Action.ShowAttachmentChooser -> onAttachmentChooserStateChanged?.invoke(action.showing)
-            is Action.AttachmentStateChanged -> {
-                val hadLimitError = attachmentLimitExceeded
-                attachmentLimitExceeded = action.limitExceeded
-                hasAttachments = action.hasAttachments
-                supportsUpload = action.supportsUpload
-                setImageButtonVisible(isChatTabSelected() && supportsUpload)
-                if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
-                    floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
-                }
-                updateSendButtonVisibility()
-                updateVoiceButtonVisibility()
-            }
-        }
+    override fun submit() {
+        // in Duck.ai mode we treat this as submitting prompts.
+        // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
+        if (!submitAsChat()) viewModel.openNewChat()
+
     }
+
+    override fun showAttachmentChooser(showing: Boolean) {
+        onAttachmentChooserStateChanged?.invoke(showing)
+    }
+
+    override fun attachmentChanged(
+        itHasAttachments: Boolean,
+        limitExceeded: Boolean,
+        itSupportsUpload: Boolean
+    ) {
+        val hadLimitError = attachmentLimitExceeded
+        attachmentLimitExceeded = limitExceeded
+        hasAttachments = itHasAttachments
+        supportsUpload = itSupportsUpload
+        setImageButtonVisible(isChatTabSelected() && supportsUpload)
+        if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
+            floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
+        }
+        updateSendButtonVisibility()
+        updateVoiceButtonVisibility()
+    }
+
+    override fun getInputState(): NativeInputState = nativeInputState
 
     private fun configureSubmitButtons() {
         if (submitButtons != null) return

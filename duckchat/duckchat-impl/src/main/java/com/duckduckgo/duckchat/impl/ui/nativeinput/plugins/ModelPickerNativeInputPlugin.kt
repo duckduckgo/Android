@@ -21,7 +21,7 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPicker
@@ -41,7 +41,7 @@ class ModelPickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     private var modelPicker: WeakReference<ModelPicker> = WeakReference(null)
 
-    override fun createView(context: Context, onAction: (Action) -> Unit): View {
+    override fun createView(context: Context, host: NativeInputHost): View {
         return ModelPickerView(context).also { picker ->
             modelPicker = WeakReference(picker)
             picker.setPickerEnabled(true)
