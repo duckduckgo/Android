@@ -116,7 +116,10 @@ class AttachmentViewModel @Inject constructor(
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 
-    fun clearAttachmentsForNewChat() = clearAttachments()
+    fun clearAttachmentsForNewChat() {
+        clearAttachments()
+        limitsHandler.setConversationImagesUsed(0)
+    }
 
     fun setDuckAiMode(enabled: Boolean) {
         _isDuckAiMode.value = enabled

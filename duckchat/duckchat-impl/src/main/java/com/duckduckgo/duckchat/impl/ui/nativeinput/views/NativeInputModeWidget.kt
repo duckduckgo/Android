@@ -374,7 +374,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val visible = isChatTabSelected() && hasContent
         submitButtons?.setSendButtonVisible(visible)
         if (!isStreaming) {
-            submitButtons?.setSendButtonEnabled(!attachmentLimitExceeded)
+            submitButtons?.setSendButtonEnabled(hasContent && !attachmentLimitExceeded)
         }
     }
 
@@ -614,9 +614,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun configureContextual() {
+        pendingIsDuckAiMode = true
         doOnAttach {
             viewModel.configureContextual()
             selectChatTab()
+            attachmentView?.setDuckAiMode(true)
         }
     }
 
