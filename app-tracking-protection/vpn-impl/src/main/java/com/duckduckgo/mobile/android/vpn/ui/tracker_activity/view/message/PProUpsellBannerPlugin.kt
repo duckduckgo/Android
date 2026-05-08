@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
 import android.view.View
+import androidx.core.net.toUri
 import androidx.core.view.doOnAttach
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
@@ -46,7 +46,6 @@ import javax.inject.Inject
 )
 class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val browserNav: BrowserNav,
     private val vpnStore: VpnStore,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val appTPStateMessageToggle: AppTPStateMessageToggle,
@@ -97,7 +96,7 @@ class PProUpsellBannerPlugin @Inject constructor(
     }
 
     private fun Context.launchPPro() {
-        startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
+        subscriptions.launchSubscription(this, PPRO_UPSELL_URL.toUri())
     }
 
     companion object {
