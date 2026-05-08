@@ -1009,8 +1009,8 @@ class BrowserTabFragment :
 
             // Handle duck.ai end CTA result from InputScreen
             data?.let { resultData ->
-                if (resultData.hasExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED)) {
-                    val okClicked = resultData.getBooleanExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED, false)
+                if (resultData.hasExtra(InputScreenActivityResultParams.DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED)) {
+                    val okClicked = resultData.getBooleanExtra(InputScreenActivityResultParams.DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED, false)
                     viewModel.onDuckAiEndCtaInputScreenResult(okClicked)
                 }
             }
@@ -1400,7 +1400,7 @@ class BrowserTabFragment :
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                     isNewTab = isNewTab,
                     showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
-                    showDuckAiEndCta = showDuckAiEndCta,
+                    showDuckAiOnboardingEndCta = showDuckAiEndCta,
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)

@@ -315,7 +315,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         updateMenuIconButton()
 
-        if (params?.showDuckAiEndCta == true) {
+        if (params?.showDuckAiOnboardingEndCta == true) {
             showDuckAiEndCta()
         }
 
@@ -564,7 +564,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun appendDuckAiEndCtaResult(data: Intent) {
         duckAiEndCtaOkClicked?.let {
-            data.putExtra(InputScreenActivityResultParams.DUCK_AI_END_CTA_OK_CLICKED, it)
+            data.putExtra(InputScreenActivityResultParams.DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED, it)
         }
     }
 
