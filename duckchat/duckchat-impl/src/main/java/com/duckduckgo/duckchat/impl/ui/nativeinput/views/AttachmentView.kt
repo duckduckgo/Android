@@ -161,7 +161,7 @@ class AttachmentView(
         val imagesView = imageAttachmentsContainer ?: return
         syncImages(imagesView, state)
         syncFiles(state)
-        val errorMessage = state.imageLimitError ?: state.fileLimitError ?: state.fileSizeError ?: state.filePageCountError
+        val errorMessage = state.imageLimitError ?: state.fileLimitError ?: state.fileSizeError ?: state.filePageCountError ?: state.fileTotalSizeError
         container.isVisible = state.hasAttachments || errorMessage != null
         updateLimitError(errorMessage)
         notifyStateChanged(state)
@@ -201,7 +201,8 @@ class AttachmentView(
                     state.imageLimitError != null ||
                         state.fileLimitError != null ||
                         state.fileSizeError != null ||
-                        state.filePageCountError != null
+                        state.filePageCountError != null ||
+                        state.fileTotalSizeError != null
                     ) && state.hasAttachments,
                 supportsUpload = state.supportsUpload,
             ),

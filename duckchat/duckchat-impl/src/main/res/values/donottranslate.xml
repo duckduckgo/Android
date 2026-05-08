@@ -49,4 +49,5 @@
     <string name="duckChatFileAttachmentLimitPerConversation">You can only attach %d files per conversation.</string>
     <string name="duckChatFileAttachmentTooLarge">File exceeds the maximum size of %d MB.</string>
     <string name="duckChatFileAttachmentTooManyPages">One of the files attached has more pages than we support. Please upload files with %d pages or fewer.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded">You have exceeded the total file size limit of %d MB for this conversation.</string>
 </resources>

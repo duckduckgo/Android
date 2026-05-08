@@ -72,6 +72,7 @@ class AttachmentViewModel @Inject constructor(
         val fileLimitError: String? = null,
         val fileSizeError: String? = null,
         val filePageCountError: String? = null,
+        val fileTotalSizeError: String? = null,
         val supportsUpload: Boolean = false,
         val supportsImageUpload: Boolean = false,
         val supportedFileTypes: List<String> = emptyList(),
@@ -94,9 +95,13 @@ class AttachmentViewModel @Inject constructor(
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
-        combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesSent) { imgSent, fileSent -> Pair(imgSent, fileSent) },
+        combine(
+            limitsHandler.conversationImagesSent,
+            limitsHandler.conversationFilesSent,
+            limitsHandler.conversationFileSizeSentBytes,
+        ) { imgSent, fileSent, fileSizeBytes -> Triple(imgSent, fileSent, fileSizeBytes) },
         _isDuckAiMode,
-    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent), isDuckAiMode ->
+    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent, conversationFileSizeSentBytes), isDuckAiMode ->
         val model = modelState.models.find { it.id == modelState.selectedModelId }
         val supportsImageUpload = modelState.models.isEmpty() ||
             (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
@@ -106,6 +111,7 @@ class AttachmentViewModel @Inject constructor(
         val currentImageCount = images.size
         val totalImages = currentImageCount + if (isDuckAiMode) conversationImagesSent else 0
         val totalFiles = files.size + if (isDuckAiMode) conversationFilesSent else 0
+        val totalFileSizeBytes = files.sumOf { it.sizeBytes } + if (isDuckAiMode) conversationFileSizeSentBytes else 0L
         AttachmentState(
             images = images,
             files = files,
@@ -113,6 +119,7 @@ class AttachmentViewModel @Inject constructor(
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
             fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
             filePageCountError = computeFilePageCountError(files, fileLimits.maxPagesPerFile),
+            fileTotalSizeError = computeFileTotalSizeError(totalFileSizeBytes, fileLimits.maxTotalFileSizeBytes),
             supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
             supportsImageUpload = supportsImageUpload,
             supportedFileTypes = supportedFileTypes,
@@ -231,6 +238,12 @@ class AttachmentViewModel @Inject constructor(
     private fun computeFilePageCountError(files: List<FileAttachment>, maxPagesPerFile: Int): String? {
         if (files.none { (it.pageCount ?: 0) > maxPagesPerFile }) return null
         return context.getString(R.string.duckChatFileAttachmentTooManyPages, maxPagesPerFile)
+    }
+
+    private fun computeFileTotalSizeError(totalFileSizeBytes: Long, maxTotalFileSizeBytes: Long): String? {
+        if (totalFileSizeBytes <= maxTotalFileSizeBytes) return null
+        val maxTotalFileSizeMb = (maxTotalFileSizeBytes / (1024 * 1024)).toInt()
+        return context.getString(R.string.duckChatFileAttachmentTotalSizeLimitExceeded, maxTotalFileSizeMb)
     }
 
     private fun processImage(uri: Uri): ImageAttachment? {

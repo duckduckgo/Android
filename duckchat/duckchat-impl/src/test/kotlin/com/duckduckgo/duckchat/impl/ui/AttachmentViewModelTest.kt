@@ -82,6 +82,10 @@ class AttachmentViewModelTest {
             .thenReturn("Too many pages")
         whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTooManyPages, 10))
             .thenReturn("Too many pages")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTotalSizeLimitExceeded, 5))
+            .thenReturn("Total file size limit exceeded")
+        whenever(it.getString(com.duckduckgo.duckchat.impl.R.string.duckChatFileAttachmentTotalSizeLimitExceeded, 10))
+            .thenReturn("Total file size limit exceeded")
     }
 
     private lateinit var viewModel: AttachmentViewModel
@@ -454,6 +458,111 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenTotalFileSizeWithinLimitThenFileTotalSizeErrorIsNull() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxTotal - 1))
+
+        assertNull(viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenTotalFileSizeExactlyAtLimitThenFileTotalSizeErrorIsNull() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxTotal))
+
+        assertNull(viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenCurrentSessionFilesExceedTotalLimitThenFileTotalSizeErrorShown() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxTotal + 1))
+
+        assertEquals("Total file size limit exceeded", viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenMultipleFilesTogetherExceedTotalLimitThenFileTotalSizeErrorShown() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(
+            aFileAttachment(sizeBytes = 3L * 1024 * 1024),
+            aFileAttachment(sizeBytes = 3L * 1024 * 1024),
+        )
+
+        assertEquals("Total file size limit exceeded", viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenConversationFileSizeSentPushesTotalOverLimitInDuckAiModeThenFileTotalSizeErrorShown() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationFileSizeSent(4L * 1024 * 1024)
+        addFiles(aFileAttachment(sizeBytes = 2L * 1024 * 1024))
+
+        assertEquals("Total file size limit exceeded", viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenConversationFileSizeSentAloneExceedsLimitInDuckAiModeThenFileTotalSizeErrorShown() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationFileSizeSent(maxTotal + 1)
+
+        assertEquals("Total file size limit exceeded", viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenNotInDuckAiModeConversationFileSizeSentIsNotCountedTowardsTotal() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        limitsHandler.addConversationFileSizeSent(maxTotal + 1)
+        addFiles(aFileAttachment(sizeBytes = 1024L))
+
+        assertNull(viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenFileRemovedSoTotalDropsBelowLimitThenFileTotalSizeErrorClears() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        val bigFile = aFileAttachment(id = "big-file", sizeBytes = 3L * 1024 * 1024)
+        addFiles(bigFile, aFileAttachment(sizeBytes = 3L * 1024 * 1024))
+        assertNotNull(viewModel.attachmentState.value.fileTotalSizeError)
+
+        viewModel.removeFileAttachment("big-file")
+
+        assertNull(viewModel.attachmentState.value.fileTotalSizeError)
+    }
+
+    @Test
+    fun whenClearAttachmentsForNewChatCalledThenConversationFileSizeSentIsReset() = runTest {
+        val maxTotal = 5L * 1024 * 1024
+        val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        viewModel.setDuckAiMode(true)
+        limitsHandler.addConversationFileSizeSent(maxTotal + 1)
+
+        viewModel.clearAttachmentsForNewChat()
+
+        assertNull(viewModel.attachmentState.value.fileTotalSizeError)
+        assertEquals(0L, limitsHandler.conversationFileSizeSentBytes.value)
+    }
+
+    @Test
     fun whenNoFilesThenGetFileAttachmentsReturnsEmptyList() = runTest {
         assertTrue(viewModel.getFileAttachments().isEmpty())
     }
@@ -609,6 +718,10 @@ class AttachmentViewModelTest {
 
         fun addConversationFilesSent(count: Int) {
             _conversationFilesSent.value += count
+        }
+
+        fun addConversationFileSizeSent(sizeBytes: Long) {
+            _conversationFileSizeSentBytes.value += sizeBytes
         }
     }
 
