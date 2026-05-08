@@ -14,6 +14,6 @@
    ~ limitations under the License.
    -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/daxColorControlFillPrimary" />
+    <solid android:color="?attr/daxColorContainer" />
     <corners android:radius="@dimen/largeShapeCornerRadius" />
 </shape>

@@ -25,11 +25,10 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageView
+import android.widget.Space
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -44,7 +43,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -294,14 +292,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyNativeStyling() {
-        if (!isWidgetBottom()) {
-            setBackgroundColor(Color.TRANSPARENT)
-        }
+        setBackgroundColor(Color.TRANSPARENT)
         hideInputFieldBackground()
         removeMargins()
+        applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
-        configureBottomRowFocusVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
             if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
@@ -310,37 +306,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateVoiceButtonVisibility()
         }
     }
-
-    private fun configureBottomRowFocusVisibility() {
-        updateBottomRowVisibility()
-        updateToggleVisibilityForFocus()
-        inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            updateBottomRowVisibility()
-            updateToggleVisibilityForFocus()
-            if (!hasFocus && isDuckAiPageContext()) {
-                hideKeyboard()
-            }
-        }
-    }
-
-    private fun updateBottomRowVisibility() {
-        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val rowSpacer = findViewById<View?>(R.id.rowSpacer)
-        // Keep row 2 visible while streaming so the stop button stays reachable in bottom mode
-        // (where it's hosted inside this row rather than in floatingSubmitContainer).
-        val visible = (inputField.hasFocus() || isStreaming) && isDuckAiPageContext()
-        bottomRow.isVisible = visible
-        rowSpacer?.isVisible = visible
-    }
-
-    private fun updateToggleVisibilityForFocus() {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        toggle.visibility = if (nativeInputState.toggleVisible && inputField.hasFocus()) VISIBLE else GONE
-    }
-
-    private fun isDuckAiPageContext(): Boolean =
-        nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
-            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
@@ -365,26 +330,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyState(state: NativeInputState) {
-        val previousContext = nativeInputState.inputContext
         nativeInputState = state
-        findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
-            setToggleMatchParent()
-            updateToggleVisibility(toggle, state)
-        }
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        setToggleMatchParent()
+        updateToggleVisibility(toggle, state)
         updateBackButtons(state)
         if (!state.toggleVisible) {
             minimize()
         }
-        applyInputFieldMinHeight()
-        updateBottomRowVisibility()
-        if (previousContext != state.inputContext && isChatTabSelected()) {
-            with(inputField) { applyChatInputType() }
-            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
-        }
-    }
-
-    private fun applyInputFieldMinHeight() {
-        inputField.minHeight = 44.toPx(context)
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
@@ -398,7 +351,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             updateSelectedTab(toggle, state)
         }
-        toggle.visibility = if (state.toggleVisible && inputField.hasFocus()) VISIBLE else GONE
+        toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
     }
 
     private fun updateBackButtons(state: NativeInputState) {
@@ -412,10 +365,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun minimize() {
+        if (floatingSubmitContainer == null) return
+        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
+        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
         findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
-        if (floatingSubmitContainer != null) {
-            getActionBarSize()?.let { minimumHeight = it }
-        }
+        getActionBarSize()?.let { minimumHeight = it }
     }
 
     private fun removeMargins() {
@@ -425,8 +379,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.updateLayoutParams<MarginLayoutParams> {
             marginEnd = 0
         }
-        findViewById<AppCompatImageView?>(R.id.inputFieldImageButton)?.updateLayoutParams<MarginLayoutParams> {
-            marginStart = 0
+    }
+
+    private fun applyTrailingButtonMargin() {
+        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = resources.getDimensionPixelSize(R.dimen.inputScreenOmnibarCardMarginHorizontal)
         }
     }
 
@@ -492,10 +449,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
-        val baseFlags = InputType.TYPE_CLASS_TEXT or
-            InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
-            InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-        setRawInputType(if (isDuckAiPageContext()) baseFlags or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseFlags)
+        setRawInputType(
+            InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+        )
         setHorizontallyScrolling(false)
     }
 
@@ -548,9 +505,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun hideMainButtons() {
         setMainButtonsVisible(false)
-        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> {
-            marginEnd = 0
-        }
     }
 
     override fun setToggleVisible(visible: Boolean) {
@@ -764,7 +718,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showSendButton()
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
-        updateBottomRowVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
     }
@@ -774,7 +727,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab)
         if (isChatTab) {
-            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
+            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             if (!isStreaming) {
                 submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
             }
