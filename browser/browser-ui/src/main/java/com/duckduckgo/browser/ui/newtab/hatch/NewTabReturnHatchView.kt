@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -28,8 +29,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -73,6 +76,10 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabReturnHatchViewModel::class.java]
     }
 
+    private val popupMenu by lazy {
+       PopupMenu(LayoutInflater.from(context), R.layout.popup_hatch_menu)
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -82,6 +89,8 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         conflatedJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        initPopupMenu()
     }
 
     override fun onDetachedFromWindow() {
@@ -119,6 +128,18 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         hatchHatchListener?.onHatchRendered(state.shouldShow)
     }
 
+    private fun initPopupMenu(){
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuReturnToTab)) {
+            hatchHatchListener?.onHatchPressed()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
+            viewModel.closeTab()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuBurnTab)) {
+            viewModel.burnTab()
+        }
+    }
+
     private fun NewTabReturnHatchViewModel.ViewState.titleOrPlaceholder(): String {
         if (tabTitle.isNotEmpty()) return tabTitle
         if (isDuckChat) return context.getString(R.string.newTabReturnHatchDuckChatPlaceholderTitle)
@@ -130,6 +151,12 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         hatchHatchListener = hatchListener
         binding.returnHatchRoot.setOnClickListener {
             hatchHatchListener?.onHatchPressed()
+        }
+        binding.returnHatchOptions.setOnClickListener { view ->
+            popupMenu.show(binding.root, view)
+        }
+        binding.returnHatchTabsMenu.setOnClickListener { view ->
+            viewModel.onTabManagerPressed()
         }
     }
 }
