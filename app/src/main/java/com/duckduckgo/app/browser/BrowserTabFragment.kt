@@ -3665,7 +3665,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onDuckAIBackButtonPressed() {
-                    onBackPressed()
+                    onBackArrowClicked()
                 }
             },
         )
