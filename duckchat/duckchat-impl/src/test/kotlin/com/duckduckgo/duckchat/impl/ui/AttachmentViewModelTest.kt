@@ -119,13 +119,6 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenImageUploadLimitReachedThenIsAtCapacityIsTrue() = runTest {
-        limitsHandler.setImageUploadLimitReached(true)
-
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
     fun whenAttachmentsAtPerTurnLimitThenIsAtCapacityIsTrue() = runTest {
         val limits = ImageLimits(maxPerTurn = 2, maxPerConversation = 10)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
@@ -144,25 +137,13 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenInDuckAiModeAndTotalImagesAtConversationLimitThenIsAtCapacityIsTrue() = runTest {
+    fun whenTotalImagesAtConversationLimitThenIsAtCapacityIsTrue() = runTest {
         val limits = ImageLimits(maxPerTurn = 5, maxPerConversation = 5)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
         limitsHandler.addConversationImagesSent(3)
         addImages(2)
 
         assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenNotInDuckAiModeConversationSentIsNotCountedForCapacity() = runTest {
-        val limits = ImageLimits(maxPerTurn = 5, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(false)
-        limitsHandler.addConversationImagesSent(5)
-        addImages(1)
-
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
     }
 
     @Test
@@ -171,25 +152,13 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenInDuckAiModeAndTotalImagesOverConversationLimitThenConversationErrorShown() = runTest {
+    fun whenTotalImagesOverConversationLimitThenConversationErrorShown() = runTest {
         val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
         limitsHandler.addConversationImagesSent(3)
         addImages(3)
 
         assertEquals("Conversation limit reached", viewModel.attachmentState.value.imageLimitError)
-    }
-
-    @Test
-    fun whenNotInDuckAiModeAndConversationSentHighThenNoConversationError() = runTest {
-        val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(false)
-        limitsHandler.addConversationImagesSent(5)
-        addImages(1)
-
-        assertNull(viewModel.attachmentState.value.imageLimitError)
     }
 
     @Test
@@ -199,13 +168,6 @@ class AttachmentViewModelTest {
         addImages(4)
 
         assertEquals("Per-message limit reached", viewModel.attachmentState.value.imageLimitError)
-    }
-
-    @Test
-    fun whenImageUploadLimitReachedThenConversationErrorShown() = runTest {
-        limitsHandler.setImageUploadLimitReached(true)
-
-        assertEquals("Conversation limit reached", viewModel.attachmentState.value.imageLimitError)
     }
 
     @Test
@@ -290,41 +252,14 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenDuckAiModeDisabledThenConversationSentNotCountedInTotal() = runTest {
+    fun whenConversationSentCountedInTotal() = runTest {
         val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(false)
-        limitsHandler.addConversationImagesSent(4)
-        addImages(1)
-
-        assertNull(viewModel.attachmentState.value.imageLimitError)
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenDuckAiModeEnabledThenConversationSentCountedInTotal() = runTest {
-        val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
         limitsHandler.addConversationImagesSent(4)
         addImages(2)
 
         assertNotNull(viewModel.attachmentState.value.imageLimitError)
         assertTrue(viewModel.attachmentState.value.isAtCapacity)
-    }
-
-    @Test
-    fun whenSwitchingFromDuckAiModeToOffThenLimitsRelax() = runTest {
-        val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
-        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
-        limitsHandler.addConversationImagesSent(4)
-        addImages(2)
-        assertTrue(viewModel.attachmentState.value.isAtCapacity)
-
-        viewModel.setDuckAiMode(false)
-
-        assertFalse(viewModel.attachmentState.value.isAtCapacity)
     }
 
     private fun addImages(
@@ -363,22 +298,11 @@ class AttachmentViewModelTest {
     )
 
     private class FakeLimitsHandler : LimitsHandler {
-        private val _imageUploadLimitReached = MutableStateFlow(false)
-        override val imageUploadLimitReached: StateFlow<Boolean> = _imageUploadLimitReached
-
         private val _conversationImagesSent = MutableStateFlow(0)
         override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
-        override fun setImageUploadLimitReached(reached: Boolean) {
-            _imageUploadLimitReached.value = reached
-        }
-
         override fun setConversationImagesUsed(count: Int) {
             _conversationImagesSent.value = count
-        }
-
-        override fun resetConversationImagesSent() {
-            _conversationImagesSent.value = 0
         }
 
         /** Test helper: increments the conversation-sent counter directly. */

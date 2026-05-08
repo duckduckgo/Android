@@ -24,33 +24,19 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 interface LimitsHandler {
-    val imageUploadLimitReached: StateFlow<Boolean>
     val conversationImagesSent: StateFlow<Int>
 
-    fun setImageUploadLimitReached(reached: Boolean)
     fun setConversationImagesUsed(count: Int)
-    fun resetConversationImagesSent()
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = LimitsHandler::class)
 class RealLimitsHandler @Inject constructor() : LimitsHandler {
 
-    private val _imageUploadLimitReached = MutableStateFlow(false)
-    override val imageUploadLimitReached: StateFlow<Boolean> = _imageUploadLimitReached
-
     private val _conversationImagesSent = MutableStateFlow(0)
     override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
-    override fun setImageUploadLimitReached(reached: Boolean) {
-        _imageUploadLimitReached.value = reached
-    }
-
     override fun setConversationImagesUsed(count: Int) {
         _conversationImagesSent.value = count
-    }
-
-    override fun resetConversationImagesSent() {
-        _conversationImagesSent.value = 0
     }
 }

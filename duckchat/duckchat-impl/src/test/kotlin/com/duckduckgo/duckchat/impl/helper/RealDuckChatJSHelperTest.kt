@@ -1705,48 +1705,6 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeHandoffDataThenImageUploadLimitReachedIsReset() = runTest {
-        testee.processJsCallbackMessage(
-            featureName = "aiChat",
-            method = "getAIChatNativeHandoffData",
-            id = "123",
-            data = null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        verify(mockLimitsHandler).setImageUploadLimitReached(false)
-    }
-
-    @Test
-    fun whenImageUploadLimitReachedThenLimitsHandlerSetToTrue() = runTest {
-        val result = testee.processJsCallbackMessage(
-            featureName = "aiChat",
-            method = "imageUploadLimitReached",
-            id = "123",
-            data = null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        assertNull(result)
-        verify(mockLimitsHandler).setImageUploadLimitReached(true)
-    }
-
-    @Test
-    fun whenImageUploadLimitResetThenLimitsHandlerResetAndConversationImagesReset() = runTest {
-        val result = testee.processJsCallbackMessage(
-            featureName = "aiChat",
-            method = "imageUploadLimitReset",
-            id = "123",
-            data = null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        assertNull(result)
-        verify(mockLimitsHandler).setImageUploadLimitReached(false)
-        verify(mockLimitsHandler).resetConversationImagesSent()
-    }
-
-    @Test
     fun whenResponseStateWithAttachmentsThenConversationImagesUsedUpdated() = runTest {
         val data = JSONObject().apply {
             put("status", "streaming")
@@ -1784,14 +1742,6 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockLimitsHandler, never()).setConversationImagesUsed(any())
-    }
-
-    @Test
-    fun whenResetConversationLimitsThenLimitsHandlerReset() {
-        testee.resetConversationLimits()
-
-        verify(mockLimitsHandler).resetConversationImagesSent()
-        verify(mockLimitsHandler).setImageUploadLimitReached(false)
     }
 
     @Test

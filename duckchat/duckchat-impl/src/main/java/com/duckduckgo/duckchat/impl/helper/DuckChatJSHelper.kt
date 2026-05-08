@@ -73,8 +73,6 @@ interface DuckChatJSHelper {
     fun clearTabContextPromptEvent()
 
     fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
-
-    fun resetConversationLimits()
 }
 
 enum class Mode {
@@ -128,10 +126,7 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also {
-                    registerDuckChatIsOpenDebounced()
-                    limitsHandler.setImageUploadLimitReached(false)
-                }
+                }.also { registerDuckChatIsOpenDebounced() }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -252,17 +247,6 @@ class RealDuckChatJSHelper @Inject constructor(
                 null
             }
 
-            METHOD_IMAGE_UPLOAD_LIMIT_REACHED -> {
-                limitsHandler.setImageUploadLimitReached(true)
-                null
-            }
-
-            METHOD_IMAGE_UPLOAD_LIMIT_RESET -> {
-                limitsHandler.setImageUploadLimitReached(false)
-                limitsHandler.resetConversationImagesSent()
-                null
-            }
-
             else -> {
                 logcat { "Duck.ai: JS method $method" }
                 null
@@ -320,11 +304,6 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun clearTabContextPromptEvent() {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         pendingTabContextStore.clear()
-    }
-
-    override fun resetConversationLimits() {
-        limitsHandler.resetConversationImagesSent()
-        limitsHandler.setImageUploadLimitReached(false)
     }
 
     override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
@@ -517,8 +496,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"
         private const val METHOD_VOICE_SESSION_ENDED = "voiceSessionEnded"
-        private const val METHOD_IMAGE_UPLOAD_LIMIT_REACHED = "imageUploadLimitReached"
-        private const val METHOD_IMAGE_UPLOAD_LIMIT_RESET = "imageUploadLimitReset"
         private const val AI_CHAT_PAYLOAD = "aiChatPayload"
         private const val METHOD_OPEN_KEYBOARD_PAYLOAD = "selector"
         private const val IS_HANDOFF_ENABLED = "isAIChatHandoffEnabled"
