@@ -39,6 +39,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REI
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboarding.ui.reentry
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -96,7 +97,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val hasPlayedIntroAnimation: Boolean = false,
+        val hasPlayedIntroAnimation: Boolean = reentry,
         val hasAnimatedCurrentDialog: Boolean = false,
         val currentDialog: PreOnboardingDialogType? = null,
         val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
@@ -191,7 +192,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun loadDaxDialog() {
         viewModelScope.launch {
             val isReinstall = isAppReinstall()
-            val dialogType = if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
+            val dialogType = if (reentry) COMPARISON_CHART else if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
             _viewState.update {
                 it.copy(
                     isReinstallUser = isReinstall,
@@ -211,7 +212,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INITIAL_REINSTALL_USER, INITIAL -> {
-                setCurrentDialog(COMPARISON_CHART)
+                setInputScreenPreviewDialog(isSearchDefault = false)
             }
 
             COMPARISON_CHART -> {

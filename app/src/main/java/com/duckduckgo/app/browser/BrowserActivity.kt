@@ -89,6 +89,7 @@ import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -443,6 +444,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     if (pendingDuckAiOnboardingFire) {
+                        closeDuckChatFullScreen()
+                        binding.tabPager.gone()
                         currentTab?.dismissDuckAiFireOnboardingCta()
                     } else {
                         externalIntentProcessingState.onIntentRequestToShowSnackbar()
@@ -458,8 +461,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     showSnackbar(message)
                     if (isDuckAiContextual) currentTab?.onContextualSheetFireComplete()
                     if (pendingDuckAiOnboardingFire) {
-                        pendingDuckAiOnboardingFire = false
-                        closeDuckChatFullScreen()
+                        // pendingDuckAiOnboardingFire = false
+                        // closeDuckChatFullScreen()
+                        startActivity(OnboardingActivity.intent(this))
+                        finish()
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
@@ -1301,6 +1306,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         private fun showWebContent() {
+            if (pendingDuckAiOnboardingFire) return
             logcat { "BrowserActivity can now start displaying web content. instance state is $instanceStateBundles" }
             configureObservers()
             binding.clearingInProgressView.gone()

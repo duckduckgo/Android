@@ -40,6 +40,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+var reentry = false
+
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
 
@@ -98,6 +100,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
         startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
         finish()
+        reentry = true
     }
 
     private fun onOnboardingDone() {

@@ -54,9 +54,10 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
             onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
         }
         if (isBrandDesignEnabled) {
+            return DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
             // TODO experiment 2 setup
         } else {
-            // TODO experiment 1 setup
+            return DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
         }
 
         return null
