@@ -548,6 +548,7 @@ class BrowserTabViewModel @Inject constructor(
     UrlExtractionListener,
     NavigationHistoryListener {
     private var buildingSiteFactoryJob: Job? = null
+    private var pendingVoiceSessionEndJob: Job? = null
     private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
@@ -885,12 +886,26 @@ class BrowserTabViewModel @Inject constructor(
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
+        observePendingVoiceSessionEnd(tabId)
+
         initialUrl?.let {
             // initialUrl is the previousUrl from previous session unless it's launched from an external app
             if (androidBrowserConfig.disableTrackerAnimationOnRestart().isEnabled() && !isExternal) {
                 previousUrl = it
             }
             buildSiteFactory(it, stillExternal = isExternal)
+        }
+    }
+
+    private fun observePendingVoiceSessionEnd(tabId: String) {
+        pendingVoiceSessionEndJob?.cancel()
+        pendingVoiceSessionEndJob = viewModelScope.launch {
+            duckChat.observeTriggerVoiceChatSessionEnd()
+                .filter { it == tabId }
+                .collect {
+                    val event = duckChatJSHelper.onNativeAction(NativeAction.END_VOICE_SESSION)
+                    _subscriptionEventDataChannel.send(event)
+                }
         }
     }
 

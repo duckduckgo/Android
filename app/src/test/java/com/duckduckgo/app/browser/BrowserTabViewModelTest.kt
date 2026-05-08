@@ -597,7 +597,10 @@ class BrowserTabViewModelTest {
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
-    private val mockDuckChat: DuckChat = mock()
+    private val voiceSessionEndTriggerFlow = MutableSharedFlow<String>(extraBufferCapacity = 8)
+    private val mockDuckChat: DuckChat = mock {
+        on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
+    }
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
@@ -9558,6 +9561,36 @@ class BrowserTabViewModelTest {
         }
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED)
+    }
+
+    @Test
+    fun whenObserveTriggerVoiceSessionEndEmitsMatchingTabIdThenEndVoiceSessionEventDispatched() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "aiChat",
+            subscriptionName = "endVoiceSession",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.END_VOICE_SESSION)).thenReturn(expectedEvent)
+
+        testee.subscriptionEventDataFlow.test {
+            voiceSessionEndTriggerFlow.emit("abc")
+
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenObserveTriggerVoiceSessionEndEmitsDifferentTabIdThenNoEventDispatched() = runTest {
+        testee.subscriptionEventDataFlow.test {
+            voiceSessionEndTriggerFlow.emit("some-other-tab")
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.END_VOICE_SESSION)
     }
 
     @Test

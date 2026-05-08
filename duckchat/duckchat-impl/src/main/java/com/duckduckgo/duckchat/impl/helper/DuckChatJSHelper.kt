@@ -82,6 +82,7 @@ enum class NativeAction {
     NEW_CHAT,
     SIDEBAR,
     DUCK_AI_SETTINGS,
+    END_VOICE_SESSION,
 }
 
 @ContributesBinding(AppScope::class)
@@ -247,6 +248,7 @@ class RealDuckChatJSHelper @Inject constructor(
             NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
             NativeAction.SIDEBAR -> SUBSCRIPTION_TOGGLE_SIDEBAR
             NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
+            NativeAction.END_VOICE_SESSION -> SUBSCRIPTION_END_VOICE_SESSION
         }
 
         return SubscriptionEventData(
@@ -500,5 +502,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
         private const val SUBSCRIPTION_SUBMIT_NATIVE_PROMPT = "submitAIChatNativePrompt"
+        private const val SUBSCRIPTION_END_VOICE_SESSION = "endVoiceSession"
     }
 }
