@@ -1373,7 +1373,7 @@ class BrowserTabFragment :
                     launchCameraCapture(callback)
                 },
                 onFilePickerRequested = { callback, mimeTypes ->
-                    launchNativeFileAttachmentChooser(callback, mimeTypes)
+                    launchFilePicker(callback, mimeTypes)
                 },
             ),
         )
@@ -4942,7 +4942,7 @@ class BrowserTabFragment :
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
-    private fun launchNativeFileAttachmentChooser(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+    private fun launchFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
         nativeInputManager.setPickingImage(true)
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
