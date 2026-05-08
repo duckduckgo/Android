@@ -2663,19 +2663,20 @@
       });
       return () => unsubscribe();
     }, [messaging2]);
-    function setEnabled() {
+    async function setEnabled() {
       const values = {
         privatePlayerMode: { enabled: {} },
         overlayInteracted: false
       };
-      messaging2.setUserValues(values).then((next) => {
+      try {
+        const next = await messaging2.setUserValues(values);
         console.log("response after setUserValues...", next);
         console.log("will set", values);
         setValue(values);
-      }).catch((err) => {
+      } catch (err) {
         console.error("could not set the enabled flag", err);
         messaging2.reportPageException({ message: "could not set the enabled flag: " + err.toString() });
-      });
+      }
     }
     return /* @__PURE__ */ k(UserValuesContext.Provider, { value: { value, setEnabled } }, children);
   }
@@ -3793,7 +3794,7 @@
   function PlayerError({ kind, layout }) {
     const { t: t3 } = useTypedTranslation();
     const errors = {
-      ["invalid-id"]: /* @__PURE__ */ k("span", { dangerouslySetInnerHTML: { __html: t3("invalidIdError") } })
+      "invalid-id": /* @__PURE__ */ k("span", { dangerouslySetInnerHTML: { __html: t3("invalidIdError") } })
     };
     const text = errors[kind] || errors["invalid-id"];
     return /* @__PURE__ */ k(
@@ -3833,7 +3834,7 @@
       ];
       const cleanups = [];
       const loadHandler = () => {
-        for (let feature of iframeFeatures) {
+        for (const feature of iframeFeatures) {
           try {
             cleanups.push(feature.iframeDidLoad(iframe));
           } catch (e3) {
@@ -3847,7 +3848,7 @@
         iframe.addEventListener("load", loadHandler);
       }
       return () => {
-        for (let cleanup of cleanups) {
+        for (const cleanup of cleanups) {
           cleanup?.();
         }
         iframe.removeEventListener("load", loadHandler);
@@ -3913,16 +3914,16 @@
         }
       }
     };
-    return versions[version]?.[youtubeError] || versions[version]?.["unknown"] || versions["v1"]["unknown"];
+    return youtubeError && versions[version]?.[youtubeError] || versions[version]?.unknown || versions.v1.unknown;
   }
   function YouTubeError({ layout, embed }) {
     const youtubeError = useYouTubeError();
-    if (!youtubeError) {
-      return null;
-    }
     const { t: t3 } = useTypedTranslation();
     const openOnYoutube = useOpenOnYoutubeHandler();
     const { heading, messages, variant } = useErrorStrings(youtubeError);
+    if (!youtubeError) {
+      return null;
+    }
     const classes = (0, import_classnames10.default)(YouTubeError_default.error, {
       [YouTubeError_default.desktop]: layout === "desktop",
       [YouTubeError_default.mobile]: layout === "mobile"
@@ -3949,11 +3950,11 @@
       platform: { name: "macos" },
       customError: { state: "enabled" }
     });
-    let embed = (
+    const embed = (
       /** @type {EmbedSettings} */
       EmbedSettings.fromHref("https://localhost?videoID=123")
     );
-    let url = embed?.toEmbedUrl();
+    const url = embed?.toEmbedUrl();
     if (!url) throw new Error("unreachable");
     return /* @__PURE__ */ k(S, null, /* @__PURE__ */ k("main", { class: Components_default.main }, /* @__PURE__ */ k("div", { class: Components_default.tube }, /* @__PURE__ */ k(Wordmark, null), /* @__PURE__ */ k("h2", null, "Floating Bar"), /* @__PURE__ */ k("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ k(InfoIcon, { debugStyles: true })), /* @__PURE__ */ k("h2", null, "Info Tooltip"), /* @__PURE__ */ k(FloatingBar, null, /* @__PURE__ */ k(Button, { icon: true }, /* @__PURE__ */ k(Icon, { src: info_data_default })), /* @__PURE__ */ k(Button, { icon: true }, /* @__PURE__ */ k(Icon, { src: cog_data_default })), /* @__PURE__ */ k(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ k("h2", null, "Info Bar"), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(SwitchProvider, null, /* @__PURE__ */ k(InfoBar, { embed }))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ k(SwitchProvider, null, /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ k("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ k(SwitchProvider, null, /* @__PURE__ */ k(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ k("h2", null, "Desktop Switch bar"), /* @__PURE__ */ k("h3", null, "idle"), /* @__PURE__ */ k(SwitchProvider, null, /* @__PURE__ */ k(SwitchBarDesktop, null))), /* @__PURE__ */ k("h2", null, /* @__PURE__ */ k("code", null, "inset=false (desktop)")), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(Player, { src: url, layout: "desktop", embed }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed })))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "sign-in-required", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(YouTubeError, { layout: "desktop" }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed }))))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "age-restricted", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(YouTubeError, { layout: "desktop" }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed }))))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "no-embed", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(YouTubeError, { layout: "desktop" }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed }))))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "unknown", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(YouTubeError, { layout: "desktop" }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed }))))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(SettingsProvider, { settings }, /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "unknown", locale: "es" }, /* @__PURE__ */ k(PlayerContainer, null, /* @__PURE__ */ k(YouTubeError, { layout: "desktop" }), /* @__PURE__ */ k(InfoBarContainer, null, /* @__PURE__ */ k(InfoBar, { embed }))))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k("h2", null, /* @__PURE__ */ k("code", null, "inset=true (mobile)")), /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "sign-in-required", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(YouTubeError, { layout: "mobile" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "age-restricted", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(YouTubeError, { layout: "mobile" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "no-embed", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(YouTubeError, { layout: "mobile" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "unknown", locale: "en" }, /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(YouTubeError, { layout: "mobile" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })))), /* @__PURE__ */ k("br", null), /* @__PURE__ */ k(YouTubeErrorProvider, { initial: "unknown", locale: "es" }, /* @__PURE__ */ k(PlayerContainer, { inset: true }, /* @__PURE__ */ k(PlayerInternal, { inset: true }, /* @__PURE__ */ k(YouTubeError, { layout: "mobile" }), /* @__PURE__ */ k(SwitchBarMobile, { platformName: "ios" })))), /* @__PURE__ */ k("br", null)));
   }
