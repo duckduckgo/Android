@@ -20,13 +20,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.impl.di.ModalEvaluatorCompletion
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 interface ModalEvaluatorCompletionStore {
@@ -34,6 +38,14 @@ interface ModalEvaluatorCompletionStore {
      * Records completion timestamp for any evaluator
      */
     suspend fun recordCompletion()
+
+    /**
+     * Records completion timestamp synchronously, on the calling thread.
+     *
+     * Use when the call site cannot suspend and the cooldown must be visible to subsequent
+     * reads before any IO completes. Persists the timestamp asynchronously so the cooldown survives process stop.
+     */
+    fun recordCompletionSync()
 
     /**
      * Checks if evaluator is blocked by 24-hour window due to a modal being shown.
@@ -47,25 +59,47 @@ interface ModalEvaluatorCompletionStore {
 class ModalEvaluatorCompletionStoreImpl @Inject constructor(
     @ModalEvaluatorCompletion private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ModalEvaluatorCompletionStore {
 
+    private val lastCompletionTimestamp = AtomicLong(UNINITIALIZED)
+
     override suspend fun recordCompletion() {
+        val now = System.currentTimeMillis()
+        lastCompletionTimestamp.set(now)
         withContext(dispatchers.io()) {
-            val key = getKeyCompletionTimestamp()
-            store.edit { it[key] = System.currentTimeMillis() }
+            storeCompletionTimestamp(now)
+        }
+    }
+
+    override fun recordCompletionSync() {
+        val now = System.currentTimeMillis()
+        lastCompletionTimestamp.set(now)
+        appCoroutineScope.launch(dispatchers.io()) {
+            storeCompletionTimestamp(now)
         }
     }
 
     override suspend fun isBlockedBy24HourWindow(): Boolean {
-        return withContext(dispatchers.io()) {
-            val lastCompletion = getLastCompletionTimestamp() ?: return@withContext false
-            val timeSinceCompletion = System.currentTimeMillis() - lastCompletion
-            return@withContext timeSinceCompletion < TWENTY_FOUR_HOURS_MILLIS
+        val cached = lastCompletionTimestamp.get()
+        val timestamp = if (cached != UNINITIALIZED) {
+            cached
+        } else {
+            val persisted = withContext(dispatchers.io()) { getLastCompletionTimestamp() ?: NO_COMPLETION }
+            lastCompletionTimestamp.compareAndSet(UNINITIALIZED, persisted)
+            persisted
         }
+        if (timestamp == NO_COMPLETION) return false
+        return System.currentTimeMillis() - timestamp < TWENTY_FOUR_HOURS_MILLIS
     }
 
     private suspend fun getLastCompletionTimestamp(): Long? {
         return store.data.firstOrNull()?.get(getKeyCompletionTimestamp())
+    }
+
+    private suspend fun storeCompletionTimestamp(timestamp: Long) {
+        val key = getKeyCompletionTimestamp()
+        store.edit { it[key] = timestamp }
     }
 
     private fun getKeyCompletionTimestamp(): Preferences.Key<Long> {
@@ -75,5 +109,7 @@ class ModalEvaluatorCompletionStoreImpl @Inject constructor(
     companion object {
         private const val KEY_NAME_COMPLETION_TIMESTAMP = "modal_evaluator_completion_timestamp"
         private const val TWENTY_FOUR_HOURS_MILLIS = 24 * 60 * 60 * 1000L
+        private const val UNINITIALIZED = -1L
+        private const val NO_COMPLETION = 0L
     }
 }
