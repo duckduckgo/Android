@@ -345,4 +345,57 @@ class NewTabReturnHatchViewModelTest {
             assertFalse(state.shouldShowTabs)
         }
     }
+
+    @Test
+    fun whenOnTabManagerPressedThenLaunchTabSwitcherCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onTabManagerPressed()
+
+            assertEquals(NewTabReturnHatchViewModel.Command.LaunchTabSwitcher, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenCloseTabThenDeletesCurrentTab() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            awaitItem() // wait for state to settle with the emitted tab
+        }
+
+        testee.closeTab()
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+    }
+
+    @Test
+    fun whenCloseTabThenHatchHides() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.closeTab()
+
+            assertFalse(awaitItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenCloseTabThenShowTabClosedSnackbarCommandEmitted() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            awaitItem() // wait for state to settle with the emitted tab
+        }
+
+        testee.commands.test {
+            testee.closeTab()
+
+            assertEquals(NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar, awaitItem())
+        }
+    }
 }

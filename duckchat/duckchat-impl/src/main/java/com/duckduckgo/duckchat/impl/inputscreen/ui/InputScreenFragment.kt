@@ -601,6 +601,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         }
                     }
                 }
+
+                override fun onBurnTabPressed() {
+                    // TODO: open the fire dialog scoped to this tab
+                }
             },
         )
     }

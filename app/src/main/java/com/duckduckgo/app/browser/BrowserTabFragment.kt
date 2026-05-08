@@ -208,6 +208,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -3609,6 +3610,10 @@ class BrowserTabFragment :
 
                 override fun onHatchRendered(visible: Boolean) {
                     // no-op
+                }
+
+                override fun onBurnTabPressed() {
+
                 }
             },
         )
