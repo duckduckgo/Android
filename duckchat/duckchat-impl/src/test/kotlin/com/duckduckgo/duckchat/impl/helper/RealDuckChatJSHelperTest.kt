@@ -1791,4 +1791,38 @@ class RealDuckChatJSHelperTest {
         val query = result!!.params.getJSONObject("query")
         assertFalse(query.has("images"))
     }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataAndVoiceSessionActiveThenForceEndNativeVoiceSession() = runTest {
+        val tabId = "test-tab-id"
+        whenever(mockVoiceSessionStateManager.isVoiceSessionActive(tabId)).thenReturn(true)
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeHandoffData",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
+        )
+
+        verify(mockVoiceSessionStateManager).onVoiceSessionEnded(tabId)
+    }
+
+    @Test
+    fun whenGetAIChatNativeHandoffDataAndVoiceSessionNotActiveThenDoNotEndNativeVoiceSession() = runTest {
+        val tabId = "test-tab-id"
+        whenever(mockVoiceSessionStateManager.isVoiceSessionActive(tabId)).thenReturn(false)
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeHandoffData",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+            tabId = tabId,
+        )
+
+        verify(mockVoiceSessionStateManager, never()).onVoiceSessionEnded(any())
+    }
 }
