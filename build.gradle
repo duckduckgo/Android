@@ -309,6 +309,9 @@ def isCI = System.getenv('CI') != null
 subprojects {
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+        // Expose the active DI framework to tests so Anvil/Dagger-specific
+        // assertions can be skipped under Metro
+        systemProperty 'ddg.di', findProperty('ddg.di') ?: 'AnvilDagger'
         develocity.testRetry {
             maxRetries = isCI ? 1 : 0
             maxFailures = 5
