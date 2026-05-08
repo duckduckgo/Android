@@ -45,6 +45,7 @@ import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.fire.FireDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show

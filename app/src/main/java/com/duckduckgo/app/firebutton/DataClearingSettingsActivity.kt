@@ -31,8 +31,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDataClearingSettingsBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
-import com.duckduckgo.app.global.view.FireDialogProvider
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.SETTINGS
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
 import com.duckduckgo.common.ui.DuckDuckGoActivity

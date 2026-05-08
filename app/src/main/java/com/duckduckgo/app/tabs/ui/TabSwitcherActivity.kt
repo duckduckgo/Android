@@ -50,8 +50,8 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.downloads.DownloadsActivity
-import com.duckduckgo.app.global.view.FireDialogProvider
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel

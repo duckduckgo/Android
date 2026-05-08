@@ -33,7 +33,6 @@ import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
@@ -73,15 +72,12 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
-    private val dismissed = MutableStateFlow(false)
-
     val viewState = combine(
         tabRepository.flowLastAccessedTab,
         tabRepository.flowTabs,
         ntpAfterIdleManager.isAfterIdleReturn,
-        dismissed,
-    ) { lastTab, tabs, afterIdle, dismissed ->
-        if (lastTab != null && afterIdle && !dismissed) {
+    ) { lastTab, tabs, afterIdle ->
+        if (lastTab != null && afterIdle) {
             val url = lastTab.url.orEmpty()
             ViewState(
                 tabTitle = lastTab.title.orEmpty(),
@@ -111,7 +107,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val tabId = viewState.value.currentTabId
         viewModelScope.launch(dispatchers.io()) {
             tabRepository.deleteTabs(listOf(tabId))
-            dismissed.value = true
             commandChannel.trySend(Command.ShowTabClosedSnackbar)
         }
     }

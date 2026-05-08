@@ -47,6 +47,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlight
 import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
@@ -103,6 +105,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
@@ -138,6 +141,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
     lateinit var browserMenuHighlight: BrowserMenuHighlight
@@ -586,7 +592,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
 
                 override fun onBurnTabPressed() {
-                    // TODO: open the fire dialog scoped to this tab
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.BROWSER)
+                        dialog.show(parentFragmentManager)
+                    }
                 }
             },
         )
