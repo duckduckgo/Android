@@ -16,8 +16,8 @@ state Skipped
 NotStarted --> InProgress : requestFirstStep()\nfirst eligible step in main path
 
 InProgress --> InProgress : onEvent ->\nAdvance / SwitchTo(path) / Return / Stay
-InProgress --> Completed  : Advance exhausts main path\n(callStack empty)\n[stageCompleted(NEW)]
-InProgress --> Skipped    : AbortPlan\n[stageCompleted(NEW),\n stageCompleted(DAX_ONBOARDING),\n hideTips = true]
+InProgress --> Completed  : Advance exhausts main path\n(callStack empty)\n[userStageStore.stageCompleted(NEW)]
+InProgress --> Skipped    : AbortPlan\n[onboardingSkipper.markOnboardingAsCompleted()]
 
 note right of Completed
   AppStage moves NEW -> DAX_ONBOARDING.

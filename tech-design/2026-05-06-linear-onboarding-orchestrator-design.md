@@ -10,24 +10,48 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 
 ## Files Changed
 
+The orchestrator lives in two new modules — **`:onboarding-api`** (interfaces and pure types) and **`:onboarding-impl`** (implementations) — following the project's standard `-api` / `-impl` split. The plan provider, step factories, and existing UI continue to live in `:app` because their dependency closure is rooted there. See [Module structure](#module-structure) for the rationale.
+
+### `:onboarding-api` (new module)
+
 | File | Change |
 |---|---|
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestrator.kt` | **New** — `AppScope` `@SingleInstanceIn` class holding the plan, current step, transitions; writes `AppStage` on terminal transitions |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingPlanProvider.kt` | **New** — builds the step registry, contains all step factory methods |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearStep.kt` | **New** — `LinearStep` sealed hierarchy (`IsolatedContext`, `BrowserContext`), `OnboardingPath`, `StepEvent`, `StepTransition` |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/OnboardingPlanState.kt` | **New** — `NotStarted` / `InProgress` / `Completed` / `Skipped` |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/PreOnboardingDialog.kt` | **New** — sealed `PreOnboardingDialog` carrying both the dialog identity and its data (replaces the parallel `PreOnboardingDialogType` enum + per-step params for the orchestrator path) |
-| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingOrchestratorFeature.kt` | **New** — `@ContributesRemoteFeature` toggle gating rollout |
-| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag. Expose `dialogState: StateFlow<PreOnboardingDialog?>` for dialog rendering and shrink `Command` to non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SkipDialogAnimation`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`). Legacy `when (currentDialog)` retained until phase 4 cleanup. |
-| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt` | Refactor `configureDaxCta` to take a `PreOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)`. Split the existing `commands` observer into a `dialogState` observer (renders the current dialog) and a slimmer `commands` observer (handles transient signals only). Legacy `WelcomePage.kt` is untouched. |
+| `LinearOnboardingOrchestrator.kt` | **New** — orchestrator interface (`state`, `onEvent`, `requestFirstStep`, `firstStepHost`, `isOnLinearBrowserStep`) |
+| `OnboardingPlanState.kt` | **New** — `NotStarted` / `InProgress(currentPath, currentStepIndex)` / `Completed` / `Skipped` |
+| `OnboardingPath.kt` | **New** — `data class OnboardingPath(val steps: List<LinearStep>)` |
+| `LinearStep.kt` | **New** — `LinearStep` sealed hierarchy (`IsolatedContext`, `BrowserContext`), `Host` enum |
+| `StepEvent.kt`, `StepTransition.kt` | **New** — sealed event and transition types |
+| `IsolatedOnboardingDialog.kt` | **New** — sealed type carrying dialog identity + data (replaces the legacy `PreOnboardingDialogType` enum on the orchestrator path) |
+| `OnboardingPathProvider.kt` | **New** — interface with `suspend fun buildMainPath(): OnboardingPath`, implemented by `:app`'s plan provider |
+| `UserStageStore.kt` (**moved from `:app`**) | Interface + `AppStage` enum + `isNewUser()` / `daxOnboardingActive()` extension functions. Implementation (`AppUserStageStore`, the Room entity, DAO, type converter) stays in `:app`. |
+| `OnboardingSkipper.kt` (**moved from `:app`**) | Interface only. `FullOnboardingSkipper` impl stays in `:app`. |
+
+### `:onboarding-impl` (new module)
+
+| File | Change |
+|---|---|
+| `RealLinearOnboardingOrchestrator.kt` | **New** — `@SingleInstanceIn(AppScope)` `@ContributesBinding(AppScope, LinearOnboardingOrchestrator::class)`. Holds `currentPath`, `currentStepIndex`, `callStack`, dispatches `StepEvent` to step transitions, writes `AppStage` on terminal transitions via injected `UserStageStore` and `OnboardingSkipper`. |
+| `LinearOnboardingOrchestratorFeature.kt` | **New** — `@ContributesRemoteFeature` toggle gating rollout |
+
+### `:app` (existing, modified)
+
+| File | Change |
+|---|---|
+| `app/src/main/java/com/duckduckgo/app/onboarding/orchestrator/LinearOnboardingPlanProvider.kt` | **New** — `@ContributesBinding(AppScope, OnboardingPathProvider::class)`. Builds the main path; private side paths (e.g. `skipPath`) referenced by value from step transitions. Holds all step factory methods. Stays in `:app` because step factories depend on `:app`-rooted classes (`SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `SettingsDataStore`, `DuckChat`, etc.). |
+| `app/src/main/java/com/duckduckgo/app/onboarding/store/UserStageStore.kt` | Interface + `AppStage` enum + extensions deleted from this file (moved to `:onboarding-api`). `AppUserStageStore`, `UserStage` Room entity, `UserStageDao`, `StageTypeConverter` stay; their imports update to point at `:onboarding-api`. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/FullOnboardingSkipper.kt` | `OnboardingSkipper` interface deleted from this file (moved to `:onboarding-api`). `FullOnboardingSkipper` impl stays. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt` | Add orchestrator-observer codepath gated on the feature flag. Expose `dialogState: StateFlow<IsolatedOnboardingDialog?>` for dialog rendering and shrink `Command` to non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SkipDialogAnimation`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`). Legacy `when (currentDialog)` retained until phase 4 cleanup. |
+| `app/src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdateWelcomePage.kt` | Refactor `configureDaxCta` to take an `IsolatedOnboardingDialog` sealed value instead of `(PreOnboardingDialogType, params...)`. Split the existing `commands` observer into a `dialogState` observer and a slimmer `commands` observer. Legacy `WelcomePage.kt` is untouched. |
 | `app/src/main/java/com/duckduckgo/app/onboarding/ui/OnboardingActivity.kt` | Add host-transition observer (launches `BrowserActivity` and self-finishes when current step's host is `BrowserContext`) |
 | `app/src/main/java/com/duckduckgo/app/browser/BrowserActivity.kt` | Add host-transition observer (launches `OnboardingActivity` and self-finishes when current step's host is `IsolatedContext`); add back-press intercept that closes app while linear flow is active |
 | `app/src/main/java/com/duckduckgo/app/cta/ui/CtaViewModel.kt` | Add `isOnLinearBrowserStep()` gate at the top of `refreshCta`, `getFireDialogCta`, `getSiteSuggestionsDialogCta`, `getEndStaticDialogCta` |
-| `app/src/main/java/com/duckduckgo/app/launch/LaunchViewModel.kt` | When `isNewUser()`, route to host indicated by `orchestrator.currentStepHost()` instead of unconditionally to `OnboardingActivity` |
+| `app/src/main/java/com/duckduckgo/app/launch/LaunchViewModel.kt` | When `isNewUser()`, route to host indicated by `orchestrator.firstStepHost()` instead of unconditionally to `OnboardingActivity` |
+| Imports in `OnboardingViewModel`, `SystemSearchViewModel`, `BrowserAdditionalPixelParams`, `OnboardingFlowCheckerImpl` | Update `UserStageStore` / `AppStage` imports to point at `:onboarding-api`. No behaviour change. |
+| `app/build.gradle` | Add `implementation(project(":onboarding-impl"))` and `implementation(project(":onboarding-api"))` |
 
 ## Goals
 
-- Lift the linear-onboarding state machine to `AppScope` so it survives activity transitions
+- Lift the linear-onboarding state machine to `AppScope` so it survives activity transitions, and out of `:app` module to improve code organization
 - Provide a single readable place where plan composition expresses itself
 - Make each step a self-contained descriptor (precondition, params, transition rules) that can be added, removed, or experiment-gated locally
 - Keep today's user-visible behavior (dialog sequence, pixels, side effects) unchanged
@@ -41,6 +65,42 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 - Changing reactive-phase CTA logic from `CtaViewModel.getHomeCta()` / `getBrowserCta()` that's presented in the `BrowserTabFragment` — those continue to gate on `AppStage` as today
 - Cross-host back-button navigation (e.g., back from a `IsolatedContext` step to a previous `BrowserContext` step) — back during linear closes the app, regardless of the current host
 - Introducing analytics beyond the existing pixels — orchestrator must fire the same pixels in the same order as today's flow
+
+## Module structure
+
+Two new modules at the project root:
+
+```
+onboarding/
+├── onboarding-api/      ← interfaces + pure types, no Anvil/Dagger
+└── onboarding-impl/     ← @ContributesBinding implementations
+```
+
+### What goes where, and why
+
+**`:onboarding-api`** holds the orchestrator's public surface plus the onboarding-state vocabulary that crosses module boundaries: `LinearOnboardingOrchestrator`, `OnboardingPlanState`, `OnboardingPath`, `LinearStep`, `StepEvent`, `StepTransition`, `IsolatedOnboardingDialog`, `Host`. It also picks up two pre-existing interfaces that are conceptually onboarding-state: **`UserStageStore` (with the `AppStage` enum)** and **`OnboardingSkipper`**. Both used to live in `:app`; the move puts the contract for "phase of onboarding" in the same module as the orchestrator that writes to it.
+
+**`:onboarding-impl`** holds `RealLinearOnboardingOrchestrator` (the AppScope orchestrator with state, advance algorithm, and call-stack management) and `LinearOnboardingOrchestratorFeature` (the rollout toggle). The orchestrator-impl's only outside-the-onboarding-domain dependencies are `DispatcherProvider` (utility) and `@AppCoroutineScope CoroutineScope` (utility). It writes terminal `AppStage` transitions via injected `UserStageStore` (for the `Completed` path) and `OnboardingSkipper.markOnboardingAsCompleted()` (for the `Skipped` path) — both interfaces from `:onboarding-api`, so no `:app` dependency.
+
+**`:app`** keeps the things whose dependency closure roots there: `LinearOnboardingPlanProvider` and all step factories (depend on `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `SettingsDataStore`, `DuckChat`, `Pixel`, etc.), `BrandDesignUpdatePageViewModel`, fragments and activities, `CtaViewModel`. The plan provider implements `OnboardingPathProvider` (declared in `:onboarding-api`) and is bound at `AppScope` from `:app`.
+
+### Why this split is worth doing now
+
+- **Onboarding-state lives in the onboarding module.** `UserStageStore` and `OnboardingSkipper` describe the linear/reactive/established phase machine. They've always been part of the onboarding domain; they were just stranded in `:app` for historical reasons. Moving them to `:onboarding-api` is the orchestrator getting the contracts it needs *and* a real architectural cleanup independently.
+- **Cross-module access becomes possible.** Future consumers outside `:app` (e.g., a tabs module wanting to know "are we mid-onboarding?", a privacy-pro module wanting to defer prompts) can depend on `:onboarding-api` directly without pulling in `:app`. Today, every reader has to be in `:app`.
+- **`:app` shrinks.** Net code that moves out of `:app`: orchestrator implementation (~300 lines) plus the `UserStageStore` and `OnboardingSkipper` interface declarations (small, but they unblock the move). This aligns with the team's broader app-module-thinning effort.
+
+### Why the plan provider stays in `:app` (for now)
+
+`LinearOnboardingPlanProvider` is where the orchestrator's abstract API meets the app's concrete domain. Each step factory injects domain-specific dependencies that today live in `:app`. Moving the plan provider to `:onboarding-impl` would force moving its dependency closure too — a much wider refactor. The `OnboardingPathProvider` interface lets the orchestrator stay decoupled while the provider stays where its dependencies are. As individual dependencies are themselves modularised (e.g., a future `:default-browser-api`), step factories that use them can migrate piecewise.
+
+### Module-rule compliance (per `CLAUDE.md`)
+
+- `:onboarding-api` has no Anvil / Dagger dependencies; only pure Kotlin + Android platform types (e.g., `Intent`).
+- `:onboarding-impl` is depended-on only by `:app` (the composition root).
+- `:onboarding-api` does not depend on other `-api` modules.
+- No `strings.xml` in either new module — no UI lives in them.
+- No `KAPT` — `:onboarding-impl` uses KSP for Anvil/Dagger.
 
 ## Architecture summary
 
@@ -58,9 +118,10 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 │         │   requestFirstStep()    (called once by welcome page)      │
 │         │   firstStepHost(): Host                                    │
 │         │                                                            │
-│         └──► AppStage facade (Room, unchanged)                       │
-│              writes stageCompleted(NEW)/(DAX_ONBOARDING) on          │
-│              terminal transitions                                    │
+│         └──► UserStageStore + OnboardingSkipper                      │
+│              (interfaces in :onboarding-api,                          │
+│               impls remain in :app, Room-backed)                      │
+│              writes AppStage on terminal transitions                  │
 └──────────────────────────────────────────────────────────────────────┘
         │                                          │
         ▼                                          ▼
@@ -77,7 +138,7 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 │  BrandDesignUpdatePageVM        │      │  CtaViewModel.refreshCta() &  │
 │   (flag-gated): observe         │      │   friends suppress while      │
 │   orchestrator.state, expose    │      │   on a BrowserContext step    │
-│   PreOnboardingDialog state     │      │                               │
+│   IsolatedOnboardingDialog state     │      │                               │
 │                                 │      │  BrowserContext renderer:     │
 │  WelcomePage / BrandDesign      │      │   DEFERRED (first project to  │
 │  page Fragment unchanged:       │      │   introduce a BrowserContext  │
@@ -99,7 +160,7 @@ sealed interface LinearStep {
 
     data class IsolatedContext(
         override val id: StepId,
-        val resolveDialog: suspend () -> PreOnboardingDialog,
+        val resolveDialog: suspend () -> IsolatedOnboardingDialog,
         override val precondition: suspend () -> Boolean = { true },
         override val transition: suspend (StepEvent) -> StepTransition,
     ) : LinearStep
@@ -113,17 +174,17 @@ sealed interface LinearStep {
     ) : LinearStep
 }
 
-sealed interface PreOnboardingDialog {
-    data object IntroAnimation : PreOnboardingDialog            // welcome animation + notification permission flow
-    data object SyncRestore : PreOnboardingDialog
-    data class Initial(val showDuckAiCopy: Boolean) : PreOnboardingDialog
-    data class InitialReinstallUser(val showDuckAiCopy: Boolean) : PreOnboardingDialog
-    data class ComparisonChart(val showDuckAiCopy: Boolean) : PreOnboardingDialog
-    data class DefaultBrowser(val intent: Intent) : PreOnboardingDialog
-    data class AddressBarPosition(val showSplitOption: Boolean) : PreOnboardingDialog
-    data class InputScreen(val showDuckAiCopy: Boolean) : PreOnboardingDialog
-    data class InputScreenPreview(val isSearchDefault: Boolean) : PreOnboardingDialog
-    data object SkipOnboardingOption : PreOnboardingDialog
+sealed interface IsolatedOnboardingDialog {
+    data object IntroAnimation : IsolatedOnboardingDialog            // welcome animation + notification permission flow
+    data object SyncRestore : IsolatedOnboardingDialog
+    data class Initial(val showDuckAiCopy: Boolean) : IsolatedOnboardingDialog
+    data class InitialReinstallUser(val showDuckAiCopy: Boolean) : IsolatedOnboardingDialog
+    data class ComparisonChart(val showDuckAiCopy: Boolean) : IsolatedOnboardingDialog
+    data class DefaultBrowser(val intent: Intent) : IsolatedOnboardingDialog
+    data class AddressBarPosition(val showSplitOption: Boolean) : IsolatedOnboardingDialog
+    data class InputScreen(val showDuckAiCopy: Boolean) : IsolatedOnboardingDialog
+    data class InputScreenPreview(val isSearchDefault: Boolean) : IsolatedOnboardingDialog
+    data object SkipOnboardingOption : IsolatedOnboardingDialog
 }
 
 sealed interface StepEvent {
@@ -150,7 +211,7 @@ data class OnboardingPath(val steps: List<LinearStep>)
 
 - **Two step subtypes, one per host.** `IsolatedContext` steps run full-screen (today: rendered by `OnboardingActivity`). `BrowserContext` steps render against the live browser. The author picks the subtype that fits; the orchestrator infers which activity should host the step from the subtype, with no separate `host` field to keep in sync.
 - **`precondition` and `resolveDialog` are `suspend` and read fresh state at call time.** This is the load-bearing decision for the config-staleness story — see [State and persistence](#state-and-persistence).
-- **`PreOnboardingDialog` is one sealed type, not enum + parallel params.** Each variant carries the data its renderer needs (e.g. `Initial(showDuckAiCopy)`, `DefaultBrowser(intent)`). The existing `PreOnboardingDialogType` enum is *deprecated; it stays in place only for the legacy `WelcomePage` path until that path is removed.
+- **`IsolatedOnboardingDialog` is one sealed type, not enum + parallel params.** Each variant carries the data its renderer needs (e.g. `Initial(showDuckAiCopy)`, `DefaultBrowser(intent)`). The existing `PreOnboardingDialogType` enum is *deprecated; it stays in place only for the legacy `WelcomePage` path until that path is removed.
 - **`transition` is a per-step function returning a `StepTransition`.** Each step's flow-control logic is local to its descriptor instead of co-mingled in a giant centralised `when`.
 - **Paths are first-class values, not registry-keyed.** `OnboardingPath` is a plain data class wrapping a list of steps. The plan provider returns the *main* path, and side paths (e.g. the skip-confirmation flow) are private `val`s in the provider, referenced by value from `SwitchTo(...)` calls inside step transitions. A step in any path can switch into any other path; transitions are local rather than coordinated through a central registry.
 - **Side flows are sequences, not single steps.** Multi-step side flows (e.g. confirm → feature-pitch → abort) fall out naturally — they're just a path with multiple steps. The "side branch" concept disappears; a side flow is just another `OnboardingPath` invoked via `SwitchTo`.
@@ -166,7 +227,7 @@ When a step's `transition(event)` returns:
   - If `callStack` is empty: terminate as `Completed`.
 - **`SwitchTo(path)`** — push `(currentPath, currentStepIndex)` onto the call stack. Set `currentPath = path`, walk to the first eligible step. If `path` has no eligible step, behave as if we'd already exhausted it: pop and resume caller (this is the "fallback" for an empty target).
 - **`Return`** — pop a frame and resume the caller at `frame.indexAtJump + 1`. With an empty call stack, `Return` is a programming error (a path designed to be returned-from should never be entered as `main`); fail loudly.
-- **`AbortPlan`** — set state to `Skipped`. Discard the entire call stack. Write `AppStage = ESTABLISHED` + `hideTips`.
+- **`AbortPlan`** — set state to `Skipped`. Discard the entire call stack. Delegate the side effects (advance `AppStage` to `ESTABLISHED`, set `hideTips = true`, dismiss the `ADD_WIDGET` CTA) to `OnboardingSkipper.markOnboardingAsCompleted()` — that interface already encapsulates the existing skip semantics; the orchestrator just calls it.
 - **`Stay`** — no state change.
 
 The "advance from a side branch resumes main" rule from the old design is no longer special-cased — it's just `Advance` exhausting a path and popping the stack, which works the same regardless of whether the popped caller is on the main path or a deeper side path.
@@ -184,7 +245,7 @@ Mutual exclusion between the three "first dialog" candidates (`SyncRestore` / `I
 
 Two architectural points worth surfacing here, since they're easy to miss in the per-step factory code:
 
-1. **`DefaultBrowser` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `PreOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `DefaultBrowserPromptFinished(isDefaultBrowser)` event. The fragment-side rendering is unchanged (no visible separate "step" to the user); it's only an architectural unit. This becomes important when the future `BrowserContext` steps land and `DefaultBrowser` is the isolated phase the user re-enters.
+1. **`DefaultBrowser` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `IsolatedOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `DefaultBrowserPromptFinished(isDefaultBrowser)` event. The fragment-side rendering is unchanged (no visible separate "step" to the user); it's only an architectural unit. This becomes important when the future `BrowserContext` steps land and `DefaultBrowser` is the isolated phase the user re-enters.
 
 2. **Pixel firing has moved into `transition` lambdas.** Today's `BrandDesignUpdatePageViewModel` has pixel calls scattered across `onPrimaryCtaClicked`, `onSecondaryCtaClicked`, `fireDialogShownPixel`, etc. In the orchestrator model, decision-time pixels live with the decision (in `transition`); show-time pixels (`fireDialogShownPixel` equivalents) stay in the renderer (the viewmodel observing `state` transitions emits the show pixel for the new step). The pixel sequence is preserved.
 
@@ -223,7 +284,7 @@ The orchestrator becomes a *writer* of `AppStage` on terminal transitions:
 |---|---|
 | `NotStarted → InProgress(...)` | none (already `NEW`) |
 | `InProgress → Completed` | `userStageStore.stageCompleted(AppStage.NEW)` → moves to `DAX_ONBOARDING` |
-| `InProgress → Skipped` | `userStageStore.stageCompleted(AppStage.NEW)` then `userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)` → reaches `ESTABLISHED`; plus `settingsDataStore.hideTips = true` (matching `FullOnboardingSkipper.markOnboardingAsCompleted`) |
+| `InProgress → Skipped` | `onboardingSkipper.markOnboardingAsCompleted()` — the existing `FullOnboardingSkipper` impl writes `hideTips`, dismisses the `ADD_WIDGET` CTA, and advances `AppStage` to `ESTABLISHED` in one call. Reusing the existing helper keeps the skip semantics identical to today's flow. |
 
 Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` continues to write `DAX_ONBOARDING → ESTABLISHED`. The orchestrator never writes that transition itself, it is only handling the linear portion of the onboarding flow.
 
@@ -365,17 +426,17 @@ When `OnboardingPlanState` is `NotStarted` / `Completed` / `Skipped`, the callba
 
 `BrandDesignUpdatePageViewModel` becomes a thin adapter that exposes two surfaces to the fragment:
 
-- **`dialogState: StateFlow<PreOnboardingDialog?>`** — the dialog the fragment should currently render (or `null` for "no dialog yet"). Replaces the family of `Show*Dialog` commands that exist today.
+- **`dialogState: StateFlow<IsolatedOnboardingDialog?>`** — the dialog the fragment should currently render (or `null` for "no dialog yet"). Replaces the family of `Show*Dialog` commands that exist today.
 - **`commands: Flow<Command>`** — transient, non-dialog signals (`Finish`, `OnboardingSkipped`, `RequestNotificationPermissions`, `SkipDialogAnimation`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`). Channel-based as today.
 
   *Correction from earlier drafts:* `SetAddressBarPositionOptions` is **not** a command on `BrandDesignUpdatePageViewModel` — it lives on the legacy `WelcomePageViewModel` only. The brand-design fragment reads `selectedAddressBarPosition` from `viewState`, and with the new `dialogState` carrying `AddressBarPosition(showSplitOption)` the fragment renders straight off the dialog payload. No separate command is needed.
 
-The split eliminates a duplicated dispatch — without it, the same dialog identity would be encoded once into a `Show*Dialog` command and immediately decoded back in the fragment to call `configureDaxCta`. With the state-flow surface, the fragment's render path is a single dispatch on `PreOnboardingDialog`.
+The split eliminates a duplicated dispatch — without it, the same dialog identity would be encoded once into a `Show*Dialog` command and immediately decoded back in the fragment to call `configureDaxCta`. With the state-flow surface, the fragment's render path is a single dispatch on `IsolatedOnboardingDialog`.
 
 ```kotlin
 class BrandDesignUpdatePageViewModel ... {
-    private val _dialogState = MutableStateFlow<PreOnboardingDialog?>(null)
-    val dialogState: StateFlow<PreOnboardingDialog?> = _dialogState
+    private val _dialogState = MutableStateFlow<IsolatedOnboardingDialog?>(null)
+    val dialogState: StateFlow<IsolatedOnboardingDialog?> = _dialogState
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -454,10 +515,10 @@ viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { command ->
 }.launchIn(lifecycleScope)
 ```
 
-`configureDaxCta(dialog: PreOnboardingDialog)` becomes the single fragment-side rendering entry point. Most variants render a dax dialog; `IntroAnimation` triggers the existing welcome-animation + notification-permission flow (which fires `onPrimaryCtaClicked()` when complete to advance the orchestrator); `DefaultBrowser` launches the system role-manager intent:
+`configureDaxCta(dialog: IsolatedOnboardingDialog)` becomes the single fragment-side rendering entry point. Most variants render a dax dialog; `IntroAnimation` triggers the existing welcome-animation + notification-permission flow (which fires `onPrimaryCtaClicked()` when complete to advance the orchestrator); `DefaultBrowser` launches the system role-manager intent:
 
 ```kotlin
-private fun configureDaxCta(dialog: PreOnboardingDialog) {
+private fun configureDaxCta(dialog: IsolatedOnboardingDialog) {
     when (dialog) {
         is IntroAnimation -> playIntroAnimation { onPrimaryCtaClicked() }  // existing welcome animation + permission flow
         is DefaultBrowser -> startActivityForResult(dialog.intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
@@ -470,7 +531,7 @@ The `IntroAnimation` case is what makes the no-replay property work: when the fr
 
 ### Why this shape
 
-- **One dispatch, not three.** The orchestrator emits a step ID; the adapter resolves it to a `PreOnboardingDialog`; the fragment renders. No round-trip through a parallel `Show*Dialog` command vocabulary.
+- **One dispatch, not three.** The orchestrator emits a step ID; the adapter resolves it to a `IsolatedOnboardingDialog`; the fragment renders. No round-trip through a parallel `Show*Dialog` command vocabulary.
 - **State-flow semantics for the dialog.** A reader can ask "what dialog is the user looking at?" via `viewModel.dialogState.value`. Activity recreation re-renders the current dialog automatically; we don't need the channel to replay missed `Show*` commands.
 - **`Command` shrinks to genuinely transient signals.** Terminal events (`Finish`, `OnboardingSkipped`, `FinishAndSubmitSearchQuery`, `FinishAndSubmitChatPrompt`), system signals (`RequestNotificationPermissions`), and UI side-effects (`SkipDialogAnimation`). These remain channel-based because they're one-shots that should fire exactly once.
 - **DefaultBrowser stays a dialog state, not a command.** Even though its rendering is a system intent rather than a custom view, it's still "what's currently active in the linear flow". Putting it in `dialogState` keeps the surface uniform.
@@ -511,7 +572,7 @@ This work does not block, and is not blocked by, the `WelcomePage` deprecation w
 - Each step's `precondition` evaluation under combinations of feature flags and stored state. Test fixtures parameterised by `canRestore` × `isReinstall` × `showInputScreen` × experiment variant.
 - Each step's `transition(event)` returns the expected `StepTransition` for each `StepEvent`; un-handled events return `Stay`.
 - `LinearOnboardingOrchestrator` advance walks `currentPath.steps` past ineligible entries to the first eligible. When a path is exhausted, the call stack is popped and the caller resumes at `indexAtJump + 1`; if the stack is empty, state becomes `Completed`.
-- `LinearOnboardingOrchestrator.onEvent()` dispatches to the current step's transition. `Advance` walks forward (with stack-pop on path exhaustion); `SwitchTo(path)` pushes a frame and runs the new path; `Return` pops a frame; `AbortPlan` writes `AppStage = ESTABLISHED` + `hideTips` regardless of stack depth; `Stay` is a no-op.
+- `LinearOnboardingOrchestrator.onEvent()` dispatches to the current step's transition. `Advance` walks forward (with stack-pop on path exhaustion); `SwitchTo(path)` pushes a frame and runs the new path; `Return` pops a frame; `AbortPlan` calls `OnboardingSkipper.markOnboardingAsCompleted()` regardless of stack depth; `Stay` is a no-op.
 - `AppStage` writes happen exactly once per terminal transition; idempotent under repeat invocation.
 
 ### Behavioral / integration tests (the regression backstop)
@@ -630,7 +691,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
         // No precondition: this is always the very first step on a fresh plan.
         // Once advanced past, the orchestrator never lands here again — the no-replay
         // property is just the universal forward-walk semantics of the advance algorithm.
-        resolveDialog = { PreOnboardingDialog.IntroAnimation },
+        resolveDialog = { IsolatedOnboardingDialog.IntroAnimation },
         transition = { event -> when (event) {
             // Fragment fires PrimaryClicked once the welcome animation + notification
             // permission flow finishes. No pixels here — they're already fired by the
@@ -643,7 +704,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private fun syncRestoreStep() = IsolatedContext(
         id = ID_SYNC_RESTORE,
         precondition = { syncAutoRestore.canRestore() },
-        resolveDialog = { PreOnboardingDialog.SyncRestore },
+        resolveDialog = { IsolatedOnboardingDialog.SyncRestore },
         transition = { event -> when (event) {
             PrimaryClicked -> {
                 pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
@@ -661,7 +722,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private fun initialReinstallUserStep() = IsolatedContext(
         id = ID_INITIAL_REINSTALL_USER,
         precondition = { !syncAutoRestore.canRestore() && appBuildConfig.isAppReinstall() },
-        resolveDialog = { PreOnboardingDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        resolveDialog = { IsolatedOnboardingDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
             PrimaryClicked -> Advance
             SecondaryClicked -> {
@@ -675,7 +736,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private fun initialStep() = IsolatedContext(
         id = ID_INITIAL,
         precondition = { !syncAutoRestore.canRestore() && !appBuildConfig.isAppReinstall() },
-        resolveDialog = { PreOnboardingDialog.Initial(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        resolveDialog = { IsolatedOnboardingDialog.Initial(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
             PrimaryClicked -> Advance
             else -> Stay
@@ -684,7 +745,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
 
     private fun comparisonChartStep() = IsolatedContext(
         id = ID_COMPARISON_CHART,
-        resolveDialog = { PreOnboardingDialog.ComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        resolveDialog = { IsolatedOnboardingDialog.ComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
             PrimaryClicked -> {
                 val isDefault = !defaultRoleBrowserDialog.shouldShowDialog()
@@ -707,7 +768,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
         resolveDialog = {
             // Today the system intent is launched from inside COMPARISON_CHART's primary;
             // here it becomes a discrete step whose dialog carries the intent.
-            PreOnboardingDialog.DefaultBrowser(intent = defaultRoleBrowserDialog.createIntent(context)!!)
+            IsolatedOnboardingDialog.DefaultBrowser(intent = defaultRoleBrowserDialog.createIntent(context)!!)
         },
         transition = { event -> when (event) {
             is DefaultBrowserPromptFinished -> {
@@ -727,7 +788,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private fun addressBarPositionStep() = IsolatedContext(
         id = ID_ADDRESS_BAR_POSITION,
         precondition = { defaultRoleBrowserDialog.shouldShowDialog() },  // matches today's "skip if shouldShowDialog == false"
-        resolveDialog = { PreOnboardingDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
+        resolveDialog = { IsolatedOnboardingDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
         transition = { event -> when (event) {
             is OmnibarTypeSelected -> {
                 settingsDataStore.omnibarType = event.type
@@ -749,7 +810,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
             defaultRoleBrowserDialog.shouldShowDialog() &&
                 androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
         },
-        resolveDialog = { PreOnboardingDialog.InputScreen(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        resolveDialog = { IsolatedOnboardingDialog.InputScreen(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
             is InputModeSelected -> {
                 onboardingStore.storeInputScreenSelection(event.withAi)
@@ -781,7 +842,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
         },
         resolveDialog = {
             val variant = duckAiOnboardingExperimentManager.enroll()
-            PreOnboardingDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
+            IsolatedOnboardingDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
         },
         transition = { event -> when (event) {
             PrimaryClicked -> Advance
@@ -791,7 +852,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
 
     private fun skipOnboardingOptionStep() = IsolatedContext(
         id = ID_SKIP_ONBOARDING_OPTION,
-        resolveDialog = { PreOnboardingDialog.SkipOnboardingOption },
+        resolveDialog = { IsolatedOnboardingDialog.SkipOnboardingOption },
         transition = { event -> when (event) {
             PrimaryClicked -> {
                 pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
