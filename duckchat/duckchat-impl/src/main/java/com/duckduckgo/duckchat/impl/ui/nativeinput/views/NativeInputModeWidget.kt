@@ -509,7 +509,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun submitMessage(message: String?) {
-        if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected() && !attachmentLimitExceeded) {
+        if (message == null && isChatTabSelected() && attachmentLimitExceeded) return
+        if (message == null && inputField.text.isNullOrBlank() && hasAttachments && isChatTabSelected()) {
             onChatSent?.invoke("")
             inputField.clearFocus()
         } else {
