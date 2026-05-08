@@ -69,6 +69,12 @@ interface PirInitialScanCompletionWideEvent {
      * every valid scan job now has a `lastScanDateInMillis > 0`, finishes the flow with Success.
      */
     suspend fun onScanCompleted()
+
+    /**
+     * Aborts any open flow so it is discarded rather than eventually emitting
+     * a stale `FlowStatus.Unknown` record via the cleanup-on-timeout policy.
+     */
+    suspend fun onUserReset()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -176,6 +182,17 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                 pirDataStore.initialScanCompletionFlowId = 0L
                 pirDataStore.initialScanCompletionForegroundRunCount = 0
                 pirDataStore.initialScanCompletionScheduledRunCount = 0
+            }
+        }
+    }
+
+    override suspend fun onUserReset() {
+        withContext(dispatchers.io()) {
+            mutex.withLock {
+                val flowId = pirDataStore.initialScanCompletionFlowId
+                if (flowId == 0L) return@withLock
+
+                wideEventClient.flowAbort(flowId)
             }
         }
     }

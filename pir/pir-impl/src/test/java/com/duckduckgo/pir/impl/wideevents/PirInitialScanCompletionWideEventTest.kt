@@ -288,6 +288,39 @@ class PirInitialScanCompletionWideEventTest {
     }
 
     @Test
+    fun whenOnUserResetCalledAndFlowOpenThenFlowAborted() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(55L))
+        whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+
+        testee.onUserReset()
+
+        verify(wideEventClient).flowAbort(55L)
+    }
+
+    @Test
+    fun whenOnUserResetCalledAndNoFlowOpenThenWideEventClientNotCalled() = runTest {
+        testee.onUserReset()
+
+        verify(wideEventClient, never()).flowAbort(any())
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenOnUserResetCalledAndFeatureFlagDisabledMidFlightThenInFlightFlowStillAborted() = runTest {
+        // Flow opens while flag is ON, then flag flips OFF before user reset. We must still abort
+        // the in-flight flow so it doesn't get auto-finished as Unknown by the cleanup timeout.
+        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(55L))
+        whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
+        runStarted(executionType = PirExecutionType.MANUAL_INITIAL)
+        pirRemoteFeatures.sendScanWideEvent().setRawStoredState(Toggle.State(false))
+
+        testee.onUserReset()
+
+        verify(wideEventClient).flowAbort(55L)
+    }
+
+    @Test
     fun whenJourneySpansMultipleRunsThenSuccessReportsTotalCounts() = runTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(7L))
 
