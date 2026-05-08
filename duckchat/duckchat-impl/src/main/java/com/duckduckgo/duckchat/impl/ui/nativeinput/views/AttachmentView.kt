@@ -197,8 +197,10 @@ class AttachmentView(
     }
 
     private fun showChooserDialog() {
-        onAction?.invoke(Action.ShowAttachmentChooser(true))
+        val state = viewModel?.attachmentState?.value
+        val supportedFileTypes = state?.supportedFileTypes.orEmpty()
 
+        onAction?.invoke(Action.ShowAttachmentChooser(true))
         ActionBottomSheetDialog.Builder(context)
             .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
             .setPrimaryItem(
@@ -209,16 +211,20 @@ class AttachmentView(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
             )
-            .addEventListener(buildDialogListener())
+            .addEventListener(buildDialogListener(supportedFileTypes))
             .show()
     }
 
-    private fun buildDialogListener() = object : ActionBottomSheetDialog.EventListener() {
+    private fun buildDialogListener(supportedFileTypes: List<String>) = object : ActionBottomSheetDialog.EventListener() {
         private var pickerLaunched = false
 
         override fun onPrimaryItemClicked() {
             pickerLaunched = true
-            onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+            if (supportedFileTypes.isNotEmpty()) {
+                onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+            } else {
+                onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+            }
         }
 
         override fun onSecondaryItemClicked() {
@@ -234,5 +240,10 @@ class AttachmentView(
     private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list)
+    }
+
+    private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+        val list = uris?.toList()
+        if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
     }
 }

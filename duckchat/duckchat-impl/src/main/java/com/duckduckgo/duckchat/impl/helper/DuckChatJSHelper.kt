@@ -166,6 +166,7 @@ class RealDuckChatJSHelper @Inject constructor(
                         fileSizeBytesUsed = attachments.optInt("fileSizeBytesUsed", 0),
                     )
                     limitsHandler.setConversationImagesUsed(usage.imagesUsed)
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed.toLong())
                 }
                 null
             }

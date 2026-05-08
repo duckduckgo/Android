@@ -35,7 +35,6 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
-import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -74,6 +73,8 @@ class AttachmentViewModel @Inject constructor(
         val files: List<FileAttachment> = emptyList(),
         val imageLimitError: String? = null,
         val supportsUpload: Boolean = false,
+        val supportsImageUpload: Boolean = false,
+        val supportedFileTypes: List<String> = emptyList(),
         val isAtCapacity: Boolean = false,
     ) {
         val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
@@ -90,7 +91,10 @@ class AttachmentViewModel @Inject constructor(
         limitsHandler.conversationImagesSent,
         _isDuckAiMode,
     ) { (images, files), modelState, conversationSent, isDuckAiMode ->
-        val supportsUpload = computeSupportsUpload(modelState)
+        val model = modelState.models.find { it.id == modelState.selectedModelId }
+        val supportsImageUpload = modelState.models.isEmpty() ||
+            (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
+        val supportedFileTypes = model?.supportedFileTypes.orEmpty()
         val limits = modelState.attachmentLimits.images
         val currentCount = images.size
         val totalImages = currentCount + if (isDuckAiMode) conversationSent else 0
@@ -98,7 +102,9 @@ class AttachmentViewModel @Inject constructor(
             images = images,
             files = files,
             imageLimitError = computeImageLimitError(currentCount, totalImages, limits),
-            supportsUpload = supportsUpload,
+            supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
+            supportsImageUpload = supportsImageUpload,
+            supportedFileTypes = supportedFileTypes,
             isAtCapacity = currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
@@ -114,9 +120,18 @@ class AttachmentViewModel @Inject constructor(
 
     fun onFilesPicked(uris: List<Uri>) {
         viewModelScope.launch {
+            val maxPerConversation = fileAttachmentProcessor.getMaxPerConversation()
+            val maxFileSizeBytes = fileAttachmentProcessor.getMaxFileSizeBytes()
+            val maxTotalFileSizeBytes = fileAttachmentProcessor.getMaxTotalFileSizeBytes()
             for (uri in uris) {
-                if (_fileAttachments.value.size >= fileAttachmentProcessor.getMaxPerConversation()) break
+                val currentFiles = _fileAttachments.value
+                val alreadySentCount = limitsHandler.conversationFilesSent.value
+                if (currentFiles.size + alreadySentCount >= maxPerConversation) break
                 val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
+                if (attachment.sizeBytes > maxFileSizeBytes) continue
+                val stagedBytes = currentFiles.sumOf { it.sizeBytes }
+                val alreadySentBytes = limitsHandler.conversationFileSizeSentBytes.value
+                if (stagedBytes + alreadySentBytes + attachment.sizeBytes > maxTotalFileSizeBytes) continue
                 _fileAttachments.update { it + attachment }
             }
         }
@@ -145,6 +160,7 @@ class AttachmentViewModel @Inject constructor(
     fun clearAttachmentsForNewChat() {
         clearAttachments()
         limitsHandler.setConversationImagesUsed(0)
+        limitsHandler.setConversationFilesUsed(0, 0L)
     }
 
     fun setDuckAiMode(enabled: Boolean) {
@@ -184,13 +200,6 @@ class AttachmentViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun computeSupportsUpload(modelState: ModelState): Boolean {
-        if (modelState.models.isEmpty()) return true
-        val model = modelState.models.find { it.id == modelState.selectedModelId }
-        return (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled()) ||
-            model?.supportsFileUpload == true
     }
 
     private fun computeImageLimitError(

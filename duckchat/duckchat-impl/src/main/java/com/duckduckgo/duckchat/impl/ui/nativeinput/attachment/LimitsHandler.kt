@@ -25,8 +25,11 @@ import javax.inject.Inject
 
 interface LimitsHandler {
     val conversationImagesSent: StateFlow<Int>
+    val conversationFilesSent: StateFlow<Int>
+    val conversationFileSizeSentBytes: StateFlow<Long>
 
     fun setConversationImagesUsed(count: Int)
+    fun setConversationFilesUsed(count: Int, sizeBytes: Long = 0L)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -36,7 +39,18 @@ class RealLimitsHandler @Inject constructor() : LimitsHandler {
     private val _conversationImagesSent = MutableStateFlow(0)
     override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
+    private val _conversationFilesSent = MutableStateFlow(0)
+    override val conversationFilesSent: StateFlow<Int> = _conversationFilesSent
+
+    private val _conversationFileSizeSentBytes = MutableStateFlow(0L)
+    override val conversationFileSizeSentBytes: StateFlow<Long> = _conversationFileSizeSentBytes
+
     override fun setConversationImagesUsed(count: Int) {
         _conversationImagesSent.value = count
+    }
+
+    override fun setConversationFilesUsed(count: Int, sizeBytes: Long) {
+        _conversationFilesSent.value = count
+        _conversationFileSizeSentBytes.value = sizeBytes
     }
 }
