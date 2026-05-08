@@ -464,9 +464,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
+                    if (pendingDuckAiOnboardingFire) {
+                        pendingDuckAiOnboardingFire = false
+                        closeDuckChatFullScreen()
+                    }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
                     showSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
+                    if (pendingDuckAiOnboardingFire) {
+                        pendingDuckAiOnboardingFire = false
+                        closeDuckChatFullScreen()
+                    }
                 }
             }
         }
