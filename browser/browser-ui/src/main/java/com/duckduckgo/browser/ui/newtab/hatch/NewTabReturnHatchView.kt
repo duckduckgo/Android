@@ -42,6 +42,7 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,6 +60,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     interface HatchListener {
         fun onHatchPressed()
         fun onHatchRendered(visible: Boolean)
+        fun onBurnTabPressed()
     }
 
     @Inject
@@ -106,7 +108,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         when (command) {
             NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
                 globalActivityStarter.start(context, TabSwitcherScreenNoParams)
+            NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
+                showTabClosedSnackbar()
         }
+    }
+
+    private fun showTabClosedSnackbar() {
+        Snackbar.make(rootView, R.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onDetachedFromWindow() {
@@ -152,7 +160,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             viewModel.closeTab()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuBurnTab)) {
-            viewModel.burnTab()
+            hatchHatchListener?.onBurnTabPressed()
         }
     }
 

@@ -26,5 +26,6 @@
     <string name="hatchMenuReturnTab">Return to Tab</string>
     <string name="hatchMenuCloseTab">Close Tab</string>
     <string name="hatchMenuBurnTab">Burn Tab</string>
+    <string name="newTabReturnHatchTabClosed">Tab closed</string>
 
 </resources>
