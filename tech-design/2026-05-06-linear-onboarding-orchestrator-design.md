@@ -36,7 +36,7 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 ## Non-goals
 
 - Persistence of orchestrator state across process death — today's flow restarts from scratch on process death; that behavior is preserved deliberately
-- Designing the `BrowserContext` step renderer or `BrowserConstraintMode` descriptor — deferred to a follow-up TD
+- Designing the `BrowserContext` step renderer — deferred to a follow-up TD
 - Migrating `WelcomePageViewModel` / `WelcomePage` — they are about to be superseded by the brand-design variant of the onboarding anyway, so they stay on the legacy in-VM state machine until removed. Only `BrandDesignUpdatePageViewModel` / `BrandDesignUpdateWelcomePage` get migrated.
 - Changing reactive-phase CTA logic from `CtaViewModel.getHomeCta()` / `getBrowserCta()` that's presented in the `BrowserTabFragment` — those continue to gate on `AppStage` as today
 - Cross-host back-button navigation (e.g., back from a `IsolatedContext` step to a previous `BrowserContext` step) — back during linear closes the app, regardless of the current host
@@ -46,18 +46,17 @@ Beyond satisfying the immediate requirement, this design invests in structure: e
 
 ```
 ┌─ AppScope ───────────────────────────────────────────────────────────┐
-│                                                                       │
-│   LinearOnboardingPlanProvider                                        │
-│         │   buildMainPath(): OnboardingPath                            │
-│         │   step factories with precondition + resolveDialog +        │
-│         │   transition lambdas (each reads fresh state at call time)  │
-│         │   side paths exposed as private vals (e.g. skipPath)        │
-│         ▼                                                             │
-│   LinearOnboardingOrchestrator    ─── state: StateFlow<…>             │
-│         │   onEvent(StepEvent)                                        │
-│         │   requestFirstStep()    (called once by welcome page)       │
-│         │   firstStepHost(): Host                                     │
-│         │   isOnLinearBrowserStep(): Boolean                          │
+│                                                                      │
+│   LinearOnboardingPlanProvider                                       │
+│         │   buildMainPath(): OnboardingPath                          │
+│         │   step factories with precondition + resolveDialog +       │
+│         │   transition lambdas (each reads fresh state at call time) │
+│         │   side paths exposed as private vals (e.g. skipPath)       │
+│         ▼                                                            │
+│   LinearOnboardingOrchestrator    ─── state: StateFlow<…>            │
+│         │   onEvent(StepEvent)                                       │
+│         │   requestFirstStep()    (called once by welcome page)      │
+│         │   firstStepHost(): Host                                    │
 │         │                                                            │
 │         └──► AppStage facade (Room, unchanged)                       │
 │              writes stageCompleted(NEW)/(DAX_ONBOARDING) on          │
@@ -115,6 +114,7 @@ sealed interface LinearStep {
 }
 
 sealed interface PreOnboardingDialog {
+    data object IntroAnimation : PreOnboardingDialog            // welcome animation + notification permission flow
     data object SyncRestore : PreOnboardingDialog
     data class Initial(val showDuckAiCopy: Boolean) : PreOnboardingDialog
     data class InitialReinstallUser(val showDuckAiCopy: Boolean) : PreOnboardingDialog
@@ -129,7 +129,7 @@ sealed interface PreOnboardingDialog {
 sealed interface StepEvent {
     data object PrimaryClicked : StepEvent
     data object SecondaryClicked : StepEvent
-    data class SystemResult(val ok: Boolean) : StepEvent           // role-manager intent result
+    data class DefaultBrowserPromptFinished(val isDefaultBrowser: Boolean) : StepEvent           // role-manager intent result
     data class OmnibarTypeSelected(val type: OmnibarType) : StepEvent
     data class InputModeSelected(val withAi: Boolean) : StepEvent
     data class InputDemoQuerySubmitted(val query: String, val isChat: Boolean) : StepEvent
@@ -173,16 +173,18 @@ The "advance from a side branch resumes main" rule from the old design is no lon
 
 ### Today's flow expressed in this model
 
-The current brand-design flow maps onto **one main path of eight steps**, plus a **single-step side path** for the skip-confirmation:
+The current brand-design flow maps onto **one main path of nine steps**, plus a **single-step side path** for the skip-confirmation:
 
-- Main path (in order): `SyncRestore`, `InitialReinstallUser`, `Initial`, `ComparisonChart`, `DefaultBrowser`, `AddressBarPosition`, `InputScreen`, `InputScreenPreview`
+- Main path (in order): `IntroAnimation`, `SyncRestore`, `InitialReinstallUser`, `Initial`, `ComparisonChart`, `DefaultBrowser`, `AddressBarPosition`, `InputScreen`, `InputScreenPreview`
 - Skip path: `SkipOnboardingOption`
+
+`IntroAnimation` is the welcome animation + notification permission flow. Modelling it as a step rather than as a fragment-side prelude has a real correctness benefit: when the user re-enters `OnboardingActivity` after a `BrowserContext` step (for the L→C→L→C flow), the orchestrator's `currentStepIndex` is already past `IntroAnimation`, so the animation does not replay. The fragment renders whatever the current step's dialog is.
 
 Mutual exclusion between the three "first dialog" candidates (`SyncRestore` / `InitialReinstallUser` / `Initial`) is expressed as preconditions on each step, not as plan-level branching — the main path stays a flat, readable list, and ineligible steps are skipped during forward walking. `InitialReinstallUser` and `SyncRestore`'s secondary CTAs invoke `SwitchTo(skipPath)`. `SkipOnboardingOption`'s secondary returns `Advance` (which walks off the end of the single-step skip path → pops the call stack → resumes main from the caller's slot + 1). The full plan-provider code is in [Appendix A: Plan provider code](#appendix-a-plan-provider-code).
 
 Two architectural points worth surfacing here, since they're easy to miss in the per-step factory code:
 
-1. **`DefaultBrowser` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `PreOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `SystemResult` event. The fragment-side rendering is unchanged (no visible separate "step" to the user); it's only an architectural unit. This becomes important when the future `BrowserContext` steps land and `DefaultBrowser` is the isolated phase the user re-enters.
+1. **`DefaultBrowser` is a first-class step.** Today the role-manager intent is launched from inside `WelcomePageViewModel.onPrimaryCtaClicked(COMPARISON_CHART)` and `onDefaultBrowserSet/NotSet` fires the next state. In the orchestrator model it's a discrete step whose `resolveDialog` returns `PreOnboardingDialog.DefaultBrowser(intent = ...)`, with the result delivered via a `DefaultBrowserPromptFinished(isDefaultBrowser)` event. The fragment-side rendering is unchanged (no visible separate "step" to the user); it's only an architectural unit. This becomes important when the future `BrowserContext` steps land and `DefaultBrowser` is the isolated phase the user re-enters.
 
 2. **Pixel firing has moved into `transition` lambdas.** Today's `BrandDesignUpdatePageViewModel` has pixel calls scattered across `onPrimaryCtaClicked`, `onSecondaryCtaClicked`, `fireDialogShownPixel`, etc. In the orchestrator model, decision-time pixels live with the decision (in `transition`); show-time pixels (`fireDialogShownPixel` equivalents) stay in the renderer (the viewmodel observing `state` transitions emits the show pixel for the new step). The pixel sequence is preserved.
 
@@ -234,11 +236,12 @@ Reactive completion in `CtaViewModel.completeStageIfDaxOnboardingCompleted` cont
 3. If `AppStage == DAX_ONBOARDING`: state = `Completed`, orchestrator never activates (linear is past, reactive owns the rest).
 4. If `AppStage == NEW`: state = `NotStarted`. Plan registry is built lazily on first `requestFirstStep()` call from the welcome page (so injection elsewhere doesn't trigger flag/state reads).
 
-**On `requestFirstStep()` (called by `BrandDesignUpdatePageViewModel` after the welcome animation and notification permission flow complete):**
+**On `requestFirstStep()` (called by `BrandDesignUpdatePageViewModel` once on view creation; idempotent if state is already `InProgress`):**
 
-- Build the plan registry (synchronous, no config wait — preconditions evaluate fresh state lazily at advance time, see [Config staleness](#config-staleness)).
-- Build the main path via `planProvider.buildMainPath()`. Walk its steps from index 0, evaluating each `precondition()` until the first eligible step is found. Set state to `InProgress(currentPath = mainPath, currentStepIndex = indexOfFirstEligible)`. Empty call stack.
-- Set `InProgress(firstEligibleStepId)`.
+- Build the main path via `planProvider.buildMainPath()` (synchronous, no config wait — preconditions evaluate fresh state lazily at advance time, see [Config staleness](#config-staleness)).
+- Walk the main path's steps from index 0, evaluating each `precondition()` until the first eligible step is found. Set state to `InProgress(currentPath = mainPath, currentStepIndex = indexOfFirstEligible)`. Empty call stack.
+
+On a fresh first-time launch this lands on `IntroAnimation`, which the fragment renders. On re-entry to `OnboardingActivity` from `BrowserActivity` (during the L→C→L→C flow), the orchestrator state is already `InProgress(...)` somewhere past `IntroAnimation`, so `requestFirstStep()` is a no-op and the fragment renders the current step's dialog directly — no animation replay.
 
 **On activity transitions mid-flow:**
 
@@ -413,10 +416,14 @@ class BrandDesignUpdatePageViewModel ... {
     fun onAddressBarPositionOptionSelected(type: OmnibarType) = orchestrator.onEvent(StepEvent.OmnibarTypeSelected(type))
     fun onInputScreenOptionSelected(withAi: Boolean) = orchestrator.onEvent(StepEvent.InputModeSelected(withAi))
     fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) = orchestrator.onEvent(StepEvent.InputDemoQuerySubmitted(query, isChat))
-    fun onDefaultBrowserSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = true))
-    fun onDefaultBrowserNotSet() = orchestrator.onEvent(StepEvent.SystemResult(ok = false))
+    fun onDefaultBrowserSet() = orchestrator.onEvent(StepEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
+    fun onDefaultBrowserNotSet() = orchestrator.onEvent(StepEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
 
-    // called by the fragment after the welcome animation completes (replaces today's loadDaxDialog logic)
+    // called by the fragment on view creation. With IntroAnimation modelled as a step,
+    // this fires before the animation runs — the orchestrator transitions to
+    // InProgress(IntroAnimation), the renderer emits dialogState = IntroAnimation,
+    // and the fragment plays the animation as part of rendering that step.
+    // Idempotent: a no-op if state is already InProgress (e.g., on re-entry from BrowserActivity).
     fun loadDaxDialog() {
         if (linearOnboardingOrchestratorFeature.self().isEnabled()) {
             viewModelScope.launch { orchestrator.requestFirstStep() }
@@ -447,16 +454,19 @@ viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { command ->
 }.launchIn(lifecycleScope)
 ```
 
-`configureDaxCta(dialog: PreOnboardingDialog)` becomes the single fragment-side rendering entry point — including handling `DefaultBrowser` by launching the system role-manager intent rather than rendering a dax dialog:
+`configureDaxCta(dialog: PreOnboardingDialog)` becomes the single fragment-side rendering entry point. Most variants render a dax dialog; `IntroAnimation` triggers the existing welcome-animation + notification-permission flow (which fires `onPrimaryCtaClicked()` when complete to advance the orchestrator); `DefaultBrowser` launches the system role-manager intent:
 
 ```kotlin
 private fun configureDaxCta(dialog: PreOnboardingDialog) {
     when (dialog) {
+        is IntroAnimation -> playIntroAnimation { onPrimaryCtaClicked() }  // existing welcome animation + permission flow
         is DefaultBrowser -> startActivityForResult(dialog.intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
-        else -> renderDaxDialog(dialog)  // existing per-variant rendering, dispatched on the sealed type
+        else -> renderDaxDialog(dialog)  // existing per-variant rendering
     }
 }
 ```
+
+The `IntroAnimation` case is what makes the no-replay property work: when the fragment is recreated (e.g., the user returns to `OnboardingActivity` from a `BrowserContext` step), it observes whatever the orchestrator's current step is. If that's not `IntroAnimation`, the animation simply isn't played — the fragment renders the current dialog directly.
 
 ### Why this shape
 
@@ -573,7 +583,7 @@ Specifically:
 1. **`BrowserContext` step descriptor and renderer.** Owned by the first project to introduce a `BrowserContext` step. This spec only declares the structural seam.
 2. **`SYNC_RESTORE` coverage in `BrandDesignUpdatePageViewModel`.** The brand-design viewmodel imports `SYNC_RESTORE` and handles it in `fireDialogShownPixel`, but its `loadDaxDialog` never dispatches to it, `onPrimaryCtaClicked(SYNC_RESTORE)` has a `// TODO`, and `onSecondaryCtaClicked(SYNC_RESTORE)` is a no-op. The orchestrator spec includes a `SYNC_RESTORE` step. If the product team is intentionally dropping `SYNC_RESTORE` with the brand-design migration, the orchestrator's `syncRestoreStep()` factory is removed from the main path in one place. If `SYNC_RESTORE` is being kept, the brand-design viewmodel needs the missing rendering paths backfilled before phase 4 cleanup.
 3. **`DefaultBrowser` intent nullability.** `defaultRoleBrowserDialog.createIntent(context)` is nullable today and the legacy VM falls through to `ADDRESS_BAR_POSITION` when it returns null while `shouldShowDialog()` is true. The orchestrator handles this by checking both in `defaultBrowserStep.precondition` (see Appendix A). Worth confirming with the team that this fall-through is the intended behaviour to preserve, since the legacy code also fires `DEFAULT_BROWSER_DIALOG_NOT_SHOWN` in that case — that pixel needs to keep firing on the orchestrator path too.
-4. **`expectedHost == null` while `NotStarted`.** `expectedHost(plan)` returns `null` when `OnboardingPlanState == NotStarted` — neither activity should redirect during that window. Today this is safe because `OnboardingActivity` is the only entry point during the welcome-animation phase before `requestFirstStep()` is called. If a future code path can hand the user to `BrowserActivity` *before* `requestFirstStep()`, the activity would silently linger; the `null` return is intentional to keep both activities passive during that window.
+4. **`expectedHost == null` while `NotStarted`.** `expectedHost()` returns `null` when `OnboardingPlanState == NotStarted` — neither activity should redirect during that window. With `IntroAnimation` modelled as a step, this window collapses to "between activity creation and the fragment's `requestFirstStep()` call" — typically tens of milliseconds. Activities silently linger if the orchestrator is `NotStarted`; the `null` return is intentional to keep both activities passive during that window.
 5. **Persistence as a follow-up.** If product later wants "preserve user's mid-flow position across process kills", it's a one-day add: DataStore-backed `OnboardingPlanState` + the reconciliation rule "if persisted `currentStepId` no longer in rebuilt plan, treat as `Completed`".
 6. **Plugin-extensible plan.** If the team's experiment-churn workload ever grows to multiple modules wanting to inject onboarding steps, `LinearStep` plugin contributions via `@ContributesPluginPoint` would cleanly extend the registry. Out of scope for now (one customer, monolithic plan).
 
@@ -598,6 +608,7 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private val context: Context,
 ) {
     fun buildMainPath(): OnboardingPath = OnboardingPath(steps = listOf(
+        introAnimationStep(),
         syncRestoreStep(),
         initialReinstallUserStep(),
         initialStep(),
@@ -613,6 +624,21 @@ class LinearOnboardingPlanProvider @Inject constructor(
     private val skipPath: OnboardingPath by lazy {
         OnboardingPath(steps = listOf(skipOnboardingOptionStep()))
     }
+
+    private fun introAnimationStep() = IsolatedContext(
+        id = ID_INTRO_ANIMATION,
+        // No precondition: this is always the very first step on a fresh plan.
+        // Once advanced past, the orchestrator never lands here again — the no-replay
+        // property is just the universal forward-walk semantics of the advance algorithm.
+        resolveDialog = { PreOnboardingDialog.IntroAnimation },
+        transition = { event -> when (event) {
+            // Fragment fires PrimaryClicked once the welcome animation + notification
+            // permission flow finishes. No pixels here — they're already fired by the
+            // existing notification-runtime-permission flow inside the fragment.
+            PrimaryClicked -> Advance
+            else -> Stay
+        }},
+    )
 
     private fun syncRestoreStep() = IsolatedContext(
         id = ID_SYNC_RESTORE,
@@ -684,12 +710,12 @@ class LinearOnboardingPlanProvider @Inject constructor(
             PreOnboardingDialog.DefaultBrowser(intent = defaultRoleBrowserDialog.createIntent(context)!!)
         },
         transition = { event -> when (event) {
-            is SystemResult -> {
+            is DefaultBrowserPromptFinished -> {
                 defaultRoleBrowserDialog.dialogShown()
-                appInstallStore.defaultBrowser = event.ok
-                if (event.ok) appInstallStore.wasEverDefaultBrowser = true
+                appInstallStore.defaultBrowser = event.isDefaultBrowser
+                if (event.isDefaultBrowser) appInstallStore.wasEverDefaultBrowser = true
                 pixel.fire(
-                    if (event.ok) DEFAULT_BROWSER_SET else DEFAULT_BROWSER_NOT_SET,
+                    if (event.isDefaultBrowser) DEFAULT_BROWSER_SET else DEFAULT_BROWSER_NOT_SET,
                     mapOf(DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
                 )
                 Advance
