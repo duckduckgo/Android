@@ -57,8 +57,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled. Controls the HashMap label-walk tracker-domain lookup path.
      * If the remote feature is not present defaults to `false`. Always-on for internal builds.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun optimizeTrackerEvaluationV3(): Toggle
 
     /**
