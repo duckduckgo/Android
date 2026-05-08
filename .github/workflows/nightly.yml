@@ -42,6 +42,7 @@ env:
 jobs:
   code_formatting:
     name: Code Formatting
+    if: ${{ (inputs.ddg_di || 'AnvilDagger') == 'AnvilDagger' }}
     runs-on: android-large-runner
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
@@ -66,7 +67,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Run Code Formatting Checks
-        run: ./gradlew spotlessCheck -Pddg.di=${{ env.DDG_DI }}
+        run: ./gradlew spotlessCheck
 
   unit_tests:
     name: Unit tests
