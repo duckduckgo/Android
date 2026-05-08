@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.nativeinput.file
+package com.duckduckgo.duckchat.impl.ui.nativeinput.file
 
 import android.content.Context
 import android.util.AttributeSet

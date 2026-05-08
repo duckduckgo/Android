@@ -34,10 +34,10 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.Action
-import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachment
-import com.duckduckgo.duckchat.impl.nativeinput.file.FileAttachmentsContainerView
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
