@@ -936,6 +936,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun showDuckAiEndCta() {
         duckAiEndCtaVisible = true
+        duckAiEndCtaOkClicked = false
         binding.ddgLogoContainer.isVisible = false
         binding.viewPager.isVisible = false
         binding.newTabContainerScrollView.isVisible = false
