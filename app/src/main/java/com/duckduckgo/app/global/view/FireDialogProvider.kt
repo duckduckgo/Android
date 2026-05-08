@@ -16,39 +16,16 @@
 
 package com.duckduckgo.app.global.view
 
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.api.fire.FireDialog
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-/**
- * Provider for creating Fire dialog instances.
- * Returns the appropriate dialog variant based on feature flag (Simple or Granular).
- *
- * To receive lifecycle events from the dialog (onShow, onCancel, onClearStarted),
- * use FragmentManager.setFragmentResultListener with the appropriate REQUEST_KEY
- * from GranularFireDialog or NonGranularFireDialog.
- */
-interface FireDialogProvider {
-    /**
-     * Creates a Fire dialog instance.
-     * @param origin The origin of the dialog request.
-     *
-     * @return Instance of FireDialog (either Simple or Granular variant)
-     */
-    suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
-
-    enum class FireDialogOrigin {
-        BROWSER,
-        SETTINGS,
-        TAB_SWITCHER,
-        DUCK_AI_CONTEXTUAL_CHAT,
-    }
-}
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)

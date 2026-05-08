@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.view
 
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory

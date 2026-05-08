@@ -208,7 +208,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.browser.api.fire.FireDialog
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -416,6 +418,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>
+
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -3613,7 +3618,10 @@ class BrowserTabFragment :
                 }
 
                 override fun onBurnTabPressed() {
-
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.BROWSER)
+                        dialog.show(parentFragmentManager)
+                    }
                 }
             },
         )

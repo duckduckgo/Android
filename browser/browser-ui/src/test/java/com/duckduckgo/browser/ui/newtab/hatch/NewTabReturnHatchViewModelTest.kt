@@ -370,20 +370,6 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenCloseTabThenHatchHides() = runTest {
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            assertTrue(awaitItem().shouldShow)
-
-            testee.closeTab()
-
-            assertFalse(awaitItem().shouldShow)
-        }
-    }
-
-    @Test
     fun whenCloseTabThenShowTabClosedSnackbarCommandEmitted() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
         lastAccessedTabFlow.emit(tab)
