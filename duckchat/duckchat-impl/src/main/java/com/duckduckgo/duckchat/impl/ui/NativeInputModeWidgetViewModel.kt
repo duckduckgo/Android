@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
+import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
@@ -190,8 +191,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
     }
 
-    fun storePendingPrompt(query: String) {
-        pendingNativePromptStore.store(query, getSelectedModelId())
+    fun storePendingPrompt(
+        query: String,
+        modelId: String?,
+        images: List<PendingNativeImage> = emptyList(),
+    ) {
+        pendingNativePromptStore.store(query, modelId, images)
     }
 
     fun configureContextual() {

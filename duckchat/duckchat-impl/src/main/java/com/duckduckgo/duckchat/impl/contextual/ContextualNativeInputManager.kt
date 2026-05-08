@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import android.net.Uri
+import android.webkit.ValueCallback
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.common.ui.view.gone
@@ -30,6 +32,7 @@ import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -40,7 +43,8 @@ interface ContextualNativeInputManager {
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
-        onImageButtonPressed: () -> Unit = {},
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
     )
 
     fun onWebViewMode()
@@ -62,13 +66,14 @@ class RealContextualNativeInputManager @Inject constructor(
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
-        onImageButtonPressed: () -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted, onImageButtonPressed)
+        setupWidget(widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -92,11 +97,19 @@ class RealContextualNativeInputManager @Inject constructor(
             .build()
     }
 
-    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
+    private fun setupWidget(
+        widget: NativeInputModeWidget,
+        onSearchSubmitted: (String) -> Unit,
+        onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
+        onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
+    ) {
         widget.configureContextual()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
-        widget.onImageClick = onImageButtonPressed
+        widget.bindAttachmentCallbacks(
+            onCameraCaptureRequested = onCameraCaptureRequested,
+            onFilePickerRequested = onFilePickerRequested,
+        )
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->
@@ -104,7 +117,9 @@ class RealContextualNativeInputManager @Inject constructor(
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
-                sendPrompt(prompt, widget.getSelectedModelId())
+                val imagesJson = widget.getImageAttachmentsJson()
+                widget.clearImageAttachments()
+                sendPrompt(prompt, widget.getSelectedModelId(), imagesJson)
                 widget.text = ""
             },
         )
@@ -116,7 +131,7 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String, modelId: String? = null) {
+    private fun sendPrompt(prompt: String, modelId: String? = null, imagesJson: JSONArray? = null) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -127,6 +142,9 @@ class RealContextualNativeInputManager @Inject constructor(
                     put("autoSubmit", true)
                     if (modelId != null) {
                         put("modelId", modelId)
+                    }
+                    if (imagesJson != null) {
+                        put("images", imagesJson)
                     }
                 },
             )
