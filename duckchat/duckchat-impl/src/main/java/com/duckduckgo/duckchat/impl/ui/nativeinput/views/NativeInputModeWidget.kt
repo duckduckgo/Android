@@ -216,6 +216,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
+    private var pendingIsDuckAiMode: Boolean = false
 
     private var attachmentView: AttachmentView? = null
 
@@ -270,6 +271,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.bind(scope, viewModelFactory)
+            pluginView.setDuckAiMode(pendingIsDuckAiMode)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -602,11 +604,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+        pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
             viewModel.configure(isDuckAiMode, isBottom)
             viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
             if (isDuckAiMode) selectChatTab()
             applyOmnibarShape(isBottom)
+            attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
 

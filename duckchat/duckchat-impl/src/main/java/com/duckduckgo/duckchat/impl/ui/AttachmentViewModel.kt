@@ -72,22 +72,23 @@ class AttachmentViewModel @Inject constructor(
     }
 
     private val _imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
+    private val _isDuckAiMode = MutableStateFlow(false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
         _imageAttachments,
         modelManager.modelState,
         limitsHandler.conversationImagesSent,
-    ) { images, modelState, conversationSent ->
+        _isDuckAiMode,
+    ) { images, modelState, conversationSent, isDuckAiMode ->
         val supportsUpload = computeSupportsUpload(modelState)
         val limits = modelState.attachmentLimits.images
         val currentCount = images.size
-        val totalImages = currentCount + conversationSent
-        val isAtCapacity = currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation
+        val totalImages = currentCount + if (isDuckAiMode) conversationSent else 0
         AttachmentState(
             images = images,
             imageLimitError = computeImageLimitError(currentCount, totalImages, limits),
             supportsUpload = supportsUpload,
-            isAtCapacity = isAtCapacity,
+            isAtCapacity = currentCount >= limits.maxPerTurn || totalImages >= limits.maxPerConversation,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
 
@@ -117,6 +118,10 @@ class AttachmentViewModel @Inject constructor(
 
     fun clearAttachmentsForNewChat() = clearAttachments()
 
+    fun setDuckAiMode(enabled: Boolean) {
+        _isDuckAiMode.value = enabled
+    }
+
     fun getImageAttachments(): List<ImageAttachment> = _imageAttachments.value
 
     fun getImageAttachmentsJson(): JSONArray? {
@@ -145,10 +150,10 @@ class AttachmentViewModel @Inject constructor(
         totalImages: Int,
         limits: ImageLimits,
     ): String? = when {
-        totalImages > limits.maxPerConversation ->
-            context.getString(R.string.duckChatImageAttachmentLimitPerConversation, limits.maxPerConversation)
         currentCount > limits.maxPerTurn ->
             context.getString(R.string.duckChatImageAttachmentLimitPerMessage, limits.maxPerTurn)
+        totalImages > limits.maxPerConversation ->
+            context.getString(R.string.duckChatImageAttachmentLimitPerConversation, limits.maxPerConversation)
         else -> null
     }
 
