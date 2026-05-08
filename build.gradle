@@ -20,6 +20,7 @@ buildscript {
         google()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
     }
     dependencies {
         classpath(Android.tools.build.gradlePlugin)
@@ -28,7 +29,7 @@ buildscript {
         // in the individual module build.gradle files
 
         // Metro DI plugin (requires JVM 21+ to load)
-        classpath "dev.zacsweers.metro:gradle-plugin:1.0.0"
+        classpath "dev.zacsweers.metro:gradle-plugin:1.1.0-SNAPSHOT"
     }
 }
 
@@ -63,6 +64,7 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://central.sonatype.com/repository/maven-snapshots/' }
         if (rootProject.ext.proprietaryFontAvailable) {
             maven {
                 url = uri("https://maven.pkg.github.com/duckduckgo/native-apps-ducksans")
