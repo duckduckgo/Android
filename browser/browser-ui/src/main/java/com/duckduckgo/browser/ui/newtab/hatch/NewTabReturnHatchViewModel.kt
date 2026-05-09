@@ -88,7 +88,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                 isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                 tabs = tabs.size,
-                shouldShowTabs = omnibarRepository.omnibarType == OmnibarType.SPLIT
+                shouldShowTabs = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             )
         } else {
             ViewState(shouldShow = false)

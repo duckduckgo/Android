@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -29,7 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
@@ -84,7 +82,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     }
 
     private val popupMenu by lazy {
-       PopupMenu(LayoutInflater.from(context), R.layout.popup_hatch_menu)
+        PopupMenu(LayoutInflater.from(context), R.layout.popup_hatch_menu)
     }
 
     override fun onAttachedToWindow() {
@@ -152,7 +150,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         hatchHatchListener?.onHatchRendered(state.shouldShow)
     }
 
-    private fun initPopupMenu(){
+    private fun initPopupMenu() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuReturnToTab)) {
             hatchHatchListener?.onHatchPressed()
         }
