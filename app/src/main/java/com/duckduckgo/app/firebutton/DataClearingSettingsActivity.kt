@@ -31,10 +31,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDataClearingSettingsBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
-import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -178,7 +178,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
+            val dialog = fireDialogProvider.createFireDialog(Settings)
             dialog.show(supportFragmentManager)
         }
     }

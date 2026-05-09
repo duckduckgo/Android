@@ -84,10 +84,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.browser.api.fire.FireDialog
-import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.BROWSER
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT
+import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -102,6 +99,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.browser.api.fire.FireDialog
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.Browser
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -449,7 +450,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == DUCK_AI_CONTEXTUAL_CHAT.name
+                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
                     val message = if (isDuckAiContextual) {
                         getString(R.string.duckAiChatDeletedSnackbar)
                     } else {
@@ -957,7 +958,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params, type = Daily())
 
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(BROWSER)
+            val dialog = fireDialogProvider.createFireDialog(Browser)
             dialog.show(supportFragmentManager)
         }
     }
@@ -1155,7 +1156,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         DuckChatSharedViewModel.Command.LaunchFire -> launchFire()
                         DuckChatSharedViewModel.Command.LaunchContextualChatFire -> {
                             lifecycleScope.launch {
-                                val dialog = fireDialogProvider.createFireDialog(DUCK_AI_CONTEXTUAL_CHAT)
+                                val dialog = fireDialogProvider.createFireDialog(DuckAiContextualChat)
                                 dialog.show(supportFragmentManager)
                             }
                         }

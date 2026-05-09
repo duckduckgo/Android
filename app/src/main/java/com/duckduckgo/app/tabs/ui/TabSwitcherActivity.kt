@@ -41,7 +41,6 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -50,8 +49,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.downloads.DownloadsActivity
-import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -75,6 +72,9 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoBookmarkM
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.TabSwitcher
+import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -640,7 +640,7 @@ class TabSwitcherActivity :
 
     private fun onFireButtonClicked() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(TAB_SWITCHER)
+            val dialog = fireDialogProvider.createFireDialog(TabSwitcher)
             dialog.show(supportFragmentManager)
         }
     }

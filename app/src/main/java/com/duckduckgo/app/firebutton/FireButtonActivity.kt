@@ -32,8 +32,6 @@ import com.duckduckgo.app.browser.databinding.ActivityDataClearingBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
-import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -44,6 +42,8 @@ import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -291,7 +291,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
+            val dialog = fireDialogProvider.createFireDialog(Settings)
             dialog.show(supportFragmentManager)
         }
     }

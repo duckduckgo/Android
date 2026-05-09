@@ -610,7 +610,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
                 override fun onBurnTabPressed() {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.BROWSER)
+                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(binding.inputScreenHatch.tabId))
                         dialog.show(parentFragmentManager)
                     }
                 }
