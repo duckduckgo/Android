@@ -159,13 +159,15 @@ class NativeInputLayoutCoordinator(
             )
         }
 
-        fun isLogoVisible(view: View): Boolean {
-            return view == newTabContent &&
-                rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
+        fun isLogoOnlyContent(view: View): Boolean {
+            if (view != newTabContent) return false
+            val logoVisible = rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
+            val hatchVisible = rootView.findViewById<View?>(R.id.newTabReturnHatchView)?.visibility == View.VISIBLE
+            return logoVisible && !hatchVisible
         }
 
         fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
-            if (isBottom || isLogoVisible(view)) return 0
+            if (isBottom || isLogoOnlyContent(view)) return 0
             val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
             return maxOf(0, anchorBottomInWindow - viewLocation[1])
         }
