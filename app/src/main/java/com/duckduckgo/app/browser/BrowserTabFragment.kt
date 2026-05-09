@@ -208,9 +208,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.browser.api.fire.FireDialog
-import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -264,6 +261,8 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
+import com.duckduckgo.browser.api.fire.FireDialogProvider
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -3598,7 +3597,7 @@ class BrowserTabFragment :
 
                 override fun onBurnTabPressed() {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.BROWSER)
+                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(newTabReturnHatchView.tabId))
                         dialog.show(parentFragmentManager)
                     }
                 }

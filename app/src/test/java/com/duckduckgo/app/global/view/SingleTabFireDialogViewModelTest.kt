@@ -26,7 +26,6 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -44,6 +43,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -146,14 +146,14 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.stateData.isDuckAiChatsSelected)
             assertFalse(state.stateData.isSingleTabEnabled)
-            assertEquals(FireDialogOrigin.BROWSER, state.origin)
+            assertEquals(FireDialogOrigin.Browser, state.origin)
             assertTrue(state.isSiteDataSubtitleVisible)
             assertFalse(state.isDownloadsSubtitleVisible)
             assertTrue(testee.shouldRestartAfterClearing)
@@ -168,7 +168,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -185,7 +185,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -202,7 +202,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -219,7 +219,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -236,7 +236,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -253,7 +253,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -270,7 +270,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -287,7 +287,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -315,7 +315,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -343,7 +343,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -360,7 +360,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -381,7 +381,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -413,7 +413,7 @@ class SingleTabFireDialogViewModelTest {
         )
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -434,7 +434,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -466,7 +466,7 @@ class SingleTabFireDialogViewModelTest {
         )
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+        testee.setOrigin(FireDialogOrigin.TabSwitcher)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -483,7 +483,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -500,7 +500,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -525,7 +525,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -546,7 +546,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -567,7 +567,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -584,7 +584,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -601,7 +601,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+        testee.setOrigin(FireDialogOrigin.TabSwitcher)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -618,7 +618,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -643,7 +643,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -664,7 +664,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -685,7 +685,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -706,7 +706,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -726,12 +726,12 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+        testee.setOrigin(FireDialogOrigin.TabSwitcher)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.TAB_SWITCHER, state.origin)
+            assertEquals(FireDialogOrigin.TabSwitcher, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -742,12 +742,12 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.BROWSER, state.origin)
+            assertEquals(FireDialogOrigin.Browser, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -758,12 +758,12 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.SETTINGS, state.origin)
+            assertEquals(FireDialogOrigin.Settings, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -778,7 +778,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.commands().test {
             assertEquals(Command.OnShow, awaitItem())
@@ -792,7 +792,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
     }
@@ -802,8 +802,8 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Browser)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
     }
@@ -814,7 +814,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         verify(mockSettingsDataStore).singleTabFireDialogShownCount = 1
     }
@@ -825,7 +825,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         verify(mockSettingsDataStore, never()).singleTabFireDialogShownCount = any()
     }
@@ -840,7 +840,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         verify(mockSettingsDataStore, never()).singleTabFireDialogShownCount = any()
     }
@@ -855,7 +855,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.SETTINGS)
+        testee.setOrigin(FireDialogOrigin.Settings)
 
         verify(mockSettingsDataStore).singleTabFireDialogShownCount = 1
     }
@@ -1051,7 +1051,7 @@ class SingleTabFireDialogViewModelTest {
         )
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.onDeleteThisTabClicked()
 
@@ -1258,7 +1258,7 @@ class SingleTabFireDialogViewModelTest {
         // isDuckChatUrl returns false — but origin should force isDuckAiTab true
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -1273,7 +1273,7 @@ class SingleTabFireDialogViewModelTest {
     fun `when origin is duck ai contextual chat then isDeleteThisTabButtonVisible is true`() = runTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -1288,7 +1288,7 @@ class SingleTabFireDialogViewModelTest {
     fun `when origin is duck ai contextual chat then isDeleteAllButtonVisible is false`() = runTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -1304,7 +1304,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -1331,7 +1331,7 @@ class SingleTabFireDialogViewModelTest {
             ),
         )
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -1350,7 +1350,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
 
         testee.commands().test {
-            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
             awaitItem() // OnShow (triggered by setOrigin)
 
             testee.onDeleteThisTabClicked()
@@ -1365,7 +1365,7 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when delete this tab clicked with duck ai contextual chat origin then clearSingleTabData is not called`() = runTest {
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.onDeleteThisTabClicked()
 
@@ -1380,7 +1380,7 @@ class SingleTabFireDialogViewModelTest {
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.onDeleteThisTabClicked()
 
@@ -1392,7 +1392,7 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when delete this tab clicked with duck ai contextual chat origin then single tab pixels are fired`() = runTest {
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+        testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
 
         testee.onDeleteThisTabClicked()
 
@@ -1408,7 +1408,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
 
         testee.commands().test {
-            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
             awaitItem() // OnShow (triggered by setOrigin)
 
             testee.onDeleteThisTabClicked()
@@ -1425,7 +1425,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
 
         testee.commands().test {
-            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            testee.setOrigin(FireDialogOrigin.DuckAiContextualChat)
             awaitItem() // OnShow (triggered by setOrigin)
 
             testee.onDeleteThisTabClicked()
@@ -1433,6 +1433,142 @@ class SingleTabFireDialogViewModelTest {
             val commands = cancelAndConsumeRemainingEvents().mapNotNull { (it as? app.cash.turbine.Event.Item)?.value }
             assertTrue(commands.none { it is Command.PlayAnimation })
         }
+    }
+
+    // endregion
+
+    // region Hatch origin
+
+    @Test
+    fun `when hatch origin then isDeleteThisTabButtonVisible is true`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when hatch origin then isDeleteAllButtonVisible is false`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteAllButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when hatch origin with duck ai url then isDuckAiTabInBrowser is true`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.isDuckAiTabInBrowser)
+            assertFalse(state.isSiteDataSubtitleVisible)
+            assertFalse(state.isDownloadsSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when hatch origin with non-duck-ai url then isDuckAiTabInBrowser is false`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.isDuckAiTabInBrowser)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when hatch origin then resolved tab url drives duck ai detection not selected tab`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(2)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "selected-tab", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenAnswer { invocation ->
+            invocation.arguments[0].toString().contains("duck.ai")
+        }
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.isDuckAiTabInBrowser)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab clicked with hatch origin then clears the hatch tab not the selected tab`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "selected-tab", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockTabRepository.getTab("hatch-tab")).thenReturn(
+            TabEntity(tabId = "hatch-tab", url = "https://news.example.com", title = "News"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.Hatch("hatch-tab"))
+            awaitItem() // OnShow
+
+            testee.onDeleteThisTabClicked()
+
+            cancelAndConsumeRemainingEvents()
+        }
+
+        verify(mockDataClearing).clearSingleTabData("hatch-tab")
+        verify(mockDataClearing, never()).clearSingleTabData("selected-tab")
     }
 
     // endregion

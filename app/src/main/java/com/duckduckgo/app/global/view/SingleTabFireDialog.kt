@@ -44,9 +44,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SheetFireSingleTabBinding
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.fire.FireDialog
 import com.duckduckgo.browser.api.fire.FireDialogProvider
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
@@ -70,6 +70,12 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
 private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
+private const val ARG_TAB_ID = "tabId"
+internal const val ORIGIN_BROWSER = "Browser"
+internal const val ORIGIN_SETTINGS = "Settings"
+internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
+internal const val ORIGIN_DUCK_AI_CONTEXTUAL_CHAT = "DuckAiContextualChat"
+internal const val ORIGIN_HATCH = "Hatch"
 
 @InjectWith(FragmentScope::class)
 class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
@@ -124,8 +130,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
-        viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
+        viewModel.setOrigin(readOriginFromArguments())
 
         setupLayout()
         configureBottomSheet()
@@ -401,11 +406,40 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         data object ClearingFinished : ClearAllEvent()
     }
 
+    private fun readOriginFromArguments(): FireDialogProvider.FireDialogOrigin {
+        val tag = arguments?.getString(ARG_ORIGIN) ?: ORIGIN_BROWSER
+        return when (tag) {
+            ORIGIN_SETTINGS -> FireDialogProvider.FireDialogOrigin.Settings
+            ORIGIN_TAB_SWITCHER -> FireDialogProvider.FireDialogOrigin.TabSwitcher
+            ORIGIN_DUCK_AI_CONTEXTUAL_CHAT -> FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
+            ORIGIN_HATCH -> {
+                val tabId = arguments?.getString(ARG_TAB_ID)
+                if (tabId != null) {
+                    FireDialogProvider.FireDialogOrigin.Hatch(tabId)
+                } else {
+                    FireDialogProvider.FireDialogOrigin.Browser
+                }
+            }
+            else -> FireDialogProvider.FireDialogOrigin.Browser
+        }
+    }
+
     companion object {
         fun newInstance(origin: FireDialogProvider.FireDialogOrigin): SingleTabFireDialog {
             return SingleTabFireDialog().apply {
-                arguments = bundleOf(ARG_ORIGIN to origin.name)
+                arguments = bundleOf(
+                    ARG_ORIGIN to origin.tag(),
+                    ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
+                )
             }
+        }
+
+        private fun FireDialogProvider.FireDialogOrigin.tag(): String = when (this) {
+            FireDialogProvider.FireDialogOrigin.Browser -> ORIGIN_BROWSER
+            FireDialogProvider.FireDialogOrigin.Settings -> ORIGIN_SETTINGS
+            FireDialogProvider.FireDialogOrigin.TabSwitcher -> ORIGIN_TAB_SWITCHER
+            FireDialogProvider.FireDialogOrigin.DuckAiContextualChat -> ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+            is FireDialogProvider.FireDialogOrigin.Hatch -> ORIGIN_HATCH
         }
     }
 }
