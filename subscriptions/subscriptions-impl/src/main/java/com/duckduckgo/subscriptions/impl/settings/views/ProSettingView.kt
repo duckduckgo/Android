@@ -86,6 +86,9 @@ class ProSettingView @JvmOverloads constructor(
     private var job: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
+    // setOnTouchListener(null) calls below are only clearing previously set touch listeners;
+    // they do not install new touch handling, so performClick() is not needed.
+    @SuppressLint("ClickableViewAccessibility")
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()

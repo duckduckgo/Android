@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <application>
+    <application android:supportsRtl="true">
         <activity
             android:name=".management.NetworkProtectionManagementActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"

@@ -1905,13 +1905,6 @@
     </issue>
 
     <issue
-        id="RtlEnabled"
-        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
-        <location
-            file="src/main/AndroidManifest.xml"/>
-    </issue>
-
-    <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
         errorLine1="        app:primaryTextColorOverlay=&quot;@color/destructive_text_color_selector&quot; />"

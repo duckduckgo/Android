@@ -240,7 +240,10 @@ class DuckChatContextualFragment :
     private var lastWebViewX = 0f
     private var lastWebViewY = 0f
 
-    @SuppressLint("SetJavaScriptEnabled")
+    // The touch listener on the WebView is used solely to coordinate scroll-direction
+    // detection with the parent BottomSheet — it is not a click handler, so performClick()
+    // is not required here.
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
