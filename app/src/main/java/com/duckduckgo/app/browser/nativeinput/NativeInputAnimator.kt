@@ -36,8 +36,22 @@ data class Margins(val top: Int, val bottom: Int)
 
 interface NativeInputAnimator {
     fun init(widgetCard: View, omnibarCard: View, omnibarWidth: Int, omnibarHeight: Int, isBottom: Boolean): Margins?
-    fun animateEnter(widgetCard: View, omnibarCard: View, widgetView: View, margins: Margins, onComplete: () -> Unit = {})
-    fun animateExit(widgetCard: View, widgetView: View, omnibarCard: View, isBottom: Boolean, onComplete: () -> Unit)
+    fun animateEnter(
+        widgetCard: View,
+        omnibarCard: View,
+        widgetView: View,
+        margins: Margins,
+        onUpdate: (fraction: Float) -> Unit = {},
+        onComplete: () -> Unit = {},
+    )
+    fun animateExit(
+        widgetCard: View,
+        widgetView: View,
+        omnibarCard: View,
+        isBottom: Boolean,
+        onUpdate: (fraction: Float) -> Unit = {},
+        onComplete: () -> Unit,
+    )
     fun cancelAnimation()
     fun applyLayoutTransitions(widgetView: View)
     fun applyLayoutTransitions(widgetView: View, isBottom: Boolean)
@@ -86,6 +100,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         omnibarCard: View,
         widgetView: View,
         margins: Margins,
+        onUpdate: (fraction: Float) -> Unit,
         onComplete: () -> Unit,
     ) {
         cancelAnimation()
@@ -104,6 +119,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 startWidth,
                 startHeight,
                 omnibarPosition,
+                onUpdate,
                 onComplete,
             )
         }
@@ -114,6 +130,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetView: View,
         omnibarCard: View,
         isBottom: Boolean,
+        onUpdate: (fraction: Float) -> Unit,
         onComplete: () -> Unit,
     ) {
         cancelAnimation()
@@ -124,7 +141,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val snapshot = snapshotBeforeExit(widgetCard, omnibarCard)
 
         waitForLayout(widgetCard) {
-            performExitAnimation(widgetCard, omnibarCard, snapshot, isBottom, onComplete)
+            performExitAnimation(widgetCard, omnibarCard, snapshot, isBottom, onUpdate, onComplete)
         }
     }
 
@@ -150,6 +167,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         omnibarCard: View,
         snapshot: ExitSnapshot,
         isBottom: Boolean,
+        onUpdate: (fraction: Float) -> Unit,
         onComplete: () -> Unit,
     ) {
         val postPosition = windowPosition(widgetCard)
@@ -181,6 +199,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 (widgetCard as? MaterialCardView)?.radius = lerpF(widgetCornerRadius, omnibarCornerRadius, fraction)
                 widgetContent?.alpha = 1 - fraction
                 omnibarCard.alpha = fraction
+                onUpdate(fraction)
             },
             onEnd = {
                 omnibarCard.alpha = 1f
@@ -259,6 +278,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         startWidth: Int,
         startHeight: Int,
         omnibarPosition: Position,
+        onUpdate: (fraction: Float) -> Unit,
         onComplete: () -> Unit,
     ) {
         val offsetToOmnibar = positionCardOverOmnibar(card, omnibarPosition)
@@ -283,6 +303,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 (card as? MaterialCardView)?.radius = lerpF(omnibarCornerRadius, widgetCornerRadius, fraction)
                 widgetContent?.alpha = fraction
                 omnibarCard.alpha = 1 - fraction
+                onUpdate(fraction)
             },
             onEnd = {
                 widgetContent?.alpha = 1f
