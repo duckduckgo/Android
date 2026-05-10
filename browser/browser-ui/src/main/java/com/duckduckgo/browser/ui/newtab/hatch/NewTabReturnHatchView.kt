@@ -131,18 +131,14 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.titleOrPlaceholder()
             if (state.isDuckChat) {
-                binding.returnHatchSiteURL.text = context.getString(R.string.input_mode_chat_tab)
                 binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
             } else {
-                binding.returnHatchSiteURL.text = state.url.extractDomain()
                 faviconJob += viewModel.viewModelScope.launch {
                     faviconManager.loadToViewFromLocalWithRetry(state.tabId, state.url, binding.returnHatchFavicon)
                 }
             }
 
             binding.returnHatchTabsMenu.count = state.tabs
-            binding.returnHatchTabsMenu.isVisible = state.shouldShowTabs
-
             binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()

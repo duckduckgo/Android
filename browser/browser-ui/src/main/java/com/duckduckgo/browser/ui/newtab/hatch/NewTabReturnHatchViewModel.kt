@@ -49,7 +49,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
-    private val omnibarRepository: OmnibarRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -61,7 +60,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val isDuckChat: Boolean = false,
         val isSerp: Boolean = false,
         val tabs: Int = 0,
-        val shouldShowTabs: Boolean = false,
     )
 
     sealed class Command {
@@ -88,7 +86,6 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                 isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                 tabs = tabs.size,
-                shouldShowTabs = omnibarRepository.omnibarType == OmnibarType.SPLIT,
             )
         } else {
             ViewState(shouldShow = false)
