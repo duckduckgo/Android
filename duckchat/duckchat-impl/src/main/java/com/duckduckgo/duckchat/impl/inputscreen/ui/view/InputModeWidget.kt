@@ -40,6 +40,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -75,6 +76,7 @@ open class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    @LayoutRes layoutResId: Int = R.layout.view_input_mode_switch_widget,
 ) : ConstraintLayout(context, attrs, defStyle) {
     @Inject
     lateinit var pixel: Pixel
@@ -176,7 +178,7 @@ open class InputModeWidget @JvmOverloads constructor(
         }
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
+        LayoutInflater.from(context).inflate(layoutResId, this, true)
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)

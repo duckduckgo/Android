@@ -22,14 +22,12 @@ import android.graphics.Color
 import android.net.Uri
 import android.text.InputType
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.webkit.ValueCallback
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.Space
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -151,7 +149,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : InputModeWidget(context, attrs, defStyle), NativeInputWidget, NativeInputHost {
+) : InputModeWidget(context, attrs, defStyle, R.layout.view_native_input_mode_switch_widget), NativeInputWidget, NativeInputHost {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -350,11 +348,64 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
+        configureBottomRowFocusVisibility()
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
         }
     }
+
+    private fun configureBottomRowFocusVisibility() {
+        updateBottomRowVisibility()
+        updateToggleVisibilityForFocus()
+        applyVerticalPaddingForFocus()
+        inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            updateBottomRowVisibility()
+            updateToggleVisibilityForFocus()
+            applyVerticalPaddingForFocus()
+            if (!hasFocus && isDuckAiPageContext()) {
+                hideKeyboard()
+            }
+        }
+    }
+
+    private fun updateBottomRowVisibility() {
+        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
+        val rowSpacer = findViewById<View?>(R.id.rowSpacer)
+        // Keep row 2 visible while streaming so the stop button stays reachable in bottom mode
+        // (where it's hosted inside this row rather than in floatingSubmitContainer).
+        val visible = (inputField.hasFocus() || isStreaming) && isDuckAiPageContext()
+        bottomRow.isVisible = visible
+        rowSpacer?.isVisible = visible
+    }
+
+    private fun updateToggleVisibilityForFocus() {
+        applyToggleVisibility(nativeInputState.toggleVisible && inputField.hasFocus())
+    }
+
+    private fun applyToggleVisibility(visible: Boolean) {
+        findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (visible) VISIBLE else GONE
+    }
+
+    private fun applyVerticalPaddingForFocus() {
+        // 4dp when minimized, 8dp when expanded on focus. The browser omnibar with the toggle
+        // disabled stays minimized regardless of focus; everywhere else (duck.ai omnibar,
+        // duck.ai contextual, browser omnibar with toggle enabled) expands on focus.
+        val isBrowserOmnibarMinimized =
+            nativeInputState.inputContext == NativeInputState.InputContext.BROWSER && !nativeInputState.toggleVisible
+        val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
+        val verticalPadAttr = if (expanded) {
+            com.duckduckgo.mobile.android.R.dimen.keyline_2
+        } else {
+            com.duckduckgo.mobile.android.R.dimen.keyline_1
+        }
+        val verticalPad = resources.getDimensionPixelSize(verticalPadAttr)
+        setPadding(paddingLeft, verticalPad, paddingRight, verticalPad)
+    }
+
+    private fun isDuckAiPageContext(): Boolean =
+        nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
+            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
@@ -384,13 +435,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun applyState(state: NativeInputState) {
         nativeInputState = state
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        setToggleMatchParent()
-        updateToggleVisibility(toggle, state)
-        updateBackButtons(state)
-        if (!state.toggleVisible) {
-            minimize()
+        findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
+            setToggleMatchParent()
+            updateToggleVisibility(toggle, state)
         }
+        updateBackButtons(state)
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
@@ -404,7 +455,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             updateSelectedTab(toggle, state)
         }
-        toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+        updateToggleVisibilityForFocus()
     }
 
     private fun updateBackButtons(state: NativeInputState) {
@@ -415,14 +466,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
-    }
-
-    private fun minimize() {
-        if (floatingSubmitContainer == null) return
-        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
-        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
-        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
-        getActionBarSize()?.let { minimumHeight = it }
     }
 
     private fun removeMargins() {
@@ -460,42 +503,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun getActionBarSize(): Int? {
-        val typedValue = TypedValue()
-        return if (context.theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
-            TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
-        } else {
-            null
-        }
-    }
-
     private fun setToggleMatchParent() {
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
-            toggle.updateLayoutParams<LayoutParams> {
-                width = 0
-                matchConstraintDefaultWidth = LayoutParams.MATCH_CONSTRAINT_SPREAD
-                constrainedWidth = false
-                startToStart = LayoutParams.UNSET
-                startToEnd = R.id.inputModeWidgetBack
-            }
+            // The toggle now lives inside the card's vertical LinearLayout with match_parent
+            // width and 8dp horizontal margins, so it fills the card width automatically.
             toggle.tabMode = TabLayout.MODE_FIXED
             toggle.tabGravity = TabLayout.GRAVITY_FILL
-            toggle.requestLayout()
         }
     }
 
     private fun configureMainButtonsVisibility() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        updateDuckAiSubmitButton()
+        applyTabUi()
         toggle.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    updateDuckAiSubmitButton()
+                    applyTabUi()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
-                    updateDuckAiSubmitButton()
+                    applyTabUi()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
             },
@@ -577,10 +605,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setToggleVisible(visible: Boolean) {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isVisible = visible && nativeInputState.toggleVisible
         suspendLayoutTransitions {
-            toggle.visibility = if (isVisible) VISIBLE else GONE
+            applyToggleVisibility(isVisible)
         }
     }
 
@@ -804,22 +831,22 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showStopButton()
         } else {
             submitButtons?.showSendButton()
+            applyTabUi()
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
+        updateBottomRowVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
     }
 
-    private fun updateDuckAiSubmitButton() {
+    private fun applyTabUi() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab && supportsUpload)
+        submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
         if (isChatTab) {
-            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
-        } else {
-            submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
         }
         updateSendButtonVisibility()
     }
@@ -869,7 +896,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         } else {
             (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
         }
-        val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
+        val buttons = InputScreenButtons(
+            context = context,
+            useTopBar = useTopBar,
+            layoutResId = R.layout.view_native_input_screen_buttons,
+        ).apply {
             onSendClick = { submitMessage() }
             onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
             onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick

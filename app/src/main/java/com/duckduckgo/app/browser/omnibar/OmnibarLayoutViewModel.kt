@@ -254,6 +254,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAIHeader: Boolean = false,
         val showDuckAISidebar: Boolean = false,
         val isDuckAiBackAvailable: Boolean = false,
+        val isNativeInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
@@ -315,6 +316,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     showTextInputClickCatcher = inputScreenEnabled || nativeInputEnabled,
                     isDuckAiBackAvailable = nativeInputEnabled && !aiToggleEnabled,
+                    isNativeInputEnabled = nativeInputEnabled,
                 )
             }
         }.launchIn(viewModelScope)

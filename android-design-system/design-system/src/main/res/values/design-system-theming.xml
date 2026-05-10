@@ -205,7 +205,6 @@
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
-        <item name="daxColorInputPrimary">@color/background_window_dark</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
@@ -346,7 +345,6 @@
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
-        <item name="daxColorInputPrimary">@color/white</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>

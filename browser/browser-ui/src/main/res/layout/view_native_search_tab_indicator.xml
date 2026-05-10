@@ -24,18 +24,18 @@
         android:id="@+id/tab_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_chat_tab_selector"
         android:layout_marginStart="@dimen/keyline_0"
         android:importantForAccessibility="no"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/ic_find_search_16"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tab_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/input_mode_chat_tab"
+        android:text="@string/input_mode_search_tab"
         android:layout_marginStart="6dp"
         app:typography="h4"
         app:layout_constraintStart_toEndOf="@id/tab_icon"

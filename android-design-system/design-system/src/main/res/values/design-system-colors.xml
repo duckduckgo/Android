@@ -71,7 +71,6 @@
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
     <attr name="daxColorControlRaisedFillPrimary" format="color"/>
     <attr name="daxColorControlRaisedBackdrop" format="color"/>
-    <attr name="daxColorInputPrimary" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>
