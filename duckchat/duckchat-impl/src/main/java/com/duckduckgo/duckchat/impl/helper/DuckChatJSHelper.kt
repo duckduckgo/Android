@@ -169,9 +169,10 @@ class RealDuckChatJSHelper @Inject constructor(
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
                         filesUsed = attachments.optInt("filesUsed", 0),
-                        fileSizeBytesUsed = attachments.optInt("fileSizeBytesUsed", 0),
+                        fileSizeBytesUsed = attachments.optLong("fileSizeBytesUsed", 0L),
                     )
                     limitsHandler.setConversationImagesUsed(usage.imagesUsed)
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed)
                 }
                 null
             }
@@ -416,6 +417,22 @@ class RealDuckChatJSHelper @Inject constructor(
                                             JSONObject().apply {
                                                 put("data", image.base64Data)
                                                 put("format", image.format)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
+                        if (pending.files.isNotEmpty()) {
+                            put(
+                                "files",
+                                JSONArray().apply {
+                                    pending.files.forEach { file ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", file.base64Data)
+                                                put("fileName", file.fileName)
+                                                put("mimeType", file.mimeType)
                                             },
                                         )
                                     }

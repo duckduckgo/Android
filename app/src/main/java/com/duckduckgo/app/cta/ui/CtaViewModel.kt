@@ -30,12 +30,14 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -91,6 +93,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -118,6 +121,9 @@ class CtaViewModel @Inject constructor(
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
     suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
+        if (onboardingStore.isDuckAiOnboardingFlow()) {
+            return listOf(CtaId.DAX_DUCK_AI_FIRE_BUTTON)
+        }
         return if (isSubscriptionCtaAvailable()) {
             listOf(
                 CtaId.DAX_INTRO,
@@ -155,6 +161,9 @@ class CtaViewModel @Inject constructor(
                 if (canSendPixel) {
                     pixel.fire(it, cta.pixelShownParameters())
                 }
+            }
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+                duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
@@ -213,15 +222,48 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun prepareAndMarkDuckAiEndCtaForInputScreen(): Boolean {
+        return withContext(dispatchers.io()) {
+            val shouldShow = canShowDuckAiEndCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
+            if (shouldShow) {
+                dismissedCtaDao.insert(DismissedCta(CtaId.DAX_DUCK_AI_END))
+                completeStageIfDaxOnboardingCompleted()
+                if (canSendShownPixel(onboardingStore, DUCK_AI_END_CTA_PIXEL_PARAM)) {
+                    val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
+                    pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
+                }
+                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
+            }
+            shouldShow
+        }
+    }
+
+    suspend fun onDuckAiEndCtaInteraction(okClicked: Boolean) {
+        withContext(dispatchers.io()) {
+            val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
+            if (okClicked) {
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
+                duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
+            } else {
+                pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
+            }
+        }
+    }
+
+    suspend fun onDuckAiFireButtonCtaPressed() {
+        duckAiOnboardingExperimentMetrics.fireFireButtonPressed()
+    }
+
     suspend fun refreshCta(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
+        suppressDuckAiOnboardingCta: Boolean = false,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site, detectedRefreshPatterns)
+                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta)
             } else {
                 getHomeCta()
             }
@@ -275,6 +317,12 @@ class CtaViewModel @Inject constructor(
             canShowDaxIntroCta() && extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 settingsDataStore.hideTips = true
                 userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+                null
+            }
+
+            // Duck.ai onboarding end
+            canShowDuckAiEndCta() -> {
+                // Suppress home CTAs until duck.ai end CTA is shown on input screen
                 null
             }
 
@@ -348,8 +396,25 @@ class CtaViewModel @Inject constructor(
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() && !daxDialogEndShown() && daxDialogIntroShown() && !hideTips()
 
     @WorkerThread
-    private suspend fun canShowSubscriptionCta(): Boolean =
-        daxOnboardingActive() && !hideTips() && !daxDialogSubscriptionShown() && isSubscriptionCtaAvailable()
+    private suspend fun canShowDuckAiEndCta(): Boolean =
+        onboardingStore.isDuckAiOnboardingFlow() && duckAiFireButtonShown() && !duckAiEndShown()
+
+    @WorkerThread
+    private suspend fun canShowSubscriptionCta(): Boolean {
+        if (hideTips() || daxDialogSubscriptionShown() || !isSubscriptionCtaAvailable()) return false
+
+        return if (onboardingStore.isDuckAiOnboardingFlow()) {
+            // Duck.ai flow: the DAX_ONBOARDING stage completes right after the fire-button CTA
+            // (so the input-mode toggle can be enabled), which makes daxOnboardingActive() false
+            // on home. Gate on the duck.ai end CTA having been shown to preserve ordering:
+            // fire button -> end CTA -> privacy pro.
+            duckAiEndShown()
+        } else {
+            // Regular search flow: privacy pro is part of requiredDaxOnboardingCtas, so the stage
+            // stays active until it's dismissed and daxOnboardingActive() carries the gating.
+            daxOnboardingActive()
+        }
+    }
 
     @WorkerThread
     private suspend fun canShowSubscriptionCtaForSkippedOnboarding(): Boolean =
@@ -375,7 +440,7 @@ class CtaViewModel @Inject constructor(
         extendedOnboardingFeatureToggles.freeTrialCopy().isEnabled() && subscriptions.isFreeTrialEligible()
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {
+    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>, suppressDuckAiOnboardingCta: Boolean): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -385,6 +450,16 @@ class CtaViewModel @Inject constructor(
 
         nonNullSite.let {
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
+                return null
+            }
+
+            // Duck.ai-focused onboarding CTAs
+            if (duckChat.isDuckChatUrl(it.url.toUri())) {
+                if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
+                    if (!duckAiFireButtonShown()) {
+                        return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
+                    }
+                }
                 return null
             }
 
@@ -446,7 +521,7 @@ class CtaViewModel @Inject constructor(
 
         if (subscriptions.isSubscriptionUrl(uri)) return true
 
-        if (duckChat.isDuckChatUrl(uri)) return true
+        if (duckChat.isDuckChatUrl(uri)) return !onboardingStore.isDuckAiOnboardingFlow()
 
         val isDuckPlayerUrl =
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
@@ -461,7 +536,11 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            val isLastContextDialogShown = if (isSubscriptionCtaAvailable()) daxDialogSubscriptionShown() else daxDialogEndShown()
+            val isLastContextDialogShown = when {
+                onboardingStore.isDuckAiOnboardingFlow() -> duckAiEndShown()
+                isSubscriptionCtaAvailable() -> daxDialogSubscriptionShown()
+                else -> daxDialogEndShown()
+            }
             noBrowserCtaExperiment || isLastContextDialogShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
@@ -469,7 +548,11 @@ class CtaViewModel @Inject constructor(
     suspend fun areInContextDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            val inContextDaxCtasShown = daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
+            val inContextDaxCtasShown = if (onboardingStore.isDuckAiOnboardingFlow()) {
+                duckAiFireButtonShown() && duckAiEndShown()
+            } else {
+                daxDialogSerpShown() && daxDialogTrackersFoundShown() && daxDialogFireEducationShown() && daxDialogEndShown()
+            }
             noBrowserCtaExperiment || inContextDaxCtasShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
@@ -493,6 +576,10 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogSubscriptionShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
+
+    private fun duckAiFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DUCK_AI_FIRE_BUTTON)
+
+    private fun duckAiEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DUCK_AI_END)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(OnboardingDaxDialogCta.SERP)
 
@@ -556,5 +643,6 @@ class CtaViewModel @Inject constructor(
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
+        private const val DUCK_AI_END_CTA_PIXEL_PARAM = "duck_ai_end_cta"
     }
 }

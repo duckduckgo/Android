@@ -327,6 +327,7 @@ enum class ReportMetric(
 enum class ModelTier(val model: String) {
     FREE("free"),
     PLUS("plus"),
+    PRO("pro"),
     INTERNAL("internal"),
     UNKNOWN("unknown"),
     ;

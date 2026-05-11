@@ -167,6 +167,17 @@ class RealDuckAiModelManager @Inject constructor(
         if (remoteLimits.isNullOrEmpty()) return AttachmentLimits()
         val tierLimits = remoteLimits[userTier.rawValue] ?: return AttachmentLimits()
         return AttachmentLimits(
+            files = tierLimits.files?.let { remote ->
+                FileLimits(
+                    maxPerConversation = remote.maxPerConversation ?: FileLimits.DEFAULT_FILE_MAX_PER_CONVERSATION,
+                    maxFileSizeBytes = remote.maxFileSizeMB?.let { it.toLong() * 1024 * 1024 }
+                        ?: FileLimits.DEFAULT_FILE_MAX_SIZE_BYTES,
+                    maxTotalFileSizeBytes = remote.maxTotalFileSizeBytes
+                        ?: remote.maxFileSizeMB?.let { it.toLong() * 1024 * 1024 }
+                        ?: FileLimits.DEFAULT_FILE_MAX_SIZE_BYTES,
+                    maxPagesPerFile = remote.maxPagesPerFile ?: FileLimits.DEFAULT_FILE_MAX_PAGES,
+                )
+            } ?: FileLimits(),
             images = tierLimits.images?.let { remote ->
                 ImageLimits(
                     maxPerTurn = remote.maxPerTurn ?: ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN,
@@ -195,6 +206,7 @@ class RealDuckAiModelManager @Inject constructor(
             provider = ModelProvider.from(id = remote.id, providerString = remote.provider),
             supportsImageUpload = remote.supportsImageUpload,
             supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
+            supportedFileTypes = remote.supportedFileTypes.orEmpty(),
         )
     }
 

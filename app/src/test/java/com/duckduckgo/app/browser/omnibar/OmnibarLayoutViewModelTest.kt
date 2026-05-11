@@ -12,6 +12,7 @@ import com.duckduckgo.app.browser.menu.BrowserViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
@@ -2873,6 +2874,74 @@ class OmnibarLayoutViewModelTest {
                 "Expected PrivacyShield after feature re-enabled on non-SERP site, but got ${viewState.leadingIconState}",
                 viewState.leadingIconState is LeadingIconState.PrivacyShield,
             )
+        }
+    }
+
+    @Test
+    fun whenSetLockedTrueAndFireButtonNotHighlightedThenEnabledStateIsNone() = runTest {
+        testee.setLocked(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.NONE, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenSetLockedTrueAndFireButtonHighlightedThenEnabledStateIsFireButtonOnly() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.setLocked(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenSetLockedFalseThenEnabledStateIsAll() = runTest {
+        testee.setLocked(true)
+        testee.setLocked(false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(EnabledState.ALL, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndLockedThenHighlightPreserved() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.setLocked(true)
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = true,
+                ),
+            )
+            assertFalse(viewState.scrollingEnabled)
+            assertEquals(EnabledState.FIRE_BUTTON_ONLY, viewState.enabledState)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndNotLockedForOnboardingThenHighlightCleared() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+            assertTrue(viewState.scrollingEnabled)
         }
     }
 }

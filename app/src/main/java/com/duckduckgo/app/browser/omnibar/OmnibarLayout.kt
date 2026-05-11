@@ -82,6 +82,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchI
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.EnabledState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -866,7 +867,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
         previousTransitionState = newTransitionState
 
-        enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
+        applyEnabledState(viewState)
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
@@ -930,6 +931,7 @@ class OmnibarLayout @JvmOverloads constructor(
             pageLoadingIndicator.isVisible = viewState.isLoading
         }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+        renderPulseAnimation(viewState)
     }
 
     private fun updatePageLoadProgressBar(viewState: ViewState) {
@@ -1010,6 +1012,10 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
+            }
+
+            is Decoration.LockForOnboarding -> {
+                viewModel.setLocked(decoration.locked)
             }
 
             is Decoration.CancelEasterEggLogoAnimation -> viewModel.onCancelAddressBarAnimations()
@@ -1485,6 +1491,42 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun applyEnabledState(viewState: ViewState) {
+        val state = viewState.enabledState
+        val isLocked = state != EnabledState.ALL
+        val nonFireEnabled = state == EnabledState.ALL
+        val fireEnabled = state != EnabledState.NONE
+
+        applyEnabled(tabsMenu, nonFireEnabled)
+        applyEnabled(browserMenu, nonFireEnabled)
+        aiChatMenu?.let { applyEnabled(it, nonFireEnabled) }
+        applyEnabled(voiceSearchButton, nonFireEnabled)
+        applyEnabled(clearTextButton, nonFireEnabled)
+        applyEnabled(duckAISidebar, nonFireEnabled)
+        applyEnabled(duckAIHeader, nonFireEnabled)
+        applyEnabled(shieldIcon, nonFireEnabled)
+        applyEnabled(fireIconMenu, fireEnabled)
+        omnibarTextInput.alpha = if (nonFireEnabled) 1.0f else LOCKED_INPUT_ALPHA
+
+        // Show the click catcher whenever a click catcher is requested OR the omnibar is
+        // locked (so the locked state can intercept and ignore the click).
+        enableTextInputClickCatcher(viewState.showTextInputClickCatcher || isLocked)
+
+        // When locked, the click catcher should not launch the input screen.
+        if (isLocked) {
+            omnibarTextInputClickCatcher.setOnClickListener(null)
+        } else if (omnibarInputScreenLaunchListener != null) {
+            omnibarTextInputClickCatcher.setOnClickListener {
+                viewModel.onTextInputClickCatcherClicked()
+            }
+        }
+    }
+
+    private fun applyEnabled(view: View, enabled: Boolean) {
+        view.isEnabled = enabled
+        view.alpha = if (enabled) 1.0f else LOCKED_INPUT_ALPHA
+    }
+
     override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
         omnibarInputScreenLaunchListener = listener
         omnibarTextInputClickCatcher.setOnClickListener {
@@ -1573,5 +1615,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     companion object {
         private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
+        private const val LOCKED_INPUT_ALPHA = 0.4f
     }
 }
