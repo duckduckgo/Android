@@ -794,6 +794,7 @@ class BrowserTabViewModelTest {
                     duckChat = mockDuckChat,
                     onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
                     appTheme = mockAppTheme,
+                    duckAiOnboardingExperimentMetrics = mock(),
                 )
 
             accessibilitySettingsDataStore =

@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -92,6 +93,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -159,6 +161,9 @@ class CtaViewModel @Inject constructor(
                 if (canSendPixel) {
                     pixel.fire(it, cta.pixelShownParameters())
                 }
+            }
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+                duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
             }
             if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))

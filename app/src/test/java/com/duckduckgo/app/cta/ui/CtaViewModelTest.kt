@@ -31,6 +31,7 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -137,6 +138,8 @@ class CtaViewModelTest {
 
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
+    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -198,6 +201,7 @@ class CtaViewModelTest {
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
+            duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
         )
     }
 
@@ -235,6 +239,20 @@ class CtaViewModelTest {
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
         testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
+    }
+
+    @Test
+    fun whenDuckAiFireButtonCtaShownThenFireFireDialogImpressionMetric() = runTest {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFireDialogImpression()
+    }
+
+    @Test
+    fun whenNonDuckAiFireButtonCtaShownThenDoNotFireFireDialogImpressionMetric() = runTest {
+        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
+
+        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFireDialogImpression()
     }
 
     @Test
