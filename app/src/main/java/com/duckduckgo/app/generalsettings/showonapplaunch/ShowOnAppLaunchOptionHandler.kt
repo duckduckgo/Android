@@ -26,6 +26,8 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchO
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent.Surface
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -54,6 +56,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
+    private val postIdleSessionWideEvent: PostIdleSessionWideEvent,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
@@ -70,7 +73,15 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
         logcat { "FirstScreen: showing $option on app launch" }
 
         when (option) {
-            LastOpenedTab -> Unit
+            LastOpenedTab -> {
+                if (fromInactivity) {
+                    // Skip when the visible tab is a blank NTP — the NTP path classifies that case.
+                    val selectedTab = tabRepository.getSelectedTab()
+                    if (selectedTab != null && !selectedTab.url.isNullOrBlank()) {
+                        postIdleSessionWideEvent.onSurfaceShown(Surface.LUT)
+                    }
+                }
+            }
             NewTabPage -> {
                 val selectedTab = tabRepository.getSelectedTab()
                 if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {

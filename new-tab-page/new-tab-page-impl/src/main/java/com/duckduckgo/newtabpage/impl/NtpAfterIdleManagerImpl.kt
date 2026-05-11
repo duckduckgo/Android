@@ -20,6 +20,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent.Surface
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
@@ -47,6 +49,7 @@ import javax.inject.Inject
 class NtpAfterIdleManagerImpl @Inject constructor(
     private val pixel: Pixel,
     private val hatchPixels: HatchPixels,
+    private val postIdleSessionWideEvent: PostIdleSessionWideEvent,
 ) : NtpAfterIdleManager, BrowserLifecycleObserver {
 
     private val pendingAfterIdle = AtomicBoolean(false)
@@ -84,6 +87,7 @@ class NtpAfterIdleManagerImpl @Inject constructor(
         if (wasAfterIdle) {
             pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
             pixel.fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
+            postIdleSessionWideEvent.onSurfaceShown(Surface.NTP)
         } else {
             pixel.fire(NTP_SHOWN_USER_INITIATED, type = Count)
             pixel.fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
@@ -92,6 +96,7 @@ class NtpAfterIdleManagerImpl @Inject constructor(
 
     override fun onReturnToPageTapped() {
         hatchPixels.fireReturnToPageTapped(_isAfterIdleReturn.value)
+        postIdleSessionWideEvent.onReturnToPageTapped()
     }
 
     override fun onNtpSearchSubmitted() {

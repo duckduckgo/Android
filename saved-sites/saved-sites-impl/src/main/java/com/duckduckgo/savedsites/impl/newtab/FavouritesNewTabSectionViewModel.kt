@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -68,6 +69,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val syncEngine: SyncEngine,
     private val feature: FavouritesNewTabSectionFixFeature,
+    private val postIdleSessionWideEvent: PostIdleSessionWideEvent,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(val favourites: List<Favorite> = emptyList())
@@ -300,6 +302,7 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     fun onFavoriteClicked(placement: FavoritesPlacement) {
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED, placement))
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED_DAILY, placement), type = Daily())
+        postIdleSessionWideEvent.onFavoriteSelected()
     }
 
     private fun formatPixelWithPlacement(

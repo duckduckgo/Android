@@ -263,6 +263,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
@@ -411,6 +412,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
+
+    @Inject
+    lateinit var postIdleSessionWideEvent: PostIdleSessionWideEvent
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -3927,6 +3931,7 @@ class BrowserTabFragment :
                         isWebViewGestureInProgress = true
                         lastTouchX = event.x
                         lastTouchY = event.y
+                        postIdleSessionWideEvent.onPageEngaged()
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {

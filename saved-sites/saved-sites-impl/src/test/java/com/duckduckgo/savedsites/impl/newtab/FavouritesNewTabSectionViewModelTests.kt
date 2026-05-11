@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -56,6 +57,7 @@ class FavouritesNewTabSectionViewModelTests {
     private val pixel: Pixel = mock()
     private val feature: FavouritesNewTabSectionFixFeature = mock()
     private val featureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
+    private val postIdleSessionWideEvent: PostIdleSessionWideEvent = mock()
 
     private lateinit var testee: FavouritesNewTabSectionViewModel
 
@@ -74,6 +76,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            postIdleSessionWideEvent,
         )
     }
 
@@ -96,6 +99,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            postIdleSessionWideEvent,
         )
 
         testeeWithFavourites.viewState.test {
@@ -317,6 +321,7 @@ class FavouritesNewTabSectionViewModelTests {
             faviconManager,
             syncEngine,
             feature,
+            postIdleSessionWideEvent,
         )
 
         viewModelWithFixDisabled.viewState.test {

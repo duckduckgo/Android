@@ -24,6 +24,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isGone
@@ -54,6 +55,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -122,6 +124,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
+    @Inject
+    lateinit var postIdleSessionWideEvent: PostIdleSessionWideEvent
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -141,6 +146,16 @@ class NewTabPageView @JvmOverloads constructor(
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
+
+    private var pageEngagedFiredForCurrentAttachment = false
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
+            pageEngagedFiredForCurrentAttachment = true
+            postIdleSessionWideEvent.onPageEngaged()
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -165,6 +180,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedChatModeJob += inputModeState.displayedMode
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        pageEngagedFiredForCurrentAttachment = false
 
         disableViewStateSaving()
     }
