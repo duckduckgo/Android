@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.fire
+package com.duckduckgo.dataclearing.api.fire
 
 import androidx.fragment.app.FragmentManager
 

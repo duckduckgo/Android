@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.fire
+package com.duckduckgo.dataclearing.api.fire
 
 /**
  * Provider for creating Fire dialog instances.
