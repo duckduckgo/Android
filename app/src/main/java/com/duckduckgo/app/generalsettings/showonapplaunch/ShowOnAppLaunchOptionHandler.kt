@@ -26,10 +26,10 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchO
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent.Surface
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesBinding
@@ -56,7 +56,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,
-    private val postIdleSessionWideEvent: PostIdleSessionWideEvent,
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
 ) : ShowOnAppLaunchOptionHandler {
 
     override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
@@ -78,7 +78,7 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
                     // Skip when the visible tab is a blank NTP — the NTP path classifies that case.
                     val selectedTab = tabRepository.getSelectedTab()
                     if (selectedTab != null && !selectedTab.url.isNullOrBlank()) {
-                        postIdleSessionWideEvent.onSurfaceShown(Surface.LUT)
+                        browserInteractionsPlugins.getPlugins().forEach { it.onLutShownAfterIdle() }
                     }
                 }
             }

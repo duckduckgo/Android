@@ -21,7 +21,6 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent.Surface
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
@@ -84,7 +83,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onSurfaceShown then starts flow with surface metadata and starts intervals`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
@@ -109,9 +108,9 @@ class RealPostIdleSessionWideEventTest {
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        testee.onSurfaceShown(Surface.LUT)
+        testee.onLutShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowAbort(1L)
@@ -127,7 +126,7 @@ class RealPostIdleSessionWideEventTest {
     fun `when feature flag disabled then no flow operations occur`() = runTest {
         androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(false))
 
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         testee.onBarUsed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -136,11 +135,11 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onPageEngaged called twice then step and ttfi end fire only once`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.onPageEngaged()
-        testee.onPageEngaged()
+        testee.onNtpEngaged()
+        testee.onNtpEngaged()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowStep(123L, "page_engaged", true, emptyMap())
@@ -149,7 +148,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onPageEngaged called without active session then is a no-op`() = runTest {
-        testee.onPageEngaged()
+        testee.onNtpEngaged()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
@@ -157,7 +156,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onBackPressed called multiple times then step and ttfi end fire only once`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onBackPressed()
@@ -170,7 +169,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when displayedMode changes during active session then toggle_used step fires`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         displayedModeFlow.value = InputMode.DUCK_AI
@@ -189,7 +188,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onBarUsed terminates session then flowFinish is Success with bar_used reason`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onBarUsed()
@@ -215,7 +214,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onReturnToPageTapped terminates session then flowFinish reason is return_to_page_tapped`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onReturnToPageTapped()
@@ -238,7 +237,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onTabSwitcherSelected terminates session then flowFinish reason is tab_switcher_selected`() = runTest {
-        testee.onSurfaceShown(Surface.LUT)
+        testee.onLutShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onTabSwitcherSelected()
@@ -261,7 +260,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onFavoriteSelected terminates session then flowFinish reason is favorite_selected`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onFavoriteSelected()
@@ -284,7 +283,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onClose called with active session then flowFinish is Cancelled with app_backgrounded reason`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onClose()
@@ -315,10 +314,10 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when all non-terminal flags set then flowFinish metadata reflects them`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.onPageEngaged()
+        testee.onNtpEngaged()
         displayedModeFlow.value = InputMode.DUCK_AI
         testee.onBackPressed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -343,7 +342,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when terminal already fired then subsequent terminal calls are no-ops`() = runTest {
-        testee.onSurfaceShown(Surface.NTP)
+        testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onBarUsed()

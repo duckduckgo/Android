@@ -19,7 +19,8 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE_DAILY
@@ -44,13 +45,13 @@ class NtpAfterIdleManagerImplTest {
 
     private val pixel: Pixel = mock()
     private val hatchPixels: HatchPixels = mock()
-    private val postIdleSessionWideEvent: PostIdleSessionWideEvent = mock()
+    private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin> = mock()
 
     private lateinit var testee: NtpAfterIdleManagerImpl
 
     @Before
     fun setup() {
-        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, postIdleSessionWideEvent)
+        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, hatchInteractionsPlugins)
     }
 
     // --- onNtpShown classification ---

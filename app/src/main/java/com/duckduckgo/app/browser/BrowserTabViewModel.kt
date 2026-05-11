@@ -318,7 +318,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
@@ -541,7 +541,7 @@ class BrowserTabViewModel @Inject constructor(
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
-    private val postIdleSessionWideEvent: PostIdleSessionWideEvent,
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val inlinePdfHandler: InlinePdfHandler,
     private val pdfDownloadTooltipDataStore: PdfDownloadTooltipDataStore,
     private val cachedFileDownloader: CachedFileDownloader,
@@ -1356,7 +1356,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         // Skip restoration paths that re-submit the tab's current URL.
         if (query != url) {
-            postIdleSessionWideEvent.onBarUsed()
+            browserInteractionsPlugins.getPlugins().forEach { it.onBarUsed() }
         }
 
         val cta = currentCtaViewState().cta
@@ -1722,7 +1722,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
-        postIdleSessionWideEvent.onBackPressed()
+        browserInteractionsPlugins.getPlugins().forEach { it.onBackPressed() }
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (isNavigationToEmptyUrlFromParent(hasSourceTab, isCustomTab)) {
@@ -3671,7 +3671,7 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
     ) {
         command.value = LaunchTabSwitcher
-        postIdleSessionWideEvent.onTabSwitcherSelected()
+        browserInteractionsPlugins.getPlugins().forEach { it.onTabSwitcherSelected() }
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)

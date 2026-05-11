@@ -31,9 +31,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -65,7 +66,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
-    private val postIdleSessionWideEvent: PostIdleSessionWideEvent = mock()
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private lateinit var testee: ShowOnAppLaunchOptionHandler
 
     @Before
@@ -80,7 +81,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             ntpAfterIdleManager,
             settingsDataStore,
             systemAutofillEngagement,
-            postIdleSessionWideEvent,
+            browserInteractionsPlugins,
         )
     }
 

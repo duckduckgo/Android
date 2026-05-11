@@ -23,12 +23,11 @@ import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent.Surface
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -44,15 +43,21 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = PostIdleSessionWideEvent::class)
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@ContributesMultibinding(AppScope::class, boundType = BrowserInteractionsPlugin::class)
+@ContributesMultibinding(AppScope::class, boundType = HatchInteractionsPlugin::class)
 class RealPostIdleSessionWideEvent @Inject constructor(
     private val wideEventClient: WideEventClient,
     private val duckChatInputModeState: DuckChatInputModeState,
     private val androidBrowserConfigFeature: Lazy<AndroidBrowserConfigFeature>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
-) : PostIdleSessionWideEvent, BrowserLifecycleObserver {
+) : BrowserInteractionsPlugin, HatchInteractionsPlugin, BrowserLifecycleObserver {
+
+    private enum class Surface(val value: String) {
+        NTP("ntp"),
+        LUT("lut"),
+    }
 
     // Serializes wide-event mutations.
     @SuppressLint("AvoidComputationUsage")
@@ -72,7 +77,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
             .launchIn(coroutineScope)
     }
 
-    override fun onSurfaceShown(surface: Surface) {
+    private fun onSurfaceShown(surface: Surface) {
         coroutineScope.launch {
             mutex.withLock {
                 if (!isFeatureEnabled()) return@launch
@@ -106,9 +111,13 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         }
     }
 
-    override fun onPageEngaged() {
-        recordNonTerminal(STEP_PAGE_ENGAGED, isAlreadyRecorded = { it.pageEngaged }) { it.pageEngaged = true }
-    }
+    override fun onLutShownAfterIdle() = onSurfaceShown(Surface.LUT)
+
+    override fun onHatchShownAfterIdle() = onSurfaceShown(Surface.NTP)
+
+    override fun onWebViewEngaged() = onPageEngaged()
+
+    override fun onNtpEngaged() = onPageEngaged()
 
     override fun onBackPressed() {
         recordNonTerminal(STEP_BACK_PRESSED, isAlreadyRecorded = { it.backPressed }) { it.backPressed = true }
@@ -128,6 +137,10 @@ class RealPostIdleSessionWideEvent @Inject constructor(
 
     override fun onFavoriteSelected() {
         finishSession(STEP_FAVORITE_SELECTED, statusReason = STEP_FAVORITE_SELECTED, status = FlowStatus.Success)
+    }
+
+    private fun onPageEngaged() {
+        recordNonTerminal(STEP_PAGE_ENGAGED, isAlreadyRecorded = { it.pageEngaged }) { it.pageEngaged = true }
     }
 
     override fun onOpen(isFreshLaunch: Boolean) {

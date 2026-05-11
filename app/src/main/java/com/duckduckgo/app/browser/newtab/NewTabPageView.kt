@@ -55,7 +55,6 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.browser.api.wideevents.PostIdleSessionWideEvent
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -63,6 +62,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -70,6 +70,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
@@ -125,7 +126,7 @@ class NewTabPageView @JvmOverloads constructor(
     lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
     @Inject
-    lateinit var postIdleSessionWideEvent: PostIdleSessionWideEvent
+    lateinit var hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>
 
     private val binding: ViewNewTabBinding by viewBinding()
 
@@ -152,7 +153,7 @@ class NewTabPageView @JvmOverloads constructor(
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
             pageEngagedFiredForCurrentAttachment = true
-            postIdleSessionWideEvent.onPageEngaged()
+            hatchInteractionsPlugins.getPlugins().forEach { it.onNtpEngaged() }
         }
         return super.dispatchTouchEvent(ev)
     }
