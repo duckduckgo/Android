@@ -32,6 +32,7 @@
     <attr name="secondaryText" format="string"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>
+    <attr name="leadingIconTint" format="reference|color"/>
     <attr name="trailingIcon" format="integer"/>
     <attr name="trailingIconTint" format="reference|color"/>
     <attr name="pillIcon" format="boolean"/>

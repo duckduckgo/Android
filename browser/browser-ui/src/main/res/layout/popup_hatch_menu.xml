@@ -25,6 +25,7 @@
         android:id="@+id/hatchMenuReturnToTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_go_back_circle_recolorable_16"
         app:primaryText="@string/hatchMenuReturnTab" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -32,6 +33,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/hatchMenuCloseTab"
+        app:leadingIcon="@drawable/ic_close_24"
+        app:leadingIconTint="?daxColorDestructive"
         app:primaryTextType="destructive" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -39,6 +42,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/hatchMenuBurnTab"
+        app:leadingIcon="@drawable/ic_fire_24"
+        app:leadingIconTint="?daxColorDestructive"
         app:primaryTextType="destructive" />
 
 </LinearLayout>

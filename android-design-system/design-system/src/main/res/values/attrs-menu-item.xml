@@ -32,6 +32,8 @@
     <declare-styleable name="PopupMenuItemView">
         <attr name="primaryText" />
         <attr name="primaryTextType" />
+        <attr name="leadingIcon" />
+        <attr name="leadingIconTint" />
         <attr name="trailingIcon" />
     </declare-styleable>
 
