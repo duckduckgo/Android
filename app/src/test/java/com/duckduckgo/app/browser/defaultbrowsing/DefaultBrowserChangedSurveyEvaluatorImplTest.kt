@@ -46,11 +46,13 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
 
     private val applicationContext: Application = ApplicationProvider.getApplicationContext()
     private val surveyManager: DefaultBrowserChangedSurveyManager = mock()
+    private val sampler: DefaultBrowserChangedSurveySampler = mock()
 
     private val testee = DefaultBrowserChangedSurveyEvaluatorImpl(
         appCoroutineScope = coroutinesTestRule.testScope,
         applicationContext = applicationContext,
         surveyManager = surveyManager,
+        surveySampler = sampler,
         dispatchers = coroutinesTestRule.testDispatcherProvider,
     )
 
@@ -72,8 +74,31 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenEvaluationReturnsModalShown() = runTest {
+    fun whenSurveyShouldNotTriggerThenSamplerIsNotConsulted() = runTest {
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(false)
+
+        testee.evaluate()
+
+        verify(sampler, never()).isInSample()
+    }
+
+    @Test
+    fun whenSurveyShouldTriggerButNotInSampleThenEvaluationIsSkipped() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(false)
+
+        val result = testee.evaluate()
+
+        assertEquals(ModalEvaluator.EvaluationResult.Skipped, result)
+        verify(surveyManager, never()).markSurveyShown()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertNull(shadowOf(applicationContext).nextStartedActivity)
+    }
+
+    @Test
+    fun whenSurveyShouldTriggerAndInSampleThenEvaluationReturnsModalShown() = runTest {
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         val result = testee.evaluate()
@@ -82,8 +107,9 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenSurveyIsMarkedShown() = runTest {
+    fun whenSurveyShouldTriggerAndInSampleThenSurveyIsMarkedShown() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         testee.evaluate()
@@ -92,8 +118,9 @@ class DefaultBrowserChangedSurveyEvaluatorImplTest {
     }
 
     @Test
-    fun whenSurveyShouldTriggerThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
+    fun whenSurveyShouldTriggerAndInSampleThenSurveyActivityIsStartedWithExpectedFlags() = runTest {
         whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        whenever(sampler.isInSample()).thenReturn(true)
         whenever(surveyManager.buildSurveyUrl("in-app")).thenReturn("https://example.com/survey")
 
         testee.evaluate()

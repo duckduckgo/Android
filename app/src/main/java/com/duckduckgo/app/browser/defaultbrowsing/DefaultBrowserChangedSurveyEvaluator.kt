@@ -50,6 +50,7 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val applicationContext: Context,
     private val surveyManager: DefaultBrowserChangedSurveyManager,
+    private val surveySampler: DefaultBrowserChangedSurveySampler,
     private val dispatchers: DispatcherProvider,
 ) : ModalEvaluator, DefaultBrowserChangedSurveyEvaluator {
 
@@ -60,6 +61,11 @@ class DefaultBrowserChangedSurveyEvaluatorImpl @Inject constructor(
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (!surveyManager.shouldTriggerSurvey()) {
             logcat { "Should not trigger survey from default browser changed evaluator" }
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        if (!surveySampler.isInSample()) {
+            logcat { "Default-browser-changed survey skipped: not in sample for this evaluation" }
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 
