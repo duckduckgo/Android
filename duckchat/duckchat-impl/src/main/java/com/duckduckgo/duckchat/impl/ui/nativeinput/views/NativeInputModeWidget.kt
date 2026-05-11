@@ -21,6 +21,8 @@ import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.text.InputType
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -360,6 +362,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateToggleVisibilityForFocus()
         applyVerticalPaddingForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            // Run a short explicit transition so the duck.ai toggle row appearing/disappearing
+            // and the padding change animate smoothly instead of snapping in. Browser-context
+            // toggle visibility is state-driven and unaffected by focus, so the transition is
+            // effectively a no-op there.
+            beginFocusTransition()
             updateBottomRowVisibility()
             updateToggleVisibilityForFocus()
             applyVerticalPaddingForFocus()
@@ -367,6 +374,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 hideKeyboard()
             }
         }
+    }
+
+    private fun beginFocusTransition() {
+        val root = parent as? ViewGroup ?: return
+        TransitionManager.beginDelayedTransition(
+            root,
+            AutoTransition().apply { duration = FOCUS_TRANSITION_DURATION_MS },
+        )
     }
 
     private fun updateBottomRowVisibility() {
@@ -380,7 +395,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateToggleVisibilityForFocus() {
-        applyToggleVisibility(nativeInputState.toggleVisible && inputField.hasFocus())
+        // Browser context: toggle is state-driven so it's already in the layout when
+        // NativeInputAnimator grows the card on entry, allowing a single smooth pass.
+        // Duck.ai contexts: keep the focus-driven hide so the toggle disappears when the input
+        // loses focus on those pages.
+        val visible = if (isDuckAiPageContext()) {
+            nativeInputState.toggleVisible && inputField.hasFocus()
+        } else {
+            nativeInputState.toggleVisible
+        }
+        applyToggleVisibility(visible)
     }
 
     private fun applyToggleVisibility(visible: Boolean) {
@@ -915,6 +939,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     companion object {
         private const val MAX_LINES = 5
+        private const val FOCUS_TRANSITION_DURATION_MS = 100L
     }
 }
 
