@@ -22,6 +22,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.DuckAiOnboardingExperimentCohort
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
@@ -53,6 +54,7 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val deviceInfo: DeviceInfo,
+    private val appBuildConfig: AppBuildConfig,
 ) : DuckAiOnboardingExperimentManager {
 
     override suspend fun enroll(): DuckAiOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
@@ -69,7 +71,8 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
     }
 
     private fun arePrerequisitesMet(): Boolean =
-        browserConfig.showInputScreenOnboarding().isEnabled() &&
+        !appBuildConfig.isDefaultVariantForced &&
+            browserConfig.showInputScreenOnboarding().isEnabled() &&
             browserConfig.singleTabFireDialog().isEnabled() &&
             !onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
             !deviceInfo.isTablet()
