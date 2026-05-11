@@ -135,36 +135,50 @@ fun TextView.addClickableSpan(
 fun Context.prependIconToText(textResId: Int, iconResId: Int): SpannableStringBuilder {
     val spannableString = SpannableStringBuilder(getText(textResId))
 
-    ContextCompat.getDrawable(this, iconResId)?.let { icon ->
-        icon.setBounds(0, 0, icon.intrinsicWidth, icon.intrinsicHeight)
-
-        // Centers the icon vertically
-        // ImageSpan.ALIGN_CENTER is API 29+ and doesn't center correctly
-        val imageSpan = object : ImageSpan(icon) {
-            override fun draw(
-                canvas: Canvas,
-                text: CharSequence,
-                start: Int,
-                end: Int,
-                x: Float,
-                top: Int,
-                y: Int,
-                bottom: Int,
-                paint: Paint,
-            ) {
-                canvas.save()
-
-                val fontMetricsInt = paint.fontMetricsInt
-                val translationY = ((y + fontMetricsInt.descent + y + fontMetricsInt.ascent) / 2) - (icon.bounds.height() / 2)
-                canvas.translate(x, translationY.toFloat())
-                icon.draw(canvas)
-
-                canvas.restore()
-            }
-        }
+    verticallyCenteredImageSpan(iconResId)?.let { imageSpan ->
         // Adds a gap at the beginning of the string to make space for the icon
         spannableString.insert(0, "  ")
         spannableString.setSpan(imageSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
     return spannableString
+}
+
+fun Context.appendIconToText(text: CharSequence, iconResId: Int): SpannableStringBuilder {
+    val spannableString = SpannableStringBuilder(text)
+
+    verticallyCenteredImageSpan(iconResId)?.let { imageSpan ->
+        // Adds a gap at the end of the string to make space for the icon
+        spannableString.append("  ")
+        spannableString.setSpan(imageSpan, spannableString.length - 1, spannableString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+    return spannableString
+}
+
+// Builds an ImageSpan that vertically centers the drawable.
+// ImageSpan.ALIGN_CENTER is API 29+ and doesn't center correctly, so we override draw().
+private fun Context.verticallyCenteredImageSpan(iconResId: Int): ImageSpan? {
+    val icon = ContextCompat.getDrawable(this, iconResId) ?: return null
+    icon.setBounds(0, 0, icon.intrinsicWidth, icon.intrinsicHeight)
+    return object : ImageSpan(icon) {
+        override fun draw(
+            canvas: Canvas,
+            text: CharSequence,
+            start: Int,
+            end: Int,
+            x: Float,
+            top: Int,
+            y: Int,
+            bottom: Int,
+            paint: Paint,
+        ) {
+            canvas.save()
+
+            val fontMetricsInt = paint.fontMetricsInt
+            val translationY = ((y + fontMetricsInt.descent + y + fontMetricsInt.ascent) / 2) - (icon.bounds.height() / 2)
+            canvas.translate(x, translationY.toFloat())
+            icon.draw(canvas)
+
+            canvas.restore()
+        }
+    }
 }
