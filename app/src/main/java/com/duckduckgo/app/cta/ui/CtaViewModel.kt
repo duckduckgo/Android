@@ -232,6 +232,7 @@ class CtaViewModel @Inject constructor(
                     val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
                     pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
                 }
+                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
             }
             shouldShow
         }

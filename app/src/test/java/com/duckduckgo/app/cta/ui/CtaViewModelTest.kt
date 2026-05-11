@@ -1446,6 +1446,25 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenPrepareDuckAiEndCtaAndEligibleThenFireFinalDialogImpressionMetric() = runTest {
+        givenCanShowDuckAiEndCta()
+
+        testee.prepareAndMarkDuckAiEndCtaForInputScreen()
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogImpression()
+    }
+
+    @Test
+    fun whenPrepareDuckAiEndCtaAndNotEligibleThenDoNotFireFinalDialogImpressionMetric() = runTest {
+        givenCanShowDuckAiEndCta()
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+
+        testee.prepareAndMarkDuckAiEndCtaForInputScreen()
+
+        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFinalDialogImpression()
+    }
+
+    @Test
     fun whenOnDuckAiEndCtaInteractionOkThenOkPixelFired() = runTest {
         testee.onDuckAiEndCtaInteraction(okClicked = true)
 
