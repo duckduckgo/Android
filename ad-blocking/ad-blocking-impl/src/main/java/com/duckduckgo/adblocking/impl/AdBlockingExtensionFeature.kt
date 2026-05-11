@@ -34,7 +34,7 @@ interface AdBlockingExtensionFeature {
     fun enabledByDefault(): Toggle
 }
 
-data class AdBlockingScriptletData(
+data class AdBlockingExtensionSettings(
     val version: String? = null,
     val scriptlets: Map<String, ScriptletEntry>? = null,
     val domains: List<Domain>? = null,
