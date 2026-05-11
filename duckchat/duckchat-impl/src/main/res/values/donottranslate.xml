@@ -54,4 +54,6 @@
     <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">File exceeds the maximum size of %1$d MB.</string>
     <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">One of the files attached has more pages than we support. Please upload files with %1$d pages or fewer.</string>
     <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">The attached files exceed the total size limit of %1$dMB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Upload a file</string>
+
 </resources>

@@ -23,7 +23,6 @@
     <!-- Uploading an image from the camera or choosing to use existing image -->
     <string name="imageCaptureCameraUnavailable">Could not access camera</string>
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload an image</string>
-    <string name="fileCaptureBrowseDisambiguationTitle">Upload a file</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Choose File</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Take Photo</string>
     <string name="imageCaptureCameraPermissionDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
