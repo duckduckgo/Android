@@ -231,7 +231,13 @@ class NativeInputLayoutCoordinator(
         widgetAnimationFrameHandler = lambda@{ card ->
             if (!widgetView.isShown) return@lambda
             val parent = card.parent as? View ?: return@lambda
-            val params = card.layoutParams as? FrameLayout.LayoutParams ?: return@lambda
+            val params = card.layoutParams as? FrameLayout.LayoutParams
+            if (params == null) {
+                // Layout params don't carry position info we can project — fall back to reading
+                // the anchor's actual position for this frame.
+                applyOffset()
+                return@lambda
+            }
             val parentLocation = IntArray(2).also { parent.getLocationInWindow(it) }
             val cardVisualTopInWindow = parentLocation[1] + params.topMargin + card.translationY.toInt()
             val cardVisualBottomInWindow = cardVisualTopInWindow + params.height
@@ -254,6 +260,7 @@ class NativeInputLayoutCoordinator(
                     ntpGroup?.layoutTransition = previousNtpTransition
                     pendingContentLayoutTransition = null
                     widgetAnimationFrameHandler = null
+                    isWidgetAnimating = false
                     targets.forEach { target ->
                         applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
                     }

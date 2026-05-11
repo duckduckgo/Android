@@ -42,6 +42,7 @@ interface NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit = {},
+        onCancel: () -> Unit = {},
         onComplete: () -> Unit = {},
     )
     fun animateExit(
@@ -50,6 +51,7 @@ interface NativeInputAnimator {
         omnibarCard: View,
         isBottom: Boolean,
         onUpdate: (fraction: Float) -> Unit = {},
+        onCancel: () -> Unit = {},
         onComplete: () -> Unit,
     )
     fun cancelAnimation()
@@ -101,6 +103,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         widgetView: View,
         margins: Margins,
         onUpdate: (fraction: Float) -> Unit,
+        onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
         cancelAnimation()
@@ -120,6 +123,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 startHeight,
                 omnibarPosition,
                 onUpdate,
+                onCancel,
                 onComplete,
             )
         }
@@ -131,6 +135,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         omnibarCard: View,
         isBottom: Boolean,
         onUpdate: (fraction: Float) -> Unit,
+        onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
         cancelAnimation()
@@ -141,7 +146,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val snapshot = snapshotBeforeExit(widgetCard, omnibarCard)
 
         waitForLayout(widgetCard) {
-            performExitAnimation(widgetCard, omnibarCard, snapshot, isBottom, onUpdate, onComplete)
+            performExitAnimation(widgetCard, omnibarCard, snapshot, isBottom, onUpdate, onCancel, onComplete)
         }
     }
 
@@ -168,6 +173,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         snapshot: ExitSnapshot,
         isBottom: Boolean,
         onUpdate: (fraction: Float) -> Unit,
+        onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
         val postPosition = windowPosition(widgetCard)
@@ -201,6 +207,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 omnibarCard.alpha = fraction
                 onUpdate(fraction)
             },
+            onCancel = onCancel,
             onEnd = {
                 omnibarCard.alpha = 1f
                 onComplete()
@@ -279,6 +286,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         startHeight: Int,
         omnibarPosition: Position,
         onUpdate: (fraction: Float) -> Unit,
+        onCancel: () -> Unit,
         onComplete: () -> Unit,
     ) {
         val offsetToOmnibar = positionCardOverOmnibar(card, omnibarPosition)
@@ -305,6 +313,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
                 omnibarCard.alpha = 1 - fraction
                 onUpdate(fraction)
             },
+            onCancel = onCancel,
             onEnd = {
                 widgetContent?.alpha = 1f
                 omnibarCard.alpha = 1f
@@ -405,7 +414,12 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     private fun lerpF(from: Float, to: Float, fraction: Float): Float =
         from + (to - from) * fraction
 
-    private fun runAnimator(cleanup: (() -> Unit)?, onUpdate: (fraction: Float) -> Unit, onEnd: () -> Unit) {
+    private fun runAnimator(
+        cleanup: (() -> Unit)?,
+        onUpdate: (fraction: Float) -> Unit,
+        onCancel: () -> Unit = {},
+        onEnd: () -> Unit,
+    ) {
         cancelAnimation()
         animationCleanup = cleanup
         transitionAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -414,7 +428,10 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
             addUpdateListener { onUpdate(it.animatedFraction) }
             addListener(object : AnimatorListenerAdapter() {
                 private var cancelled = false
-                override fun onAnimationCancel(animation: Animator) { cancelled = true }
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                    onCancel()
+                }
                 override fun onAnimationEnd(animation: Animator) {
                     transitionAnimator = null
                     animationCleanup = null

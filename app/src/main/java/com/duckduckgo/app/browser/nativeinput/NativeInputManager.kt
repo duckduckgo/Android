@@ -194,6 +194,7 @@ class RealNativeInputManager @Inject constructor(
                 omnibarCard = omnibarCard,
                 isBottom = isBottom,
                 onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
+                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
                 onComplete = {
                     layoutCoordinator.setWidgetAnimating(false)
                     isExiting = false
@@ -591,6 +592,7 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
             onComplete = {
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
