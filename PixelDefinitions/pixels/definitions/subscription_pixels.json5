@@ -144,10 +144,6 @@
         "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "petal",
-            "osVersion"
-        ]
+        "parameters": ["appVersion", "petal", "osVersion"]
     }
 }
