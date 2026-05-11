@@ -221,8 +221,13 @@ class AttachmentView(
         val mimeTypes = state?.acceptedMimeTypes ?: listOf("image/*")
 
         onAction?.invoke(Action.ShowAttachmentChooser(true))
+        val title = if (supportsImages) {
+            context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle)
+        } else {
+            context.getString(R.string.fileCaptureBrowseDisambiguationTitle)
+        }
         ActionBottomSheetDialog.Builder(context)
-            .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
+            .setTitle(title)
             .setPrimaryItem(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_image_24,
