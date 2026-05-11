@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.firemode.impl
+package com.duckduckgo.app.browser.mode
 
 import com.duckduckgo.browser.api.mode.BrowserMode
 import org.junit.Assert.assertEquals
