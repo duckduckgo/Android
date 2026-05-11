@@ -20,8 +20,6 @@ import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -50,10 +48,10 @@ class NewTabReturnHatchViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockNtpAfterIdleManager: NtpAfterIdleManager = mock()
-    private val mockOmnibarRepository: OmnibarRepository = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val afterIdleReturnFlow = MutableStateFlow(true)
+    private val nativeInputEnabledFlow = MutableStateFlow(true)
 
     private lateinit var testee: NewTabReturnHatchViewModel
 
@@ -62,7 +60,7 @@ class NewTabReturnHatchViewModelTest {
         whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
         whenever(mockTabRepository.flowTabs).thenReturn(tabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
-        whenever(mockOmnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+        whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
 
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
@@ -70,7 +68,6 @@ class NewTabReturnHatchViewModelTest {
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
-            omnibarRepository = mockOmnibarRepository,
         )
     }
 
@@ -308,41 +305,44 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenOmnibarTypeIsSplitThenShouldShowTabsIsTrue() = runTest {
-        whenever(mockOmnibarRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
+    fun whenNativeInputEnabledThenShowTabsButtonIsTrue() = runTest {
+        nativeInputEnabledFlow.value = true
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
             val state = awaitItem()
-            assertTrue(state.shouldShowTabs)
+            assertTrue(state.showTabsButton)
         }
     }
 
     @Test
-    fun whenOmnibarTypeIsSingleTopThenShouldShowTabsIsFalse() = runTest {
-        whenever(mockOmnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+    fun whenNativeInputDisabledThenShowTabsButtonIsFalse() = runTest {
+        nativeInputEnabledFlow.value = false
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
             val state = awaitItem()
-            assertFalse(state.shouldShowTabs)
+            assertFalse(state.showTabsButton)
         }
     }
 
     @Test
-    fun whenOmnibarTypeIsSingleBottomThenShouldShowTabsIsFalse() = runTest {
-        whenever(mockOmnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_BOTTOM)
+    fun whenNativeInputToggledThenShowTabsButtonUpdates() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-
         lastAccessedTabFlow.emit(tab)
 
         testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShowTabs)
+            assertTrue(awaitItem().showTabsButton)
+
+            nativeInputEnabledFlow.value = false
+            assertFalse(awaitItem().showTabsButton)
+
+            nativeInputEnabledFlow.value = true
+            assertTrue(awaitItem().showTabsButton)
         }
     }
 

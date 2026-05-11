@@ -138,7 +138,12 @@ class NewTabReturnHatchView @JvmOverloads constructor(
                 }
             }
 
-            binding.returnHatchTabsMenu.count = state.tabs
+            if (state.showTabsButton) {
+                binding.returnHatchTabsMenu.count = state.tabs
+                binding.returnHatchTabsMenu.show()
+            } else {
+                binding.returnHatchTabsMenu.gone()
+            }
             binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()

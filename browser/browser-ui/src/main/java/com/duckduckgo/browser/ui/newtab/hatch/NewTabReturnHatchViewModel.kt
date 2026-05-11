@@ -23,8 +23,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.api.OmnibarRepository
-import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -60,6 +58,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val isDuckChat: Boolean = false,
         val isSerp: Boolean = false,
         val tabs: Int = 0,
+        val showTabsButton: Boolean = false,
     )
 
     sealed class Command {
@@ -74,7 +73,8 @@ class NewTabReturnHatchViewModel @Inject constructor(
         tabRepository.flowLastAccessedTab,
         tabRepository.flowTabs,
         ntpAfterIdleManager.isAfterIdleReturn,
-    ) { lastTab, tabs, afterIdle ->
+        duckChat.observeNativeInputFieldUserSettingEnabled(),
+    ) { lastTab, tabs, afterIdle, nativeInputEnabled ->
         if (lastTab != null && afterIdle) {
             val url = lastTab.url.orEmpty()
             ViewState(
@@ -86,6 +86,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
                 isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
                 isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                 tabs = tabs.size,
+                showTabsButton = nativeInputEnabled,
             )
         } else {
             ViewState(shouldShow = false)

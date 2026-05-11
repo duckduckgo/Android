@@ -91,6 +91,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/returnHatchTabsMenu"
+            app:layout_goneMarginEnd="@dimen/keyline_2"
             android:src="@drawable/ic_menu_vertical_24"
 
             tools:ignore="ContentDescription" />
