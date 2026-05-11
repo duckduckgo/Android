@@ -249,6 +249,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun onDuckAiFireButtonCtaPressed() {
+        duckAiOnboardingExperimentMetrics.fireFireButtonPressed()
+    }
+
     suspend fun refreshCta(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,

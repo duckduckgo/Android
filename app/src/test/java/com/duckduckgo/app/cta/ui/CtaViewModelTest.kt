@@ -1465,6 +1465,13 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenOnDuckAiFireButtonCtaPressedThenFireFireButtonPressedMetric() = runTest {
+        testee.onDuckAiFireButtonCtaPressed()
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFireButtonPressed()
+    }
+
+    @Test
     fun whenOnDuckAiEndCtaInteractionOkThenOkPixelFired() = runTest {
         testee.onDuckAiEndCtaInteraction(okClicked = true)
 

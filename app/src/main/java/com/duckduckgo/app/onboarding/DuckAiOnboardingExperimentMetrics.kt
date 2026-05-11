@@ -48,6 +48,7 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
             MetricsPixel(metric = METRIC_SEARCH_TYPE, value = VALUE_OPTION_3, toggle = toggle, conversionWindow = conversionWindow),
             MetricsPixel(metric = METRIC_SCREEN_IMPRESSION, value = VALUE_FIRE_DIALOG, toggle = toggle, conversionWindow = conversionWindow),
             MetricsPixel(metric = METRIC_SCREEN_IMPRESSION, value = VALUE_FINAL_DIALOG, toggle = toggle, conversionWindow = conversionWindow),
+            MetricsPixel(metric = METRIC_CTA_PRESSED, value = VALUE_FIRE_BUTTON_PRESSED, toggle = toggle, conversionWindow = conversionWindow),
         )
     }
 
@@ -60,6 +61,8 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
     suspend fun fireFireDialogImpression() = fire(METRIC_SCREEN_IMPRESSION, VALUE_FIRE_DIALOG)
 
     suspend fun fireFinalDialogImpression() = fire(METRIC_SCREEN_IMPRESSION, VALUE_FINAL_DIALOG)
+
+    suspend fun fireFireButtonPressed() = fire(METRIC_CTA_PRESSED, VALUE_FIRE_BUTTON_PRESSED)
 
     private suspend fun fireOptionType(metricName: String, optionIndex: Int?) {
         val value = when (optionIndex) {
@@ -80,6 +83,7 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
         private const val METRIC_AICHAT_TYPE = "aichat_type"
         private const val METRIC_SEARCH_TYPE = "search_type"
         private const val METRIC_SCREEN_IMPRESSION = "screen-impression"
+        private const val METRIC_CTA_PRESSED = "cta-pressed"
 
         private const val VALUE_CUSTOM = "custom"
         private const val VALUE_OPTION_1 = "option1"
@@ -87,5 +91,6 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
         private const val VALUE_OPTION_3 = "option3"
         private const val VALUE_FIRE_DIALOG = "fire-dialog"
         private const val VALUE_FINAL_DIALOG = "final-dialog"
+        private const val VALUE_FIRE_BUTTON_PRESSED = "fire-button-pressed"
     }
 }
