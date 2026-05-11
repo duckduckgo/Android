@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,10 +36,12 @@ class RealPirFeatureDataCleaner @Inject constructor(
     private val pirSchedulingRepository: PirSchedulingRepository,
     private val pirEventsRepository: PirEventsRepository,
     private val pirScanWideEvent: PirScanWideEvent,
+    private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
 ) : PirFeatureDataCleaner {
 
     override suspend fun removeAllData() {
         pirScanWideEvent.onUserReset()
+        pirInitialScanCompletionWideEvent.onUserReset()
         pirRepository.clearAllData()
         pirSchedulingRepository.clearAllData()
         pirEventsRepository.clearAllData()
@@ -46,6 +49,7 @@ class RealPirFeatureDataCleaner @Inject constructor(
 
     override suspend fun removeUserData() {
         pirScanWideEvent.onUserReset()
+        pirInitialScanCompletionWideEvent.onUserReset()
         pirRepository.clearUserData()
         pirSchedulingRepository.clearAllData()
         pirEventsRepository.clearAllData()
