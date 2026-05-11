@@ -4064,7 +4064,13 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta() {
         hideDaxBubbleCta()
         renderer.showNewTab()
-        showKeyboard()
+        // When the input-screen feature is on, the omnibar's click catcher disables the text
+        // input, so requestFocus() can't succeed. Showing the IME there leaves the keyboard up
+        // with no focused field. Skip the keyboard call in that case and leave the user on the
+        // NTP — tapping the omnibar will launch the input screen as usual.
+        if (omnibar.omnibarTextInput.isFocusable) {
+            showKeyboard()
+        }
     }
 
     private fun hideDaxBubbleCta() {
