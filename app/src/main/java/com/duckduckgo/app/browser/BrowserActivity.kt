@@ -40,6 +40,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -265,6 +266,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var lastIntent: Intent? = null
 
+    /**
+     * External [Intent] received while in FIRE mode, deferred until the REGULAR-bound activity
+     * comes up. Survives the mode-switch [recreate] via [onSaveInstanceState]; consumed by
+     * [BrowserStateRenderer.showWebContent].
+     */
+    private var pendingExternalIntent: Intent? = null
+
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
@@ -358,6 +366,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
+        pendingExternalIntent = savedInstanceState?.let { BundleCompat.getParcelable(it, KEY_PENDING_EXTERNAL_INTENT, Intent::class.java) }
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
@@ -406,6 +415,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
+        pendingExternalIntent?.let { outState.putParcelable(KEY_PENDING_EXTERNAL_INTENT, it) }
     }
 
     private suspend fun configureFlowCollectors() {
@@ -662,13 +672,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        // External intents always open in REGULAR mode. setIntent() does not survive
-        // Activity.recreate(), so stash the intent in an app-scoped store; the recreated
-        // REGULAR-bound activity consumes it from showWebContent().
+        // External intents always open in REGULAR mode, so we must stash the intent and carry it
+        // to the recreated REGULAR-bound instance, where showWebContent() consumes it.
         val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
         if (viewModel.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal)) {
             logcat(INFO) { "External intent received in FIRE — switching to REGULAR before processing" }
-            viewModel.stashPendingExternalIntent(intent)
+            pendingExternalIntent = intent
             lifecycleScope.launch { viewModel.switchToMode(BrowserMode.REGULAR) }
             return
         }
@@ -1303,6 +1312,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
+        private const val KEY_PENDING_EXTERNAL_INTENT = "pendingExternalIntent"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
@@ -1343,11 +1353,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             configureObservers()
             binding.clearingInProgressView.gone()
 
-            val pendingExternalIntent = viewModel.consumePendingExternalIntent()
-            if (pendingExternalIntent != null) {
+            pendingExternalIntent?.let { pending ->
                 logcat(INFO) { "External intent deferred across mode-switch recreate; handling now" }
+                pendingExternalIntent = null
                 processedOriginalIntent = true
-                launchNewSearchOrQuery(pendingExternalIntent)
+                launchNewSearchOrQuery(pending)
                 return
             }
 
