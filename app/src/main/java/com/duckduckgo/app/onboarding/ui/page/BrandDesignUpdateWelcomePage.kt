@@ -657,7 +657,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     getString(R.string.preOnboardingWelcomeDialogTitle),
                                 ) {
                                     val animators = mutableListOf<Animator>(
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -889,7 +891,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 0f)
+                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 0f)
+                            .setDuration(OUTRO_FADE_DURATION),
+                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
@@ -903,8 +907,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             override fun onAnimationEnd(animation: Animator) {
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
-                                binding.daxDialogCta.welcomeContent.bodyText.text =
+                                binding.daxDialogCta.welcomeContent.bodyText1.text =
                                     getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
+                                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                                 binding.daxDialogCta.welcomeContent.titleText.text = ""
@@ -918,7 +923,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 ) {
                                     skipOnboardingFadeInAnimatorSet = AnimatorSet().apply {
                                         playTogether(
-                                            ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
+                                            ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
                                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                             ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -1255,7 +1260,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
-                binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                 if (onboardingDialogType == INITIAL_REINSTALL_USER) {
@@ -1356,9 +1362,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
-                binding.daxDialogCta.welcomeContent.bodyText.text =
+                binding.daxDialogCta.welcomeContent.bodyText1.text =
                     getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
-                binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
