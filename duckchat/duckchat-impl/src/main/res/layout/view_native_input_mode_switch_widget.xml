@@ -77,7 +77,7 @@
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_arrow_left_24" />
 
-                    <com.duckduckgo.browser.ui.inputmode.InputModeTabLayout
+                    <com.duckduckgo.browser.ui.inputmode.NativeInputModeTabLayout
                         android:id="@+id/inputModeSwitch"
                         style="@style/Widget.DuckDuckGo.TabLayout.Rounded.Native"
                         android:layout_width="0dp"
@@ -96,7 +96,7 @@
                             android:layout_height="wrap_content"
                             android:layout="@layout/view_native_chat_tab_indicator" />
 
-                    </com.duckduckgo.browser.ui.inputmode.InputModeTabLayout>
+                    </com.duckduckgo.browser.ui.inputmode.NativeInputModeTabLayout>
 
                 </LinearLayout>
 
