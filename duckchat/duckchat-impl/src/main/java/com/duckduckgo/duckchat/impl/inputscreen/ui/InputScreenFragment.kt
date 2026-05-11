@@ -989,6 +989,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.onboardingBackground.setImageResource(0)
                 binding.ddgLogoContainer.isVisible = true
                 binding.viewPager.isVisible = true
+                val state = viewModel.visibilityState.value
+                updateFavoritesVisibility(state.searchMode, !state.autoCompleteSuggestionsVisible)
             }
             .start()
     }
@@ -1021,7 +1023,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         hasContent: Boolean? = null,
     ) {
         val actualHasContent = hasContent ?: binding.newTabContainerLayout.isNotEmpty()
-        val shouldShow = searchMode && autocompleteHidden && actualHasContent
+        val shouldShow = searchMode && autocompleteHidden && actualHasContent && !duckAiEndCtaVisible
         val isCurrentlyVisible = binding.newTabContainerScrollView.isVisible
 
         when {
