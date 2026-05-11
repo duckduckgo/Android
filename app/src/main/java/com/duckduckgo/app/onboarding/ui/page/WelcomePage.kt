@@ -652,14 +652,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         buttons.forEachIndexed { index, button ->
             suggestions[index].setOptionView(button)
             button.setOnClickListener {
-                viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == CHAT)
+                viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == CHAT, optionIndex = index + 1)
             }
         }
 
         inputScreenPreviewBinding.inputModeDemoActionIcon.setOnClickListener {
             val query = inputScreenPreviewBinding.inputText.text?.toString().orEmpty().trim()
             if (query.isNotEmpty()) {
-                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == CHAT)
+                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == CHAT, optionIndex = null)
             }
         }
 

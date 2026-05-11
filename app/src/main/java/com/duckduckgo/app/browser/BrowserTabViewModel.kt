@@ -4977,7 +4977,12 @@ class BrowserTabViewModel @Inject constructor(
         val cta = currentCtaViewState().cta
 
         // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
-        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) return
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+            viewModelScope.launch {
+                ctaViewModel.onDuckAiFireButtonCtaPressed()
+            }
+            return
+        }
 
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
             onUserDismissedCta(cta)

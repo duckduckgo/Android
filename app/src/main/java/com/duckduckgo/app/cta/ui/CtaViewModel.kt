@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -92,6 +93,7 @@ class CtaViewModel @Inject constructor(
     private val subscriptionPromoCtaShownPlugins: PluginPoint<SubscriptionPromoCtaShownPlugin>,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -160,6 +162,9 @@ class CtaViewModel @Inject constructor(
                     pixel.fire(it, cta.pixelShownParameters())
                 }
             }
+            if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) {
+                duckAiOnboardingExperimentMetrics.fireFireDialogImpression()
+            }
             if (cta is DaxCta && cta.markAsReadOnShow) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -227,6 +232,7 @@ class CtaViewModel @Inject constructor(
                     val journey = addCtaToHistory(onboardingStore, appInstallStore, DUCK_AI_END_CTA_PIXEL_PARAM)
                     pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_SHOWN, mapOf(Pixel.PixelParameter.CTA_SHOWN to journey))
                 }
+                duckAiOnboardingExperimentMetrics.fireFinalDialogImpression()
             }
             shouldShow
         }
@@ -237,10 +243,15 @@ class CtaViewModel @Inject constructor(
             val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
             if (okClicked) {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
+                duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
             } else {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
             }
         }
+    }
+
+    suspend fun onDuckAiFireButtonCtaPressed() {
+        duckAiOnboardingExperimentMetrics.fireFireButtonPressed()
     }
 
     suspend fun refreshCta(

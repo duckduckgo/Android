@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
@@ -106,6 +107,7 @@ class WelcomePageViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -458,11 +460,16 @@ class WelcomePageViewModel @Inject constructor(
             appBuildConfig.isAppReinstall()
         }
 
-    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+    /**
+     * @param optionIndex 1, 2 or 3 if the user tapped one of the preset suggestions; null if they submitted a custom query.
+     */
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, optionIndex: Int?) {
         viewModelScope.launch {
             if (isChat) {
+                duckAiOnboardingExperimentMetrics.fireAiChatType(optionIndex)
                 _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
             } else {
+                duckAiOnboardingExperimentMetrics.fireSearchType(optionIndex)
                 _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
             }
         }
