@@ -88,22 +88,28 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun finishAndSubmitSearchQuery(query: String) {
-        viewModel.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
-        startActivity(BrowserActivity.intent(this@OnboardingActivity, queryExtra = query))
-        finish()
+        lifecycleScope.launch {
+            viewModel.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+            startActivity(BrowserActivity.intent(this@OnboardingActivity, queryExtra = query))
+            finish()
+        }
     }
 
     fun finishAndSubmitChatPrompt(prompt: String) {
-        viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
-        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
-        startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
-        finish()
+        lifecycleScope.launch {
+            viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+            val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
+            startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
+            finish()
+        }
     }
 
     private fun onOnboardingDone() {
-        viewModel.onOnboardingDone()
-        startActivity(BrowserActivity.intent(this@OnboardingActivity))
-        finish()
+        lifecycleScope.launch {
+            viewModel.onOnboardingDone()
+            startActivity(BrowserActivity.intent(this@OnboardingActivity))
+            finish()
+        }
     }
 
     private suspend fun configurePager() {

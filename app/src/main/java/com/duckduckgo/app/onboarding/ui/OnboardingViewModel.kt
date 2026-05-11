@@ -35,6 +35,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -64,9 +65,8 @@ class OnboardingViewModel @Inject constructor(
         return pageLayoutManager.buildPage(position)
     }
 
-    fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
-        // Executing this on IO to avoid any delay changing threads between Main-IO.
-        viewModelScope.launch(dispatchers.io()) {
+    suspend fun onOnboardingDone(extendedOnboardingFlow: ExtendedOnboardingFlow = DEFAULT) {
+        withContext(dispatchers.io()) {
             userStageStore.stageCompleted(AppStage.NEW)
 
             when (extendedOnboardingFlow) {
