@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
@@ -98,6 +100,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.browser.api.mode.BrowserMode
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -121,11 +124,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-//noinspection NoImplImportsInAppModule
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
-import com.duckduckgo.browser.api.mode.BrowserMode
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -661,12 +662,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        // External intents always open in REGULAR mode. The recreate observer picks up the mode
-        // change and the new REGULAR-bound activity re-processes this intent via getIntent().
+        // External intents always open in REGULAR mode. setIntent() does not survive
+        // Activity.recreate(), so stash the intent in an app-scoped store; the recreated
+        // REGULAR-bound activity consumes it from showWebContent().
         val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
         if (viewModel.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal)) {
             logcat(INFO) { "External intent received in FIRE — switching to REGULAR before processing" }
-            setIntent(intent)
+            viewModel.stashPendingExternalIntent(intent)
             lifecycleScope.launch { viewModel.switchToMode(BrowserMode.REGULAR) }
             return
         }
@@ -1340,6 +1342,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             logcat { "BrowserActivity can now start displaying web content. instance state is $instanceStateBundles" }
             configureObservers()
             binding.clearingInProgressView.gone()
+
+            val pendingExternalIntent = viewModel.consumePendingExternalIntent()
+            if (pendingExternalIntent != null) {
+                logcat(INFO) { "External intent deferred across mode-switch recreate; handling now" }
+                processedOriginalIntent = true
+                launchNewSearchOrQuery(pendingExternalIntent)
+                return
+            }
 
             if (lastIntent != null) {
                 logcat(INFO) { "There was a deferred intent to process; handling now" }

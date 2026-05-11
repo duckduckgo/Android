@@ -38,6 +38,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.mode.BrowserMode
+import com.duckduckgo.browser.api.mode.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -45,8 +47,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.browser.api.mode.BrowserMode
-import com.duckduckgo.firemode.api.BrowserModeStateHolder
 import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import junit.framework.TestCase
