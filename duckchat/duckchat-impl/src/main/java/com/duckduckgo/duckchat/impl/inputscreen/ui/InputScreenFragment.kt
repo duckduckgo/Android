@@ -886,6 +886,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         overlay: View,
         onAnimationUpdate: () -> Unit = {},
     ) {
+        // The end CTA has served its purpose once the user starts interacting enough to bring
+        // up a suggestions overlay. Dismiss it so the transparent overlay (which is clickable
+        // and would otherwise block touches to the CTA while empty) can't strand the user.
+        if (duckAiEndCtaVisible) hideDuckAiEndCta()
         disableViewPagerInput()
         overlay.elevation = 3f.toPx()
         overlay.alpha = 0f
