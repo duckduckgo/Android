@@ -16,13 +16,19 @@
 
 package com.duckduckgo.adblocking.impl.di
 
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
+import com.duckduckgo.adblocking.impl.remoteconfig.DomainJsonAdapter
 import com.duckduckgo.adblocking.impl.store.AD_BLOCKING_EXTENSION_MIGRATIONS
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDao
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDatabase
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -47,4 +53,13 @@ object AdBlockingExtensionModule {
     @Provides
     fun provideAdBlockingExtensionDao(database: AdBlockingExtensionDatabase): AdBlockingExtensionDao =
         database.adBlockingExtensionDao()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAdBlockingExtensionSettingsAdapter(): JsonAdapter<AdBlockingExtensionSettings> =
+        Moshi.Builder()
+            .add(Domain::class.java, DomainJsonAdapter().nullSafe())
+            .add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(AdBlockingExtensionSettings::class.java)
 }
