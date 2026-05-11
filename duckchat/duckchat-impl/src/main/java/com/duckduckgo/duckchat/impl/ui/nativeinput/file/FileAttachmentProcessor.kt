@@ -42,6 +42,8 @@ class RealFileAttachmentProcessor @Inject constructor(
             val (fileName, fileSize) = resolveFileInfo(context, uri) ?: return@withContext null
             val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
 
+            // readBytes() + encodeToString each hold the full payload in memory simultaneously (~1.33× file size peak).
+            // At the 5 MB per-file limit this is ~6.7 MB per file; no streaming Base64 path exists on Android.
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
             val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
 
