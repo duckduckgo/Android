@@ -942,7 +942,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         duckAiEndCtaVisible = true
         duckAiEndCtaOkClicked = false
         binding.ddgLogoContainer.isVisible = false
-        binding.viewPager.isVisible = false
+        // Keep the viewPager laid out (INVISIBLE, not GONE) so its child fragments — including
+        // ChatTabFragment, which owns the chat suggestions adapter + observers — actually get
+        // bound by FragmentStateAdapter. With GONE the page is never laid out, the fragment is
+        // never instantiated, and typing in chat mode produces no suggestions until a toggle
+        // forces the page to be re-bound. The CTA above (elevation 5dp) still covers it visually.
+        binding.viewPager.visibility = View.INVISIBLE
         binding.newTabContainerScrollView.isVisible = false
 
         val backgroundRes = if (appTheme.isLightModeEnabled()) {
