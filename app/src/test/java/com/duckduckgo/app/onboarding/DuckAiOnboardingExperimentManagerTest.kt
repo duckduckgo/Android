@@ -21,6 +21,7 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles.DuckAiOnboardingExperimentCohort
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
@@ -45,6 +46,7 @@ class DuckAiOnboardingExperimentManagerTest {
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val deviceInfo: DeviceInfo = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private val showInputScreenOnboardingToggle: Toggle = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
@@ -66,7 +68,19 @@ class DuckAiOnboardingExperimentManagerTest {
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
             extendedOnboardingFeatureToggles = extendedOnboardingFeatureToggles,
             deviceInfo = deviceInfo,
+            appBuildConfig = appBuildConfig,
         )
+    }
+
+    @Test
+    fun whenDefaultVariantForcedThenReturnsNullAndDoesNotEnroll() = runTest {
+        givenPrerequisitesMet()
+        whenever(appBuildConfig.isDefaultVariantForced).thenReturn(true)
+
+        val result = testee.enroll()
+
+        assertNull(result)
+        verify(experimentToggle, never()).enroll()
     }
 
     @Test
@@ -181,6 +195,7 @@ class DuckAiOnboardingExperimentManagerTest {
     }
 
     private suspend fun givenPrerequisitesMet() {
+        whenever(appBuildConfig.isDefaultVariantForced).thenReturn(false)
         whenever(showInputScreenOnboardingToggle.isEnabled()).thenReturn(true)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         whenever(brandDesignUpdateToggle.isEnabled()).thenReturn(false)
