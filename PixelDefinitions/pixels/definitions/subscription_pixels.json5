@@ -58,8 +58,7 @@
             {
                 "key": "is_repeated",
                 "description": "Indicates whether this is a repeated crash after a recovery attempt. 'false' for first crash, 'true' for repeated crash.",
-                "type": "string",
-                "enum": ["true", "false"]
+                "type": "boolean"
             }
         ]
     },

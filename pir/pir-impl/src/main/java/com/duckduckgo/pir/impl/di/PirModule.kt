@@ -49,6 +49,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoR
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.service.DbpService
+import com.duckduckgo.pir.impl.store.PirDataStore
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
@@ -69,8 +70,14 @@ class PirModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providePirRepository(
+    fun providePirDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
+    ): PirDataStore = RealPirDataStore(sharedPreferencesProvider)
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePirRepository(
+        pirDataStore: PirDataStore,
         dispatcherProvider: DispatcherProvider,
         currentTimeProvider: CurrentTimeProvider,
         dbpService: DbpService,
@@ -79,7 +86,7 @@ class PirModule {
         pixelSender: PirPixelSender,
     ): PirRepository = RealPirRepository(
         dispatcherProvider,
-        RealPirDataStore(sharedPreferencesProvider),
+        pirDataStore,
         currentTimeProvider,
         databaseFactory,
         dbpService,

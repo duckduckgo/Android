@@ -126,7 +126,13 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also { registerDuckChatIsOpenDebounced() }
+                }.also {
+                    if (voiceSessionStateManager.isVoiceSessionActive(tabId)) {
+                        // NOTE: Force end native chat state if duck ai chat has been refreshed with an active voice session
+                        voiceSessionStateManager.onVoiceSessionEnded(tabId)
+                    }
+                    registerDuckChatIsOpenDebounced()
+                }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -163,9 +169,10 @@ class RealDuckChatJSHelper @Inject constructor(
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
                         filesUsed = attachments.optInt("filesUsed", 0),
-                        fileSizeBytesUsed = attachments.optInt("fileSizeBytesUsed", 0),
+                        fileSizeBytesUsed = attachments.optLong("fileSizeBytesUsed", 0L),
                     )
                     limitsHandler.setConversationImagesUsed(usage.imagesUsed)
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed)
                 }
                 null
             }
@@ -243,7 +250,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_ENDED -> {
-                voiceSessionStateManager.onVoiceSessionEnded()
+                voiceSessionStateManager.onVoiceSessionEnded(tabId)
                 null
             }
 
@@ -410,6 +417,22 @@ class RealDuckChatJSHelper @Inject constructor(
                                             JSONObject().apply {
                                                 put("data", image.base64Data)
                                                 put("format", image.format)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
+                        if (pending.files.isNotEmpty()) {
+                            put(
+                                "files",
+                                JSONArray().apply {
+                                    pending.files.forEach { file ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", file.base64Data)
+                                                put("fileName", file.fileName)
+                                                put("mimeType", file.mimeType)
                                             },
                                         )
                                     }

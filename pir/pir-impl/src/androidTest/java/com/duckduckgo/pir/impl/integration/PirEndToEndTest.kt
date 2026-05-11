@@ -105,6 +105,8 @@ import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -367,6 +369,9 @@ class PirEndToEndTest {
                 override suspend fun update(): Boolean = true
             },
             pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+            pirScanWideEvent = NoOpPirScanWideEvent,
+            pirInitialScanCompletionWideEvent = NoOpPirInitialScanCompletionWideEvent,
+            networkProtectionState = fakeNetworkProtectionState,
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -983,4 +988,52 @@ class PirEndToEndTest {
         val schedulingConfig: TestSchedulingConfig,
         val removedAt: Long?,
     )
+
+    /**
+     * No-op implementation of [PirScanWideEvent] used by the integration test. This test asserts on
+     * the discrete pixel stream and on PIR's persistent state, not on wide events; the wide-event
+     * lifecycle is exercised by `PirScanWideEventTest` and `RealPirJobsRunnerTest` (unit-test side).
+     */
+    private object NoOpPirScanWideEvent : PirScanWideEvent {
+        override suspend fun onRunStarted(
+            executionType: PirExecutionType,
+            profileQueriesCount: Int,
+            brokerCount: Int,
+            totalScanJobs: Int,
+            webViewCount: Int,
+            isPowerSavingEnabled: Boolean,
+            isVpnConnected: Boolean,
+            batteryOptimizationsEnabled: Boolean,
+            notificationsPermissionGranted: Boolean,
+            isTrackerBlockingEnabled: Boolean,
+        ) = Unit
+
+        override suspend fun onScanJobsResolved(executionType: PirExecutionType, actualScanJobs: Int) = Unit
+        override suspend fun onScanJobCompleted(executionType: PirExecutionType) = Unit
+        override suspend fun onScanCompleted(executionType: PirExecutionType) = Unit
+        override suspend fun onOptOutStarted(executionType: PirExecutionType) = Unit
+        override suspend fun onOptOutCompleted(executionType: PirExecutionType, totalOptOutJobs: Int) = Unit
+        override suspend fun onOptOutSkipped(executionType: PirExecutionType) = Unit
+        override suspend fun onRunFailed(executionType: PirExecutionType, reason: PirScanWideEvent.FailureReason) = Unit
+        override suspend fun onRunCancelled(executionType: PirExecutionType) = Unit
+        override suspend fun onUserReset() = Unit
+    }
+
+    private object NoOpPirInitialScanCompletionWideEvent : PirInitialScanCompletionWideEvent {
+        override suspend fun onRunStarted(
+            executionType: PirExecutionType,
+            profileQueriesCount: Int,
+            brokerCount: Int,
+            totalScanJobs: Int,
+            webViewCount: Int,
+            isPowerSavingEnabled: Boolean,
+            isVpnConnected: Boolean,
+            batteryOptimizationsEnabled: Boolean,
+            notificationsPermissionGranted: Boolean,
+            isTrackerBlockingEnabled: Boolean,
+        ) = Unit
+
+        override suspend fun onScanCompleted() = Unit
+        override suspend fun onUserReset() = Unit
+    }
 }

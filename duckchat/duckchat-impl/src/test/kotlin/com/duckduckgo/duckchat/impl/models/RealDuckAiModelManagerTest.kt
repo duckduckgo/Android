@@ -452,6 +452,29 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenModelHasSupportedFileTypesThenResolvedModel() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("claude", supportedFileTypes = listOf("application/pdf")),
+                    remoteModel("gpt", supportedFileTypes = null),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val byId = testee.modelState.value.models.associateBy { it.id }
+        assertEquals(listOf("application/pdf"), byId.getValue("claude").supportedFileTypes)
+        assertTrue(byId.getValue("claude").supportsFileUpload)
+        assertTrue(byId.getValue("gpt").supportedFileTypes.isEmpty())
+        assertFalse(byId.getValue("gpt").supportsFileUpload)
+    }
+
+    @Test
     fun whenAttachmentLimitsProvidedThenResolvedForFreeTier() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -460,9 +483,11 @@ class RealDuckAiModelManagerTest {
                 models = listOf(remoteModel("id")),
                 attachmentLimits = mapOf(
                     "free" to RemoteTierAttachmentLimits(
+                        files = RemoteFileLimits(maxPerConversation = 3, maxFileSizeMB = 5, maxPagesPerFile = 8),
                         images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 5, maxInputCharsWithAttachments = 4500),
                     ),
                     "plus" to RemoteTierAttachmentLimits(
+                        files = RemoteFileLimits(maxPerConversation = 5, maxFileSizeMB = 25, maxPagesPerFile = 15),
                         images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 10, maxInputCharsWithAttachments = 4500),
                     ),
                 ),
@@ -473,6 +498,9 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         val limits = testee.modelState.value.attachmentLimits
+        assertEquals(3, limits.files.maxPerConversation)
+        assertEquals(5L * 1024 * 1024, limits.files.maxFileSizeBytes)
+        assertEquals(8, limits.files.maxPagesPerFile)
         assertEquals(3, limits.images.maxPerTurn)
         assertEquals(5, limits.images.maxPerConversation)
     }
@@ -487,9 +515,11 @@ class RealDuckAiModelManagerTest {
                 models = listOf(remoteModel("id")),
                 attachmentLimits = mapOf(
                     "free" to RemoteTierAttachmentLimits(
+                        files = RemoteFileLimits(maxPerConversation = 3, maxFileSizeMB = 5, maxPagesPerFile = 8),
                         images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 5),
                     ),
                     "plus" to RemoteTierAttachmentLimits(
+                        files = RemoteFileLimits(maxPerConversation = 5, maxFileSizeMB = 25, maxPagesPerFile = 15),
                         images = RemoteImageLimits(maxPerTurn = 3, maxPerConversation = 10),
                     ),
                 ),
@@ -500,6 +530,9 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         val limits = testee.modelState.value.attachmentLimits
+        assertEquals(5, limits.files.maxPerConversation)
+        assertEquals(25L * 1024 * 1024, limits.files.maxFileSizeBytes)
+        assertEquals(15, limits.files.maxPagesPerFile)
         assertEquals(10, limits.images.maxPerConversation)
     }
 
@@ -515,6 +548,8 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         val limits = testee.modelState.value.attachmentLimits
+        assertEquals(FileLimits.DEFAULT_FILE_MAX_PER_CONVERSATION, limits.files.maxPerConversation)
+        assertEquals(FileLimits.DEFAULT_FILE_MAX_SIZE_BYTES, limits.files.maxFileSizeBytes)
         assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN, limits.images.maxPerTurn)
         assertEquals(ImageLimits.DEFAULT_IMAGE_MAX_PER_CONVERSATION, limits.images.maxPerConversation)
     }
@@ -588,6 +623,7 @@ class RealDuckAiModelManagerTest {
         entityHasAccess: Boolean = true,
         provider: String? = null,
         supportsImageUpload: Boolean = false,
+        supportedFileTypes: List<String>? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -597,5 +633,6 @@ class RealDuckAiModelManagerTest {
         entityHasAccess = entityHasAccess,
         provider = provider,
         supportsImageUpload = supportsImageUpload,
+        supportedFileTypes = supportedFileTypes,
     )
 }

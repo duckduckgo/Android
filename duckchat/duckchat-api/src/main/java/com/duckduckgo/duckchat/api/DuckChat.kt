@@ -121,9 +121,14 @@ interface DuckChat {
     fun openVoiceDuckChat()
 
     /**
-     * Returns `true` if a voice session is currently active.
+     * Returns `true` if a voice session is currently active on the tab with the given [tabId].
      */
-    fun isVoiceSessionActive(): Boolean
+    fun isVoiceChatSessionActive(tabId: String): Boolean
+
+    /**
+     * Emits the set of tab IDs that currently have an active voice session.
+     */
+    val activeVoiceChatSessions: Flow<Set<String>>
 
     /**
      * Emits the tab id whenever an end-voice-session action is requested (e.g. from the

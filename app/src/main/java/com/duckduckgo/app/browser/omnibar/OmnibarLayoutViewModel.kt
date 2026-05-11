@@ -78,6 +78,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -120,6 +121,10 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
+
+    // Tracked separately from ViewState so the derived enabledState can be recomputed
+    // whenever either the lock or the fire-button highlight changes.
+    private var locked: Boolean = false
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -204,6 +209,13 @@ class OmnibarLayoutViewModel @Inject constructor(
             initialValue = true,
         )
 
+    private val voiceActiveOnSelectedTab: StateFlow<Boolean> = combine(
+        duckChat.activeVoiceChatSessions,
+        tabRepository.flowSelectedTab,
+    ) { activeSessions, selectedTab ->
+        selectedTab?.tabId?.let { it in activeSessions } == true
+    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -244,6 +256,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isDuckAiBackAvailable: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
+        val enabledState: EnabledState = EnabledState.ALL,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -253,6 +266,14 @@ class OmnibarLayoutViewModel @Inject constructor(
             return updateOmnibarText && url.isNotEmpty()
         }
     }
+
+    /**
+     * Which interactive elements in the omnibar are enabled.
+     * - [ALL]: every button/input is enabled (default).
+     * - [NONE]: every button/input is disabled (omnibar locked).
+     * - [FIRE_BUTTON_ONLY]: only the fire button is enabled; everything else disabled.
+     */
+    enum class EnabledState { ALL, NONE, FIRE_BUTTON_ONLY }
 
     sealed class Command {
         data object CancelAnimations : Command()
@@ -301,6 +322,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         showDuckAiButton.onEach { showDuckAiButton ->
             _viewState.update {
                 it.copy(showChatMenu = showDuckAiButton)
+            }
+        }.launchIn(viewModelScope)
+
+        voiceActiveOnSelectedTab.onEach { voiceActive ->
+            _viewState.update {
+                it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, it.hasFocus, voiceActive))
             }
         }.launchIn(viewModelScope)
 
@@ -389,7 +416,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, true),
+                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, true),
                 )
             }
         } else {
@@ -439,6 +466,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     ),
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
+                    enabledState = enabledStateFor(locked, fireButtonHighlighted = false),
                     showClearButton = false,
                     showTabsMenu = !isSplitOmnibarEnabled,
                     showFireIcon = !isSplitOmnibarEnabled,
@@ -453,7 +481,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = shouldUpdateOmnibarText,
                     omnibarText = omnibarText,
                     showDuckAIHeader = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
-                    showDuckAISidebar = shouldShowDuckAiHeader(_viewState.value.viewMode, false),
+                    showDuckAISidebar = shouldShowDuckAiSidebar(_viewState.value.viewMode, false),
                 )
             }
 
@@ -563,6 +591,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    private fun shouldShowDuckAiSidebar(
+        viewMode: ViewMode,
+        hasFocus: Boolean,
+        voiceActive: Boolean = voiceActiveOnSelectedTab.value,
+    ): Boolean = shouldShowDuckAiHeader(viewMode, hasFocus) && !voiceActive
+
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
         val hasFocus = _viewState.value.hasFocus
@@ -598,7 +632,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             omnibarText = "",
                             updateOmnibarText = true,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
                         )
                     }
                 }
@@ -637,7 +671,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                             ),
                             showShadows = false,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
-                            showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
                         )
                     }
                 }
@@ -683,7 +717,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
         logcat { "Omnibar: onFireIconPressed" }
-        if (_viewState.value.highlightFireButton.isHighlighted()) {
+        if (_viewState.value.highlightFireButton.isHighlighted() && _viewState.value.enabledState == EnabledState.ALL) {
             _viewState.update {
                 it.copy(
                     highlightFireButton = HighlightableButton.Visible(
@@ -691,6 +725,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         highlighted = false,
                     ),
                     scrollingEnabled = true,
+                    enabledState = enabledStateFor(locked, fireButtonHighlighted = false),
                 )
             }
         }
@@ -786,8 +821,22 @@ class OmnibarLayoutViewModel @Inject constructor(
                     highlighted = decoration.fireButton,
                 ),
                 scrollingEnabled = !isScrollingDisabled,
+                enabledState = enabledStateFor(locked, fireButtonHighlighted = decoration.fireButton),
             )
         }
+    }
+
+    fun setLocked(locked: Boolean) {
+        this.locked = locked
+        _viewState.update {
+            it.copy(enabledState = enabledStateFor(locked, it.highlightFireButton.isHighlighted()))
+        }
+    }
+
+    private fun enabledStateFor(locked: Boolean, fireButtonHighlighted: Boolean): EnabledState = when {
+        !locked -> EnabledState.ALL
+        fireButtonHighlighted -> EnabledState.FIRE_BUTTON_ONLY
+        else -> EnabledState.NONE
     }
 
     fun onExternalStateChange(stateChange: StateChange) {

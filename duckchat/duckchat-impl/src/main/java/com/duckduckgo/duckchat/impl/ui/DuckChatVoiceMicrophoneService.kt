@@ -33,7 +33,6 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -46,9 +45,6 @@ class DuckChatVoiceMicrophoneService : Service() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject
-    lateinit var voiceSessionStateManager: VoiceSessionStateManager
 
     @Inject
     lateinit var browserNav: BrowserNav
@@ -66,10 +62,11 @@ class DuckChatVoiceMicrophoneService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        val tabId = intent?.getStringExtra(EXTRA_TAB_ID)?.takeIf { it.isNotBlank() }
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
-            buildNotification(),
+            buildNotification(tabId),
             if (appBuildConfig.sdkInt >= 30) {
                 FOREGROUND_SERVICE_TYPE_MICROPHONE
             } else {
@@ -79,8 +76,7 @@ class DuckChatVoiceMicrophoneService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun buildNotification(): Notification {
-        val tabId = voiceSessionStateManager.activeSessionTabId
+    private fun buildNotification(tabId: String?): Notification {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.duckAiVoiceNotificationTitle))
             .setContentText(getString(R.string.duckAiVoiceNotificationMessage))
@@ -145,9 +141,13 @@ class DuckChatVoiceMicrophoneService : Service() {
         private const val REQUEST_CODE_OPEN_CHAT = 1
         private const val REQUEST_CODE_END_SESSION = 2
         private const val REQUEST_CODE_FALLBACK = 3
+        private const val EXTRA_TAB_ID = "EXTRA_TAB_ID"
 
-        fun start(context: Context) {
-            ContextCompat.startForegroundService(context, Intent(context, DuckChatVoiceMicrophoneService::class.java))
+        fun start(context: Context, tabId: String) {
+            val intent = Intent(context, DuckChatVoiceMicrophoneService::class.java).apply {
+                putExtra(EXTRA_TAB_ID, tabId)
+            }
+            ContextCompat.startForegroundService(context, intent)
         }
 
         fun stop(context: Context) {

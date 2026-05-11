@@ -48,22 +48,26 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
         DenyListedEntry(
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "first",
-            errorMessage = "first() will throw if flow is empty, firstOrNull() it's a safer option."
+            errorMessage = "first() will throw if flow is empty, firstOrNull() it's a safer option.",
+            allowInTests = true,
         ),
         DenyListedEntry(
             className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
             functionName = "last",
-            errorMessage = "last() will throw if there's not at least one item, lastOrNull() it's a safer option."
+            errorMessage = "last() will throw if there's not at least one item, lastOrNull() it's a safer option.",
+            allowInTests = true,
         ),
         DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.Toggle",
             functionName = "setRawStoredState",
-            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!"
+            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!",
+            allowInTests = true,
         ),
         DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.Toggle",
             functionName = "getRawStoredState",
-            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!"
+            errorMessage = "If you find yourself using this API in production, you're doing something wrong!!",
+            allowInTests = true,
         ),
         DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin",
@@ -177,6 +181,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                     typeConfig.functionEntries.getOrDefault(MATCH_ALL, emptyList())
 
                 deniedFunctions.forEach { denyListEntry ->
+                    if (denyListEntry.allowInTests && context.isTestSource) return@forEach
                     if (denyListEntry.parametersMatchWith(function) && denyListEntry.argumentsMatchWith(node)) {
                         context.report(
                             issue = ISSUE,
@@ -206,6 +211,7 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                     typeConfig.referenceEntries.getOrDefault(MATCH_ALL, emptyList())
 
                 deniedFunctions.forEach { denyListEntry ->
+                    if (denyListEntry.allowInTests && context.isTestSource) return@forEach
                     context.report(
                         issue = ISSUE,
                         location = context.getLocation(node),
@@ -290,6 +296,8 @@ data class DenyListedEntry(
     /** Argument expressions to match at the call site, or null to match all invocations. */
     val arguments: List<String>? = null,
     val errorMessage: String,
+    /** When true, this entry is not reported in test sources (`src/test/...`, `src/androidTest/...`). */
+    val allowInTests: Boolean = false,
 ) {
     init {
         require((functionName == null) xor (fieldName == null)) {
