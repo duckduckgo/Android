@@ -4580,7 +4580,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
@@ -4592,7 +4592,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleAppLinkCalledAndIsUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
@@ -4604,7 +4604,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleAppLinkCalledAndIsNotUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
-        testee.handleAppLink(urlType, isForMainFrame = true)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
@@ -4617,13 +4617,48 @@ class BrowserTabViewModelTest {
     fun whenHandleAppLinkCalledAndCustomTabIsTrueThenOpenAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
         testee.setIsCustomTab(true)
-        testee.handleAppLink(urlType, isForMainFrame = true)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
         whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
         verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledInCustomTabWithoutGestureAndNotUserQueryThenSuppressHandoff() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        testee.setIsCustomTab(true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        val result = testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        assertFalse(result)
+        verify(mockAppLinksHandler, never()).handleAppLink(any(), any(), any(), any(), any())
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledOutsideCustomTabWithoutGestureAndNotUserQueryThenSuppressHandoff() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        testee.setIsCustomTab(false)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        val result = testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        assertFalse(result)
+        verify(mockAppLinksHandler, never()).handleAppLink(any(), any(), any(), any(), any())
+        assertCommandNotIssued<Command.OpenAppLink>()
+        assertCommandNotIssued<Command.ShowAppLinkPrompt>()
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledWithoutGestureButIsUserQueryThenForwardToHandler() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = exampleUrl)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        testee.handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq(exampleUrl), eq(false), eq(true), appLinkCaptor.capture())
+        appLinkCaptor.lastValue.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
     }
 
     @Test

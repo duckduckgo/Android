@@ -627,9 +627,9 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleAppLink(urlType, isForMainFrame = true)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -638,9 +638,9 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleAppLink(urlType, isForMainFrame = true)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -649,7 +649,19 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
         testee.webViewClientListener = null
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener, never()).handleAppLink(any(), any())
+        verify(listener, never()).handleAppLink(any(), any(), any())
+    }
+
+    @Test
+    fun whenAppLinkDetectedThenHasGestureForwardedFromRequest() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.hasGesture()).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
+        verify(listener).handleAppLink(urlType, isForMainFrame = true, hasGesture = true)
     }
 
     @Test
@@ -873,13 +885,13 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.processUrl(anyString(), anyString())).thenReturn(appLink)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(true)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = getImmediatelyInvokedMockWebView()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
-        verify(listener).handleAppLink(appLink, true)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
     }
 
     @Test
@@ -894,13 +906,13 @@ class BrowserWebViewClientTest {
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.processUrl(anyString(), anyString())).thenReturn(appLink)
-        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        whenever(listener.handleAppLink(any(), any(), any())).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = getImmediatelyInvokedMockWebView()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
-        verify(listener).handleAppLink(appLink, true)
+        verify(listener).handleAppLink(appLink, isForMainFrame = true, hasGesture = false)
     }
 
     @Test

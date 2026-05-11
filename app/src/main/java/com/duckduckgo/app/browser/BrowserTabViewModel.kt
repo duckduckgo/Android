@@ -3487,13 +3487,17 @@ class BrowserTabViewModel @Inject constructor(
     override fun handleAppLink(
         appLink: AppLink,
         isForMainFrame: Boolean,
+        hasGesture: Boolean,
     ): Boolean =
-        appLinksHandler.handleAppLink(
-            isForMainFrame,
-            appLink.uriString,
-            appSettingsPreferencesStore.appLinksEnabled,
-            !appSettingsPreferencesStore.showAppLinksPrompt,
-        ) { appLinkClicked(appLink) }
+        // HTTP navigations shouldn't launch apps unless they are started with a user gesture. This
+        // avoids issues like CCT <-> app redirection loops, and mirrors Chromium's behaviour.
+        (hasGesture || appLinksHandler.isUserQuery()) &&
+            appLinksHandler.handleAppLink(
+                isForMainFrame,
+                appLink.uriString,
+                appSettingsPreferencesStore.appLinksEnabled,
+                !appSettingsPreferencesStore.showAppLinksPrompt,
+            ) { appLinkClicked(appLink) }
 
     fun openAppLink() {
         browserViewState.value?.previousAppLink?.let { appLink ->
