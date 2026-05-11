@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.firemode.impl
+package com.duckduckgo.app.browser.mode
 
+import com.duckduckgo.browser.api.mode.BrowserMode
+import com.duckduckgo.browser.api.mode.BrowserModeStateHolder
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.firemode.api.BrowserMode
-import com.duckduckgo.firemode.api.BrowserModeStateHolder
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow

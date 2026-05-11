@@ -68,8 +68,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.firemode.api.BrowserMode
-import com.duckduckgo.firemode.api.BrowserModeStateHolder
+import com.duckduckgo.browser.api.mode.BrowserMode
+import com.duckduckgo.browser.api.mode.BrowserModeStateHolder
 import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope

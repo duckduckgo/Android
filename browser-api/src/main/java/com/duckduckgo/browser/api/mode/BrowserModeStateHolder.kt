@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.firemode.api
+package com.duckduckgo.browser.api.mode
 
 import kotlinx.coroutines.flow.StateFlow
 

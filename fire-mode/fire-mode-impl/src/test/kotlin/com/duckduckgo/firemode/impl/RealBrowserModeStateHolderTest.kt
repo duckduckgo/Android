@@ -16,7 +16,7 @@
 
 package com.duckduckgo.firemode.impl
 
-import com.duckduckgo.firemode.api.BrowserMode
+import com.duckduckgo.browser.api.mode.BrowserMode
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

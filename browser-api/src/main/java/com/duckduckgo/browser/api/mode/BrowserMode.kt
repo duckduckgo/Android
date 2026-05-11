@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.firemode.api
+package com.duckduckgo.browser.api.mode
 
 /**
  * Which browsing mode the user is currently in.
