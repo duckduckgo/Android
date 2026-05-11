@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.browser.nativeinput
 
+import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.updateLayoutParams
 
 /**
  * Sets the Duck.ai entry icon according to whether the native input field setting is enabled.
- * Native enabled → chevron-down variant with a leading inset; otherwise the standard chat icon
- * with no leading inset.
+ * Native enabled → chevron-down variant with a leading inset and 4dp trailing margin; otherwise
+ * the standard chat icon with no leading inset and no trailing margin.
  */
 fun ImageView.applyDuckAiIconStyling(isNativeInputEnabled: Boolean) {
     if (isNativeInputEnabled) {
@@ -32,8 +34,14 @@ fun ImageView.applyDuckAiIconStyling(isNativeInputEnabled: Boolean) {
             0,
             paddingBottom,
         )
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginEnd = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
+        }
     } else {
         setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_24)
         setPaddingRelative(0, paddingTop, 0, paddingBottom)
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginEnd = 0
+        }
     }
 }
