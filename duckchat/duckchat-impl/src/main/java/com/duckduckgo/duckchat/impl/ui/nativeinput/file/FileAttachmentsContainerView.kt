@@ -59,10 +59,6 @@ class FileAttachmentsContainerView @JvmOverloads constructor(
         removeAllViews()
     }
 
-    fun attachmentCount(): Int = attachments.size
-
-    fun totalSizeBytes(): Long = attachments.sumOf { it.sizeBytes }
-
     private fun addFileItemView(attachment: FileAttachment) {
         val itemView = LayoutInflater.from(context).inflate(R.layout.view_file_attachment_item, this, false)
         val fileNameText = itemView.findViewById<DaxTextView>(R.id.fileName)

@@ -150,7 +150,7 @@ class RealFileAttachmentProcessorTest {
     }
 
     @Test
-    fun whenSizeColumnMissingThenFileSizeFallsBackToZero() = runTest {
+    fun whenSizeColumnMissingThenFileSizeFallsBackToActualByteCount() = runTest {
         val cursor: Cursor = mock()
         whenever(contentResolver.query(uri, null, null, null, null)).thenReturn(cursor)
         whenever(cursor.moveToFirst()).thenReturn(true)
@@ -158,11 +158,30 @@ class RealFileAttachmentProcessorTest {
         whenever(cursor.getColumnIndex(OpenableColumns.SIZE)).thenReturn(-1)
         whenever(cursor.getString(0)).thenReturn("file.txt")
         whenever(contentResolver.getType(uri)).thenReturn("text/plain")
-        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(ByteArray(0)))
+        val fileBytes = "hello world".toByteArray()
+        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(fileBytes))
 
         val result = processor.processFile(context, uri)
 
-        assertEquals(0L, result!!.sizeBytes)
+        assertEquals(fileBytes.size.toLong(), result!!.sizeBytes)
+    }
+
+    @Test
+    fun whenSizeColumnNullThenFileSizeFallsBackToActualByteCount() = runTest {
+        val cursor: Cursor = mock()
+        whenever(contentResolver.query(uri, null, null, null, null)).thenReturn(cursor)
+        whenever(cursor.moveToFirst()).thenReturn(true)
+        whenever(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)).thenReturn(0)
+        whenever(cursor.getColumnIndex(OpenableColumns.SIZE)).thenReturn(1)
+        whenever(cursor.isNull(1)).thenReturn(true)
+        whenever(cursor.getString(0)).thenReturn("file.txt")
+        whenever(contentResolver.getType(uri)).thenReturn("text/plain")
+        val fileBytes = "hello world".toByteArray()
+        whenever(contentResolver.openInputStream(uri)).thenReturn(ByteArrayInputStream(fileBytes))
+
+        val result = processor.processFile(context, uri)
+
+        assertEquals(fileBytes.size.toLong(), result!!.sizeBytes)
     }
 
     @Test
