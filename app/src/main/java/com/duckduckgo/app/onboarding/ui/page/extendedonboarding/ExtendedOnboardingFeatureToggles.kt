@@ -51,7 +51,6 @@ interface ExtendedOnboardingFeatureToggles {
     fun freeTrialCopy(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Experiment
     fun onboardingDuckAiExperimentMay26(): Toggle
 
     enum class DuckAiOnboardingExperimentCohort(override val cohortName: String) : Toggle.State.CohortName {
