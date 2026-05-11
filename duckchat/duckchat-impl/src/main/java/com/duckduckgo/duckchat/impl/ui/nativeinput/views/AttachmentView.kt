@@ -280,9 +280,6 @@ class AttachmentView(
 
     private fun buildCombinedPickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList() ?: return@ValueCallback
-        val imageUris = list.filter { context.contentResolver.getType(it)?.startsWith("image/") == true }
-        val fileUris = list - imageUris.toSet()
-        if (imageUris.isNotEmpty()) viewModel?.onImagesPicked(imageUris)
-        if (fileUris.isNotEmpty()) viewModel?.onFilesPicked(fileUris)
+        if (list.isNotEmpty()) viewModel?.onMixedAttachmentsPicked(list)
     }
 }

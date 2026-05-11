@@ -141,6 +141,23 @@ class AttachmentViewModel @Inject constructor(
         }
     }
 
+    fun onMixedAttachmentsPicked(uris: List<Uri>) {
+        viewModelScope.launch {
+            val imageUris = withContext(dispatchers.io()) {
+                uris.filter { context.contentResolver.getType(it)?.startsWith("image/") == true }
+            }
+            val fileUris = uris - imageUris.toSet()
+            imageUris.forEach { uri ->
+                val attachment = withContext(dispatchers.io()) { processImage(uri) } ?: return@forEach
+                imageAttachments.update { it + attachment }
+            }
+            for (uri in fileUris) {
+                val attachment = fileAttachmentProcessor.processFile(context, uri) ?: continue
+                _fileAttachments.update { it + attachment }
+            }
+        }
+    }
+
     fun removeImageAttachment(id: String) {
         var toRecycle: Bitmap? = null
         imageAttachments.update { list ->

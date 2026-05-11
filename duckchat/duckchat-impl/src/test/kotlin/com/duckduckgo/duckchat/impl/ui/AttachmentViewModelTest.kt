@@ -602,6 +602,81 @@ class AttachmentViewModelTest {
         assertTrue(viewModel.attachmentState.value.images.isEmpty())
     }
 
+    @Test
+    fun whenMixedAttachmentsPickedWithFileMimeTypeThenFileIsAdded() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val fileUri: Uri = mock()
+        whenever(contentResolver.getType(fileUri)).thenReturn("application/pdf")
+        val file = aFileAttachment()
+        fileAttachmentProcessor.givenProcessFileReturns(fileUri, file)
+
+        viewModel.onMixedAttachmentsPicked(listOf(fileUri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenMixedAttachmentsPickedWithImageMimeTypeThenUriNotRoutedToFileProcessor() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val imageUri: Uri = mock()
+        whenever(contentResolver.getType(imageUri)).thenReturn("image/jpeg")
+
+        viewModel.onMixedAttachmentsPicked(listOf(imageUri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenMixedAttachmentsPickedWithBothTypesThenEachIsRoutedCorrectly() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val imageUri: Uri = mock()
+        val fileUri: Uri = mock()
+        whenever(contentResolver.getType(imageUri)).thenReturn("image/png")
+        whenever(contentResolver.getType(fileUri)).thenReturn("application/pdf")
+        val file = aFileAttachment()
+        fileAttachmentProcessor.givenProcessFileReturns(fileUri, file)
+        whenever(contentResolver.openInputStream(imageUri)).thenReturn(null)
+
+        viewModel.onMixedAttachmentsPicked(listOf(imageUri, fileUri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+        assertTrue(viewModel.attachmentState.value.images.isEmpty())
+    }
+
+    @Test
+    fun whenMixedAttachmentsPickedAndProcessFileReturnsNullThenFileNotAdded() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val uri: Uri = mock()
+        whenever(contentResolver.getType(uri)).thenReturn("application/pdf")
+
+        viewModel.onMixedAttachmentsPicked(listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenMixedAttachmentsPickedAndMimeTypeIsNullThenUriRoutedToFileProcessor() = runTest {
+        val contentResolver: android.content.ContentResolver = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        val uri: Uri = mock()
+        whenever(contentResolver.getType(uri)).thenReturn(null)
+        val file = aFileAttachment()
+        fileAttachmentProcessor.givenProcessFileReturns(uri, file)
+
+        viewModel.onMixedAttachmentsPicked(listOf(uri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
     private fun addImages(
         count: Int,
         base64: String = "data",
