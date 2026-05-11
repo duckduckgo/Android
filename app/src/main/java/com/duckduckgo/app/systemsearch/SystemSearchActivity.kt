@@ -336,7 +336,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     }
                 }
                 launch {
-                    duckChat.observeNativeInputFieldUserSettingEnabled().collectLatest {
+                    duckChat.observeNativeInputFieldUserSettingEnabled().collect {
                         duckAi.applyDuckAiIconStyling(it)
                     }
                 }

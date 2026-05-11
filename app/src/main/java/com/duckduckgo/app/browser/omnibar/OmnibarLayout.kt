@@ -209,6 +209,7 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var omnibarRepository: OmnibarRepository
 
     private var previousTransitionState: TransitionState? = null
+    private var lastAppliedNativeInputEnabled: Boolean? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -1530,6 +1531,11 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun applyAiChatMenuStyling(isNativeInputEnabled: Boolean) {
+        // applyTransitionState fires on every view-state update; skip the call when the value
+        // hasn't changed so we don't keep triggering requestLayout() via setPaddingRelative,
+        // setImageResource, and updateLayoutParams.
+        if (lastAppliedNativeInputEnabled == isNativeInputEnabled) return
+        lastAppliedNativeInputEnabled = isNativeInputEnabled
         (aiChatMenu as? android.widget.ImageView)?.applyDuckAiIconStyling(isNativeInputEnabled)
     }
 

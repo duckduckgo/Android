@@ -64,7 +64,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         android:id="@+id/inputModeWidgetBack"
@@ -215,7 +217,7 @@
                             android:id="@+id/inputScreenButtonsContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:visibility="invisible" />
+                            android:visibility="gone" />
 
                     </LinearLayout>
 

@@ -67,7 +67,7 @@
         android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_find_search_24"
+        android:src="@drawable/ic_arrow_right_24_inverted"
         android:visibility="gone"
         app:tint="?attr/daxColorWhite" />
 

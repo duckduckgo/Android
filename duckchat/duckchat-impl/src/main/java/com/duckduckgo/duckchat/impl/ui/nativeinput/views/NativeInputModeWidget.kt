@@ -359,16 +359,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun configureBottomRowFocusVisibility() {
         updateBottomRowVisibility()
-        updateToggleVisibilityForFocus()
         applyVerticalPaddingForFocus()
         inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            // Run a short explicit transition so the duck.ai toggle row appearing/disappearing
-            // and the padding change animate smoothly instead of snapping in. Browser-context
-            // toggle visibility is state-driven and unaffected by focus, so the transition is
-            // effectively a no-op there.
+            // Toggle visibility is intentionally NOT updated here: it's owned by applyState
+            // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
+            // driven on duck.ai). Re-evaluating it from the focus listener would race with
+            // setToggleVisible — e.g. re-show the toggle after the keyboard has been dismissed.
             beginFocusTransition()
             updateBottomRowVisibility()
-            updateToggleVisibilityForFocus()
             applyVerticalPaddingForFocus()
             if (!hasFocus && isDuckAiPageContext()) {
                 hideKeyboard()
@@ -394,17 +392,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         rowSpacer?.isVisible = visible
     }
 
-    private fun updateToggleVisibilityForFocus() {
-        // Browser context: toggle is state-driven so it's already in the layout when
-        // NativeInputAnimator grows the card on entry, allowing a single smooth pass.
-        // Duck.ai contexts: keep the focus-driven hide so the toggle disappears when the input
-        // loses focus on those pages.
-        val visible = if (isDuckAiPageContext()) {
-            nativeInputState.toggleVisible && inputField.hasFocus()
-        } else {
-            nativeInputState.toggleVisible
-        }
-        applyToggleVisibility(visible)
+    private fun updateToggleVisibilityForState() {
+        if (isDuckAiPageContext()) return
+        applyToggleVisibility(nativeInputState.toggleVisible)
     }
 
     private fun applyToggleVisibility(visible: Boolean) {
@@ -479,7 +469,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             updateSelectedTab(toggle, state)
         }
-        updateToggleVisibilityForFocus()
+        updateToggleVisibilityForState()
     }
 
     private fun updateBackButtons(state: NativeInputState) {
