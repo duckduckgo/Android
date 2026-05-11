@@ -46,8 +46,8 @@
 
     <!-- File attachment -->
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
-    <string name="duckChatFileAttachmentLimitPerConversation">You can only attach %d files per conversation.</string>
-    <string name="duckChatFileAttachmentTooLarge">File exceeds the maximum size of %d MB.</string>
-    <string name="duckChatFileAttachmentTooManyPages">One of the files attached has more pages than we support. Please upload files with %d pages or fewer.</string>
-    <string name="duckChatFileAttachmentTotalSizeLimitExceeded">The attached files exceed the total size limit of %dMB.</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">File exceeds the maximum size of %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">One of the files attached has more pages than we support. Please upload files with %1$d pages or fewer.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">The attached files exceed the total size limit of %1$dMB.</string>
 </resources>
