@@ -3504,15 +3504,6 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserDismissedCta(cta, viaCloseBtn = true)
             if (cta is DaxBubbleCta) {
                 command.value = HideOnboardingDaxBubbleCta(cta)
-                // For users with the input screen enabled, the omnibar text input is hidden behind a
-                // click catcher and is not focusable, so showing the keyboard from
-                // hideOnboardingDaxBubbleCta would land on a non-focused field. Launch the input
-                // screen instead — same UX they'd get from tapping the omnibar. Mirrors the
-                // behaviour of onPrivacyProSkippedOnboardingDismissed for SubscriptionPromoModalCta.
-                val isSubscriptionCta = cta is DaxBubbleCta.DaxSubscriptionCta || cta is DaxSubscriptionBrandDesignUpdateBubbleCta
-                if (isSubscriptionCta && duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
-                    command.value = LaunchInputScreen()
-                }
             } else if (cta is OnboardingDaxDialogCta) {
                 command.value = HideOnboardingDaxDialog(cta)
                 if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
