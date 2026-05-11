@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -524,7 +525,7 @@ class AttachmentViewModelTest {
         viewModel.clearAttachmentsForNewChat()
 
         assertNull(viewModel.attachmentState.value.fileTotalSizeError)
-        assertEquals(0L, limitsHandler.conversationFileSizeSentBytes.value)
+        assertEquals(0L, limitsHandler.conversationFilesUsed.value.sizeBytes)
     }
 
     @Test
@@ -662,19 +663,15 @@ class AttachmentViewModelTest {
         private val _conversationImagesSent = MutableStateFlow(0)
         override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
-        private val _conversationFilesSent = MutableStateFlow(0)
-        override val conversationFilesSent: StateFlow<Int> = _conversationFilesSent
-
-        private val _conversationFileSizeSentBytes = MutableStateFlow(0L)
-        override val conversationFileSizeSentBytes: StateFlow<Long> = _conversationFileSizeSentBytes
+        private val _conversationFilesUsed = MutableStateFlow(ConversationFileUsage(0, 0L))
+        override val conversationFilesUsed: StateFlow<ConversationFileUsage> = _conversationFilesUsed
 
         override fun setConversationImagesUsed(count: Int) {
             _conversationImagesSent.value = count
         }
 
         override fun setConversationFilesUsed(count: Int, sizeBytes: Long) {
-            _conversationFilesSent.value = count
-            _conversationFileSizeSentBytes.value = sizeBytes
+            _conversationFilesUsed.value = ConversationFileUsage(count, sizeBytes)
         }
 
         fun addConversationImagesSent(count: Int) {
@@ -682,11 +679,11 @@ class AttachmentViewModelTest {
         }
 
         fun addConversationFilesSent(count: Int) {
-            _conversationFilesSent.value += count
+            _conversationFilesUsed.value = _conversationFilesUsed.value.copy(count = _conversationFilesUsed.value.count + count)
         }
 
         fun addConversationFileSizeSent(sizeBytes: Long) {
-            _conversationFileSizeSentBytes.value += sizeBytes
+            _conversationFilesUsed.value = _conversationFilesUsed.value.copy(sizeBytes = _conversationFilesUsed.value.sizeBytes + sizeBytes)
         }
     }
 

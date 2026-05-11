@@ -94,13 +94,11 @@ class AttachmentViewModel @Inject constructor(
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
-        combine(
-            limitsHandler.conversationImagesSent,
-            limitsHandler.conversationFilesSent,
-            limitsHandler.conversationFileSizeSentBytes,
-        ) { imgSent, fileSent, fileSizeBytes -> Triple(imgSent, fileSent, fileSizeBytes) },
+        combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         _isDuckAiMode,
-    ) { (images, files), modelState, (conversationImagesSent, conversationFilesSent, conversationFileSizeSentBytes), isDuckAiMode ->
+    ) { (images, files), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
+        val conversationFilesSent = conversationFilesUsed.count
+        val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
         val supportsImageUpload = modelState.models.isEmpty() ||
             (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())

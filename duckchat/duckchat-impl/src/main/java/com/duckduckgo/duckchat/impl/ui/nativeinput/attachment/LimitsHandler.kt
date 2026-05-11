@@ -23,10 +23,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
+data class ConversationFileUsage(val count: Int, val sizeBytes: Long)
+
 interface LimitsHandler {
     val conversationImagesSent: StateFlow<Int>
-    val conversationFilesSent: StateFlow<Int>
-    val conversationFileSizeSentBytes: StateFlow<Long>
+    val conversationFilesUsed: StateFlow<ConversationFileUsage>
 
     fun setConversationImagesUsed(count: Int)
     fun setConversationFilesUsed(count: Int, sizeBytes: Long = 0L)
@@ -39,18 +40,14 @@ class RealLimitsHandler @Inject constructor() : LimitsHandler {
     private val _conversationImagesSent = MutableStateFlow(0)
     override val conversationImagesSent: StateFlow<Int> = _conversationImagesSent
 
-    private val _conversationFilesSent = MutableStateFlow(0)
-    override val conversationFilesSent: StateFlow<Int> = _conversationFilesSent
-
-    private val _conversationFileSizeSentBytes = MutableStateFlow(0L)
-    override val conversationFileSizeSentBytes: StateFlow<Long> = _conversationFileSizeSentBytes
+    private val _conversationFilesUsed = MutableStateFlow(ConversationFileUsage(0, 0L))
+    override val conversationFilesUsed: StateFlow<ConversationFileUsage> = _conversationFilesUsed
 
     override fun setConversationImagesUsed(count: Int) {
         _conversationImagesSent.value = count
     }
 
     override fun setConversationFilesUsed(count: Int, sizeBytes: Long) {
-        _conversationFilesSent.value = count
-        _conversationFileSizeSentBytes.value = sizeBytes
+        _conversationFilesUsed.value = ConversationFileUsage(count, sizeBytes)
     }
 }
