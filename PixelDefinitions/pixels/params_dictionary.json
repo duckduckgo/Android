@@ -9,6 +9,11 @@
         "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
         "examples": ["0.89.3"]
     },
+    "osVersion": {
+        "key": "os_version",
+        "type": "integer",
+        "description": "OS version of the device"
+    },
     "atb": {
         "key": "atb",
         "type": "string",

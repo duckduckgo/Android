@@ -21,22 +21,33 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.ui.NativeInputState
 
 sealed class PromptContribution {
     data class ModelSelection(val modelId: String) : PromptContribution()
 }
 
-sealed class Action {
-    data object StartChat : Action()
-    data class ShowAttachmentChooser(val showing: Boolean) : Action()
-    data class AttachmentStateChanged(val hasAttachments: Boolean, val limitExceeded: Boolean, val supportsUpload: Boolean) : Action()
+/**
+ * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
+ * (e.g. [submit]) and to read the host's current [NativeInputState] when their behaviour depends on it,
+ * without coupling to the widget class directly.
+ */
+interface NativeInputHost {
+    /** Submit the current input as a chat message; opens a new chat session if the input is empty. */
+    fun submit()
+
+    fun showAttachmentChooser(showing: Boolean)
+    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+
+    /** Current input state of the host widget (mode, context, position). */
+    fun getInputState(): NativeInputState
 }
 
 interface NativeInputPlugin : ActivePlugin {
 
     val containerId: Int
 
-    fun createView(context: Context, onAction: (Action) -> Unit): View
+    fun createView(context: Context, host: NativeInputHost): View
 
     fun getPromptContribution(): PromptContribution?
 }

@@ -117,7 +117,7 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion", "freeTrial"]
+        "parameters": ["appVersion", "freeTrial", "osVersion"]
     },
     "m_subscribe": {
         "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
@@ -144,14 +144,6 @@
         "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "petal",
-            {
-                "key": "os_version",
-                "description": "OS version of the device",
-                "type": "integer"
-            }
-        ]
+        "parameters": ["appVersion", "petal", "osVersion"]
     }
 }
