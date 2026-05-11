@@ -169,10 +169,10 @@ class RealDuckChatJSHelper @Inject constructor(
                     val usage = AIChatAttachmentUsage(
                         imagesUsed = attachments.optInt("imagesUsed", 0),
                         filesUsed = attachments.optInt("filesUsed", 0),
-                        fileSizeBytesUsed = attachments.optInt("fileSizeBytesUsed", 0),
+                        fileSizeBytesUsed = attachments.optLong("fileSizeBytesUsed", 0L),
                     )
                     limitsHandler.setConversationImagesUsed(usage.imagesUsed)
-                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed.toLong())
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed)
                 }
                 null
             }

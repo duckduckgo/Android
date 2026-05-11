@@ -86,7 +86,7 @@ data class ImageLimits(
 data class AIChatAttachmentUsage(
     val imagesUsed: Int = 0,
     val filesUsed: Int = 0,
-    val fileSizeBytesUsed: Int = 0,
+    val fileSizeBytesUsed: Long = 0L,
 )
 
 data class AIChatModel(
