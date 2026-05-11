@@ -829,7 +829,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // in Duck.ai mode we treat this as submitting prompts.
         // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
         if (!submitAsChat()) viewModel.openNewChat()
-
     }
 
     override fun showAttachmentChooser(showing: Boolean) {
@@ -837,14 +836,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun attachmentChanged(
-        itHasAttachments: Boolean,
+        hasAttachments: Boolean,
         limitExceeded: Boolean,
-        itSupportsUpload: Boolean
+        supportsUpload: Boolean,
     ) {
         val hadLimitError = attachmentLimitExceeded
         attachmentLimitExceeded = limitExceeded
-        hasAttachments = itHasAttachments
-        supportsUpload = itSupportsUpload
+        this.hasAttachments = hasAttachments
+        this.supportsUpload = supportsUpload
         setImageButtonVisible(isChatTabSelected() && supportsUpload)
         if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE

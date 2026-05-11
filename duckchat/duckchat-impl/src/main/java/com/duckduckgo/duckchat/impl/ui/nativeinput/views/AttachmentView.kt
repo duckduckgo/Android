@@ -33,7 +33,7 @@ import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,7 @@ class AttachmentView(
     context: Context,
 ) : FrameLayout(context) {
 
-    var onAction: ((Action) -> Unit)? = null
+    var host: NativeInputHost? = null
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
 
@@ -158,17 +158,15 @@ class AttachmentView(
     }
 
     private fun notifyStateChanged(state: AttachmentViewModel.AttachmentState) {
-        onAction?.invoke(
-            Action.AttachmentStateChanged(
-                hasAttachments = state.hasAttachments,
-                limitExceeded = state.imageLimitError != null && state.hasAttachments,
-                supportsUpload = state.supportsUpload,
-            ),
+        host?.attachmentChanged(
+            hasAttachments = state.hasAttachments,
+            limitExceeded = state.imageLimitError != null && state.hasAttachments,
+            supportsUpload = state.supportsUpload,
         )
     }
 
     private fun showChooserDialog() {
-        onAction?.invoke(Action.ShowAttachmentChooser(true))
+        host?.showAttachmentChooser(true)
 
         ActionBottomSheetDialog.Builder(context)
             .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
@@ -198,7 +196,7 @@ class AttachmentView(
         }
 
         override fun onBottomSheetDismissed() {
-            if (!pickerLaunched) onAction?.invoke(Action.ShowAttachmentChooser(false))
+            if (!pickerLaunched) host?.showAttachmentChooser(false)
         }
     }
 
