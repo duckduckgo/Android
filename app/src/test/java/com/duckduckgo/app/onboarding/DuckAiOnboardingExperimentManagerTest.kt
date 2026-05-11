@@ -22,6 +22,8 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,6 +44,7 @@ class DuckAiOnboardingExperimentManagerTest {
     private val browserConfig: AndroidBrowserConfigFeature = mock()
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
+    private val deviceInfo: DeviceInfo = mock()
 
     private val showInputScreenOnboardingToggle: Toggle = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
@@ -62,6 +65,7 @@ class DuckAiOnboardingExperimentManagerTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
             extendedOnboardingFeatureToggles = extendedOnboardingFeatureToggles,
+            deviceInfo = deviceInfo,
         )
     }
 
@@ -91,6 +95,17 @@ class DuckAiOnboardingExperimentManagerTest {
     fun whenBrandDesignUpdateEnabledThenReturnsNullAndDoesNotEnroll() = runTest {
         givenPrerequisitesMet()
         whenever(brandDesignUpdateToggle.isEnabled()).thenReturn(true)
+
+        val result = testee.enroll()
+
+        assertNull(result)
+        verify(experimentToggle, never()).enroll()
+    }
+
+    @Test
+    fun whenDeviceIsTabletThenReturnsNullAndDoesNotEnroll() = runTest {
+        givenPrerequisitesMet()
+        whenever(deviceInfo.formFactor()).thenReturn(FormFactor.TABLET)
 
         val result = testee.enroll()
 
@@ -169,6 +184,7 @@ class DuckAiOnboardingExperimentManagerTest {
         whenever(showInputScreenOnboardingToggle.isEnabled()).thenReturn(true)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         whenever(brandDesignUpdateToggle.isEnabled()).thenReturn(false)
+        whenever(deviceInfo.formFactor()).thenReturn(FormFactor.PHONE)
     }
 
     private suspend fun givenCohort(name: String) {
