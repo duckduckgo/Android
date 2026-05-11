@@ -38,7 +38,7 @@ class NotificationLaunchModalReporter @Inject constructor(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
-        if (activity.intent?.getBooleanExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, false) == true) {
+        if (activity.intent?.getBooleanExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, false) == true && savedInstanceState == null) {
             modalShownReporter.reportModalShown()
         }
     }
