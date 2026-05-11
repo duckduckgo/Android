@@ -1485,6 +1485,13 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenOnDuckAiEndCtaInteractionOkThenFireFinalDialogPressedMetric() = runTest {
+        testee.onDuckAiEndCtaInteraction(okClicked = true)
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireFinalDialogPressed()
+    }
+
+    @Test
     fun whenOnDuckAiEndCtaInteractionDismissThenDismissPixelFired() = runTest {
         testee.onDuckAiEndCtaInteraction(okClicked = false)
 
@@ -1495,6 +1502,13 @@ class CtaViewModelTest {
             eq(Count),
         )
         verify(mockPixel, never()).fire(eq(ONBOARDING_DAX_CTA_OK_BUTTON), any(), any(), eq(Count))
+    }
+
+    @Test
+    fun whenOnDuckAiEndCtaInteractionDismissThenDoNotFireFinalDialogPressedMetric() = runTest {
+        testee.onDuckAiEndCtaInteraction(okClicked = false)
+
+        verify(mockDuckAiOnboardingExperimentMetrics, never()).fireFinalDialogPressed()
     }
 
     private fun givenCanShowDuckAiEndCta() {

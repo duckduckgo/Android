@@ -49,6 +49,7 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
             MetricsPixel(metric = METRIC_SCREEN_IMPRESSION, value = VALUE_FIRE_DIALOG, toggle = toggle, conversionWindow = conversionWindow),
             MetricsPixel(metric = METRIC_SCREEN_IMPRESSION, value = VALUE_FINAL_DIALOG, toggle = toggle, conversionWindow = conversionWindow),
             MetricsPixel(metric = METRIC_CTA_PRESSED, value = VALUE_FIRE_BUTTON_PRESSED, toggle = toggle, conversionWindow = conversionWindow),
+            MetricsPixel(metric = METRIC_CTA_PRESSED, value = VALUE_FINAL_DIALOG, toggle = toggle, conversionWindow = conversionWindow),
         )
     }
 
@@ -63,6 +64,8 @@ class DuckAiOnboardingExperimentMetrics @Inject constructor(
     suspend fun fireFinalDialogImpression() = fire(METRIC_SCREEN_IMPRESSION, VALUE_FINAL_DIALOG)
 
     suspend fun fireFireButtonPressed() = fire(METRIC_CTA_PRESSED, VALUE_FIRE_BUTTON_PRESSED)
+
+    suspend fun fireFinalDialogPressed() = fire(METRIC_CTA_PRESSED, VALUE_FINAL_DIALOG)
 
     private suspend fun fireOptionType(metricName: String, optionIndex: Int?) {
         val value = when (optionIndex) {

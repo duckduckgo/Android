@@ -243,6 +243,7 @@ class CtaViewModel @Inject constructor(
             val params = mapOf(Pixel.PixelParameter.CTA_SHOWN to DUCK_AI_END_CTA_PIXEL_PARAM)
             if (okClicked) {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON, params)
+                duckAiOnboardingExperimentMetrics.fireFinalDialogPressed()
             } else {
                 pixel.fire(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON, params)
             }
