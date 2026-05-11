@@ -20,6 +20,8 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 /**
  * Feature toggles for the onboarding brand design updates.
@@ -43,4 +45,17 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun brandDesignUpdate(): Toggle
+
+    /**
+     * A/B test gating the re-installer quick-setup screen. Only users in the [QuickSetupCohorts.TREATMENT]
+     * cohort should be shown the quick-setup screen during onboarding.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Experiment
+    fun quickSetup(): Toggle
+
+    enum class QuickSetupCohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
 }
