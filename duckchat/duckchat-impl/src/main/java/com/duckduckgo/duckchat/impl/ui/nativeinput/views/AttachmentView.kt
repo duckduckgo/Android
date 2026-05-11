@@ -33,7 +33,7 @@ import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -47,7 +47,7 @@ class AttachmentView(
     context: Context,
 ) : FrameLayout(context) {
 
-    var onAction: ((Action) -> Unit)? = null
+    var host: NativeInputHost? = null
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
 
@@ -199,18 +199,16 @@ class AttachmentView(
     }
 
     private fun notifyStateChanged(state: AttachmentViewModel.AttachmentState) {
-        onAction?.invoke(
-            Action.AttachmentStateChanged(
-                hasAttachments = state.hasAttachments,
-                limitExceeded = (
-                    state.imageLimitError != null ||
-                        state.fileLimitError != null ||
-                        state.fileSizeError != null ||
-                        state.filePageCountError != null ||
-                        state.fileTotalSizeError != null
-                    ) && state.hasAttachments,
-                supportsUpload = state.supportsUpload,
-            ),
+        host?.attachmentChanged(
+            hasAttachments = state.hasAttachments,
+            limitExceeded = (
+                state.imageLimitError != null ||
+                    state.fileLimitError != null ||
+                    state.fileSizeError != null ||
+                    state.filePageCountError != null ||
+                    state.fileTotalSizeError != null
+                ) && state.hasAttachments,
+            supportsUpload = state.supportsUpload,
         )
     }
 
@@ -220,7 +218,7 @@ class AttachmentView(
         val supportsImages = state?.supportsImageUpload == true
         val mimeTypes = state?.acceptedMimeTypes ?: listOf("image/*")
 
-        onAction?.invoke(Action.ShowAttachmentChooser(true))
+        host?.showAttachmentChooser(true)
         val title = if (supportsImages) {
             context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle)
         } else {
@@ -269,7 +267,7 @@ class AttachmentView(
         }
 
         override fun onBottomSheetDismissed() {
-            if (!pickerLaunched) onAction?.invoke(Action.ShowAttachmentChooser(false))
+            if (!pickerLaunched) host?.showAttachmentChooser(false)
         }
     }
 
