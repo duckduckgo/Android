@@ -149,7 +149,7 @@ sealed class OnboardingDaxDialogCta(
         onPrimaryCtaClicked: () -> Unit,
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit = {},
-        onDismissCtaClicked: () -> Unit,
+        onDismissCtaClicked: (() -> Unit)?,
     ) {
         val daxDialog = binding.includeOnboardingInContextDaxDialog
 
@@ -175,6 +175,7 @@ sealed class OnboardingDaxDialogCta(
         daxDialog.onboardingDialogSuggestionsContent.gone()
         daxDialog.onboardingDialogContent.show()
         daxDialog.root.alpha = MAX_ALPHA
+        daxDialog.daxDialogDismissButton.isVisible = onDismissCtaClicked != null
         TransitionManager.beginDelayedTransition(daxDialog.cardView, AutoTransition())
         val afterAnimation = {
             daxDialog.dialogTextCta.finishAnimation()
@@ -192,7 +193,7 @@ sealed class OnboardingDaxDialogCta(
             }
             binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
-            binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+            daxDialog.daxDialogDismissButton.setOnClickListener(onDismissCtaClicked?.let { { it() } })
             onTypingAnimationFinished.invoke()
         }
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
@@ -535,6 +536,43 @@ sealed class OnboardingDaxDialogCta(
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
                 onDismissCtaClicked = onDismissCtaClicked,
+            )
+        }
+    }
+
+    class DaxDuckAiFireButtonCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_DUCK_AI_FIRE_BUTTON,
+        R.string.onboardingDuckAiFireButtonDaxDialogDescription,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
+        "duck_ai_fire_button_cta",
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxTitle = context.getString(R.string.onboardingDuckAiFireButtonDaxDialogTitle),
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                primaryCtaText = null,
+                binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = null, // no dismiss button
             )
         }
     }
@@ -1248,7 +1286,11 @@ class SubscriptionPromoModalCta(
     override fun pixelCancelParameters(): Map<String, String> = pixelParams()
 }
 
-fun DaxCta.addCtaToHistory(newCta: String): String {
+fun addCtaToHistory(
+    onboardingStore: OnboardingStore,
+    appInstallStore: AppInstallStore,
+    newCta: String,
+): String {
     val param =
         onboardingStore.onboardingDialogJourney
             ?.split("-")
@@ -1261,7 +1303,13 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
     return finalParam
 }
 
-fun DaxCta.canSendShownPixel(): Boolean {
+fun DaxCta.addCtaToHistory(newCta: String): String =
+    addCtaToHistory(onboardingStore, appInstallStore, newCta)
+
+fun canSendShownPixel(
+    onboardingStore: OnboardingStore,
+    ctaPixelParam: String,
+): Boolean {
     val param =
         onboardingStore.onboardingDialogJourney
             ?.split("-")
@@ -1269,6 +1317,9 @@ fun DaxCta.canSendShownPixel(): Boolean {
             .toMutableList()
     return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
 }
+
+fun DaxCta.canSendShownPixel(): Boolean =
+    canSendShownPixel(onboardingStore, ctaPixelParam)
 
 fun String.getStringForOmnibarPosition(position: OmnibarType): String =
     when (position) {

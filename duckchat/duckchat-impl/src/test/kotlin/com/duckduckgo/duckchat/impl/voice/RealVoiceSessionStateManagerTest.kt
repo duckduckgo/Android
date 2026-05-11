@@ -58,7 +58,7 @@ class RealVoiceSessionStateManagerTest {
     @After
     fun teardown() {
         // Cancels the flowTabs collect coroutine so runTest doesn't fail with UncompletedCoroutinesError
-        testee.onVoiceSessionEnded()
+        testee.onExit()
     }
 
     @Before
@@ -76,29 +76,29 @@ class RealVoiceSessionStateManagerTest {
 
     @Test
     fun whenCreatedThenVoiceSessionIsNotActive() {
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
     fun whenVoiceSessionStartedThenIsVoiceSessionActiveIsTrue() {
         testee.onVoiceSessionStarted(TAB_ID)
 
-        assertTrue(testee.isVoiceSessionActive)
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
     fun whenVoiceSessionEndedThenIsVoiceSessionActiveIsFalse() {
         testee.onVoiceSessionStarted(TAB_ID)
-        testee.onVoiceSessionEnded()
+        testee.onVoiceSessionEnded(TAB_ID)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
     fun whenVoiceSessionEndedWithoutStartThenIsVoiceSessionActiveIsFalse() {
-        testee.onVoiceSessionEnded()
+        testee.onVoiceSessionEnded(TAB_ID)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -106,7 +106,7 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted(TAB_ID)
         testee.onVoiceSessionStarted(TAB_ID)
 
-        assertTrue(testee.isVoiceSessionActive)
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -114,7 +114,7 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted(TAB_ID)
         testee.onOpen(isFreshLaunch = true)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -122,14 +122,14 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted(TAB_ID)
         testee.onOpen(isFreshLaunch = false)
 
-        assertTrue(testee.isVoiceSessionActive)
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
     fun whenFreshLaunchAndNoActiveSessionThenRemainsInactive() {
         testee.onOpen(isFreshLaunch = true)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -137,27 +137,31 @@ class RealVoiceSessionStateManagerTest {
         testee.onVoiceSessionStarted(TAB_ID)
         testee.onExit()
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
     fun whenExitAndNoActiveSessionThenRemainsInactive() {
         testee.onExit()
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
-    fun whenVoiceSessionStartedWithBlankTabIdThenSessionIsActiveButTabRemovalNotTracked() = coroutineTestRule.testScope.runTest {
-        tabsFlow.value = listOf(tabEntity(TAB_ID))
+    fun whenVoiceSessionStartedWithBlankTabIdThenSessionIsNotActive() {
         testee.onVoiceSessionStarted("")
 
-        tabsFlow.value = emptyList()
-        advanceUntilIdle()
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+    }
 
-        // Session stays active — no tab to track, so tab removal has no effect
-        assertTrue(testee.isVoiceSessionActive)
-        testee.onVoiceSessionEnded()
+    @Test
+    fun whenVoiceSessionEndedWithBlankTabIdThenActiveSessionIsUnchanged() {
+        testee.onVoiceSessionStarted(TAB_ID)
+
+        testee.onVoiceSessionEnded("")
+
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
+        testee.onVoiceSessionEnded(TAB_ID)
     }
 
     @Test
@@ -168,7 +172,7 @@ class RealVoiceSessionStateManagerTest {
         tabsFlow.value = emptyList()
         advanceUntilIdle()
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -179,8 +183,8 @@ class RealVoiceSessionStateManagerTest {
         tabsFlow.value = listOf(tabEntity(TAB_ID))
         advanceUntilIdle()
 
-        assertTrue(testee.isVoiceSessionActive)
-        testee.onVoiceSessionEnded() // cancel collect coroutine before runTest checks for leaks
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
+        testee.onVoiceSessionEnded(TAB_ID) // cancel collect coroutine before runTest checks for leaks
     }
 
     @Test
@@ -191,20 +195,20 @@ class RealVoiceSessionStateManagerTest {
         tabsFlow.value = listOf(tabEntity(TAB_ID), tabEntity(OTHER_TAB_ID))
         advanceUntilIdle()
 
-        assertTrue(testee.isVoiceSessionActive)
-        testee.onVoiceSessionEnded() // cancel collect coroutine before runTest checks for leaks
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
+        testee.onVoiceSessionEnded(TAB_ID) // cancel collect coroutine before runTest checks for leaks
     }
 
     @Test
     fun whenSessionEndedManuallyAndActiveTabSubsequentlyRemovedThenNoAdditionalEffect() = coroutineTestRule.testScope.runTest {
         tabsFlow.value = listOf(tabEntity(TAB_ID))
         testee.onVoiceSessionStarted(TAB_ID)
-        testee.onVoiceSessionEnded()
+        testee.onVoiceSessionEnded(TAB_ID)
 
         tabsFlow.value = emptyList()
         advanceUntilIdle()
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     @Test
@@ -219,8 +223,8 @@ class RealVoiceSessionStateManagerTest {
 
         testee.onVoiceSessionStarted(TAB_ID)
 
-        assertTrue(testee.isVoiceSessionActive)
-        testee.onVoiceSessionEnded() // cancel collect coroutine before runTest checks for leaks
+        assertTrue(testee.isVoiceSessionActive(TAB_ID))
+        testee.onVoiceSessionEnded(TAB_ID) // cancel collect coroutine before runTest checks for leaks
     }
 
     @Test
@@ -234,9 +238,77 @@ class RealVoiceSessionStateManagerTest {
         )
         testee.onVoiceSessionStarted(TAB_ID)
 
-        testee.onVoiceSessionEnded()
+        testee.onVoiceSessionEnded(TAB_ID)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+    }
+
+    @Test
+    fun whenSessionsActiveOnTwoTabsAndOneEndsThenOtherTabSessionRemainsActive() = coroutineTestRule.testScope.runTest {
+        tabsFlow.value = listOf(tabEntity(TAB_ID), tabEntity(OTHER_TAB_ID))
+        testee.onVoiceSessionStarted(TAB_ID)
+        testee.onVoiceSessionStarted(OTHER_TAB_ID)
+
+        testee.onVoiceSessionEnded(TAB_ID)
+
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+        assertTrue(testee.isVoiceSessionActive(OTHER_TAB_ID))
+        testee.onVoiceSessionEnded(OTHER_TAB_ID) // cancel collect coroutine before runTest checks for leaks
+    }
+
+    @Test
+    fun whenSessionsActiveOnTwoTabsAndBothEndThenSessionsInactive() = coroutineTestRule.testScope.runTest {
+        tabsFlow.value = listOf(tabEntity(TAB_ID), tabEntity(OTHER_TAB_ID))
+        testee.onVoiceSessionStarted(TAB_ID)
+        testee.onVoiceSessionStarted(OTHER_TAB_ID)
+
+        testee.onVoiceSessionEnded(TAB_ID)
+        testee.onVoiceSessionEnded(OTHER_TAB_ID)
+
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+        assertFalse(testee.isVoiceSessionActive(OTHER_TAB_ID))
+    }
+
+    @Test
+    fun whenSessionsActiveOnTwoTabsAndOneTabClosedThenOtherTabSessionRemainsActive() = coroutineTestRule.testScope.runTest {
+        tabsFlow.value = listOf(tabEntity(TAB_ID), tabEntity(OTHER_TAB_ID))
+        testee.onVoiceSessionStarted(TAB_ID)
+        testee.onVoiceSessionStarted(OTHER_TAB_ID)
+
+        tabsFlow.value = listOf(tabEntity(OTHER_TAB_ID))
+        advanceUntilIdle()
+
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+        assertTrue(testee.isVoiceSessionActive(OTHER_TAB_ID))
+        testee.onVoiceSessionEnded(OTHER_TAB_ID) // cancel collect coroutine before runTest checks for leaks
+    }
+
+    @Test
+    fun whenSessionsActiveOnTwoTabsAndAllTabsClosedThenSessionsInactive() = coroutineTestRule.testScope.runTest {
+        tabsFlow.value = listOf(tabEntity(TAB_ID), tabEntity(OTHER_TAB_ID))
+        testee.onVoiceSessionStarted(TAB_ID)
+        testee.onVoiceSessionStarted(OTHER_TAB_ID)
+
+        tabsFlow.value = emptyList()
+        advanceUntilIdle()
+
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
+        assertFalse(testee.isVoiceSessionActive(OTHER_TAB_ID))
+    }
+
+    @Test
+    fun whenSessionStartedOnTabThenIsVoiceSessionActiveOnDifferentTabIsFalse() {
+        testee.onVoiceSessionStarted(TAB_ID)
+
+        assertFalse(testee.isVoiceSessionActive(OTHER_TAB_ID))
+    }
+
+    @Test
+    fun whenIsVoiceSessionActiveCalledWithBlankTabIdThenReturnsFalse() {
+        testee.onVoiceSessionStarted(TAB_ID)
+
+        assertFalse(testee.isVoiceSessionActive(""))
+        testee.onVoiceSessionEnded(TAB_ID)
     }
 
     @Test
@@ -273,11 +345,11 @@ class RealVoiceSessionStateManagerTest {
 
     @Test
     fun whenTriggerVoiceSessionEndCalledThenIsVoiceSessionActiveUnchanged() {
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
 
         testee.triggerVoiceSessionEnd(TAB_ID)
 
-        assertFalse(testee.isVoiceSessionActive)
+        assertFalse(testee.isVoiceSessionActive(TAB_ID))
     }
 
     private fun tabEntity(tabId: String) = TabEntity(tabId = tabId)

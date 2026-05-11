@@ -327,6 +327,7 @@ enum class ReportMetric(
 enum class ModelTier(val model: String) {
     FREE("free"),
     PLUS("plus"),
+    PRO("pro"),
     INTERNAL("internal"),
     UNKNOWN("unknown"),
     ;
@@ -804,7 +805,9 @@ class RealDuckChat @Inject constructor(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeChatSuggestionsUserSettingEnabled()
 
-    override fun isVoiceSessionActive(): Boolean = voiceSessionStateManager.isVoiceSessionActive
+    override fun isVoiceChatSessionActive(tabId: String): Boolean = voiceSessionStateManager.isVoiceSessionActive(tabId)
+
+    override val activeVoiceChatSessions: Flow<Set<String>> get() = voiceSessionStateManager.activeVoiceSessions
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 

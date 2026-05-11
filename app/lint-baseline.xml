@@ -3752,17 +3752,6 @@
 
     <issue
         id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val bookmarkRootRelations = savedSitesRelationsDao.relations(SavedSitesNames.BOOKMARKS_ROOT).first()"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/bookmarks/mapper/migration/BookmarksMigrationTest.kt"
-            line="262"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
         message="Deprecated and may not be reliable. Use AppBuildConfig.isNewInstall() to check for new installs, or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp."
         errorLine1="        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(1)"
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -4115,94 +4104,6 @@
 
     <issue
         id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val rootRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).first()"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="96"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="97"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val desktopRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_DESKTOP_ROOT).first()"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="114"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="115"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val rootRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).first()"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="116"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val desktopRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_DESKTOP_ROOT).first()"
-        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="134"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()"
-        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="135"
-            column="31"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        val rootRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).first()"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/sync/RealSavedSitesFormFactorSyncMigrationTest.kt"
-            line="136"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
         message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
         errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {"
         errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
@@ -4221,17 +4122,6 @@
             file="src/main/java/com/duckduckgo/app/browser/certificates/remoteconfig/SSLCertificatesFeature.kt"
             line="71"
             column="58"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        Assert.assertEquals(listOf(bookmark), repository.getBookmarks().first())"
-        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/app/bookmarks/model/SavedSitesRepositoryTest.kt"
-            line="409"
-            column="47"/>
     </issue>
 
     <issue
@@ -4529,17 +4419,6 @@
             file="src/androidTest/java/com/duckduckgo/app/fire/UnsentForgetAllPixelStoreSharedPreferencesTest.kt"
             line="33"
             column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
-        errorLine1="        assertEquals(1, dao.allDomainsFlow().first().size)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidTest/java/com/duckduckgo/app/privacy/db/UserAllowListDaoTest.kt"
-            line="72"
-            column="25"/>
     </issue>
 
     <issue

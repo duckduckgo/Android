@@ -126,7 +126,13 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also { registerDuckChatIsOpenDebounced() }
+                }.also {
+                    if (voiceSessionStateManager.isVoiceSessionActive(tabId)) {
+                        // NOTE: Force end native chat state if duck ai chat has been refreshed with an active voice session
+                        voiceSessionStateManager.onVoiceSessionEnded(tabId)
+                    }
+                    registerDuckChatIsOpenDebounced()
+                }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -244,7 +250,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_ENDED -> {
-                voiceSessionStateManager.onVoiceSessionEnded()
+                voiceSessionStateManager.onVoiceSessionEnded(tabId)
                 null
             }
 
