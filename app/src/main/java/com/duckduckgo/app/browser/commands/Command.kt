@@ -524,5 +524,7 @@ sealed class Command {
         val cachedFileUri: Uri,
     ) : Command()
 
+    data object ShowPdfDownloadTooltip : Command()
+
     data object ExpandOmnibar : Command()
 }

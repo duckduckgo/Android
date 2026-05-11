@@ -1,27 +1,17 @@
-name: Mark task as complete and move PRs merged to the default branch to Waiting for release
+name: Mark task as complete on merge
 
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  add-pr-comment-and-move-to-section:
+  add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - name: Add PR merged comment
-        uses: duckduckgo/native-github-asana-sync@v2.0
+      - uses: duckduckgo/native-github-asana-sync@v2.0
         if: github.event.pull_request.merged
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
           action: 'notify-pr-merged'
           is-complete: true
-      - name: If merged to the default branch, add to Waiting for release
-        if: github.event.pull_request.merged && github.event.pull_request.base.ref == github.event.repository.default_branch
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_WAITING_FOR_RELEASE_SECTION_ID }}
-          trigger-phrase: "Task/Issue URL:"
-          action: 'add-task-asana-project'

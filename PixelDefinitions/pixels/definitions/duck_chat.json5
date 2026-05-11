@@ -410,7 +410,7 @@
         "parameters": [
             "appVersion",
             { "key": "direction", "type": "string", "description": "Direction of the toggle switch", "enum": ["to_search", "to_duckai"] },
-            { "key": "had_text", "type": "string", "description": "Whether the input field had text", "enum": ["true", "false"] },
+            { "key": "had_text", "type": "boolean", "description": "Whether the input field had text" },
             {
                 "key": "default_position",
                 "type": "string",

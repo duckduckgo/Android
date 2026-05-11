@@ -148,7 +148,7 @@
             {
                 "key": "upgradedHttps",
                 "description": "",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "userRefreshCount",
@@ -163,12 +163,12 @@
             {
                 "key": "protectionsState",
                 "description": "If the protections toggle is on or not for the site.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "blockListExperiment",
@@ -195,12 +195,12 @@
             {
                 "key": "gpc",
                 "description": "Global Privacy Control value reported.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "drmEnabled",
                 "description": "Whether DRM is effectively enabled for the reported site load.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "urlParametersRemoved",
@@ -295,7 +295,7 @@
             {
                 "key": "referrerHeaderTrimmed",
                 "description": "True if the 'Referer' request header was trimmed for this page.",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "remoteConfigVersion",
@@ -325,7 +325,7 @@
             {
                 "key": "upgradedHttps",
                 "description": "",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "userRefreshCount",
@@ -335,12 +335,12 @@
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "drmEnabled",
                 "description": "Whether DRM is effectively enabled for the reported site load.",
-                "enum": ["false", "true"]
+                "type": "boolean"
             },
             {
                 "key": "wvVersion",

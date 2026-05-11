@@ -158,7 +158,9 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.BubbleTooltipDrawable
 import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfDownloadTooltipPopup
 import com.duckduckgo.app.browser.pdf.PdfPixelName
 import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
@@ -263,7 +265,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
-import com.duckduckgo.browser.ui.browsermenu.BrowserPopupMenu
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -368,6 +369,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -404,6 +406,8 @@ class BrowserTabFragment :
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
+
+    private var voiceActiveOnThisTab: Boolean = false
 
     @Inject
     lateinit var nativeInputManager: NativeInputManager
@@ -660,8 +664,8 @@ class BrowserTabFragment :
 
     private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
-    private var popupMenu: BrowserPopupMenu? = null
     private var bottomSheetMenu: BrowserMenuBottomSheet? = null
+    private var pdfDownloadTooltipPopup: PdfDownloadTooltipPopup? = null
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: HomeScreenWidgetBottomSheetDialog
     private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
@@ -672,7 +676,11 @@ class BrowserTabFragment :
         object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    hideKeyboardRetainFocus()
+                    if (nativeInputManager.isNativeInputEnabled()) {
+                        hideKeyboardImmediatelyRetainFocus()
+                    } else {
+                        hideKeyboardRetainFocus()
+                    }
                 }
             }
         }
@@ -1318,13 +1326,14 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId ->
+                onDuckAiChatSubmitted = { query, modelId, imagesJson ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
                             subscriptionName = "submitAIChatNativePrompt",
                             params = JSONObject().apply {
                                 put("platform", "android")
+                                put("tool", "query")
                                 put(
                                     "query",
                                     JSONObject().apply {
@@ -1334,6 +1343,9 @@ class BrowserTabFragment :
                                         // if (modelId != null) {
                                         //     put("modelId", modelId)
                                         // }
+                                        if (imagesJson != null) {
+                                            put("images", imagesJson)
+                                        }
                                     },
                                 )
                             },
@@ -1341,6 +1353,7 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+                onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1356,8 +1369,11 @@ class BrowserTabFragment :
                     hideKeyboard()
                     voiceSearchLauncher.launch(requireActivity(), mode)
                 },
-                onImageButtonPressed = {
-                    // To be implemented
+                onCameraCaptureRequested = { callback ->
+                    launchCameraCapture(callback)
+                },
+                onFilePickerRequested = { callback, mimeTypes ->
+                    launchFilePicker(callback, mimeTypes)
                 },
             ),
         )
@@ -1375,7 +1391,6 @@ class BrowserTabFragment :
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                     isNewTab = isNewTab,
-                    useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false,
                     showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
                 ),
             )
@@ -1568,12 +1583,7 @@ class BrowserTabFragment :
     }
 
     private fun createBrowserMenu() {
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
-            createBottomSheetMenu()
-        } else {
-            createPopupMenuClassic()
-        }
+        createBottomSheetMenu()
     }
 
     private fun renderBrowserMenu(
@@ -1599,146 +1609,22 @@ class BrowserTabFragment :
             serpLogoUrl = serpLogoUrl,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
-        val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu) {
-            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
-            omnibar.configureBrowserMenuIcon(resId)
-            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
-            bottomSheetMenu?.render(viewState = browseMenuState)
-        } else {
-            val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24
-            omnibar.configureBrowserMenuIcon(resId)
-            browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
-            popupMenu?.render(viewState = browseMenuState)
-        }
+        val resId = com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24
+        omnibar.configureBrowserMenuIcon(resId)
+        browserNavigationBarIntegration.configureBrowserMenuIcon(resId)
+        bottomSheetMenu?.render(viewState = browseMenuState)
     }
 
     private fun launchBrowserMenu(addExtraDelay: Boolean = false) {
         val viewState = viewModel.browserViewState.value
-        val useBottomSheetMenu = viewState?.useBottomSheetMenu ?: false
-        if (useBottomSheetMenu && bottomSheetMenu != null) {
+        if (bottomSheetMenu != null) {
             recreateBrowserMenu()
             viewState?.let {
                 renderBrowserMenu(viewState = viewState, omnibarViewMode = omnibar.viewMode)
             }
             launchBottomSheetMenu(addExtraDelay)
-        } else if (!useBottomSheetMenu && popupMenu != null) {
-            val isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT
-            launchPopupMenu(anchorToNavigationBar = isSplitOmnibarEnabled, addExtraDelay = addExtraDelay)
         } else {
             logcat { "Want to show browser menu without any view initialized" }
-        }
-    }
-
-    private fun createPopupMenuClassic() {
-        popupMenu = BrowserPopupMenu(
-            context = requireContext(),
-            layoutInflater = layoutInflater,
-            omnibarType = omnibar.omnibarType,
-        )
-        popupMenu?.apply {
-            onMenuItemClicked(forwardMenuItem) {
-                onForwardArrowClicked()
-            }
-            onMenuItemClicked(backMenuItem) {
-                onBackArrowClicked()
-            }
-            onMenuItemLongClicked(backMenuItem) {
-                onBackArrowLongClicked()
-            }
-            onMenuItemClicked(refreshMenuItem) {
-                viewModel.onRefreshRequested(triggeredByUser = true)
-                if (isActiveCustomTab()) {
-                    viewModel.fireCustomTabRefreshPixel()
-                } else {
-                    viewModel.handleMenuRefreshAction()
-                }
-            }
-            onMenuItemClicked(newTabMenuItem) {
-                viewModel.onNewTabMenuItemClicked()
-            }
-            onMenuItemClicked(duckChatMenuItem) {
-                activity?.currentFocus?.let {
-                    it.hideKeyboard()
-                    it.clearFocus()
-                }
-                if (duckAiFeatureState.showFullScreenMode.value) {
-                    viewModel.openNewDuckChat(omnibar.viewMode)
-                } else {
-                    viewModel.onDuckChatMenuClicked()
-                }
-            }
-            onMenuItemClicked(bookmarksMenuItem) {
-                viewModel.onBookmarksMenuItemClicked()
-            }
-            onMenuItemClicked(fireproofWebsiteMenuItem) {
-                viewModel.onFireproofWebsiteMenuClicked()
-            }
-            onMenuItemClicked(addBookmarksMenuItem) {
-                viewModel.onBookmarkMenuClicked()
-            }
-            onMenuItemClicked(findInPageMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
-                viewModel.onFindInPageSelected()
-            }
-            onMenuItemClicked(privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-            onMenuItemClicked(brokenSiteMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
-                viewModel.onBrokenSiteSelected()
-            }
-            onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                browserActivity?.launchDownloads()
-            }
-            onMenuItemClicked(settingsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
-                browserActivity?.launchSettings()
-            }
-            onMenuItemClicked(changeBrowserModeMenuItem) {
-                viewModel.onChangeBrowserModeClicked()
-            }
-            onMenuItemClicked(defaultBrowserMenuItem) {
-                viewModel.onSetDefaultBrowserSelected()
-            }
-            onMenuItemClicked(sharePageMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
-                viewModel.onShareSelected()
-            }
-            onMenuItemClicked(addToHomeMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
-                viewModel.onPinPageToHomeSelected()
-            }
-            onMenuItemClicked(createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
-            onMenuItemClicked(openInAppMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
-                viewModel.openAppLink()
-            }
-            onMenuItemClicked(printPageMenuItem) {
-                viewModel.onPrintSelected()
-            }
-            onMenuItemClicked(autofillMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
-                viewModel.onAutofillMenuSelected()
-            }
-            onMenuItemClicked(openInDdgBrowserMenuItem) {
-                viewModel.url?.let {
-                    launchCustomTabUrlInDdg(it)
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
-                }
-            }
-            onMenuItemClicked(vpnMenuItem) {
-                viewModel.onVpnMenuClicked()
-            }
-            onMenuItemClicked(duckNewChatMenuItem) {
-                viewModel.openNewDuckChat(omnibar.viewMode)
-            }
-            onMenuItemClicked(duckChatHistoryMenuItem) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
-                viewModel.openDuckChatSidebar()
-            }
-            onMenuItemClicked(duckChatSettingsMenuItem) {
-                viewModel.openDuckChatSettings()
-            }
         }
     }
 
@@ -1747,12 +1633,12 @@ class BrowserTabFragment :
             context = requireContext(),
             faviconManager = faviconManager,
             onDismissListener = {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
+                pixel.fire(AppPixelName.BROWSING_MENU_DISMISSED)
             },
             onMenuItemClickListener = {
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_DAILY, type = Daily())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED_UNIQUE, type = Unique())
-                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_USED, type = Count)
+                pixel.fire(AppPixelName.BROWSING_MENU_USED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.BROWSING_MENU_USED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.BROWSING_MENU_USED, type = Count)
             },
         )
         bottomSheetMenu?.apply {
@@ -1924,47 +1810,24 @@ class BrowserTabFragment :
                 }
                 viewModel.onBrowserMenuLaunched(omnibar.viewMode)
                 val viewState = viewModel.browserViewState.value
-                if (isActiveCustomTab()) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS)
-                } else if (omnibar.viewMode == ViewMode.DuckAI) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_AICHAT)
-                } else if (omnibar.viewMode == ViewMode.NewTab) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_NTP)
-                } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR)
-                } else {
-                    pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
-                }
-                fireMenuOpenedPixels(isFocusedNtp, viewState)
-            }
-        }
-    }
-
-    private fun launchPopupMenu(
-        anchorToNavigationBar: Boolean,
-        addExtraDelay: Boolean = false,
-    ) {
-        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-        val delay = if (addExtraDelay) POPUP_MENU_DELAY * 2 else POPUP_MENU_DELAY
-        // small delay added to let keyboard disappear and avoid jarring transition
-        binding.rootView.postDelayed(delay) {
-            if (isAdded) {
-                // Check if VPN menu item will be shown to non-subscribed user and increment count
-                val currentViewState = viewModel.browserViewState.value
-                if (currentViewState != null) {
-                    val shouldShowVpnMenuItem = !currentViewState.browserShowing && !isActiveCustomTab()
-                    if (currentViewState.vpnMenuState == VpnMenuState.NotSubscribed && shouldShowVpnMenuItem) {
+                if (viewState != null) {
+                    val shouldShowVpnMenuItem = !viewState.browserShowing && !isActiveCustomTab()
+                    if (viewState.vpnMenuState == VpnMenuState.NotSubscribed && shouldShowVpnMenuItem) {
                         vpnMenuStore.incrementVpnMenuShownCount()
                     }
                 }
-                if (anchorToNavigationBar) {
-                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
-                    popupMenu?.showAnchoredView(requireActivity(), binding.rootView, anchorView)
+                if (isActiveCustomTab()) {
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_CUSTOMTABS)
+                } else if (omnibar.viewMode == ViewMode.DuckAI) {
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_AICHAT)
+                } else if (omnibar.viewMode == ViewMode.NewTab) {
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_NTP)
+                } else if (viewState != null && (viewState.sslError != NONE || viewState.browserError != OMITTED)) {
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED_ERROR)
                 } else {
-                    popupMenu?.show(binding.rootView, omnibar.toolbar)
+                    pixel.fire(AppPixelName.BROWSING_MENU_DISPLAYED)
                 }
-                viewModel.onBrowserMenuLaunched(omnibar.viewMode)
-                fireMenuOpenedPixels(isFocusedNtp, currentViewState)
+                fireMenuOpenedPixels(isFocusedNtp, viewState)
             }
         }
     }
@@ -2049,6 +1912,8 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
+        pdfDownloadTooltipPopup?.dismiss()
+        pdfDownloadTooltipPopup = null
         dismissDownloadFragment()
         super.onPause()
     }
@@ -2279,6 +2144,25 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
+    private fun showPdfDownloadTooltip() {
+        val omnibarType = omnibarRepository.omnibarType
+        val isBottomAnchored = omnibarType == OmnibarType.SPLIT || omnibarType == OmnibarType.SINGLE_BOTTOM
+        val anchor: View = if (omnibarType == OmnibarType.SPLIT) {
+            browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
+        } else {
+            view?.findViewById(R.id.browserMenu) ?: return
+        }
+        val wavePosition = if (isBottomAnchored) {
+            BubbleTooltipDrawable.WavePosition.BOTTOM
+        } else {
+            BubbleTooltipDrawable.WavePosition.TOP
+        }
+        pdfDownloadTooltipPopup?.dismiss()
+        pdfDownloadTooltipPopup = PdfDownloadTooltipPopup(requireContext(), wavePosition).also { popup ->
+            popup.show(anchor)
+        }
+    }
+
     private fun showPdf(url: String, cachedFileUri: Uri) {
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabRootLayout.gone()
@@ -2319,7 +2203,11 @@ class BrowserTabFragment :
             .commitAllowingStateLoss()
         binding.pdfViewerContainer.gone()
         binding.swipeRefreshContainer.isEnabled = true
-        viewModel.onPdfHidden(currentWebViewUrl = webView?.url, currentWebViewTitle = webView?.title)
+        viewModel.onPdfHidden(
+            currentWebViewUrl = webView?.url,
+            currentWebViewTitle = webView?.title,
+            currentWebViewCertificate = webView?.certificate,
+        )
         // PdfViewerFragmentV2 dispatches window insets to handle edge-to-edge, which can
         // leave a bottom padding on the WebView. Re-dispatch so siblings recompute insets.
         ViewCompat.requestApplyInsets(binding.root)
@@ -2574,12 +2462,7 @@ class BrowserTabFragment :
         viewModel.resetErrors()
     }
 
-    /**
-     * Dismisses any open browser menu, whether it's a popup menu or a bottom sheet menu.
-     * This is used to ensure that only one menu is open at a time and to clean up the UI when necessary.
-     */
     fun dismissBrowserMenu() {
-        popupMenu?.dismiss()
         bottomSheetMenu?.dismiss()
     }
 
@@ -2657,20 +2540,24 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
-                webView?.let { safeWebView ->
-                    lifecycleScope.launch {
-                        refresh()
-                        privacyProtectionEnabledConfirmation(it.domain)
+                lifecycleScope.launch {
+                    if (isPdfVisible()) {
+                        viewModel.onPrivacyProtectionToggledForPdf()
+                    } else {
+                        webView?.let { refresh() }
                     }
+                    privacyProtectionEnabledConfirmation(it.domain)
                 }
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
-                webView?.let { safeWebView ->
-                    lifecycleScope.launch {
-                        refresh()
-                        privacyProtectionDisabledConfirmation(it.domain)
+                lifecycleScope.launch {
+                    if (isPdfVisible()) {
+                        viewModel.onPrivacyProtectionToggledForPdf()
+                    } else {
+                        webView?.let { refresh() }
                     }
+                    privacyProtectionDisabledConfirmation(it.domain)
                 }
             }
 
@@ -2992,6 +2879,8 @@ class BrowserTabFragment :
             is Command.ShowPdfInTab -> {
                 showPdf(it.url, it.cachedFileUri)
             }
+
+            is Command.ShowPdfDownloadTooltip -> showPdfDownloadTooltip()
 
             is Command.ExpandOmnibar -> {
                 omnibar.setExpanded(true)
@@ -3784,6 +3673,10 @@ class BrowserTabFragment :
                     pixel.fire(DuckChatPixelName.DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED)
                     viewModel.openDuckChatSidebar()
                 }
+
+                override fun onDuckAIBackButtonPressed() {
+                    onBackArrowClicked()
+                }
             },
         )
     }
@@ -4474,11 +4367,18 @@ class BrowserTabFragment :
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
-            webView?.canScrollVertically(-1) ?: false
+            voiceActiveOnThisTab || (webView?.canScrollVertically(-1) ?: false)
         }
 
         // avoids progressView from showing under toolbar
         binding.swipeRefreshContainer.progressViewStartOffset -= 15
+
+        duckChat.activeVoiceChatSessions
+            .map { tabId in it }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { voiceActiveOnThisTab = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
@@ -4776,6 +4676,13 @@ class BrowserTabFragment :
         }
     }
 
+    private fun hideKeyboardImmediatelyRetainFocus() {
+        if (!isHidden) {
+            logcat(VERBOSE) { "Keyboard now hiding" }
+            omnibar.omnibarTextInput.hideKeyboard()
+        }
+    }
+
     private fun showKeyboard() {
         if (!isHidden) {
             logcat(VERBOSE) { "Keyboard now showing" }
@@ -5033,6 +4940,24 @@ class BrowserTabFragment :
         }
     }
 
+    private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {
+        nativeInputManager.setPickingImage(true)
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = listOf("image/*"),
+        )
+        launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    private fun launchFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        nativeInputManager.setPickingImage(true)
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = mimeTypes.ifEmpty { listOf("*/*") },
+        )
+        launchFilePicker(callback, fileChooserParams)
+    }
+
     private fun minSdk30(): Boolean = appBuildConfig.sdkInt >= Build.VERSION_CODES.R
 
     @Suppress("NewApi") // we use appBuildConfig
@@ -5166,7 +5091,6 @@ class BrowserTabFragment :
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
-        private const val POPUP_MENU_DELAY = 200L
         private const val BOTTOM_SHEET_MENU_DELAY = 300L
         private const val WIDGET_PROMPT_DELAY = 200L
         private const val CHECK_IF_ABOUT_BLANK_DELAY = 200L
@@ -5609,6 +5533,11 @@ class BrowserTabFragment :
         }
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
+            // Chat tab owns rendering its autoCompleteSuggestionsList.
+            if (nativeInputManager.isChatTabSelected()) {
+                lastSeenAutoCompleteViewState = null
+                return
+            }
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
@@ -5757,7 +5686,6 @@ class BrowserTabFragment :
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
                 val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
-                val menuTypeChanged = viewState.useBottomSheetMenu != lastSeenBrowserViewState?.useBottomSheetMenu
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
@@ -5793,9 +5721,6 @@ class BrowserTabFragment :
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 
-                if (menuTypeChanged) {
-                    recreateBrowserMenu()
-                }
                 renderBrowserMenu(viewState)
 
                 renderFullscreenMode(viewState)

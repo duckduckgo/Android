@@ -20,6 +20,7 @@ import com.squareup.moshi.Json
 
 data class AIChatModelsResponse(
     val models: List<RemoteAIChatModel>,
+    val attachmentLimits: Map<String, RemoteTierAttachmentLimits>? = null,
 )
 
 data class RemoteAIChatModel(
@@ -30,6 +31,39 @@ data class RemoteAIChatModel(
     @field:Json(name = "accessTier") val accessTier: List<String>? = null,
     @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
     @field:Json(name = "provider") val provider: String? = null,
+    @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
+)
+
+data class RemoteTierAttachmentLimits(
+    val images: RemoteImageLimits? = null,
+)
+
+data class RemoteImageLimits(
+    val maxPerTurn: Int? = null,
+    val maxPerConversation: Int? = null,
+    val maxInputCharsWithAttachments: Int? = null,
+)
+
+data class AttachmentLimits(
+    val images: ImageLimits = ImageLimits(),
+)
+
+data class ImageLimits(
+    val maxPerTurn: Int = DEFAULT_IMAGE_MAX_PER_TURN,
+    val maxPerConversation: Int = DEFAULT_IMAGE_MAX_PER_CONVERSATION,
+    val maxInputCharsWithAttachments: Int = DEFAULT_MAX_INPUT_CHARS_WITH_ATTACHMENTS,
+) {
+    companion object {
+        const val DEFAULT_IMAGE_MAX_PER_TURN = 3
+        const val DEFAULT_IMAGE_MAX_PER_CONVERSATION = 5
+        const val DEFAULT_MAX_INPUT_CHARS_WITH_ATTACHMENTS = 4500
+    }
+}
+
+data class AIChatAttachmentUsage(
+    val imagesUsed: Int = 0,
+    val filesUsed: Int = 0,
+    val fileSizeBytesUsed: Int = 0,
 )
 
 data class AIChatModel(
@@ -40,7 +74,13 @@ data class AIChatModel(
     val accessTier: List<String>,
     val isAccessible: Boolean,
     val provider: ModelProvider = ModelProvider.UNKNOWN,
-)
+    val supportsImageUpload: Boolean = false,
+    val supportedImageFormats: List<String> = emptyList(),
+) {
+    companion object {
+        val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
+    }
+}
 
 enum class UserTier(val rawValue: String) {
     FREE("free"),

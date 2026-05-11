@@ -22,7 +22,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserChangedSurveyManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
@@ -96,8 +95,6 @@ class BrowserViewModelTest {
     private val additionalDefaultBrowserPromptsCommandsFlow = Channel<AdditionalDefaultBrowserPrompts.Command>(capacity = Channel.CONFLATED)
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
-
-    @Mock private lateinit var mockDefaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager
 
     @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
@@ -700,7 +697,6 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            defaultBrowserChangedSurveyManager = mockDefaultBrowserChangedSurveyManager,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,
@@ -724,7 +720,6 @@ class BrowserViewModelTest {
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
-            defaultBrowserChangedSurveyManager = mockDefaultBrowserChangedSurveyManager,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
             ntpAfterIdleManager = mockNtpAfterIdleManager,

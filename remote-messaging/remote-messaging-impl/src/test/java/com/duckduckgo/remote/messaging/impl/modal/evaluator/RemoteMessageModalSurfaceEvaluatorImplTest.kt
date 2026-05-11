@@ -309,7 +309,7 @@ class RemoteMessageModalSurfaceEvaluatorImplTest {
 
     @Test
     fun evaluatorHasCorrectPriority() {
-        assertEquals(1, testee.priority)
+        assertEquals(4, testee.priority)
     }
 
     @Test

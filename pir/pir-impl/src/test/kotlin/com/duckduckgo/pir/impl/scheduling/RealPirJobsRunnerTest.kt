@@ -21,6 +21,7 @@ import android.os.PowerManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
@@ -38,12 +39,19 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType.MANUAL_INITIAL
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType.SCHEDULED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -72,15 +80,21 @@ class RealPirJobsRunnerTest {
     private val mockBrokerJsonUpdater: BrokerJsonUpdater = mock()
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockEnsureBrokerDataToggle: Toggle = mock()
+    private val mockTrackerBlockingToggle: Toggle = mock()
+    private val mockPirScanWideEvent: PirScanWideEvent = mock()
+    private val mockNetworkProtectionState: NetworkProtectionState = mock()
 
     @Before
-    fun setUp() {
+    fun setUp() = kotlinx.coroutines.runBlocking {
         whenever(mockContext.getSystemService(Context.POWER_SERVICE)).thenReturn(mockPowerManager)
         whenever(mockContext.packageName).thenReturn("com.duckduckgo.mobile.android")
         whenever(mockPowerManager.isPowerSaveMode).thenReturn(false)
         whenever(mockPowerManager.isIgnoringBatteryOptimizations(any())).thenReturn(true)
         whenever(mockPirRemoteFeatures.ensureBrokerDataBeforeScan()).thenReturn(mockEnsureBrokerDataToggle)
         whenever(mockEnsureBrokerDataToggle.isEnabled()).thenReturn(true)
+        whenever(mockPirRemoteFeatures.trackerBlocking()).thenReturn(mockTrackerBlockingToggle)
+        whenever(mockTrackerBlockingToggle.isEnabled()).thenReturn(false)
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
 
         testee = RealPirJobsRunner(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -94,6 +108,8 @@ class RealPirJobsRunnerTest {
             pixelSender = mockPixelSender,
             brokerJsonUpdater = mockBrokerJsonUpdater,
             pirRemoteFeatures = mockPirRemoteFeatures,
+            pirScanWideEvent = mockPirScanWideEvent,
+            networkProtectionState = mockNetworkProtectionState,
         )
     }
 
@@ -254,9 +270,11 @@ class RealPirJobsRunnerTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(
             mockPirScan.executeScanForJobs(
-                listOf(testScanJobRecord),
-                mockContext,
-                RunType.MANUAL,
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -270,9 +288,11 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(1), eq(MANUAL_INITIAL), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
-            listOf(testScanJobRecord),
-            mockContext,
-            RunType.MANUAL,
+            eq(listOf(testScanJobRecord)),
+            eq(mockContext),
+            eq(RunType.MANUAL),
+            anyOrNull(),
+            anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
     }
@@ -305,9 +325,11 @@ class RealPirJobsRunnerTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(
             mockPirScan.executeScanForJobs(
-                listOf(testScanJobRecord),
-                mockContext,
-                RunType.MANUAL,
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -321,9 +343,11 @@ class RealPirJobsRunnerTest {
         // we just dont attempt what the mock for time provider is giving us
         verify(mockPixelSender).reportInitialScanDuration(eq(0L), eq(2), eq(false), eq(false), eq(2), eq(MANUAL_INITIAL), any())
         verify(mockPirScan).executeScanForJobs(
-            listOf(testScanJobRecord),
-            mockContext,
-            RunType.MANUAL,
+            eq(listOf(testScanJobRecord)),
+            eq(mockContext),
+            eq(RunType.MANUAL),
+            anyOrNull(),
+            anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
     }
@@ -387,9 +411,11 @@ class RealPirJobsRunnerTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(
             mockPirScan.executeScanForJobs(
-                listOf(testScanJobRecord),
-                mockContext,
-                RunType.SCHEDULED,
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.SCHEDULED),
+                anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
@@ -399,11 +425,13 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPixelSender).reportScheduledScanStarted(any(), any())
-        verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any())
+        verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any(), any(), any())
         verify(mockPirScan).executeScanForJobs(
-            listOf(testScanJobRecord),
-            mockContext,
-            RunType.SCHEDULED,
+            eq(listOf(testScanJobRecord)),
+            eq(mockContext),
+            eq(RunType.SCHEDULED),
+            anyOrNull(),
+            anyOrNull(),
         )
         verifyNoMoreInteractions(mockPixelSender)
     }
@@ -776,9 +804,11 @@ class RealPirJobsRunnerTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(
             mockPirScan.executeScanForJobs(
-                listOf(testScanJobRecord),
-                mockContext,
-                RunType.MANUAL,
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(
@@ -806,9 +836,11 @@ class RealPirJobsRunnerTest {
         )
         verify(mockEligibleScanJobProvider).getAllEligibleScanJobs(testCurrentTime)
         verify(mockPirScan).executeScanForJobs(
-            listOf(testScanJobRecord),
-            mockContext,
-            RunType.MANUAL,
+            eq(listOf(testScanJobRecord)),
+            eq(mockContext),
+            eq(RunType.MANUAL),
+            anyOrNull(),
+            anyOrNull(),
         )
         verify(mockPirRepository).getAllExtractedProfiles()
         verify(mockPirSchedulingRepository).getValidOptOutJobRecord(testExtractedProfile.dbId, includeDeprecated = true)
@@ -1231,5 +1263,350 @@ class RealPirJobsRunnerTest {
         verify(mockPixelSender).reportManualScanStarted(any(), any(), any(), eq(MANUAL_INITIAL), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any(), any(), any(), any(), eq(MANUAL_INITIAL), any())
         verifyNoMoreInteractions(mockPixelSender)
+    }
+
+    @Test
+    fun whenManualInitialRunThenWideEventLifecycleCalled() = runTest {
+        // Given
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime))
+            .thenReturn(listOf(testOptOutJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenReturn(Result.success(Unit))
+        whenever(mockPirOptOut.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext))
+            .thenReturn(Result.success(Unit))
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+
+        // Then
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = MANUAL_INITIAL,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 1,
+            webViewCount = 1,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutStarted(any())
+        verify(mockPirScanWideEvent).onOptOutCompleted(any(), any())
+        verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+    }
+
+    @Test
+    fun whenManualEditProfileRunThenWideEventLifecycleCalled() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(emptyList())
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime))
+            .thenReturn(emptyList())
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL_EDIT_PROFILE)
+
+        // Then
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = MANUAL_EDIT_PROFILE,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 0,
+            webViewCount = 0,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutSkipped(any())
+        verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
+    }
+
+    @Test
+    fun whenScheduledRunThenWideEventLifecycleCalled() = runTest {
+        // Given
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime))
+            .thenReturn(emptyList())
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.SCHEDULED),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenReturn(Result.success(Unit))
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+
+        // When
+        testee.runEligibleJobs(mockContext, SCHEDULED)
+
+        // Then - scheduled runs now also drive the wide-event lifecycle (sampling is handled
+        // inside the wide-event impl, not at the call site).
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = SCHEDULED,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 1,
+            webViewCount = 1,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onScanCompleted(SCHEDULED)
+        verify(mockPirScanWideEvent).onOptOutSkipped(SCHEDULED)
+    }
+
+    @Test
+    fun whenManualRunHasNoActiveBrokersThenWideEventOnRunFailed() = runTest {
+        // Given
+        whenever(mockEnsureBrokerDataToggle.isEnabled()).thenReturn(false)
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(emptyList())
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+
+        // Then
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = MANUAL_INITIAL,
+            profileQueriesCount = 1,
+            brokerCount = 0,
+            totalScanJobs = 0,
+            webViewCount = 0,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.NO_ACTIVE_BROKERS))
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutStarted(any())
+        verify(mockPirScanWideEvent, never()).onOptOutSkipped(any())
+    }
+
+    @Test
+    fun whenScanThrowsCancellationExceptionThenWideEventOnRunCancelled() = runTest {
+        // Given
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenThrow(CancellationException("cancelled"))
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected CancellationException to propagate")
+        } catch (e: CancellationException) {
+            assertEquals("cancelled", e.message)
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = MANUAL_INITIAL,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 1,
+            webViewCount = 1,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onRunCancelled(any())
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunFailed(any(), any())
+    }
+
+    @Test
+    fun whenScanThrowsIllegalStateExceptionThenWideEventOnRunFailedWithIllegalStateException() = runTest {
+        // Given
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenThrow(IllegalStateException("boom"))
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected IllegalStateException to propagate")
+        } catch (e: IllegalStateException) {
+            assertEquals("boom", e.message)
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onRunStarted(
+            executionType = MANUAL_INITIAL,
+            profileQueriesCount = 1,
+            brokerCount = 1,
+            totalScanJobs = 1,
+            webViewCount = 1,
+            isPowerSavingEnabled = false,
+            isVpnConnected = false,
+            batteryOptimizationsEnabled = false,
+            notificationsPermissionGranted = false,
+            isTrackerBlockingEnabled = false,
+        )
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
+        verify(mockPirScanWideEvent, never()).onScanCompleted(any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+    }
+
+    @Test
+    fun whenScanThrowsTimeoutCancellationExceptionThenWideEventOnRunFailedWithTimeoutReason() = runTest {
+        // Given - TimeoutCancellationException extends CancellationException, so the runner has to
+        // match it BEFORE the generic cancellation catch, otherwise timeouts get silently
+        // misclassified as user cancellations. Its constructor is internal in kotlinx.coroutines,
+        // so we capture a real instance by triggering an actual timeout.
+        val timeoutException = runCatching {
+            kotlinx.coroutines.runBlocking {
+                kotlinx.coroutines.withTimeout(1L) { kotlinx.coroutines.delay(1000L) }
+            }
+        }.exceptionOrNull() as TimeoutCancellationException
+
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(listOf(testScanJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                eq(listOf(testScanJobRecord)),
+                eq(mockContext),
+                eq(RunType.MANUAL),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenThrow(timeoutException)
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected TimeoutCancellationException to propagate")
+        } catch (_: TimeoutCancellationException) {
+            // expected
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.TIMEOUT_CANCELLATION_EXCEPTION))
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
+    }
+
+    @Test
+    fun whenOptOutThrowsIllegalStateExceptionThenWideEventOnRunFailedWithIllegalStateException() = runTest {
+        // Given - scan completes, then opt-out execution throws.
+        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(listOf(testProfileQuery))
+        whenever(mockPirSchedulingRepository.getValidScanJobRecord(testBrokerName, testProfileQuery.id))
+            .thenReturn(testScanJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime))
+            .thenReturn(emptyList())
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime))
+            .thenReturn(listOf(testOptOutJobRecord))
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirOptOut.executeOptOutForJobs(
+                listOf(testOptOutJobRecord),
+                mockContext,
+            ),
+        ).thenThrow(IllegalStateException("opt-out boom"))
+
+        // When
+        try {
+            testee.runEligibleJobs(mockContext, MANUAL_INITIAL)
+            fail("Expected IllegalStateException to propagate")
+        } catch (e: IllegalStateException) {
+            assertEquals("opt-out boom", e.message)
+        }
+
+        // Then
+        verify(mockPirScanWideEvent).onScanCompleted(any())
+        verify(mockPirScanWideEvent).onOptOutStarted(any())
+        verify(mockPirScanWideEvent).onRunFailed(any(), eq(FailureReason.ILLEGAL_STATE_EXCEPTION))
+        verify(mockPirScanWideEvent, never()).onOptOutCompleted(any(), any())
+        verify(mockPirScanWideEvent, never()).onRunCancelled(any())
     }
 }

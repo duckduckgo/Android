@@ -31,7 +31,17 @@
     <string name="duckAiVoiceNotificationTitle">Duck.ai Voice Chat Active</string>
     <string name="duckAiVoiceNotificationMessage">Microphone is in use by Duck.ai</string>
     <string name="duckAiVoiceNotificationChannelName">Duck.ai Voice Chat</string>
+    <string name="duckAiVoiceNotificationActionOpenChat">Open chat</string>
+    <string name="duckAiVoiceNotificationActionEndSession">End session</string>
 
     <!-- Start chat icon content description -->
     <string name="duckChatStartChatContentDescription">Start chat</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">You can only attach %1$d images at a time.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">You can only attach %1$d images per conversation.</string>
+
 </resources>

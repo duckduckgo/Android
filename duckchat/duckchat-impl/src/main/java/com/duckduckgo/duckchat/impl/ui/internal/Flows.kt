@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.daxprompts.api
+package com.duckduckgo.duckchat.impl.ui.internal
 
-/**
- * DaxPrompts interface provides a set of methods for controlling the display for various Dax Prompts in the app.
- */
-interface DaxPrompts {
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.take
 
-    suspend fun evaluate(): ActionType
-
-    enum class ActionType {
-        SHOW_BROWSER_COMPARISON_PROMPT,
-        TOO_SOON_TO_SHOW_OTHER_PROMPTS,
-        NONE,
-    }
-}
+@OptIn(FlowPreview::class)
+internal fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> =
+    merge(
+        take(1),
+        drop(1).debounce(timeoutMillis),
+    )

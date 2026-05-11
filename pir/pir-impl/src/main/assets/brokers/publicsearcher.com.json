@@ -1,7 +1,7 @@
 {
   "name": "PublicSearcher",
   "url": "publicsearcher.com",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "parent": "privatereports.com",
   "optOutUrl": "https://www.publicsearcher.com/api/helper/optOutLight/search",
   "steps": [
@@ -149,6 +149,9 @@
             "addressCityStateList": {
               "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
               "separator": "/(?<=, [A-Z]{2}), /"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
             }
           },
           "id": "a75cc46f-81dd-4257-b241-964632818184"

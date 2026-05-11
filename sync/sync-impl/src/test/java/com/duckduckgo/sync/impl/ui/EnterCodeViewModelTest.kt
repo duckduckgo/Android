@@ -95,6 +95,11 @@ internal class EnterCodeViewModelTest {
     fun whenUserClicksOnPasteCodeThenClipboardIsPasted() = runTest {
         whenever(syncAccountRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
+        // `parseSyncAuthCode` returns the sealed `SyncAuthCode`; without a stub Mockito returns
+        // null, then `any()` in the `processCode` matcher won't match null, and the unstubbed
+        // `processCode` falls back to null → `NoWhenBranchMatchedException` under K2 (Metro).
+        whenever(syncAccountRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Unknown(jsonRecoveryKeyEncoded))
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Error(code = INVALID_CODE.code))
 
         testee.onPasteCodeClicked()
 

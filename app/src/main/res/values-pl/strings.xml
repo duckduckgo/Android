@@ -1024,6 +1024,9 @@
     <string name="syncRestoreDialogPrimaryCta">Przywróć moje dane</string>
     <string name="syncRestoreDialogSecondaryCta">Pomiń</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Pobierz PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Kopiuj tekst linku</string>
     <string name="linkTextCopied">Skopiowano tekst linku</string>

@@ -72,16 +72,12 @@ import javax.inject.Named
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
-    @Component.Builder
-    interface Builder {
-
-        @BindsInstance
-        fun application(application: Application): Builder
-
-        @BindsInstance
-        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
-
-        fun build(): AppComponent
+    @Component.Factory
+    interface Factory {
+        fun create(
+            @BindsInstance application: Application,
+            @BindsInstance @AppCoroutineScope applicationCoroutineScope: CoroutineScope,
+        ): AppComponent
     }
 
     fun inject(searchWidget: SearchWidget)

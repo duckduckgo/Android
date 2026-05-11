@@ -1004,6 +1004,9 @@
     <string name="syncRestoreDialogPrimaryCta">Manas lietas atjaunošana</string>
     <string name="syncRestoreDialogSecondaryCta">Izlaist</string>
 
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Lejupielādēt PDF</string>
+
     <!-- Sharing options -->
     <string name="copyLinkText">Saites teksta kopēšana</string>
     <string name="linkTextCopied">Saites teksts nokopēts</string>

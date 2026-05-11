@@ -61,7 +61,6 @@ data class BrowserViewState(
     val showDuckChatOption: Boolean = false,
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
-    val useBottomSheetMenu: Boolean = false,
     val currentPdfCachedUri: Uri? = null,
     val currentPdfFileName: String? = null,
 )

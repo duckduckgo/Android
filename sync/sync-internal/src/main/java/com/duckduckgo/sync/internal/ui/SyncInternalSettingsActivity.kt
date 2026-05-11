@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.ui
+package com.duckduckgo.sync.internal.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
@@ -32,16 +33,16 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.databinding.ActivityInternalSyncSettingsBinding
-import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.LoginSuccess
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
-import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.internal.databinding.ActivityInternalSyncSettingsBinding
+import com.duckduckgo.sync.internal.databinding.ItemConnectedDeviceBinding
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.LoginSuccess
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowMessage
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ShowQR
+import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -173,7 +174,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             }
 
             Command.LaunchRecoverDataScreen -> {
-                startActivity(SetupAccountActivity.intent(this, SetupAccountActivity.Companion.Screen.RECOVERY_CODE, null))
+                startActivity(
+                    Intent(this, SetupAccountActivity::class.java).apply {
+                        putExtra(SetupAccountActivity.SETUP_ACCOUNT_SCREEN_EXTRA, SetupAccountActivity.Companion.Screen.RECOVERY_CODE)
+                    },
+                )
             }
         }
     }
