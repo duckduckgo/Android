@@ -54,7 +54,13 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (query: String, modelId: String?, imagesJson: JSONArray?, filesJson: JSONArray?) -> Unit,
+    val onDuckAiChatSubmitted: (
+        query: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        imagesJson: JSONArray?,
+        filesJson: JSONArray?,
+    ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -350,7 +356,13 @@ class RealNativeInputManager @Inject constructor(
                     widget.text = ""
                     widget.clearAttachments()
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson, filesJson)
+                    callbacks.onDuckAiChatSubmitted(
+                        query,
+                        widget.getSelectedModelId(),
+                        widget.getResolvedReasoningEffort(),
+                        imagesJson,
+                        filesJson,
+                    )
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)

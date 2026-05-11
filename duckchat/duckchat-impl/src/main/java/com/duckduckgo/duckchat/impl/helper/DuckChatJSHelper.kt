@@ -408,6 +408,9 @@ class RealDuckChatJSHelper @Inject constructor(
                         if (pending.modelId != null) {
                             put("modelId", pending.modelId)
                         }
+                        if (pending.reasoningEffort != null) {
+                            put("reasoningEffort", pending.reasoningEffort)
+                        }
                         if (pending.images.isNotEmpty()) {
                             put(
                                 "images",

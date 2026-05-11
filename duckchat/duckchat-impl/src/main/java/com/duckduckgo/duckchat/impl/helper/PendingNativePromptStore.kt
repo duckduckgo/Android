@@ -36,6 +36,7 @@ data class PendingNativeFile(
 data class PendingNativePrompt(
     val prompt: String,
     val modelId: String?,
+    val reasoningEffort: String?,
     val images: List<PendingNativeImage> = emptyList(),
     val files: List<PendingNativeFile> = emptyList(),
 )
@@ -44,6 +45,7 @@ interface PendingNativePromptStore {
     fun store(
         prompt: String,
         modelId: String?,
+        reasoningEffort: String?,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
     )
@@ -59,10 +61,11 @@ class RealPendingNativePromptStore @Inject constructor() : PendingNativePromptSt
     override fun store(
         prompt: String,
         modelId: String?,
+        reasoningEffort: String?,
         images: List<PendingNativeImage>,
         files: List<PendingNativeFile>,
     ) {
-        pending.set(PendingNativePrompt(prompt, modelId, images, files))
+        pending.set(PendingNativePrompt(prompt, modelId, reasoningEffort, images, files))
     }
 
     override fun consume(): PendingNativePrompt? {

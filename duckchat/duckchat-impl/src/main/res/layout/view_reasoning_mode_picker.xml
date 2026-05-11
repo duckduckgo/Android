@@ -14,9 +14,16 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <item name="modelPickerContainer" type="id"/>
-    <item name="reasoningModePickerContainer" type="id"/>
-    <item name="startChatContainer" type="id"/>
-    <item name="attachButtonContainer" type="id"/>
-</resources>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/reasoningModePickerButton"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:contentDescription="@string/duckChatReasoningModeContentDescription"
+        android:scaleType="centerInside"
+        tools:srcCompat="@drawable/ic_reasoning_fast_24" />
+
+</merge>

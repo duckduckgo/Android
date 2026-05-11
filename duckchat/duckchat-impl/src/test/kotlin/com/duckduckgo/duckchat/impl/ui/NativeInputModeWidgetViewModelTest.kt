@@ -337,18 +337,27 @@ class NativeInputModeWidgetViewModelTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
 
-        viewModel.storePendingPrompt("hello", "model-1")
+        viewModel.storePendingPrompt("hello", "model-1", null)
 
-        verify(pendingNativePromptStore).store("hello", "model-1", emptyList(), emptyList())
+        verify(pendingNativePromptStore).store("hello", "model-1", null, emptyList(), emptyList())
     }
 
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
-        viewModel.storePendingPrompt("hello", null)
+        viewModel.storePendingPrompt("hello", null, null)
 
-        verify(pendingNativePromptStore).store("hello", null, emptyList(), emptyList())
+        verify(pendingNativePromptStore).store("hello", null, null, emptyList(), emptyList())
+    }
+
+    @Test
+    fun whenStorePendingPromptWithReasoningEffortThenForwardsEffort() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello", "model-1", "low")
+
+        verify(pendingNativePromptStore).store("hello", "model-1", "low", emptyList(), emptyList())
     }
 
     @Test
@@ -470,6 +479,31 @@ class NativeInputModeWidgetViewModelTest {
         val viewModel = createViewModel(plugins = listOf(plugin))
 
         assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPluginReturnsReasoningEffortSelectionThenGetResolvedReasoningEffortReturnsIt() = runTest {
+        val plugin = fakeReasoningPlugin(containerId = 7, effort = "low")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenNoPluginContributesReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertNull(viewModel.getResolvedReasoningEffort())
+    }
+
+    private fun fakeReasoningPlugin(containerId: Int, effort: String?): NativeInputPlugin {
+        return object : NativeInputPlugin {
+            override val containerId: Int = containerId
+            override fun createView(context: Context, host: NativeInputHost): View = View(context)
+            override fun getPromptContribution(): PromptContribution? =
+                effort?.let { PromptContribution.ReasoningEffortSelection(it) }
+        }
     }
 
     @Test

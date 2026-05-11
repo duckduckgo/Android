@@ -108,6 +108,7 @@ interface NativeInputWidget {
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
+    fun getResolvedReasoningEffort(): String?
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
@@ -596,6 +597,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
+    override fun getResolvedReasoningEffort(): String? = viewModel.getResolvedReasoningEffort()
+
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
@@ -611,7 +614,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val files = attachmentView?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), images, files)
+        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
     }
 
