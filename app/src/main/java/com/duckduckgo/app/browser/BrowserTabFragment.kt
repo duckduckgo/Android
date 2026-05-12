@@ -5983,15 +5983,15 @@ class BrowserTabFragment :
                 // Both layouts live in the tree; only one should be visible at a time.
                 daxDialogInContext.root.gone()
                 configuration.showOnboardingCta(
-                    binding,
-                    { viewModel.onUserClickCtaOkButton(configuration) },
-                    { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                    binding = binding,
+                    onPrimaryCtaClicked = { viewModel.onUserClickCtaOkButton(configuration) },
+                    onSecondaryCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
                     // The base class invokes onTypingAnimationSettled exactly once.
                     // CTA-type-specific notifications (e.g. DaxTrackersBlocked) live on the
                     // subclass override, not on the fragment.
-                    { viewModel.onOnboardingDaxTypingAnimationFinished() },
-                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
-                    { viewModel.onUserClickCtaDismissButton(configuration) },
+                    onTypingAnimationFinished = { viewModel.onOnboardingDaxTypingAnimationFinished() },
+                    onSuggestedOptionClicked = { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
+                    onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
                     instantShow = instantShow,
                 )
             } else {
