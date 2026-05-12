@@ -46,6 +46,17 @@ class NativeInputStateTest {
     }
 
     @Test
+    fun whenZeroThenChatIdIsNull() {
+        assertNull(NativeInputState.zero().chatId)
+    }
+
+    @Test
+    fun whenCopyingWithChatIdThenValueIsPreserved() {
+        val state = NativeInputState.zero().copy(chatId = "chat-42")
+        assertEquals("chat-42", state.chatId)
+    }
+
+    @Test
     fun whenZeroThenAttachedImagesIsEmpty() {
         assertTrue(NativeInputState.zero().attachedImages.isEmpty())
     }

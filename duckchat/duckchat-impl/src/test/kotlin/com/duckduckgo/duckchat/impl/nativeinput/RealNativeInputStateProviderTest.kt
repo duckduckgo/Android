@@ -16,55 +16,40 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ui.NativeInputState
-import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateDao
-import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealNativeInputStateProviderTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
-    private val dao: NativeInputTabStateDao = mock()
+    private val duckAiChatStore: DuckAiChatStore = mock()
     private lateinit var testee: RealNativeInputStateProvider
 
     @Before
     fun setUp() {
-        whenever(dao.getTab(any())).thenReturn(null)
-        testee = RealNativeInputStateProvider(
-            dao = dao,
-            appScope = coroutineRule.testScope,
-            dispatchers = coroutineRule.testDispatcherProvider,
-        )
+        testee = RealNativeInputStateProvider(duckAiChatStore)
     }
 
     @Test
-    fun whenDisplayedStateInitialThenZero() = runTest {
+    fun whenDisplayedStateInitialThenZero() {
         assertEquals(NativeInputState.zero(), testee.displayedState.value)
     }
 
     @Test
-    fun whenStateForUnknownTabThenZero() = runTest {
+    fun whenStateForUnknownTabThenZero() {
         assertEquals(NativeInputState.zero(), testee.stateForTab("new-tab").value)
     }
 
     @Test
-    fun whenSetActiveTabThenDisplayedStateUpdated() = runTest {
+    fun whenSetActiveTabThenDisplayedStateUpdated() {
         val structural = NativeInputState(
             inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
             inputContext = NativeInputState.InputContext.DUCK_AI,
@@ -76,37 +61,31 @@ class RealNativeInputStateProviderTest {
     }
 
     @Test
-    fun whenSetActiveTabWithPersistedModelThenStateMergesModelId() = runTest {
-        whenever(dao.getTab("tab-1")).thenReturn(
-            NativeInputTabStateEntity(tabId = "tab-1", selectedModelId = "claude-3"),
-        )
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
+    fun whenSetActiveTabThenExistingTabFieldsPreserved() {
+        testee.setActiveTab("tab-1", structural())
+        testee.update("tab-1") { copy(selectedModelId = "claude-3", chatId = "chat-1") }
 
-        assertEquals("claude-3", testee.displayedState.value.selectedModelId)
+        testee.setActiveTab(
+            "tab-1",
+            structural(context = NativeInputState.InputContext.DUCK_AI),
+        )
+
+        val state = testee.displayedState.value
+        assertEquals("claude-3", state.selectedModelId)
+        assertEquals("chat-1", state.chatId)
+        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
     }
 
     @Test
-    fun whenSetActiveTabWithNoPersistedDataThenSelectedModelIdIsNull() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
+    fun whenSetActiveTabFirstTimeThenSelectedModelIdIsNull() {
+        testee.setActiveTab("tab-1", structural())
 
         assertNull(testee.displayedState.value.selectedModelId)
     }
 
     @Test
-    fun whenUpdateOnActiveTabThenDisplayedStateReflectsChange() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
+    fun whenUpdateOnActiveTabThenDisplayedStateReflectsChange() {
+        testee.setActiveTab("tab-1", structural())
 
         testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
 
@@ -114,88 +93,130 @@ class RealNativeInputStateProviderTest {
     }
 
     @Test
-    fun whenUpdateOnActiveTabWithChangedModelIdThenDaoPersists() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
+    fun whenUpdateChatIdOnActiveTabThenDisplayedStateReflectsChange() {
+        testee.setActiveTab("tab-1", structural())
 
-        testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
+        testee.update("tab-1") { copy(chatId = "chat-42") }
 
-        verify(dao).upsert(NativeInputTabStateEntity(tabId = "tab-1", selectedModelId = "gpt-4o"))
+        assertEquals("chat-42", testee.displayedState.value.chatId)
     }
 
     @Test
-    fun whenUpdateWithUnchangedModelIdThenDaoNotCalled() = runTest {
-        whenever(dao.getTab("tab-1")).thenReturn(
-            NativeInputTabStateEntity(tabId = "tab-1", selectedModelId = "claude-3"),
-        )
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
-
-        testee.update("tab-1") { copy(selectedModelId = "claude-3") }
-
-        verify(dao, never()).upsert(any())
-    }
-
-    @Test
-    fun whenUpdateOnUnknownTabThenNoOp() = runTest {
+    fun whenUpdateOnUnknownTabThenEntryCreatedAndDisplayedStateUntouched() {
         testee.update("never-set-tab") { copy(selectedModelId = "model") }
 
+        assertEquals("model", testee.stateForTab("never-set-tab").value.selectedModelId)
+        // No active tab yet, so the ambient displayed state is unaffected.
         assertEquals(NativeInputState.zero(), testee.displayedState.value)
     }
 
     @Test
-    fun whenClearActiveTabThenDisplayedStateResetsToZero() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
-            inputContext = NativeInputState.InputContext.DUCK_AI,
-        )
-        testee.setActiveTab("tab-1", structural)
+    fun whenUpdateBeforeSetActiveTabThenSetActiveTabPreservesPatchedFields() {
+        testee.update("tab-1") { copy(chatId = "chat-77", selectedModelId = "claude-3") }
+
+        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
+
+        val state = testee.displayedState.value
+        assertEquals("chat-77", state.chatId)
+        assertEquals("claude-3", state.selectedModelId)
+        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
+    }
+
+    @Test
+    fun whenClearActiveTabThenDisplayedStateResetsToZero() {
+        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
         testee.clearTab("tab-1")
 
         assertEquals(NativeInputState.zero(), testee.displayedState.value)
     }
 
     @Test
-    fun whenClearActiveTabThenDaoDeletes() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
-        testee.clearTab("tab-1")
-
-        verify(dao).delete("tab-1")
-    }
-
-    @Test
-    fun whenClearNonActiveTabThenDisplayedStateUnchanged() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
-            inputContext = NativeInputState.InputContext.DUCK_AI,
-        )
-        testee.setActiveTab("tab-1", structural)
-        testee.setActiveTab("tab-2", structural.copy(inputContext = NativeInputState.InputContext.BROWSER))
+    fun whenClearNonActiveTabThenDisplayedStateUnchanged() {
+        testee.setActiveTab("tab-1", structural())
+        testee.setActiveTab("tab-2", structural(context = NativeInputState.InputContext.DUCK_AI))
 
         testee.clearTab("tab-1")
 
-        assertEquals(NativeInputState.InputContext.BROWSER, testee.displayedState.value.inputContext)
+        assertEquals(NativeInputState.InputContext.DUCK_AI, testee.displayedState.value.inputContext)
     }
 
     @Test
     fun whenStateForTabAfterUpdateThenReturnsUpdatedState() = runTest {
-        val structural = NativeInputState(
-            inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.BROWSER,
-        )
-        testee.setActiveTab("tab-1", structural)
+        testee.setActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "llama-3") }
 
-        assertEquals("llama-3", testee.stateForTab("tab-1").firstOrNull()?.selectedModelId)
+        assertEquals("llama-3", testee.stateForTab("tab-1").first().selectedModelId)
     }
+
+    @Test
+    fun whenClearedTabIsRequestedAgainThenZero() {
+        testee.setActiveTab("tab-1", structural())
+        testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
+        testee.clearTab("tab-1")
+
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-1").value)
+    }
+
+    @Test
+    fun whenLoadChatStateWithKnownChatThenChatIdAndModelHydrated() = runTest {
+        testee.setActiveTab("tab-1", structural())
+        whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = "gpt-4o"))
+
+        testee.loadChatState("tab-1", "chat-1")
+
+        val state = testee.displayedState.value
+        assertEquals("chat-1", state.chatId)
+        assertEquals("gpt-4o", state.selectedModelId)
+    }
+
+    @Test
+    fun whenLoadChatStateWithUnknownChatThenChatIdSetAndExistingModelKept() = runTest {
+        testee.setActiveTab("tab-1", structural())
+        testee.update("tab-1") { copy(selectedModelId = "user-pick") }
+        whenever(duckAiChatStore.getChat("chat-1")).thenReturn(null)
+
+        testee.loadChatState("tab-1", "chat-1")
+
+        val state = testee.displayedState.value
+        assertEquals("chat-1", state.chatId)
+        assertEquals("user-pick", state.selectedModelId)
+    }
+
+    @Test
+    fun whenLoadChatStateWithChatMissingModelThenExistingModelKept() = runTest {
+        testee.setActiveTab("tab-1", structural())
+        testee.update("tab-1") { copy(selectedModelId = "user-pick") }
+        whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = ""))
+
+        testee.loadChatState("tab-1", "chat-1")
+
+        val state = testee.displayedState.value
+        assertEquals("chat-1", state.chatId)
+        assertEquals("user-pick", state.selectedModelId)
+    }
+
+    @Test
+    fun whenLoadChatStateBeforeWidgetAttachesThenStateBufferedForLaterSetActiveTab() = runTest {
+        whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = "gpt-4o"))
+
+        testee.loadChatState("tab-1", "chat-1")
+        testee.setActiveTab("tab-1", structural())
+
+        val state = testee.displayedState.value
+        assertEquals("chat-1", state.chatId)
+        assertEquals("gpt-4o", state.selectedModelId)
+    }
+
+    private fun chatWith(id: String, model: String) = DuckAiChat(
+        chatId = id,
+        title = "title",
+        model = model,
+        lastEdit = "2026-04-01T00:00:00.000Z",
+        pinned = false,
+    )
+
+    private fun structural(
+        mode: NativeInputState.InputMode = NativeInputState.InputMode.SEARCH_ONLY,
+        context: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
+    ) = NativeInputState(inputMode = mode, inputContext = context)
 }

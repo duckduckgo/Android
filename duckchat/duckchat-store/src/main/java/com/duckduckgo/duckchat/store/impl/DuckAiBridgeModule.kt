@@ -23,7 +23,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
-import com.duckduckgo.duckchat.store.impl.store.NativeInputTabStateDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -38,7 +37,7 @@ object DuckAiBridgeModule {
     @SingleInstanceIn(AppScope::class)
     fun provideDatabase(context: Context): DuckAiBridgeDatabase =
         Room.databaseBuilder(context, DuckAiBridgeDatabase::class.java, "duck_ai_bridge.db")
-            .addMigrations(DuckAiBridgeDatabase.MIGRATION_1_2, DuckAiBridgeDatabase.MIGRATION_2_3, DuckAiBridgeDatabase.MIGRATION_3_4)
+            .addMigrations(DuckAiBridgeDatabase.MIGRATION_1_2, DuckAiBridgeDatabase.MIGRATION_2_3)
             .build()
 
     @Provides
@@ -49,9 +48,6 @@ object DuckAiBridgeModule {
 
     @Provides
     fun provideFileMetaDao(db: DuckAiBridgeDatabase): DuckAiBridgeFileMetaDao = db.fileMetaDao()
-
-    @Provides
-    fun provideNativeInputTabStateDao(db: DuckAiBridgeDatabase): NativeInputTabStateDao = db.nativeInputTabStateDao()
 
     @Provides
     @DuckAiBridgeFilesDir

@@ -24,7 +24,8 @@ data class NativeInputState(
     val inputPosition: InputPosition = InputPosition.TOP,
     /** Model explicitly chosen by the user for this tab. Null = use global default. */
     val selectedModelId: String? = null,
-    /** Images attached to the current message. Not persisted across restarts. */
+    /** Duck Chat conversation associated with this tab, or null if none yet. */
+    val chatId: String? = null,
     val attachedImages: List<Uri> = emptyList(),
 ) {
     enum class InputMode {

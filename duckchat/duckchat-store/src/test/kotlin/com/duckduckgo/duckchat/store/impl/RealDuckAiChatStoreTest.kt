@@ -137,6 +137,36 @@ class RealDuckAiChatStoreTest {
         assertTrue(store.getChats().isEmpty())
     }
 
+    // --- getChat ---
+
+    @Test
+    fun `getChat returns parsed chat when row exists`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        val chat = store.getChat("abc")
+
+        assertEquals("abc", chat?.chatId)
+        assertEquals("Test", chat?.title)
+        assertEquals("gpt-5-mini", chat?.model)
+        assertEquals("2026-04-01T21:31:54.260Z", chat?.lastEdit)
+        assertEquals(true, chat?.pinned)
+    }
+
+    @Test
+    fun `getChat returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        assertEquals(null, store.getChat("missing"))
+    }
+
+    @Test
+    fun `getChat returns null when json is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "{not json"))
+
+        assertEquals(null, store.getChat("abc"))
+    }
+
     // --- deleteChat ---
 
     @Test

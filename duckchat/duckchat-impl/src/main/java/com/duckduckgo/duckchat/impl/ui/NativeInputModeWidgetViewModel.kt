@@ -56,6 +56,7 @@ import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -68,9 +69,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -99,8 +103,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val mutableNativeInputStateProvider: MutableNativeInputStateProvider,
 ) : ViewModel() {
 
-    // Empty until configure()/configureContextual() is called; callers should check isEmpty().
-    private var tabId: String = ""
+    // Null until configure()/configureContextual() is called.
+    private val tabIdFlow = MutableStateFlow<String?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val tabState: StateFlow<NativeInputState> = tabIdFlow
+        .flatMapLatest { id ->
+            if (id == null) flowOf(NativeInputState.zero()) else nativeInputStateProvider.stateForTab(id)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, NativeInputState.zero())
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
         AutoComplete.Config(showInstalledApps = inputScreenConfigResolver.shouldShowInstalledApps()),
@@ -134,14 +145,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun getSelectedModelId(): String? {
-        if (tabId.isEmpty()) return null
-        return nativeInputStateProvider.stateForTab(tabId).value.selectedModelId
-            ?: _plugins.value.firstNotNullOfOrNull { plugin ->
-                @Suppress("DEPRECATION")
-                (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
-            }
-    }
+    fun getSelectedModelId(): String? = tabState.value.selectedModelId
+        ?: _plugins.value.firstNotNullOfOrNull { plugin ->
+            @Suppress("DEPRECATION")
+            (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
+        }
 
     fun getResolvedReasoningEffort(): String? {
         return _plugins.value.firstNotNullOfOrNull { plugin ->
@@ -161,11 +169,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
         widgetConfig,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config ->
+        tabState,
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, perTab ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
+            selectedModelId = perTab.selectedModelId,
+            chatId = perTab.chatId,
+            attachedImages = perTab.attachedImages,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -203,7 +215,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
-        this.tabId = tabId
+        tabIdFlow.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
@@ -223,7 +235,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun configureContextual(tabId: String) {
-        this.tabId = tabId
+        tabIdFlow.value = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
         val snapshot = state.replayCache.lastOrNull()
         val structural = NativeInputState(

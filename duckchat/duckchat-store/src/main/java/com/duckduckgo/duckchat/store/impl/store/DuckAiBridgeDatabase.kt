@@ -26,16 +26,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DuckAiBridgeChatEntity::class,
         DuckAiBridgeSettingEntity::class,
         DuckAiBridgeFileMetaEntity::class,
-        NativeInputTabStateEntity::class,
     ],
-    version = 4,
+    version = 3,
     exportSchema = false,
 )
 abstract class DuckAiBridgeDatabase : RoomDatabase() {
     abstract fun chatsDao(): DuckAiBridgeChatsDao
     abstract fun settingsDao(): DuckAiBridgeSettingsDao
     abstract fun fileMetaDao(): DuckAiBridgeFileMetaDao
-    abstract fun nativeInputTabStateDao(): NativeInputTabStateDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -52,15 +50,6 @@ abstract class DuckAiBridgeDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_duck_ai_file_meta_chatId` ON `duck_ai_file_meta` (`chatId`)",
-                )
-            }
-        }
-        val MIGRATION_3_4 = object : Migration(3, 4) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `native_input_tab_state` " +
-                        "(`tabId` TEXT NOT NULL, `selectedModelId` TEXT, " +
-                        "PRIMARY KEY(`tabId`))",
                 )
             }
         }

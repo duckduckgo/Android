@@ -53,6 +53,9 @@ interface DuckAiChatStore {
     /** Returns all chats currently in the native store. Skips entries with malformed JSON or missing chatId. */
     suspend fun getChats(): List<DuckAiChat>
 
+    /** Returns the [DuckAiChat] for [chatId], or null if the chat is unknown or its row is malformed. */
+    suspend fun getChat(chatId: String): DuckAiChat?
+
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
 
@@ -77,6 +80,9 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun getChats(): List<DuckAiChat> =
         withContext(dispatchers.io()) { chatsDao.getAll().mapNotNull { it.toDuckAiChat() } }
+
+    override suspend fun getChat(chatId: String): DuckAiChat? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.toDuckAiChat() }
 
     override suspend fun deleteChat(chatId: String): Boolean =
         withContext(dispatchers.io()) {
