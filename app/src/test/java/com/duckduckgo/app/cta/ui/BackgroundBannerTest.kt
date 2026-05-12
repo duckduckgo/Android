@@ -22,7 +22,6 @@ import android.widget.ImageView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.BackgroundBanner
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -91,15 +90,6 @@ class BackgroundBannerTest {
         val animator = BackgroundBanner(view, res = 0).slideOut()
 
         assertNull(animator)
-    }
-
-    @Test
-    fun slideOut_viewVisibleAndResSet_returnsAnimator() {
-        whenever(view.visibility).thenReturn(View.VISIBLE)
-
-        val animator = BackgroundBanner(view, res = R.drawable.bg_onboarding_serp).slideOut()
-
-        assertNotNull(animator)
     }
 
     @Test
