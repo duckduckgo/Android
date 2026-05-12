@@ -97,9 +97,9 @@ class RealPostIdleSessionWideEventTest {
                 ),
             ),
         )
-        verify(wideEventClient).flowStep(123L, "surface_shown", true, emptyMap())
         verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull())
         verify(wideEventClient).intervalStart(eq(123L), eq("time_to_first_interaction_ms_bucketed"), anyOrNull(), anyOrNull())
+        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
     }
 
     @Test
@@ -134,16 +134,29 @@ class RealPostIdleSessionWideEventTest {
     }
 
     @Test
-    fun `when onPageEngaged called twice then step and ttfi end fire only once`() = runTest {
+    fun `when onPageEngaged called twice then ttfi end fires only once and metadata reflects engagement`() = runTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onNtpEngaged()
         testee.onNtpEngaged()
+        testee.onBarUsed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowStep(123L, "page_engaged", true, emptyMap())
         verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = eq(
+                mapOf(
+                    "surface" to "ntp",
+                    "status_reason" to "bar_used",
+                    "page_engaged" to "true",
+                    "toggle_used" to "false",
+                    "back_pressed" to "false",
+                ),
+            ),
+        )
     }
 
     @Test
@@ -151,31 +164,59 @@ class RealPostIdleSessionWideEventTest {
         testee.onNtpEngaged()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
+        verify(wideEventClient, never()).intervalEnd(any(), any())
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
     @Test
-    fun `when onBackPressed called multiple times then step and ttfi end fire only once`() = runTest {
+    fun `when onBackPressed called multiple times then ttfi end fires only once and metadata reflects back press`() = runTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         testee.onBackPressed()
         testee.onBackPressed()
+        testee.onBarUsed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowStep(123L, "back_pressed", true, emptyMap())
         verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = eq(
+                mapOf(
+                    "surface" to "ntp",
+                    "status_reason" to "bar_used",
+                    "page_engaged" to "false",
+                    "toggle_used" to "false",
+                    "back_pressed" to "true",
+                ),
+            ),
+        )
     }
 
     @Test
-    fun `when displayedMode changes during active session then toggle_used step fires`() = runTest {
+    fun `when displayedMode changes during active session then toggle_used metadata is set on terminal`() = runTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         displayedModeFlow.value = InputMode.DUCK_AI
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        testee.onBarUsed()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowStep(123L, "toggle_used", true, emptyMap())
+        verify(wideEventClient).flowFinish(
+            wideEventId = eq(123L),
+            status = eq<FlowStatus>(FlowStatus.Success),
+            metadata = eq(
+                mapOf(
+                    "surface" to "ntp",
+                    "status_reason" to "bar_used",
+                    "page_engaged" to "false",
+                    "toggle_used" to "true",
+                    "back_pressed" to "false",
+                ),
+            ),
+        )
     }
 
     @Test
@@ -183,7 +224,8 @@ class RealPostIdleSessionWideEventTest {
         displayedModeFlow.value = InputMode.DUCK_AI
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
+        verify(wideEventClient, never()).intervalEnd(any(), any())
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 
     @Test
@@ -194,7 +236,6 @@ class RealPostIdleSessionWideEventTest {
         testee.onBarUsed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(wideEventClient).flowStep(123L, "bar_used", true, emptyMap())
         verify(wideEventClient).intervalEnd(123L, "session_duration_ms_bucketed")
         verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
         verify(wideEventClient).flowFinish(

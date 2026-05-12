@@ -101,7 +101,6 @@ class RealPostIdleSessionWideEvent @Inject constructor(
                     activeSession = SessionState(flowId = flowId, surface = surface)
                     logcat(tag = TAG) { "Post-idle session started: flowId=$flowId, surface=${surface.value}" }
 
-                    wideEventClient.flowStep(flowId, STEP_SURFACE_SHOWN)
                     wideEventClient.intervalStart(flowId, KEY_SESSION_DURATION)
                     wideEventClient.intervalStart(flowId, KEY_TIME_TO_FIRST_INTERACTION)
                 }.onFailure { error ->
@@ -120,27 +119,27 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     override fun onNtpEngaged() = onPageEngaged()
 
     override fun onBackPressed() {
-        recordNonTerminal(STEP_BACK_PRESSED, isAlreadyRecorded = { it.backPressed }) { it.backPressed = true }
+        recordNonTerminal(action = "back_pressed", isAlreadyRecorded = { it.backPressed }) { it.backPressed = true }
     }
 
     override fun onBarUsed() {
-        finishSession(STEP_BAR_USED, statusReason = STEP_BAR_USED, status = FlowStatus.Success)
+        finishSession(statusReason = REASON_BAR_USED, status = FlowStatus.Success)
     }
 
     override fun onReturnToPageTapped() {
-        finishSession(STEP_RETURN_TO_PAGE_TAPPED, statusReason = STEP_RETURN_TO_PAGE_TAPPED, status = FlowStatus.Success)
+        finishSession(statusReason = REASON_RETURN_TO_PAGE_TAPPED, status = FlowStatus.Success)
     }
 
     override fun onTabSwitcherSelected() {
-        finishSession(STEP_TAB_SWITCHER_SELECTED, statusReason = STEP_TAB_SWITCHER_SELECTED, status = FlowStatus.Success)
+        finishSession(statusReason = REASON_TAB_SWITCHER_SELECTED, status = FlowStatus.Success)
     }
 
     override fun onFavoriteSelected() {
-        finishSession(STEP_FAVORITE_SELECTED, statusReason = STEP_FAVORITE_SELECTED, status = FlowStatus.Success)
+        finishSession(statusReason = REASON_FAVORITE_SELECTED, status = FlowStatus.Success)
     }
 
     private fun onPageEngaged() {
-        recordNonTerminal(STEP_PAGE_ENGAGED, isAlreadyRecorded = { it.pageEngaged }) { it.pageEngaged = true }
+        recordNonTerminal(action = "page_engaged", isAlreadyRecorded = { it.pageEngaged }) { it.pageEngaged = true }
     }
 
     override fun onOpen(isFreshLaunch: Boolean) {
@@ -148,15 +147,15 @@ class RealPostIdleSessionWideEvent @Inject constructor(
     }
 
     override fun onClose() {
-        finishSession(STEP_APP_BACKGROUNDED, statusReason = STEP_APP_BACKGROUNDED, status = FlowStatus.Cancelled)
+        finishSession(statusReason = REASON_APP_BACKGROUNDED, status = FlowStatus.Cancelled)
     }
 
     private fun onToggleUsedInternal() {
-        recordNonTerminal(STEP_TOGGLE_USED, isAlreadyRecorded = { it.toggleUsed }) { it.toggleUsed = true }
+        recordNonTerminal(action = "toggle_used", isAlreadyRecorded = { it.toggleUsed }) { it.toggleUsed = true }
     }
 
     private fun recordNonTerminal(
-        stepName: String,
+        action: String,
         isAlreadyRecorded: (SessionState) -> Boolean,
         updateState: (SessionState) -> Unit,
     ) {
@@ -166,25 +165,23 @@ class RealPostIdleSessionWideEvent @Inject constructor(
                 val session = activeSession ?: return@launch
                 if (isAlreadyRecorded(session)) return@launch
 
-                wideEventClient.flowStep(session.flowId, stepName)
                 updateState(session)
                 if (!session.firstInteractionRecorded) {
                     wideEventClient.intervalEnd(session.flowId, KEY_TIME_TO_FIRST_INTERACTION)
                     session.firstInteractionRecorded = true
                 }
-                logcat(tag = TAG) { "Post-idle session ${session.flowId}: step=$stepName recorded" }
+                logcat(tag = TAG) { "Post-idle session ${session.flowId}: $action recorded" }
             }
         }
     }
 
-    private fun finishSession(stepName: String, statusReason: String, status: FlowStatus) {
+    private fun finishSession(statusReason: String, status: FlowStatus) {
         coroutineScope.launch {
             mutex.withLock {
                 if (!isFeatureEnabled()) return@launch
                 val session = activeSession ?: return@launch
                 activeSession = null
 
-                wideEventClient.flowStep(session.flowId, stepName, success = status is FlowStatus.Success)
                 wideEventClient.intervalEnd(session.flowId, KEY_SESSION_DURATION)
                 if (!session.firstInteractionRecorded) {
                     wideEventClient.intervalEnd(session.flowId, KEY_TIME_TO_FIRST_INTERACTION)
@@ -222,15 +219,11 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         const val TAG = "RealPostIdleSessionWideEvent"
         const val FEATURE_NAME = "post_idle_session"
 
-        const val STEP_SURFACE_SHOWN = "surface_shown"
-        const val STEP_PAGE_ENGAGED = "page_engaged"
-        const val STEP_TOGGLE_USED = "toggle_used"
-        const val STEP_BACK_PRESSED = "back_pressed"
-        const val STEP_BAR_USED = "bar_used"
-        const val STEP_RETURN_TO_PAGE_TAPPED = "return_to_page_tapped"
-        const val STEP_TAB_SWITCHER_SELECTED = "tab_switcher_selected"
-        const val STEP_FAVORITE_SELECTED = "favorite_selected"
-        const val STEP_APP_BACKGROUNDED = "app_backgrounded"
+        const val REASON_BAR_USED = "bar_used"
+        const val REASON_RETURN_TO_PAGE_TAPPED = "return_to_page_tapped"
+        const val REASON_TAB_SWITCHER_SELECTED = "tab_switcher_selected"
+        const val REASON_FAVORITE_SELECTED = "favorite_selected"
+        const val REASON_APP_BACKGROUNDED = "app_backgrounded"
 
         const val KEY_SURFACE = "surface"
         const val KEY_STATUS_REASON = "status_reason"
