@@ -122,7 +122,7 @@ class RealPostIdleSessionWideEvent @Inject constructor(
         recordNonTerminal(action = "back_pressed", isAlreadyRecorded = { it.backPressed }) { it.backPressed = true }
     }
 
-    override fun onBarUsed() {
+    override fun onInputSubmitted() {
         finishSession(statusReason = REASON_BAR_USED, status = FlowStatus.Success)
     }
 

@@ -21,11 +21,11 @@ package com.duckduckgo.browser.api.wideevents
  * regardless of which surface (NTP or LUT) is visible.
  */
 interface BrowserInteractionsPlugin {
-    /** A real page is shown after an idle return. */
+    /** Last used tab (LUT) is shown after an idle return. */
     fun onLutShownAfterIdle() {}
 
     /** User submitted a search or chat query via the omnibar. */
-    fun onBarUsed() {}
+    fun onInputSubmitted() {}
 
     /** User opened the tab switcher. */
     fun onTabSwitcherSelected() {}

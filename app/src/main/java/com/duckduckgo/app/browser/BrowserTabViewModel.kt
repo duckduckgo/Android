@@ -1356,7 +1356,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         // Skip restoration paths that re-submit the tab's current URL.
         if (query != url) {
-            browserInteractionsPlugins.getPlugins().forEach { it.onBarUsed() }
+            browserInteractionsPlugins.getPlugins().forEach { it.onInputSubmitted() }
         }
 
         val cta = currentCtaViewState().cta

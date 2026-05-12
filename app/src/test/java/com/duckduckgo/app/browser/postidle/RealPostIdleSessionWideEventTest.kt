@@ -127,7 +127,7 @@ class RealPostIdleSessionWideEventTest {
         androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(false))
 
         testee.onHatchShownAfterIdle()
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient)
@@ -140,7 +140,7 @@ class RealPostIdleSessionWideEventTest {
 
         testee.onNtpEngaged()
         testee.onNtpEngaged()
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
@@ -175,7 +175,7 @@ class RealPostIdleSessionWideEventTest {
 
         testee.onBackPressed()
         testee.onBackPressed()
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(123L, "time_to_first_interaction_ms_bucketed")
@@ -201,7 +201,7 @@ class RealPostIdleSessionWideEventTest {
 
         displayedModeFlow.value = InputMode.DUCK_AI
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
@@ -229,11 +229,11 @@ class RealPostIdleSessionWideEventTest {
     }
 
     @Test
-    fun `when onBarUsed terminates session then flowFinish is Success with bar_used reason`() = runTest {
+    fun `when onInputSubmitted terminates session then flowFinish is Success with bar_used reason`() = runTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(123L, "session_duration_ms_bucketed")
@@ -363,7 +363,7 @@ class RealPostIdleSessionWideEventTest {
         testee.onBackPressed()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
@@ -386,7 +386,7 @@ class RealPostIdleSessionWideEventTest {
         testee.onHatchShownAfterIdle()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.onBarUsed()
+        testee.onInputSubmitted()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         testee.onTabSwitcherSelected()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
