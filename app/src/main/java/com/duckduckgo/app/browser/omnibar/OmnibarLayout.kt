@@ -71,6 +71,7 @@ import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.databinding.IncludeNewCustomTabToolbarBinding
+import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
 import com.duckduckgo.app.browser.omnibar.Omnibar.InputScreenLaunchListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
@@ -208,6 +209,7 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var omnibarRepository: OmnibarRepository
 
     private var previousTransitionState: TransitionState? = null
+    private var lastAppliedNativeInputEnabled: Boolean? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
         requireNotNull(findViewTreeLifecycleOwner())
@@ -857,6 +859,7 @@ class OmnibarLayout @JvmOverloads constructor(
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
+        applyAiChatMenuStyling(viewState.isNativeInputEnabled)
         aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
         duckAISidebar.isVisible = newTransitionState.showDuckSidebar
         duckAIBack.isVisible = newTransitionState.showDuckBack
@@ -1525,6 +1528,15 @@ class OmnibarLayout @JvmOverloads constructor(
     private fun applyEnabled(view: View, enabled: Boolean) {
         view.isEnabled = enabled
         view.alpha = if (enabled) 1.0f else LOCKED_INPUT_ALPHA
+    }
+
+    private fun applyAiChatMenuStyling(isNativeInputEnabled: Boolean) {
+        // applyTransitionState fires on every view-state update; skip the call when the value
+        // hasn't changed so we don't keep triggering requestLayout() via setPaddingRelative,
+        // setImageResource, and updateLayoutParams.
+        if (lastAppliedNativeInputEnabled == isNativeInputEnabled) return
+        lastAppliedNativeInputEnabled = isNativeInputEnabled
+        (aiChatMenu as? android.widget.ImageView)?.applyDuckAiIconStyling(isNativeInputEnabled)
     }
 
     override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
