@@ -21,9 +21,24 @@ import android.os.Binder
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsService
 import androidx.browser.customtabs.CustomTabsSessionToken
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
+import com.duckduckgo.di.scopes.ServiceScope
+import dagger.android.AndroidInjection
 import logcat.logcat
+import javax.inject.Inject
 
+@InjectWith(ServiceScope::class)
 class DuckDuckGoCustomTabService : CustomTabsService() {
+
+    @Inject
+    lateinit var sessionRegistry: CustomTabsSessionRegistry
+
+    override fun onCreate() {
+        super.onCreate()
+        AndroidInjection.inject(this)
+    }
+
     override fun warmup(flags: Long): Boolean {
         logcat { "warmup called with flags=$flags" }
         return true
@@ -33,7 +48,16 @@ class DuckDuckGoCustomTabService : CustomTabsService() {
         val uid = Binder.getCallingUid()
         val packageName = packageManager.getPackagesForUid(uid)?.singleOrNull()
         logcat { "newSession called with sessionToken=$sessionToken; uid=$uid and packageName=$packageName" }
+        if (packageName != null) {
+            sessionRegistry.recordSession(sessionToken, packageName)
+        }
         return true
+    }
+
+    override fun cleanUpSession(sessionToken: CustomTabsSessionToken): Boolean {
+        logcat { "cleanUpSession called with sessionToken=$sessionToken" }
+        sessionRegistry.clearSession(sessionToken)
+        return super.cleanUpSession(sessionToken)
     }
 
     override fun mayLaunchUrl(

@@ -656,6 +656,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
+    private var customTabClientPackage: String? = null
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
@@ -909,8 +910,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun setIsCustomTab(isCustomTab: Boolean) {
+    fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null) {
         this.isCustomTabScreen = isCustomTab
+        this.customTabClientPackage = clientPackage
     }
 
     fun onViewReady() {
@@ -3488,16 +3490,22 @@ class BrowserTabViewModel @Inject constructor(
         appLink: AppLink,
         isForMainFrame: Boolean,
         hasGesture: Boolean,
-    ): Boolean =
-        // HTTP navigations shouldn't launch apps unless they are started with a user gesture. This
-        // avoids issues like CCT <-> app redirection loops, and mirrors Chromium's behaviour.
-        (hasGesture || appLinksHandler.isUserQuery()) &&
+    ): Boolean {
+        // HTTP navigations shouldn't launch apps unless started with a user gesture. That is unless
+        // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
+        // point back to that same app should be allowed even without user interaction.
+        val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
+        val isTrustedCaller = isCustomTabScreen &&
+            customTabClientPackage != null &&
+            customTabClientPackage == targetPackage
+        return (hasGesture || appLinksHandler.isUserQuery() || isTrustedCaller) &&
             appLinksHandler.handleAppLink(
                 isForMainFrame,
                 appLink.uriString,
                 appSettingsPreferencesStore.appLinksEnabled,
                 !appSettingsPreferencesStore.showAppLinksPrompt,
             ) { appLinkClicked(appLink) }
+    }
 
     fun openAppLink() {
         browserViewState.value?.previousAppLink?.let { appLink ->

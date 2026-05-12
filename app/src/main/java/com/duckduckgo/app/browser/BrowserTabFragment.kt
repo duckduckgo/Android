@@ -478,6 +478,7 @@ class BrowserTabFragment :
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
+    private val customTabClientPackage get() = requireArguments().getString(CLIENT_PACKAGE_ARG)
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
@@ -1144,7 +1145,7 @@ class BrowserTabFragment :
         disableViewStateSaving()
 
         if (savedInstanceState == null) {
-            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen)
+            viewModel.setIsCustomTab(tabDisplayedInCustomTabScreen, customTabClientPackage)
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
@@ -5086,6 +5087,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+        private const val CLIENT_PACKAGE_ARG = "CLIENT_PACKAGE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5497,6 +5499,7 @@ class BrowserTabFragment :
             skipHome: Boolean,
             toolbarColor: Int,
             isExternal: Boolean,
+            clientPackage: String? = null,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -5505,6 +5508,9 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+            if (clientPackage != null) {
+                args.putString(CLIENT_PACKAGE_ARG, clientPackage)
+            }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

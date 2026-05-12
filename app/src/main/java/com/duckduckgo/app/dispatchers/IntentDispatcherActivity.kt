@@ -59,13 +59,13 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
         } else if (viewState.customTabRequested) {
-            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
+            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal, viewState.clientPackage)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean, clientPackage: String?) {
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
@@ -74,6 +74,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
+                clientPackage = clientPackage,
             ),
         )
 

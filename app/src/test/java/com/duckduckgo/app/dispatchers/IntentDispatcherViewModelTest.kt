@@ -28,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
@@ -57,6 +58,7 @@ class IntentDispatcherViewModelTest {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val syncUrlIdentifier: SyncUrlIdentifier = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockCustomTabsSessionRegistry: CustomTabsSessionRegistry = mock()
 
     private lateinit var testee: IntentDispatcherViewModel
 
@@ -69,6 +71,7 @@ class IntentDispatcherViewModelTest {
             duckDuckGoUrlDetector = duckDuckGoUrlDetector,
             syncUrlIdentifier = syncUrlIdentifier,
             appBuildConfig = mockAppBuildConfig,
+            customTabsSessionRegistry = mockCustomTabsSessionRegistry,
         )
 
         whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(anyOrNull())).thenReturn(false)

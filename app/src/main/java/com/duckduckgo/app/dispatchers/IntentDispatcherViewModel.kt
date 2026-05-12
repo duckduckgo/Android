@@ -18,6 +18,7 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -28,6 +29,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -47,6 +49,7 @@ class IntentDispatcherViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val syncUrlIdentifier: SyncUrlIdentifier,
     private val appBuildConfig: AppBuildConfig,
+    private val customTabsSessionRegistry: CustomTabsSessionRegistry,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -58,6 +61,7 @@ class IntentDispatcherViewModel @Inject constructor(
         val activityParams: ActivityParams? = null,
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
+        val clientPackage: String? = null,
     )
 
     fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
@@ -87,6 +91,16 @@ class IntentDispatcherViewModel @Inject constructor(
                 val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
 
+                // Resolve the verified calling package for a CCT intent (non-null only when the
+                // launching app bound DuckDuckGoCustomTabService). Used by handleAppLink's
+                // trusted-caller carve-out.
+                val clientPackage = if (customTabRequested && intent != null) {
+                    CustomTabsSessionToken.getSessionTokenFromIntent(intent)
+                        ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+                } else {
+                    null
+                }
+
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 
                 customTabDetector.setCustomTab(customTabRequested)
@@ -98,6 +112,7 @@ class IntentDispatcherViewModel @Inject constructor(
                         activityParams = activityParams,
                         toolbarColor = toolbarColor,
                         isExternal = isExternal,
+                        clientPackage = clientPackage,
                     ),
                 )
             }.onFailure {
