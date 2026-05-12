@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.history
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -107,13 +108,124 @@ class ChatHistoryViewModelTest {
         }
     }
 
+    @Test
+    fun `onSearchActivated marks Loaded as searchActive without filtering`() = runTest {
+        source.value = listOf(
+            item("a", title = "Apple"),
+            item("b", title = "Banana"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            assertEquals(false, (awaitItem() as Loaded).searchActive)
+
+            viewModel.onSearchActivated()
+
+            val activated = awaitItem() as Loaded
+            assertEquals(true, activated.searchActive)
+            assertEquals("", activated.searchQuery)
+            assertEquals(listOf("a", "b"), activated.recent.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `onSearchQueryChanged filters recent by case-insensitive substring`() = runTest {
+        source.value = listOf(
+            item("a", title = "Apple pie"),
+            item("b", title = "Banana bread"),
+            item("c", title = "Pineapple crumble"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onSearchActivated()
+            awaitItem() // searchActive=true
+
+            viewModel.onSearchQueryChanged("apple")
+            val filtered = awaitItem() as Loaded
+            assertEquals("apple", filtered.searchQuery)
+            assertEquals(listOf("a", "c"), filtered.recent.map { it.chatId })
+            assertEquals(emptyList<String>(), filtered.pinned.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `onSearchQueryChanged filters pinned section independently of recent`() = runTest {
+        source.value = listOf(
+            item("p1", pinned = true, title = "Pinned apple"),
+            item("p2", pinned = true, title = "Pinned banana"),
+            item("r1", title = "Recent apple"),
+            item("r2", title = "Recent banana"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onSearchActivated()
+            awaitItem() // searchActive=true
+
+            viewModel.onSearchQueryChanged("apple")
+            val filtered = awaitItem() as Loaded
+            assertEquals(listOf("p1"), filtered.pinned.map { it.chatId })
+            assertEquals(listOf("r1"), filtered.recent.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `query with no matches keeps Loaded with empty sections so search UI stays visible`() = runTest {
+        source.value = listOf(item("a", title = "Apple"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onSearchActivated()
+            awaitItem()
+
+            viewModel.onSearchQueryChanged("zzz")
+            val filtered = awaitItem() as Loaded
+            assertEquals(true, filtered.searchActive)
+            assertEquals("zzz", filtered.searchQuery)
+            assertTrue(filtered.pinned.isEmpty())
+            assertTrue(filtered.recent.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onSearchClosed resets searchActive and searchQuery to restore unfiltered list`() = runTest {
+        source.value = listOf(
+            item("a", title = "Apple"),
+            item("b", title = "Banana"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onSearchActivated()
+            awaitItem()
+            viewModel.onSearchQueryChanged("apple")
+            awaitItem()
+
+            viewModel.onSearchClosed()
+            val restored = awaitItem() as Loaded
+            assertEquals(false, restored.searchActive)
+            assertEquals("", restored.searchQuery)
+            assertEquals(listOf("a", "b"), restored.recent.map { it.chatId })
+        }
+    }
+
     private fun item(
         chatId: String,
         pinned: Boolean = false,
         lastEdit: Long = 0L,
+        title: String = chatId,
     ): ChatHistoryItem = ChatHistoryItem(
         chatId = chatId,
-        displayTitle = chatId,
+        displayTitle = title,
         type = ChatType.Discussion,
         pinned = pinned,
         lastEditMillis = lastEdit,

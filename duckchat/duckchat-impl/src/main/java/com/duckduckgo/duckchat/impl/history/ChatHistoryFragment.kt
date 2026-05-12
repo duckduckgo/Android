@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.history
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -28,8 +29,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.SearchBar
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -62,6 +67,12 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         onChatMoreClicked = { _, anchor -> showRowPopup(anchor) },
     )
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
+        override fun handleOnBackPressed() {
+            hideSearchBar()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -75,6 +86,15 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.chatHistoryList.adapter = adapter
 
         binding.chatHistoryEmptyState.setOnPrimaryCtaClickListener { duckChat.openDuckChat() }
+
+        binding.searchBar.onAction { action ->
+            when (action) {
+                is SearchBar.Action.PerformUpAction -> hideSearchBar()
+                is SearchBar.Action.PerformSearch -> viewModel.onSearchQueryChanged(action.searchText)
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
 
         viewModel.uiState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -104,11 +124,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun buildEntries(state: ChatHistoryUiState.Loaded): List<ChatHistoryListEntry> = buildList {
         if (state.pinned.isNotEmpty()) {
-            add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
+            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
             state.pinned.forEach { add(ChatHistoryListEntry.Row(it)) }
         }
         if (state.recent.isNotEmpty()) {
-            add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_recent))
+            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_recent))
             state.recent.forEach { add(ChatHistoryListEntry.Row(it)) }
         }
     }
@@ -118,13 +138,30 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             showToolbarOverflowPopup()
             true
         }
-        R.id.chat_history_action_fire,
-        R.id.chat_history_action_search,
-        -> {
+        R.id.chat_history_action_search -> {
+            showSearchBar()
+            true
+        }
+        R.id.chat_history_action_fire -> {
             showComingSoonSnackbar()
             true
         }
         else -> false
+    }
+
+    private fun showSearchBar() {
+        onBackPressedCallback.isEnabled = true
+        binding.toolbar.gone()
+        binding.searchBar.handle(SearchBar.Event.ShowSearchBar)
+        viewModel.onSearchActivated()
+    }
+
+    private fun hideSearchBar() {
+        onBackPressedCallback.isEnabled = false
+        binding.searchBar.handle(SearchBar.Event.DismissSearchBar)
+        requireActivity().hideKeyboard()
+        binding.toolbar.show()
+        viewModel.onSearchClosed()
     }
 
     private fun showToolbarOverflowPopup() {

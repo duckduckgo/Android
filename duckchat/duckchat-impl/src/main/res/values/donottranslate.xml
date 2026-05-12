@@ -87,4 +87,7 @@
     <string name="duck_ai_chat_history_action_rename">Rename</string>
     <string name="duck_ai_chat_history_action_download">Download</string>
     <string name="duck_ai_chat_history_action_delete">Delete</string>
+    <string name="duck_ai_chat_history_search_hint">Search chats</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Close search</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
 </resources>

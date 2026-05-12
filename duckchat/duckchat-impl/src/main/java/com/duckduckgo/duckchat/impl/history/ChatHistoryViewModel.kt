@@ -22,10 +22,12 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import logcat.logcat
 import javax.inject.Inject
 
@@ -34,27 +36,57 @@ class ChatHistoryViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
 ) : ViewModel() {
 
-    val uiState: StateFlow<ChatHistoryUiState> = chatHistoryRepository.observeChats()
-        .map(::reduce)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
-            initialValue = ChatHistoryUiState.Loading,
-        )
+    private val searchState = MutableStateFlow(SearchState())
 
-    private fun reduce(items: List<ChatHistoryItem>): ChatHistoryUiState {
-        logcat { "ChatHistory: reduce ${items.size} item(s)" }
+    val uiState: StateFlow<ChatHistoryUiState> = combine(
+        chatHistoryRepository.observeChats(),
+        searchState,
+        ::reduce,
+    ).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        initialValue = ChatHistoryUiState.Loading,
+    )
+
+    fun onSearchActivated() {
+        searchState.update { it.copy(active = true) }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        searchState.update { it.copy(query = query) }
+    }
+
+    fun onSearchClosed() {
+        searchState.value = SearchState()
+    }
+
+    private fun reduce(items: List<ChatHistoryItem>, search: SearchState): ChatHistoryUiState {
+        logcat { "ChatHistory: reduce ${items.size} item(s), searchActive=${search.active}" }
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         return Loaded(
-            pinned = pinned.sortedByDate(),
-            recent = recent.sortedByDate(),
+            pinned = pinned.sortedByDate().filterBy(search),
+            recent = recent.sortedByDate().filterBy(search),
+            searchQuery = search.query,
+            searchActive = search.active,
             mode = Mode.Default,
         )
     }
 
+    private fun List<ChatHistoryItem>.filterBy(search: SearchState): List<ChatHistoryItem> =
+        if (!search.active || search.query.isEmpty()) {
+            this
+        } else {
+            filter { it.displayTitle.contains(search.query, ignoreCase = true) }
+        }
+
     private fun List<ChatHistoryItem>.sortedByDate(): List<ChatHistoryItem> =
         sortedByDescending { it.lastEditMillis }
+
+    private data class SearchState(
+        val active: Boolean = false,
+        val query: String = "",
+    )
 
     private companion object {
         const val STOP_TIMEOUT_MILLIS = 5_000L
