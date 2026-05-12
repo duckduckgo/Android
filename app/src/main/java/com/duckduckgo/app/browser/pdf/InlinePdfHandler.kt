@@ -124,6 +124,10 @@ class RealInlinePdfHandler @Inject constructor(
 
     override fun classifyPdfRequest(url: String, contentDisposition: String?, mimeType: String): PdfRenderDecision {
         if (!androidBrowserConfigFeature.pdfViewer().isEnabled()) return PdfRenderDecision.NotApplicable
+        // downloadToCache fetches via OkHttp, which rejects any scheme other than http/https.
+        // Let data:/file:/content: PDFs fall through to the standard download flow.
+        val scheme = url.toUri().scheme?.lowercase()
+        if (scheme != "http" && scheme != "https") return PdfRenderDecision.NotApplicable
         // Use lastPathSegment so query strings and fragments don't break the .pdf check
         // (e.g. signed URLs like https://cdn.example.com/report.pdf?auth=token).
         val pathEndsInPdf = url.toUri().lastPathSegment?.endsWith(".pdf", ignoreCase = true) == true
