@@ -385,9 +385,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
         val rowSpacer = findViewById<View?>(R.id.rowSpacer)
-        // Keep row 2 visible while streaming so the stop button stays reachable in bottom mode
-        // (where it's hosted inside this row rather than in floatingSubmitContainer).
-        val visible = (inputField.hasFocus() || isStreaming) && isDuckAiPageContext()
+        val chatActive = isDuckAiPageContext() || (nativeInputState.toggleVisible && isChatTabSelected())
+        val visible = chatActive && (inputField.hasFocus() || isStreaming)
         bottomRow.isVisible = visible
         rowSpacer?.isVisible = visible
     }
@@ -863,6 +862,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             inputField.maxLines = MAX_LINES
         }
         updateSendButtonVisibility()
+        updateBottomRowVisibility()
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
