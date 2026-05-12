@@ -121,7 +121,7 @@ class PrivacyProtectionNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): Intent {
+    override suspend fun getLaunchIntent(): Intent {
         return BrowserActivity.intent(context, newSearch = true, interstitialScreen = true).apply {
             putExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
         }

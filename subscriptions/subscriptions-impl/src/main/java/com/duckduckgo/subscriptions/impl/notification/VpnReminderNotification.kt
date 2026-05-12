@@ -135,7 +135,7 @@ class VpnReminderNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): Intent? {
+    override suspend fun getLaunchIntent(): Intent? {
         return globalActivityStarter.startIntent(
             context,
             NetworkProtectionManagementScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),

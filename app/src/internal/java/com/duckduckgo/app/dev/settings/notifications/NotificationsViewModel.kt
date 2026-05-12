@@ -90,7 +90,7 @@ class NotificationViewModel @Inject constructor(
 
                 // the survey intent hits the DB, so we need to do this on IO
                 val rawLaunchIntent = withContext(dispatcher.io()) { plugin.getLaunchIntent() }
-                val launchIntent = launchIntentBuilder.build(rawLaunchIntent)
+                val launchIntent = launchIntentBuilder.createLaunchPendingIntent(rawLaunchIntent, 0)
 
                 NotificationItem(
                     id = plugin.getSpecification().systemId,
