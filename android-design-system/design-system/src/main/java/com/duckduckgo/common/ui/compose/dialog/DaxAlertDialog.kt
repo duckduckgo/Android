@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
@@ -40,17 +38,27 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 /**
  * Base alert dialog composable for the DuckDuckGo design system.
  *
- * This is the foundation dialog that other specialized dialogs (TextAlertDialog,
- * StackedAlertDialog, RadioListAlertDialog) are built upon.
+ * Slot-based: use this directly for any dialog. The convenience wrapper [TextAlertDialog]
+ * exists for the common title/message/positive/negative shape. For richer dialogs, use
+ * this composable directly with helpers like [DaxRadioOptions] (content slot) or
+ * [DaxStackedButtons] (buttons slot).
+ *
+ * Buttons are pinned at the bottom and never scroll. The [content] slot is responsible for
+ * its own scrolling when needed (see [DaxRadioOptions]).
  *
  * @param onDismissRequest Callback invoked when the dialog should be dismissed
  * @param title The dialog title text (required)
- * @param modifier Modifier to be applied to the dialog content
- * @param message Optional message text displayed below the title
+ * @param modifier Modifier applied to the dialog surface
+ * @param message Optional message slot rendered below the title. Use a plain [DaxText] for
+ *  static text or pass any composable (e.g. an annotated [androidx.compose.material3.Text]
+ *  with link annotations) for clickable spans.
  * @param headerImage Optional drawable resource ID for an image displayed above the title
- * @param dismissOnClickOutside Whether clicking outside the dialog dismisses it (default: true)
+ * @param cancellable Whether the dialog can be dismissed by clicking outside or pressing back (default: false)
  * @param content Optional composable slot for custom content between message and buttons
- * @param buttons Composable slot for dialog buttons
+ * @param buttons Composable slot for dialog buttons (pinned, won't scroll)
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735717450949
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,19 +66,19 @@ fun DaxAlertDialog(
     onDismissRequest: () -> Unit,
     title: String,
     modifier: Modifier = Modifier,
-    message: String? = null,
+    message: (@Composable () -> Unit)? = null,
     @DrawableRes headerImage: Int? = null,
-    dismissOnClickOutside: Boolean = true,
+    cancellable: Boolean = false,
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
 ) {
     BasicAlertDialog(
-        onDismissRequest = {
-            if (dismissOnClickOutside) {
-                onDismissRequest()
-            }
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = cancellable,
+            dismissOnBackPress = cancellable,
+        ),
     ) {
         DaxAlertDialogContent(
             title = title,
@@ -91,7 +99,7 @@ fun DaxAlertDialog(
 internal fun DaxAlertDialogContent(
     title: String,
     modifier: Modifier = Modifier,
-    message: String? = null,
+    message: (@Composable () -> Unit)? = null,
     @DrawableRes headerImage: Int? = null,
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
@@ -102,12 +110,9 @@ internal fun DaxAlertDialogContent(
         color = DuckDuckGoTheme.colors.backgrounds.surface,
     ) {
         Column(
-            modifier = Modifier
-                .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 18.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Header image
             if (headerImage != null) {
                 Image(
                     painter = painterResource(id = headerImage),
@@ -118,26 +123,22 @@ internal fun DaxAlertDialogContent(
                 )
             }
 
-            // Title
             DaxText(
                 text = title,
                 style = DuckDuckGoTheme.typography.h2,
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            // Message
             if (message != null) {
-                DaxText(
-                    text = message,
-                    style = DuckDuckGoTheme.typography.body1,
-                    color = DuckDuckGoTheme.textColors.secondary,
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
-                )
+                ) {
+                    message()
+                }
             }
 
-            // Custom content slot
             if (content != null) {
                 Column(
                     modifier = Modifier
@@ -148,7 +149,6 @@ internal fun DaxAlertDialogContent(
                 }
             }
 
-            // Buttons slot
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
