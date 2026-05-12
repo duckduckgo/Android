@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 
 class TdsClient(
     override val name: Client.ClientName,
@@ -78,9 +79,11 @@ class TdsClient(
     }
 
     private fun findTrackerByLabelWalk(host: String): TdsTracker? {
+        val eTldPlusOne = host.toTldPlusOne()
         var candidate: String = host
         while (true) {
             trackerByDomain[candidate]?.let { return it }
+            if (candidate == eTldPlusOne) return null
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
             candidate = candidate.substring(dot + 1)
