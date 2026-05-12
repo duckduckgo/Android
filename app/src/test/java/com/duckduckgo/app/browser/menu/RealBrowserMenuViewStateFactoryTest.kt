@@ -27,7 +27,6 @@ import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -52,14 +51,13 @@ class RealBrowserMenuViewStateFactoryTest {
     private val fullscreenModeFlow = MutableStateFlow(false)
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val duckChat: DuckChat = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector, duckChat)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
     }
 
     @Test
