@@ -743,7 +743,7 @@ sealed class OnboardingDaxDialogCta(
             }
 
             val typeAndFadeIn = {
-                animateBackgroundIn(container)
+                bannerFor(container)?.slideIn()
                 val daxTitle = titleView.text?.toString().orEmpty()
                 val startContentFadeIn = {
                     val animators = mutableListOf<Animator>(
@@ -796,7 +796,7 @@ sealed class OnboardingDaxDialogCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
-                buildBackgroundSlideOutAnimator(container)?.let { fadeOutAnimators += it }
+                bannerFor(container)?.slideOut()?.let { fadeOutAnimators += it }
                 runningFadeOut = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
@@ -859,13 +859,7 @@ sealed class OnboardingDaxDialogCta(
             container.alpha = 1f
             container.show()
 
-            if (backgroundRes != 0) {
-                // applyBackground registers a doOnPreDraw that pushes the banner off-screen for
-                // the slide-in animator; this second listener fires after it in the same pre-draw
-                // pass and resets to 0 so the banner lands in its final position on the first frame.
-                container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
-                    ?.doOnPreDraw { it.translationY = 0f }
-            }
+            bannerFor(container)?.snapToFinalPosition()
 
             // No animation to skip — clear any stale tap-to-skip listener from a prior animated show.
             container.setOnClickListener(null)
@@ -903,7 +897,7 @@ sealed class OnboardingDaxDialogCta(
             configureContentViews(container)
             hiddenTitle.text = titleView.text
             applyTitleSlotVisibility(container, titleView)
-            applyBackground(container)
+            bannerFor(container)?.show()
             applyOptionsContentHeight(container)
         }
 
@@ -973,39 +967,63 @@ sealed class OnboardingDaxDialogCta(
                 if (titleIsEmpty) View.GONE else View.VISIBLE
         }
 
-        private fun applyBackground(container: View) {
-            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
-                ?: return
-            if (backgroundRes == 0) return
-            backgroundView.setImageResource(backgroundRes)
-            backgroundView.visibility = View.VISIBLE
-            backgroundView.doOnPreDraw { it.translationY = offScreenY(it) }
+        private fun bannerFor(container: View): BackgroundBanner? {
+            val view = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground) ?: return null
+            return BackgroundBanner(view, backgroundRes)
         }
 
-        private fun buildBackgroundSlideOutAnimator(container: View): Animator? {
-            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
-                ?: return null
-            if (backgroundView.visibility != View.VISIBLE) return null
-            if (backgroundRes == 0) return null
-            return ObjectAnimator.ofFloat(backgroundView, View.TRANSLATION_Y, offScreenY(backgroundView))
-                .setDuration(BACKGROUND_SLIDE_DURATION)
-        }
+        /**
+         * Slide-up banner that sits behind the contextual card. Scoped to a single CTA show:
+         * construct per-call and discard. State is read from the view (visibility, translationY)
+         * so callers don't need to thread flags through.
+         */
+        internal class BackgroundBanner(
+            private val view: ImageView,
+            @DrawableRes private val res: Int,
+        ) {
+            val isShowing: Boolean get() = view.isVisible
 
-        private fun animateBackgroundIn(container: View) {
-            val backgroundView = container.findViewById<ImageView>(R.id.contextualBrandDesignBackground)
-                ?: return
-            if (backgroundView.visibility != View.VISIBLE) return
-            backgroundView.animate()
-                .translationY(0f)
-                .setDuration(BACKGROUND_SLIDE_DURATION)
-                .setInterpolator(AccelerateDecelerateInterpolator())
-                .start()
-        }
+            /** Stage the banner offscreen, ready for [slideIn] to bring it up. */
+            fun show() {
+                if (res == 0) return
+                view.setImageResource(res)
+                view.visibility = View.VISIBLE
+                view.doOnPreDraw { it.translationY = offScreenY() }
+            }
 
-        /** Y translation that takes [view] just below its parent's bottom edge. */
-        private fun offScreenY(view: View): Float {
-            val parent = view.parent as? View
-            return if (parent != null) (parent.height - view.top).toFloat() else view.height.toFloat()
+            /**
+             * Snap the banner to its final on-screen position. Registers in the same pre-draw
+             * pass as [show]'s offscreen offset; the later registration wins so the banner lands
+             * fully on-screen on the first frame (used by the instantShow path on rotation).
+             */
+            fun snapToFinalPosition() {
+                if (res == 0) return
+                view.doOnPreDraw { it.translationY = 0f }
+            }
+
+            fun slideIn() {
+                if (!isShowing) return
+                view.animate()
+                    .translationY(0f)
+                    .setDuration(SLIDE_DURATION)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+                    .start()
+            }
+
+            fun slideOut(): Animator? {
+                if (!isShowing || res == 0) return null
+                return ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, offScreenY())
+                    .setDuration(SLIDE_DURATION)
+            }
+
+            private fun offScreenY(): Float {
+                val parent = view.parent as? View
+                return if (parent != null) (parent.height - view.top).toFloat() else view.height.toFloat()
+            }
+
+            companion object {
+                private const val SLIDE_DURATION = 300L
+            }
         }
 
         /**
@@ -1097,7 +1115,6 @@ sealed class OnboardingDaxDialogCta(
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_FADE_IN_START_DELAY = 200L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
-            private const val BACKGROUND_SLIDE_DURATION = 300L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
 
