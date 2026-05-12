@@ -56,7 +56,7 @@ class AppNotificationSender(
         val launchIntent =
             launchIntentBuilder.createLaunchPendingIntent(
                 notificationPlugin.getLaunchIntent(),
-                notificationPlugin.getSpecification().systemId,
+                specification.systemId,
             )
         val cancelIntent = NotificationHandlerService.pendingCancelNotificationHandlerIntent(context, notification.javaClass)
         val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
