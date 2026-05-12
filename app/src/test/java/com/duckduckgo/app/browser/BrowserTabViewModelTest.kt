@@ -9575,12 +9575,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckChatHistoryAndAvailableThenNativeHistoryOpened() = runTest {
+    fun whenOpenDuckChatHistoryAndAvailableThenLaunchDuckChatHistoryCommandEmitted() = runTest {
         whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(true)
 
         testee.openDuckChatHistory()
 
-        verify(mockDuckChat).openDuckChatHistory()
+        assertCommandIssued<Command.LaunchDuckChatHistory>()
         verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
     }
 
@@ -9596,7 +9596,7 @@ class BrowserTabViewModelTest {
 
         testee.openDuckChatHistory()
 
-        verify(mockDuckChat, never()).openDuckChatHistory()
+        assertCommandNotIssued<Command.LaunchDuckChatHistory>()
         testee.subscriptionEventDataFlow.test {
             val emittedEvent = awaitItem()
             assertEquals(expectedEvent.featureName, emittedEvent.featureName)

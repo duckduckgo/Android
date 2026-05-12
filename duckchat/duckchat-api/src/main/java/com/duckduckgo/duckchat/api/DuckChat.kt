@@ -138,11 +138,6 @@ interface DuckChat {
     fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 
     /**
-     * Launches the native Duck.ai chat history Activity.
-     */
-    fun openDuckChatHistory()
-
-    /**
      * Returns `true` when the native Duck.ai chat history surface is enabled by all gating feature flags.
      * Suspending because the underlying feature-flag reads must not block the main thread.
      */

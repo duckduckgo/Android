@@ -494,6 +494,8 @@ sealed class Command {
 
     data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
 
+    data object LaunchDuckChatHistory : Command()
+
     data class ExtractSerpLogo(
         val currentUrl: String,
     ) : Command()

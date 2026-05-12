@@ -43,7 +43,6 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.history.ChatHistoryActivity
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
@@ -824,11 +823,6 @@ class RealDuckChat @Inject constructor(
             duckChatFeature.useNativeStorageChatData().isEnabled() &&
             duckAiChatHistoryFeature.self().isEnabled() &&
             duckAiChatHistoryFeature.historyScreen().isEnabled()
-    }
-
-    override fun openDuckChatHistory() {
-        val intent = Intent(context, ChatHistoryActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
-        context.startActivity(intent)
     }
 
     override fun openWithChatId(chatId: String) {

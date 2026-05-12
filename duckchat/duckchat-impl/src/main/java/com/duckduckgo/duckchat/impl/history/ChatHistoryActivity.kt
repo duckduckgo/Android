@@ -17,16 +17,19 @@
 package com.duckduckgo.duckchat.impl.history
 
 import android.os.Bundle
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.impl.databinding.ActivityChatHistoryBinding
 
 /**
  * Thin host for chat-history-related fragments.
  */
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(DuckChatHistoryNoParams::class, screenName = "duckai.history")
 class ChatHistoryActivity : DuckDuckGoActivity() {
     private val binding: ActivityChatHistoryBinding by viewBinding()
 

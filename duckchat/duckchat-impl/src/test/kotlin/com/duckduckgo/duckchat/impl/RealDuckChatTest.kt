@@ -1787,13 +1787,6 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenOpenDuckChatHistoryThenActivityStartedOnInjectedContext() = runTest {
-        testee.openDuckChatHistory()
-
-        verify(mockContext).startActivity(any())
-    }
-
-    @Test
     fun whenOpenWithChatIdThenDuckChatOpenedWithChatIdUrlParameterAndForcedFreshSession() = runTest {
         val urlCaptor = argumentCaptor<String>()
         val sessionCaptor = argumentCaptor<Boolean>()
