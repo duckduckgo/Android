@@ -752,9 +752,10 @@ sealed class OnboardingDaxDialogCta(
                         ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                     )
-                    // Dismiss button is persistent; on content transition it already sits at alpha=1
-                    // so we omit the fade-in animator (otherwise it would briefly snap then re-show).
-                    if (!isContentTransition) {
+                    // Dismiss button is persistent: fade it in only if it isn't already fully shown,
+                    // which covers both the first-show path (alpha=0) and the case where a previous
+                    // animation was cancelled mid-flight leaving it at a fractional alpha.
+                    if (dismissButton.alpha < 1f) {
                         animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
