@@ -106,7 +106,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenSelected: Boolean = true,
         val showSplitOption: Boolean = false,
         val isReinstallUser: Boolean = false,
-        val showQuickSetup: Boolean = false,
         val inputScreenPreviewSearchSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewIsSearchSelected: Boolean = false,
@@ -198,12 +197,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun loadDaxDialog() {
         viewModelScope.launch {
             val isReinstall = isAppReinstall()
-            val showQuickSetup = isReinstall && isInQuickSetupTreatment()
             val dialogType = if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
             _viewState.update {
                 it.copy(
                     isReinstallUser = isReinstall,
-                    showQuickSetup = showQuickSetup,
                     currentDialog = dialogType,
                     hasAnimatedCurrentDialog = false,
                 )
@@ -211,9 +208,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             fireDialogShownPixel(dialogType)
         }
     }
-
-    private suspend fun isInQuickSetupTreatment(): Boolean =
-        onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT
 
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
@@ -323,7 +317,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
             QUICK_SETUP -> {
                 viewModelScope.launch {
-                    _commands.send(Command.Finish)
+                    _commands.send(Command.OnboardingSkipped)
                 }
             }
         }
@@ -344,11 +338,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 _viewState.update { it.copy(isReinstallUser = true) }
-                if (_viewState.value.showQuickSetup) {
-                    setCurrentDialog(QUICK_SETUP)
-                } else {
-                    setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                viewModelScope.launch {
+                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        setCurrentDialog(QUICK_SETUP)
+                    } else {
+                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                    }
                 }
             }
 
