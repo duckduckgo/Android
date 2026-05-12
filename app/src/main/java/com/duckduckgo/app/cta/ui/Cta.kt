@@ -960,18 +960,13 @@ sealed class OnboardingDaxDialogCta(
             }
         }
 
-        /**
-         * Collapse the title slot when the CTA has no title so the FrameLayout (and its
-         * marginBottom) is excluded from the LinearLayout flow, leaving the description sitting
-         * at the card's top padding. Runs synchronously right after [configureContentViews] so
-         * the layout is correct from the first frame.
-         */
-        /** Sets the primary CTA button text from [buttonText] so subclasses don't have to. */
         private fun applyPrimaryCtaText(container: View) {
             val text = buttonText ?: return
             container.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
         }
 
+        // GONE (not INVISIBLE) so the FrameLayout's marginBottom drops out of the LinearLayout
+        // flow, leaving the description sitting at the card's top padding.
         private fun applyTitleSlotVisibility(container: View, titleView: DaxTypeAnimationTextView) {
             val titleIsEmpty = titleView.text?.toString().orEmpty().isEmpty()
             container.findViewById<View>(R.id.contextualBrandDesignTitleSlot)?.visibility =
