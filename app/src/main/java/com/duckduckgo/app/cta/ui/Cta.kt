@@ -676,6 +676,7 @@ sealed class OnboardingDaxDialogCta(
             runningFadeOut?.cancel()
             runningFadeOut = null
             ctaView?.animate()?.cancel()
+            ctaView?.let { bannerFor(it)?.cancel() }
             ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
                 ?.cancelAnimation()
         }
@@ -1026,6 +1027,10 @@ sealed class OnboardingDaxDialogCta(
                 if (!isShowing || res == 0) return null
                 return ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, offScreenY())
                     .setDuration(SLIDE_DURATION)
+            }
+
+            fun cancel() {
+                view.animate().cancel()
             }
 
             private fun offScreenY(): Float {
