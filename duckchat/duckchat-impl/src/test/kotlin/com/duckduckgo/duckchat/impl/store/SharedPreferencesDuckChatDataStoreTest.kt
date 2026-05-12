@@ -529,4 +529,22 @@ class SharedPreferencesDuckChatDataStoreTest {
         // No writes at all — DUCK_AI_INPUT_SCREEN_USER_SETTING key is absent
         assertFalse(testee.isInputScreenEverEnabled())
     }
+
+    @Test
+    fun whenSelectedReasoningModeNotSetThenReturnNull() = runTest {
+        assertNull(testee.getSelectedReasoningMode())
+    }
+
+    @Test
+    fun whenSetSelectedReasoningModeThenStoredValueReturned() = runTest {
+        testee.setSelectedReasoningMode("reasoning")
+        assertEquals("reasoning", testee.getSelectedReasoningMode())
+    }
+
+    @Test
+    fun whenSetSelectedReasoningModeNullThenStoredValueCleared() = runTest {
+        testee.setSelectedReasoningMode("fast")
+        testee.setSelectedReasoningMode(null)
+        assertNull(testee.getSelectedReasoningMode())
+    }
 }

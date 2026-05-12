@@ -33,6 +33,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "provider") val provider: String? = null,
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
     @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
+    @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
 )
 
 data class RemoteTierAttachmentLimits(
@@ -100,6 +101,7 @@ data class AIChatModel(
     val supportsImageUpload: Boolean = false,
     val supportedImageFormats: List<String> = emptyList(),
     val supportedFileTypes: List<String> = emptyList(),
+    val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
 ) {
     val supportsFileUpload: Boolean
         get() = supportedFileTypes.isNotEmpty()

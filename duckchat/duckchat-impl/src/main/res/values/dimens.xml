@@ -33,4 +33,7 @@
     <dimen name="modelPickerChipStrokeWidth">1dp</dimen>
     <dimen name="modelPickerChipTextSize">13sp</dimen>
     <dimen name="modelPickerMenuElevation">6dp</dimen>
+
+    <!-- Reasoning Mode Picker -->
+    <dimen name="reasoningModePickerMenuWidth">220dp</dimen>
 </resources>

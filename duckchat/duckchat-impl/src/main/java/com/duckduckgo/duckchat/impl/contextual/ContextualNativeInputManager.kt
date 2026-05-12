@@ -120,7 +120,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
                 widget.clearAttachments()
-                sendPrompt(prompt, widget.getSelectedModelId(), imagesJson, filesJson)
+                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), imagesJson, filesJson)
                 widget.text = ""
             },
         )
@@ -132,7 +132,13 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String, modelId: String? = null, imagesJson: JSONArray? = null, filesJson: JSONArray? = null) {
+    private fun sendPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -143,6 +149,9 @@ class RealContextualNativeInputManager @Inject constructor(
                     put("autoSubmit", true)
                     if (modelId != null) {
                         put("modelId", modelId)
+                    }
+                    if (reasoningEffort != null) {
+                        put("reasoningEffort", reasoningEffort)
                     }
                     if (imagesJson != null) {
                         put("images", imagesJson)

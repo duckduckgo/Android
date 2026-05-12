@@ -1334,7 +1334,7 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, imagesJson, filesJson ->
+                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, imagesJson, filesJson ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -1351,6 +1351,9 @@ class BrowserTabFragment :
                                         // if (modelId != null) {
                                         //     put("modelId", modelId)
                                         // }
+                                        if (reasoningEffort != null) {
+                                            put("reasoningEffort", reasoningEffort)
+                                        }
                                         if (imagesJson != null) {
                                             put("images", imagesJson)
                                         }

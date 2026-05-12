@@ -624,6 +624,7 @@ class RealDuckAiModelManagerTest {
         provider: String? = null,
         supportsImageUpload: Boolean = false,
         supportedFileTypes: List<String>? = null,
+        supportedReasoningEffort: List<String>? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -634,5 +635,278 @@ class RealDuckAiModelManagerTest {
         provider = provider,
         supportsImageUpload = supportsImageUpload,
         supportedFileTypes = supportedFileTypes,
+        supportedReasoningEffort = supportedReasoningEffort,
     )
+
+    @Test
+    fun whenRemoteHasUnknownReasoningEffortThenUnknownDropped() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "id",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("low", "mystery", "high"),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val resolved = testee.modelState.value.models.single()
+        assertEquals(listOf(ReasoningEffort.LOW, ReasoningEffort.HIGH), resolved.supportedReasoningEfforts)
+    }
+
+    @Test
+    fun whenCachedReasoningModeExistsThenStateRestoredOnInit() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
+
+        testee = createManager()
+
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenCachedReasoningModeIsUnparseableThenStoreClearedAndStateNull() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn("garbage_value")
+
+        testee = createManager()
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenCachedReasoningModeExistsButNoCachedModelThenOrphanClearedFromStore() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
+
+        testee = createManager()
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        assertNull(testee.modelState.value.selectedModelId)
+        verify(dataStore).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenRestoreCachedSelectionThrowsThenEntitlementCollectorStillStarts() = runTest {
+        whenever(dataStore.getSelectedModel()).thenThrow(RuntimeException("disk error"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        entitlementFlow.emit(emptyList())
+
+        verify(modelsService).getModels(any())
+    }
+
+    @Test
+    fun whenCachedReasoningModeIsNullThenStoreNotTouchedAndStateNull() = runTest {
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(null)
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+
+        testee = createManager()
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenFetchAndSelectedModelSupportsPersistedModeThenAvailableModesPopulated() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("none", "low"),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val state = testee.modelState.value
+        assertEquals(2, state.availableReasoningModes.size)
+        assertEquals(ReasoningMode.REASONING, state.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenFetchAndSelectedModelDoesNotSupportPersistedModeThenStaleClearedFromStateAndStore() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.EXTENDED_REASONING.rawValue)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("none", "low"),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenSelectModelClearsStaleReasoningWhenNewModelLacksSupport() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.FAST.rawValue)
+        testee = createManager()
+
+        val newModel = AIChatModel(
+            id = "n",
+            name = "N",
+            displayName = "N",
+            shortName = "N",
+            accessTier = listOf("free"),
+            isAccessible = true,
+            supportedReasoningEfforts = listOf(ReasoningEffort.LOW),
+        )
+
+        testee.selectModel(newModel)
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenSelectModelPreservesPersistedReasoningModeWhenSupportedByNewModel() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.FAST.rawValue)
+        testee = createManager()
+
+        val newModel = AIChatModel(
+            id = "n",
+            name = "N",
+            displayName = "N",
+            shortName = "N",
+            accessTier = listOf("free"),
+            isAccessible = true,
+            supportedReasoningEfforts = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW),
+        )
+
+        testee.selectModel(newModel)
+
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(null)
+    }
+
+    @Test
+    fun whenSelectReasoningModeAndSupportedThenPersistedAndStateUpdated() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("none", "low"),
+                    ),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        testee.selectReasoningMode(ReasoningMode.FAST)
+
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(ReasoningMode.FAST.rawValue)
+    }
+
+    @Test
+    fun whenSelectReasoningModeAndUnsupportedThenIgnored() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("low"),
+                    ),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        testee.selectReasoningMode(ReasoningMode.FAST)
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(ReasoningMode.FAST.rawValue)
+    }
+
+    @Test
+    fun whenGetResolvedReasoningEffortAndPersistedSupportedThenReturnsRaw() = runTest {
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("low"),
+                    ),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("low", testee.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenGetResolvedReasoningEffortAndNoPersistedThenReturnsNull() = runTest {
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(null)
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("low"),
+                    ),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+
+        assertNull(testee.getResolvedReasoningEffort())
+    }
 }
