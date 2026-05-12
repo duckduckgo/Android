@@ -625,7 +625,13 @@ sealed class OnboardingDaxDialogCta(
 
         private var runningFadeIn: AnimatorSet? = null
         private var runningFadeOut: AnimatorSet? = null
-        private var animationsSettled: Boolean = false
+        private var cardContainer: TouchInterceptingLinearLayout? = null
+
+        private var isAnimating: Boolean = false
+            set(value) {
+                field = value
+                cardContainer?.interceptChildTouches = value
+            }
 
         /** Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]). */
         abstract val activeIncludeId: Int
@@ -658,10 +664,11 @@ sealed class OnboardingDaxDialogCta(
             cancelRunningAnimations()
             hideContainer(binding)
             ctaView = null
+            cardContainer = null
         }
 
         private fun cancelRunningAnimations() {
-            animationsSettled = true
+            isAnimating = false
             runningFadeIn?.removeAllListeners()
             runningFadeIn?.cancel()
             runningFadeIn = null
@@ -719,20 +726,18 @@ sealed class OnboardingDaxDialogCta(
                 return
             }
 
-            animationsSettled = false
-
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
-            cardContainer.interceptChildTouches = true
+            this.cardContainer = cardContainer
+            isAnimating = true
 
             val activeInclude = container.findViewById<View>(activeIncludeId)
 
             val notifySettled = {
-                if (!animationsSettled) {
-                    animationsSettled = true
-                    cardContainer.interceptChildTouches = false
+                if (isAnimating) {
+                    isAnimating = false
                     onTypingAnimationSettled(onTypingAnimationFinished)
                 }
             }
@@ -806,7 +811,7 @@ sealed class OnboardingDaxDialogCta(
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(DIALOG_FADE_IN_START_DELAY)
                     .withEndAction {
-                        if (!animationsSettled) {
+                        if (isAnimating) {
                             typeAndFadeIn()
                         }
                     }
@@ -823,7 +828,7 @@ sealed class OnboardingDaxDialogCta(
                     dismissButton = dismissButton,
                     activeInclude = activeInclude,
                     cardContainer = cardContainer,
-                    alreadySettled = animationsSettled,
+                    alreadySettled = !isAnimating,
                     contentFadeInAnimator = runningFadeIn,
                     onSettled = { notifySettled() },
                 )
@@ -932,7 +937,8 @@ sealed class OnboardingDaxDialogCta(
             contentFadeInAnimator: AnimatorSet?,
             onSettled: () -> Unit,
         ) {
-            cardContainer.interceptChildTouches = false
+            this.cardContainer = cardContainer
+            isAnimating = false
             titleView.finishAnimation()
             // If typing hasn't started yet (tap during initial fade-in), set title directly
             // so we don't show an empty title. Restore alpha to 1 for CTAs that do have a title;
