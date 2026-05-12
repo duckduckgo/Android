@@ -88,7 +88,7 @@ sealed interface LinearOnboardingState {
         val currentStepIndex: Int,
     ) : LinearOnboardingState {
         val currentStep: LinearOnboardingStep
-            get() = currentPath.steps[currentStepIndex]
+            get() = currentPlan.steps[currentStepIndex]
     }
     data object Completed : LinearOnboardingState
     data object Skipped : LinearOnboardingState
@@ -110,7 +110,10 @@ enum class LinearOnboardingHost {
     BrowserActivity,
 }
 
-interface LinearOnboardingEvent // only a placeholder/alias for the plan provider events
+// Opaque marker. The orchestrator never inspects events; it just routes them to
+// step.transition(). Concrete event types live with the plan provider in :app, so
+// consumers outside :app don't inherit onboarding's event vocabulary.
+interface LinearOnboardingEvent
 
 sealed interface LinearOnboardingTransition {
     data object Advance : LinearOnboardingTransition                                 // next step in current plan
@@ -123,5 +126,5 @@ sealed interface LinearOnboardingTransition {
 ```
 
 **Design notes**
-- The primary `LinearOnboardingPlan` must be built synchronously at app launch so it can navigate to the right host immediately, which means it has to be privacy-config-independent at build time. To handle steps that depend on privacy config, each step exposes a `suspend LinearOnboardingStep#precondition` that can read fresh config when the step advances. Without this, we'd have to block plan construction until a fresh config instance was available (or a guard timeout elapsed), risking delays in the initial onboarding experience. This still risks latest config not being available at precondition time but matches the existing production behavior.
+- The primary `LinearOnboardingPlan` is built **synchronously at app launch**, so `LaunchViewModel` can route to the right host (e.g. `OnboardingActivity` vs `BrowserActivity`) without waiting on async setup. To make this synchronous, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behaviour: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` or its model are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside of the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
