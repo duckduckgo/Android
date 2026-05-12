@@ -45,13 +45,13 @@ class OnboardingQuickSetupExperimentManagerImpl @Inject constructor(
 ) : OnboardingQuickSetupExperimentManager {
 
     override suspend fun enroll(): QuickSetupExperimentVariant? = withContext(dispatcherProvider.io()) {
-        toggles.quickSetup().enroll()
+        toggles.onboardingQuickSetupExperimentMay26().enroll()
         when {
-            toggles.quickSetup().isEnrolledAndEnabled(QuickSetupCohorts.TREATMENT) -> {
+            toggles.onboardingQuickSetupExperimentMay26().isEnrolledAndEnabled(QuickSetupCohorts.TREATMENT) -> {
                 QuickSetupExperimentVariant.TREATMENT
             }
 
-            toggles.quickSetup().isEnrolledAndEnabled(QuickSetupCohorts.CONTROL) -> {
+            toggles.onboardingQuickSetupExperimentMay26().isEnrolledAndEnabled(QuickSetupCohorts.CONTROL) -> {
                 QuickSetupExperimentVariant.CONTROL
             }
 
