@@ -214,7 +214,6 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -6179,12 +6178,12 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             daxDialogInContext.dialogTextCta.cancelAnimation()
             daxDialogInContext.daxCtaContainer.gone()
-            (lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta)
-                ?.hideOnboardingCta(binding)
-            daxDialogInContextBrandDesign.root
-                .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-                ?.cancelAnimation()
-            daxDialogInContextBrandDesign.root.gone()
+            val cta = lastSeenCtaViewState?.cta as? OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta
+            if (cta != null) {
+                cta.hideOnboardingCta(binding)
+            } else {
+                OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta.hideContainer(binding)
+            }
         }
 
         fun renderHomeCta() {

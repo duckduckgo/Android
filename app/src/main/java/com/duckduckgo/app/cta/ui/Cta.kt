@@ -656,10 +656,7 @@ sealed class OnboardingDaxDialogCta(
 
         override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
             cancelRunningAnimations()
-            binding.includeOnboardingInContextDaxDialogBrandDesign.root
-                .findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
-                ?.cancelAnimation()
-            binding.includeOnboardingInContextDaxDialogBrandDesign.root.gone()
+            hideContainer(binding)
             ctaView = null
         }
 
@@ -672,6 +669,8 @@ sealed class OnboardingDaxDialogCta(
             runningFadeOut?.cancel()
             runningFadeOut = null
             ctaView?.animate()?.cancel()
+            ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+                ?.cancelAnimation()
         }
 
         override fun showOnboardingCta(
@@ -1099,6 +1098,18 @@ sealed class OnboardingDaxDialogCta(
             private const val BACKGROUND_SLIDE_DURATION = 300L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
+
+            /**
+             * Cancels the title typing animation and hides the brand-design root, without
+             * touching the AnimatorSet state owned by a CTA instance. Used by the fragment as
+             * a no-instance fallback and by [hideOnboardingCta] after instance-level cleanup.
+             */
+            internal fun hideContainer(binding: FragmentBrowserTabBinding) {
+                val root = binding.includeOnboardingInContextDaxDialogBrandDesign.root
+                root.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
+                    ?.cancelAnimation()
+                root.gone()
+            }
         }
     }
 
