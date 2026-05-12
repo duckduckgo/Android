@@ -46,7 +46,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     private val hiddenTitle: DaxTextView = mock()
     private val descriptionView: DaxTextView = mock()
     private val dismissButton: ImageView = mock()
-    private val backgroundView: View = mock()
+    private val backgroundView: ImageView = mock()
     private val cardContainer: TouchInterceptingLinearLayout = mock()
     private val activeInclude: View = mock()
     private val primaryInclude: View = mock()
@@ -71,7 +71,7 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(primaryInclude)
         whenever(container.findViewById<View>(R.id.contextualBrandDesignOptionsContent))
             .thenReturn(optionsInclude)
-        whenever(container.findViewById<View>(R.id.contextualBrandDesignBackground))
+        whenever(container.findViewById<ImageView>(R.id.contextualBrandDesignBackground))
             .thenReturn(backgroundView)
 
         testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore)
@@ -251,6 +251,7 @@ class BrandDesignContextualDaxDialogCtaTest {
                 cardContainer = cardContainer,
                 alreadySettled = alreadySettled,
                 contentFadeInAnimator = null,
+                fadeOutAnimator = null,
                 onSettled = { settledInvocations++ },
             )
         }

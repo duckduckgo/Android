@@ -797,12 +797,18 @@ sealed class OnboardingDaxDialogCta(
                     }
                 }
                 bannerFor(container)?.slideOut()?.let { fadeOutAnimators += it }
+                if (container.alpha < 1f) {
+                    fadeOutAnimators += ObjectAnimator.ofFloat(container, View.ALPHA, 1f)
+                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                }
                 runningFadeOut = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             applyContent(container, isContentTransition = true)
-                            typeAndFadeIn()
+                            if (isAnimating) {
+                                typeAndFadeIn()
+                            }
                         }
                     })
                     start()
@@ -831,6 +837,7 @@ sealed class OnboardingDaxDialogCta(
                     cardContainer = cardContainer,
                     alreadySettled = !isAnimating,
                     contentFadeInAnimator = runningFadeIn,
+                    fadeOutAnimator = runningFadeOut,
                     onSettled = { notifySettled() },
                 )
             }
@@ -877,6 +884,7 @@ sealed class OnboardingDaxDialogCta(
                 cardContainer = cardContainer,
                 alreadySettled = false,
                 contentFadeInAnimator = null,
+                fadeOutAnimator = null,
                 onSettled = { onTypingAnimationSettled(onTypingAnimationFinished) },
             )
         }
@@ -930,10 +938,12 @@ sealed class OnboardingDaxDialogCta(
             cardContainer: TouchInterceptingLinearLayout,
             alreadySettled: Boolean,
             contentFadeInAnimator: AnimatorSet?,
+            fadeOutAnimator: AnimatorSet?,
             onSettled: () -> Unit,
         ) {
             this.cardContainer = cardContainer
             isAnimating = false
+            fadeOutAnimator?.let { if (it.isRunning) it.cancel() }
             titleView.finishAnimation()
             // If typing hasn't started yet (tap during initial fade-in), set title directly
             // so we don't show an empty title. Restore alpha to 1 for CTAs that do have a title;
@@ -948,6 +958,8 @@ sealed class OnboardingDaxDialogCta(
             descriptionView.alpha = 1f
             dismissButton.alpha = 1f
             activeInclude.alpha = 1f
+            container.alpha = 1f
+            bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
             if (!alreadySettled) {
                 onSettled()
