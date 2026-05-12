@@ -275,11 +275,11 @@ class CtaViewModel @Inject constructor(
             when {
                 canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_skippedonboarding_android",
+                    origin = "funnel_modal_android__skippedonboardingupsell",
                 )
                 canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_newusermodal_android",
+                    origin = "funnel_modal_android__subscriptionnudge",
                 )
                 else -> null
             }

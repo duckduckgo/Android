@@ -3398,21 +3398,21 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSubscriptionPromoModalCtaThenLaunchSubscriptionWithReinstallModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_skippedonboarding_android")
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__skippedonboardingupsell")
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
-            assertEquals("funnel_skippedonboarding_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_modal_android__skippedonboardingupsell", uri.getQueryParameter("origin"))
         }
     }
 
     @Test
     fun whenUserClickedPromoModalSubscriptionPromoCtaThenLaunchSubscriptionWithPromoModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_newusermodal_android")
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge")
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
-            assertEquals("funnel_newusermodal_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_modal_android__subscriptionnudge", uri.getQueryParameter("origin"))
         }
     }
 
