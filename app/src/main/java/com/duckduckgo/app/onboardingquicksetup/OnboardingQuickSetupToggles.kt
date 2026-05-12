@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboardingbranddesignupdate
+package com.duckduckgo.app.onboardingquicksetup
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
+import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 /**
- * Feature toggles for the onboarding brand design updates.
+ * Feature toggles for the reinstaller quick-setup onboarding experiment.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "onboardingBrandDesignUpdate",
+    featureName = "onboardingQuickSetup",
 )
-interface OnboardingBrandDesignUpdateToggles {
+interface OnboardingQuickSetupToggles {
 
     /**
-     * Main toggle for the onboarding brand design update feature.
+     * Main toggle for the onboarding quick-setup feature.
      * Default value: false (disabled).
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     /**
-     * Toggle for the brand design update variant.
-     * Default value: false (disabled).
+     * A/B test gating the re-installer quick-setup screen. Only users in the [QuickSetupCohorts.TREATMENT]
+     * cohort should be shown the quick-setup screen during onboarding.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun brandDesignUpdate(): Toggle
+    @Experiment
+    fun quickSetup(): Toggle
+
+    enum class QuickSetupCohorts(override val cohortName: String) : CohortName {
+        CONTROL("control"),
+        TREATMENT("treatment"),
+    }
 }
