@@ -73,11 +73,11 @@
     <string name="duckChatOptionsMenuWebSearchSubtitle">Source answers from the web</string>
 
     <!-- Chat history -->
-    <string name="duck_ai_chat_history_title">Duck.ai Chats</string>
+    <string name="duck_ai_chat_history_title">Chats</string>
     <string name="duck_ai_chat_history_section_pinned">Pinned</string>
     <string name="duck_ai_chat_history_section_recent">Recent</string>
     <string name="duck_ai_chat_history_untitled">Untitled chat</string>
-    <string name="duck_ai_chat_history_empty_title">No Duck.ai Chats yet</string>
+    <string name="duck_ai_chat_history_empty_title">No Chats yet</string>
     <string name="duck_ai_chat_history_empty_cta_open">Open Duck.ai</string>
     <string name="duck_ai_chat_history_coming_soon">Coming soon</string>
     <string name="duck_ai_chat_history_more_options">More options</string>
@@ -86,4 +86,5 @@
     <string name="duck_ai_chat_history_action_unpin">Unpin</string>
     <string name="duck_ai_chat_history_action_rename">Rename</string>
     <string name="duck_ai_chat_history_action_download">Download</string>
+    <string name="duck_ai_chat_history_action_delete">Delete</string>
 </resources>

@@ -228,7 +228,7 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_chats_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuDuckChatHistory" />
+                app:primaryText="@string/browserMenuChats" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/bookmarksMenuItem"

@@ -40,4 +40,10 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/duck_ai_chat_history_action_download" />
 
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/duck_ai_chat_history_action_delete" />
+
 </LinearLayout>

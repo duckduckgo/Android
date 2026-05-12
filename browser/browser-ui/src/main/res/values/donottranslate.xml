@@ -28,5 +28,5 @@
     <string name="hatchMenuBurnTab">Delete Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab closed</string>
     <string name="newTabReturnHatchUndo">Undo</string>
-
+    <string name="browserMenuChats">Chats</string>
 </resources>

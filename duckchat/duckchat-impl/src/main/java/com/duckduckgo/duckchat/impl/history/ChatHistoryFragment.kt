@@ -141,6 +141,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.rename)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
+        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { showComingSoonSnackbar() }
         popup.show(binding.root, anchor)
     }
 
