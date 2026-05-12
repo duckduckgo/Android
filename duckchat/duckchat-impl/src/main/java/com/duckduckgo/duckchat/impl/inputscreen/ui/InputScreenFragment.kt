@@ -57,6 +57,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
@@ -105,6 +107,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
@@ -140,6 +143,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
     lateinit var browserMenuHighlight: BrowserMenuHighlight
@@ -599,6 +605,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         if (useTopBar) {
                             restoreLogoTopMargin(visible)
                         }
+                    }
+                }
+
+                override fun onBurnTabPressed() {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(binding.inputScreenHatch.tabId))
+                        dialog.show(parentFragmentManager)
                     }
                 }
             },

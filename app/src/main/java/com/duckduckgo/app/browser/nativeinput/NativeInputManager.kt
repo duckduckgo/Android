@@ -193,10 +193,20 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            animator.animateExit(card, widgetView, omnibarCard, isBottom) {
-                isExiting = false
-                onHide()
-            }
+            layoutCoordinator.setWidgetAnimating(true)
+            animator.animateExit(
+                widgetCard = card,
+                widgetView = widgetView,
+                omnibarCard = omnibarCard,
+                isBottom = isBottom,
+                onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
+                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+                onComplete = {
+                    layoutCoordinator.setWidgetAnimating(false)
+                    isExiting = false
+                    onHide()
+                },
+            )
         } else {
             isExiting = false
             onHide()
@@ -587,11 +597,24 @@ class RealNativeInputManager @Inject constructor(
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
-        animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) { onEnterComplete(widgetView) }
+        layoutCoordinator.setWidgetAnimating(true)
+        animator.animateEnter(
+            widgetCard = widgetCard,
+            omnibarCard = omnibarCard,
+            widgetView = widgetView,
+            margins = margins,
+            onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+            onComplete = {
+                layoutCoordinator.setWidgetAnimating(false)
+                onEnterComplete(widgetView)
+            },
+        )
         return true
     }
 
     private fun onEnterComplete(widgetView: View) {
+        layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
         widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
