@@ -79,7 +79,7 @@ class TdsClient(
     }
 
     private fun findTrackerByLabelWalk(host: String): TdsTracker? {
-        val eTldPlusOne = host.toTldPlusOne()
+        val eTldPlusOne = host.toTldPlusOne() ?: return null
         var candidate: String = host
         while (true) {
             trackerByDomain[candidate]?.let { return it }

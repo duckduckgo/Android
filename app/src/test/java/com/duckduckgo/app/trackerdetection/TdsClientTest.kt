@@ -491,6 +491,18 @@ class TdsClientTest {
         assertEquals(false, result.isATracker)
     }
 
+    @Test
+    fun whenV3EnabledAndHostHasNoETldPlusOneThenResultIsNoMatch() {
+        // Hosts without a resolvable eTLD+1 (single-label, IPs, public-suffix-only) must never
+        // match — even if a tracker entry exists at the exact host key.
+        val tracker = TdsTracker(Domain("localhost"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://localhost/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
     companion object {
         private const val OWNER = "A Network Owner"
         private val DOCUMENT_URL = "http://example.com/index.htm".toUri()
