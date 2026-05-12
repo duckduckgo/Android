@@ -38,7 +38,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
-import androidx.core.os.postDelayed
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -134,6 +134,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -742,7 +743,28 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             if (duckAiFeatureState.showFullScreenMode.value) {
                 val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
-                if (swipingTabsFeature.isEnabled) {
+                val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
+                val existingDuckAiTabId = if (duckChatSessionActive) {
+                    viewModel.tabs.value.orEmpty().firstOrNull {
+                        it.url?.toUri()?.let(duckChat::isDuckChatUrl) == true
+                    }?.tabId
+                } else {
+                    null
+                }
+                if (existingDuckAiTabId != null) {
+                    lifecycleScope.launch {
+                        if (swipingTabsFeature.isEnabled) {
+                            tabManager.switchToTab(existingDuckAiTabId)
+                        } else {
+                            viewModel.onTabSelected(existingDuckAiTabId)
+                        }
+                        // Wait until the pager has actually swapped to the target tab before
+                        // submitting the chat URL — otherwise `currentTab` would still point at
+                        // the previously-selected fragment and the navigation would land there.
+                        viewModel.selectedTabFlow.first { it == existingDuckAiTabId }
+                        currentTab?.submitQuery(url)
+                    }
+                } else if (swipingTabsFeature.isEnabled) {
                     launchNewTab(query = url, skipHome = true)
                 } else {
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
