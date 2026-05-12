@@ -97,6 +97,7 @@ import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
+import com.duckduckgo.app.browser.commands.Command.HideDaxBubbleCtaOnSubmit
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideKeyboardForChat
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
@@ -678,6 +679,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
+    private var nativeInputFieldEnabled: Boolean = false
 
     @Volatile
     var isSerpLogoInMenuEnabled: Boolean = true
@@ -781,6 +783,10 @@ class BrowserTabViewModel @Inject constructor(
 
         observeSyncStatusChangesForDuckChat()
         observeSubscriptionChangesForDuckChat()
+
+        duckChat.observeNativeInputFieldUserSettingEnabled()
+            .onEach { nativeInputFieldEnabled = it }
+            .launchIn(viewModelScope)
 
         tabRepository.childClosedTabs
             .onEach { closedTab ->
@@ -1382,10 +1388,18 @@ class BrowserTabViewModel @Inject constructor(
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
                 }
+                dismissDaxBubbleCtaOnSubmit(cta as DaxBubbleCta)
             }
 
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is DaxVisitSiteOptionsBrandDesignUpdateBubbleCta,
+            -> {
+                if (!ctaViewModel.isSuggestedSiteOption(query)) {
+                    pixel.fire(ONBOARDING_VISIT_SITE_CUSTOM, type = Unique())
+                }
+                dismissDaxBubbleCtaOnSubmit(cta as DaxBubbleCta)
+            }
+
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             is DaxSiteSuggestionsBrandDesignUpdateContextualCta,
             -> {
@@ -5006,6 +5020,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
         onUserDismissedCta(cta)
         command.value = HideOnboardingDaxDialog(cta)
+    }
+
+    private fun dismissDaxBubbleCtaOnSubmit(cta: DaxBubbleCta) {
+        if (!nativeInputFieldEnabled) return
+        ctaViewState.value = currentCtaViewState().copy(cta = null)
+        command.value = HideDaxBubbleCtaOnSubmit(cta)
     }
 
     fun onFireMenuSelected(viewMode: Omnibar.ViewMode) {

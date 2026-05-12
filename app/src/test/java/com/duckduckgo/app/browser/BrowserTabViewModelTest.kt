@@ -74,6 +74,7 @@ import com.duckduckgo.app.browser.commands.Command.CloseCustomTab
 import com.duckduckgo.app.browser.commands.Command.EnqueueCookiesAnimation
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
+import com.duckduckgo.app.browser.commands.Command.HideDaxBubbleCtaOnSubmit
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
@@ -605,8 +606,10 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val voiceSessionEndTriggerFlow = MutableSharedFlow<String>(extraBufferCapacity = 8)
+    private val nativeInputFieldUserSettingEnabledFlow = MutableStateFlow(false)
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
+        on { observeNativeInputFieldUserSettingEnabled() } doReturn nativeInputFieldUserSettingEnabledFlow
     }
     private val mockSyncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
@@ -7030,6 +7033,34 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         verify(mockPixel).fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
+    }
+
+    @Test
+    fun givenIntroOptionsBubbleShownAndNativeInputEnabledWhenUserSubmittedQueryThenBubbleIsDismissed() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+        nativeInputFieldUserSettingEnabledFlow.value = true
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandIssued<HideDaxBubbleCtaOnSubmit> {
+            assertEquals(cta, this.daxBubbleCta)
+        }
+        assertNull(testee.ctaViewState.value?.cta)
+    }
+
+    @Test
+    fun givenIntroOptionsBubbleShownAndNativeInputDisabledWhenUserSubmittedQueryThenBubbleIsNotDismissed() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        val cta = DaxTryASearchBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+        nativeInputFieldUserSettingEnabledFlow.value = false
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandNotIssued<HideDaxBubbleCtaOnSubmit>()
+        assertEquals(cta, testee.ctaViewState.value?.cta)
     }
 
     @Test
