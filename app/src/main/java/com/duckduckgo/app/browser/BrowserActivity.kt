@@ -134,7 +134,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -761,7 +761,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         // Wait until the pager has actually swapped to the target tab before
                         // submitting the chat URL — otherwise `currentTab` would still point at
                         // the previously-selected fragment and the navigation would land there.
-                        viewModel.selectedTabFlow.first { it == existingDuckAiTabId }
+                        viewModel.selectedTabFlow.firstOrNull { it == existingDuckAiTabId }
                         currentTab?.submitQuery(url)
                     }
                 } else if (swipingTabsFeature.isEnabled) {
