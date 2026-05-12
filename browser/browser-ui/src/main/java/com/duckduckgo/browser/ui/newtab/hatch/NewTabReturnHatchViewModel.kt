@@ -28,11 +28,15 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -63,33 +67,44 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
     sealed class Command {
         data object LaunchTabSwitcher : Command()
-        data object ShowTabClosedSnackbar : Command()
+        data class ShowTabClosedSnackbar(val tabId: String) : Command()
     }
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
-    val viewState = combine(
-        tabRepository.flowLastAccessedTab,
-        tabRepository.flowTabs,
-        ntpAfterIdleManager.isAfterIdleReturn,
-        duckChat.observeNativeInputFieldUserSettingEnabled(),
-    ) { lastTab, tabs, afterIdle, nativeInputEnabled ->
-        if (lastTab != null && afterIdle) {
-            val url = lastTab.url.orEmpty()
-            ViewState(
-                tabTitle = lastTab.title.orEmpty(),
-                url = url,
-                tabId = lastTab.tabId,
-                currentTabId = lastTab.tabId,
-                shouldShow = true,
-                isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
-                isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
-                tabs = tabs.size,
-                showTabsButton = nativeInputEnabled,
-            )
+    private val pendingClose = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val viewState = pendingClose.flatMapLatest { isClosed ->
+        if (isClosed) {
+            // Once the user closes the hatch, freeze it: stop observing upstream flows so the
+            // post-deletion re-emission from flowLastAccessedTab doesn't trigger another render.
+            flowOf(ViewState(shouldShow = false))
         } else {
-            ViewState(shouldShow = false)
+            combine(
+                tabRepository.flowLastAccessedTab,
+                tabRepository.flowTabs,
+                ntpAfterIdleManager.isAfterIdleReturn,
+                duckChat.observeNativeInputFieldUserSettingEnabled(),
+            ) { lastTab, tabs, afterIdle, nativeInputEnabled ->
+                if (lastTab != null && afterIdle) {
+                    val url = lastTab.url.orEmpty()
+                    ViewState(
+                        tabTitle = lastTab.title.orEmpty(),
+                        url = url,
+                        tabId = lastTab.tabId,
+                        currentTabId = lastTab.tabId,
+                        shouldShow = true,
+                        isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
+                        isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
+                        tabs = tabs.size,
+                        showTabsButton = nativeInputEnabled,
+                    )
+                } else {
+                    ViewState(shouldShow = false)
+                }
+            }
         }
     }
         .flowOn(dispatchers.io())
@@ -103,10 +118,21 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
     fun closeTab() {
         val tabId = viewState.value.currentTabId
+        if (tabId.isEmpty()) return
+        pendingClose.value = true
+        commandChannel.trySend(Command.ShowTabClosedSnackbar(tabId))
+    }
+
+    fun onUndoCloseTab(tabId: String) {
+        pendingClose.value = false
+    }
+
+    fun onTabClosedSnackbarDismissed(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             tabRepository.deleteTabs(listOf(tabId))
-            commandChannel.trySend(Command.ShowTabClosedSnackbar)
         }
+        // pendingClose intentionally not reset: once the user commits to closing the hatch's tab,
+        // the hatch should not reappear with a different last-accessed tab.
     }
 
     fun onTabManagerPressed() {

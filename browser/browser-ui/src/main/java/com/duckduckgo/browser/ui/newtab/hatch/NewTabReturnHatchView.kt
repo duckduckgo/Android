@@ -104,13 +104,20 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         when (command) {
             NewTabReturnHatchViewModel.Command.LaunchTabSwitcher ->
                 globalActivityStarter.start(context, TabSwitcherScreenNoParams)
-            NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
-                showTabClosedSnackbar()
+            is NewTabReturnHatchViewModel.Command.ShowTabClosedSnackbar ->
+                showTabClosedSnackbar(command.tabId)
         }
     }
 
-    private fun showTabClosedSnackbar() {
-        Snackbar.make(rootView, R.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG).show()
+    private fun showTabClosedSnackbar(tabId: String) {
+        Snackbar.make(rootView, R.string.newTabReturnHatchTabClosed, Snackbar.LENGTH_LONG)
+            .setAction(R.string.newTabReturnHatchUndo) { viewModel.onUndoCloseTab(tabId) }
+            .addCallback(object : Snackbar.Callback() {
+                override fun onDismissed(snackbar: Snackbar, event: Int) {
+                    if (event != DISMISS_EVENT_ACTION) viewModel.onTabClosedSnackbarDismissed(tabId)
+                }
+            })
+            .show()
     }
 
     override fun onDetachedFromWindow() {
