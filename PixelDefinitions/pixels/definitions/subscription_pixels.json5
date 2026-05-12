@@ -117,7 +117,7 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["atb", "appVersion", "freeTrial", "osVersion"]
+        "parameters": ["appVersion", "freeTrial", "osVersion"]
     },
     "m_subscribe": {
         "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
