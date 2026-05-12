@@ -190,13 +190,28 @@
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <FrameLayout
-                        android:id="@id/attachButtonContainer"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
-                        android:visibility="gone"
-                        tools:visibility="visible" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@id/attachButtonContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@id/optionsButtonContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
