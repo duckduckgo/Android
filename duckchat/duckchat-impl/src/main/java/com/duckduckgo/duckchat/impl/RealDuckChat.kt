@@ -41,7 +41,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
-import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
@@ -375,7 +374,6 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
-    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -821,8 +819,7 @@ class RealDuckChat @Inject constructor(
     override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
         isEnabled() &&
             duckChatFeature.useNativeStorageChatData().isEnabled() &&
-            duckAiChatHistoryFeature.self().isEnabled() &&
-            duckAiChatHistoryFeature.historyScreen().isEnabled()
+            duckChatFeature.historyScreen().isEnabled()
     }
 
     override fun openWithChatId(chatId: String) {

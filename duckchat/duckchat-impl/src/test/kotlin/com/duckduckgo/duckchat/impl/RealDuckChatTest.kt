@@ -35,7 +35,6 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
-import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialog
@@ -108,7 +107,6 @@ class RealDuckChatTest {
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVoiceSessionStateManager: VoiceSessionStateManager = mock()
-    private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
 
     private lateinit var testee: RealDuckChat
 
@@ -151,7 +149,6 @@ class RealDuckChatTest {
                 mockDuckAiHostProvider,
                 mockAppBuildConfig,
                 mockVoiceSessionStateManager,
-                duckAiChatHistoryFeature,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1758,17 +1755,9 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenHistorySelfOffThenIsChatHistoryAvailableFalse() = runTest {
-        enableChatHistoryFlags()
-        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = false))
-
-        assertFalse(testee.isChatHistoryAvailable())
-    }
-
-    @Test
     fun whenHistoryScreenOffThenIsChatHistoryAvailableFalse() = runTest {
         enableChatHistoryFlags()
-        duckAiChatHistoryFeature.historyScreen().setRawStoredState(State(enable = false))
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
 
         assertFalse(testee.isChatHistoryAvailable())
     }
@@ -1778,8 +1767,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = false))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
-        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = false))
-        duckAiChatHistoryFeature.historyScreen().setRawStoredState(State(enable = false))
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
 
@@ -1802,8 +1790,7 @@ class RealDuckChatTest {
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))
-        duckAiChatHistoryFeature.self().setRawStoredState(State(enable = true))
-        duckAiChatHistoryFeature.historyScreen().setRawStoredState(State(enable = true))
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
