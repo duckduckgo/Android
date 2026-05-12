@@ -28,7 +28,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupToggles
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -88,9 +88,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
-    private val mockOnboardingQuickSetupToggles: OnboardingQuickSetupToggles = FakeFeatureToggleFactory.create(
-        OnboardingQuickSetupToggles::class.java,
-    )
+    private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -106,7 +104,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
             mockDuckAiOnboardingExperimentManager,
-            mockOnboardingQuickSetupToggles,
+            mockOnboardingQuickSetupExperimentManager,
         )
     }
 
@@ -873,6 +871,104 @@ class BrandDesignUpdatePageViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitSearchQuery)
             assertEquals("search query", (command as Command.FinishAndSubmitSearchQuery).query)
+        }
+    }
+
+    // endregion
+
+    // region Quick setup experiment - loadDaxDialog
+
+    @Test
+    fun whenLoadDaxDialogAndReinstallAndQuickSetupEnabledThenShowQuickSetupIsTrue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertTrue(state.isReinstallUser)
+            assertTrue(state.showQuickSetup)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoadDaxDialogAndReinstallAndQuickSetupDisabledThenShowQuickSetupIsFalse() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = false))
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertTrue(state.isReinstallUser)
+            assertFalse(state.showQuickSetup)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoadDaxDialogAndNotReinstallButQuickSetupEnabledThenShowQuickSetupIsFalse() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertFalse(state.isReinstallUser)
+            assertFalse(state.showQuickSetup)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region Quick setup experiment - onSecondaryCtaClicked
+
+    @Test
+    fun whenSecondaryCtaFromReinstallUserAndQuickSetupEnabledThenShowQuickSetupDialog() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            awaitItem() // INITIAL_REINSTALL_USER
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertTrue(state.isReinstallUser)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSecondaryCtaFromReinstallUserAndQuickSetupEnabledThenDoNotFireSkipOnboardingPixel() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        verify(mockPixel, never()).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+    }
+
+    // endregion
+
+    // region Quick setup experiment - onPrimaryCtaClicked
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupThenSendFinishCommand() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        mockOnboardingQuickSetupToggles.quickSetup().setRawStoredState(Toggle.State(enable = true))
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
+        testee.commands.test {
+            testee.onPrimaryCtaClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.Finish)
         }
     }
 

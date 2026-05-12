@@ -39,7 +39,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REI
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
-import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupToggles
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -94,7 +95,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
-    private val onboardingQuickSetupToggles: OnboardingQuickSetupToggles,
+    private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -211,10 +212,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isInQuickSetupTreatment(): Boolean = withContext(dispatchers.io()) {
-        // onboardingQuickSetupToggles.quickSetup().isEnrolledAndEnabled(QuickSetupCohorts.TREATMENT)
-        onboardingQuickSetupToggles.quickSetup().isEnabled()
-    }
+    private suspend fun isInQuickSetupTreatment(): Boolean =
+        onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT
 
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
