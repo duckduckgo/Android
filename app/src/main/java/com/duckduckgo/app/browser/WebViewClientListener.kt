@@ -132,6 +132,7 @@ interface WebViewClientListener {
     fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,
+        errorCode: String,
     )
 
     fun onReceivedMaliciousSiteWarning(
@@ -156,6 +157,8 @@ interface WebViewClientListener {
         statusCode: Int,
         url: String,
     )
+
+    fun onSiteVisited(url: String, title: String?)
 
     fun getCurrentTabId(): String
 
@@ -183,4 +186,7 @@ interface WebViewClientListener {
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     )
+
+    /** Called when the URL changes via history.replaceState / history.pushState (no page reload). */
+    fun onHistoryUrlChanged(url: String) {}
 }

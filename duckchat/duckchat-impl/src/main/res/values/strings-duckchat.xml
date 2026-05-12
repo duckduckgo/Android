@@ -47,6 +47,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
     <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="'Toggle' refers to the UI tab switcher component (Search/Duck.ai), not the verb 'to toggle'.">New tab toggle position</string>
+    <string name="duckAiDefaultTogglePositionSearch">Search</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Last Used</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Voice Search</string>
 
@@ -92,4 +98,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Enable in AI Features Settings</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Manage in AI Features Settings</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configure Duck.ai in AI Features settings.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Summarize This Page</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Page Content</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatically send page content to Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Attach Page Content</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Clear chat</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Clear data</string>
+    <string name="duckChatBrowserMenuContentDescription">More options</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Voice Chat</string>
 </resources>

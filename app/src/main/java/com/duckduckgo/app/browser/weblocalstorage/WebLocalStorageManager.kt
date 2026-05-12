@@ -17,12 +17,9 @@
 package com.duckduckgo.app.browser.weblocalstorage
 
 import android.content.Context
-import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -41,21 +38,10 @@ import javax.inject.Inject
 
 interface WebLocalStorageManager {
     /**
-     * Clears web local storage based on predefined settings and fireproofed websites (legacy).
-     *
-     * Uses settingsDataStore.clearDuckAiData to determine if DuckAi data should be cleared.
+     * Clears non-allowed-domain keys from web local storage (LevelDB).
+     * Allowed domains (configured remotely + fireproofed) are preserved.
      */
     suspend fun clearWebLocalStorage()
-
-    /**
-     * Clears web local storage based on the specified options.
-     * @param shouldClearBrowserData If true, clears browser web data (cache, history, form data, authentication, cookies, directories).
-     * @param shouldClearDuckAiData If true, clears chat-related data from WebStorage.
-     */
-    suspend fun clearWebLocalStorage(
-        shouldClearBrowserData: Boolean,
-        shouldClearDuckAiData: Boolean,
-    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -65,37 +51,19 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val webLocalStorageSettingsJsonParser: WebLocalStorageSettingsJsonParser,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val settingsDataStore: SettingsDataStore,
-    private val duckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener>,
 ) : WebLocalStorageManager {
 
-    private var domains = emptyList<String>()
-    private var keysToDelete = emptyList<String>()
-    private var matchingRegex = emptyList<String>()
-
-    override suspend fun clearWebLocalStorage() = withContext(dispatcherProvider.io()) {
-        val shouldClearBrowserData = true // As per legacy behavior, we always clear browser data
-        val shouldClearDuckAiData = settingsDataStore.clearDuckAiData
-        clearWebLocalStorage(shouldClearBrowserData, shouldClearDuckAiData)
-    }
-
-    override suspend fun clearWebLocalStorage(
-        shouldClearBrowserData: Boolean,
-        shouldClearDuckAiData: Boolean,
-    ) {
+    override suspend fun clearWebLocalStorage() {
         withContext(dispatcherProvider.io()) {
             val settings = androidBrowserConfigFeature.webLocalStorage().getSettings()
             val webLocalStorageSettings = webLocalStorageSettingsJsonParser.parseJson(settings)
 
             val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
 
-            domains = webLocalStorageSettings.domains.list + fireproofedDomains
-            keysToDelete = webLocalStorageSettings.keysToDelete.list
-            matchingRegex = webLocalStorageSettings.matchingRegex.list
-            var duckAiDataDeleted = false
+            val domains = webLocalStorageSettings.domains.list + fireproofedDomains
+            val matchingRegex = webLocalStorageSettings.matchingRegex.list
 
             logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-            logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
             logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
             val db = databaseProvider.get()
@@ -106,31 +74,24 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     val entry = iterator.next()
                     val key = String(entry.key, StandardCharsets.UTF_8)
 
-                    val domainForMatchingAllowedKey = getDomainForMatchingAllowedKey(key)
-                    if (domainForMatchingAllowedKey == null && shouldClearBrowserData) {
+                    val domainForMatchingAllowedKey =
+                        getDomainForMatchingAllowedKey(key, domains, matchingRegex)
+                    if (domainForMatchingAllowedKey == null) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
-                        if (keysToDelete.any { key.endsWith(it) }) {
-                            db.delete(entry.key)
-                            duckAiDataDeleted = true
-                            logcat { "WebLocalStorageManager: Deleted key: $key" }
-                        }
                     }
                 }
             }
 
-            logcat { "WebLocalStorageManager: finished deleting local storage data. duck AI chats cleared:$duckAiDataDeleted" }
-            if (duckAiDataDeleted) {
-                // Notify all listeners that Duck AI chats have been deleted
-                duckAiChatDeletionListeners.getPlugins().forEach { listener ->
-                    listener.onDuckAiChatsDeleted()
-                }
-            }
+            logcat { "WebLocalStorageManager: finished deleting local storage data" }
         }
     }
 
-    private fun getDomainForMatchingAllowedKey(key: String): String? {
+    private fun getDomainForMatchingAllowedKey(
+        key: String,
+        domains: List<String>,
+        matchingRegex: List<String>,
+    ): String? {
         for (domain in domains) {
             val escapedDomain = Regex.escape(domain)
             val regexPatterns = matchingRegex.map { pattern ->
@@ -141,10 +102,6 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
             }
         }
         return null
-    }
-
-    companion object {
-        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
     }
 }
 

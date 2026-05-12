@@ -16,9 +16,11 @@
 
 package com.duckduckgo.navigation.impl
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -26,6 +28,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
 import logcat.logcat
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -35,24 +39,32 @@ import javax.inject.Inject
 class GlobalActivityStarterImpl @Inject constructor(
     private val activityMappers: DaggerSet<GlobalActivityStarter.ParamToActivityMapper>,
 ) : GlobalActivityStarter {
+
     override fun start(context: Context, params: GlobalActivityStarter.ActivityParams, options: Bundle?) {
-        startIntent(context, params)?.let {
-            logcat { "Activity $it for params $params found" }
-            context.startActivity(it, options)
-        } ?: throw IllegalArgumentException("Activity for params $params not found")
+        val intent = startIntent(context, params)
+        if (intent == null) {
+            logcat(ERROR) { "No activity found for params $params" }
+            throw IllegalArgumentException("Activity for params $params not found")
+        }
+        context.startActivity(intent, options)
     }
 
     override fun startIntent(context: Context, params: GlobalActivityStarter.ActivityParams): Intent? {
-        val activityClass = activityMappers.firstNotNullOfOrNull {
-            it.map(params)
+        return buildIntent(context, params)?.apply {
+            if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+    }
 
-        return activityClass?.let {
-            logcat { "Activity $it for params $params found" }
+    private fun buildIntent(context: Context, params: GlobalActivityStarter.ActivityParams): Intent? {
+        val matchingClasses = activityMappers.mapNotNull { it.map(params) }
+        if (matchingClasses.size > 1) {
+            logcat(WARN) { "Multiple mappers found for ${params::class.java.simpleName}: $matchingClasses. First match will be used." }
+        }
+        val activityClass = matchingClasses.firstOrNull() ?: return null
 
-            Intent(context, it).apply {
-                putExtra(ACTIVITY_SERIALIZABLE_PARAMETERS_ARG, params)
-            }
+        logcat { "Activity $activityClass for params $params found" }
+        return Intent(context, activityClass).apply {
+            putExtra(ACTIVITY_SERIALIZABLE_PARAMETERS_ARG, params)
         }
     }
 
@@ -61,23 +73,46 @@ class GlobalActivityStarterImpl @Inject constructor(
         deeplinkActivityParams: DeeplinkActivityParams,
         options: Bundle?,
     ) {
-        startIntent(context, deeplinkActivityParams)?.let {
-            logcat { "Activity $it for params $deeplinkActivityParams found" }
-            context.startActivity(it, options)
-        } ?: throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")
+        val intent = startIntent(context, deeplinkActivityParams)
+        if (intent == null) {
+            logcat(ERROR) { "No activity found for params $deeplinkActivityParams" }
+            throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")
+        }
+        context.startActivity(intent, options)
     }
 
     override fun startIntent(
         context: Context,
         deeplinkActivityParams: DeeplinkActivityParams,
     ): Intent? {
-        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull {
-            it.map(deeplinkActivityParams)
+        return buildIntent(context, deeplinkActivityParams)?.apply {
+            if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
+    }
 
-        return activityParams?.let {
-            startIntent(context, it)
+    private fun buildIntent(context: Context, deeplinkActivityParams: DeeplinkActivityParams): Intent? {
+        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull { it.map(deeplinkActivityParams) }
+        return activityParams?.let { buildIntent(context, it) }
+    }
+
+    // context is used only to construct the Intent — FLAG_ACTIVITY_NEW_TASK is never added,
+    // regardless of context type. Callers should pass the Activity that owns the launcher.
+    override fun startForResult(context: Context, params: ActivityParams, launcher: ActivityResultLauncher<Intent>) {
+        val intent = buildIntent(context, params)
+        if (intent == null) {
+            logcat(ERROR) { "No activity found for params $params" }
+            throw IllegalArgumentException("Activity for params $params not found")
         }
+        launcher.launch(intent)
+    }
+
+    override fun startForResult(context: Context, deeplinkActivityParams: DeeplinkActivityParams, launcher: ActivityResultLauncher<Intent>) {
+        val intent = buildIntent(context, deeplinkActivityParams)
+        if (intent == null) {
+            logcat(ERROR) { "No activity found for params $deeplinkActivityParams" }
+            throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")
+        }
+        launcher.launch(intent)
     }
 }
 

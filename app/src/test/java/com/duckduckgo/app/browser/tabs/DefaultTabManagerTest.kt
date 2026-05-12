@@ -47,7 +47,7 @@ class DefaultTabManagerTest {
     }
 
     @Test
-    fun whenOnSelectedTabChangedThenSelectedTabIdIsUpdated() {
+    fun whenOnSelectedTabChangedThenSelectedTabIdIsUpdated() = runTest {
         val tabId = "tabId"
         testee.onSelectedTabChanged(tabId)
 

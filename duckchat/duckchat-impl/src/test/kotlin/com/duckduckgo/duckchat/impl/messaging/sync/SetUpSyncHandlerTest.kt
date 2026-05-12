@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -49,6 +49,7 @@ class SetUpSyncHandlerTest {
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val mockContext: Context = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockJsMessaging: JsMessaging = mock()
 
     val callbackDataCaptor = argumentCaptor<JsCallbackData>()
@@ -57,10 +58,12 @@ class SetUpSyncHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         handler = SetUpSyncHandler(
             globalActivityStarter = mockGlobalActivityStarter,
             context = mockContext,
             deviceSyncState = mockDeviceSyncState,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 
@@ -69,7 +72,7 @@ class SetUpSyncHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(HOST_DUCK_AI, domains[1])
+        assertEquals("duck.ai", domains[1])
     }
 
     @Test
@@ -108,7 +111,7 @@ class SetUpSyncHandlerTest {
     }
 
     @Test
-    fun `when sync setup is disabled then error response is sent`() {
+    fun `when sendToSetupSync and sync feature is disabled then error response is sent`() {
         whenever(mockDeviceSyncState.isFeatureEnabled()).thenReturn(false)
         val jsMessage = createJsMessage("sendToSetupSync", "test-id")
 
@@ -119,6 +122,23 @@ class SetUpSyncHandlerTest {
         assertEquals("test-id", response.id)
         assertEquals("aiChat", response.featureName)
         assertEquals("sendToSetupSync", response.method)
+        verifyErrorResponse(response.params, "setup unavailable")
+        verifyNoInteractions(mockGlobalActivityStarter)
+        verifyNoInteractions(mockContext)
+    }
+
+    @Test
+    fun `when sendToSyncSettings and sync feature is disabled then error response is sent`() {
+        whenever(mockDeviceSyncState.isFeatureEnabled()).thenReturn(false)
+        val jsMessage = createJsMessage("sendToSyncSettings", "test-id")
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockJsMessaging).onResponse(callbackDataCaptor.capture())
+        val response = callbackDataCaptor.firstValue
+        assertEquals("test-id", response.id)
+        assertEquals("aiChat", response.featureName)
+        assertEquals("sendToSyncSettings", response.method)
         verifyErrorResponse(response.params, "setup unavailable")
         verifyNoInteractions(mockGlobalActivityStarter)
         verifyNoInteractions(mockContext)
@@ -176,6 +196,21 @@ class SetUpSyncHandlerTest {
         val intent = Intent()
         whenever(mockGlobalActivityStarter.startIntent(any(), any<ActivityParams>())).thenReturn(intent)
         val jsMessage = createJsMessage("sendToSetupSync", "test-id")
+
+        handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
+
+        verify(mockGlobalActivityStarter).startIntent(mockContext, SyncActivityWithEmptyParams)
+        verify(mockContext).startActivity(intent)
+        verifyNoInteractions(mockJsMessaging)
+    }
+
+    @Test
+    fun `when sendToSyncSettings and sync is already enabled then activity is still started`() {
+        configureSyncEnabled()
+        whenever(mockDeviceSyncState.getAccountState()).thenReturn(SignedIn("testUserId", emptyList()))
+        val intent = Intent()
+        whenever(mockGlobalActivityStarter.startIntent(any(), any<ActivityParams>())).thenReturn(intent)
+        val jsMessage = createJsMessage("sendToSyncSettings", "test-id")
 
         handler.getJsMessageHandler().process(jsMessage, mockJsMessaging, null)
 

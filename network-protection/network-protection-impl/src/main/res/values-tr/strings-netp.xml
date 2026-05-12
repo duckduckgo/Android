@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">VPN\'lerle uyumlu değil</string>
     <string name="netpExclusionListAutoExcludeDescription">Bankacılık veya yayın uygulamaları gibi bazı uygulamalar VPN\'lerle iyi çalışmaz. Bu ayar etkinleştirildiğinde, bu uygulamalar otomatik olarak hariç tutulur.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Kapat</string>
+    <string name="netpVpnIndicatorContentDescription">VPN durum göstergesi</string>
+
 </resources>

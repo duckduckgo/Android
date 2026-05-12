@@ -27,6 +27,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirWebJsMessageHandler
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -52,6 +53,10 @@ class PirDashboardWebMessagingInterfaceTest {
 
     private val mockJsMessageHelper: JsMessageHelper = mock()
     private val mockMessageHandlers: PluginPoint<PirWebJsMessageHandler> = mock()
+    private val mockPirDashboardUrlProvider: PirDashboardUrlProvider = mock {
+        on { getUrl() }.thenReturn(PirDashboardWebConstants.DEFAULT_WEB_UI_URL)
+        on { getAllowedDomains() }.thenReturn(listOf(PirDashboardWebConstants.ALLOWED_DOMAIN))
+    }
     private val mockWebView: WebView = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val mockMessageHandler: PirWebJsMessageHandler = mock()
@@ -63,6 +68,7 @@ class PirDashboardWebMessagingInterfaceTest {
             jsMessageHelper = mockJsMessageHelper,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             messageHandlers = mockMessageHandlers,
+            pirDashboardUrlProvider = mockPirDashboardUrlProvider,
         )
     }
 

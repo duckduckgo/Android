@@ -111,6 +111,10 @@ class RestoreSubscriptionViewModelTest {
 
     @Test
     fun whenRestoreFromStoreClickThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
+            RecoverSubscriptionResult.Failure("error"),
+        )
+
         viewModel.restoreFromStore(isOriginWeb = false)
         verify(pixelSender).reportActivateSubscriptionRestorePurchaseClick()
     }

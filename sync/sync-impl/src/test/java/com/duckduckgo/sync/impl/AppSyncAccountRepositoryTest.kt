@@ -78,6 +78,7 @@ import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.TestScope
@@ -121,6 +122,7 @@ class AppSyncAccountRepositoryTest {
     private lateinit var syncRepo: SyncAccountRepository
 
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
     @Before
     fun before() {
@@ -137,6 +139,7 @@ class AppSyncAccountRepositoryTest {
             syncFeature,
             deviceKeyGenerator,
             syncCodeUrlWrapper = syncCodeUrlWrapper,
+            syncSetupWideEvent = syncSetupWideEvent,
         )
 
         // passthrough by default (no modifications)

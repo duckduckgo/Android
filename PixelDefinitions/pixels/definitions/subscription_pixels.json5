@@ -1,0 +1,149 @@
+{
+    "subscription_free_trial_start_u": {
+        "description": "Fired when a user starts a free trial. Used to measure total count of trialists independent of whether they complete the trial.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_free_trial_vpn_activation_u": {
+        "description": "Fired when a user activates VPN while on a free trial. Used to measure how many trialists activate VPN and compare with wide event data.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "activation_day",
+                "description": "Indicates when VPN was activated relative to free trial start",
+                "type": "string",
+                "enum": ["vpn_activated_d1", "vpn_activated_d2_to_d7"]
+            },
+            {
+                "key": "activation_platform",
+                "description": "The platform where the subscription was purchased",
+                "type": "string",
+                "enum": ["apple", "google", "stripe"]
+            }
+        ]
+    },
+    "subscription_free_trial_duck_ai_paid_used_u": {
+        "description": "Fired when a user submits a prompt to duck.ai paid. Used to measure how many trialists use duck.ai paid and compare with wide event data.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "activation_day",
+                "description": "Indicates when prompt was submitted relative to free trial start",
+                "type": "string",
+                "enum": ["d1", "d2_to_d7"]
+            },
+            {
+                "key": "activation_platform",
+                "description": "The platform where the subscription was purchased",
+                "type": "string",
+                "enum": ["apple", "google", "stripe"]
+            }
+        ]
+    },
+    "subscription_webview_render_process_crash": {
+        "description": "Fired when a render process crash is reported by the WebView that shows subscription pages.",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_repeated",
+                "description": "Indicates whether this is a repeated crash after a recovery attempt. 'false' for first crash, 'true' for repeated crash.",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_subscription_paywall_impression_u": {
+        "description": "Fired once (unique) the first time a user opens the Privacy Pro paywall. Includes the day-since-install cohort bucket to understand when users first encounter the paywall.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "days_since_install",
+                "description": "Day-cohort bucket indicating how many days after install the user first saw the paywall",
+                "type": "string",
+                "enum": ["d0", "d1_to_d3", "d4_to_d7", "d8_to_d14", "d15_to_d30", "d30_plus"]
+            }
+        ]
+    },
+    "m_subscription_paywall_not_seen_d0_u": {
+        "description": "Fired once (unique) on day 1 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d3_u": {
+        "description": "Fired once (unique) on day 4 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d7_u": {
+        "description": "Fired once (unique) on day 8 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d14_u": {
+        "description": "Fired once (unique) on day 15 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_subscription_paywall_not_seen_d30_u": {
+        "description": "Fired once (unique) on day 31 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened", "subscriptionPromoShown"]
+    },
+    "m_privacy-pro_app_subscription-purchase_success": {
+        "description": "Fired when a subscription purchase completes successfully.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["atb", "appVersion", "freeTrial", "osVersion"]
+    },
+    "m_subscribe": {
+        "description": "Fired when a subscription purchase completes, capturing purchase origin and locale.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "locale",
+                "description": "The sanitized BCP 47 language tag of the device locale.",
+                "type": "string"
+            },
+            {
+                "key": "origin",
+                "description": "The origin from which the user initiated the purchase, if available.",
+                "type": "string"
+            },
+            "freeTrial"
+        ]
+    },
+    "m_privacy-pro_app_subscription_active_d": {
+        "description": "Fired once daily on app start for an active subscription",
+        "owners": ["lmac012"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "petal", "osVersion"]
+    }
+}

@@ -47,6 +47,13 @@ class AppTpRemoteFeaturesStoreTest {
                     return preferences
                 }
 
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
@@ -102,6 +109,13 @@ class AppTpRemoteFeaturesStoreTest {
                     return preferences
                 }
 
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
@@ -144,6 +158,13 @@ class AppTpRemoteFeaturesStoreTest {
                     multiprocess: Boolean,
                 ): SharedPreferences? {
                     throw IOException("test")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
                 }
 
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {

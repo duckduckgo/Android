@@ -24,11 +24,14 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_CARD_ID
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_NAME_DISMISS_TYPE
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.RealCardsListRemoteMessagePixelHelper.Companion.PARAM_VALUE_CLOSE_BUTTON
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
@@ -39,7 +42,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+sealed class ImageLoadSource {
+    data object Header : ImageLoadSource()
+    data class CardItem(val cardId: String) : ImageLoadSource()
+}
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
@@ -75,9 +84,9 @@ class CardsListRemoteMessageViewModel @Inject constructor(
                 lastRemoteMessageSeen = message
             }
             val cardsList = message?.content as? Content.CardsList
-            val imageFile = remoteMessagingModel.getRemoteMessageImageFile()
+            val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.MODAL)
             if (cardsList != null) {
-                _viewState.value = ViewState(cardsList, imageFile)
+                _viewState.value = buildViewState(cardsList, imageFile)
             } else {
                 _command.send(Command.DismissMessage)
             }
@@ -88,10 +97,11 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageShown(message)
-            val cardsList = message.content as? Content.CardsList
-            cardsList?.listItems?.forEach { cardItem ->
-                cardsListPixelHelper.fireCardItemShownPixel(message, cardItem)
-            }
+            _viewState.value?.modalListItems
+                ?.filterIsInstance<ModalListItem.CardListItem>()
+                ?.forEach { item ->
+                    cardsListPixelHelper.fireCardItemShownPixel(message, item.cardItem)
+                }
         }
     }
 
@@ -102,14 +112,16 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val customParams = mapOf(
                 PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_CLOSE_BUTTON,
             )
-            cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
+            withContext(dispatchers.io()) {
+                cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
+            }
         }
     }
 
     fun onActionButtonClicked() {
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
-            val action = _viewState.value?.cardsLists?.primaryAction
+            val action = _viewState.value?.primaryAction
             action?.let {
                 val command = commandActionMapper.asCommand(it)
                 _command.send(command)
@@ -118,18 +130,64 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    fun onRemoteImageLoadFailed() {
-        pixel.fire(
-            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
-            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+    private suspend fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+        val items = mutableListOf<ModalListItem>()
+
+        items.add(
+            ModalListItem.Header(
+                titleText = cardsList.titleText,
+                placeholder = cardsList.placeholder,
+                imageUrl = cardsList.imageUrl,
+                imageFilePath = imageFilePath,
+            ),
+        )
+
+        items.addAll(
+            cardsList.listItems.map { cardItem ->
+                val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
+                    remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
+                } else {
+                    null
+                }
+                ModalListItem.CardListItem(id = cardItem.id, cardItem = cardItem, imageFilePath = itemImagePath)
+            },
+        )
+
+        return ViewState(
+            modalListItems = items,
+            primaryActionText = cardsList.primaryActionText,
+            primaryAction = cardsList.primaryAction,
         )
     }
 
-    fun onRemoteImageLoadSuccess() {
-        pixel.fire(
-            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
-            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
-        )
+    fun onImageLoadFailed(source: ImageLoadSource) {
+        val (pixelName, params) = when (source) {
+            is ImageLoadSource.Header ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED to
+                    mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty())
+            is ImageLoadSource.CardItem ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_FAILED to
+                    mapOf(
+                        Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty(),
+                        PARAM_NAME_CARD_ID to source.cardId,
+                    )
+        }
+        pixel.fire(pixelName, params)
+    }
+
+    fun onImageLoadSuccess(source: ImageLoadSource) {
+        val (pixelName, params) = when (source) {
+            is ImageLoadSource.Header ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS to
+                    mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty())
+            is ImageLoadSource.CardItem ->
+                RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_SUCCESS to
+                    mapOf(
+                        Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty(),
+                        PARAM_NAME_CARD_ID to source.cardId,
+                    )
+        }
+        pixel.fire(pixelName, params)
     }
 
     override fun onItemClicked(item: CardItem.ListItem) {
@@ -143,8 +201,9 @@ class CardsListRemoteMessageViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val cardsLists: Content.CardsList,
-        val cardsListImageFilePath: String?,
+        val modalListItems: List<ModalListItem>,
+        val primaryActionText: String,
+        val primaryAction: Action?,
     )
 
     sealed class Command {

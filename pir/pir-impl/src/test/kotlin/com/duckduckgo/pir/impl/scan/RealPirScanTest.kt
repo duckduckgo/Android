@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -61,6 +62,7 @@ class RealPirScanTest {
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
+    private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
 
     @Before
     fun setUp() {
@@ -75,6 +77,7 @@ class RealPirScanTest {
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
+            webViewDataCleaner = mockWebViewDataCleaner,
         )
     }
 
@@ -174,6 +177,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -193,6 +197,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -213,6 +218,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -234,6 +240,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -259,6 +266,7 @@ class RealPirScanTest {
         // Then
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -281,6 +289,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -300,6 +309,7 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -325,6 +335,7 @@ class RealPirScanTest {
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testScanStep))
         verify(mockPirActionsRunner).stop()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -354,6 +365,7 @@ class RealPirScanTest {
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson)
         verify(mockBrokerStepsParser).parseStep(testBroker2, testStepsJson)
         verify(mockPirCssScriptLoader).getScript()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -380,6 +392,7 @@ class RealPirScanTest {
         // Verify broker steps parsed only once for the same broker name
         verify(mockRepository).getBrokerScanSteps(testBrokerName)
         verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -402,6 +415,7 @@ class RealPirScanTest {
 
         // Then
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.SCHEDULED)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -424,6 +438,7 @@ class RealPirScanTest {
 
         // Then
         verify(mockEventsRepository).deleteAllScanResults()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -445,5 +460,6 @@ class RealPirScanTest {
         testee.stop()
 
         verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
     }
 }

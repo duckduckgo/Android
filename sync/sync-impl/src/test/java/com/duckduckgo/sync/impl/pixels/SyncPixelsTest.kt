@@ -32,6 +32,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealSyncPixelsTest {
@@ -161,6 +162,58 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.ERROR_REASON to "unauthorized",
             ),
         )
+    }
+
+    @Test
+    fun whenFireAiChatActiveThenDailyPixelFired() {
+        testee.fireAiChatActive()
+
+        verify(pixel).fire(SyncPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireAiChatsRescopeTokenErrorWith400ThenValidationErrorPixelFired() {
+        val error = Error(code = API_CODE.VALIDATION_ERROR.code, reason = "bad request")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_validation_error_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireAiChatsRescopeTokenErrorWith409ThenObjectLimitExceededPixelFired() {
+        val error = Error(code = API_CODE.COUNT_LIMIT.code, reason = "count limit")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_object_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireAiChatsRescopeTokenErrorWith413ThenRequestSizeLimitExceededPixelFired() {
+        val error = Error(code = API_CODE.CONTENT_TOO_LARGE.code, reason = "too large")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_request_size_limit_exceeded_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireAiChatsRescopeTokenErrorWith429ThenTooManyRequestsPixelFired() {
+        val error = Error(code = API_CODE.TOO_MANY_REQUESTS_1.code, reason = "rate limited")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verify(pixel).fire("m_sync_ai_chats_too_many_requests_daily", emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenFireAiChatsRescopeTokenErrorWith401ThenNoPixelFired() {
+        val error = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "unauthorized")
+
+        testee.fireAiChatsRescopeTokenError(error)
+
+        verifyNoInteractions(pixel)
     }
 
     private fun givenSomeDailyStats(): DailyStats {

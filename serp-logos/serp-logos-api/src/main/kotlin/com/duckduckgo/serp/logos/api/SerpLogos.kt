@@ -17,6 +17,7 @@
 package com.duckduckgo.serp.logos.api
 
 import android.webkit.WebView
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Public interface for evaluating SERP logos
@@ -33,4 +34,9 @@ interface SerpLogos {
      * @return The appropriate [SerpLogo] found in the page
      */
     suspend fun extractSerpLogo(webView: WebView): SerpLogo
+
+    /**
+     * Flow of the currently set favourite logo URL, or null if no favourite is set.
+     */
+    val favouriteSerpEasterEggLogoUrlFlow: Flow<String?>
 }

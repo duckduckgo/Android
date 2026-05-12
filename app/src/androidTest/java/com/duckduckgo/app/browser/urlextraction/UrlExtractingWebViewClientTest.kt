@@ -70,7 +70,7 @@ class UrlExtractingWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenInjectUrlExtractionJS() {
-        testee.onPageStarted(mockWebView, BrowserWebViewClientTest.EXAMPLE_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         verify(urlExtractor).injectUrlExtractionJS(mockWebView)
     }
 

@@ -129,8 +129,6 @@
     <string name="atp_NewTabDisabled"><b>Uygulama İzleme Koruması devre dışı.</b>\nUygulamalarınızda izleme girişimlerini engellemeye devam etmek için dokunun.</string>
     <string name="atp_NewTabRevoked"><b>Cihazınızdaki bir VPN uygulaması Uygulama İzleme Korumasını devre dışı bıraktı.</b>\nYeniden etkinleştirmek için dokunun.</string>
     <string name="atp_NewTabEnabled"><b>Uygulama İzleme Koruması etkinleştirildi</b> ve uygulamalarınızdaki izleme girişimlerini engelliyor.</string>
-    <!-- smartling.character_limit = 15 -->
-    <string name="vpnMenuYellowPill">Ücretsiz deneme</string>
 
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Tüm Uygulamalar</string>
@@ -433,5 +431,9 @@
     <string name="apptp_PproUpsellBannerAction">Daha Fazla Bilgi</string>
     <string name="apptp_PproUpsellBannerMessage_freeTrial">DuckDuckGo\'ya abone olun ve App Tracking Protection ile uyumlu tek VPN\'e sahip olun.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Ücretsiz deneyin!</string>
+
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Kapat</string>
+    <string name="atp_close_button_content_description">Kapat</string>
 
 </resources>

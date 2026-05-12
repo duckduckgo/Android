@@ -22,7 +22,7 @@ interface RemoteMessageModel {
 
     fun getActiveMessage(): RemoteMessage?
 
-    fun getActiveMessages(): Flow<RemoteMessage?>
+    fun observeActiveMessages(): Flow<RemoteMessage?>
 
     suspend fun onMessageShown(remoteMessage: RemoteMessage)
 
@@ -34,5 +34,9 @@ interface RemoteMessageModel {
 
     suspend fun onActionClicked(remoteMessage: RemoteMessage): Action?
 
-    suspend fun getRemoteMessageImageFile(): String?
+    suspend fun getRemoteMessageImageFile(surface: Surface): String?
+
+    suspend fun clearMessageImage(surface: Surface)
+
+    suspend fun isMessageDismissed(id: String): Boolean
 }

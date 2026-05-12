@@ -269,16 +269,16 @@ private class FakeSubscriptions(
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
 
-    override fun shouldLaunchPrivacyProForUrl(url: String): Boolean = false
+    override fun shouldLaunchSubscriptionForUrl(url: String): Boolean = false
 
-    override fun launchPrivacyPro(
+    override fun launchSubscription(
         context: Context,
         uri: Uri?,
     ) {
         // no-op
     }
 
-    override fun isPrivacyProUrl(uri: Uri): Boolean = false
+    override fun isSubscriptionUrl(uri: Uri): Boolean = false
 
     override suspend fun isFreeTrialEligible(): Boolean = false
 }

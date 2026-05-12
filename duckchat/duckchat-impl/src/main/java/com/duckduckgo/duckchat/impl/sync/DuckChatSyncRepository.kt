@@ -45,6 +45,11 @@ interface DuckChatSyncRepository {
      * Clears the deletion timestamp only if it matches the provided timestamp.
      */
     suspend fun clearDeletionTimestampIfMatches(timestamp: String)
+
+    suspend fun recordSingleChatDeletion(chatId: String)
+    suspend fun getPendingChatDeletions(): Set<String>
+    suspend fun removePendingChatDeletions(ids: Set<String>)
+    suspend fun clearPendingChatDeletions()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -76,6 +81,35 @@ class RealDuckChatSyncRepository @Inject constructor(
                 logcat { "DuckChat-Sync: cleared local deletion timestamp $timestamp" }
                 duckChatSyncMetadataStore.deletionTimestamp = null
             }
+        }
+    }
+
+    override suspend fun recordSingleChatDeletion(chatId: String) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatDeletions
+            duckChatSyncMetadataStore.pendingChatDeletions = current + chatId
+            logcat { "DuckChat-Sync: recorded pending chat deletion for $chatId, queue size: ${current.size + 1}" }
+        }
+    }
+
+    override suspend fun getPendingChatDeletions(): Set<String> {
+        return withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatDeletions
+        }
+    }
+
+    override suspend fun removePendingChatDeletions(ids: Set<String>) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatDeletions
+            duckChatSyncMetadataStore.pendingChatDeletions = current - ids
+            logcat { "DuckChat-Sync: removed ${ids.size} pending chat deletions, remaining: ${(current - ids).size}" }
+        }
+    }
+
+    override suspend fun clearPendingChatDeletions() {
+        withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatDeletions = emptySet()
+            logcat { "DuckChat-Sync: cleared all pending chat deletions" }
         }
     }
 }

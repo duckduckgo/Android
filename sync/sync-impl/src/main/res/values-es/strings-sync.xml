@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Esto crea una copia de seguridad encriptada de tus marcadores, contraseñas y chats de Duck.ai en el servidor seguro de DuckDuckGo que se puede sincronizar con tus otros dispositivos.\n\n La clave de encriptación solo se almacena en tu dispositivo, DuckDuckGo no puede acceder a ella.</string>
     <string name="sync_intro_enable_footer">Puedes sincronizar con tus otros dispositivos más tarde.</string>
     <string name="sync_intro_enable_cta">Activar sincronización y copia de seguridad</string>
-    <string name="sync_intro_recover_title">Recuperar datos sincronizados</string>
-    <string name="sync_intro_recover_content">Para restaurar tus datos sincronizados, necesitarás el código de recuperación que guardaste cuando configuraste la sincronización por primera vez. Es posible que este código se haya guardado como PDF en el dispositivo que utilizaste originalmente para configurar la sincronización.</string>
-    <string name="sync_intro_recover_cta">Empezar</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Recupera tus datos sincronizados</string>
+    <string name="sync_recover_synced_data_content">Necesitarás el código de recuperación que recibiste cuando configuraste Sync &amp; Backup. Puede que lo hayas guardado como PDF en el dispositivo que usaste.</string>
+    <string name="sync_recover_synced_data_cta">Recuperar datos sincronizados</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Escanear código QR</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">¿Eliminar datos del servidor?</string>
-    <string name="sync_delete_server_data_dialog_content">Todos los dispositivos se desconectarán y tus datos sincronizados se eliminarán del servidor.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Eliminar datos</string>
+    <string name="sync_delete_server_data_dialog_content">Tu copia de seguridad se eliminará del servidor. Todos los dispositivos se desconectarán de la sincronización, pero no se eliminará nada de ningún dispositivo.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Eliminar datos del servidor</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Cancelar</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sincronizar marcadores entre dispositivos</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Ocultar</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obtén el navegador de escritorio</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo para Mac y Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recuperación</string>
+    <string name="sync_settings_download_recovery_code_item">Descarga el código de recuperación como PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Usa este código para recuperar tus datos si pierdes el acceso a este dispositivo — guárdalo de forma segura.</string>
+    <string name="sync_settings_data_expiration">Los datos de Sync &amp; Backup no se pueden recuperar después de 18 meses de inactividad. <annotation type="learn_more_link">Más información</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">¿Restaurar los datos de Sync &amp; Backup de la instalación anterior?</string>
+    <string name="sync_previous_session_ready_body">Restaura para recuperar tus marcadores, contraseñas y otros datos en DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Restaurar Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Configurar nueva sincronización</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Recupera tus datos fácilmente</string>
+    <string name="sync_recover_data_content">Usa este código para restaurar tus datos si pierdes el acceso a este dispositivo. Los datos de Sync &amp; Backup no se pueden recuperar después de 18 meses de inactividad.</string>
+    <string name="sync_recover_data_recovery_code_label">Código de recuperación</string>
+    <string name="sync_recover_data_download_pdf">Descargar como PDF</string>
+    <string name="sync_restore_on_reinstall_title">Restaurar al reinstalar la aplicación</string>
+    <string name="sync_restore_on_reinstall_description">Si vuelves a instalar la aplicación DuckDuckGo, te preguntaremos si quieres restaurar los datos en este dispositivo.</string>
 </resources>

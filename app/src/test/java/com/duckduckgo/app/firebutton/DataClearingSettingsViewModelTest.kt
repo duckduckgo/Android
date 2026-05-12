@@ -29,6 +29,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -358,5 +359,13 @@ internal class DataClearingSettingsViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOnClearDataActionClickedThenFirePixels() = runTest {
+        testee.onClearDataActionClicked()
+
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY, type = Daily())
     }
 }

@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Eksperimentinis naršyklės meniu</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">Po neaktyvumo</string>
+    <string name="afterInactivityTimeoutRowTitle">Pasirinkite neaktyvumo laikmatį</string>
+    <string name="afterInactivityScreenSectionHeader">Pasirink, ką matysi, kai grįši po neaktyvumo</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Pasirink, ką matysi, kai grįši po %1$s min. neaktyvumo</string>
+    <string name="afterInactivityTimeoutAlways">Visada</string>
+    <string name="afterInactivityTimeout1Minute">1 min.</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d min.</string>
+    <string name="afterInactivityTimeout1Hour">1 val.</string>
+    <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d val.</string>
 </resources>

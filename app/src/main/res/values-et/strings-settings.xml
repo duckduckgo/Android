@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Eksperimentaalne brauseri menüü</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">Pärast tegevusetust</string>
+    <string name="afterInactivityTimeoutRowTitle">Vali tegevusetusaja taimer</string>
+    <string name="afterInactivityScreenSectionHeader">Vali, mida näed, kui naased pärast tegevusetust</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Vali, mida näed pärast %1$s minutilisest tegevusetusest naasmist.</string>
+    <string name="afterInactivityTimeoutAlways">Alati</string>
+    <string name="afterInactivityTimeout1Minute">1 minut</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d minutit</string>
+    <string name="afterInactivityTimeout1Hour">1 tund</string>
+    <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d tundi</string>
 </resources>

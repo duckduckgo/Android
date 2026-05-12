@@ -55,4 +55,11 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
     ): Intent {
         return BrowserActivity.intent(context = context, closeDuckChat = true)
     }
+
+    override fun openExistingTab(
+        context: Context,
+        tabId: String,
+    ): Intent {
+        return BrowserActivity.intent(context = context, openExistingTabId = tabId)
+    }
 }

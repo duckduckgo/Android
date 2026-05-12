@@ -46,6 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
@@ -69,7 +70,6 @@ class AppRemoteMessagingRepositoryTest {
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
-        coroutineRule.testDispatcherProvider,
         getMessageMapper(),
         remoteMessageImageStore,
     )
@@ -429,18 +429,44 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenGetRemoteMessageImageFileReturnFilePathIfExists() = runTest {
-        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn("imagePath")
+        whenever(remoteMessageImageStore.getLocalImageFilePath(Surface.NEW_TAB_PAGE)).thenReturn("imagePath")
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
 
         assertEquals("imagePath", result)
     }
 
     @Test
     fun whenGetRemoteMessageImageFileReturnNullIfFilePathDoesNotExist() = runTest {
-        whenever(remoteMessageImageStore.getLocalImageFilePath()).thenReturn(null)
+        whenever(remoteMessageImageStore.getLocalImageFilePath(Surface.NEW_TAB_PAGE)).thenReturn(null)
 
-        val result = testee.getRemoteMessageImageFile()
+        val result = testee.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenClearMessageImageThenClearStoredImageFileForSurface() = runTest {
+        testee.clearMessageImage(Surface.MODAL)
+
+        verify(remoteMessageImageStore).clearStoredImageFile(Surface.MODAL)
+    }
+
+    @Test
+    fun whenGetCardItemImageFilePathThenReturnImagePathFromImageStore() = runTest {
+        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn("/path/to/item1.png")
+
+        val result = testee.getCardItemImageFilePath("item1")
+
+        assertEquals("/path/to/item1.png", result)
+        verify(remoteMessageImageStore).getCardItemImageFilePath("item1")
+    }
+
+    @Test
+    fun whenGetCardItemImageFilePathReturnNullWhenStoreReturnsNull() = runTest {
+        whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn(null)
+
+        val result = testee.getCardItemImageFilePath("item1")
 
         assertNull(result)
     }

@@ -155,6 +155,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     AUTOFILL_DEVICE_CAPABILITY_CAPABLE("m_autofill_device_capability_capable"),
     AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE("m_autofill_device_capability_secure_storage_unavailable"),
+    AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_DAILY("autofill_device_capability_secure_storage_unavailable_daily"),
     AUTOFILL_DEVICE_CAPABILITY_DEVICE_AUTH_DISABLED("m_autofill_device_capability_device_auth_disabled"),
     AUTOFILL_DEVICE_CAPABILITY_SECURE_STORAGE_UNAVAILABLE_AND_DEVICE_AUTH_DISABLED(
         "m_autofill_device_capability_secure_storage_unavailable_and_device_auth_disabled",
@@ -227,6 +228,24 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
     PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED("autofill_harmony_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_RETRIEVAL_FAILED("autofill_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_FAILED("autofill_preferences_get_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED("autofill_harmony_preferences_get_key_failed"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED("autofill_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED("autofill_harmony_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_KEY_MISMATCH("autofill_harmony_key_mismatch"),
+    AUTOFILL_HARMONY_KEY_MISSING("autofill_harmony_key_missing"),
+    AUTOFILL_PREFERENCES_KEY_MISSING("autofill_preferences_key_missing"),
+    AUTOFILL_STORE_KEY_ALREADY_EXISTS("autofill_store_key_already_exists"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_preferences_update_key_null_file"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_harmony_preferences_update_key_null_file"),
+    AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE("autofill_preferences_get_key_null_file"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE("autofill_harmony_preferences_get_key_null_file"),
+    AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED("autofill_harmony_update_key_rollback_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_preferences_get_key_decode_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_harmony_preferences_get_key_decode_failed"),
+    AUTOFILL_DECRYPT_DATA_FAILED("autofill_decrypt_failed"),
+    AUTOFILL_ENCRYPT_DATA_FAILED("autofill_encrypt_failed"),
 }
 
 object AutofillPixelParameters {
@@ -313,6 +332,7 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR.pixelName to PixelParameter.removeAtb(),
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED.pixelName to PixelParameter.removeAtb(),
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT.pixelName to PixelParameter.removeAtb(),
+
         )
     }
 }

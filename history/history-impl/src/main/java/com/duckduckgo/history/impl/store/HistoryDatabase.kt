@@ -19,10 +19,11 @@ package com.duckduckgo.history.impl.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         HistoryEntryEntity::class,
         VisitEntity::class,
@@ -32,4 +33,24 @@ abstract class HistoryDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS visits_list_new (" +
+                "historyEntryId INTEGER NOT NULL, " +
+                "timestamp TEXT NOT NULL, " +
+                "tabId TEXT NOT NULL DEFAULT '', " +
+                "PRIMARY KEY (timestamp, historyEntryId, tabId), " +
+                "FOREIGN KEY (historyEntryId) REFERENCES history_entries(id) ON DELETE CASCADE" +
+                ")",
+        )
+        db.execSQL(
+            "INSERT INTO visits_list_new (historyEntryId, timestamp, tabId) " +
+                "SELECT historyEntryId, timestamp, '' FROM visits_list",
+        )
+        db.execSQL("DROP TABLE visits_list")
+        db.execSQL("ALTER TABLE visits_list_new RENAME TO visits_list")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)

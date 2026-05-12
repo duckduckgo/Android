@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -24,6 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -35,6 +38,7 @@ import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
@@ -45,6 +49,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
@@ -58,32 +63,41 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
+import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
+import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyContract
+import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyResult
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.LoginSuccess
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
@@ -129,6 +143,9 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
+    @Inject
+    lateinit var syncSetupWideEvent: SyncSetupWideEvent
+
     private val syncIntroLauncher = registerForActivityResult(
         SyncIntroContract(),
     ) { resultOk ->
@@ -136,6 +153,27 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onDeviceConnected()
         } else {
             viewModel.onConnectionCancelled()
+        }
+    }
+
+    private var pendingOriginalFlow: OriginalFlow? = null
+
+    private val recoverAccountLauncher = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onDeviceConnected()
+        } else {
+            viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val previousSessionReadyLauncher = registerForActivityResult(SyncPreviousSessionReadyContract()) { result ->
+        when (result) {
+            is SyncPreviousSessionReadyResult.Resumed -> viewModel.onDeviceConnected()
+            is SyncPreviousSessionReadyResult.ContinueSetup -> {
+                viewModel.onContinueSetupAfterSkipRestore(pendingOriginalFlow)
+                pendingOriginalFlow = null
+            }
+            is SyncPreviousSessionReadyResult.Cancelled -> viewModel.onConnectionCancelled()
         }
     }
 
@@ -154,10 +192,19 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.onScreenExit()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        savedInstanceState?.getString(KEY_PENDING_ORIGINAL_FLOW)?.let { name ->
+            pendingOriginalFlow = OriginalFlow.valueOf(name)
+        }
 
         binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
 
@@ -172,6 +219,11 @@ class SyncActivity : DuckDuckGoActivity() {
         syncSetupUrl()?.let { setupUrl ->
             viewModel.processSetupDeepLink(setupUrl)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingOriginalFlow?.let { outState.putString(KEY_PENDING_ORIGINAL_FLOW, it.name) }
     }
 
     private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
@@ -213,7 +265,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncDisabled.syncSetupSyncThisDevice.setClickListener {
-            viewModel.onSyncThisDevice()
+            viewModel.onSyncThisDevice(extractSource())
         }
 
         binding.viewSyncDisabled.syncSetupRecoverData.setClickListener {
@@ -223,6 +275,17 @@ class SyncActivity : DuckDuckGoActivity() {
         binding.viewSyncEnabled.disableSyncButton.setClickListener {
             viewModel.onTurnOffClicked()
         }
+
+        binding.viewSyncEnabled.dataExpirationText.addClickableSpan(
+            textSequence = getText(R.string.sync_settings_data_expiration),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
 
         binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
             viewModel.onSaveRecoveryCodeClicked()
@@ -240,7 +303,15 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         }
 
+        binding.viewSyncEnabled.getDesktopBrowser.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncEnabled()
+        }
+
         binding.viewSyncDisabled.syncSetupOtherPlatforms.setOnClickListener {
+            viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
+        }
+
+        binding.viewSyncDisabled.getDesktopBrowser.setOnClickListener {
             viewModel.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         }
     }
@@ -261,8 +332,8 @@ class SyncActivity : DuckDuckGoActivity() {
         viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { processCommand(it) }.launchIn(lifecycleScope)
     }
 
-    private fun processCommand(it: Command) {
-        when (it) {
+    private fun processCommand(command: Command) {
+        when (command) {
             is SyncWithAnotherDevice -> {
                 authenticate {
                     connectFlow.launch(ConnectFlowContractInput(extractSource()))
@@ -270,7 +341,14 @@ class SyncActivity : DuckDuckGoActivity() {
             }
 
             is IntroCreateAccount -> {
-                authenticate {
+                authenticate(
+                    onCancelled = { lifecycleScope.launch { syncSetupWideEvent.onUserAuthCancelled() } },
+                ) { hasValidDeviceAuthentication ->
+                    if (hasValidDeviceAuthentication) {
+                        // authenticate() also passes if device is not enrolled into auth,
+                        // so only notify that auth was successful if it actually happened
+                        lifecycleScope.launch { syncSetupWideEvent.onUserAuthSuccess() }
+                    }
                     syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, extractSource()))
                 }
             }
@@ -291,11 +369,11 @@ class SyncActivity : DuckDuckGoActivity() {
                 syncIntroLauncher.launch(SyncIntroContractInput(SETUP_COMPLETE, extractSource()))
             }
 
-            is AskTurnOffSync -> askTurnOffSync(it.device)
+            is AskTurnOffSync -> askTurnOffSync(command.device)
             is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 authenticate {
-                    shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
+                    shareAction.shareFile(this@SyncActivity, command.recoveryCodePDFFile)
                 }
             }
 
@@ -305,28 +383,39 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
-            is AskRemoveDevice -> askRemoveDevice(it.device)
-            is AskEditDevice -> askEditDevice(it.device)
+            is AskRemoveDevice -> askRemoveDevice(command.device)
+            is AskEditDevice -> askEditDevice(command.device)
             is AddAnotherDevice -> {
                 authenticate {
                     syncWithAnotherDeviceFlow.launch(null)
                 }
             }
-            is ShowError -> showError(it)
+            is ShowError -> showError(command)
             is ShowDeviceUnsupported -> {
                 startActivity(DeviceUnsupportedActivity.intent(this))
                 finish()
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
-            is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
-            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(it.syncBarcodeUrl)
+            is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(command.source)
+            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
+            is LaunchLearnMore -> globalActivityStarter.start(
+                this,
+                SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
+            )
+            is ShowPreviousSessionReady -> {
+                pendingOriginalFlow = command.originalFlow
+                authenticate {
+                    previousSessionReadyLauncher.launch(command.originalFlow.toPixelSource())
+                }
+            }
+            is LaunchOriginalFlow -> launchOriginalFlow(command.originalFlow)
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,
                     displayTextResource = R.string.deep_link_auth_prompt_message,
                 )
                 authenticate(config = authConfig) {
-                    deepLinkIntoSetup(it.barcodeSyncUrl.asUrl())
+                    deepLinkIntoSetup(command.barcodeSyncUrl.asUrl())
                 }
             }
         }
@@ -446,6 +535,10 @@ class SyncActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         deviceAuthenticator.launchDeviceAuthEnrollment(this@SyncActivity)
                     }
+
+                    override fun onDialogShown() {
+                        lifecycleScope.launch { syncSetupWideEvent.onEnrollDeviceAuthDialogShown() }
+                    }
                 },
             )
             .setCancellable(true)
@@ -454,6 +547,21 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
+
+        binding.viewSyncEnabled.getDesktopBrowser.isVisible = viewState.newDesktopBrowserSettingEnabled
+        binding.viewSyncEnabled.syncSetupOtherPlatforms.isVisible = !viewState.newDesktopBrowserSettingEnabled
+
+        binding.viewSyncDisabled.getDesktopBrowser.isVisible = viewState.newDesktopBrowserSettingEnabled
+        binding.viewSyncDisabled.syncSetupOtherPlatforms.isVisible = !viewState.newDesktopBrowserSettingEnabled
+
+        binding.viewSyncEnabled.restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
+        if (viewState.showAutoRestoreToggle) {
+            binding.viewSyncEnabled.restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled) { _, isChecked ->
+                viewModel.onAutoRestoreToggleChanged(isChecked)
+            }
+            val iconRes = if (viewState.autoRestoreEnabled) R.drawable.device_default_24 else R.drawable.device_soft_alert_24
+            binding.viewSyncEnabled.restoreOnReinstallItem.setLeadingIconResource(iconRes)
+        }
 
         if (viewState.showAccount) {
             syncedDevicesAdapter.updateData(viewState.syncedDevices)
@@ -472,22 +580,46 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun authenticate(config: AuthConfiguration = AuthConfiguration(), onSuccess: () -> Unit) {
+    private fun authenticate(
+        config: AuthConfiguration = AuthConfiguration(),
+        onCancelled: () -> Unit = {},
+        onSuccess: (hasValidDeviceAuthentication: Boolean) -> Unit,
+    ) {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
             deviceAuthenticator.authenticate(config = config, fragmentActivity = this) {
                 when (it) {
-                    Success -> onSuccess()
-                    else -> { }
+                    Success -> onSuccess(true)
+                    else -> onCancelled()
                 }
             }
         } else {
-            onSuccess()
+            onSuccess(false)
         }
     }
 
     private fun extractSource(): String? {
         return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
     }
+
+    private fun launchOriginalFlow(originalFlow: OriginalFlow?) {
+        val source = extractSource()
+        when (originalFlow) {
+            OriginalFlow.SYNC_THIS_DEVICE -> syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, source))
+            OriginalFlow.SYNC_WITH_ANOTHER -> connectFlow.launch(ConnectFlowContractInput(source))
+            OriginalFlow.RECOVER_SYNCED_DATA -> recoverAccountLauncher.launch(null)
+            null -> {}
+        }
+    }
+
+    companion object {
+        private const val KEY_PENDING_ORIGINAL_FLOW = "pendingOriginalFlow"
+    }
+}
+
+private fun OriginalFlow.toPixelSource(): String = when (this) {
+    OriginalFlow.SYNC_WITH_ANOTHER -> SyncPixelParameters.AUTO_RESTORE_SOURCE_PAIRING
+    OriginalFlow.SYNC_THIS_DEVICE -> SyncPixelParameters.AUTO_RESTORE_SOURCE_BACKUP
+    OriginalFlow.RECOVER_SYNCED_DATA -> SyncPixelParameters.AUTO_RESTORE_SOURCE_RECOVER
 }
 
 data class SyncActivityWithSourceParams(val source: String?) : GlobalActivityStarter.ActivityParams

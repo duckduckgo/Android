@@ -123,4 +123,11 @@
     <string name="webview_internal_feature_subtitle">WebView dev settings and tools</string>
     <string name="webview_dev_ui_not_available">WebView Developer UI is not available.</string>
     <string name="webview_play_store_unavailable">Play Store unavailable on this device</string>
+
+    <!-- Onboarding Dev Settings -->
+    <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
+    <string name="onboardingDevSettingsStateSection">Onboarding state</string>
+    <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
+    <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
+    <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.messaging
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import org.json.JSONObject
@@ -8,7 +9,8 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 class DuckChatContentScopeJsMessageHandlerTest {
-    private val handler = DuckChatContentScopeJsMessageHandler().getJsMessageHandler()
+    private val duckAiHostProvider = object : DuckAiHostProvider {}
+    private val handler = DuckChatContentScopeJsMessageHandler(duckAiHostProvider).getJsMessageHandler()
 
     @Test
     fun `when message sent then callback called`() {
@@ -41,7 +43,7 @@ class DuckChatContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() {
         val methods = handler.methods
-        assertTrue(methods.size == 10)
+        assertTrue(methods.size == 18)
         assertTrue(methods[0] == "getAIChatNativeHandoffData")
         assertTrue(methods[1] == "getAIChatNativeConfigValues")
         assertTrue(methods[2] == "openAIChat")
@@ -52,6 +54,14 @@ class DuckChatContentScopeJsMessageHandlerTest {
         assertTrue(methods[7] == "showChatInput")
         assertTrue(methods[8] == "reportMetric")
         assertTrue(methods[9] == "openKeyboard")
+        assertTrue(methods[10] == "getAIChatPageContext")
+        assertTrue(methods[11] == "togglePageContextTelemetry")
+        assertTrue(methods[12] == "submitAIChatPageContext")
+        assertTrue(methods[13] == "userDidAcceptTermsAndConditions")
+        assertTrue(methods[14] == "getAIChatNativePrompt")
+        assertTrue(methods[15] == "voiceSessionStarted")
+        assertTrue(methods[16] == "voiceSessionEnded")
+        assertTrue(methods[17] == "responseReceived")
     }
 
     private val callback = object : JsMessageCallback() {

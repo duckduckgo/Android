@@ -25,17 +25,23 @@ interface SubscriptionsUrlProvider {
     val welcomeUrl: String
     val activateUrl: String
     val manageUrl: String
+    val plansUrl: String
+    val upgradeToProUrl: String
 }
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsUrlProvider @Inject constructor(
-    subscriptionsBaseUrl: SubscriptionsBaseUrl,
+    private val subscriptionsBaseUrl: SubscriptionsBaseUrl,
 ) : SubscriptionsUrlProvider {
-    override val buyUrl: String = subscriptionsBaseUrl.subscriptionsBaseUrl
+    override val buyUrl: String by lazy { subscriptionsBaseUrl.subscriptionsBaseUrl }
 
-    override val welcomeUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/welcome"
+    override val welcomeUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/welcome" }
 
-    override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow"
+    override val activateUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow" }
 
-    override val manageUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage"
+    override val manageUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage" }
+
+    override val plansUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans" }
+
+    override val upgradeToProUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans?tier=pro" }
 }

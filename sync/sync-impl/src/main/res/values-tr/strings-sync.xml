@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Bu işlem, yer işaretleri, şifreler ve Duck.ai sohbetlerinin şifrelenmiş bir yedeğini DuckDuckGo\'nun güvenli sunucusunda oluşturur ve bunlar diğer cihazlarınızla senkronize edilebilir. \n\n Şifreleme anahtarı sadece cihazınızda saklanır ve DuckDuckGo bu anahtara erişemez.</string>
     <string name="sync_intro_enable_footer">Daha sonra diğer cihazlarınızla senkronize edebilirsiniz.</string>
     <string name="sync_intro_enable_cta">Senkronizasyon ve Yedekleme\'yi açın</string>
-    <string name="sync_intro_recover_title">Senkronize Edilen Verileri Kurtar</string>
-    <string name="sync_intro_recover_content">Senkronize edilmiş verilerinizi geri yüklemek için Senkronizasyonu ilk ayarlarken belirlediğiniz Kurtarma Koduna ihtiyacınız olacaktır. Bu kod, Senkronizasyonu yapmak üzere kullandığınız cihaza PDF olarak kaydedilmiş olabilir.</string>
-    <string name="sync_intro_recover_cta">Başlayın</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Senkronize edilmiş verilerinizi kurtarın</string>
+    <string name="sync_recover_synced_data_content">Sync &amp; Backup kurulumunda verilen Kurtarma Koduna ihtiyacınız olacak. Kullandığınız cihazda PDF olarak kaydetmiş olabilirsiniz.</string>
+    <string name="sync_recover_synced_data_cta">Senkronize Edilen Verileri Kurtar</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR Kodunu Tara</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Sunucu Verileri Silinsin mi?</string>
-    <string name="sync_delete_server_data_dialog_content">Tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Verileri Sil</string>
+    <string name="sync_delete_server_data_dialog_content">Yedekleriniz sunucudan silinecektir. Tüm cihazların senkronizasyon bağlantısı kesilecek, ancak hiçbir cihazdan hiçbir şey silinmeyecektir.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Sunucu Verilerini Sil</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Vazgeç</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Yer İşaretlerini Cihazlar Arasında Senkronize Et</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Gizle</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Kurtarma</string>
+    <string name="sync_settings_download_recovery_code_item">Kurtarma Kodunu PDF Olarak İndir</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Bu kodu kaydedin ve güvenli bir yerde tutun. Böylece bu cihaza erişiminizi kaybederseniz verilerinizi kurtarabilirsiniz.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Önceki kurulumdan Sync &amp; Backup verileri geri yüklensin mi?</string>
+    <string name="sync_previous_session_ready_body">DuckDuckGo\'ya önceki yer işaretleri, şifreleri ve diğer verileri almak için geri yükleyin.</string>
+    <string name="sync_previous_session_ready_resume_cta">Sync &amp; Backup\'ı geri yükleyin</string>
+    <string name="sync_previous_session_ready_continue_cta">Yeni Senkronizasyon Ayarlayın</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Verilerinizi Kolayca Kurtarın</string>
+    <string name="sync_recover_data_content">Bu cihaza erişiminizi kaybettiğinizde verilerinizi kurtarmak için bu kodu kullanın. Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz.</string>
+    <string name="sync_recover_data_recovery_code_label">Kurtarma Kodu</string>
+    <string name="sync_recover_data_download_pdf">PDF olarak indir</string>
+    <string name="sync_restore_on_reinstall_title">Uygulama Yeniden Yüklendiğinde Geri Yükle</string>
+    <string name="sync_restore_on_reinstall_description">DuckDuckGo uygulamasını yeniden yüklerseniz, verilerinizi bu cihazda geri yüklemek isteyip istemediğinizi sorarız.</string>
 </resources>

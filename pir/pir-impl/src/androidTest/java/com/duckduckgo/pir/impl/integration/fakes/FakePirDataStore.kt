@@ -30,10 +30,16 @@ class FakePirDataStore : PirDataStore {
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
     override var latestBackgroundScanRunInMs: Long = 0L
+    override var featureReceivedMs: Long = 0L
+    override var hasInitialScanEverStarted: Boolean = false
+    override var initialScanCompletionFlowId: Long = 0L
+    override var initialScanCompletionForegroundRunCount: Int = 0
+    override var initialScanCompletionScheduledRunCount: Int = 0
 
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
         resetUserData()
     }
 
@@ -44,5 +50,9 @@ class FakePirDataStore : PirDataStore {
         mauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
+        hasInitialScanEverStarted = false
+        initialScanCompletionFlowId = 0L
+        initialScanCompletionForegroundRunCount = 0
+        initialScanCompletionScheduledRunCount = 0
     }
 }

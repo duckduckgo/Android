@@ -266,8 +266,8 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
 
     fun reportAccessRevokedDialogShown()
-    fun reportPrivacyProPromotionDialogShown()
-    fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+    fun reportSubscriptionPromotionDialogShown()
+    fun reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled()
 
     fun reportVpnEnabledFromQuickSettingsTile()
     fun reportVpnDisabledFromQuickSettingsTile()
@@ -303,6 +303,7 @@ interface NetworkProtectionPixels {
     fun reportAutoExcludePromptEnable()
     fun reportAutoExcludeEnableViaExclusionList()
     fun reportAutoExcludeDisableViaExclusionList()
+    fun reportNotificationLaunched(pixelName: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -545,14 +546,14 @@ class RealNetworkProtectionPixel @Inject constructor(
         tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY)
     }
 
-    override fun reportPrivacyProPromotionDialogShown() {
-        firePixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN)
-        tryToFireDailyPixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY)
+    override fun reportSubscriptionPromotionDialogShown() {
+        firePixel(NETP_SUBSCRIPTION_PROMOTION_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_SUBSCRIPTION_PROMOTION_DIALOG_SHOWN_DAILY)
     }
 
-    override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
-        firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
-        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
+    override fun reportVpnBetaStoppedWhenSubscriptionUpdatedAndEnabled() {
+        firePixel(NETP_BETA_STOPPED_WHEN_SUBSCRIPTION_UPDATED_AND_ENABLED)
+        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_SUBSCRIPTION_UPDATED_AND_ENABLED_DAILY)
     }
 
     override fun reportVpnEnabledFromQuickSettingsTile() {
@@ -673,6 +674,10 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportAutoExcludeDisableViaExclusionList() {
         firePixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST)
         tryToFireDailyPixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST_DAILY)
+    }
+
+    override fun reportNotificationLaunched(pixelName: String) {
+        firePixel(pixelName)
     }
 
     private fun firePixel(

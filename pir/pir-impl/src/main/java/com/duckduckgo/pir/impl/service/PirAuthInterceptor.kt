@@ -40,7 +40,9 @@ class PirAuthInterceptor @Inject constructor(
     override fun intercept(chain: Chain): Response {
         val request = chain.request()
 
-        val authRequired = request.tag(Invocation::class.java)
+        val invocation = request.tag(Invocation::class.java)
+
+        val authRequired = invocation
             ?.method()
             ?.isAnnotationPresent(PirAuthRequired::class.java) == true
 

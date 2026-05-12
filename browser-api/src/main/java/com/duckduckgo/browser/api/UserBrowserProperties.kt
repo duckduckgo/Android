@@ -23,9 +23,21 @@ interface UserBrowserProperties {
     fun appTheme(): DuckDuckGoTheme
     suspend fun bookmarks(): Long
     suspend fun favorites(): Long
+
+    @Deprecated(
+        message = "Use AppBuildConfig.isNewInstall() to check for new installs, " +
+            "or PackageInfo.firstInstallTime / lastUpdateTime if you need the actual timestamp.",
+    )
     fun daysSinceInstalled(): Long
     suspend fun daysUsedSince(since: Date): Long
     fun defaultBrowser(): Boolean
+
+    /**
+     * Returns true if this app has ever been set as the user's default browser.
+     * Once true, this value is permanent — it does not revert if the user later
+     * changes their default browser to something else.
+     */
+    suspend fun wasEverDefaultBrowser(): Boolean
     fun emailEnabled(): Boolean
     fun searchCount(): Long
     fun widgetAdded(): Boolean

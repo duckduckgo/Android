@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
+import androidx.core.net.toUri
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -48,7 +65,76 @@ class DataClearing @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val dataClearingWideEvent: DataClearingWideEvent,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val navigationHistory: NavigationHistory,
+    private val tabOperations: TabAtomicOperations,
+    private val tabRepository: TabRepository,
+    private val duckChat: DuckChat,
+    private val contextualDataStore: DuckChatContextualDataStore,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
+    private val dataClearingTrigger: DataClearingTrigger,
 ) : ManualDataClearing, AutomaticDataClearing {
+
+    override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
+        suspend fun clearContextualChatDataIfNeeded(tabId: String) {
+            val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
+                .contains(FireClearOption.DUCKAI_CHATS)
+
+            if (isDuckAiChatHistoryClearingEnabled) {
+                val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+                clearDuckAiChatIfNeeded(contextualTabChatUrl)
+
+                contextualDataStore.clearTabChatUrl(tabId)
+            }
+        }
+
+        logcat { "Performing single tab clear for tab: $tabId" }
+
+        val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
+        val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
+        val tabUrl = tabRepository.getTab(tabId)?.url
+
+        clearDuckAiChatIfNeeded(tabUrl)
+        clearContextualChatDataIfNeeded(tabId)
+        navigationHistory.removeHistoryForTab(tabId)
+
+        val url = getNewTabUrl(tabUrl)
+        tabOperations.replaceTabWithNewTab(tabId, url)
+
+        logcat { "Single tab clear completed for tab: $tabId" }
+        return clearDataResult
+    }
+
+    override suspend fun clearTabContextualChat(tabId: String): ClearDataResult {
+        suspend fun deleteContextualChat(tabId: String) {
+            val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            clearDuckAiChatIfNeeded(contextualTabChatUrl)
+        }
+
+        logcat { "Performing contextual sheet clear for tab: $tabId" }
+
+        deleteContextualChat(tabId)
+
+        logcat { "Contextual sheet clear completed for tab: $tabId" }
+        return ClearDataResult.Success
+    }
+
+    private suspend fun getNewTabUrl(tabUrl: String?): String? {
+        val option = showOnAppLaunchOptionDataStore.optionFlow.firstOrNull()
+        val isDuckChat = tabUrl?.toUri()?.let { duckChat.isDuckChatUrl(it) } == true
+        return when {
+            isDuckChat -> duckChat.getDuckChatUrl("", autoPrompt = false)
+            option is ShowOnAppLaunchOption.SpecificPage -> option.url
+            else -> null
+        }
+    }
+
+    private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
+        logcat { "clearDuckAiChatIfNeeded url=$tabUrl" }
+        if (tabUrl == null) return
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Single(tabUrl)))
+    }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
         val options = fireDataStore.getManualClearOptions()
@@ -63,6 +149,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (shouldRestartIfRequired && wasDataCleared) {
+            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }
@@ -80,6 +167,7 @@ class DataClearing @Inject constructor(
             duckAiFeatureState.showClearDuckAIChatHistory.value
         val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (killProcessIfNeeded && wasDataCleared) {
+            dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killProcess()
             return false
         } else {
@@ -166,6 +254,7 @@ class DataClearing @Inject constructor(
 
         if (shouldClearDuckAiChats) {
             clearDataAction.clearDuckAiChatsOnly()
+            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.All))
         }
 
         logcat { "Granular clear completed" }

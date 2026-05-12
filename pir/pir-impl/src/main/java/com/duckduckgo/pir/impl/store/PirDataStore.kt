@@ -29,6 +29,25 @@ interface PirDataStore {
     var weeklyStatLastSentMs: Long
     var hasBrokerConfigBeenManuallyUpdated: Boolean
     var latestBackgroundScanRunInMs: Long
+    var featureReceivedMs: Long
+
+    /**
+     * Set the first time `MANUAL_INITIAL` runs for a user. Once set, the
+     * `pir-time-to-first-scan-complete` wide event will not start a new flow for that user.
+     */
+    var hasInitialScanEverStarted: Boolean
+
+    /**
+     * Persisted `flowId` of the in-progress `pir-time-to-first-scan-complete` wide event.
+     * `0L` when no flow is open.
+     */
+    var initialScanCompletionFlowId: Long
+
+    /** Number of foreground service runs that have contributed to the open completion flow. */
+    var initialScanCompletionForegroundRunCount: Int
+
+    /** Number of scheduled worker runs that have contributed to the open completion flow. */
+    var initialScanCompletionScheduledRunCount: Int
 
     fun reset()
     fun resetUserData()
@@ -108,9 +127,50 @@ internal class RealPirDataStore(
             }
         }
 
+    override var featureReceivedMs: Long
+        get() = preferences.getLong(KEY_FEATURE_RECEIVED_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_FEATURE_RECEIVED_MS, value)
+            }
+        }
+
+    override var hasInitialScanEverStarted: Boolean
+        get() = preferences.getBoolean(KEY_HAS_INITIAL_SCAN_EVER_STARTED, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(KEY_HAS_INITIAL_SCAN_EVER_STARTED, value)
+            }
+        }
+
+    override var initialScanCompletionFlowId: Long
+        get() = preferences.getLong(KEY_INITIAL_SCAN_COMPLETION_FLOW_ID, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_INITIAL_SCAN_COMPLETION_FLOW_ID, value)
+            }
+        }
+
+    override var initialScanCompletionForegroundRunCount: Int
+        get() = preferences.getInt(KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT, 0)
+        set(value) {
+            preferences.edit {
+                putInt(KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT, value)
+            }
+        }
+
+    override var initialScanCompletionScheduledRunCount: Int
+        get() = preferences.getInt(KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT, 0)
+        set(value) {
+            preferences.edit {
+                putInt(KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT, value)
+            }
+        }
+
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
         resetUserData()
     }
 
@@ -121,6 +181,10 @@ internal class RealPirDataStore(
         mauLastSentMs = 0L
         weeklyStatLastSentMs = 0L
         latestBackgroundScanRunInMs = 0L
+        hasInitialScanEverStarted = false
+        initialScanCompletionFlowId = 0L
+        initialScanCompletionForegroundRunCount = 0
+        initialScanCompletionScheduledRunCount = 0
     }
 
     companion object {
@@ -133,5 +197,10 @@ internal class RealPirDataStore(
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
         private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
         private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"
+        private const val KEY_FEATURE_RECEIVED_MS = "KEY_FEATURE_RECEIVED_MS"
+        private const val KEY_HAS_INITIAL_SCAN_EVER_STARTED = "KEY_HAS_INITIAL_SCAN_EVER_STARTED"
+        private const val KEY_INITIAL_SCAN_COMPLETION_FLOW_ID = "KEY_INITIAL_SCAN_COMPLETION_FLOW_ID"
+        private const val KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_FOREGROUND_RUN_COUNT"
+        private const val KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT = "KEY_INITIAL_SCAN_COMPLETION_SCHEDULED_RUN_COUNT"
     }
 }

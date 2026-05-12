@@ -491,7 +491,6 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
-
             testee.handleState(state)
 
             verify(mockJobRecordUpdater).updateOptOutRequested(testExtractedProfileId)
@@ -541,7 +540,6 @@ class RealPirRunStateHandlerTest {
                     optOutRemovedDateInMillis = 0L,
                 ),
             )
-
             testee.handleState(state)
 
             verify(mockJobRecordUpdater).updateOptOutError(testExtractedProfileId)

@@ -42,8 +42,10 @@ class InputScreenButtons @JvmOverloads constructor(
     var onSendClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionSend.setOnClickListener { value?.invoke() }
+            binding.actionSend.setOnClickListener { sendIfEnabled() }
         }
+
+    var onStopClick: (() -> Unit)? = null
 
     var onNewLineClick: (() -> Unit)? = null
         set(value) {
@@ -51,10 +53,16 @@ class InputScreenButtons @JvmOverloads constructor(
             binding.actionNewLine.setOnClickListener { value?.invoke() }
         }
 
-    var onVoiceClick: (() -> Unit)? = null
+    var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionVoice.setOnClickListener { value?.invoke() }
+            binding.actionVoiceSearch.setOnClickListener { value?.invoke() }
+        }
+
+    var onVoiceChatClick: (() -> Unit)? = null
+        set(value) {
+            field = value
+            binding.actionVoiceChat.setOnClickListener { value?.invoke() }
         }
 
     init {
@@ -62,13 +70,46 @@ class InputScreenButtons @JvmOverloads constructor(
             // when used in top bar we want to transform the buttons to floating
             transformButtonsToFloating()
         } else {
-            // when in bottom bar mode, the voice icon is shown in the input field
-            binding.actionVoice.gone()
+            // when in bottom bar mode, the voice search icon is shown in the input field
+            binding.actionVoiceSearch.gone()
         }
     }
 
     fun setSendButtonIcon(iconResId: Int) {
         binding.actionSend.setImageResource(iconResId)
+    }
+
+    fun showStopButton() {
+        binding.actionSend.isEnabled = true
+        binding.actionSend.setImageResource(R.drawable.ic_stop_16)
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
+        binding.actionSend.setOnClickListener { onStopClick?.invoke() }
+    }
+
+    fun showSendButton() {
+        binding.actionSend.setImageResource(R.drawable.ic_arrow_up_24)
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
+            if (binding.actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
+        )
+        binding.actionSend.setOnClickListener { sendIfEnabled() }
+    }
+
+    private fun sendIfEnabled() {
+        if (binding.actionSend.isEnabled) onSendClick?.invoke()
+    }
+
+    private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
+        val attributes = context.obtainStyledAttributes(intArrayOf(attr))
+        val colorStateList = attributes.getColorStateList(0)
+        attributes.recycle()
+        return colorStateList
+    }
+
+    fun setSendButtonEnabled(enabled: Boolean) {
+        binding.actionSend.isEnabled = enabled
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
+            if (enabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
+        )
     }
 
     fun setSendButtonVisible(visible: Boolean) {
@@ -79,8 +120,12 @@ class InputScreenButtons @JvmOverloads constructor(
         binding.actionNewLine.isVisible = visible
     }
 
-    fun setVoiceButtonVisible(visible: Boolean) {
-        binding.actionVoice.isVisible = visible
+    fun setVoiceSearchVisible(visible: Boolean) {
+        binding.actionVoiceSearch.isVisible = visible
+    }
+
+    fun setVoiceChatVisible(visible: Boolean) {
+        binding.actionVoiceChat.isVisible = visible
     }
 
     private fun transformButtonsToFloating() {
@@ -94,7 +139,11 @@ class InputScreenButtons @JvmOverloads constructor(
             width = buttonSizePx
             height = buttonSizePx
         }
-        binding.actionVoice.updateLayoutParams {
+        binding.actionVoiceSearch.updateLayoutParams {
+            width = buttonSizePx
+            height = buttonSizePx
+        }
+        binding.actionVoiceChat.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
@@ -102,7 +151,8 @@ class InputScreenButtons @JvmOverloads constructor(
         // add shadows via elevation and add padding to the container to avoid clipping
         val elevation = 6f.toPx(context)
         binding.actionNewLine.elevation = elevation
-        binding.actionVoice.elevation = elevation
+        binding.actionVoiceSearch.elevation = elevation
+        binding.actionVoiceChat.elevation = elevation
         binding.actionSend.elevation = elevation
         val padding = elevation.times(2).roundToInt()
         binding.root.setPadding(padding)
@@ -110,9 +160,11 @@ class InputScreenButtons @JvmOverloads constructor(
         // add circular background and click ripple to all remaining buttons
         val backgroundRes = R.drawable.background_input_screen_button
         binding.actionNewLine.setBackgroundResource(backgroundRes)
-        binding.actionVoice.setBackgroundResource(backgroundRes)
+        binding.actionVoiceChat.setBackgroundResource(backgroundRes)
+        binding.actionVoiceSearch.setBackgroundResource(backgroundRes)
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
         binding.actionNewLine.foreground = circularRippleDrawable
-        binding.actionVoice.foreground = circularRippleDrawable
+        binding.actionVoiceSearch.foreground = circularRippleDrawable
+        binding.actionVoiceChat.foreground = circularRippleDrawable
     }
 }

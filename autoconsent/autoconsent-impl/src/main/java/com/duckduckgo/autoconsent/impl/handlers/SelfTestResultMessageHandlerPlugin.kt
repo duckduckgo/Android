@@ -18,6 +18,8 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -32,6 +34,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class SelfTestResultMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -47,7 +50,16 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor(
                     autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_FAIL_DAILY)
                 }
 
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
+                autoconsentCallback.onResultReceived(
+                    AutoconsentResult(
+                        consentManaged = true,
+                        optOutFailed = false,
+                        selfTestFailed = message.result,
+                        isCosmetic = null,
+                        consentRule = message.cmp,
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    ),
+                )
             } catch (e: Exception) {
                 logcat { e.localizedMessage }
             }

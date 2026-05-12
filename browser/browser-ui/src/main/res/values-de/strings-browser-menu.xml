@@ -33,8 +33,10 @@
     <string name="browserMenuEmailAlias">Duck-Adresse generieren</string>
     <string name="browserMenuFindInPage">Auf Seite suchen</string>
     <string name="browserMenuPrint">Seite drucken</string>
+    <string name="browserMenuPrintSite">Drucken</string>
     <string name="browserMenuOpenAppLink">In App öffnen</string>
     <string name="browserMenuAddToHome">Zum Startbildschirm hinzufügen</string>
+    <string name="browserMenuDownloadPdf">PDF herunterladen</string>
     <string name="browserMenuReportBrokenSite">Fehlerhafte Seite melden</string>
     <string name="browserMenuAutofill">Passwörter</string>
     <string name="browserMenuDownloads">Downloads</string>
@@ -45,11 +47,15 @@
     <string name="browserMenuNewChat">Neuer Chat</string>
     <string name="browserMenuNewAIChat">Neuer AI Chat</string>
     <string name="browserMenuChatHistory">Chatverlauf</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai-Chats</string>
     <string name="browserMenuChatSettings">Duck.ai-Einstellungen</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Gratis testen</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Zurück</string>
     <string name="browserMenuForward">Weiter</string>
     <string name="browserMenuRefresh">Aktualisieren</string>
+    <string name="browserMenuFireTabsData">Tabs und Daten löschen</string>
 </resources>

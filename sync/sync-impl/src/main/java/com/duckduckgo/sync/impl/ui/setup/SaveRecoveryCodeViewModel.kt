@@ -39,6 +39,7 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Recov
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -56,6 +57,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
     private val syncPixels: SyncPixels,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -68,8 +70,12 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                 val newState = SignedIn(
                     b64RecoveryCode = recoveryCode.rawCode,
                 )
+                syncSetupWideEvent.onRecoveryCodeShown()
                 viewState.emit(ViewState(newState))
-            } ?: command.send(Command.FinishWithError)
+            } ?: run {
+                syncSetupWideEvent.onRecoveryCodeGenerationFailed()
+                command.send(Command.FinishWithError)
+            }
         } else {
             viewState.emit(ViewState(CreatingAccount))
             syncAccountRepository.createAccount().onFailure {

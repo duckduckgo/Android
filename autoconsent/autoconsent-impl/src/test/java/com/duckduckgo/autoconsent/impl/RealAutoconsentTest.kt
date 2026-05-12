@@ -129,7 +129,13 @@ class RealAutoconsentTest {
 
     @Test
     fun whenSetAutoconsentOptOutThenEvaluateJavascriptCalled() {
-        val expected = """javascript:(function() {window.autoconsentMessageCallback({ "type": "optOut" }, window.origin);})();"""
+        val expected = """
+            javascript:(function() {
+                if (typeof window.autoconsentMessageCallback === 'function') {
+                    window.autoconsentMessageCallback({ "type": "optOut" }, window.origin);
+                }
+            })();
+        """.trimIndent()
 
         autoconsent.setAutoconsentOptOut(webView)
         assertEquals(expected, shadowOf(webView).lastEvaluatedJavascript)

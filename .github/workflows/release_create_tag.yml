@@ -1,16 +1,24 @@
 name: Release - Create and Push Tag
 
 on:
+  workflow_call:
+    inputs:
+      app-version:
+        description: 'App Version for Release'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       app-version:
         description: 'App Version for Release'
         required: true
         default: 'PLACEHOLDER'
+        type: string
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  emoji_start: ":flight_departure:" # 🛫
   emoji_info: ":information_source:" # ℹ️
 
 concurrency:
@@ -23,6 +31,15 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Check app-version value
+        run: |
+          if [ "${{ inputs.app-version }}" == "PLACEHOLDER" ]; then
+            echo "Input value cannot be 'PLACEHOLDER'."
+            exit 1
+          else
+            echo "Input value is valid: ${{ inputs.app-version }}"
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -67,10 +84,20 @@ jobs:
           ruby-version: 2.7.2
           bundler-cache: true
 
+      - name: Notify Mattermost of Release starting
+        id: send-mm-release-starting
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{env.emoji_start}} Starting release process for version ${{ inputs.app-version }}
+          action: 'send-mattermost-message'
+
       - name: Use fastlane lane to create and push tagged release
         id: create_git_tag
         run: |        
-          bundle exec fastlane android tag_and_push_release_version app_version:${{ github.event.inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
+          bundle exec fastlane android tag_and_push_release_version app_version:${{ inputs.app-version }} ref:${{ steps.get_lgc_tag.outputs.lgc_tag }}
 
       - name: Notify Mattermost
         id: send-mm-message
@@ -79,7 +106,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
+          mattermost-message: ${{env.emoji_info}} Release ${{ inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ inputs.app-version }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

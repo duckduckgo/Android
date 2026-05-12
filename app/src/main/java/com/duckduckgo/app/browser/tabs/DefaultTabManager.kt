@@ -37,7 +37,7 @@ interface TabManager {
 
     fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)
     fun getSelectedTabId(): String?
-    fun onSelectedTabChanged(tabId: String)
+    suspend fun onSelectedTabChanged(tabId: String)
 
     suspend fun onTabsChanged(updatedTabIds: List<TabModel>)
     suspend fun switchToTab(tabId: String)
@@ -69,8 +69,11 @@ class DefaultTabManager @Inject constructor(
 
     override fun getSelectedTabId(): String? = selectedTabId
 
-    override fun onSelectedTabChanged(tabId: String) {
+    override suspend fun onSelectedTabChanged(tabId: String) {
         selectedTabId = tabId
+        withContext(dispatchers.io()) {
+            tabRepository.updateTabLastAccess(tabId)
+        }
     }
 
     override suspend fun onTabsChanged(updatedTabIds: List<TabModel>) {

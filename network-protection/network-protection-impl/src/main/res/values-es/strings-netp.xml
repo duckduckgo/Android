@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatible con VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Algunas aplicaciones, como las de banca o streaming, no funcionan bien con VPN. Cuando este ajuste esté activado, excluiremos automáticamente esas aplicaciones.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Cerrar</string>
+    <string name="netpVpnIndicatorContentDescription">Indicador de estado de la VPN</string>
+
 </resources>

@@ -22,7 +22,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -36,7 +36,7 @@ class RealRemoteMessageModel @Inject constructor(
 ) : RemoteMessageModel {
 
     override fun getActiveMessage(): RemoteMessage? = remoteMessagingRepository.message()
-    override fun getActiveMessages() = remoteMessagingRepository.messageFlow()
+    override fun observeActiveMessages() = remoteMessagingRepository.messageFlow()
 
     override suspend fun onMessageShown(remoteMessage: RemoteMessage) {
         withContext(dispatchers.io()) {
@@ -79,8 +79,16 @@ class RealRemoteMessageModel @Inject constructor(
         return action
     }
 
-    override suspend fun getRemoteMessageImageFile(): String? {
-        return remoteMessagingRepository.getRemoteMessageImageFile()
+    override suspend fun getRemoteMessageImageFile(surface: Surface): String? {
+        return remoteMessagingRepository.getRemoteMessageImageFile(surface)
+    }
+
+    override suspend fun clearMessageImage(surface: Surface) {
+        remoteMessagingRepository.clearMessageImage(surface)
+    }
+
+    override suspend fun isMessageDismissed(id: String): Boolean = withContext(dispatchers.io()) {
+        remoteMessagingRepository.dismissedMessages().contains(id)
     }
 
     private fun Content.getPrimaryAction(): Action? {

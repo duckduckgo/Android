@@ -29,6 +29,7 @@ import java.io.Serializable
  * @param browserButtonsConfig configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu)
  * @param showInstalledApps whether apps installed on the device should appear in autocomplete results
  * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
+ * @param isNewTab whether the input screen is being launched as part of a new tab creation action
  */
 data class InputScreenActivityParams(
     val query: String,
@@ -37,6 +38,9 @@ data class InputScreenActivityParams(
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
     val launchOnChat: Boolean = false,
+    val showReturnHatch: Boolean = false,
+    val isNewTab: Boolean = false,
+    val showDuckAiOnboardingEndCta: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**
@@ -71,6 +75,9 @@ data object InputScreenActivityResultParams {
 
     /** Key for any canceled draft content when result is [Activity.RESULT_CANCELED] */
     const val CANCELED_DRAFT_PARAM = "draft"
+
+    /** Key for duck.ai end CTA interaction result (Boolean: true = OK clicked, false = dismissed) */
+    const val DUCK_AI_ONBOARDING_END_CTA_OK_CLICKED = "duck_ai_end_cta_ok"
 }
 
 /**

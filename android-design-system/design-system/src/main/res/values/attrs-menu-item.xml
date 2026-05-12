@@ -26,6 +26,7 @@
         <attr name="primaryText" />
         <attr name="typography" />
         <attr name="textType" />
+        <attr name="showDotIndicator" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="PopupMenuItemView">

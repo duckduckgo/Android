@@ -96,6 +96,7 @@ enum class ButtonType {
     GHOST,
     SECONDARY,
     DESTRUCTIVE,
+    DESTRUCTIVE_SECONDARY,
     GHOST_DESTRUCTIVE,
     GHOST_ALT,
     ;
@@ -106,6 +107,7 @@ enum class ButtonType {
             GHOST -> DaxButtonGhost(context, null)
             SECONDARY -> DaxButtonSecondary(context, null)
             DESTRUCTIVE -> DaxButtonDestructive(context, null)
+            DESTRUCTIVE_SECONDARY -> DaxButtonDestructiveSecondary(context, null)
             GHOST_DESTRUCTIVE -> DaxButtonGhostDestructive(context, null)
             GHOST_ALT -> DaxButtonGhostAlt(context, null)
         }

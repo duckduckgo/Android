@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Annuleren</string>
     <string name="autocompleteRemoveItemRemove">Verwijderen</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Overschakelen naar tabblad · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Automatische suggesties bevatten nu ook je recent bezochte sites. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
-    <string name="openAutoCompleteSettings">Open Instellingen</string>
 </resources>

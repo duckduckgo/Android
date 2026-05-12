@@ -1,0 +1,148 @@
+{
+  "name": "CurAdvisor",
+  "url": "curadvisor.com",
+  "version": "0.7.0",
+  "addedDatetime": 1703052000000,
+  "optOutUrl": "https://curadvisor.com/nada/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "e25dd6a6-60da-4d55-b544-bb03216f9e99",
+          "url": "https://curadvisor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "c9babcb9-540e-48ac-900b-b32229e28124",
+          "selector": ".card",
+          "noResultsSelector": "//div[@class='page-404' and h1[starts-with(text(), 'Sorry')]]",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " ~"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Known as:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "years old",
+              "selector": ".card-title",
+              "afterText": " ~"
+            },
+            "addressCityState": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Has lived in:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Related to:']]/dd/ul[@class='list-inline m-0']/li",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://curadvisor.com/pro/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://curadvisor.com/nada/control/privacy",
+          "id": "0a0fd3f4-4505-4ebc-bbbe-819b86ac18a7"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "0cb160f0-3475-4476-a87f-2a084bcbd4d8"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "5ebf6fc6-a3ee-41f2-875f-82e9d11d24e9"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "22ec8469-c3f8-41e5-8537-6406e817da06"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "d02dd323-1508-4be7-b2d2-72f4bd67fc95"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "be51eb91-bba3-4f2d-8e33-d973372e281d"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "e417378b-bb62-4d63-ad8b-f2e1c3b30e1a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "e47c20c6-c45f-4d75-b514-06ffa97e35d5"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763397120463
+}

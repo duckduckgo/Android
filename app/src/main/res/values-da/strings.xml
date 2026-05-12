@@ -27,6 +27,9 @@
     <string name="cancel">Annullér</string>
     <string name="search">Søg</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat slettet</string>
+
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Besøg Indstillinger for at søge og surfe med DuckDuckGo hver gang.</string>
     <string name="onboardingDefaultBrowserTitle">Gør DuckDuckGo til din standard</string>
@@ -118,8 +121,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Ryd data</string>
-    <string name="fireClearAll">Ryd faner og data</string>
-    <string name="fireClearAllPlusDuckChats">Ryd faner, data og Duck.ai-chats</string>
+    <string name="fireClearAll">Slet faner og data</string>
+    <string name="fireClearAllPlusDuckChats">Slet faner, data og Duck.ai-chats</string>
     <string name="fireCancel">Annuller</string>
     <string name="fireDataCleared">Data ryddet</string>
 
@@ -128,6 +131,7 @@
     <string name="settingsMenuItemTitle">Indstillinger</string>
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">udseende</string>
+    <string name="settingsWhatsNew">Nyheder</string>
     <string name="settingsHeadingAbout">Omkring</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
@@ -135,6 +139,7 @@
     <string name="leaveFeedbackNew">Send tilbagemelding</string>
     <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
     <string name="settingsHeadingNextSteps">Næste trin</string>
+    <string name="settingsNextStepsHideItem">Skjul</string>
     <string name="settingsLightTheme">Let</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mørk</string>
@@ -172,9 +177,8 @@
     <string name="privateSearchAutocompleteHint">Vis søgeforslag, mens du skriver, inklusive fra dine bogmærker. Alle søgninger er private.</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nyligt besøgte websteder</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Vis nyligt besøgte websteder i søgeforslag. Nyligt besøgte sider er private, gemmes kun på din enhed og kan slettes med Fire Button.</string>
-    <string name="improvedAutoCompleteIAMContent">Forslag til autoudfyld inkluderer nu dine senest besøgte websteder. Slå fra i Indstillinger, eller ryd når som helst med 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Samme fortrolighed.\nBedre søgeforslag!</string>
-    <string name="openAutoCompleteSettings">Åbn indstillinger</string>
+    <string name="privateSearchChatSuggestionsToggle">Chatforslag</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Vis forslag fra din historik, bogmærker og Duck.ai-chathistorik (valgfrit), mens du skriver i søgefeltet. Alle søgninger er private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>
@@ -206,13 +210,24 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Udtrykker fravalgsrettigheder på dine vegne ved at fortælle websteder, at de ikke må sælge eller dele dine personlige oplysninger.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hent browser til computeren</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo til Mac og Windows</string>
+    <string name="getDesktopBrowserTitle">Beskyt dine personlige oplysninger, også på Mac og Windows!</string>
+    <string name="getDesktopBrowserBody">For at downloade DuckDuckGo på Mac eller Windows, skal du besøge:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Del downloadlink</string>
+    <string name="getDesktopBrowserNoThanks">Nej tak</string>
+    <string name="getDesktopBrowserHideItem">Skjul</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopieret</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
-    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at rydde data manuelt, eller opsæt automatisk rydning.</string>
+    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at slette data manuelt, eller opsæt automatisk sletning.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d websted udelukket fra rydning</item>
         <item quantity="other">%1$d websteder udelukket fra rydning</item>
@@ -221,7 +236,7 @@
     <string name="dataClearingAutomaticClearingOff">Fra</string>
     <string name="dataClearingClearBrowsingData">Ryd browserdata</string>
     <string name="dataClearingAutomaticDataClearing">Automatisk sletning af data</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Ryd data automatisk</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatisk sletning af data</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Luk alle åbne faner</string>
     <string name="dataClearingAutomaticDataOptionDescription">Slet alle webstedsdata, inklusive besøgte sider. Du kan blive logget ud af konti.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Slet alle chats, inklusive fastgjorte chats</string>
@@ -244,6 +259,22 @@
         <item quantity="other">Slet fra %1$d websteder. Du kan blive logget ud af konti.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Slet faner og webstedsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Slet faner, webstedsdata og chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Slet alle</string>
+    <string name="singleTabFireDialogDeleteThisTab">Slet denne fane</string>
+    <string name="singleTabFireDialogDeleteChat">Slet chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Slet denne chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Sletning af webstedsdata kan logge dig ud af konti.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dette annullerer igangværende downloads.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d fane og dens data slettet</item>
+        <item quantity="other">%1$d faner og deres data slettet</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Webstedsdata kunne ikke slettes. Opdater WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Webstedsdata kunne ikke slettes på grund af en fejl.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tilladelser</string>
 
@@ -261,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Ryd den …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Ryd den …</string>
+    <string name="settingsAutomaticallyClearWhen">Slet ved ...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Slet den ...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App-afslutning, inaktiv i 5 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App-afslutning, inaktiv i 15 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App-afslutning, inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App-afslutning, inaktiv i 1 time</string>
-    <string name="settingsClearAiDataTitle">Ryd Duck.ai-chats</string>
+    <string name="settingsClearAiDataTitle">Slet Duck.ai-chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historik, inklusive fastgjorte chats.</string>
     <string name="settingsClearDataActionSecondaryText">Rydder alle faner og data for websteder, du ikke har sikret med Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rydder alle faner, Duck.ai-chats og data for websteder, du ikke har sikret med Fireproof.</string>
@@ -795,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
     <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
@@ -807,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
     <string name="preOnboardingAddressBarOkButton">Næste</string>
@@ -855,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vidste du?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
@@ -941,4 +977,18 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Søg privat med DuckDuckGo, eller spørg Duck.ai. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Søg eller besøg dine yndlingssider privat med ét tryk. Stemmesøgning og Duck.ai er tilgængelige, hvis de er aktiveret.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Lad os fortsætte, hvor du slap</string>
+    <string name="syncRestoreDialogDescription">Vil du gendanne dine bogmærker, adgangskoder og andet fra din tidligere DuckDuckGo-synkronisering?</string>
+    <string name="syncRestoreDialogPrimaryCta">Gendan mine data</string>
+    <string name="syncRestoreDialogSecondaryCta">Spring over</string>
+
+    <!-- PDF download tooltip -->
+    <string name="pdfDownloadTooltipText">Download PDF-fil</string>
+
+    <!-- Sharing options -->
+    <string name="copyLinkText">Kopier linktekst</string>
+    <string name="linkTextCopied">Linktekst kopieret</string>
+    <string name="linkTextCopyFailed">Linkteksten kunne ikke kopieres</string>
 </resources>

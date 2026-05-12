@@ -30,6 +30,12 @@
         <item quantity="many">Tvoje záložky pro %1$s a %2$d dalšího webu se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
         <item quantity="other">Tvoje záložky pro %1$s a %2$d dalších webů se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Prohledat záložky</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Přidat složku</string>
+    <string name="bookmarksMenuContentDescription">Další možnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Přepnout viditelnost oblíbených</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Spravovat záložky</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Import z Googlu</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber soubor záložek…</string>
     <string name="bookmarksImportDialogClose">Zavřít</string>
+
 </resources>

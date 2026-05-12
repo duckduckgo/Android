@@ -26,12 +26,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class Domains(val list: List<String> = emptyList())
-data class KeysToDelete(val list: List<String> = emptyList())
 data class MatchingRegex(val list: List<String> = emptyList())
 
 data class WebLocalStorageSettings(
     val domains: Domains = Domains(),
-    val keysToDelete: KeysToDelete = KeysToDelete(),
     val matchingRegex: MatchingRegex = MatchingRegex(),
 )
 
@@ -52,23 +50,18 @@ class WebLocalStorageSettingsJsonParserImpl @Inject constructor(
     }
 
     override suspend fun parseJson(json: String?): WebLocalStorageSettings = withContext(dispatcherProvider.io()) {
-        if (json == null) return@withContext WebLocalStorageSettings(Domains(), KeysToDelete(), MatchingRegex())
+        if (json == null) return@withContext WebLocalStorageSettings()
 
         kotlin.runCatching {
             val parsed = jsonAdapter.fromJson(json)
             val domains = parsed?.asDomains() ?: Domains()
-            val keysToDelete = parsed?.asKeysToDelete() ?: KeysToDelete()
             val matchingRegex = parsed?.asMatchingRegex() ?: MatchingRegex()
-            WebLocalStorageSettings(domains, keysToDelete, matchingRegex)
-        }.getOrDefault(WebLocalStorageSettings(Domains(), KeysToDelete(), MatchingRegex()))
+            WebLocalStorageSettings(domains, matchingRegex)
+        }.getOrDefault(WebLocalStorageSettings())
     }
 
     private fun SettingsJson.asDomains(): Domains {
         return Domains(domains ?: emptyList())
-    }
-
-    private fun SettingsJson.asKeysToDelete(): KeysToDelete {
-        return KeysToDelete(keysToDelete ?: emptyList())
     }
 
     private fun SettingsJson.asMatchingRegex(): MatchingRegex {
@@ -77,7 +70,6 @@ class WebLocalStorageSettingsJsonParserImpl @Inject constructor(
 
     private data class SettingsJson(
         val domains: List<String>?,
-        val keysToDelete: List<String>?,
         val matchingRegex: List<String>?,
     )
 }

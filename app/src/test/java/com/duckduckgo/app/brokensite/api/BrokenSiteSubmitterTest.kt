@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -108,6 +109,8 @@ class BrokenSiteSubmitterTest {
 
     private val ampLinks: AmpLinks = mock()
 
+    private val sitePermissionsRepository: SitePermissionsRepository = mock()
+
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
 
@@ -126,6 +129,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+        runBlocking { whenever(sitePermissionsRepository.isDrmEnabledForSite(url = any())).thenReturn(true) }
 
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -163,6 +167,7 @@ class BrokenSiteSubmitterTest {
             webViewVersionProvider,
             ampLinks,
             inventory,
+            sitePermissionsRepository,
         )
     }
 
@@ -606,6 +611,30 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
+    fun whenDrmIsEnabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(true)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("true", paramsCaptor.lastValue["drmEnabled"])
+    }
+
+    @Test
+    fun whenDrmIsDisabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(false)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("false", paramsCaptor.lastValue["drmEnabled"])
+    }
+
+    @Test
     fun whenSubmitReportAndActiveContentScopeExperimentsThenIncludeParam() = runTest {
         val brokenSite = getBrokenSite()
         val contentScopeExperiments = listOf(
@@ -639,6 +668,34 @@ class BrokenSiteSubmitterTest {
         assertEquals("flag1,flag2", params["debugFlags"])
     }
 
+    @Test
+    fun whenBreakageDataIsNullThenEncodedParamsDoNotContainIt() = runTest {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertFalse(encodedParams.containsKey("breakageData"))
+    }
+
+    @Test
+    fun whenBreakageDataExistsThenItIsIncludedInEncodedParams() = runTest {
+        // Pre-encoded breakage data from content-scope-scripts
+        val preEncodedBreakageData = "%7B%22test%22%3A%22value%22%7D"
+        val brokenSite = getBrokenSite().copy(breakageData = preEncodedBreakageData)
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertEquals(preEncodedBreakageData, encodedParams["breakageData"])
+    }
+
     private fun assignToExperiment() {
         val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
@@ -665,6 +722,8 @@ class BrokenSiteSubmitterTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            consentRule = null,
+            consentReloadLoop = false,
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
@@ -674,6 +733,7 @@ class BrokenSiteSubmitterTest {
             jsPerformance = null,
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = null,
         )
     }
 

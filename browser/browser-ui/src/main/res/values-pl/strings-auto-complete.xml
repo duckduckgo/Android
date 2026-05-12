@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Anuluj</string>
     <string name="autocompleteRemoveItemRemove">Usuń</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Przełącz na kartę - %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
-    <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
 </resources>

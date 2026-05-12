@@ -80,6 +80,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pirDevBrokerConfig" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/pirDevCustomDashboardUrl"
+                app:typography="h4" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/pirCustomUrlInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:editable="true"
+                app:type="url" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/pirSetCustomUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevSetCustomUrl" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                android:id="@+id/pirResetCustomUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pirDevResetCustomUrl" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

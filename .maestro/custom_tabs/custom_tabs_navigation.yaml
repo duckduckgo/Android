@@ -1,7 +1,5 @@
 appId: com.duckduckgo.mobile.android
 name: "Custom Tabs navigation"
-tags:
-  - customTabsTest
 ---
 - retry:
     maxRetries: 3
@@ -11,8 +9,8 @@ tags:
           stopApp: true
 
       - assertVisible:
-          text: ".*Ready for a faster browser that keeps you protected?.*"
-      - tapOn: "let's do it!"
+          text: ".*Ready for a faster browser that protects you and lets you decide when and how to use AI?.*"
+      - tapOn: "let's get started!"
       - assertVisible:
           text: "Protections activated!"
       - tapOn: "choose your browser"

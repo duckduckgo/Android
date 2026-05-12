@@ -18,37 +18,48 @@ package com.duckduckgo.espresso
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.isClickable
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.clickMenuItem
 import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.duckduckgo.browser.ui.R as BrowserUiR
 
 @RunWith(AndroidJUnit4::class)
 class BasicJourneyTest {
 
-    /**
-     * Use [ActivityScenarioRule] to create and launch the activity under test before each test,
-     * and close it after each test. This is a replacement for
-     * [androidx.test.rule.ActivityTestRule].
-     */
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
     @Test @UserJourney
     fun browser_openPopUp() {
+        // dismiss any first-run dialogs (e.g., widget promo)
+        dismissBlockingDialogs()
+
         // since we use a fake toolbar, we want to wait until the real one is visible
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
 
-        // tap on PopupMenu
+        // tap on menu
         onView(allOf(withId(R.id.browserMenu), isClickable())).perform(click())
 
-        // check that the forward arrow is visible
-        onView(withContentDescription("Forward")).check(matches(isDisplayed()))
+        // check that the forward button is visible
+        clickMenuItem(withId(BrowserUiR.id.forwardMenuItem))
+    }
+
+    private fun dismissBlockingDialogs() {
+        // dismiss the home screen widget promo if present
+        runCatching {
+            onView(isRoot()).inRoot(isDialog())
+                .perform(waitForView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton), timeout = 3000))
+            onView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton)).perform(click())
+        }
     }
 }

@@ -23,7 +23,7 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -47,7 +47,7 @@ interface SubscriptionRestoreWideEvent {
 @ContributesBinding(AppScope::class)
 class SubscriptionRestoreWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : SubscriptionRestoreWideEvent {
@@ -141,7 +141,7 @@ class SubscriptionRestoreWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
+        subscriptionsFeature.get().sendSubscriptionRestoreWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

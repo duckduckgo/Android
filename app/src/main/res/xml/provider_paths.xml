@@ -20,4 +20,6 @@
         name="external_files"
         path="." />
     <cache-path name="sync" path="sync" />
+    <cache-path name="favicons" path="favicons/" />
+    <cache-path name="favicons_widget_placeholders" path="faviconsWidgetPlaceholders/" />
 </paths>

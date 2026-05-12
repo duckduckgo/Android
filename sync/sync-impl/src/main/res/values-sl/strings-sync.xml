@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">S tem ustvarite šifrirano varnostno kopijo zaznamkov, gesel in klepetov Duck.ai v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_footer">Pozneje lahko sinhronizirate z drugimi napravami.</string>
     <string name="sync_intro_enable_cta">Vklopite sinhronizacijo in varnostno kopiranje</string>
-    <string name="sync_intro_recover_title">Obnovitev sinhroniziranih podatkov</string>
-    <string name="sync_intro_recover_content">Za obnovitev sinhroniziranih podatkov potrebujete kodo za obnovitev, ki ste jo shranili ob prvi nastavitvi sinhronizacije. Ta koda je bila morda shranjena kot PDF v napravi, ki ste jo prvotno uporabili za nastavitev sinhronizacije.</string>
-    <string name="sync_intro_recover_cta">Začni</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Obnovi sinhronizirane podatke</string>
+    <string name="sync_recover_synced_data_content">Potrebovali boste obnovitveno kodo, ki ste jo prejeli ob nastavitvi funkcije Sync &amp; Backup. To kodo ste morda shranili kot PDF v napravi, ki ste jo takrat uporabili.</string>
+    <string name="sync_recover_synced_data_cta">Obnovitev sinhroniziranih podatkov</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniranje kode QR</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Želite izbrisati podatke strežnika?</string>
-    <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
+    <string name="sync_delete_server_data_dialog_content">Vaša varnostna kopija bo izbrisana s strežnika. Za vse naprave bo sinhronizacija prekinjena, vendar iz nobene naprave ne bo nič izbrisano.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Izbriši podatke strežnika</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sinhronizirajte zaznamke med napravami</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Skrij se</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Namesti namizni brskalnik</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za računalnike Mac in Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Obnovitev</string>
+    <string name="sync_settings_download_recovery_code_item">Prenesite kodo za obnovitev kot PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Uporabite to kodo za obnovitev podatkov, če izgubite dostop do te naprave – hranite jo na varnem.</string>
+    <string name="sync_settings_data_expiration">Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti. <annotation type="learn_more_link">Več o tem</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Želite obnoviti podatke funkcije Sync &amp; Backup iz prejšnje namestitve?</string>
+    <string name="sync_previous_session_ready_body">Z obnovitvijo dobite svoje prejšnje zaznamke, gesla in druge podatke nazaj v DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Obnovi podatke Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Nastavitev nove sinhronizacije</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Preprosto obnovite svoje podatke</string>
+    <string name="sync_recover_data_content">S to kodo obnovite podatke, če izgubite dostop do te naprave. Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti.</string>
+    <string name="sync_recover_data_recovery_code_label">Obnovitvena koda</string>
+    <string name="sync_recover_data_download_pdf">Prenesi kot PDF</string>
+    <string name="sync_restore_on_reinstall_title">Obnovi ob ponovni namestitvi aplikacije</string>
+    <string name="sync_restore_on_reinstall_description">Če ponovno namestite aplikacijo DuckDuckGo, vas bomo vprašali, ali želite obnoviti podatke v tej napravi.</string>
 </resources>

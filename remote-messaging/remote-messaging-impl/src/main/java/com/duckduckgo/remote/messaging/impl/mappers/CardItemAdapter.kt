@@ -39,6 +39,7 @@ class CardItemAdapter {
                 matchingRules = cardItem.matchingRules,
                 exclusionRules = cardItem.exclusionRules,
                 itemIDs = null,
+                imageUrl = cardItem.imageUrl,
             )
 
             is CardItem.SectionTitle -> CardItemJson(
@@ -74,6 +75,7 @@ class CardItemAdapter {
                     primaryActionText = json.primaryActionText ?: "",
                     matchingRules = json.matchingRules ?: emptyList(),
                     exclusionRules = json.exclusionRules ?: emptyList(),
+                    imageUrl = json.imageUrl,
                 )
             }
 
@@ -99,5 +101,6 @@ class CardItemAdapter {
         val matchingRules: List<Int>? = null,
         val exclusionRules: List<Int>? = null,
         val itemIDs: List<String>? = null,
+        val imageUrl: String? = null,
     )
 }

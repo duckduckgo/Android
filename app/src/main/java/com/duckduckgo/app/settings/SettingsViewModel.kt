@@ -24,6 +24,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_SETTINGS_OPENED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED
@@ -42,7 +46,9 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WHATS_NEW_PRESSED
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.GetDesktopBrowserCompleteSetupSettings.Companion.GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -61,10 +67,11 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScr
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -83,8 +90,8 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -121,13 +128,14 @@ class SettingsViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val modalSurfaceStore: ModalSurfaceStore,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
-    private val postCtaExperienceToggles: PostCtaExperienceToggles,
+    private val settingsDataStore: SettingsDataStore,
+    private val appInstallStore: AppInstallStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -138,7 +146,7 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
         val isAutoconsentEnabled: Boolean = false,
-        val isPrivacyProEnabled: Boolean = false,
+        val isSubscriptionEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
@@ -146,6 +154,11 @@ class SettingsViewModel @Inject constructor(
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
         val showWhatsNew: Boolean = false,
+        val showGetDesktopBrowser: Boolean = false,
+        val nextStepsAddressBarDismissed: Boolean = false,
+        val nextStepsVoiceSearchDismissed: Boolean = false,
+        val nextStepsSectionHidden: Boolean = false,
+        val showNextStepsHideButton: Boolean = false,
     )
 
     sealed class Command {
@@ -155,7 +168,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
-        data class LaunchAddHomeScreenWidget(val simpleWidgetPrompt: Boolean) : Command()
+        data object LaunchAddHomeScreenWidget : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
@@ -170,8 +183,9 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAboutScreen : Command()
         data object LaunchGeneralSettingsScreen : Command()
         data object LaunchFeedback : Command()
-        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchSubscriptionUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data object LaunchGetDesktopBrowser : Command()
         data class LaunchWhatsNew(
             val messageId: String,
             val messageType: Content.MessageType,
@@ -184,6 +198,8 @@ class SettingsViewModel @Inject constructor(
     private val appTPPollJob = ConflatedJob()
 
     private var widgetPromptShown = false
+    private var omnibarTypeBeforeNavigation: OmnibarType? = null
+    private var voiceSearchAvailableBeforeNavigation: Boolean? = null
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -197,6 +213,7 @@ class SettingsViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
+        refreshNextStepsDismissals()
         start()
         startPollingAppTPState()
     }
@@ -220,7 +237,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
-                    isPrivacyProEnabled = subscriptions.isEligible(),
+                    isSubscriptionEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
@@ -232,6 +249,21 @@ class SettingsViewModel @Inject constructor(
                     },
                     showWhatsNew = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.whatsNewEnabled().isEnabled() && modalSurfaceStore.getLastShownRemoteMessageId() != null
+                    },
+                    showGetDesktopBrowser = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled()
+                    },
+                    nextStepsAddressBarDismissed = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsAddressBarDismissed
+                    },
+                    nextStepsVoiceSearchDismissed = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsVoiceSearchDismissed
+                    },
+                    nextStepsSectionHidden = withContext(dispatcherProvider.io()) {
+                        settingsDataStore.nextStepsSectionHidden
+                    },
+                    showNextStepsHideButton = withContext(dispatcherProvider.io()) {
+                        appInstallStore.hasInstallTimestampRecorded() && appInstallStore.daysInstalled() >= NEXT_STEPS_HIDE_BUTTON_DAYS_THRESHOLD
                     },
                 ),
             )
@@ -249,7 +281,7 @@ class SettingsViewModel @Inject constructor(
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = subscriptions.isEligible(),
+                    isSubscriptionEnabled = subscriptions.isEligible(),
                 )
                 delay(1_000)
             }
@@ -269,6 +301,7 @@ class SettingsViewModel @Inject constructor(
             val messageId = modalSurfaceStore.getLastShownRemoteMessageId()
             val messageType = modalSurfaceStore.getLastShownRemoteMessageType()
             if (messageId != null && messageType != null) {
+                pixel.fire(SETTINGS_WHATS_NEW_PRESSED)
                 command.send(Command.LaunchWhatsNew(messageId, messageType))
             }
         }
@@ -276,8 +309,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val simpleWidgetPrompt = postCtaExperienceToggles.self().isEnabled() && postCtaExperienceToggles.simpleSearchWidgetPrompt().isEnabled()
-            command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            command.send(LaunchAddHomeScreenWidget)
             if (!currentViewState().widgetsInstalled) {
                 widgetPromptShown = true
             }
@@ -285,13 +317,37 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onChangeAddressBarPositionClicked() {
+        omnibarTypeBeforeNavigation = settingsDataStore.omnibarType
         viewModelScope.launch { command.send(LaunchAppearanceScreen) }
         pixel.fire(SETTINGS_NEXT_STEPS_ADDRESS_BAR)
     }
 
     fun onEnableVoiceSearchClicked() {
+        voiceSearchAvailableBeforeNavigation = voiceSearchAvailability.isVoiceSearchAvailable
         viewModelScope.launch { command.send(LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_NEXT_STEPS_VOICE_SEARCH)
+    }
+
+    fun onNextStepsHideClicked() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.nextStepsSectionHidden = true
+            viewState.update { it.copy(nextStepsSectionHidden = true) }
+        }
+    }
+
+    fun refreshNextStepsDismissals() {
+        omnibarTypeBeforeNavigation?.let { before ->
+            if (settingsDataStore.omnibarType != before) {
+                settingsDataStore.nextStepsAddressBarDismissed = true
+            }
+            omnibarTypeBeforeNavigation = null
+        }
+        voiceSearchAvailableBeforeNavigation?.let { before ->
+            if (voiceSearchAvailability.isVoiceSearchAvailable != before) {
+                settingsDataStore.nextStepsVoiceSearchDismissed = true
+            }
+            voiceSearchAvailableBeforeNavigation = null
+        }
     }
 
     fun onDefaultBrowserSettingClicked() {
@@ -391,7 +447,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireButtonSettingClicked() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 command.send(Command.LaunchDataClearingSettingsScreen)
             } else {
                 command.send(LaunchFireButtonScreen)
@@ -417,8 +473,8 @@ class SettingsViewModel @Inject constructor(
 
     fun onShareFeedbackClicked() {
         viewModelScope.launch {
-            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
-                command.send(LaunchPproUnifiedFeedback)
+            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(LaunchSubscriptionUnifiedFeedback)
             } else {
                 command.send(LaunchFeedback)
             }
@@ -430,7 +486,18 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
 
+    fun onGetDesktopBrowserClicked() {
+        pixel.fire(
+            AppPixelName.GET_DESKTOP_BROWSER_CLICKED,
+            mapOf(GET_DESKTOP_BROWSER_SOURCE_PIXEL_PARAM to GET_DESKTOP_BROWSER_SOURCE_SETTINGS),
+        )
+        viewModelScope.launch { command.send(Command.LaunchGetDesktopBrowser) }
+    }
+
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
+
+        private const val GET_DESKTOP_BROWSER_SOURCE_SETTINGS = "settings"
+        private const val NEXT_STEPS_HIDE_BUTTON_DAYS_THRESHOLD = 14L
     }
 }

@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">”%1$s” vill öppna din DRM-programvara</string>
-    <string name="drmSiteDialogSubtitle">DRM-programvara (Digital Rights Management) krävs för att spela upp skyddat medieinnehåll, men ger också tillgång till enhetsidentifierare. Ge endast behörighet att hantera dessa uppgifter till webbplatser du litar på.Du kan hantera behörigheter när som helst i Inställningar. <annotation type="drm_learn_more_link">Läs mer</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">”%1$s” vill öppna din DRM (Digital Rights Management)-programvara</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Om du väljer ”Avböj” kan videor på webbplatsen bli ospelbara, men %1$s kommer inte att ha åtkomst till enhetsidentifierare som tillhandahålls av DRM-programvara. Du kan hantera behörigheter när som helst i Inställningar. <annotation type="drm_learn_more_link">Läs mer</annotation></string>
     <string name="drmSiteDialogAllowAlways">Alltid</string>
     <string name="drmSiteDialogAllowOnce">Endast för denna session</string>
     <string name="drmSiteDialogDenyAlways">Neka alltid</string>

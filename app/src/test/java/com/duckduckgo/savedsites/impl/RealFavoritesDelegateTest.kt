@@ -400,6 +400,7 @@ class RealFavoritesDelegateTest {
         testee.insertFavorite(id = "Favorite1", title = "Favorite", url = "http://favexample.com", lastModified = "timestamp")
 
         val testObserver = testee.getFavoritesObservable().test()
+        testObserver.awaitCount(1)
         val lastState = testObserver.assertNoErrors().values().last()
 
         Assert.assertEquals(1, lastState.size)

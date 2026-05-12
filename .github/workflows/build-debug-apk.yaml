@@ -15,8 +15,13 @@ concurrency:
 
 jobs:
   build_debug_apk:
-    name: Build debug apk
+    name: Build debug apk (${{ matrix.di }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        di: [AnvilDagger, Metro]
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -59,18 +64,20 @@ jobs:
       - name: Assemble the project
         env:
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
-        run: ./gradlew assembleInternalDebug -Pforce-default-variant
+          DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
+          DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+        run: ./gradlew assembleInternalDebug -Pforce-default-variant -Pddg.di=${{ matrix.di }}
 
       - name: Obtain debug apk
         if: always()
-        run: cp "$(find . -regex '.*outputs/apk/.*internal-debug.apk')" pr-ddg-debug.apk
+        run: cp "$(find . -regex '.*outputs/apk/.*internal-debug.apk')" pr-ddg-debug-${{ matrix.di }}.apk
 
       - name: Upload debug apk
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pr-ddg-debug
-          path: pr-ddg-debug.apk
+          name: pr-ddg-debug-${{ matrix.di }}
+          path: pr-ddg-debug-${{ matrix.di }}.apk
 
       - name: Cleanup secrets
         if: always()

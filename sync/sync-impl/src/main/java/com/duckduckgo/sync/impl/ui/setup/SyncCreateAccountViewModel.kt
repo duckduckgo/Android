@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +46,7 @@ class SyncCreateAccountViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
     private val syncFeatureToggle: SyncFeatureToggle,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -77,9 +79,11 @@ class SyncCreateAccountViewModel @Inject constructor(
             command.send(FinishSetupFlow)
         } else {
             syncAccountRepository.createAccount().onSuccess {
+                syncSetupWideEvent.onAccountCreated()
                 syncPixels.fireSignupDirectPixel(source)
                 command.send(FinishSetupFlow)
             }.onFailure {
+                syncSetupWideEvent.onAccountCreationFailed()
                 command.send(Command.ShowError(R.string.sync_create_account_generic_error, it.reason))
             }
         }

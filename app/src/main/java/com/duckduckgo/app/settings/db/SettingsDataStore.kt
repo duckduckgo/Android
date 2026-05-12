@@ -37,7 +37,6 @@ import javax.inject.Inject
 interface SettingsDataStore {
     var lastExecutedJobId: String?
 
-    @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
     var maliciousSiteProtectionEnabled: Boolean
     var appIcon: AppIcon
@@ -82,6 +81,8 @@ interface SettingsDataStore {
     var automaticallyClearWhatOption: ClearWhatOption
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
+    var lastSessionBackgroundTimestamp: Long
+    var userSelectedIdleThresholdSeconds: Long?
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
@@ -105,8 +106,13 @@ interface SettingsDataStore {
      */
     var urlPreferenceSetByUser: Boolean
     var clearDuckAiData: Boolean
-    var useBottomSheetMenu: Boolean
     var showTrackersCountInAddressBar: Boolean
+    var hasNewDownload: Boolean
+    var singleTabFireDialogShownCount: Int
+    var getDesktopBrowserSettingDismissed: Boolean
+    var nextStepsAddressBarDismissed: Boolean
+    var nextStepsVoiceSearchDismissed: Boolean
+    var nextStepsSectionHidden: Boolean
 
     /**
      * Check if a value has been set to the URL display preference.
@@ -221,6 +227,23 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getLong(KEY_APP_BACKGROUNDED_TIMESTAMP, 0)
         set(value) = preferences.edit(commit = true) { putLong(KEY_APP_BACKGROUNDED_TIMESTAMP, value) }
 
+    override var lastSessionBackgroundTimestamp: Long
+        get() = preferences.getLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, 0)
+        set(value) = preferences.edit(commit = true) { putLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, value) }
+
+    override var userSelectedIdleThresholdSeconds: Long?
+        get() {
+            val value = preferences.getLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, Long.MIN_VALUE)
+            return if (value == Long.MIN_VALUE) null else value
+        }
+        set(value) = preferences.edit(commit = true) {
+            if (value == null) {
+                remove(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS)
+            } else {
+                putLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, value)
+            }
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
@@ -269,13 +292,33 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CLEAR_DUCK_AI_DATA, enabled) }
 
-    override var useBottomSheetMenu: Boolean
-        get() = preferences.getBoolean(KEY_USE_BOTTOM_SHEET_MENU, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_USE_BOTTOM_SHEET_MENU, enabled) }
-
     override var showTrackersCountInAddressBar: Boolean
         get() = preferences.getBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, enabled) }
+
+    override var hasNewDownload: Boolean
+        get() = preferences.getBoolean(KEY_HAS_NEW_DOWNLOAD, false)
+        set(value) = preferences.edit { putBoolean(KEY_HAS_NEW_DOWNLOAD, value) }
+
+    override var singleTabFireDialogShownCount: Int
+        get() = preferences.getInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, 0)
+        set(value) = preferences.edit { putInt(KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT, value) }
+
+    override var getDesktopBrowserSettingDismissed: Boolean
+        get() = preferences.getBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED, value) }
+
+    override var nextStepsAddressBarDismissed: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED, value) }
+
+    override var nextStepsVoiceSearchDismissed: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED, value) }
+
+    override var nextStepsSectionHidden: Boolean
+        get() = preferences.getBoolean(KEY_NEXT_STEPS_SECTION_HIDDEN, false)
+        set(value) = preferences.edit { putBoolean(KEY_NEXT_STEPS_SECTION_HIDDEN, value) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
 
@@ -334,6 +377,8 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
+        const val KEY_LAST_SESSION_BACKGROUND_TIMESTAMP = "LAST_SESSION_BACKGROUND_TIMESTAMP"
+        const val KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS = "KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS"
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
@@ -355,8 +400,13 @@ class SettingsSharedPreferences @Inject constructor(
         const val URL_PREFERENCE_MIGRATED = "URL_PREFERENCE_MIGRATED"
         const val URL_PREFERENCE_SET_BY_USER = "URL_PREFERENCE_SET_BY_USER"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
-        const val KEY_USE_BOTTOM_SHEET_MENU = "USE_BOTTOM_SHEET_MENU"
         const val KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR = "KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR"
+        const val KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT = "KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT"
+        const val KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED = "KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED"
+        const val KEY_HAS_NEW_DOWNLOAD = "KEY_HAS_NEW_DOWNLOAD"
+        const val KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED = "KEY_NEXT_STEPS_ADDRESS_BAR_DISMISSED"
+        const val KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED = "KEY_NEXT_STEPS_VOICE_SEARCH_DISMISSED"
+        const val KEY_NEXT_STEPS_SECTION_HIDDEN = "KEY_NEXT_STEPS_SECTION_HIDDEN"
     }
 
     private class FireAnimationPrefsMapper {

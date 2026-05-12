@@ -30,6 +30,12 @@
         <item quantity="many">Синхронизировать ваши закладки на %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
         <item quantity="other">Синхронизировать ваши закладки на %1$s и другие сайты (%2$d) не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Поиск по закладкам</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Добавить папку</string>
+    <string name="bookmarksMenuContentDescription">Другие параметры</string>
+    <string name="newTabFavoritesToggleContentDescription">Переключить видимость избранного</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Управление закладками</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортировать из Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Выберите файл закладок…</string>
     <string name="bookmarksImportDialogClose">Закрыть</string>
+
 </resources>

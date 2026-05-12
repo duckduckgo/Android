@@ -22,7 +22,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_default_browser_mobile_grey_16"
+            android:src="@drawable/ic_default_browser_mobile_grey_24"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView

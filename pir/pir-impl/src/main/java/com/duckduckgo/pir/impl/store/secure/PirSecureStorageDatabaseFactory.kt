@@ -19,10 +19,11 @@ package com.duckduckgo.pir.impl.store.secure
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.pir.impl.store.PirDatabase
+import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
@@ -42,38 +43,38 @@ interface PirSecureStorageDatabaseFactory {
 )
 class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
+    private val sqlCipherLoader: SqlCipherLoader,
     private val keyProvider: PirSecureStorageKeyProvider,
 ) : PirSecureStorageDatabaseFactory {
     private var _database: PirDatabase? = null
 
     private val mutex = Mutex()
 
-    init {
-        logcat { "PIR-DB: Loading the sqlcipher native library" }
-        try {
-            LibraryLoader.loadLibrary(context, "sqlcipher")
-            logcat { "PIR-DB: sqlcipher native library loaded ok" }
-        } catch (t: Throwable) {
-            // error loading the library
-            logcat(ERROR) { "PIR-DB: Error loading sqlcipher library: ${t.asLog()}" }
-        }
-    }
-
     override suspend fun getDatabase(): PirDatabase? {
-        _database?.let { return it }
+        _database?.let {
+            logcat { "PIR-DB: Returning existing database instance" }
+            return it
+        }
         return mutex.withLock {
             getInnerDatabase()
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun getInnerDatabase(): PirDatabase? {
         // If we have already the DB instance then let's use it
         if (_database != null) {
+            logcat { "PIR-DB: Database was initialized while waiting for lock" }
             return _database
         }
 
-        return runCatching {
+        logcat { "PIR-DB: Waiting for sqlcipher native library" }
+        sqlCipherLoader.waitForLibraryLoad().getOrElse { t ->
+            logcat(ERROR) { "PIR-DB: SqlCipher library load failure: ${t.asLog()}" }
+            return null
+        }
+        logcat { "PIR-DB: sqlcipher native library loaded ok" }
+
+        return try {
             // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.
             if (keyProvider.canAccessKeyStore()) {
                 // At this point, we are guaranteed that if L1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
@@ -96,8 +97,10 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
                 logcat(ERROR) { "PIR-DB: Cannot access key store!" }
                 null
             }
-        }.getOrElse {
-            logcat(ERROR) { "PIR-DB: Cannot instantiate the database due to ${it.message}!" }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "PIR-DB: Cannot instantiate the database due to ${e.message}!" }
             null
         }
     }

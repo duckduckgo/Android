@@ -38,7 +38,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 interface DuckAiMetricCollector {
     fun onMessageSent()
@@ -83,7 +82,7 @@ class DuckAiAttributedMetric @Inject constructor(
     override suspend fun getMetricParameters(): Map<String, String> {
         val stats = getEventStats()
         val params = mutableMapOf(
-            "count" to getBucketValue(stats.rollingAverage.roundToInt()).toString(),
+            "count" to getBucketValue(stats.rollingAverage).toString(),
             "version" to bucketConfig.await().version.toString(),
         )
         if (!hasCompleteDataWindow()) {
@@ -113,7 +112,7 @@ class DuckAiAttributedMetric @Inject constructor(
         }
     }
 
-    private suspend fun getBucketValue(avg: Int): Int {
+    private suspend fun getBucketValue(avg: Double): Int {
         val buckets = bucketConfig.await().buckets
         return buckets.indexOfFirst { bucket -> avg <= bucket }.let { index ->
             if (index == -1) buckets.size else index

@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.messaging
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeJsMessaging
 import com.duckduckgo.js.messaging.api.JsMessage
 import org.json.JSONObject
@@ -29,7 +30,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ClearMigrationDataHandlerTest {
     private val standaloneStore = InMemoryStandaloneStore()
-    private val plugin = ClearMigrationDataHandler(standaloneStore)
+    private val duckAiHostProvider = object : DuckAiHostProvider {}
+    private val plugin = ClearMigrationDataHandler(standaloneStore, duckAiHostProvider)
     private val handler = plugin.getJsMessageHandler()
     private lateinit var messaging: FakeJsMessaging
 

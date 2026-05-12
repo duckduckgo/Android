@@ -33,9 +33,12 @@ class FakeDuckChat(
     private val openDuckChatWithAutoPromptCalls = mutableListOf<String>()
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
-    private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
+    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
+    private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
+    var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
 
@@ -54,6 +57,7 @@ class FakeDuckChat(
     override fun getDuckChatUrl(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
@@ -89,6 +93,25 @@ class FakeDuckChat(
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> {
         return automaticContextAttachmentUserSettingEnabled
     }
+
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
+        return nativeInputFieldUserSettingEnabled
+    }
+
+    override suspend fun isStandaloneMigrationCompleted(): Boolean {
+        return standaloneMigrationCompleted
+    }
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        chatSuggestionsUserSettingEnabled.value = enabled
+    }
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
+
+    override fun openVoiceDuckChat() { }
+    override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+    override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

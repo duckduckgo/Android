@@ -109,7 +109,8 @@ sealed class Content(val messageType: MessageType) {
         DDG_ANNOUNCE("DDGAnnounce"),
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
-        MAC_AND_WINDOWS("NewForMacAndWindows"),
+        MAC_AND_WINDOWS_NEW("NewForMacAndWindows"),
+        MAC_AND_WINDOWS("MacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
         DUCK_AI_OLD("Duck.ai"),
         DUCK_AI("DuckAi"),
@@ -118,6 +119,8 @@ sealed class Content(val messageType: MessageType) {
         RADAR("Radar"),
         KEY_IMPORT("KeyImport"),
         SPLIT_BAR_SETTINGS("SplitBarSettings"),
+        BOOKMARKS_IMPORT("BookmarksImport"),
+        NEW_TAB_OPTIONS("NewTabOptions"),
         ;
 
         companion object {
@@ -184,6 +187,7 @@ sealed class CardItem {
         val primaryActionText: String = "",
         val matchingRules: List<Int>,
         val exclusionRules: List<Int>,
+        val imageUrl: String? = null,
     ) : CardItem()
 
     /**

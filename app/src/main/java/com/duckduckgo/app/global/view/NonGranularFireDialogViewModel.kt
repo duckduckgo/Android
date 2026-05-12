@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.ManualDataClearing
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -52,6 +53,7 @@ import javax.inject.Inject
 class NonGranularFireDialogViewModel @Inject constructor(
     private val fireDataStore: FireDataStore,
     private val dataClearing: ManualDataClearing,
+    private val dataClearingWideEvent: DataClearingWideEvent,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
@@ -124,7 +126,18 @@ class NonGranularFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-                dataClearing.clearDataUsingManualFireOptions()
+                val clearOptions = fireDataStore.getManualClearOptions()
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.NONGRANULAR_FIRE_DIALOG,
+                    clearOptions = clearOptions,
+                )
+                try {
+                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
             }
 
             command.send(Command.ClearingComplete)

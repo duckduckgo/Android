@@ -23,4 +23,8 @@ interface SerpEasterEggLogosToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun setFavourite(): Toggle
 }

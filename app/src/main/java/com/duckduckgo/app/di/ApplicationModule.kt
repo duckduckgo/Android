@@ -21,17 +21,17 @@ import android.content.Context
 import com.duckduckgo.app.global.currentProcessName
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-abstract class ApplicationModule {
+@ContributesTo(AppScope::class)
+object ApplicationModule {
 
     @SingleInstanceIn(AppScope::class)
-    @Binds
-    abstract fun bindContext(application: Application): Context
+    @Provides
+    fun provideContext(application: Application): Context = application
 }
 
 @Module

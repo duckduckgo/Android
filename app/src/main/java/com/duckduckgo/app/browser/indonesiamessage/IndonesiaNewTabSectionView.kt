@@ -118,6 +118,8 @@ class IndonesiaNewTabSectionView @JvmOverloads constructor(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_INDONESIA_MESSAGE,
+    featureName = "pluginIndonesiaNewTabSectionPlugin",
+    parentFeatureName = "pluginPointNewTabPageSectionPlugin",
 )
 class IndonesiaNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
 

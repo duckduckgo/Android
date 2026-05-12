@@ -45,6 +45,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -88,6 +89,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     private val mockPrivacyConfig: PrivacyConfig = mock()
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
+    private val sitePermissionsRepository: SitePermissionsRepository = mock()
 
     private val networkProtectionState: NetworkProtectionState = mock()
 
@@ -157,6 +159,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             webViewVersionProvider,
             ampLinks = mock(),
             inventory,
+            sitePermissionsRepository = sitePermissionsRepository,
         )
     }
 
@@ -173,6 +176,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
             PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
         )
+        runBlocking {
+            whenever(sitePermissionsRepository.isDrmEnabledForSite(testCase.siteURL)).thenReturn(testCase.drmEnabled)
+        }
 
         val url = Uri.parse(testCase.siteURL).host
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(!testCase.protectionsEnabled)
@@ -189,6 +195,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
             consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
+            consentRule = null,
+            consentReloadLoop = false,
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
@@ -198,6 +206,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             jsPerformance = listOf(123.45),
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = testCase.breakageData,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -250,6 +259,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val consentSelfTestFailed: String,
         val remoteConfigEtag: String?,
         val remoteConfigVersion: String?,
+        val breakageData: String?,
+        val drmEnabled: Boolean = true,
     )
 
     data class UrlParam(

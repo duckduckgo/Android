@@ -56,6 +56,7 @@
             "type": "two_line_list_item",
             "titleText": "Enhanced Scam Blocker",
             "descriptionText": "Browse confidently with protection against even more sneaky online threats.",
+            "imageUrl": "imageUrl",
             "placeholder": "Radar",
             "primaryAction": {
               "type": "url_in_context",

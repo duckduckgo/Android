@@ -33,9 +33,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionAppFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ActivityFeedbackBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.Command
@@ -54,9 +54,9 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PrivacyProFeedbackScreenWithParams::class)
-@ContributeToActivityStarter(PrivacyProAppFeedbackScreenWithParams::class)
-@ContributeToActivityStarter(GeneralPrivacyProFeedbackScreenNoParams::class)
+@ContributeToActivityStarter(SubscriptionFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(SubscriptionAppFeedbackScreenWithParams::class)
+@ContributeToActivityStarter(GeneralSubscriptionFeedbackScreenNoParams::class)
 class SubscriptionFeedbackActivity :
     DuckDuckGoActivity(),
     SubscriptionFeedbackGeneralFragment.Listener,
@@ -91,20 +91,20 @@ class SubscriptionFeedbackActivity :
 
     private fun handleInitialState() {
         val generalFeedbackParams =
-            intent.getActivityParams(GeneralPrivacyProFeedbackScreenNoParams::class.java)
+            intent.getActivityParams(GeneralSubscriptionFeedbackScreenNoParams::class.java)
         if (generalFeedbackParams != null) {
             viewModel.allowUserToChooseFeedbackType()
             return
         }
 
         val feedbackScreenParams =
-            intent.getActivityParams(PrivacyProFeedbackScreenWithParams::class.java)
+            intent.getActivityParams(SubscriptionFeedbackScreenWithParams::class.java)
         if (feedbackScreenParams != null) {
             viewModel.allowUserToChooseReportType(feedbackScreenParams.feedbackSource)
             return
         }
 
-        intent.getActivityParams(PrivacyProAppFeedbackScreenWithParams::class.java)?.let {
+        intent.getActivityParams(SubscriptionAppFeedbackScreenWithParams::class.java)?.let {
             viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
         }
     }
@@ -113,7 +113,7 @@ class SubscriptionFeedbackActivity :
         globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
     }
 
-    override fun onPproFeedbackClicked() {
+    override fun onSubscriptionFeedbackClicked() {
         viewModel.onProFeedbackSelected()
     }
 

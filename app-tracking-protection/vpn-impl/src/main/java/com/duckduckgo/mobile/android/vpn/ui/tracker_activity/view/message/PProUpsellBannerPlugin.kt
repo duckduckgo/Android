@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import android.content.Context
 import android.view.View
+import androidx.core.net.toUri
 import androidx.core.view.doOnAttach
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
@@ -41,10 +41,11 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_UPSELL_BANNER,
+    featureName = "pluginPProUpsellBannerPlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val browserNav: BrowserNav,
     private val vpnStore: VpnStore,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val appTPStateMessageToggle: AppTPStateMessageToggle,
@@ -54,7 +55,7 @@ class PProUpsellBannerPlugin @Inject constructor(
         vpnState: VpnState,
         clickListener: (DefaultAppTPMessageAction) -> Unit,
     ): View? {
-        val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isPproUpsellBannerDismised() }
+        val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isSubscriptionUpsellBannerDismised() }
         return if (isEligible) {
             val actionText: String
             runBlocking {
@@ -76,17 +77,17 @@ class PProUpsellBannerPlugin @Inject constructor(
                         ),
                     )
                     this.onCloseButtonClicked {
-                        deviceShieldPixels.reportPproUpsellBannerDismissed()
-                        vpnStore.dismissPproUpsellBanner()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerDismissed()
+                        vpnStore.dismissSubscriptionUpsellBanner()
                         this.gone()
                     }
 
                     this.onPrimaryActionClicked {
-                        deviceShieldPixels.reportPproUpsellBannerLinkClicked()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerLinkClicked()
                         context.launchPPro()
                     }
                     this.doOnAttach {
-                        deviceShieldPixels.reportPproUpsellBannerShown()
+                        deviceShieldPixels.reportSubscriptionUpsellBannerShown()
                     }
                 }
         } else {
@@ -95,7 +96,7 @@ class PProUpsellBannerPlugin @Inject constructor(
     }
 
     private fun Context.launchPPro() {
-        startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
+        subscriptions.launchSubscription(this, PPRO_UPSELL_URL.toUri())
     }
 
     companion object {

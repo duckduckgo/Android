@@ -72,7 +72,7 @@ class UserSegmentsPixelSenderTest {
         whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
         whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
 
-        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2")
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", mapOf())
         advanceUntilIdle()
 
         verify(usageHistory).addDuckAiUsage("v123-2")
@@ -90,7 +90,7 @@ class UserSegmentsPixelSenderTest {
     fun whenDuckAiRetentionAtbRefreshedAndAtbUnchangedThenPixelNotFired() = runTest {
         whenever(usageHistory.getDuckAiHistory()).thenReturn(listOf("v123-1"))
 
-        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-1")
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-1", mapOf())
         advanceUntilIdle()
 
         verify(segmentCalculation, never()).computeUserSegmentForActivityType(any(), any())
@@ -117,11 +117,63 @@ class UserSegmentsPixelSenderTest {
         whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
         whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
 
-        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2")
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", mapOf())
         advanceUntilIdle()
 
         verify(usageHistory, never()).addAppUsage(any())
         verify(usageHistory, never()).addSearchUsage(any())
+    }
+
+    @Test
+    fun whenDuckAiRetentionAtbRefreshedWithEmptyMetadata_thenPixelFiredWithSegmentParamsOnly() = runTest {
+        val usageHistoryList = listOf("v123-1", "v123-2")
+        val userSegment = SegmentCalculation.UserSegment(
+            activityType = "duckai",
+            cohortAtb = "v123-1",
+            newSetAtb = "v123-2",
+            countAsWau = true,
+            countAsMau = "tttt",
+            segmentsToday = listOf("first_month"),
+            segmentsPrevWeek = emptyList(),
+        )
+        whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
+        whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
+
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", emptyMap())
+        advanceUntilIdle()
+
+        verify(pixel).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = eq(userSegment.toPixelParams()),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun whenDuckAiRetentionAtbRefreshedWithMetadata_andAtbChanges_thenPixelStillFired() = runTest {
+        val usageHistoryList = listOf("v123-1", "v123-2")
+        val userSegment = SegmentCalculation.UserSegment(
+            activityType = "duckai",
+            cohortAtb = "v123-1",
+            newSetAtb = "v123-2",
+            countAsWau = true,
+            countAsMau = "tttt",
+            segmentsToday = listOf("first_month"),
+            segmentsPrevWeek = emptyList(),
+        )
+        whenever(usageHistory.getDuckAiHistory()).thenReturn(usageHistoryList)
+        whenever(segmentCalculation.computeUserSegmentForActivityType(DUCKAI, usageHistoryList)).thenReturn(userSegment)
+
+        testee.onDuckAiRetentionAtbRefreshed("v123-1", "v123-2", mapOf("modelTier" to "tier1"))
+        advanceUntilIdle()
+
+        verify(pixel).fire(
+            pixelName = eq(StatisticsPixelName.RETENTION_SEGMENTS.pixelName),
+            parameters = eq(userSegment.toPixelParams()),
+            encodedParameters = any(),
+            type = any(),
+        )
     }
 
     @Test

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Vazgeç</string>
     <string name="autocompleteRemoveItemRemove">Kaldır</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Sekmeye Geç · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
-    <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
-    <string name="openAutoCompleteSettings">Ayarları Aç</string>
 </resources>

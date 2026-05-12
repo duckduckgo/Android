@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tai sukuria užšifruotą jūsų žymių, slaptažodžių ir Duck.ai pokalbių atsarginę kopiją “DuckDuckGo” saugiame serveryje, kurią galima sinchronizuoti su kitais jūsų įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
-    <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>
-    <string name="sync_intro_recover_content">Norėdami atkurti sinchronizuotus duomenis, turėsite naudoti atkūrimo kodą, kurį išsaugojote pirmą kartą nustatydami sinchronizavimą. Šis kodas galėjo būti išsaugotas kaip PDF failas įrenginyje, kurį iš pradžių naudojote sinchronizavimui nustatyti.</string>
-    <string name="sync_intro_recover_cta">Pradėti</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Sinchronizuotų duomenų atkūrimas</string>
+    <string name="sync_recover_synced_data_content">Reikės atkūrimo kodo, kurį gavai, kai nustatei „Sync &amp; Backup\". Galbūt išsaugojai jį kaip PDF failą naudojamame įrenginyje.</string>
+    <string name="sync_recover_synced_data_cta">Atkurti sinchronizuotus duomenis</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Nuskaityti QR kodą</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ištrinti serverio duomenis?</string>
-    <string name="sync_delete_server_data_dialog_content">Visi įrenginiai bus atjungti, o sinchronizuoti duomenys bus ištrinti iš serverio.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Ištrinti duomenis</string>
+    <string name="sync_delete_server_data_dialog_content">Jūsų atsarginė kopija bus ištrinta iš serverio. Visi įrenginiai bus atjungti nuo sinchronizavimo, bet iš nė vieno įrenginio niekas nebus ištrinta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Ištrinti serverio duomenis</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Atšaukti</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sinchronizuoti žymes skirtinguose įrenginiuose</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Slėpti</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Atkūrimas</string>
+    <string name="sync_settings_download_recovery_code_item">Atsisiųsk atkūrimo kodą PDF formatu</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Naudok šį kodą duomenims atkurti, jei prarasi prieigą prie šio įrenginio. Saugok jį.</string>
+    <string name="sync_settings_data_expiration">Po 18 mėnesių neaktyvumo negalima atkurti „Sync &amp; Backup“ duomenų. <annotation type="learn_more_link">Sužinoti daugiau</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Ar atkurti sinchronizavimo ir atsarginio kopijavimo duomenis iš ankstesnio įdiegimo?</string>
+    <string name="sync_previous_session_ready_body">Atkurk, kad susigrąžintum ankstesnes parankines, slaptažodžius ir kitus duomenis į „DuckDuckGo“.</string>
+    <string name="sync_previous_session_ready_resume_cta">Atkurti „Sync &amp; Backup“</string>
+    <string name="sync_previous_session_ready_continue_cta">Nustatyk naują sinchronizavimą</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Lengvas duomenų atkūrimas</string>
+    <string name="sync_recover_data_content">Naudok šį kodą duomenims atkurti, jei prarasi prieigą prie šio įrenginio. Po 18 mėnesių neaktyvumo negalima atkurti „Sync &amp; Backup“ duomenų.</string>
+    <string name="sync_recover_data_recovery_code_label">Atkūrimo kodas</string>
+    <string name="sync_recover_data_download_pdf">Atsisiųsti kaip PDF</string>
+    <string name="sync_restore_on_reinstall_title">Atkurti iš naujo įdiegus programą</string>
+    <string name="sync_restore_on_reinstall_description">Jei iš naujo įdiegsi programą „DuckDuckGo“, paklausime, ar nori atkurti duomenis šiame įrenginyje.</string>
 </resources>

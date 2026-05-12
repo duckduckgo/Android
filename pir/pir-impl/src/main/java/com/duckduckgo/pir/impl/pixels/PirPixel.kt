@@ -28,11 +28,26 @@ enum class PirPixel(
 ) {
     PIR_FOREGROUND_RUN_STARTED(
         baseName = "m_dbp_foreground-run_started",
-        type = Count,
+        types = setOf(Count, Daily()),
     ),
 
     PIR_FOREGROUND_RUN_COMPLETED(
         baseName = "m_dbp_foreground-run_completed",
+        type = Count,
+    ),
+
+    PIR_FOREGROUND_RUN_START_FAILED(
+        baseName = "m_dbp_foreground-run_start-failed",
+        type = Count,
+    ),
+
+    PIR_FOREGROUND_RUN_LOW_MEMORY(
+        baseName = "m_dbp_foreground-run_low-memory",
+        type = Count,
+    ),
+
+    PIR_INITIAL_SCAN_INCOMPLETE(
+        baseName = "m_dbp_initial-scan_incomplete",
         type = Count,
     ),
 
@@ -252,7 +267,11 @@ enum class PirPixel(
     ),
     PIR_DOWNLOAD_MAINCONFIG_FAILURE(
         baseName = "m_dbp_download_mainconfig_failure",
-        type = Count,
+        types = setOf(Count, Daily()),
+    ),
+    PIR_DOWNLOAD_BROKER_JSON_FAILURE(
+        baseName = "m_dbp_download_broker-json_failure",
+        types = setOf(Count, Daily()),
     ),
     PIR_BROKER_ACTION_FAILED(
         baseName = "m_dbp_data_broker_action-failed_error",
@@ -276,6 +295,22 @@ enum class PirPixel(
     ),
     PIR_OPTOUT_INVALID_EVENT(
         baseName = "m_dbp_optout_invalid-event_dropped",
+        type = Daily(),
+    ),
+    PIR_MANUAL_RESET(
+        baseName = "m_dbp_manual_reset",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_BUNDLE_BROKER_JSON_LOADED(
+        baseName = "m_dbp_bundle_broker-json_loaded",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_BUNDLE_BROKER_JSON_FAILURE(
+        baseName = "m_dbp_bundle_broker-json_failure",
+        types = setOf(Count, Daily()),
+    ),
+    PIR_CAN_RUN_PIR(
+        baseName = "m_dbp_user-eligible",
         type = Daily(),
     ),
     ;

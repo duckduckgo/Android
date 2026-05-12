@@ -1,0 +1,314 @@
+---
+alwaysApply: true
+---
+# Android Architecture Rules
+
+## Core Principle: Decoupling Over Everything
+
+Features communicate through `-api` modules only. An `-impl` module must never depend on another `-impl` module. If two features need to interact, one exposes an interface in its `-api`, the other injects it. This is non-negotiable — it prevents circular dependencies and keeps the Dagger graph clean.
+
+---
+
+## Module Structure
+
+Every feature follows the `-api` / `-impl` split:
+
+```
+my-feature/
+  my-feature-api/       ← interfaces, data classes, no implementation
+  my-feature-impl/      ← implementation, UI, DI bindings
+```
+
+Rules:
+- `my-feature-impl` depends on `my-feature-api`
+- `my-feature-impl` depends on other features' `-api` modules only — never their `-impl`
+- `settings.gradle` auto-discovers modules 2 levels deep — no manual `include` needed
+- New `-impl` modules must be added to `app/build.gradle` to enter the Dagger graph
+- UI resources (layouts, drawables, strings) live inside the `-impl` module, not a separate UI module
+- String resource files are named by feature: `strings-my-feature.xml` (not `strings.xml`)
+
+---
+
+## Dependency Injection (Anvil / Dagger)
+
+### Scopes
+
+| Scope | Use for |
+|---|---|
+| `AppScope` | Singletons that live for the app lifetime |
+| `ActivityScope` | Things scoped to a single Activity (gets activity context) |
+| `FragmentScope` | ViewModels and things scoped to a Fragment |
+| `ViewScope` | Custom views that need injected dependencies |
+| `ReceiverScope` | `BroadcastReceiver` implementations |
+| `ServiceScope` | `Service` implementations |
+| `VpnScope` | VPN-process-specific services and receivers |
+
+Use `@SingleInstanceIn(AppScope::class)` — **not** `@Singleton` (javax). `@Singleton` conflicts with AppComponent's scope.
+
+### Scope hierarchy
+
+The scope hierarchy determines what dependencies each scope can access, where its factory lookup happens, and what `HasDaggerInjector` handles injection. It is encoded implicitly in the Anvil-generated `_SubComponent` files — this diagram is the source of truth:
+
+```
+DuckDuckGoApplication [HasDaggerInjector]
+└── AppComponent [AppScope]
+    │   Factory map contains: ActivityComponent.Factory, ReceiverSubComponent factories,
+    │                         ServiceSubComponent factories, VpnScope factories
+    │
+    ├── ActivityComponent [ActivityScope]  ← subcomponent of AppComponent
+    │   │   Factory map contains: FragmentSubComponent factories, ViewSubComponent factories
+    │   │   Provided bindings: @ActivityContext Context, AppCompatActivity
+    │   │
+    │   ├── EachFragment_SubComponent [FragmentScope]  ← subcomponent of ActivityComponent
+    │   └── EachView_SubComponent [ViewScope]          ← subcomponent of ActivityComponent
+    │
+    ├── EachReceiver_SubComponent [ReceiverScope]  ← subcomponent of AppComponent
+    └── EachService_SubComponent [ServiceScope]    ← subcomponent of AppComponent
+```
+
+**What this means in practice:**
+
+- `FragmentScope` and `ViewScope` subcomponents parent to `ActivityComponent`. Their factory lookup goes through `DaggerActivity.injectorFactoryMap`. A Fragment or View can access `ActivityScope` bindings (e.g. `@ActivityContext Context`).
+- `ReceiverScope` and `ServiceScope` subcomponents parent directly to `AppComponent`. Their factory lookup goes through `DuckDuckGoApplication.injectorFactoryMap`. They can only access `AppScope` bindings — there is no `@ActivityContext` available.
+- `VpnScope` types also parent to `AppComponent` and are only for the VPN secondary process.
+
+**Debugging "could not find dagger component" crashes:**
+
+- Crash in a Fragment/View injection → check `DaggerActivity.injectorFactoryMap` — the class is missing `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
+- Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap` — the class is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
+
+**The parent scope is set by the generated `ParentComponent`'s `@ContributesTo` annotation.** When Anvil processes `@InjectWith(FragmentScope::class)` on a Fragment, it generates a `ParentComponent` annotated with `@ContributesTo(ActivityScope::class)`, which causes the factory to be merged into `ActivityComponent`. For Receivers it generates `@ContributesTo(AppScope::class)`. You do not set this manually — it is determined by the scope you pass to `@InjectWith`.
+
+### Common Annotations
+
+```kotlin
+// Singleton binding
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class RealFoo @Inject constructor(...) : Foo
+
+// Override an existing binding (higher rank wins)
+@ContributesBinding(AppScope::class, rank = 1)
+
+// ViewModel
+@ContributesViewModel(FragmentScope::class)
+class FooViewModel @Inject constructor(...) : ViewModel()
+
+// Plugin contribution (multibinding)
+@ContributesMultibinding(AppScope::class)
+class MyPlugin @Inject constructor(...) : SomePlugin
+
+// Remote feature flag
+@ContributesRemoteFeature(scope = AppScope::class, featureName = "myFeature")
+interface MyFeature : Feature {
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun myToggle(): Toggle
+}
+```
+
+`DefaultFeatureValue.INTERNAL` = enabled only in internal/debug builds.
+
+### Activity Context
+
+`@ActivityContext Context` and `AppCompatActivity` are provided at `ActivityScope` via `DaggerActivityScopedModule`. Inject them with:
+
+```kotlin
+@ContributesBinding(ActivityScope::class)
+class RealFoo @Inject constructor(
+    @ActivityContext private val context: Context,
+) : Foo
+```
+
+Never pass `Context` as a parameter through an interface if DI can provide it at the right scope.
+
+### App Coroutine Scope
+
+```kotlin
+@AppCoroutineScope private val appScope: CoroutineScope
+```
+
+---
+
+## Plugin System
+
+Two kinds of plugin points exist. Pick based on whether you need remote feature flag control.
+
+### `@ContributesPluginPoint` — basic
+
+`PluginPoint<T>` — Dagger multibinding under the hood. Returns all registered plugins, no runtime filtering.
+
+```kotlin
+// Declare (in -api or -impl module)
+@ContributesPluginPoint(AppScope::class)
+interface MyPlugin { fun doThing() }
+
+// Contribute
+@ContributesMultibinding(AppScope::class)
+class MyPluginImpl @Inject constructor() : MyPlugin
+
+// Contribute with explicit ordering (lower value = higher priority)
+@ContributesMultibinding(AppScope::class)
+@PriorityKey(100)
+class MyPluginImpl @Inject constructor() : MyPlugin
+
+// Consume
+class Foo @Inject constructor(private val plugins: PluginPoint<MyPlugin>)
+// plugins.getPlugins() → all plugins, in priority order if @PriorityKey is used
+```
+
+### `@ContributesActivePluginPoint` — with remote feature flags + codegen
+
+`ActivePluginPoint<T>` — wraps a regular plugin point with two levels of feature-flag gating. The annotation processor generates all the boilerplate: a remote feature for the plugin point itself, a remote feature per plugin, a `MultiProcessStore`, and a wrapper that applies both guards at runtime.
+
+**Plugin point must be declared on a private interface** (the codegen is the only consumer):
+```kotlin
+// The plugin interface must extend ActivePlugin
+interface MyPlugin : ActivePlugin { fun doThing() }
+
+// Declared with a private trigger interface (in -impl)
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    featureName = "pluginPointMyPlugin",  // required, must start with "pluginPoint"
+)
+private interface MyPluginPointTrigger
+```
+
+**Contribute a plugin:**
+```kotlin
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    featureName = "pluginMyPluginImpl",            // required, must start with "plugin" (not "pluginPoint")
+    parentFeatureName = "pluginPointMyPlugin",     // required, must match an existing plugin point's featureName
+)
+class MyPluginImpl @Inject constructor() : MyPlugin {
+    // isActive() is generated — backed by its own remote feature flag
+}
+```
+
+**Consume:**
+```kotlin
+class Foo @Inject constructor(private val plugins: ActivePluginPoint<MyPlugin>)
+// plugins.getPlugins() → only plugins whose feature flag is enabled AND isActive() == true
+```
+
+**How the gating works at runtime:**
+1. If the plugin point's own `self()` toggle is OFF → `emptyList()` immediately
+2. Otherwise, filter each plugin by its individual `pluginXxx()` toggle (via `isActive()`)
+
+**Naming conventions** (enforced at compile time):
+
+| Parameter | Prefix | Example |
+|---|---|---|
+| `@ContributesActivePluginPoint.featureName` | `pluginPoint` | `"pluginPointMyPlugin"` |
+| `@ContributesActivePlugin.featureName` | `plugin` (not `pluginPoint`) | `"pluginMyPluginImpl"` |
+| `@ContributesActivePlugin.parentFeatureName` | `pluginPoint` | `"pluginPointMyPlugin"` |
+
+- `featureName` and `parentFeatureName` are **required** — blank or missing values fail the build.
+- `parentFeatureName` must match an existing `@ContributesActivePluginPoint`'s `featureName`. This is validated at compile time across modules (including sibling modules that don't depend on each other) via a sentinel/deferred-marker mechanism. A typo in `parentFeatureName` will fail the build.
+
+All flags default to `TRUE` so newly contributed plugins are on by default and can be killed remotely.
+
+### Notable active plugin points in the browser
+- `JsInjectorPlugin` — hooks into `onPageStarted` / `onPageFinished` on the browser WebView
+- `ContentScopeJsMessageHandlersPlugin` — handles JS→native messages via content scope scripts
+
+---
+
+## UI Patterns
+
+### ViewModels
+
+Commands are emitted via a `Channel<Command>`:
+```kotlin
+private val _commands = Channel<Command>(Channel.BUFFERED)
+val commands: Flow<Command> = _commands.receiveAsFlow()
+```
+
+State is `StateFlow` derived via `combine` + `stateIn`.
+
+### Coroutine Jobs
+
+Prefer `ConflatedJob` over a raw `Job` variable or a `Map<Key, Job>` when you need to cancel-and-replace a running job:
+```kotlin
+private var dwellJob by ConflatedJob()
+dwellJob = scope.launch { /* cancels previous */ }
+```
+
+---
+
+## Navigation
+
+Use `GlobalActivityStarter` (from `navigation-api`) to navigate between activities. Never construct or start an Intent directly — the starter keeps navigation decoupled across modules.
+
+### Registering a screen
+
+Define an `ActivityParams` type and annotate the activity. Anvil codegen generates the mapper automatically.
+
+```kotlin
+// In the feature's -api module
+data class MyScreenParams(val id: String) : GlobalActivityStarter.ActivityParams
+
+// In the feature's -impl module
+@ContributeToActivityStarter(MyScreenParams::class)
+class MyActivity : DuckDuckGoActivity() {
+    private val params by lazy { intent.getActivityParams(MyScreenParams::class.java) }
+}
+```
+
+Use `screenName` to opt into deeplink support:
+```kotlin
+@ContributeToActivityStarter(MyScreenParams::class, screenName = "myScreen")
+```
+
+### Starting a screen — choose the right overload
+
+| Situation | Use |
+|---|---|
+| Fire and forget | `globalActivityStarter.start(context, params)` |
+| Need a result back | `globalActivityStarter.startForResult(context, params, launcher)` |
+| Need the raw `Intent` (e.g. `PendingIntent` for a notification) | `globalActivityStarter.startIntent(context, params)` |
+
+**Do not** use `startIntent()` + `launcher.launch(intent)` — use `startForResult()` instead. The `startIntent()` path returns a nullable `Intent` and calling `launch(null)` will crash.
+
+`FLAG_ACTIVITY_NEW_TASK` is added automatically when `context` is not an `Activity` (Services, broadcast receivers, JS message handlers, etc.) — do not add it manually.
+
+---
+
+## URL vs. Search Classification
+
+Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** use `UriString.isWebUrl()` for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
+
+```kotlin
+private fun isNavigate(query: String): Boolean =
+    if (queryUrlPredictor.isReady()) {
+        queryUrlPredictor.classify(query) is Decision.Navigate
+    } else {
+        UriString.isWebUrl(query)  // fallback while native lib initialises
+    }
+```
+
+- `Decision` is a sealed interface with `Navigate(url)` and `Search(query)` — both are data classes.
+- `isReady()` is false briefly at startup while the native library loads; always guard with a `UriString.isWebUrl` fallback.
+- `QueryUrlPredictor` lives in `browser-api` and is injectable at `AppScope`. `Decision` is exported transitively via `browser-api`'s `api` dep on `url-predictor-android`.
+
+---
+
+## Logging
+
+```kotlin
+import logcat.logcat   // correct
+// NOT: import com.squareup.logcat.logcat
+```
+
+---
+
+## Testing
+
+- JUnit4 (`@Test`, not JUnit5/Jupiter)
+- Assertions: `org.junit.Assert.*`
+- Mocking: `org.mockito.kotlin.mock()` + `whenever()`
+- Coroutines: `CoroutineTestRule` + `runTest { }`
+- Test files mirror the class: `RealFoo.kt` → `RealFooTest.kt`
+- No coroutine test setup needed for pure logic classes

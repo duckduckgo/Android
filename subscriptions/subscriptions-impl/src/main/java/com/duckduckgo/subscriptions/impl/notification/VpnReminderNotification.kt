@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenWithLaunchPixel
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -138,8 +138,10 @@ class VpnReminderNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)
-            ?: return null
+        val intent = globalActivityStarter.startIntent(
+            context,
+            NetworkProtectionManagementScreenWithLaunchPixel(pixelName(NOTIFICATION_LAUNCHED_PIXEL)),
+        ) ?: return null
         return taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -149,5 +151,6 @@ class VpnReminderNotificationPlugin @Inject constructor(
     companion object {
         private const val NOTIFICATION_SHOWN_PIXEL = "mnot_s"
         private const val NOTIFICATION_CANCELLED_PIXEL = "mnot_c"
+        private const val NOTIFICATION_LAUNCHED_PIXEL = "mnot_l"
     }
 }

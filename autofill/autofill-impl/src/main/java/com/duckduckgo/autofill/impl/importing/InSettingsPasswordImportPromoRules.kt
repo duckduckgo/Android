@@ -24,11 +24,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface InSettingsPasswordImportPromoRules {
     suspend fun canShowPromo(): Boolean
 }
+
+private const val TAG = "InSettingsPasswordImportPromoRules"
 
 @ContributesBinding(AppScope::class)
 class RealInSettingsPasswordImportPromoRules @Inject constructor(
@@ -52,9 +55,17 @@ class RealInSettingsPasswordImportPromoRules @Inject constructor(
                 return@withContext false
             }
 
-            if ((autofillStore.getCredentialCount().firstOrNull() ?: 0) >= MAX_CREDENTIALS_FOR_PROMO) {
-                return@withContext false
-            }
+            autofillStore.getCredentialCount().firstOrNull()?.fold(
+                onSuccess = { value ->
+                    if ((value) >= MAX_CREDENTIALS_FOR_PROMO) {
+                        return@withContext false
+                    }
+                },
+                onFailure = {
+                    logcat(TAG) { "Credential count retrieval failed, fallback to disabled" }
+                    return@withContext false
+                },
+            ) ?: return@withContext false
 
             if (importPasswordCapabilityChecker.webViewCapableOfImporting().not()) {
                 return@withContext false

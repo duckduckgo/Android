@@ -20,6 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/selectable_item_rounded_corner_background"
+    tools:ignore="Overdraw"
     tools:layout_height="@dimen/toolbarIcon"
     tools:layout_width="@dimen/toolbarIcon">
 

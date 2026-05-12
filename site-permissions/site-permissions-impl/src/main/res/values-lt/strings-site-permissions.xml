@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ nori atidaryti jūsų DRM programinę įrangą</string>
-    <string name="drmSiteDialogSubtitle">Skaitmeninių teisių valdymo programinė įranga reikalinga norint atkurti apsaugotą medijos turinį, bet taip pat suteikia prieigą prie įrenginio identifikatorių. Suteikite leidimą tik toms svetainėms, kurioms patikite šiuos duomenis. Leidimus bet kada galite tvarkyti nustatymuose. <annotation type="drm_learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">„%1$s“ nori atidaryti tavo skaitmeninių teisių valdymo (angl. „Digital Rights Management“, DRM) programinę įrangą</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Jei pasirinksi „Drausti“, vaizdo įrašai interneto svetainėje gali nebeveikti, tačiau „%1$s“ neturės prieigos prie įrenginio identifikatorių, kuriuos teikia DRM programinė įranga. Leidimus bet kada gali valdyti nuostatose. <annotation type="drm_learn_more_link">Sužinok daugiau</annotation></string>
     <string name="drmSiteDialogAllowAlways">Visada</string>
     <string name="drmSiteDialogAllowOnce">Tik šiam seansui</string>
     <string name="drmSiteDialogDenyAlways">Visada atsisakyti</string>

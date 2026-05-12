@@ -22,13 +22,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.common.ui.compose.cards.DaxCard
+import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
+import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.card.MaterialCardView
@@ -49,8 +65,39 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class TopAppBarComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar))
 
-    class SwitchComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_switch))
+    class SwitchComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_switch)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_one, isDarkTheme = isDarkTheme) {
+                var isChecked by remember { mutableStateOf(false) }
+
+                DaxSwitch(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_two, isDarkTheme = isDarkTheme) {
+                var isChecked by remember { mutableStateOf(true) }
+
+                DaxSwitch(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_three, isDarkTheme = isDarkTheme) {
+                DaxSwitch(checked = false, onCheckedChange = {}, enabled = false)
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_switch_four, isDarkTheme = isDarkTheme) {
+                DaxSwitch(checked = true, onCheckedChange = {}, enabled = false)
+            }
+        }
+    }
 
     class RadioButtonComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_radio_button))
@@ -99,7 +146,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val promoSingleMessage = Message(
-                middleIllustration = CommonR.drawable.desktop_promo_artwork,
+                middleIllustration = CommonR.drawable.promo_mac_and_windows,
                 title = "Promo Single Action Message",
                 subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                 promoAction = "Promo Link",
@@ -331,7 +378,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     class DividerComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_section_divider))
 
-    class CardComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
+    class CardComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_card)) {
         override fun bind(component: Component) {
             view.findViewById<MaterialCardView>(R.id.ticketViewCard).apply {
                 val cornerSize = resources.getDimension(CommonR.dimen.smallShapeCornerRadius)
@@ -345,21 +395,62 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
                 setOnClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
             }
+
+            view.setupThemedComposeView(R.id.composeCards, isDarkTheme) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
+                    DaxCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxCard(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                    DaxSurface(
+                        onClick = {
+                            Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                    ) { }
+                }
+            }
         }
     }
 
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_settings))
+        ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
+        override fun bind(component: Component) {
+            view.findViewById<SettingsListItem>(R.id.settingsListItemWithBetaTag).apply {
+                showPillIcon(true)
+            }
+        }
+    }
 
     companion object {
         fun create(
             parent: ViewGroup,
             viewType: Int,
+            isDarkTheme: Boolean,
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
                 Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
-                Component.SWITCH -> SwitchComponentViewHolder(parent)
+                Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
@@ -373,7 +464,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SINGLE_LINE_LIST_ITEM -> OneLineListItemComponentViewHolder(parent)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
-                Component.CARD -> CardComponentViewHolder(parent)
+                Component.CARD -> CardComponentViewHolder(parent, isDarkTheme)
                 Component.SETTINGS_LIST_ITEM -> SettingsListItemComponentViewHolder(parent)
                 else -> {
                     TODO()

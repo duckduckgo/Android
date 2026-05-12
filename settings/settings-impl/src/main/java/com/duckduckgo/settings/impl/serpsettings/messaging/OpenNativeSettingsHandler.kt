@@ -17,7 +17,6 @@
 package com.duckduckgo.settings.impl.serpsettings.messaging
 
 import android.content.Context
-import android.content.Intent
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
@@ -56,9 +55,7 @@ class OpenNativeSettingsHandler @Inject constructor(
                 when (val screenParam = params.optString("screen", "")) {
                     AI_FEATURES_SCREEN_NAME -> {
                         pixel.fire(SERP_SETTINGS_OPEN_DUCK_AI)
-                        val intent = globalActivityStarter.startIntent(context, DuckChatNativeSettingsNoParams)
-                        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
+                        globalActivityStarter.start(context, DuckChatNativeSettingsNoParams)
                     }
                     else -> {
                         logcat(WARN) { "No action for given screen param: $screenParam" }

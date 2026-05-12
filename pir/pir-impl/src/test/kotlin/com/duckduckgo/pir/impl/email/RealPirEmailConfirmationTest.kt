@@ -25,6 +25,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -60,6 +61,7 @@ class RealPirEmailConfirmationTest {
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
+    private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
 
     @Before
     fun setUp() {
@@ -72,6 +74,7 @@ class RealPirEmailConfirmationTest {
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
+            webViewDataCleaner = mockWebViewDataCleaner,
         )
     }
 
@@ -202,6 +205,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -219,6 +223,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -236,6 +241,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -266,6 +272,7 @@ class RealPirEmailConfirmationTest {
         )
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -286,6 +293,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -322,6 +330,7 @@ class RealPirEmailConfirmationTest {
         )
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -350,6 +359,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -368,6 +378,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -389,6 +400,7 @@ class RealPirEmailConfirmationTest {
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
+        verifyNoInteractions(mockWebViewDataCleaner)
     }
 
     @Test
@@ -420,6 +432,7 @@ class RealPirEmailConfirmationTest {
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testEmailConfirmationStep))
         verify(mockPirActionsRunner).stop()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -467,6 +480,7 @@ class RealPirEmailConfirmationTest {
             testEmailConfirmationJobRecord2,
         )
         verify(mockPirCssScriptLoader).getScript()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -515,6 +529,7 @@ class RealPirEmailConfirmationTest {
             testStepsJson,
             duplicateJobRecord,
         )
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -542,6 +557,7 @@ class RealPirEmailConfirmationTest {
 
         assert(result.isSuccess)
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.SCHEDULED)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -570,6 +586,7 @@ class RealPirEmailConfirmationTest {
         testee.stop()
 
         verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
     }
 
     @Test
@@ -602,6 +619,7 @@ class RealPirEmailConfirmationTest {
         )
 
         verify(mockPirActionsRunner, times(3)).stop()
+        verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
     }
 
     @Test
@@ -640,6 +658,7 @@ class RealPirEmailConfirmationTest {
         assert(result.isSuccess)
         verify(mockPirActionsRunner).start(eq(testProfileQuery), any())
         verify(mockPirActionsRunner, never()).start(eq(testProfileQuery2), any())
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
@@ -672,5 +691,6 @@ class RealPirEmailConfirmationTest {
 
         assert(result.isSuccess)
         verify(mockPirActionsRunner).start(deprecatedProfile, listOf(testEmailConfirmationStep))
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 }

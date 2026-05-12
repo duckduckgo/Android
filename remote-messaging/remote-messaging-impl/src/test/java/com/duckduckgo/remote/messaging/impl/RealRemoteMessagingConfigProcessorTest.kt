@@ -22,7 +22,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
@@ -161,7 +160,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImageStore).fetchAndStoreImage(evaluatedMessage)
+        verify(remoteMessageImageStore).fetchAndStoreImages(evaluatedMessage)
         verify(remoteMessagingRepository).activeMessage(evaluatedMessage)
     }
 
@@ -174,7 +173,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImageStore).fetchAndStoreImage(null)
+        verify(remoteMessageImageStore).fetchAndStoreImages(null)
         verify(remoteMessagingRepository).activeMessage(null)
     }
 }

@@ -39,6 +39,21 @@
             android:background="?attr/daxColorToolbar">
 
             <ImageView
+                android:id="@+id/duckAiBack"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/keyline_3"
+                android:layout_marginTop="@dimen/omnibarCardMarginTop"
+                android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/back"
+                android:padding="@dimen/keyline_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_arrow_left_24" />
+
+            <ImageView
                 android:id="@+id/duckAiSidebar"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -49,9 +64,9 @@
                 android:contentDescription="@string/browserMenuChatHistory"
                 android:padding="@dimen/keyline_1"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/duckAiBack"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_list_24" />
+                app:srcCompat="@drawable/ic_chats_24" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -104,6 +119,15 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 tools:progress="50"
                                 tools:visibility="visible" />
+
+                            <com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
+                                android:id="@+id/pageLoadProgressBar"
+                                android:layout_width="match_parent"
+                                android:layout_height="2dp"
+                                android:visibility="invisible"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent" />
 
                             <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/trackersAnimation"
@@ -500,7 +524,7 @@
                         android:layout_height="7dp"
                         android:layout_gravity="end"
                         android:layout_margin="@dimen/keyline_2"
-                        android:background="@drawable/ic_circle_7_accent_blue"
+                        android:background="@drawable/ic_dot_indicator_7"
                         android:visibility="gone" />
 
                 </FrameLayout>
@@ -533,6 +557,57 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/duckAIFreePill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/duckAIFreePillTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duckAiHeaderFreePlan"
+                        app:typography="body2_bold" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginStart="2dp"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_chevron_down_24_small" />
+                </LinearLayout>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckAIFreePillUpgrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/duckAiHeaderUpgrade"
+                    app:typography="caption"
+                    app:textType="secondary" />
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

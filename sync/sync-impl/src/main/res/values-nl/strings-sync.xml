@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Hiermee maak je een versleutelde back-up van je bladwijzers, wachtwoorden en Duck.ai-chats op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
     <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
     <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
-    <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
-    <string name="sync_intro_recover_content">Om je gesynchroniseerde gegevens te herstellen, heb je de herstelcode nodig die je hebt opgeslagen tijdens het instellen van \'Synchronisatie\'. Deze code is mogelijk als PDF opgeslagen op het apparaat dat je gebruikte om \'Synchronisatie\' in te stellen.</string>
-    <string name="sync_intro_recover_cta">Aan de slag</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Herstel je gesynchroniseerde gegevens</string>
+    <string name="sync_recover_synced_data_content">Je hebt de herstelcode nodig die je kreeg toen je Sync &amp; Backup instelde. Je hebt deze mogelijk als PDF opgeslagen op het apparaat dat je gebruikte.</string>
+    <string name="sync_recover_synced_data_cta">Gesynchroniseerde gegevens herstellen</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-code scannen</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Wil je de servergegevens verwijderen?</string>
-    <string name="sync_delete_server_data_dialog_content">De verbinding met alle apparaten wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Gegevens verwijderen</string>
+    <string name="sync_delete_server_data_dialog_content">Je back-up wordt verwijderd van de server. Alle apparaten worden losgekoppeld van de synchronisatie, maar er wordt niets van de apparaten verwijderd.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Servergegevens verwijderen</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Annuleren</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Bladwijzers op al je apparaten synchroniseren</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Verbergen</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Herstellen</string>
+    <string name="sync_settings_download_recovery_code_item">Herstelcode downloaden als PDF-bestand</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest — bewaar hem veilig.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit. <annotation type="learn_more_link">Meer informatie</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Gegevens van eerdere installatie herstellen, synchroniseren en back-uppen?</string>
+    <string name="sync_previous_session_ready_body">Herstel je eerdere bladwijzers, wachtwoorden en andere gegevens in DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Herstel Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Nieuwe synchronisatie instellen</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Eenvoudig je gegevens herstellen</string>
+    <string name="sync_recover_data_content">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest. Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit.</string>
+    <string name="sync_recover_data_recovery_code_label">Herstelcode</string>
+    <string name="sync_recover_data_download_pdf">Downloaden als PDF</string>
+    <string name="sync_restore_on_reinstall_title">Herstellen bij app-herinstallatie</string>
+    <string name="sync_restore_on_reinstall_description">Als je de DuckDuckGo-app opnieuw installeert, vragen we of je je gegevens op dit apparaat wilt herstellen.</string>
 </resources>

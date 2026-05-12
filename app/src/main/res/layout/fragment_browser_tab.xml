@@ -35,6 +35,7 @@
         android:background="?attr/daxColorBrowserOverlay"
         android:clipToPadding="false"
         android:elevation="2dp"
+        android:outlineProvider="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
@@ -46,6 +47,7 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorBrowserOverlay"
         android:elevation="2dp"
+        android:outlineProvider="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_scrollFlags="noScroll" />
 
@@ -117,6 +119,13 @@
                     android:layout_height="match_parent"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     tools:background="#4F00" />
+
+                <com.duckduckgo.app.browser.pdf.SwipeBlockingFrameLayout
+                    android:id="@+id/pdfViewerContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/daxColorBackdrop"
+                    android:visibility="gone" />
 
                 <include
                     android:id="@+id/includeErrorView"

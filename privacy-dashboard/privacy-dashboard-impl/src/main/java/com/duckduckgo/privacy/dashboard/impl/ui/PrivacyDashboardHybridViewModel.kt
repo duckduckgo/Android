@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardOpenedPlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -94,6 +95,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
+    private val privacyDashboardOpenedPlugin: PluginPoint<PrivacyDashboardOpenedPlugin>,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -200,6 +202,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val optoutFailed: Boolean? = false,
         val configurable: Boolean? = true,
         val cosmetic: Boolean? = false,
+        val consentRule: String? = null,
+        val consentReloadLoop: Boolean = false,
     )
 
     data class RemoteFeatureSettingsViewState(
@@ -236,6 +240,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),
                 type = Unique(),
             )
+            privacyDashboardOpenedPlugin.getPlugins().forEach { it.onPrivacyDashboardOpened() }
         }
 
         site.filterNotNull()
@@ -428,6 +433,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
                 consentSelfTestFailed = site.consentSelfTestFailed,
+                consentRule = site.consentRule,
+                consentReloadLoop = site.consentReloadLoop,
                 errorCodes = moshi.adapter<List<String>>(
                     Types.newParameterizedType(List::class.java, String::class.java),
                 ).toJson(site.errorCodeEvents.toList()).toString(),
@@ -437,6 +444,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                breakageData = site.realBrokenSiteContext.breakageData,
                 contentScopeExperiments = site.activeContentScopeExperiments,
                 debugFlags = site.debugFlags,
             )
@@ -522,6 +530,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
                 consentSelfTestFailed = site.consentSelfTestFailed,
+                consentRule = site.consentRule,
+                consentReloadLoop = site.consentReloadLoop,
                 errorCodes = moshi.adapter<List<String>>(
                     Types.newParameterizedType(List::class.java, String::class.java),
                 ).toJson(site.errorCodeEvents.toList()).toString(),
@@ -534,6 +544,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                breakageData = site.realBrokenSiteContext.breakageData,
                 contentScopeExperiments = site.activeContentScopeExperiments,
                 debugFlags = site.debugFlags,
             )

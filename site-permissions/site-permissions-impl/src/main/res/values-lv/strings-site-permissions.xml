@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" grib atvērt tavu DRM programmatūru</string>
-    <string name="drmSiteDialogSubtitle">Lai atskaņotu aizsargātu multivides saturu, ir nepieciešama digitālo tiesību pārvaldības programmatūra, kas nodrošina arī piekļuvi ierīces identifikatoriem. Piešķir atļauju tikai tām vietnēm, kurām uztici šos datus. Atļaujas jebkurā laikā vari pārvaldīt iestatījumos. <annotation type="drm_learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">“%1$s” vēlas atvērt jūsu digitālā satura tiesību pārvaldības (DRM) programmatūru.</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Ja izvēlies “Aizliegt”, vietnē esošos videoklipus, iespējams, nevarēs atskaņot, taču %1$s nebūs piekļuves DRM programmatūras nodrošinātajiem ierīču identifikatoriem. Atļaujas jebkurā laikā vari pārvaldīt iestatījumos. <annotation type="drm_learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="drmSiteDialogAllowAlways">Vienmēr</string>
     <string name="drmSiteDialogAllowOnce">Tikai šai sesijai</string>
     <string name="drmSiteDialogDenyAlways">Vienmēr aizliegt</string>

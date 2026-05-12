@@ -96,3 +96,6 @@ ktlint_standard_filename = disabled
 ktlint_standard_package-name = disabled
 ktlint_standard_annotation = disabled
 ktlint_standard_kdoc-wrapping = disabled
+
+[android-design-system/**/ui/compose/**/*.kt]
+ktlint_standard_enum-entry-name-case = disabled

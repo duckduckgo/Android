@@ -30,18 +30,22 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.ui.store.ThemingSharedPreferences
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
 
 @Module
+@ContributesTo(AppScope::class)
 abstract class StoreModule {
 
     @Binds
@@ -55,6 +59,9 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindTabRepository(tabRepository: TabDataRepository): TabRepository
+
+    @Binds
+    abstract fun bindTabAtomicOperations(tabRepository: TabDataRepository): TabAtomicOperations
 
     @Binds
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore

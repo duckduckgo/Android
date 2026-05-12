@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Skróty Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Wybierz, które skróty Duck.ai chcesz wyświetlić</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Pozycja przełącznika nowej karty</string>
+    <string name="duckAiDefaultTogglePositionSearch">Szukaj</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Ostatnie użycie</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Wyszukiwanie głosowe</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Włącz w ustawieniach funkcji AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Zarządzaj w ustawieniach funkcji AI</string>
     <string name="duck_ai_paid_settings_manage_secondary">Skonfiguruj Duck.ai w ustawieniach funkcji AI.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Podsumuj tę stronę</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Wyczyść czat</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Wyczyść dane</string>
+    <string name="duckChatBrowserMenuContentDescription">Więcej opcji</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Czat głosowy</string>
 </resources>

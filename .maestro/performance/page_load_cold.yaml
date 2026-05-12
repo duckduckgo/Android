@@ -1,0 +1,24 @@
+appId: com.duckduckgo.mobile.android
+name: "Benchmark: Page load cold (multiple iterations)"
+tags:
+  - benchmark
+---
+# For each website in the list, runs multiple cold page loads (clearing all app state
+# including HTTP cache before each). Use this to collect a stable distribution of cold
+# start metrics across different sites.
+
+- runScript: steps/init_websites.js
+
+- repeat:
+    while:
+      true: ${output.websites.counter < output.websites.urls.length}
+    commands:
+      - evalScript: ${output.websites.iterationCounter = 0}
+      - repeat:
+          while:
+            true: ${output.websites.iterationCounter < output.websites.coldIterations}
+          commands:
+            - runFlow: steps/cold_load.yaml
+            - evalScript: ${output.websites.iterationCounter++}
+
+      - evalScript: ${output.websites.counter++}

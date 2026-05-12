@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -94,6 +95,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
 
     private val webViewVersionProvider: WebViewVersionProvider = mock()
 
+    private val sitePermissionsRepository: SitePermissionsRepository = mock()
+
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
 
@@ -123,6 +126,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
     fun before() {
         MockitoAnnotations.openMocks(this)
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+        runBlocking { whenever(sitePermissionsRepository.isDrmEnabledForSite(any())).thenReturn(true) }
 
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -160,6 +164,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             webViewVersionProvider,
             ampLinks = mock(),
             inventory,
+            sitePermissionsRepository = sitePermissionsRepository,
         )
     }
 
@@ -183,6 +188,9 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
                 PrivacyConfigData(version = report.remoteConfigVersion ?: "v", eTag = report.remoteConfigEtag ?: "e"),
             )
+            runBlocking {
+                whenever(sitePermissionsRepository.isDrmEnabledForSite(report.siteURL)).thenReturn(report.drmEnabled ?: true)
+            }
 
             if (previousSite == currentSite) {
                 whenever(mockBrokenSiteLastSentReport.getLastSentDay(any())).thenReturn("2023-11-01")
@@ -202,6 +210,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 consentManaged = report.consentManaged.toBoolean(),
                 consentOptOutFailed = report.consentOptOutFailed.toBoolean(),
                 consentSelfTestFailed = report.consentSelfTestFailed.toBoolean(),
+                consentRule = null,
+                consentReloadLoop = false,
                 errorCodes = "",
                 httpErrorCodes = "",
                 loginSite = null,
@@ -211,6 +221,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 jsPerformance = null,
                 contentScopeExperiments = null,
                 debugFlags = null,
+                breakageData = report.breakageData,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -279,6 +290,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
         val remoteConfigEtag: String?,
         val remoteConfigVersion: String?,
         val lastSentDay: String?,
+        val drmEnabled: Boolean?,
+        val breakageData: String?,
     )
 
     data class UrlParam(

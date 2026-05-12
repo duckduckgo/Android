@@ -37,6 +37,7 @@ import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.toFeatureException
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -74,6 +75,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
     private val userAllowListRepository = mock<UserAllowListRepository>()
     private val fireproofRepository = mock<FireproofRepository>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private lateinit var cookieModifier: FirstPartyCookiesModifier
 
     companion object {
@@ -106,6 +108,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             mock(),
             fireproofRepository,
             DefaultDispatcherProvider(),
+            mockDuckAiHostProvider,
         )
         val host = testCase.siteURL.toUri().host
 

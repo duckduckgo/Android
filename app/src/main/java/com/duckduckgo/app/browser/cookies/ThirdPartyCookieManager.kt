@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -41,6 +42,7 @@ class AppThirdPartyCookieManager(
     private val cookieManagerProvider: CookieManagerProvider,
     private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
     private val thirdPartyCookieNames: ThirdPartyCookieNames,
+    duckAiHostProvider: DuckAiHostProvider,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ThirdPartyCookieManager {
 
@@ -66,7 +68,8 @@ class AppThirdPartyCookieManager(
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(dispatchers.main()) {
-            if (domain != null && hasExcludedCookieName()) {
+            // Allow third-party cookies for domains that need cross-domain functionality
+            if (hostsThatAlwaysRequireThirdPartyCookies.contains(host) || (domain != null && hasExcludedCookieName())) {
                 logcat { "Cookies enabled for $uri" }
                 cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
             } else {
@@ -83,7 +86,7 @@ class AppThirdPartyCookieManager(
     }
 
     private suspend fun addHostToList(uri: Uri) {
-        val ssDomain = uri.getQueryParameter(SS_DOMAIN)
+        val ssDomain = uri.getQueryParameter(SS_DOMAIN_PARAM) ?: uri.getQueryParameter(APP_DOMAIN_PARAM)
         val accessType = uri.getQueryParameter(RESPONSE_TYPE)
         ssDomain?.let {
             if (accessType?.contains(CODE) == false) {
@@ -100,13 +103,16 @@ class AppThirdPartyCookieManager(
         } != null
     }
 
+    // duck.ai needs third-party cookies for cross-domain migration between duckduckgo.com and duck.ai
+    private val hostsThatAlwaysRequireThirdPartyCookies: List<String> = listOf("home.nest.com", duckAiHostProvider.getHost(), "duckduckgo.com")
+
     // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below values
     companion object {
-        private const val SS_DOMAIN = "ss_domain"
+        private const val SS_DOMAIN_PARAM = "ss_domain"
+        private const val APP_DOMAIN_PARAM = "app_domain"
         private const val RESPONSE_TYPE = "response_type"
         private const val CODE = "code"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
-        val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com")
     }
 }

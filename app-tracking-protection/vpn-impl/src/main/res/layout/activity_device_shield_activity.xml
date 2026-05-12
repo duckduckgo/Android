@@ -60,6 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/apptp_shield_enabled"/>
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView

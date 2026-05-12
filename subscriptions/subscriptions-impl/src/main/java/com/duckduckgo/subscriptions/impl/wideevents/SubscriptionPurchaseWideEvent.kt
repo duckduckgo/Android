@@ -22,14 +22,14 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
 
 interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFlowStarted(
@@ -74,7 +74,7 @@ interface SubscriptionPurchaseWideEvent {
 @ContributesBinding(AppScope::class)
 class SubscriptionPurchaseWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatchers: DispatcherProvider,
 ) : SubscriptionPurchaseWideEvent {
 
@@ -213,7 +213,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         wideEventClient.intervalStart(
             wideEventId = wideEventId,
             key = KEY_ACTIVATION_LATENCY_MS_BUCKETED,
-            timeout = Duration.ofHours(4),
+            timeout = 4.hours,
         )
 
         wideEventClient.flowStep(
@@ -306,7 +306,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendSubscriptionPurchaseWideEvent().isEnabled()
+        subscriptionsFeature.get().sendSubscriptionPurchaseWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

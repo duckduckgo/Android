@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Jauna cilnes slēdža pozīcija</string>
+    <string name="duckAiDefaultTogglePositionSearch">Meklēt</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Pēdējo reizi lietots</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Balss meklēšana</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Duck.ai MI funkciju iestatījumos.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Apkopot šo lapu</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automātiski nosūtīt lapas saturu</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automātiski nosūtīt lapas saturu uz Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Pievienot lapas saturu</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Notīrīt tērzēšanas sarunu</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Notīrīt datus</string>
+    <string name="duckChatBrowserMenuContentDescription">Citas iespējas</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Balss tērzēšana</string>
 </resources>

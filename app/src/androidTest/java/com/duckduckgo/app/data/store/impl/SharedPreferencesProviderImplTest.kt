@@ -33,6 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mock
 import java.util.UUID
 
 class SharedPreferencesProviderImplTest {
@@ -67,7 +68,10 @@ class SharedPreferencesProviderImplTest {
         preferencesProvider = SharedPreferencesProviderImpl(
             context,
             coroutineRule.testDispatcherProvider,
-        ) { crashLogger }
+            { mock() },
+            { mock() },
+            { crashLogger },
+        )
     }
 
     @After

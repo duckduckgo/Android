@@ -28,6 +28,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
@@ -255,9 +256,53 @@ class ContentScopeScriptsJsMessagingTest {
             assertEquals(0, callback.counter)
         }
 
+    @Test
+    fun `when processing webEvents webEvent message then nativeData with webViewId is injected`() =
+        runTest {
+            val webEventsHandlers = WebEventsPluginPoint()
+            val messaging = ContentScopeScriptsJsMessaging(
+                jsMessageHelper,
+                coroutineRule.testDispatcherProvider,
+                coreContentScopeScripts,
+                webEventsHandlers,
+            )
+            messaging.register(mockWebView, webEventsCallback)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webEvents","id":"e1","method":"webEvent","params":{"type":"adwall.detected"}}
+                """.trimIndent()
+
+            messaging.process(message, messaging.secret)
+
+            assertEquals(1, webEventsCallback.counter)
+            val params = webEventsCallback.lastData!!
+            val nativeData = params.getJSONObject("nativeData")
+            assertEquals(System.identityHashCode(mockWebView).toString(), nativeData.getString("webViewId"))
+        }
+
+    @Test
+    fun `when processing non-webEvent message then nativeData is not injected`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(1, callback.counter)
+            val params = callback.lastData
+            assertFalse(params?.has("nativeData") ?: false)
+        }
+
     private val callback =
         object : JsMessageCallback() {
             var counter = 0
+            var lastData: JSONObject? = null
 
             override fun process(
                 featureName: String,
@@ -266,8 +311,46 @@ class ContentScopeScriptsJsMessagingTest {
                 data: JSONObject?,
             ) {
                 counter++
+                lastData = data
             }
         }
+
+    private val webEventsCallback =
+        object : JsMessageCallback() {
+            var counter = 0
+            var lastData: JSONObject? = null
+
+            override fun process(
+                featureName: String,
+                method: String,
+                id: String?,
+                data: JSONObject?,
+            ) {
+                counter++
+                lastData = data
+            }
+        }
+
+    private class WebEventsPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(WebEventsPlugin())
+
+        inner class WebEventsPlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = emptyList()
+                    override val featureName: String = "webEvents"
+                    override val methods: List<String> = listOf("webEvent")
+                }
+        }
+    }
 
     private fun givenInterfaceIsRegistered() {
         contentScopeScriptsJsMessaging.register(mockWebView, callback)

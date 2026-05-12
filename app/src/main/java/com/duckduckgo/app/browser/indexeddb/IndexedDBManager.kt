@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -38,12 +39,16 @@ interface IndexedDBManager {
      * Uses AndroidBrowserConfigFeature to determine which domains to preserve.
      * @param shouldClearDuckAiData If true, clears DuckAI-related IndexedDB data (duckduckgo.com and duck.ai domains).
      * All other domains are preserved.
+     *
+     * @throws FileDeleteException if some files could not be deleted.
      */
     suspend fun clearIndexedDB(shouldClearDuckAiData: Boolean)
 
     /**
      * Clears only DuckAI-related IndexedDB data (duckduckgo.com and duck.ai domains).
      * All other domains are preserved.
+     *
+     * @throws FileDeleteException if some files could not be deleted.
      */
     suspend fun clearOnlyDuckAiData()
 }
@@ -60,6 +65,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : IndexedDBManager {
 
     private val jsonAdapter: JsonAdapter<IndexedDBSettings> by lazy {
@@ -73,18 +79,21 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val excludedFolders = getExcludedFolders(rootFolder, allowedDomains, shouldClearDuckAiData)
 
-        fileDeleter.deleteContents(rootFolder, excludedFolders)
+        fileDeleter.deleteContents(rootFolder, excludedFolders).getOrThrow()
     }
 
-    override suspend fun clearOnlyDuckAiData() = withContext(dispatcherProvider.io()) {
+    override suspend fun clearOnlyDuckAiData(): Unit = withContext(dispatcherProvider.io()) {
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val duckAiFolders = getDuckAiFolders(rootFolder)
 
         logcat { "IndexedDBManager: Clearing only DuckAI folders: $duckAiFolders" }
 
-        duckAiFolders.forEach { folderName ->
-            fileDeleter.deleteContents(File(rootFolder, folderName), emptyList())
-        }
+        duckAiFolders
+            .map { folderName ->
+                fileDeleter.deleteContents(parentDirectory = File(rootFolder, folderName))
+            }
+            .firstOrNull { it.isFailure }
+            ?.getOrThrow()
     }
 
     private fun getAllowedDomains(): List<String> {
@@ -133,10 +142,8 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     }
 
     private fun isFromDuckDuckGoDomains(domain: String): Boolean {
-        return DUCKDUCKGO_DOMAINS.any { sameOrSubdomain(domain, it) }
+        return duckDuckGoDomains.any { sameOrSubdomain(domain, it) }
     }
 
-    companion object {
-        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
-    }
+    private val duckDuckGoDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

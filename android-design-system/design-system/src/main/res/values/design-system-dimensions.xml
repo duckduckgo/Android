@@ -142,11 +142,18 @@
     <dimen name="verticalDividerWidth">1dp</dimen>
     <dimen name="verticalDividerSidePadding">@dimen/keyline_4</dimen>
 
+    <!-- Dax Switch -->
+    <dimen name="daxSwitchThumbSize">32dp</dimen>
+
     <!-- Slider -->
     <dimen name="sliderTrackHeight">6dp</dimen>
 
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
+
+    <!-- Yellow Pill -->
+    <dimen name="yellowPillHeight">15dp</dimen>
+    <dimen name="yellowPillPaddingHorizontal">4dp</dimen>
 
     <!-- Message CTA -->
     <dimen name="messageCtaCloseButtonSize">40dp</dimen>

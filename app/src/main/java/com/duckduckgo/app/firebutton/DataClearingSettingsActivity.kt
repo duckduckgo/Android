@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.databinding.ActivityDataClearingSettingsBindin
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
 import com.duckduckgo.app.global.view.FireDialogProvider
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -90,7 +91,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
                     updateAutomaticClearingStatus(it.automaticallyClearingEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
-                    updateClearDataAction(it.clearDuckAiData)
                     updateFireproofWebsitesCount(it.fireproofWebsitesCount)
                 }
             }.launchIn(lifecycleScope)
@@ -121,14 +121,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     ) {
         binding.clearDuckAiDataSetting.quietlySetIsChecked(enabled, clearDuckAiDataToggleListener)
         binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
-    private fun updateClearDataAction(clearDuckAiData: Boolean) {
-        if (clearDuckAiData) {
-            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAllPlusDuckChats))
-        } else {
-            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAll))
-        }
     }
 
     private fun updateFireproofWebsitesCount(count: Int) {
@@ -186,7 +178,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
             dialog.show(supportFragmentManager)
         }
     }

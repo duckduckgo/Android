@@ -50,8 +50,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -80,7 +82,7 @@ class NewTabPageViewModelTest {
         val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(null))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
 
         testee = createTestee()
@@ -107,7 +109,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
@@ -125,7 +127,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageAvailableAndOnboardingNotCompleteThenMessageNotShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
 
         testee.onStart(mockLifecycleOwner)
@@ -143,7 +145,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageAvailableAndOnboardingCompleteThenMessageShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -162,8 +164,8 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageAvailableWithStoredImageAndOnboardingCompleteThenMessageShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
-        whenever(mockRemoteMessageModel.getRemoteMessageImageFile()).thenReturn("messageFile")
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn("messageFile")
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -182,7 +184,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
 
@@ -194,19 +196,20 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
 
         testee.onMessageCloseButtonClicked()
 
         verify(mockRemoteMessageModel).onMessageDismissed(remoteMessage)
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
     }
 
     @Test
     fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
@@ -216,6 +219,7 @@ class NewTabPageViewModelTest {
 
         testee.onMessagePrimaryButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
@@ -226,7 +230,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onSecondaryActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
@@ -236,6 +240,7 @@ class NewTabPageViewModelTest {
 
         testee.onMessageSecondaryButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
@@ -246,7 +251,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteMessageActionButtonClickedThenFirePixelAndDismiss() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         val action = Action.Dismiss
         whenever(mockRemoteMessageModel.onActionClicked(remoteMessage)).thenReturn(Action.Dismiss)
@@ -256,10 +261,33 @@ class NewTabPageViewModelTest {
 
         testee.onMessageActionButtonClicked()
 
+        verify(mockRemoteMessageModel).clearMessageImage(Surface.NEW_TAB_PAGE)
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
             }
+        }
+    }
+
+    @Test
+    fun whenRemoteMessageActionButtonClickedWithShareActionThenImageNotCleared() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
+
+        val shareAction = Action.Share("https://example.com", mapOf("title" to "Share Title"))
+        whenever(mockRemoteMessageModel.onActionClicked(remoteMessage)).thenReturn(shareAction)
+        whenever(mockCommandActionMapper.asNewTabCommand(shareAction)).thenReturn(
+            NewTabPageViewModel.Command.SharePromoLinkRMF("https://example.com", "Share Title"),
+        )
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.onMessageActionButtonClicked()
+
+        verify(mockRemoteMessageModel, never()).clearMessageImage(any())
+        testee.commands().test {
+            val command = expectMostRecentItem()
+            assertTrue(command is NewTabPageViewModel.Command.SharePromoLinkRMF)
         }
     }
 
@@ -291,7 +319,7 @@ class NewTabPageViewModelTest {
             onClose = {},
             onShown = {},
         )
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
         whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
 
@@ -321,7 +349,7 @@ class NewTabPageViewModelTest {
             onClose = {},
             onShown = {},
         )
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
         whenever(mockLowPriorityMessagingModel.getMessage()).thenReturn(lowPriorityMessage)
 
@@ -399,7 +427,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when onboarding complete and RMF available, then hide logo`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -436,7 +464,7 @@ class NewTabPageViewModelTest {
         val favouritesFlow = MutableSharedFlow<List<SavedSite.Favorite>>(replay = 0)
         val remoteMessageFlow = MutableSharedFlow<RemoteMessage?>(replay = 0)
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favouritesFlow)
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(remoteMessageFlow)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(remoteMessageFlow)
 
         testee = createTestee()
         testee.onStart(mockLifecycleOwner)
@@ -506,7 +534,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when remote message available with MODAL surface then show logo, not the message`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.MODAL))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -522,7 +550,7 @@ class NewTabPageViewModelTest {
     @Test
     fun `when remote message available with NEW_TAB_PAGE surface then show the message, not the logo`() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -537,7 +565,7 @@ class NewTabPageViewModelTest {
 
     @Test
     fun `when no remote message available then show the logo`() = runTest {
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(null))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
 
         testee.onStart(mockLifecycleOwner)
@@ -553,7 +581,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteImageLoadSuccessThenPixelFired() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
         testee.onRemoteImageLoadSuccess()
@@ -567,7 +595,7 @@ class NewTabPageViewModelTest {
     @Test
     fun whenRemoteImageLoadFailedThenPixelFired() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
 
         testee.onStart(mockLifecycleOwner)
         testee.onRemoteImageLoadFailed()

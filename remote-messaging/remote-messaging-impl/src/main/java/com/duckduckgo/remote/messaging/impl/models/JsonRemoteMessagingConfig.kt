@@ -62,6 +62,7 @@ data class JsonContentTranslations(
 data class JsonListItemTranslation(
     val titleText: String = "",
     val descriptionText: String? = "",
+    val primaryActionText: String? = "",
 )
 
 data class JsonMatchingRule(
@@ -85,6 +86,7 @@ data class JsonListItem(
     val matchingRules: List<Int>? = emptyList(),
     val exclusionRules: List<Int>? = emptyList(),
     val itemIDs: List<String>? = emptyList(),
+    val imageUrl: String? = null,
 )
 
 @Suppress("ktlint:standard:class-naming")

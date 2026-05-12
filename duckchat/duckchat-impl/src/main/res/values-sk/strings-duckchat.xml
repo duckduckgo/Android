@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Skratky Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Vyber, ktoré skratky Duck.ai sa majú zobraziť</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Nová poloha prepínača záložiek</string>
+    <string name="duckAiDefaultTogglePositionSearch">Vyhľadávať</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Naposledy použité</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Hlasové vyhľadávanie</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Povoliť v nastaveniach funkcií AI</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Spravovať v nastaveniach funkcií AI</string>
     <string name="duck_ai_paid_settings_manage_secondary">Nakonfigurovať Duck.ai v nastaveniach funkcií AI.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Zhrň túto stránku</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automaticky odoslať obsah stránky</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automaticky odoslať obsah stránky do Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Pripoj obsah stránky</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Zmazať chat</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Vymazať údaje</string>
+    <string name="duckChatBrowserMenuContentDescription">Ďalšie možnosti</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Hlasový čet</string>
 </resources>

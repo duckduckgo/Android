@@ -34,6 +34,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_ONBOARDING,
+    featureName = "pluginOnboardingEnabledMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class OnboardingEnabledMessagePlugin @Inject constructor(
     private val vpnStore: VpnStore,

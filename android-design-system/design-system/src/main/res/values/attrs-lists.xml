@@ -34,15 +34,8 @@
     <attr name="leadingIcon" format="integer"/>
     <attr name="trailingIcon" format="integer"/>
     <attr name="trailingIconTint" format="reference|color"/>
-    <attr name="showBetaPill" format="boolean"/>
-    <attr name="pillIcon">
-        <enum name="none" value="0" />
-        <!-- Beta Pill -->
-        <enum name="betaPill" value="1" />
-        <!-- New Pill -->
-        <enum name="newPill" value="2" />
-    </attr>
-    <attr name="showNewPill" format="boolean"/>
+    <attr name="pillIcon" format="boolean"/>
+    <attr name="pillText" format="string"/>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
     <attr name="leadingIconBackground">
@@ -90,7 +83,8 @@
         <attr name="trailingIconTint"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
-        <attr name="showNewPill"/>
+        <attr name="pillIcon"/>
+        <attr name="pillText"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
@@ -105,7 +99,8 @@
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="trailingIconSize"/>
-        <attr name="showBetaPill"/>
+        <attr name="pillIcon"/>
+        <attr name="pillText"/>
         <attr name="showSwitch"/>
         <attr name="switchEnabled"/>
     </declare-styleable>

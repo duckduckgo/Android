@@ -27,8 +27,8 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +44,7 @@ import javax.inject.Inject
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
 ) : ViewModel() {
 
     data class ViewState(
@@ -56,9 +56,9 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         data object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         data object LaunchWebViewWithPrivacyPolicyUrl : Command()
         data object LaunchFeedback : Command()
-        data object LaunchPproUnifiedFeedback : Command()
+        data object LaunchSubscriptionUnifiedFeedback : Command()
         data object LaunchWebViewWithComparisonChartUrl : Command()
-        data object LaunchWebViewWithPPROUrl : Command()
+        data object LaunchWebViewWithSubscriptionUrl : Command()
         data object LaunchWebViewWithVPNUrl : Command()
     }
 
@@ -85,8 +85,8 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchWebViewWithComparisonChartUrl) }
     }
 
-    fun onPProHelpPageLinkClicked() {
-        viewModelScope.launch { command.send(Command.LaunchWebViewWithPPROUrl) }
+    fun onSubscriptionHelpPageLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithSubscriptionUrl) }
     }
 
     fun onVPNHelpPageLinkClicked() {
@@ -118,8 +118,8 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun onProvideFeedbackClicked() {
         viewModelScope.launch {
-            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
-                command.send(Command.LaunchPproUnifiedFeedback)
+            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = DDG_SETTINGS)) {
+                command.send(Command.LaunchSubscriptionUnifiedFeedback)
             } else {
                 command.send(Command.LaunchFeedback)
             }

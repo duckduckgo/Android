@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 interface OmnibarView {
     val omnibarType: OmnibarType
     var isScrollingEnabled: Boolean
+    var isUiLocked: Boolean
     val isEditing: Boolean
     val isEditingFlow: Flow<Boolean>
     val findInPage: IncludeFindInPageBinding
@@ -51,6 +52,7 @@ interface OmnibarView {
     fun isPulseAnimationPlaying(): Boolean
     fun setDraftTextIfNtpOrSerp(query: String)
     fun setExpanded(expanded: Boolean)
+    fun disableViewStateSaving()
     fun setExpanded(
         expanded: Boolean,
         animate: Boolean,

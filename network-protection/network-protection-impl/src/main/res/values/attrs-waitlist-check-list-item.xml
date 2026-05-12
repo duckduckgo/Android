@@ -24,7 +24,6 @@
         <attr name="primaryTextTruncated"/>
         <attr name="secondaryText"/>
         <attr name="secondaryTextColorOverlay"/>
-        <attr name="showBetaPill"/>
         <attr name="leadingIcon" />
     </declare-styleable>
 

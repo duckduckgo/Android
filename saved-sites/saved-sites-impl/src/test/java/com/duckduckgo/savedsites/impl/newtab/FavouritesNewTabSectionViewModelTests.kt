@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
@@ -39,6 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -48,11 +50,12 @@ class FavouritesNewTabSectionViewModelTests {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private var mockLifecycleOwner: LifecycleOwner = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
+    private val feature: FavouritesNewTabSectionFixFeature = mock()
+    private val featureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
 
     private lateinit var testee: FavouritesNewTabSectionViewModel
 
@@ -62,19 +65,20 @@ class FavouritesNewTabSectionViewModelTests {
     @Before
     fun setup() {
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(feature.self()).thenReturn(featureToggle)
+        whenever(featureToggle.isEnabled()).thenReturn(true)
         testee = FavouritesNewTabSectionViewModel(
             coroutinesTestRule.testDispatcherProvider,
             mockSavedSitesRepository,
             pixel,
             faviconManager,
             syncEngine,
+            feature,
         )
     }
 
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitInitialState() = runTest {
-        testee.onResume(mockLifecycleOwner)
-
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertTrue(it.favourites.isEmpty())
@@ -85,10 +89,16 @@ class FavouritesNewTabSectionViewModelTests {
     @Test
     fun whenViewModelIsInitializedAndFavouritesPresentThenViewStateShouldEmitCorrectState() = runTest {
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite1)))
+        val testeeWithFavourites = FavouritesNewTabSectionViewModel(
+            coroutinesTestRule.testDispatcherProvider,
+            mockSavedSitesRepository,
+            pixel,
+            faviconManager,
+            syncEngine,
+            feature,
+        )
 
-        testee.onResume(mockLifecycleOwner)
-
-        testee.viewState.test {
+        testeeWithFavourites.viewState.test {
             expectMostRecentItem().also {
                 assertFalse(it.favourites.isEmpty())
                 assertTrue(it.favourites.first() == favorite1)
@@ -277,5 +287,44 @@ class FavouritesNewTabSectionViewModelTests {
         val decision = testee.onTouchMove(x = 1f, y = 1f, touchSlop = 1)
 
         assertNull(decision)
+    }
+
+    @Test
+    fun `when feature flag enabled and onResume called multiple times then no additional flow collections started`() = runTest {
+        val lifecycleOwner: LifecycleOwner = mock()
+
+        testee.viewState.test {
+            awaitItem() // initial empty state from stateIn
+            testee.onResume(lifecycleOwner)
+            testee.onResume(lifecycleOwner)
+            testee.onResume(lifecycleOwner)
+            expectNoEvents()
+        }
+
+        // getFavorites() called once by the stateIn flow, not once per onResume
+        verify(mockSavedSitesRepository, times(1)).getFavorites()
+    }
+
+    @Test
+    fun `when feature flag disabled and onResume called then viewState emits favourites`() = runTest {
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite1)))
+        whenever(featureToggle.isEnabled()).thenReturn(false)
+        val lifecycleOwner: LifecycleOwner = mock()
+        val viewModelWithFixDisabled = FavouritesNewTabSectionViewModel(
+            coroutinesTestRule.testDispatcherProvider,
+            mockSavedSitesRepository,
+            pixel,
+            faviconManager,
+            syncEngine,
+            feature,
+        )
+
+        viewModelWithFixDisabled.viewState.test {
+            awaitItem() // initial empty state from _legacyViewState
+            viewModelWithFixDisabled.onResume(lifecycleOwner)
+            val state = awaitItem()
+            assertFalse(state.favourites.isEmpty())
+            assertTrue(state.favourites.first() == favorite1)
+        }
     }
 }

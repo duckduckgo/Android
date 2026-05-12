@@ -29,13 +29,14 @@ class RealDownloadConfirmation @Inject constructor() : DownloadConfirmation {
     override fun instance(pendingDownload: PendingFileDownload): BottomSheetDialogFragment {
         val fragment = DownloadConfirmationFragment()
         fragment.isCancelable = false
-        val bundle = Bundle()
-        bundle.putSerializable(PENDING_DOWNLOAD_BUNDLE_KEY, pendingDownload)
-        fragment.arguments = bundle
+        val key = PendingDownloadStore.put(pendingDownload)
+        fragment.arguments = Bundle().apply {
+            putString(PENDING_DOWNLOAD_KEY, key)
+        }
         return fragment
     }
 
     companion object {
-        const val PENDING_DOWNLOAD_BUNDLE_KEY = "PENDING_DOWNLOAD_BUNDLE_KEY"
+        const val PENDING_DOWNLOAD_KEY = "PENDING_DOWNLOAD_KEY"
     }
 }

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Отмени</string>
     <string name="autocompleteRemoveItemRemove">Премахване</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Превключване към раздел · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
-    <string name="openAutoCompleteSettings">Отвори Настройки</string>
 </resources>

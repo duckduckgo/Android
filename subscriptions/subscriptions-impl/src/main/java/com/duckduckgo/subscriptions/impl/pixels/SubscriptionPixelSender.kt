@@ -26,7 +26,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_G
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V1_SIGN_IN_ATTEMPT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_RECOVERED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_INVALID_REFRESH_TOKEN_SIGNED_OUT
@@ -36,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRAT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_STORE_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_VALIDATION_ERROR
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_DUCK_AI_PAID_USED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
@@ -46,6 +46,12 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_DUC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_VPN_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D0
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D14
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D3
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D30
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_ACCOUNT_CREATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_BACKEND
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_OTHER
@@ -63,12 +69,14 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_A
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_REDIRECT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_PLATFORM
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.DAYS_SINCE_INSTALL
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -84,8 +92,8 @@ interface SubscriptionPixelSender {
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
-    fun reportPurchaseSuccess()
-    fun reportPurchaseSuccessOrigin(origin: String?)
+    fun reportPurchaseSuccess(isFreeTrial: Boolean)
+    fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean)
     fun reportOfferRestorePurchaseClick()
     fun reportActivateSubscriptionEnterEmailClick()
     fun reportActivateSubscriptionRestorePurchaseClick()
@@ -111,7 +119,7 @@ interface SubscriptionPixelSender {
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
-    fun reportPrivacyProRedirect()
+    fun reportSubscriptionRedirect()
     fun reportAuthV2InvalidRefreshTokenDetected()
     fun reportAuthV2InvalidRefreshTokenSignedOut()
     fun reportAuthV2InvalidRefreshTokenRecovered()
@@ -122,15 +130,17 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
-    fun reportAuthV1SignInAttempt()
     fun reportFreeTrialStart()
-    fun reportFreeTrialVpnActivation(activationDay: String)
+    fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
+    fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
+    fun reportPaywallNotSeen(dayBucket: String, returningUser: Boolean, privacyDashboardEverOpened: Boolean, subscriptionPromoShown: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
+    private val paywallMetricsManager: PaywallMetricsManager,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -142,8 +152,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             ),
         )
 
-    override fun reportOfferScreenShown() =
+    override fun reportOfferScreenShown() {
+        paywallMetricsManager.recordFirstPaywallSeen()?.let { dayBucket ->
+            fire(PAYWALL_SHOWN_FIRST_TIME, mapOf(DAYS_SINCE_INSTALL to dayBucket))
+        }
         fire(OFFER_SCREEN_SHOWN)
+    }
 
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
@@ -169,12 +183,19 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPurchaseFailureAccountCreation() =
         fire(PURCHASE_FAILURE_ACCOUNT_CREATION)
 
-    override fun reportPurchaseSuccess() =
-        fire(PURCHASE_SUCCESS)
+    override fun reportPurchaseSuccess(isFreeTrial: Boolean) =
+        fire(
+            PURCHASE_SUCCESS,
+            mapOf(
+                SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
+                SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
+            ),
+        )
 
-    override fun reportPurchaseSuccessOrigin(origin: String?) {
+    override fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean) {
         val map = mutableMapOf(
             "locale" to appBuildConfig.deviceLocale.toSanitizedLanguageTag(),
+            SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
         )
         origin?.let {
             map.put("origin", origin)
@@ -257,8 +278,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportAddEmailSuccess() =
         fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
 
-    override fun reportPrivacyProRedirect() =
-        fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
+    override fun reportSubscriptionRedirect() =
+        fire(SUBSCRIPTION_REDIRECT)
 
     override fun reportAuthV2InvalidRefreshTokenDetected() {
         fire(AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED)
@@ -300,16 +321,40 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH, mapOf("is_repeated" to isRepeated.toString()))
     }
 
-    override fun reportAuthV1SignInAttempt() {
-        fire(AUTH_V1_SIGN_IN_ATTEMPT)
-    }
-
     override fun reportFreeTrialStart() {
         fire(FREE_TRIAL_START)
     }
 
-    override fun reportFreeTrialVpnActivation(activationDay: String) {
-        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay))
+    override fun reportFreeTrialVpnActivation(activationDay: String, platform: String) {
+        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
+    }
+
+    override fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String) {
+        fire(FREE_TRIAL_DUCK_AI_PAID_USED, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
+    }
+
+    override fun reportPaywallNotSeen(
+        dayBucket: String,
+        returningUser: Boolean,
+        privacyDashboardEverOpened: Boolean,
+        subscriptionPromoShown: Boolean,
+    ) {
+        val pixel = when (dayBucket) {
+            "d0" -> PAYWALL_NOT_SEEN_D0
+            "d3" -> PAYWALL_NOT_SEEN_D3
+            "d7" -> PAYWALL_NOT_SEEN_D7
+            "d14" -> PAYWALL_NOT_SEEN_D14
+            "d30" -> PAYWALL_NOT_SEEN_D30
+            else -> return
+        }
+        fire(
+            pixel,
+            mapOf(
+                SubscriptionPixelParameter.RETURNING_USER to returningUser.toString(),
+                SubscriptionPixelParameter.PRIVACY_DASHBOARD_EVER_OPENED to privacyDashboardEverOpened.toString(),
+                SubscriptionPixelParameter.SUBSCRIPTION_PROMO_SHOWN to subscriptionPromoShown.toString(),
+            ),
+        )
     }
 
     private fun fire(
@@ -317,7 +362,11 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         params: Map<String, String> = emptyMap(),
     ) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            if (pixel.enqueue) {
+                pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
+            } else {
+                pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            }
         }
     }
 }

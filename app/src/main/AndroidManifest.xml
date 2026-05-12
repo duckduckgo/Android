@@ -24,6 +24,12 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
+    <!--
+    androidx.pdf library is defining a min version to 31, but our app supports 21 and above.
+    This allows us to use the library while still supporting older versions of Android
+    -->
+    <uses-sdk tools:overrideLibrary="androidx.pdf,androidx.pdf.document.service,androidx.pdf.viewer.fragment" />
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -384,6 +390,11 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserActivity"
+            android:exported="false"
+            android:label="@string/getDesktopBrowserSettingItemTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
             android:exported="false"
             android:label="@string/fireproofWebsitesActivityTitle"
@@ -503,16 +514,6 @@
             />
 
         <service
-            android:name="com.duckduckgo.widget.FavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
-            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
             android:name="com.duckduckgo.customtabs.impl.service.DuckDuckGoCustomTabService"
             android:exported="true"
             tools:ignore="ExportedService">
@@ -529,6 +530,10 @@
             tools:ignore="MissingClass" />
 
         <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
+
+        <receiver
+            android:name="com.duckduckgo.app.desktopbrowser.GetDesktopBrowserShareBroadcastReceiver"
+            android:exported="false" />
 
         <receiver
             android:name="com.duckduckgo.widget.SearchWidget"
@@ -593,11 +598,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
         </receiver>
-
-        <receiver
-            android:name=".remotemessage.SharePromoLinkRMFBroadCastReceiver"
-            android:exported="false" />
-
     </application>
 
 </manifest>

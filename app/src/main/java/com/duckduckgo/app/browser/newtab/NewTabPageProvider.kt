@@ -44,6 +44,8 @@ class RealNewTabPageProvider @Inject constructor(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
     priority = NewTabPagePlugin.PRIORITY_NTP,
+    featureName = "pluginNewTabPage",
+    parentFeatureName = "pluginPointNewTabPagePlugin",
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
@@ -59,5 +61,6 @@ class NewTabPage @Inject constructor() : NewTabPagePlugin {
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
+    featureName = "pluginPointNewTabPagePlugin",
 )
 private interface NewTabPagePluginPointTrigger

@@ -17,6 +17,7 @@
 
 <com.duckduckgo.common.ui.view.listitem.OneLineListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/syncSetupPromoListItem"
     android:layout_width="match_parent"
@@ -24,5 +25,6 @@
     android:layout_marginStart="@dimen/keyline_4"
     android:layout_marginEnd="@dimen/keyline_4"
     android:background="@drawable/selectable_rounded_container_ripple"
+    tools:ignore="Overdraw"
     app:trailingIcon="@drawable/ic_menu_vertical_24"
     app:primaryText="@string/addBookmarkDialogSyncPromoText" />

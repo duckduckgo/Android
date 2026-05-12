@@ -81,3 +81,5 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
         }
     }
 }
+
+fun DeviceInfo.isTablet() = formFactor() == TABLET

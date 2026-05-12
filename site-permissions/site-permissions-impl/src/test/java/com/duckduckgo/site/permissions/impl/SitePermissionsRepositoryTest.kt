@@ -127,6 +127,27 @@ class SitePermissionsRepositoryTest {
     }
 
     @Test
+    fun whenDrmSessionAllowsThenDrmIsEnabledForSite() = runTest {
+        repository.saveDrmForSession(domain, true)
+
+        assertTrue(repository.isDrmEnabledForSite(url))
+    }
+
+    @Test
+    fun whenDrmSessionDeniesThenDrmIsDisabledForSite() = runTest {
+        repository.saveDrmForSession(domain, false)
+
+        assertFalse(repository.isDrmEnabledForSite(url))
+    }
+
+    @Test
+    fun whenDrmBlockedByConfigThenDrmIsDisabledForSite() = runTest {
+        whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
+
+        assertFalse(repository.isDrmEnabledForSite(url))
+    }
+
+    @Test
     fun whenSitePermissionsWasGrantedWithin24hThenReturnPermissionGranted() = runTest {
         setInitialSettings()
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE

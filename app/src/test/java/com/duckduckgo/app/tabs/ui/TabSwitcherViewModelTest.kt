@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -41,6 +40,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.EXISTING
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState.NEW
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -84,6 +84,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -92,9 +93,12 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.util.Date
 import kotlin.Boolean
 
+@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
+@Config(sdk = [34])
 @SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {
@@ -133,8 +137,6 @@ class TabSwitcherViewModelTest {
     private val mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels = mock()
 
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
-
-    private val androidBrowserConfig = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
@@ -197,7 +199,6 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
-            androidBrowserConfig,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -227,10 +228,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
 
         val emptyTab = TabEntity("EMPTY_TAB", url = "", sourceTabId = null, position = 0)
         val tabListWithEmptyTab = listOf(
@@ -249,10 +249,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndEmptyTabWithSourceTabExistsThenAddNewTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndEmptyTabWithSourceTabExistsThenAddNewTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
 
         val tabListWithEmptyTabWithSource = listOf(
             TabEntity("1", url = "https://cnn.com", position = 1),
@@ -270,53 +269,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankEnabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
+    fun whenNewTabRequestedAndSwipingTabsEnabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = true))
-
-        val tabListWithoutEmptyTab = listOf(
-            TabEntity("1", url = "https://cnn.com", position = 1),
-            TabEntity("2", url = "https://test.com", position = 2),
-        )
-        tabList = tabListWithoutEmptyTab
-        initializeMockTabEntitesData()
-        initializeViewModel()
-        prepareSelectionMode()
-
-        testee.onNewTabRequested()
-
-        verify(mockTabRepository, never()).select(any())
-        verify(mockTabRepository).add()
-    }
-
-    @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankDisabledAndEmptyTabExistsThenSelectEmptyTab() = runTest {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = false))
-
-        val emptyTab = TabEntity("EMPTY_TAB", url = "", sourceTabId = "SOURCE_TAB", position = 0)
-        val tabListWithEmptyTab = listOf(
-            TabEntity("1", url = "https://cnn.com", position = 1),
-            emptyTab,
-        )
-        tabList = tabListWithEmptyTab
-        initializeMockTabEntitesData()
-        initializeViewModel()
-        prepareSelectionMode()
-
-        testee.onNewTabRequested()
-
-        verify(mockTabRepository).select("EMPTY_TAB")
-        verify(mockTabRepository, never()).add()
-    }
-
-    @Test
-    fun whenNewTabRequestedAndSwipingTabsEnabledAndHandleAboutBlankDisabledAndNoEmptyTabExistsThenAddNewTab() = runTest {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-        swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-        androidBrowserConfig.handleAboutBlank().setRawStoredState(State(enable = false))
 
         val tabListWithoutEmptyTab = listOf(
             TabEntity("1", url = "https://cnn.com", position = 1),
@@ -720,6 +675,14 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenOnFireButtonTappedThenPixelsSent() {
+        testee.onFireButtonTapped()
+
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
+    }
+
+    @Test
     fun whenOnUpButtonPressedCalledThePixelSent() {
         testee.onUpButtonPressed()
 
@@ -872,7 +835,7 @@ class TabSwitcherViewModelTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
         val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        whenever(duckChatMock.getDuckChatUrl(any(), any())).thenReturn(duckChatURL)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
 
         testee.onDuckAIButtonClicked()
 
@@ -1962,6 +1925,45 @@ class TabSwitcherViewModelTest {
         assertFalse(viewState.dynamicInterface.isNewTabButtonVisible)
     }
 
+    @Test
+    fun `when tab has duck ai url then item is DuckAiTab`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        tabList = listOf(TabEntity("duckai1", url = duckAiUrl, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(true)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue("Expected DuckAiTab but got: $items", items.any { it is DuckAiTab })
+    }
+
+    @Test
+    fun `when tab has regular url then item is NormalTab`() = runTest {
+        val url = "https://example.com"
+        tabList = listOf(TabEntity("tab1", url = url, position = 1))
+        whenever(duckChatMock.isDuckChatUrl(any())).thenReturn(false)
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.any { it is NormalTab })
+        assertTrue(items.none { it is DuckAiTab })
+    }
+
+    @Test
+    fun `when tab has null url then item is NormalTab`() = runTest {
+        tabList = listOf(TabEntity("tab2", url = null, position = 1))
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
+
+        assertTrue(items.any { it is NormalTab })
+        assertTrue(items.none { it is DuckAiTab })
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)
@@ -2013,6 +2015,10 @@ class TabSwitcherViewModelTest {
         }
 
         override fun defaultBrowser(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun wasEverDefaultBrowser(): Boolean {
             TODO("Not yet implemented")
         }
 

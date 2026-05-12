@@ -28,6 +28,7 @@
     <attr name="daxButtonGhost" format="reference"/>
     <attr name="daxButtonDestructive" format="reference"/>
     <attr name="daxButtonGhostDestructive" format="reference"/>
+    <attr name="daxButtonDestructiveSecondary" format="reference"/>
     <attr name="daxButtonGhostAlt" format="reference"/>
 
     <attr name="radioButtonStyle" format="reference"/>

@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Mégsem</string>
     <string name="autocompleteRemoveItemRemove">Eltávolítás</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Váltás lapra · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
-    <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
-    <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
 </resources>

@@ -46,7 +46,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
     buildFeatures {
         viewBinding = true
@@ -54,6 +54,7 @@ android {
 }
 dependencies {
     lintChecks project(':lint-rules')
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
 }
 
 tasks.register('checks') {

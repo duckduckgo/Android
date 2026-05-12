@@ -24,8 +24,10 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -74,7 +76,7 @@ sealed class Command {
 
     data object ResetHistory : Command()
 
-    class LaunchPrivacyPro(
+    class LaunchSubscription(
         val uri: Uri,
     ) : Command()
 
@@ -211,6 +213,7 @@ sealed class Command {
     class HandleNonHttpAppLink(
         val nonHttpAppLink: NonHttpAppLink,
         val headers: Map<String, String>,
+        val showConfirmation: Boolean = true,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -251,7 +254,7 @@ sealed class Command {
 
     data object LaunchAppTPOnboarding : Command()
 
-    data object LaunchAddWidget : Command()
+    data object LaunchAddWidgetOnboarding : Command()
 
     class RequiresAuthentication(
         val request: BasicAuthenticationRequest,
@@ -413,6 +416,10 @@ sealed class Command {
 
     data object ScreenUnlock : Command()
 
+    data class UiLockChanged(val locked: Boolean) : Command()
+
+    data class SetContentAllowsSwipeToRefresh(val allowed: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(
@@ -453,10 +460,8 @@ sealed class Command {
 
     class SetBrowserBackground(
         @DrawableRes val backgroundRes: Int,
-    ) : Command()
-
-    class SetBrowserBackgroundColor(
-        @ColorRes val colorRes: Int,
+        val useRebrandBackground: Boolean = false,
+        @AttrRes val backgroundColorAttr: Int = 0,
     ) : Command()
 
     class SetOnboardingDialogBackground(
@@ -487,7 +492,7 @@ sealed class Command {
 
     data object RefreshOmnibar : Command()
 
-    data object LaunchInputScreen : Command()
+    data class LaunchInputScreen(val showDuckAiEndCta: Boolean = false) : Command()
 
     data class ExtractSerpLogo(
         val currentUrl: String,
@@ -503,8 +508,25 @@ sealed class Command {
     data object PageStarted : Command()
 
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
-    data class DisableDuckAIFullScreen(val url: String) : Command()
+    data class DuckAIFullScreenDisabled(val url: String) : Command()
 
-    data object ShowDuckAIContextualMode : Command()
+    data class ShowDuckAIContextualMode(val tabId: String) : Command()
+
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
+
+    data class PageContextReceived(
+        val tabId: String,
+        val pageContext: String,
+    ) : Command()
+
+    data class ShowToast(@param:StringRes val textResId: Int) : Command()
+
+    data class ShowPdfInTab(
+        val url: String,
+        val cachedFileUri: Uri,
+    ) : Command()
+
+    data object ShowPdfDownloadTooltip : Command()
+
+    data object ExpandOmnibar : Command()
 }

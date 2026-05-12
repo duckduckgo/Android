@@ -31,6 +31,7 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.DaxYellowPill
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.recursiveEnable
@@ -52,8 +53,7 @@ abstract class DaxListItem(
     internal abstract val trailingIcon: ImageView
     internal abstract val trailingIconContainer: View
     internal abstract val trailingSwitch: DaxSwitch
-    internal abstract val betaPill: ImageView?
-    internal abstract val newPill: ImageView?
+    internal abstract val yellowPill: DaxYellowPill?
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
 
@@ -264,15 +264,6 @@ abstract class DaxListItem(
         leadingIconContainer.gone()
         val padding = resources.getDimensionPixelSize(R.dimen.twoLineItemVerticalBigPadding)
         itemContainer.setPadding(0, padding, 0, padding)
-    }
-
-    /** Sets the trailing image content description */
-    fun setPillVisible(isVisible: Boolean) {
-        if (isVisible) {
-            betaPill?.show()
-        } else {
-            betaPill?.gone()
-        }
     }
 
     /** Sets the switch value */

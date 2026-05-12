@@ -22,6 +22,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.brokensite.RealBrokenSiteContext
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -45,6 +46,7 @@ class SiteFactoryImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val duckPlayer: DuckPlayer,
+    private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
 ) : SiteFactory {
 
     private val siteCache = LruCache<String, Site>(1)
@@ -77,6 +79,7 @@ class SiteFactoryImpl @Inject constructor(
                 dispatcherProvider,
                 RealBrokenSiteContext(duckDuckGoUrlDetector),
                 duckPlayer,
+                standardizedLeadingIconToggle,
             ).also {
                 siteCache.put(cacheKey, it)
             }

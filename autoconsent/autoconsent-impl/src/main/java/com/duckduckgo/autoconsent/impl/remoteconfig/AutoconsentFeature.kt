@@ -56,4 +56,7 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun cpmPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun heuristicAction(): Toggle
 }

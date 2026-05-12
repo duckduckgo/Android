@@ -55,7 +55,7 @@ class ReturningUserToggleTargetMatcherTest {
     }
 
     companion object {
-        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null)
+        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null, null)
         private val RU_TARGET = NULL_TARGET.copy(isReturningUser = true)
         private val NOT_RU_TARGET = NULL_TARGET.copy(isReturningUser = false)
     }

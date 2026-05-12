@@ -156,7 +156,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun setupLayout() {
         binding.deleteButton.setOnClickListener {
-            hideClearDataOptions()
+            hideDialog()
             viewModel.onDeleteClicked()
         }
         binding.cancelButton.setOnClickListener {
@@ -197,7 +197,13 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
                 sendFragmentResult(FireDialog.EVENT_ON_CANCEL)
                 dismiss()
             }
-            is Command.OnClearStarted -> sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+            is Command.OnClearStarted -> {
+                if (viewModel.viewState.value.shouldRestartAfterClearing) {
+                    sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
+                } else {
+                    sendFragmentResult(FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED)
+                }
+            }
         }
     }
 
@@ -314,7 +320,7 @@ class GranularFireDialog : BottomSheetDialogFragment(), FireDialog {
         )
     }
 
-    private fun hideClearDataOptions() {
+    private fun hideDialog() {
         binding.fireDialogRootView.gone()
     }
 

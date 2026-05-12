@@ -1,0 +1,352 @@
+{
+  "basic": {
+    "name": "Basic",
+    "desc": "Basic Request Blocklist functionality",
+    "tests": [
+      {
+        "name": "matching rule, <all> domains",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule (subdomain), <all> domains",
+        "requestUrl": "https://subdomain.request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule (implicit wildcard), <all> domains",
+        "requestUrl": "https://request-blocklist.example/block/ignored",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, matching domain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://sometimes.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, matching subdomain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://subdomain.sometimes.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, matching (non-eTLD+1) domain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://subdomain.different.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, matching (non-eTLD+1) subdomain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://another.subdomain.different.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, non-matching domain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://other-website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, non-matching domain",
+        "requestUrl": "https://request-blocklist.example/sometimes-block",
+        "requestType": "image",
+        "websiteUrl": "https://different.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "non-matching rule",
+        "requestUrl": "https://other-website.example/no-match",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule with wildcard, <all> domains",
+        "requestUrl": "https://request-blocklist.example/path/block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, port in URL",
+        "requestUrl": "https://request-blocklist.example:3000/port-block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "non-matching rule due to port",
+        "requestUrl": "https://request-blocklist.example/port-block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, first-party request",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://request-blocklist.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, query part of URL considered",
+        "requestUrl": "https://request-blocklist.example/incorrect?query-part",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, '.' literal considered",
+        "requestUrl": "https://request-blocklist.example/.path/regex",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, case considered",
+        "requestUrl": "https://request-blocklist.example/CASE",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "non-matching rule due to case",
+        "requestUrl": "https://request-blocklist.example/case",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, URL case normalised",
+        "requestUrl": "HtTpS://ReQuEsT-BlOcKlIsT.ExAmPlE/CASE",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "allowlisting": {
+    "name": "Allowlisting",
+    "desc": "Interactions between allowlisting and the Request Blocklist",
+    "tests": [
+      {
+        "name": "matching rule, in tracker allowlist",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://allowlisted-website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, subdomain in tracker allowlist",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://subdomain.allowlisted-website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, content blocking disabled",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://content-blocking-exception.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, subdomain content blocking disabled",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://subdomain.content-blocking-exception.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, user allowlisted",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://user-allowlisted.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, subdomain exception",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://subdomain.request-blocking-exception.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "trackers": {
+    "name": "Trackers",
+    "desc": "Interactions between Tracker Blocklist and the Request Blocklist",
+    "tests": [
+      {
+        "name": "matching rule, tracker blocklist allow",
+        "requestUrl": "https://tracker.example/unknown.js",
+        "requestType": "script",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, tracker blocklist blocked",
+        "requestUrl": "https://tracker.example/block.js",
+        "requestType": "script",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, tracker blocklist surrogate",
+        "requestUrl": "https://tracker.example/analytics.js",
+        "requestType": "script",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, first-party request",
+        "requestUrl": "https://tracker.example/block-first-party",
+        "requestType": "image",
+        "websiteUrl": "https://tracker.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "matching rule, non-matching (cname alias) domain",
+        "requestUrl": "https://tracker.example/block-first-party",
+        "requestType": "image",
+        "websiteUrl": "https://tracker-example.cname.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "non-matching rule (cname alias), <all domains>",
+        "requestUrl": "https://tracker-example.cname.example/unknown.js",
+        "requestType": "script",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "incorrect": {
+    "name": "Incorrect",
+    "desc": "Incorrect rules that are not expected to match",
+    "tests": [
+      {
+        "name": "incorrect rule using regexp syntax",
+        "requestUrl": "https://request-blocklist.example/path/regex",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "incorrect rule using adblock filter syntax",
+        "requestUrl": "https://request-blocklist.example/adblock-filter",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "incorrect rule that misses required property",
+        "requestUrl": "https://request-blocklist.example/missing-prop",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "incorrect rule that has extra property",
+        "requestUrl": "https://request-blocklist.example/extra-prop",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "rules don't match main_frame requests (aka navigations)",
+        "requestUrl": "https://request-blocklist.example/block",
+        "requestType": "main_frame",
+        "websiteUrl": "https://request-blocklist.example/block",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "incorrect rule that includes redundant port in URL",
+        "requestUrl": "https://request-blocklist.example/incorrect-port-block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "incorrect entry under subdomain (instead of etld+1)",
+        "requestUrl": "https://subdomain.request-blocklist.example/subdomain",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "allow",
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "ordering": {
+    "name": "Ordering",
+    "desc": "Rules that should apply despite other rules that don't",
+    "tests": [
+      {
+        "name": "two matching rules, first one applies to domain",
+        "requestUrl": "https://request-blocklist-ordering.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://sometimes.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "two matching rules, second one applies to domain",
+        "requestUrl": "https://request-blocklist-ordering.example/block",
+        "requestType": "image",
+        "websiteUrl": "https://website.example",
+        "expectAction": "block",
+        "exceptPlatforms": []
+      }
+    ]
+  }
+}

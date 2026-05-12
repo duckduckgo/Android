@@ -98,5 +98,6 @@ class RealNewTabPageSectionProvider @Inject constructor(
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    featureName = "pluginPointNewTabPageSectionPlugin",
 )
 private interface NewTabPageSectionPluginPointTrigger

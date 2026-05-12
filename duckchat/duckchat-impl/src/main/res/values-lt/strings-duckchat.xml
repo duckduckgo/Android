@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">„Duck.ai“ spartieji klavišai</string>
     <string name="duck_ai_shortcut_settings_description">Pasirinkite, kuriuos „Duck.ai“ sparčiuosius klavišus rodyti</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Naujos kortelės perjungimo vieta</string>
+    <string name="duckAiDefaultTogglePositionSearch">Paieška</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Paskutinį kartą naudota</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Paieška balsu</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Įgalinti DI funkcijų nustatymuose</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Duck.ai“ DI funkcijų nustatymuose.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Apibendrinti šį puslapį</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatiškai siųsti puslapio turinį</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatiškai siųsti puslapio turinį į „Duck.ai“</string>
+    <string name="duckAIContextualAttachPageContent">Pridėkite puslapio turinį</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Išvalyti pokalbį</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Valyti duomenis</string>
+    <string name="duckChatBrowserMenuContentDescription">Daugiau parinkčių</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Balso pokalbis</string>
 </resources>

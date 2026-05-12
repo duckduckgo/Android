@@ -205,6 +205,8 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_APP_TP,
+    featureName = "pluginAppTrackingProtectionNewTabPageSectionPlugin",
+    parentFeatureName = "pluginPointNewTabPageSectionPlugin",
 )
 class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
     private val vpnStore: VpnStore,

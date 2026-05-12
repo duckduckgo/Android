@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Prekliči</string>
     <string name="autocompleteRemoveItemRemove">Odstrani</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Preklopi na zavihek · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Predlogi za samodejno dokončanje zdaj vključujejo vaša nedavno obiskana spletna mesta. Izklopite v nastavitvah ali pa seznam kadar koli počistite z gumbom Fire Button 🔥.</string>
-    <string name="improvedAutoCompleteIAMTitle">Enaka raven zasebnosti.\nBoljši predlogi iskanja!</string>
-    <string name="openAutoCompleteSettings">Odpri nastavitve</string>
 </resources>

@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -27,8 +28,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import kotlinx.coroutines.flow.collectLatest
@@ -52,6 +56,12 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pirNotificationManager: PirNotificationManager
+
+    @Inject
+    lateinit var pirInternalSettingsDataStore: PirInternalSettingsDataStore
+
+    @Inject
+    lateinit var pirDashboardUrlProvider: PirDashboardUrlProvider
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -83,6 +93,24 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
         binding.brokerConfig.setOnClickListener {
             globalActivityStarter.start(this, PirBrokerConfigScreenNoParams)
+        }
+
+        binding.pirCustomUrlInput.text = pirDashboardUrlProvider.getUrl()
+
+        binding.pirSetCustomUrl.setOnClickListener {
+            val url = binding.pirCustomUrlInput.text
+            if (url.isBlank()) {
+                Toast.makeText(this, getString(R.string.pirDevCustomUrlEmpty), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            pirInternalSettingsDataStore.customDashboardUrl = url
+            Toast.makeText(this, getString(R.string.pirDevCustomUrlSet), Toast.LENGTH_SHORT).show()
+        }
+
+        binding.pirResetCustomUrl.setOnClickListener {
+            pirInternalSettingsDataStore.customDashboardUrl = null
+            binding.pirCustomUrlInput.text = PirDashboardWebConstants.DEFAULT_WEB_UI_URL
+            Toast.makeText(this, getString(R.string.pirDevCustomUrlReset), Toast.LENGTH_SHORT).show()
         }
     }
 

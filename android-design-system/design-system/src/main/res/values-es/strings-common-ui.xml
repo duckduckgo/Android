@@ -37,4 +37,12 @@
     <string name="alwaysOn">Siempre activado</string>
     <string name="on">Activado</string>
     <string name="off">Desactivado</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Más información</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Cerrar</string>
+    <string name="bookmarkFavoriteContentDescription">Favorito</string>
+
 </resources>

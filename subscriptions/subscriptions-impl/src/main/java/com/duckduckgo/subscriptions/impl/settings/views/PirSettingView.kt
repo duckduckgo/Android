@@ -44,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
@@ -106,6 +107,7 @@ class PirSettingView @JvmOverloads constructor(
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
                     isClickable = true
                     binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }
+                    binding.pirSettings.showPillIcon(viewState.pirState.type == Type.DASHBOARD)
                 }
 
                 is Disabled -> {
@@ -114,6 +116,7 @@ class PirSettingView @JvmOverloads constructor(
                     setStatus(isOn = false)
                     binding.pirSettings.setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
+                    binding.pirSettings.showPillIcon(false)
                 }
 
                 Hidden -> isGone = true

@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Raccourcis Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Choisissez les raccourcis Duck.ai à afficher</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Position de bascule du nouvel onglet</string>
+    <string name="duckAiDefaultTogglePositionSearch">Rechercher</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Dernière utilisation</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Recherche vocale</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Activer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gérer dans les réglages des fonctionnalités d\'IA</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configurez Duck.ai dans les réglages des fonctionnalités d\'IA.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Résumer cette page</string>
+    <string name="duckAIContextualAutomaticContextTitle">Envoyer automatiquement le contenu de la page</string>
+    <string name="duckAIContextualAutomaticContextMessage">Envoyer automatiquement le contenu de la page à Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Joindre le contenu de la page</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Effacer la discussion</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Effacer les données</string>
+    <string name="duckChatBrowserMenuContentDescription">Plus d\'options</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Chat vocal</string>
 </resources>

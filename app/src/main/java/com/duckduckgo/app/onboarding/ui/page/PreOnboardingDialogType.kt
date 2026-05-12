@@ -17,10 +17,12 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 enum class PreOnboardingDialogType {
+    SYNC_RESTORE,
     INITIAL_REINSTALL_USER,
     INITIAL,
     SKIP_ONBOARDING_OPTION,
     COMPARISON_CHART,
     ADDRESS_BAR_POSITION,
     INPUT_SCREEN,
+    INPUT_SCREEN_PREVIEW,
 }

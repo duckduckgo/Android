@@ -1,8 +1,7 @@
 appId: com.duckduckgo.mobile.android
 androidWebViewHierarchy: devtools
 tags:
-  ## This tag will be updated to securityTest once we close the https://app.asana.com/1/137249556945/project/1211724162604201/task/1212015085457815?focus=true task
-  - securityTestInternal
+  - securityTest
 ---
 - retry:
     maxRetries: 3

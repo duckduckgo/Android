@@ -32,6 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
+        android:contentDescription="@string/atp_close_button_content_description"
         android:layout_gravity="end"
     />
 

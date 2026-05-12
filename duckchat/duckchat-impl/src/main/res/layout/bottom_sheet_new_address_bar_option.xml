@@ -67,6 +67,7 @@
                             android:layout_height="32dp"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginBottom="@dimen/keyline_4"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/ic_ddg_logo" />
 
                         <LinearLayout
@@ -79,6 +80,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="8dp"
+                                android:importantForAccessibility="no"
                                 android:src="@drawable/ic_new_pill" />
 
                             <com.duckduckgo.common.ui.view.text.DaxTextView

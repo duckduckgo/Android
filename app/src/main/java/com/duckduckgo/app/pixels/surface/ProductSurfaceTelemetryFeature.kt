@@ -30,4 +30,8 @@ interface ProductSurfaceTelemetryFeature {
     @DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
+
+    @DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun enableTelemetry(): Toggle
 }

@@ -78,6 +78,7 @@ class OnboardingInputScreenSelectionObserver @Inject constructor(
     private fun setSelectionWhenEstablished() {
         userStageStore.userAppStageFlow()
             .distinctUntilChanged()
+            .drop(1)
             .filter { it == AppStage.ESTABLISHED }
             .onEach {
                 val selection = onboardingStore.getInputScreenSelection()

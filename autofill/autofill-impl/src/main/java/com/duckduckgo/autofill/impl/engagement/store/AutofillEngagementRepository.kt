@@ -143,7 +143,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
     }
 
     private suspend fun getNumberStoredPasswords(): Int {
-        return autofillStore.getCredentialCount().firstOrNull() ?: 0
+        return autofillStore.getCredentialCount().firstOrNull()?.getOrThrow() ?: 0
     }
 
     override suspend fun clearData(preserveToday: Boolean) {

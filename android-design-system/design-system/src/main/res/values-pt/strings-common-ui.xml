@@ -37,4 +37,12 @@
     <string name="alwaysOn">Sempre ligada</string>
     <string name="on">Ligado</string>
     <string name="off">Desligado</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Saiba mais</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Fechar</string>
+    <string name="bookmarkFavoriteContentDescription">Favorito</string>
+
 </resources>

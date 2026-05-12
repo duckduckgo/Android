@@ -22,7 +22,4 @@
     <string name="autocompleteRemoveItemCancel">Zrušit</string>
     <string name="autocompleteRemoveItemRemove">Odstranit</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Přepnout na kartu · %1$s</string>
-    <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
-    <string name="openAutoCompleteSettings">Otevřít nastavení</string>
 </resources>

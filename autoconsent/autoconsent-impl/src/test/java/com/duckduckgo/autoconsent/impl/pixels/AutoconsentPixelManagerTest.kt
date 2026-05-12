@@ -29,6 +29,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -165,6 +166,7 @@ class AutoconsentPixelManagerTest {
                 parameters["init"] == "2" && parameters["popup-found"] == "1"
             },
             eq(emptyMap()),
+            any(),
         )
     }
 
@@ -185,11 +187,13 @@ class AutoconsentPixelManagerTest {
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters -> parameters["init"] == "1" },
             eq(emptyMap()),
+            any(),
         )
         verify(mockPixel).enqueueFire(
             eq(AutoConsentPixel.AUTOCONSENT_SUMMARY),
             argThat { parameters -> parameters["popup-found"] == "1" },
             eq(emptyMap()),
+            any(),
         )
     }
 }

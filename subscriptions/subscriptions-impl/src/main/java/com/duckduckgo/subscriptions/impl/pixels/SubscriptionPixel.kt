@@ -29,6 +29,7 @@ enum class SubscriptionPixel(
     private val types: Set<PixelType>,
     private val withSuffix: Boolean = true,
     val includedParameters: Set<PixelParameter> = emptySet(),
+    val enqueue: Boolean = false,
 ) {
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
@@ -201,7 +202,7 @@ enum class SubscriptionPixel(
         type = Unique(),
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    SUBSCRIPTION_PRIVACY_PRO_REDIRECT(
+    SUBSCRIPTION_REDIRECT(
         baseName = "m_privacy-pro_app_redirect",
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
@@ -256,11 +257,6 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
-    AUTH_V1_SIGN_IN_ATTEMPT(
-        baseName = "subscription_auth_v1_sign_in_attempt",
-        types = setOf(Count, Daily()),
-        includedParameters = setOf(APP_VERSION),
-    ),
     FREE_TRIAL_START(
         baseName = "subscription_free_trial_start",
         type = Unique(),
@@ -270,6 +266,50 @@ enum class SubscriptionPixel(
         baseName = "subscription_free_trial_vpn_activation",
         type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    FREE_TRIAL_DUCK_AI_PAID_USED(
+        baseName = "subscription_free_trial_duck_ai_paid_used",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+
+    PAYWALL_SHOWN_FIRST_TIME(
+        baseName = "m_subscription_paywall_impression",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+    ),
+
+    PAYWALL_NOT_SEEN_D0(
+        baseName = "m_subscription_paywall_not_seen_d0",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D3(
+        baseName = "m_subscription_paywall_not_seen_d3",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D7(
+        baseName = "m_subscription_paywall_not_seen_d7",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D14(
+        baseName = "m_subscription_paywall_not_seen_d14",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D30(
+        baseName = "m_subscription_paywall_not_seen_d30",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     ;
 
@@ -278,7 +318,8 @@ enum class SubscriptionPixel(
         type: PixelType,
         withSuffix: Boolean = true,
         includedParameters: Set<PixelParameter> = emptySet(),
-    ) : this(baseName, setOf(type), withSuffix, includedParameters)
+        enqueue: Boolean = false,
+    ) : this(baseName, setOf(type), withSuffix, includedParameters, enqueue)
 
     fun getPixelNames(): Map<PixelType, String> =
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
@@ -290,6 +331,12 @@ object SubscriptionPixelParameter {
     const val OS_VERSION = "os_version"
     const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
+    const val ACTIVATION_PLATFORM = "activation_platform"
+    const val DAYS_SINCE_INSTALL = "days_since_install"
+    const val RETURNING_USER = "returning_user"
+    const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
+    const val SUBSCRIPTION_PROMO_SHOWN = "subscription_promo_shown"
+    const val FREE_TRIAL = "free_trial"
 }
 
 internal val PixelType.pixelNameSuffix: String

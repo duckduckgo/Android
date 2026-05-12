@@ -110,7 +110,15 @@ class WideEventRepositoryImpl @Inject constructor(
         eventId: Long,
         name: String,
         timeout: Duration?,
+        buckets: List<Duration>?,
     ) {
+        if (buckets != null) {
+            require(buckets.none { it.isNegative }) {
+                "Bucket boundaries must not be negative: $buckets"
+            }
+        }
+        val sortedBuckets = buckets?.sorted()
+
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
 
@@ -123,6 +131,7 @@ class WideEventRepositoryImpl @Inject constructor(
                     name = name,
                     startedAt = timeProvider.getCurrentTime(),
                     timeout = timeout,
+                    buckets = sortedBuckets,
                 )
 
             event.copy(activeIntervals = event.activeIntervals + interval)
@@ -144,13 +153,21 @@ class WideEventRepositoryImpl @Inject constructor(
                 }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
-            val durationBucket = INTERVAL_BUCKETS.firstOrNull { it >= duration } ?: INTERVAL_BUCKETS.last()
+            val intervalBuckets = interval.buckets
+            val bucketValue = when {
+                duration.isNegative -> NEGATIVE_INTERVAL_BUCKET_VALUE
+                intervalBuckets == null -> duration.toMillis().toString()
+                else -> {
+                    val matched = intervalBuckets.lastOrNull { it <= duration }
+                    (matched?.toMillis() ?: 0L).toString()
+                }
+            }
 
             event.copy(
                 metadata =
                 mergeMetadata(
                     existingMetadata = event.metadata,
-                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                    newMetadata = mapOf(interval.name to bucketValue),
                 ),
                 activeIntervals = event.activeIntervals - interval,
             )
@@ -178,16 +195,7 @@ class WideEventRepositoryImpl @Inject constructor(
     }
 
     private companion object {
-        val INTERVAL_BUCKETS =
-            listOf(
-                Duration.ofSeconds(1),
-                Duration.ofSeconds(5),
-                Duration.ofSeconds(10),
-                Duration.ofSeconds(30),
-                Duration.ofMinutes(1),
-                Duration.ofMinutes(5),
-                Duration.ofMinutes(10),
-            )
+        const val NEGATIVE_INTERVAL_BUCKET_VALUE = "-1"
     }
 }
 

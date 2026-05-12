@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-snarveier</string>
     <string name="duck_ai_shortcut_settings_description">Velg hvilke Duck.ai-snarveier du vil skal vises</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Plassering av Ny fane-bryter</string>
+    <string name="duckAiDefaultTogglePositionSearch">Søk</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Sist brukt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Talesøk</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Aktiver i innstillingene for AI-funksjoner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Administrer i innstillingene for AI-funksjoner</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurer Duck.ai i innstillingene for AI-funksjoner.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Oppsummer denne siden</string>
+    <string name="duckAIContextualAutomaticContextTitle">Send sideinnhold automatisk</string>
+    <string name="duckAIContextualAutomaticContextMessage">Send sideinnhold automatisk til Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Legg ved sideinnhold</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Fjern chat</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Slett data</string>
+    <string name="duckChatBrowserMenuContentDescription">Flere alternativer</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Talechat</string>
 </resources>

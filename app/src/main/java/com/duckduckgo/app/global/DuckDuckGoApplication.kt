@@ -21,16 +21,18 @@ import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppComponentFactory
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
+import dagger.android.getFactory
+import dev.zacsweers.metro.HasMemberInjections
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
@@ -43,7 +45,9 @@ import java.io.File
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
+private const val PIR_PROCESS_NAME = "pir"
 
+@HasMemberInjections
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
     @Inject
@@ -59,6 +63,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var vpnLifecycleObserverPluginPoint: PluginPoint<VpnProcessLifecycleObserver>
 
     @Inject
+    lateinit var pirLifecycleObserverPluginPoint: PluginPoint<PirProcessLifecycleObserver>
+
+    @Inject
     lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.browser.api.ActivityLifecycleCallbacks>
 
     @Inject
@@ -66,7 +73,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*, *>>
+    lateinit var injectorFactoryMap: dagger.android.InjectorFactoryMap
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -115,6 +122,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                         }
                     }
                 }
+
+                if (shortProcessName == PIR_PROCESS_NAME) {
+                    // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
+                    // is good enough.
+                    // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
+                    ProcessLifecycleOwner.get().lifecycle.apply {
+                        logcat { "PIR-LIFECYCLE: New PIR process created with pid=${android.os.Process.myPid()}" }
+                        pirLifecycleObserverPluginPoint.getPlugins().forEach {
+                            it.onPirProcessCreated()
+                        }
+                    }
+                }
             }
         }
     }
@@ -142,10 +161,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureDependencyInjection() {
-        daggerAppComponent = DaggerAppComponent.builder()
-            .application(this)
-            .applicationCoroutineScope(applicationCoroutineScope)
-            .build()
+        daggerAppComponent = AppComponentFactory.create(this, applicationCoroutineScope)
         daggerAppComponent.inject(this)
     }
 
@@ -222,7 +238,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
     override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*, *> {
-        return injectorFactoryMap[key]
+        return injectorFactoryMap.getFactory(key)
             ?: throw RuntimeException(
                 """
                 Could not find the dagger component for ${key.simpleName}.

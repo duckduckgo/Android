@@ -43,6 +43,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -268,6 +269,26 @@ class IntentDispatcherViewModelTest {
             val state = awaitItem()
             assertNull(state.activityParams)
         }
+    }
+
+    @Test
+    fun whenCustomTabIntentReceivedThenDetectorIsUpdatedWithTrue() = runTest {
+        configureHasSession(true)
+        whenever(mockIntent.intentText).thenReturn("https://example.com")
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        verify(mockCustomTabDetector).setCustomTab(true)
+    }
+
+    @Test
+    fun whenNonCustomTabIntentReceivedThenDetectorIsUpdatedWithFalse() = runTest {
+        configureHasSession(false)
+        whenever(mockIntent.intentText).thenReturn("https://example.com")
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        verify(mockCustomTabDetector).setCustomTab(false)
     }
 
     private fun configureHasSession(returnValue: Boolean) {

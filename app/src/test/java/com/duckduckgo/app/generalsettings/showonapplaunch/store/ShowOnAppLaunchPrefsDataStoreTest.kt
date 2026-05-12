@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +54,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
             produceFile = { dataStoreFile },
         )
 
-    private val testee: ShowOnAppLaunchOptionDataStore =
+    private val testee: ShowOnAppLaunchOptionPrefsDataStore =
         ShowOnAppLaunchOptionPrefsDataStore(testDataStore)
 
     @After
@@ -61,7 +63,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
     }
 
     @Test
-    fun whenOptionIsNullThenShouldReturnLastOpenedPage() = runTest {
+    fun whenOptionIsNullThenShouldReturnLastOpenedTab() = runTest {
         assertEquals(LastOpenedTab, testee.optionFlow.first())
     }
 
@@ -103,13 +105,35 @@ class ShowOnAppLaunchPrefsDataStoreTest {
 
             assertEquals(LastOpenedTab, defaultOption)
 
-            testee.setShowOnAppLaunchOption(NewTabPage)
+            testee.setShowOnAppLaunchOption(LastOpenedTab)
 
-            assertEquals(NewTabPage, awaitItem())
+            assertEquals(LastOpenedTab, awaitItem())
 
             testee.setShowOnAppLaunchOption(SpecificPage("example.com"))
 
             assertEquals(SpecificPage("example.com"), awaitItem())
         }
+    }
+
+    @Test
+    fun whenNoOptionSelectedThenHasOptionSelectedReturnsFalse() = runTest {
+        assertFalse(testee.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOptionSelectedThenHasOptionSelectedReturnsTrue() = runTest {
+        testee.setShowOnAppLaunchOption(NewTabPage)
+        assertTrue(testee.hasOptionSelected())
+    }
+
+    @Test
+    fun whenResolvedPageUrlIsSetThenSpecificPageIncludesResolvedUrl() = runTest {
+        testee.setShowOnAppLaunchOption(SpecificPage("example.com"))
+        testee.setResolvedPageUrl("https://www.example.com/")
+
+        val option = testee.optionFlow.first()
+        assertTrue(option is SpecificPage)
+        assertEquals("example.com", (option as SpecificPage).url)
+        assertEquals("https://www.example.com/", option.resolvedUrl)
     }
 }

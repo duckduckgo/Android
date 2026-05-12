@@ -55,4 +55,10 @@ sealed class Decoration {
     data class DisableVoiceSearch(
         val url: String,
     ) : Decoration()
+
+    data class LockForOnboarding(
+        val locked: Boolean,
+    ) : Decoration()
+
+    data object CancelEasterEggLogoAnimation : Decoration()
 }

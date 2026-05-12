@@ -70,7 +70,7 @@ class LocaleToggleTargetMatcherTest {
     }
 
     companion object {
-        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null)
+        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null, null)
         private val US_COUNTRY_TARGET = NULL_TARGET.copy(localeCountry = Locale.US.country)
         private val US_LANG_TARGET = NULL_TARGET.copy(localeLanguage = Locale.US.language)
         private val US_TARGET = NULL_TARGET.copy(localeLanguage = Locale.US.language, localeCountry = Locale.US.country)

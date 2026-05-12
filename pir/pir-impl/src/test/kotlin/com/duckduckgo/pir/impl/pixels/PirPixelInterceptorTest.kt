@@ -18,6 +18,8 @@ package com.duckduckgo.pir.impl.pixels
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -41,10 +43,13 @@ class PirPixelInterceptorTest {
 
     @Before
     fun setUp() {
-        testee = PirPixelInterceptor(mockAppBuildConfig)
+        testee = PirPixelInterceptor(
+            mockAppBuildConfig,
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
+        )
         whenever(mockChain.proceed(any())).thenReturn(mockResponse)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
-        whenever(mockAppBuildConfig.manufacturer).thenReturn("TestManufacturer")
+        whenever(mockAppBuildConfig.manufacturer).thenReturn("Samsung")
     }
 
     @Test
@@ -66,7 +71,7 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
+        val man = capturedRequest.url.queryParameter("manufacturer")
         assertNull(man)
     }
 
@@ -84,8 +89,8 @@ class PirPixelInterceptorTest {
         verify(mockChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
-        val man = capturedRequest.url.queryParameter("man")
-        assertEquals("TestManufacturer", man)
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
     }
 
     @Test
@@ -104,7 +109,43 @@ class PirPixelInterceptorTest {
         val capturedRequest = requestCaptor.firstValue
         assertEquals("param", capturedRequest.url.queryParameter("existing"))
         assertEquals("value", capturedRequest.url.queryParameter("another"))
-        assertEquals("TestManufacturer", capturedRequest.url.queryParameter("man"))
+        assertEquals("samsung", capturedRequest.url.queryParameter("manufacturer"))
+    }
+
+    @Test
+    fun whenManufacturerIsCommonButMixedCaseThenLowercased() = runTest {
+        whenever(mockAppBuildConfig.manufacturer).thenReturn("OnePlus")
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_initial_scan_duration")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        assertEquals("oneplus", capturedRequest.url.queryParameter("manufacturer"))
+    }
+
+    @Test
+    fun whenManufacturerIsNotCommonThenReportedAsOther() = runTest {
+        whenever(mockAppBuildConfig.manufacturer).thenReturn("ObscureBrand")
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_initial_scan_duration")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        assertEquals("other", capturedRequest.url.queryParameter("manufacturer"))
     }
 
     @Test
@@ -123,5 +164,59 @@ class PirPixelInterceptorTest {
 
         val capturedRequest = requestCaptor.firstValue
         assertEquals(originalUrl, capturedRequest.url.toString())
+    }
+
+    @Test
+    fun whenInterceptLowMemoryPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_foreground-run_low-memory")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
+    }
+
+    @Test
+    fun whenInterceptStartFailedPixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_foreground-run_start-failed")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
+    }
+
+    @Test
+    fun whenInterceptInitialScanIncompletePixelThenAddsManufacturerParameter() = runTest {
+        val request = Request.Builder()
+            .url("https://example.com/m_dbp_initial-scan_incomplete")
+            .build()
+
+        whenever(mockChain.request()).thenReturn(request)
+
+        testee.intercept(mockChain)
+
+        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
+        verify(mockChain).proceed(requestCaptor.capture())
+
+        val capturedRequest = requestCaptor.firstValue
+        val man = capturedRequest.url.queryParameter("manufacturer")
+        assertEquals("samsung", man)
     }
 }

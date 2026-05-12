@@ -21,6 +21,18 @@
     android:layout_height="match_parent"
     android:clipChildren="false">
 
+    <ImageView
+        android:id="@+id/onboardingBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"
@@ -30,11 +42,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+        android:id="@+id/inputScreenHatch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inputScreenHatchTopMarginWithTopBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"/>
+
     <FrameLayout
         android:id="@+id/ddgLogoContainer"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="@dimen/inputScreenLogoTopBarTopMargin"
         android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +79,7 @@
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop" />
+        app:layout_constraintTop_toBottomOf="@id/inputScreenHatch" />
 
     <com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView
         android:id="@+id/newTabContainerScrollView"
@@ -67,17 +88,18 @@
         android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
         android:visibility="gone"
         android:elevation="2dp"
+        android:clipToOutline="true"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+        app:layout_constraintTop_toBottomOf="@id/inputScreenHatch">
 
         <FrameLayout
             android:id="@+id/newTabContainerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true" />
 
@@ -114,6 +136,36 @@
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/chatSuggestionsOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:visibility="gone"
+        android:elevation="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
+            android:id="@+id/chatSuggestionsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <FrameLayout
+            android:id="@+id/chatSuggestionsBottomFadeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:foreground="@drawable/bottom_fade_overlay" />
+
+    </FrameLayout>
+
+    <FrameLayout
         android:id="@+id/inputScreenButtonsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -131,5 +183,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <include
+        android:id="@+id/duckAiEndCta"
+        layout="@layout/include_duck_ai_end_cta"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="5dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"
+        app:layout_constraintVertical_bias="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

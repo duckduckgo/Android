@@ -105,7 +105,10 @@ class DuckAiRetentionIntegrationTest {
         val sharedPreferencesProvider = SharedPreferencesProviderImpl(
             context,
             coroutineRule.testDispatcherProvider,
-        ) { crashLogger }
+            { mock() },
+            { mock() },
+            { crashLogger },
+        )
 
         usageHistory = SegmentStoreModule().provideSegmentStore(
             sharedPreferencesProvider,

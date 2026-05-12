@@ -31,7 +31,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
-import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.asActionType
@@ -105,8 +104,8 @@ class BrokerActionFailedEventHandler @Inject constructor(
             // for optout, for ANY action we retry at most 3 times
             state.actionRetryCount < MAX_RETRY_COUNT_OPTOUT
         } else {
-            // For scans, we ONLY retry once if the action is expectation
-            (currentAction is Expectation && state.actionRetryCount < MAX_RETRY_COUNT_SCAN)
+            // For scans, we ONLY retry once
+            state.actionRetryCount < MAX_RETRY_COUNT_SCAN
         }
     }
 

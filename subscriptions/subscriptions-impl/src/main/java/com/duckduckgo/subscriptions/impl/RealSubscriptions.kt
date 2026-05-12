@@ -39,9 +39,9 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
@@ -65,7 +65,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
-    private val subscriptionsFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
 ) : Subscriptions {
@@ -95,6 +95,11 @@ class RealSubscriptions @Inject constructor(
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
+
+        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+            return isActive
+        }
+
         return isActive || (isEligible && supportsEncryption)
     }
 
@@ -120,27 +125,27 @@ class RealSubscriptions @Inject constructor(
             }.toSet()
     }
 
-    override fun launchPrivacyPro(context: Context, uri: Uri?) {
+    override fun launchSubscription(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
         val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
-        val privacyPro = globalActivityStarter.startIntent(
+        val subscriptionIntent = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
                 url = buildSubscriptionUrl(uri),
                 origin = origin,
             ),
         ) ?: return
-        val intents: Array<Intent> = listOf(settings, privacyPro).toTypedArray<Intent>()
+        val intents: Array<Intent> = listOf(settings, subscriptionIntent).toTypedArray<Intent>()
         intents[0] = Intent(intents[0])
         if (!ContextCompat.startActivities(context, intents)) {
             val topIntent = Intent(intents[intents.size - 1])
             context.startActivity(topIntent)
         }
-        pixel.reportPrivacyProRedirect()
+        pixel.reportSubscriptionRedirect()
     }
 
-    override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
-        return if (isPrivacyProUrl(url.toUri())) {
+    override fun shouldLaunchSubscriptionForUrl(url: String): Boolean {
+        return if (isSubscriptionUrl(url.toUri())) {
             runBlocking {
                 isEligible()
             }
@@ -149,11 +154,11 @@ class RealSubscriptions @Inject constructor(
         }
     }
 
-    override fun isPrivacyProUrl(uri: Uri): Boolean {
+    override fun isSubscriptionUrl(uri: Uri): Boolean {
         val eTld = uri.host?.toTldPlusOne() ?: return false
         val size = uri.pathSegments.size
         val path = uri.pathSegments.firstOrNull()
-        return eTld == PRIVACY_PRO_ETLD && size == 1 && (path == PRIVACY_PRO_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
+        return eTld == SUBSCRIPTIONS_ETLD && size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -173,9 +178,9 @@ class RealSubscriptions @Inject constructor(
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "privacyPro",
-    toggleStore = PrivacyProFeatureStore::class,
+    toggleStore = SubscriptionsFeatureStore::class,
 )
-interface PrivacyProFeature {
+interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
@@ -192,36 +197,21 @@ interface PrivacyProFeature {
     fun authApiV2(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun isLaunchedROW(): Toggle
-
-    // Kill switch
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun featuresApi(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
     /**
      * Enables/Disables duckAi for subscribers (advanced models)
      * This flag is used to hide the feature in the native client and FE.
-     * It will be used for the feature rollout and kill-switch if necessary.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun duckAiPlus(): Toggle
-
-    /**
-     * Android supports v2 token, but still relies on old v1 subscription messaging.
-     * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
-     * It doesn't control which version of messaging FE uses.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun enableNewSubscriptionMessages(): Toggle
+    fun duckAiPlus(): Toggle
 
     /**
      * When enabled, we signal FE if v2 is available, enabling v2 messaging
      * When disabled, FE works with old messaging (v1)
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
+     * Note: best to remove together with v1 clean up.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enableSubscriptionFlowsV2(): Toggle
@@ -233,15 +223,13 @@ interface PrivacyProFeature {
     fun authApiV2JwksCache(): Toggle
 
     /**
-     * As part of Duck.ai we are adding new supported JS messages.
-     * This is enabled by default, but can be disabled if necessary.
+     * Controls Duck.ai <> subscription JS messaging.
+     * Enabled by default.
+     * When Disabled, no subscription messaging supported.
      * FF only controls native messaging (enabled/disabled).
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAISubscriptionMessaging(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun refreshSubscriptionPlanFeatures(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
@@ -257,9 +245,6 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionRestoreWideEvent(): Toggle
-
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
-    fun supportsSwitchSubscription(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun blackFridayOffer2025(): Toggle
@@ -278,17 +263,36 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tierMessagingEnabled(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun allowProTierPurchase(): Toggle
+
+    /**
+     * When enabled, pending plan hint is displayed to users.
+     * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showPendingPlanHint(): Toggle
+
     /**
      * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
      */
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun vpnReminderNotification(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun fetchProTierEntitlements(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun schedulePaywallNotSeenPixels(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-@RemoteFeatureStoreNamed(PrivacyProFeature::class)
-class PrivacyProFeatureStore @Inject constructor(
+@RemoteFeatureStoreNamed(SubscriptionsFeature::class)
+class SubscriptionsFeatureStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

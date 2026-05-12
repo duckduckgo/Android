@@ -84,10 +84,6 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
     <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
     <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık planla %%%1$s tasarruf edin</string>
-    <!-- smartling.character_limit = 10 -->
-    <string name="subscriptionSettingSwitchUpgradePill">En iyi</string>
-    <string name="subscriptionSettingSwitchDowngrade">Planı Değiştir</string>
     <string name="subscriptionSettingManagePlan">Ödemeyi Yönet</string>
 
     <!--Purchase Subscriptions-->
@@ -108,8 +104,8 @@
     <string name="changePlanDescription">Aboneliğiniz Apple App Store üzerinden satın alınmış. Planınızı veya faturalandırma ayarlarınızı değiştirmek için lütfen aboneliğinizi satın alırken kullandığınız Apple Hesabı ile giriş yapmış bir cihazdan Ayarlar &gt; Apple Hesabı &gt; Abonelikler bölümüne gidin.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde Privacy Pro\'yu etkinleştirin</string>
-    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; Privacy Pro</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
+    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde DuckDuckGo aboneliğini etkinleştirin</string>
+    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; DuckDuckGo\'ya Abone Ol</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +148,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Danışmanı aramak yardımcı olmuyor</string>
     <string name="feedbackSubCategoryItrOther">Diğer</string>
 
-    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre</string>
-    <string name="feedbackSubCategorySubsOther">Diğer</string>
+    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre ile ilgili sorun</string>
+    <string name="feedbackSubCategorySubsOther">Başka bir şey</string>
 
     <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>
@@ -169,7 +165,6 @@
     <string name="activitySubscriptions">Abonelikler</string>
     <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
     <string name="activityActivateSubscription">Aboneliğim Var</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
@@ -185,14 +180,27 @@
 
     <string name="feedbackGeneralSubscription">Abonelik</string>
 
-    <!-- Switch plan-->
-    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık planla %%%1$s tasarruf edin!</string>
-    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Yıllık bir plan, mevcut %2$s aylık planınıza kıyasla ayda sadece %1$s tutarındadır.</string>
-    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Yıllık Plana Geç (%1$s/yıl)</string>
-    <string name="switchBottomSheetSecondaryButtonUpgrade">Aylık Planı Sürdür</string>
-    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Yıllık planla %%%1$s tasarruf ediyorsunuz!</string>
-    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Geçiş yapmak, aylık fiyatı %1$s/ay\'dan %2$s/ay\'a çıkaracaktır.</string>
-    <string name="switchBottomSheetPrimaryButtonDowngrade">Yıllık Planı Sürdür</string>
-    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Aylık Plana Geç (%1$s/ay)</string>
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus veya Pro seviye özelliklere erişilemiyor</string>
+    <string name="subscriptionsProUpgradeTitle">Pro\'ya Yükseltin</string>
+    <string name="subscriptionsProUpgradeMessage">Daha güçlü yapay zekanın kilidini açın</string>
+    <string name="subscriptionSettingSectionManageSubscription">Aboneliği Yönet</string>
+    <string name="subscriptionSettingViewAllPlans">Bütün Planları Görüntüle</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Ödemeyi Yönetin veya İptal Edin</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeDowngradePanel" instruction="First placeholder is the Tier name (e.g. Plus, Pro), second is date in short format (month day)">Planınız %2$s tarihinde %1$s planına düşürülecek.</string>
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planın %2$s tarihinde %1$s planına yükseltilecek.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planınız %2$s tarihinde %1$s planına düşürülecek.</string>
+    <string name="planNamePlusMonthly">Plus Aylık</string>
+    <string name="planNamePlusYearly">Plus Yıllık</string>
+    <string name="planNameProMonthly">Pro Aylık</string>
+    <string name="planNameProYearly">Pro Yıllık</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
+
+    <!-- Content Descriptions -->
+    <string name="subscriptionExpiredStatusIconContentDescription">Abonelik süresi doldu</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Abonelik aktif</string>
 
 </resources>

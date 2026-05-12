@@ -18,7 +18,10 @@ package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
 import app.cash.turbine.test
+import com.duckduckgo.app.FakeSettingsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -27,7 +30,9 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSetti
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchDataClearingSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWhatsNew
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -44,7 +49,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -57,9 +62,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("DenyListedApi")
 class SettingsViewModelTest {
@@ -91,7 +98,7 @@ class SettingsViewModelTest {
 
     private val voiceSearchAvailabilityMock: VoiceSearchAvailability = mock()
 
-    private val privacyProUnifiedFeedbackMock: PrivacyProUnifiedFeedback = mock()
+    private val subscriptionUnifiedFeedbackMock: SubscriptionUnifiedFeedback = mock()
 
     private val settingsPixelDispatcherMock: SettingsPixelDispatcher = mock()
 
@@ -108,9 +115,11 @@ class SettingsViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
-    private val fakePostCtaExperienceToggles = FakeFeatureToggleFactory.create(PostCtaExperienceToggles::class.java)
-
     private val modalSurfaceStoreMock: ModalSurfaceStore = mock()
+
+    private val fakeSettingsDataStore: SettingsDataStore = FakeSettingsDataStore()
+
+    private val mockAppInstallStore: AppInstallStore = mock()
 
     @Before
     fun before() = runTest {
@@ -119,6 +128,8 @@ class SettingsViewModelTest {
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
         whenever(mockDuckAiFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -135,13 +146,14 @@ class SettingsViewModelTest {
             duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             modalSurfaceStore = modalSurfaceStoreMock,
-            privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
+            subscriptionUnifiedFeedback = subscriptionUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
-            postCtaExperienceToggles = fakePostCtaExperienceToggles,
+            settingsDataStore = fakeSettingsDataStore,
+            appInstallStore = mockAppInstallStore,
         )
     }
 
@@ -218,26 +230,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserRequestedToAddHomeScreenWidgetAndSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithTrue() = runTest {
-        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
-        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(true))
-
+    fun whenUserRequestedToAddHomeScreenWidgetThenLaunchAddHomeScreenWidgetCommandSent() = runTest {
         testee.userRequestedToAddHomeScreenWidget()
 
         testee.commands().test {
-            assertEquals(LaunchAddHomeScreenWidget(true), awaitItem())
-        }
-    }
-
-    @Test
-    fun whenUserRequestedToAddHomeScreenWidgetAndNotSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithFalse() = runTest {
-        fakePostCtaExperienceToggles.self().setRawStoredState(State(true))
-        fakePostCtaExperienceToggles.simpleSearchWidgetPrompt().setRawStoredState(State(false))
-
-        testee.userRequestedToAddHomeScreenWidget()
-
-        testee.commands().test {
-            assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
+            assertEquals(LaunchAddHomeScreenWidget, awaitItem())
         }
     }
 
@@ -297,7 +294,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when fire button setting clicked and improved data clearing enabled then launch data clearing settings screen`() = runTest {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
 
         testee.commands().test {
             testee.onFireButtonSettingClicked()
@@ -308,7 +305,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when fire button setting clicked and improved data clearing disabled then launch fire button screen`() = runTest {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
 
         testee.commands().test {
             testee.onFireButtonSettingClicked()
@@ -369,6 +366,24 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `when new desktop browser setting disabled then don't show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
+    fun `when new desktop browser setting enabled then show new desktop browser setting `() = runTest {
+        fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showGetDesktopBrowser)
+    }
+
+    @Test
     fun `when whats new clicked and message id is null then no command is sent`() = runTest {
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(null)
         whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(MessageType.MEDIUM)
@@ -390,5 +405,178 @@ class SettingsViewModelTest {
 
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `when what new clicked and message id and type exist then pixel event is fired`() = runTest {
+        val messageId = "test-message-id"
+        val messageType = MessageType.MEDIUM
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageId()).thenReturn(messageId)
+        whenever(modalSurfaceStoreMock.getLastShownRemoteMessageType()).thenReturn(messageType)
+
+        testee.onWhatsNewClicked()
+
+        verify(pixelMock).fire(AppPixelName.SETTINGS_WHATS_NEW_PRESSED)
+    }
+
+    @Test
+    fun `when get desktop browser clicked then launch get desktop browser command is sent`() = runTest {
+        testee.commands().test {
+            testee.onGetDesktopBrowserClicked()
+
+            assertEquals(SettingsViewModel.Command.LaunchGetDesktopBrowser, awaitItem())
+        }
+    }
+
+    @Test
+    fun `when get desktop browser clicked then pixel is fired`() = runTest {
+        testee.onGetDesktopBrowserClicked()
+
+        verify(pixelMock).fire(
+            eq(AppPixelName.GET_DESKTOP_BROWSER_CLICKED),
+            eq(mapOf("source" to "settings")),
+            eq(emptyMap()),
+            eq(Count),
+        )
+    }
+
+    @Test
+    fun `when address bar position changes after click then next step is dismissed`() = runTest {
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+
+        testee.onChangeAddressBarPositionClicked()
+
+        // Simulate user changed position
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+        testee.refreshNextStepsDismissals()
+
+        assertTrue(fakeSettingsDataStore.nextStepsAddressBarDismissed)
+
+        // start() picks it up from DataStore
+        testee.start()
+        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
+    }
+
+    @Test
+    fun `when address bar position does not change after click then next step is not dismissed`() = runTest {
+        fakeSettingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+
+        testee.onChangeAddressBarPositionClicked()
+
+        // User did not change position
+        testee.refreshNextStepsDismissals()
+
+        assertFalse(testee.viewState().first().nextStepsAddressBarDismissed)
+        assertFalse(fakeSettingsDataStore.nextStepsAddressBarDismissed)
+    }
+
+    @Test
+    fun `when voice search availability changes after click then next step is dismissed`() = runTest {
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(false)
+
+        testee.onEnableVoiceSearchClicked()
+
+        // Simulate user enabled voice search
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(true)
+        testee.refreshNextStepsDismissals()
+
+        assertTrue(fakeSettingsDataStore.nextStepsVoiceSearchDismissed)
+
+        // start() picks it up from DataStore
+        testee.start()
+        assertTrue(testee.viewState().first().nextStepsVoiceSearchDismissed)
+    }
+
+    @Test
+    fun `when voice search availability does not change after click then next step is not dismissed`() = runTest {
+        whenever(voiceSearchAvailabilityMock.isVoiceSearchAvailable).thenReturn(false)
+
+        testee.onEnableVoiceSearchClicked()
+
+        // User did not enable voice search
+        testee.refreshNextStepsDismissals()
+
+        assertFalse(testee.viewState().first().nextStepsVoiceSearchDismissed)
+        assertFalse(fakeSettingsDataStore.nextStepsVoiceSearchDismissed)
+    }
+
+    @Test
+    fun `when hide next steps clicked then section is hidden`() = runTest {
+        testee.onNextStepsHideClicked()
+
+        assertTrue(testee.viewState().first().nextStepsSectionHidden)
+        assertTrue(fakeSettingsDataStore.nextStepsSectionHidden)
+    }
+
+    @Test
+    fun `when app installed for 14 days then show hide button`() = runTest {
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(
+            System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14),
+        )
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().showNextStepsHideButton)
+    }
+
+    @Test
+    fun `when app installed for less than 14 days then do not show hide button`() = runTest {
+        whenever(mockAppInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(
+            System.currentTimeMillis() - TimeUnit.DAYS.toMillis(13),
+        )
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().showNextStepsHideButton)
+    }
+
+    @Test
+    fun `when section previously hidden then start returns hidden state`() = runTest {
+        fakeSettingsDataStore.nextStepsSectionHidden = true
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().nextStepsSectionHidden)
+    }
+
+    @Test
+    fun `when address bar previously dismissed then start returns dismissed state`() = runTest {
+        fakeSettingsDataStore.nextStepsAddressBarDismissed = true
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().nextStepsAddressBarDismissed)
+    }
+
+    @Test
+    fun `when widgets installed then widgetsInstalled is true in view state`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+
+        testee.start()
+
+        assertTrue(testee.viewState().first().widgetsInstalled)
+    }
+
+    @Test
+    fun `when widgets not installed then widgetsInstalled is false in view state`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        testee.start()
+
+        assertFalse(testee.viewState().first().widgetsInstalled)
+    }
+
+    @Test
+    fun `when widget installed after refresh then widgetsInstalled updates to true`() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        testee.start()
+        assertFalse(testee.viewState().first().widgetsInstalled)
+
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        testee.refreshWidgetsInstalledState()
+
+        assertTrue(testee.viewState().first().widgetsInstalled)
     }
 }

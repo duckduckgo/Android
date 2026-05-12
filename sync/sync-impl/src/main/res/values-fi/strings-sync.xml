@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tämä luo salatun varmuuskopion kirjanmerkeistäsi, salasanoistasi ja Duck.ai -keskusteluistasi DuckDuckGon suojatulle palvelimelle, ja se voidaan synkronoida muiden laitteidesi kanssa. \n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
-    <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
-    <string name="sync_intro_recover_content">Jos haluat palauttaa synkronoidut tietosi, tarvitset palautuskoodin, jonka tallensit ottaessasi synkronoinnin käyttöön. Koodi on voitu tallentaa PDF-tiedostona laitteelle, jolla määritit synkronoinnin.</string>
-    <string name="sync_intro_recover_cta">Aloita</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Palauta synkronoidut tiedot</string>
+    <string name="sync_recover_synced_data_content">Tarvitset palautuskoodin, jonka sait Sync &amp; Backup -ominaisuuden käyttöönoton yhteydessä. Olet saattanut tallentaa sen PDF-tiedostona käyttämällesi laitteelle.</string>
+    <string name="sync_recover_synced_data_cta">Palauta synkronoidut tiedot</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skannaa QR-koodi</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Poista palvelimen tiedot?</string>
-    <string name="sync_delete_server_data_dialog_content">Kaikkien laitteiden yhteys katkaistaan, ja synkronoidut tietosi poistetaan palvelimelta.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Poista tiedot</string>
+    <string name="sync_delete_server_data_dialog_content">Varmuuskopiosi poistetaan palvelimelta. Kaikkien laitteiden synkronointi katkaistaan, mutta mitään ei poisteta mistään laitteesta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Poista palvelimen tiedot</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Peruuta</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synkronoi kirjanmerkit laitteidesi välillä</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Piilota</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hanki pöytäkoneselain</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac- ja Windows-laitteeseen</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Palautus</string>
+    <string name="sync_settings_download_recovery_code_item">Lataa palautuskoodi PDF-muodossa</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Käytä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen – pidä se turvassa.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden toimettomuuden jälkeen. <annotation type="learn_more_link">Lue lisää</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Palautetaanko Sync &amp; Backup -data edellisestä asennuksesta?</string>
+    <string name="sync_previous_session_ready_body">Palauta saadaksesi aiemmat kirjanmerkkisi, salasanasi ja muut tietosi takaisin DuckDuckGohon.</string>
+    <string name="sync_previous_session_ready_resume_cta">Palauta Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Määritä uusi synkronointi</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Palauta tietosi helposti</string>
+    <string name="sync_recover_data_content">Käytä tätä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen. Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden toimettomuuden jälkeen.</string>
+    <string name="sync_recover_data_recovery_code_label">Palautuskoodi</string>
+    <string name="sync_recover_data_download_pdf">Lataa PDF-muodossa</string>
+    <string name="sync_restore_on_reinstall_title">Palauta sovelluksen uudelleenasennuksen yhteydessä</string>
+    <string name="sync_restore_on_reinstall_description">Jos asennat DuckDuckGo-sovelluksen uudelleen, kysymme, haluatko palauttaa laitteen tiedot.</string>
 </resources>

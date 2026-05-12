@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/modelPickerChip"
+        style="@style/Widget.MaterialComponents.Chip.Choice"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/modelPickerChipHeight"
+        android:layout_gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:textColor="?attr/daxColorPrimaryText"
+        android:textSize="@dimen/modelPickerChipTextSize"
+        app:chipBackgroundColor="?attr/daxColorSurface"
+        app:chipCornerRadius="@dimen/modelPickerChipCornerRadius"
+        app:chipMinHeight="@dimen/modelPickerChipHeight"
+        app:chipStrokeColor="?attr/daxColorLines"
+        app:chipStrokeWidth="@dimen/modelPickerChipStrokeWidth"
+        app:closeIcon="@drawable/ic_chevron_down_24_small"
+        app:closeIconEnabled="true"
+        app:closeIconTint="?attr/daxColorSecondaryText"
+        app:closeIconVisible="true"
+        app:ensureMinTouchTargetSize="false"
+        tools:text="4o-mini" />
+
+</merge>

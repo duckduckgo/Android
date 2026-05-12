@@ -69,6 +69,16 @@ interface PirRepository {
      */
     suspend fun isRepositoryAvailable(): Boolean
 
+    /**
+     * Returns the time in ms when the feature was first allowed to be run on the user's device. If the feature is not allowed to be run, we get 0L.
+     */
+    suspend fun getFeatureReceivedMs(): Long
+
+    /**
+     * Set the time in ms when the feature was first allowed to be run on the user's device
+     */
+    suspend fun setFeatureReceivedMs(long: Long)
+
     suspend fun getCurrentMainEtag(): String?
 
     suspend fun updateMainEtag(etag: String?)
@@ -84,6 +94,8 @@ interface PirRepository {
     suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
+
+    suspend fun getAllBrokerObjects(): List<Broker>
 
     suspend fun getBrokerForName(name: String): Broker?
 
@@ -294,6 +306,16 @@ class RealPirRepository(
 
     override suspend fun isRepositoryAvailable(): Boolean = database.await() != null
 
+    override suspend fun getFeatureReceivedMs(): Long = withContext(dispatcherProvider.io()) {
+        pirDataStore.featureReceivedMs
+    }
+
+    override suspend fun setFeatureReceivedMs(long: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.featureReceivedMs = long
+        }
+    }
+
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
     override suspend fun updateMainEtag(etag: String?) {
@@ -344,32 +366,17 @@ class RealPirRepository(
 
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getAllActiveBrokers()?.map {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }.orEmpty()
+            return@withContext brokerDao()?.getAllActiveBrokers()?.map { it.toBroker() }.orEmpty()
+        }
+
+    override suspend fun getAllBrokerObjects(): List<Broker> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao()?.getAllBrokers()?.map { it.toBroker() }.orEmpty()
         }
 
     override suspend fun getBrokerForName(name: String): Broker? =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getBrokerDetails(name)?.let {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }
+            return@withContext brokerDao()?.getBrokerDetails(name)?.toBroker()
         }
 
     override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> =
@@ -883,6 +890,16 @@ class RealPirRepository(
             birthYear = this.birthYear,
             deprecated = this.deprecated,
         )
+
+    private fun BrokerEntity.toBroker() = Broker(
+        name = name,
+        fileName = fileName,
+        url = url,
+        version = version,
+        parent = parent,
+        addedDatetime = addedDatetime,
+        removedAt = removedAt,
+    )
 
     private suspend fun prepareDatabase(): PirDatabase? {
         val database = databaseFactory.getDatabase()

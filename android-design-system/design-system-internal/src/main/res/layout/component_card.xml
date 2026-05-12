@@ -78,6 +78,13 @@
         android:layout_width="match_parent"
         app:primaryText="Default Card"/>
 
+    <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_1"
+        app:platformType="view"/>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/defaultCard"
         android:layout_width="match_parent"
@@ -89,5 +96,19 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_margin="@dimen/keyline_4"/>
+
+    <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_1"
+        app:platformType="compose"/>
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeCards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:layout_marginBottom="@dimen/keyline_2" />
 
 </LinearLayout>

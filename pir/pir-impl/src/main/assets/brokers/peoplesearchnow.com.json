@@ -1,0 +1,67 @@
+{
+  "name": "People Search Now",
+  "url": "peoplesearchnow.com",
+  "version": "0.5.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1705989600000,
+  "optOutUrl": "https://www.peoplesearchnow.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "80be0e78-1499-4d5d-83bb-deb8b6c92e8d",
+          "url": "https://peoplesearchnow.com/person/${firstName}-${lastName}_${city}_${state}/"
+        },
+        {
+          "actionType": "extract",
+          "id": "79098855-0459-4f26-877b-039700e098b3",
+          "selector": ".result-search-block",
+          "noResultsSelector": ".no-results",
+          "profile": {
+            "name": {
+              "selector": ".//p[@class='ellipsis pull-left']"
+            },
+            "age": {
+              "selector": ".//div[contains(@class, 'result-search-block-desc')]/p[span[text()='Approximate Age:']]/span[2]"
+            },
+            "addressCityState": {
+              "selector": ".//p[span[text()='Current Address:']]/span[@itemprop='address']",
+              "beforeText": "*",
+              "afterText": ";"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[span[text()='Used to Live:']]/span[@itemprop='address']/a",
+              "findElements": true,
+              "beforeText": "*",
+              "afterText": ";"
+            },
+            "relativesList": {
+              "selector": ".//a[@itemprop='relatedTo']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".result-search-block-title a",
+              "identifierType": "path",
+              "identifier": "https://www.peoplesearchnow.com/name/${firstName}-${middleName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -56,6 +56,7 @@ interface WideEventRepository {
         eventId: Long,
         name: String,
         timeout: Duration?,
+        buckets: List<Duration>?,
     )
 
     suspend fun endInterval(
@@ -108,5 +109,6 @@ interface WideEventRepository {
         val name: String,
         val startedAt: Instant,
         val timeout: Duration?,
+        val buckets: List<Duration>?,
     )
 }

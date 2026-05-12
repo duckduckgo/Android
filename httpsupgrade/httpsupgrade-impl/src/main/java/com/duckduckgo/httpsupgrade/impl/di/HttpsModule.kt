@@ -17,9 +17,10 @@
 package com.duckduckgo.httpsupgrade.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.store.BinaryDataStore
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
@@ -43,13 +44,15 @@ object HttpsModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAppDatabase(
-        context: Context,
-    ): HttpsUpgradeDatabase {
-        return Room.databaseBuilder(context, HttpsUpgradeDatabase::class.java, "httpsupgrade.db")
-            .addMigrations(*HttpsUpgradeDatabase.ALL_MIGRATIONS.toTypedArray())
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAppDatabase(databaseProvider: DatabaseProvider): HttpsUpgradeDatabase {
+        return databaseProvider.buildRoomDatabase(
+            HttpsUpgradeDatabase::class.java,
+            "httpsupgrade.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = HttpsUpgradeDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides

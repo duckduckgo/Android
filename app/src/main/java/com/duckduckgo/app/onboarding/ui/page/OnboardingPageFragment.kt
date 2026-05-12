@@ -19,7 +19,9 @@ package com.duckduckgo.app.onboarding.ui.page
 import androidx.annotation.LayoutRes
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import dev.zacsweers.metro.HasMemberInjections
 
+@HasMemberInjections
 abstract class OnboardingPageFragment(@LayoutRes contentLayoutId: Int = 0) : DuckDuckGoFragment(contentLayoutId) {
 
     fun onContinuePressed() {

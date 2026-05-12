@@ -58,14 +58,14 @@ class RxPixelSender @Inject constructor(
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val deviceInfo: DeviceInfo,
-    private val statisticsLibraryConfig: StatisticsLibraryConfig?,
+    private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
 ) : PixelSender, MainProcessLifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
 
     private val shouldFirePixelsAsDev: Int? by lazy {
-        if (statisticsLibraryConfig?.shouldFirePixelsAsDev() == true) 1 else null
+        if (statisticsLibraryConfig.shouldFirePixelsAsDev()) 1 else null
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -128,15 +128,24 @@ class RxPixelSender @Inject constructor(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
-    ): Completable {
-        return Completable.fromCallable {
-            val pixelEntity = PixelEntity(
-                pixelName = pixelName,
-                atb = getAtbInfo(),
-                additionalQueryParams = addDeviceParametersTo(parameters),
-                encodedQueryParams = encodedParameters,
-            )
-            pendingPixelDao.insert(pixelEntity)
+        type: Pixel.PixelType,
+    ): Single<PixelSender.EnqueuePixelResult> {
+        return Single.fromCallable {
+            runBlocking {
+                if (shouldFirePixel(pixelName, type)) {
+                    val pixelEntity = PixelEntity(
+                        pixelName = pixelName,
+                        atb = getAtbInfo(),
+                        additionalQueryParams = addDeviceParametersTo(parameters),
+                        encodedQueryParams = encodedParameters,
+                    )
+                    pendingPixelDao.insert(pixelEntity)
+                    storePixelFired(pixelName, type)
+                    PixelSender.EnqueuePixelResult.PIXEL_ENQUEUED
+                } else {
+                    PixelSender.EnqueuePixelResult.PIXEL_IGNORED
+                }
+            }
         }
     }
 

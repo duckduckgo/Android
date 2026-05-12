@@ -50,13 +50,18 @@ class AutofillDeviceCapabilityReporter @Inject constructor(
         logcat(VERBOSE) { "Autofill device capability reporter created" }
 
         appCoroutineScope.launch(dispatchers.io()) {
-            if (pixel.hasDeterminedCapabilities()) {
-                logcat(VERBOSE) { "Already determined device autofill capabilities previously" }
-                return@launch
-            }
-
             try {
                 val secureStorageAvailable = secureStorage.canAccessSecureStorage()
+
+                if (!secureStorageAvailable) {
+                    pixel.sendSecureStorageUnavailableDailyPixel()
+                }
+
+                if (pixel.hasDeterminedCapabilities()) {
+                    logcat(VERBOSE) { "Already determined device autofill capabilities previously" }
+                    return@launch
+                }
+
                 val deviceAuthAvailable = deviceAuthenticator.hasValidDeviceAuthentication()
 
                 logcat {

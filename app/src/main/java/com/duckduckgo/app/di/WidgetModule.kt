@@ -21,11 +21,13 @@ import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesGridCalculator
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
+@ContributesTo(AppScope::class)
 object WidgetModule {
 
     @Provides

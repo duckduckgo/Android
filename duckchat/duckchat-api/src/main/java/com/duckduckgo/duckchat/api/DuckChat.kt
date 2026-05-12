@@ -50,11 +50,14 @@ interface DuckChat {
     /**
      * Returns the Duck Chat URL to be used
      */
-    fun getDuckChatUrl(query: String, autoPrompt: Boolean): String
+    fun getDuckChatUrl(query: String, autoPrompt: Boolean, sidebar: Boolean = false): String
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.
-     *
+     * There are two Duck Chat URLs
+     * Legacy: https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5
+     * After Migration: https://duck.ai/chat?q=DuckDuckGo+AI+Chat&duckai=5&atb=v520-1ru&ko=-1&t=ddg_android&migration=native-import
+     * https://app.asana.com/1/137249556945/task/1210497696306780
      * @return true if it is a DuckChat URL, false otherwise.
      */
     fun isDuckChatUrl(uri: Uri): Boolean
@@ -94,4 +97,43 @@ interface DuckChat {
      * Observes the value for the automatic context attachment for Contextual Mode
      */
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Observes whether the native input field user setting is enabled.
+     */
+    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
+
+    suspend fun isStandaloneMigrationCompleted(): Boolean
+
+    /**
+     * Set user preference for whether chat suggestions are shown in the input screen.
+     */
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    /**
+     * Observes whether the user has enabled chat suggestions.
+     */
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
+    /**
+     * Opens Duck.ai directly in voice mode (duck.ai/?mode=voice-mode).
+     */
+    fun openVoiceDuckChat()
+
+    /**
+     * Returns `true` if a voice session is currently active on the tab with the given [tabId].
+     */
+    fun isVoiceChatSessionActive(tabId: String): Boolean
+
+    /**
+     * Emits the set of tab IDs that currently have an active voice session.
+     */
+    val activeVoiceChatSessions: Flow<Set<String>>
+
+    /**
+     * Emits the tab id whenever an end-voice-session action is requested (e.g. from the
+     * foreground service notification). Tabs should collect this flow and dispatch the
+     * end-voice-session JS event when their id is emitted.
+     */
+    fun observeTriggerVoiceChatSessionEnd(): Flow<String>
 }

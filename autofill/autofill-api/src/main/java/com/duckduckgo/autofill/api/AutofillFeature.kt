@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
@@ -177,6 +178,12 @@ interface AutofillFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun prioritizeDomainMatchesOnSearch(): Toggle
 
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun useHarmony(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun sendSanitizedStackTraces(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun readFromHarmony(): Toggle
 }

@@ -21,6 +21,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
@@ -213,5 +214,140 @@ class LoadUrlFailedEventHandlerTest {
         assertEquals(RECOVERY_URL, result.nextState.pendingUrl)
         assertEquals(LoadUrl(RECOVERY_URL), result.sideEffect)
         assertNull(result.nextEvent)
+    }
+
+    @Test
+    fun whenLoadUrlFailedWhilePreseedingThenClearsPendingUrlAndReturnsExecuteNextBrokerStep() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlFailed(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        assertNull(result.nextState.pendingUrl)
+        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenLoadUrlFailedWhilePreseedingThenDoesNotAttemptRecovery() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                currentBrokerStepIndex = 2,
+                currentActionIndex = 0,
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlFailed(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        // Should not set pendingUrl to RECOVERY_URL, should just clear it
+        assertNull(result.nextState.pendingUrl)
+        // Should not return LoadUrl side effect
+        assertNull(result.sideEffect)
+        // Should proceed to next broker step
+        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        // Should preserve other state fields
+        assertEquals(2, result.nextState.currentBrokerStepIndex)
+        assertEquals(0, result.nextState.currentActionIndex)
+    }
+
+    @Test
+    fun whenLoadUrlFailedNotPreseedingThenSetsPreseedingToFalseOnRecovery() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                preseeding = false,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlFailed(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(RECOVERY_URL, result.nextState.pendingUrl)
+        assertEquals(false, result.nextState.preseeding)
+        assertEquals(LoadUrl(RECOVERY_URL), result.sideEffect)
+    }
+
+    @Test
+    fun whenLoadUrlFailedOnRecoveryUrlThenSetsPreseedingToFalse() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = RECOVERY_URL,
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlFailed(url = RECOVERY_URL)
+
+        val result = testee.invoke(state, event)
+
+        // Preseeding check happens before recovery URL check, so this will return ExecuteNextBrokerStep
+        assertNull(result.nextState.pendingUrl)
+        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+    }
+
+    @Test
+    fun whenLoadUrlFailedWhilePreseedingPreservesOtherStateFields() = runTest {
+        val state =
+            State(
+                runType = RunType.SCHEDULED,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                currentBrokerStepIndex = 3,
+                currentActionIndex = 1,
+                actionRetryCount = 2,
+                transactionID = "txn-123",
+                attemptId = "attempt-456",
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.FILL_FORM,
+                    stageStartMs = 5000L,
+                ),
+            )
+        val event = LoadUrlFailed(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(RunType.SCHEDULED, result.nextState.runType)
+        assertEquals(testProfileQuery, result.nextState.profileQuery)
+        assertEquals(3, result.nextState.currentBrokerStepIndex)
+        assertEquals(1, result.nextState.currentActionIndex)
+        assertEquals(2, result.nextState.actionRetryCount)
+        assertEquals("txn-123", result.nextState.transactionID)
+        assertEquals("attempt-456", result.nextState.attemptId)
+        assertEquals(PirStage.FILL_FORM, result.nextState.stageStatus.currentStage)
+        // preseeding is preserved (not explicitly set to false in preseeding branch)
+        assertEquals(true, result.nextState.preseeding)
     }
 }

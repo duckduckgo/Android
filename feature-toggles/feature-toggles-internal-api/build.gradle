@@ -27,10 +27,12 @@ java {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 dependencies {
-
+    implementation Square.moshi
+    implementation Square.okio
+    implementation "org.json:json:_"
 }
 

@@ -33,8 +33,10 @@
     <string name="browserMenuEmailAlias">Gerar Duck Address</string>
     <string name="browserMenuFindInPage">Encontrar na página</string>
     <string name="browserMenuPrint">Imprimir página</string>
+    <string name="browserMenuPrintSite">Imprimir</string>
     <string name="browserMenuOpenAppLink">Abrir na app</string>
     <string name="browserMenuAddToHome">Adicionar à Página Inicial</string>
+    <string name="browserMenuDownloadPdf">Descarregar PDF</string>
     <string name="browserMenuReportBrokenSite">Denunciar site danificado</string>
     <string name="browserMenuAutofill">Palavras-passe</string>
     <string name="browserMenuDownloads">Transferências</string>
@@ -45,11 +47,15 @@
     <string name="browserMenuNewChat">Nova conversa</string>
     <string name="browserMenuNewAIChat">Novo AI Chat</string>
     <string name="browserMenuChatHistory">Histórico do chat</string>
+    <string name="browserMenuDuckChatHistory">Chats Duck.ai</string>
     <string name="browserMenuChatSettings">Definições do Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Tentar grátis</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Retroceder</string>
     <string name="browserMenuForward">Avançar</string>
     <string name="browserMenuRefresh">Atualizar</string>
+    <string name="browserMenuFireTabsData">Eliminar separadores e dados</string>
 </resources>

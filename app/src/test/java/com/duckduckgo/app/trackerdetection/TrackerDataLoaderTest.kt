@@ -54,7 +54,7 @@ class TrackerDataLoaderTest {
 
     private lateinit var testee: TrackerDataLoader
 
-    private val mockTrackerDetector: TrackerDetector = mock()
+    private val mockTrackerDetectorClientProvider: TrackerDetectorClientProvider = mock()
     private val mockTdsTrackerDao: TdsTrackerDao = mock()
     private val mockTdsEntityDao: TdsEntityDao = mock()
     private val mockTdsDomainEntityDao: TdsDomainEntityDao = mock()
@@ -71,7 +71,7 @@ class TrackerDataLoaderTest {
     fun setup() {
         testee = TrackerDataLoader(
             appCoroutineScope = TestScope(),
-            trackerDetector = mockTrackerDetector,
+            trackerDetectorClientProvider = mockTrackerDetectorClientProvider,
             tdsTrackerDao = mockTdsTrackerDao,
             tdsEntityDao = mockTdsEntityDao,
             tdsDomainEntityDao = mockTdsDomainEntityDao,

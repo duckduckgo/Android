@@ -22,21 +22,24 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
 
 interface FreeTrialConversionWideEvent {
     suspend fun onFreeTrialStarted(productId: String)
 
     suspend fun onVpnActivatedSuccessfully()
+
+    suspend fun onDuckAiPaidPromptSubmitted()
 
     /**
      * Called when subscription data is refreshed to detect free trial end.
@@ -55,7 +58,7 @@ interface FreeTrialConversionWideEvent {
 @ContributesBinding(AppScope::class)
 class FreeTrialConversionWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val authRepository: AuthRepository,
     private val timeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -64,6 +67,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
 
     private var cachedFlowId: Long? = null
     private var vpnActivationStepRecorded: Boolean = false
+    private var duckAiUsedStepRecorded: Boolean = false
 
     override suspend fun onFreeTrialStarted(productId: String) {
         pixelSender.reportFreeTrialStart()
@@ -76,6 +80,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         }
 
         vpnActivationStepRecorded = false
+        duckAiUsedStepRecorded = false
 
         cachedFlowId = wideEventClient
             .flowStart(
@@ -84,7 +89,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                     KEY_FREE_TRIAL_PLAN to productId,
                 ),
                 cleanupPolicy = OnTimeout(
-                    duration = Duration.ofDays(FREE_TRIAL_TIMEOUT_DAYS),
+                    duration = FREE_TRIAL_TIMEOUT_DAYS.days,
                     flowStatus = FlowStatus.Failure(FAILURE_REASON_TIMEOUT),
                 ),
             )
@@ -92,39 +97,58 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     override suspend fun onVpnActivatedSuccessfully() {
-        val subscription = authRepository.getSubscription() ?: return
+        val (subscription, activationDay) = getSubscriptionWithActivationDay() ?: return
 
-        // Only proceed if subscription is in free trial
-        if (!authRepository.isFreeTrialActive()) {
-            return
+        pixelSender.reportFreeTrialVpnActivation(activationDay, subscription.platform)
+
+        recordStepIfNotAlreadyRecorded(
+            stepName = activationDay,
+            alreadyRecorded = vpnActivationStepRecorded,
+        ) { vpnActivationStepRecorded = true }
+    }
+
+    override suspend fun onDuckAiPaidPromptSubmitted() {
+        val (subscription, activationDay) = getSubscriptionWithActivationDay() ?: return
+
+        val duckAiActivationDay = when (activationDay) {
+            STEP_VPN_ACTIVATED_D1 -> "d1"
+            STEP_VPN_ACTIVATED_D2_TO_D7 -> "d2_to_d7"
+            else -> "unknown"
         }
+        pixelSender.reportFreeTrialDuckAiPaidUsed(duckAiActivationDay, subscription.platform)
 
-        val subscriptionStartedAt = subscription.startedAt
-        val currentTime = timeProvider.currentTimeMillis()
-        val daysSinceStart = TimeUnit.MILLISECONDS.toDays(currentTime - subscriptionStartedAt)
+        recordStepIfNotAlreadyRecorded(
+            stepName = STEP_DUCK_AI_PAID_USED,
+            alreadyRecorded = duckAiUsedStepRecorded,
+        ) { duckAiUsedStepRecorded = true }
+    }
 
-        val activationDay = if (daysSinceStart < 1) {
-            STEP_VPN_ACTIVATED_D1
-        } else {
-            STEP_VPN_ACTIVATED_D2_TO_D7
-        }
+    private suspend fun getSubscriptionWithActivationDay(): Pair<Subscription, String>? {
+        val subscription = authRepository.getSubscription() ?: return null
+        if (!authRepository.isFreeTrialActive()) return null
 
-        // Fire pixel for VPN activation during free trial (independent of wide event feature flag)
-        pixelSender.reportFreeTrialVpnActivation(activationDay)
+        val daysSinceStart = TimeUnit.MILLISECONDS.toDays(
+            timeProvider.currentTimeMillis() - subscription.startedAt,
+        )
+        val activationDay = if (daysSinceStart < 1) STEP_VPN_ACTIVATED_D1 else STEP_VPN_ACTIVATED_D2_TO_D7
+        return subscription to activationDay
+    }
 
-        // Wide event logic (gated by feature flag)
+    private suspend fun recordStepIfNotAlreadyRecorded(
+        stepName: String,
+        alreadyRecorded: Boolean,
+        onRecorded: () -> Unit,
+    ) {
         if (!isFeatureEnabled()) return
-        if (vpnActivationStepRecorded) return
-
+        if (alreadyRecorded) return
         val wideEventId = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(
             wideEventId = wideEventId,
-            stepName = activationDay,
+            stepName = stepName,
             success = true,
         )
-
-        vpnActivationStepRecorded = true
+        onRecorded()
     }
 
     override suspend fun onSubscriptionRefreshed(
@@ -145,6 +169,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                 )
                 cachedFlowId = null
                 vpnActivationStepRecorded = false
+                duckAiUsedStepRecorded = false
             }
 
             // Free trial expired (was free trial, no longer active)
@@ -155,12 +180,13 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                 )
                 cachedFlowId = null
                 vpnActivationStepRecorded = false
+                duckAiUsedStepRecorded = false
             }
         }
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
+        subscriptionsFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {
@@ -188,6 +214,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         const val FAILURE_REASON_TIMEOUT = "timeout"
 
         // Steps
+        const val STEP_DUCK_AI_PAID_USED = "duck_ai_paid_used"
         const val STEP_VPN_ACTIVATED_D1 = "vpn_activated_d1"
         const val STEP_VPN_ACTIVATED_D2_TO_D7 = "vpn_activated_d2_to_d7"
     }

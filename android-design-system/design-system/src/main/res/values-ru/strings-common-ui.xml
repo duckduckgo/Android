@@ -37,4 +37,12 @@
     <string name="alwaysOn">Всегда включено</string>
     <string name="on">вкл.</string>
     <string name="off">Выкл</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Узнать больше</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Закрыть</string>
+    <string name="bookmarkFavoriteContentDescription">Избранное</string>
+
 </resources>

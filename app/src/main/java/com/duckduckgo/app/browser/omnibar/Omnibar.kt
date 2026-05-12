@@ -84,6 +84,8 @@ class Omnibar(
         fun onBackButtonPressed()
 
         fun onDuckAISidebarButtonPressed()
+
+        fun onDuckAIBackButtonPressed()
     }
 
     interface FindInPageListener {
@@ -107,7 +109,7 @@ class Omnibar(
             query: String,
         )
 
-        fun onBackKeyPressed()
+        fun onBackKeyPressed(): Boolean
 
         fun onEnterPressed()
 
@@ -153,6 +155,8 @@ class Omnibar(
         ) : ViewMode()
 
         data object DuckAI : ViewMode()
+
+        data class Pdf(val url: String?) : ViewMode()
     }
 
     val omnibarView: OmnibarView by lazy {
@@ -252,6 +256,12 @@ class Omnibar(
             omnibarView.isScrollingEnabled = value
         }
 
+    var isUiLocked: Boolean
+        get() = omnibarView.isUiLocked
+        set(value) {
+            omnibarView.isUiLocked = value
+        }
+
     var viewMode: ViewMode = ViewMode.Browser(null)
         private set
 
@@ -299,6 +309,10 @@ class Omnibar(
 
     fun addTextListener(listener: TextListener) {
         omnibarView.setOmnibarTextListener(listener)
+    }
+
+    fun disableViewStateSaving() {
+        omnibarView.disableViewStateSaving()
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
@@ -381,6 +395,7 @@ class Omnibar(
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
             ),
         )
+        omnibarView.decorate(Decoration.LockForOnboarding(viewState.isOmnibarLockedForOnboarding))
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {
@@ -393,6 +408,10 @@ class Omnibar(
 
     fun cancelTrackersAnimation() {
         omnibarView.decorate(Decoration.CancelAnimations)
+    }
+
+    fun cancelEasterEggLogoAnimation() {
+        omnibarView.decorate(Decoration.CancelEasterEggLogoAnimation)
     }
 
     fun startTrackersAnimation(events: List<Entity>?) {

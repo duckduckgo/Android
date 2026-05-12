@@ -63,6 +63,7 @@ class UserSegmentsPixelSender @Inject constructor(
     override fun onDuckAiRetentionAtbRefreshed(
         oldAtb: String,
         newAtb: String,
+        metadata: Map<String, String?>,
     ) {
         coroutineScope.launch(dispatcherProvider.io()) {
             val params = handleAtbRefresh(DUCKAI, oldAtb = oldAtb, newAtb = newAtb)

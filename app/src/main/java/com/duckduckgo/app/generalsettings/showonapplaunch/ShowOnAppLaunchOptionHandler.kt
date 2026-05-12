@@ -18,21 +18,26 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
+    suspend fun handleAfterInactivityOption(wasIdle: Boolean)
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
@@ -46,13 +51,49 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val settingsDataStore: SettingsDataStore,
+    private val systemAutofillEngagement: SystemAutofillEngagement,
 ) : ShowOnAppLaunchOptionHandler {
 
+    override suspend fun handleAfterInactivityOption(wasIdle: Boolean) {
+        logcat { "FirstScreen: Inactivity Timer passed" }
+        applyShowOnAppLaunchOption(fromInactivity = wasIdle)
+    }
+
     override suspend fun handleAppLaunchOption() {
-        when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
+        applyShowOnAppLaunchOption(fromInactivity = false)
+    }
+
+    private suspend fun applyShowOnAppLaunchOption(fromInactivity: Boolean) {
+        val option = showOnAppLaunchOptionDataStore.optionFlow.first()
+        logcat { "FirstScreen: showing $option on app launch" }
+
+        when (option) {
             LastOpenedTab -> Unit
-            NewTabPage -> tabRepository.add()
-            is SpecificPage -> handleSpecificPageOption(option)
+            NewTabPage -> {
+                val selectedTab = tabRepository.getSelectedTab()
+                if (selectedTab == null || !selectedTab.url.isNullOrBlank()) {
+                    if (fromInactivity) {
+                        // Set pendingAfterIdle BEFORE adding the tab so BrowserViewModel's
+                        // flowSelectedTab emit consumes it via onNtpShown for the new NTP.
+                        ntpAfterIdleManager.onIdleReturnTriggered()
+                        notifyAutofillIdleReturn("new_tab_page")
+                    }
+                    tabRepository.add()
+                }
+                // When the user is already on an NTP we deliberately don't trigger here:
+                // - If the prior session classified this NTP as auto-initiated, NtpAfterIdleManager
+                //   has preserved the state across the background; the hatch is still correct.
+                // - Setting pendingAfterIdle here would leak to the next NTP shown (e.g. a
+                //   manually-opened new tab), incorrectly classifying it as auto-initiated.
+            }
+            is SpecificPage -> {
+                if (fromInactivity) {
+                    notifyAutofillIdleReturn("specific_page")
+                }
+                handleSpecificPageOption(option)
+            }
         }
     }
 
@@ -69,6 +110,12 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
             if (shouldSaveCurrentUrlForShowOnAppLaunch) {
                 showOnAppLaunchOptionDataStore.setResolvedPageUrl(currentUrl!!)
             }
+        }
+    }
+
+    private fun notifyAutofillIdleReturn(optionName: String) {
+        if (settingsDataStore.userSelectedIdleThresholdSeconds == 0L) {
+            systemAutofillEngagement.setIdleReturnTriggered(optionName)
         }
     }
 

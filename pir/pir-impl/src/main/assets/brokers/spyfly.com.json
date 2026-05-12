@@ -1,0 +1,474 @@
+{
+  "name": "SpyFly",
+  "url": "spyfly.com",
+  "version": "0.7.0",
+  "addedDatetime": 1775214750818,
+  "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spyfly.com/help-center/privacy-requests",
+          "id": "192af9bf-ba6f-4fb3-9bda-c72f8b489f8e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "9423632f-b0d0-4d66-be94-4fbb23085e9d"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "_comment": "This input doesn't follow the same id pattern as the rest",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "97679943-0b17-41e7-9916-6774a8163bc3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "_comment": "Ensure the captcha checkbox is checked before proceeding",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "04d2e2c3-688c-486a-8c4d-920d31c4677f"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "b5774ac1-d743-490c-b738-f9a70b63ada5"
+        },
+        {
+          "_comment": "After Continue, the email verification page loads.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "a5ffc9fd-1ddf-4f5f-8c91-37db9f142ab5"
+        },
+        {
+          "_comment": "Generate a disposable email address before filling the email field",
+          "actionType": "generateEmail",
+          "id": "63c07f1a-fa0c-4c64-a516-4e9701a209cc"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "a63daf34-fd46-46b9-abeb-ea54c0b65494"
+        },
+        {
+          "_comment": "Wait for Turnstile on email page",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "fbe8687d-caf5-48c7-9572-4401141e1cf7"
+        },
+        {
+          "_comment": "Submit the email",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "38d0e82c-5d6e-4c69-8695-17b957537854"
+        },
+        {
+          "_comment": "SpyFly sends a verification code to the generated email. Poll the backend until it arrives.",
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "6d78ef56-d2cb-4ba2-b521-0d0127cbfe48"
+        },
+        {
+          "_comment": "Wait for the verification code page to load",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "d25356d5-1585-40bb-99f0-b31f5b8f8558"
+        },
+        {
+          "_comment": "Fill the verification code from the email",
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "d032386d-3cec-4598-b154-9ebe0689bbc3"
+        },
+        {
+          "_comment": "Wait for Turnstile on verification code page",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "bd28f924-1c63-4e4b-9107-bf414a51146d"
+        },
+        {
+          "_comment": "Submit the verification code",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "386c4ff6-c057-4d8e-a587-f7de9832882c"
+        },
+        {
+          "_comment": "Wait for the results page to load",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "90deb9b3-42b1-4377-be87-f7da82c07f9d"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "//h1[contains(., 'Sorry, we were unable to find any results')]",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            },
+            "age": {
+              "selector": ".//p[contains(., 'Age')]",
+              "afterText": "Age: "
+            },
+            "addressCityStateList": {
+              "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//p[contains(., 'Relatives')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "22b645d1-9504-4350-8031-0fa8268e4a2e"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.spyfly.com/help-center/privacy-requests",
+          "id": "bfb6652e-20d1-4b5b-9123-ae234fe1c48d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "928fdd3b-69c8-48f2-9d52-6f30a82a0bbc"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "098032c0-d8c0-40b3-b9f1-d9a4883fc338"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "3aa26942-a743-49a4-ad5e-277ee726ac2e"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "6b012cd0-d1e7-4969-a24d-05be01123084"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "a540257d-17ff-4c31-b0ce-6bf0934ba503"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "82af023b-7bd8-449d-94a6-449ec2144882"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "b2129acb-6d7b-4e9a-8a15-1692f897f0a3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "d5adefdd-b519-414a-b4d3-424000bed137"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "8056bd39-9db2-4ddf-bd7b-f138171821ca"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "08f0eddc-1ade-4a57-85e9-d51f8175245e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "50ca8d93-c3b5-4cc3-a43b-5e24667df7df"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "a94edfa1-9bc3-4c93-8dbe-bb98d7d25613"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": ".form__captcha"
+            }
+          ],
+          "id": "66fff0ae-7f55-4560-9d54-d29404536e92"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "6807275b-f28c-4c9b-afcf-4bccefc28ca5"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "9a5f702f-2218-4090-9bf9-b9182df979b6"
+        },
+        {
+          "_comment": "Click Remove on the matched profile using profileMatch",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".result-item",
+                  "profile": {
+                    "name": {
+                      "selector": "h2"
+                    },
+                    "age": {
+                      "selector": ".//p[contains(., 'Age')]",
+                      "afterText": "Age: "
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "eab75fe5-15be-429d-98ce-10f206759066"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "h1",
+              "expect": "Request Submitted"
+            }
+          ],
+          "id": "798a9f5a-1e55-4541-b729-9b8544e003d6"
+        },
+        {
+          "_comment": "SpyFly sends a confirmation link. Decoupled: native releases the webview and picks up the link later.",
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "dce5999c-ad7a-4050-b92f-8bc4e945e68d"
+        },
+        {
+          "_comment": "After clicking the confirmation link, verify the success page",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "h1",
+              "expect": "Verification Complete"
+            }
+          ],
+          "id": "7d78b439-ce6e-4660-b20a-04d10ca817bc"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -18,12 +18,15 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
-import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
+import com.duckduckgo.sync.api.engine.DeletableType
+import com.duckduckgo.sync.api.engine.ModifiedSince
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -35,6 +38,7 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -81,7 +85,7 @@ internal class SyncApiClientTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Success)
@@ -93,7 +97,7 @@ internal class SyncApiClientTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
+        whenever(syncApi.patchData(any(), any())).thenReturn(patchAllError)
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Error)
@@ -173,7 +177,7 @@ internal class SyncApiClientTest {
     fun whenDeleteAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, "timestamp"))
+        val result = apiClient.delete(SyncDeletionRequest(DeletableType.DUCK_AI_CHATS, "timestamp"))
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
         verifyNoInteractions(syncApiErrorRecorder)
@@ -185,7 +189,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.deleteAiChats(any(), any())).thenReturn(Result.Success(Unit))
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+        val result = apiClient.delete(SyncDeletionRequest(DeletableType.DUCK_AI_CHATS, timestamp))
 
         assertTrue(result is Result.Success)
         verifyNoInteractions(syncApiErrorRecorder)
@@ -198,9 +202,107 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.deleteAiChats(any(), any())).thenReturn(deleteError)
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+        val result = apiClient.delete(SyncDeletionRequest(DeletableType.DUCK_AI_CHATS, timestamp))
 
         assertTrue(result is Result.Error)
-        verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, deleteError)
+        verify(syncApiErrorRecorder).record(DeletableType.DUCK_AI_CHATS, deleteError)
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsAndApiSucceedsThenReturnSuccess() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        val result = apiClient.patch(changes)
+
+        assertTrue(result is Result.Success)
+        verifyNoInteractions(syncApiErrorRecorder)
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsAndApiFailsThenReturnErrorAndRecordError() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(patchAllError)
+
+        val result = apiClient.patch(changes)
+
+        assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, patchAllError)
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsThenPatchChatsIsCalled() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(changes)
+
+        verify(syncApi).patchChats(any(), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenPatchBookmarksThenPatchDataIsCalled() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(bookmarksChanges)
+
+        verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchCredentialsThenPatchDataIsCalled() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val credentialsChanges = SyncChangesRequest(CREDENTIALS, updatesJSON, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(credentialsChanges)
+
+        verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchSettingsThenPatchDataIsCalled() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val settingsChanges = SyncChangesRequest(SyncableType.SETTINGS, updatesJSON, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(settingsChanges)
+
+        verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsWithTimestampThenSinceIsPassedToPatchChats() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2026-01-01"))
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(changes)
+
+        verify(syncApi).patchChats(any(), any(), org.mockito.kotlin.eq("2026-01-01"))
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsWithFirstSyncThenSinceIsNull() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(changes)
+
+        verify(syncApi).patchChats(any(), any(), org.mockito.kotlin.isNull())
     }
 }

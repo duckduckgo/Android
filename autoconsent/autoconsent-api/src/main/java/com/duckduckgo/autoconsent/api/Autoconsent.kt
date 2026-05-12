@@ -78,10 +78,29 @@ interface AutoconsentCallback {
     fun onPopUpHandled(isCosmetic: Boolean)
 
     /**
-     * This method is called whenever autoconsent has a result to be sent
+     * This method is called whenever autoconsent has a result to be sent.
      */
-    fun onResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean, isCosmetic: Boolean?)
+    fun onResultReceived(result: AutoconsentResult)
 }
+
+/**
+ * Result of an autoconsent action on a page.
+ *
+ * @property consentManaged true if autoconsent handled a cookie consent popup on this page.
+ * @property optOutFailed true if autoconsent attempted to opt out but the opt-out steps failed.
+ * @property selfTestFailed true if the post-opt-out self-test detected the consent state was not correctly set.
+ * @property isCosmetic true if the popup was hidden via CSS rather than opted out, null if not applicable.
+ * @property consentRule the autoconsent rule identifier that matched (e.g. "cookiebot", "onetrust"), or null if no rule matched.
+ * @property consentReloadLoop true if a reload loop was detected (same CMP re-triggering on the same URL without navigation).
+ */
+data class AutoconsentResult(
+    val consentManaged: Boolean,
+    val optOutFailed: Boolean,
+    val selfTestFailed: Boolean,
+    val isCosmetic: Boolean?,
+    val consentRule: String?,
+    val consentReloadLoop: Boolean,
+)
 
 /** List of [AutoconsentFeatureName] that belong to the Autoconsent feature */
 enum class AutoconsentFeatureName(val value: String) {

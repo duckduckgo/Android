@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" ønsker at åbne din DRM-software</string>
-    <string name="drmSiteDialogSubtitle">Digital Rights Management-software er nødvendig for at afspille beskyttet medieindhold, men giver også adgang til enhedsidentifikatorer. Giv kun tilladelse til sider, du stoler på, til at bruge disse data. Du kan til enhver tid administrere tilladelser i Indstillinger. <annotation type="drm_learn_more_link">Få mere at vide</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" vil åbne din Digital Rights Management (DRM)-software</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Hvis du vælger \"Afvis\", kan videoer på webstedet muligvis ikke afspilles, men %1$s vil ikke have adgang til enhedens identifikatorer leveret af DRM-software. Du kan til enhver tid administrere tilladelser i Indstillinger. <annotation type="drm_learn_more_link">Læs mere</annotation></string>
     <string name="drmSiteDialogAllowAlways">Altid</string>
     <string name="drmSiteDialogAllowOnce">Kun for denne session</string>
     <string name="drmSiteDialogDenyAlways">Afvis altid</string>

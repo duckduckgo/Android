@@ -30,6 +30,8 @@ data class BrokenSiteData(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
+    val consentRule: String?,
+    val consentReloadLoop: Boolean,
     val errorCodes: List<String>,
     val httpErrorCodes: String,
     val isDesktopMode: Boolean,
@@ -37,6 +39,7 @@ data class BrokenSiteData(
     val userRefreshCount: Int,
     val openerContext: BrokenSiteOpenerContext?,
     val jsPerformance: DoubleArray?,
+    val breakageData: String?,
 ) {
     enum class ReportFlow { MENU, DASHBOARD, TOGGLE_DASHBOARD, TOGGLE_MENU, RELOAD_THREE_TIMES_WITHIN_20_SECONDS }
 
@@ -55,10 +58,13 @@ data class BrokenSiteData(
             val consentManaged = site?.consentManaged ?: false
             val consentOptOutFailed = site?.consentOptOutFailed ?: false
             val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
+            val consentRule = site?.consentRule
+            val consentReloadLoop = site?.consentReloadLoop ?: false
             val isDesktopMode = site?.isDesktopMode ?: false
             val userRefreshCount = site?.realBrokenSiteContext?.userRefreshCount ?: 0
             val openerContext = site?.realBrokenSiteContext?.openerContext
             val jsPerformance = site?.realBrokenSiteContext?.jsPerformance
+            val breakageData = site?.realBrokenSiteContext?.breakageData
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,
@@ -68,6 +74,8 @@ data class BrokenSiteData(
                 consentManaged = consentManaged,
                 consentOptOutFailed = consentOptOutFailed,
                 consentSelfTestFailed = consentSelfTestFailed,
+                consentRule = consentRule,
+                consentReloadLoop = consentReloadLoop,
                 errorCodes = errorCodes,
                 httpErrorCodes = httErrorCodes,
                 isDesktopMode = isDesktopMode,
@@ -75,6 +83,7 @@ data class BrokenSiteData(
                 userRefreshCount = userRefreshCount,
                 openerContext = openerContext,
                 jsPerformance = jsPerformance,
+                breakageData = breakageData,
             )
         }
     }

@@ -38,6 +38,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_REVOKED,
+    featureName = "pluginPproUpsellRevokedMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PproUpsellRevokedMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,
@@ -65,7 +67,7 @@ class PproUpsellRevokedMessagePlugin @Inject constructor(
                     context.getText(messageRes),
                 ) { context.launchPPro() }
                 doOnAttach {
-                    deviceShieldPixels.reportPproUpsellRevokedInfoShown()
+                    deviceShieldPixels.reportSubscriptionUpsellRevokedInfoShown()
                 }
             }
         } else {
@@ -74,7 +76,7 @@ class PproUpsellRevokedMessagePlugin @Inject constructor(
     }
 
     private fun Context.launchPPro() {
-        deviceShieldPixels.reportPproUpsellRevokedInfoLinkClicked()
+        deviceShieldPixels.reportSubscriptionUpsellRevokedInfoLinkClicked()
         startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
     }
 

@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -78,6 +79,7 @@ class RealPirEmailConfirmation @Inject constructor(
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirJob(callbacks),
     PirEmailConfirmation {
@@ -129,7 +131,7 @@ class RealPirEmailConfirmation @Inject constructor(
                 }
             }
         }.awaitAll()
-
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
@@ -246,11 +248,13 @@ class RealPirEmailConfirmation @Inject constructor(
         logcat { "PIR-EMAIL-CONFIRMATION: Debug execution completed" }
 
         onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
     override fun stop() {
         logcat { "PIR-EMAIL-CONFIRMATION: Stopping all runners" }
+        webViewDataCleaner.cleanWebViewData()
         runners.forEach {
             it.stop()
         }

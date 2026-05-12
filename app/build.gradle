@@ -1,4 +1,7 @@
 import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
     id 'com.android.application'
@@ -7,6 +10,8 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
+    id 'androidx.room'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -28,13 +33,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
         sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            androidTest.assets.srcDirs += files("$projectDir/schemas")
             main {
                 java {
                     resources {
@@ -48,6 +48,8 @@ android {
                 }
             }
         }
+
+        buildConfigField "String", "DI_FRAMEWORK", "\"${findProperty('ddg.di') ?: 'AnvilDagger'}\""
 
         if (project.hasProperty('perf-test')) {
             buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
@@ -82,7 +84,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
     ksp {
         arg("room.generateKotlin", "true")
@@ -202,8 +204,46 @@ android {
         compose true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "_"
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
+    // Conditional source set: swap DI graph creation based on ddg.di property
+    def diFramework = findProperty('ddg.di') ?: 'AnvilDagger'
+    sourceSets {
+        main {
+            if (diFramework == 'Metro') {
+                java.srcDirs += 'src/metro/java'
+            } else {
+                java.srcDirs += 'src/anvilDagger/java'
+            }
+        }
+    }
+}
+
+if (!rootProject.ext.proprietaryFontAvailable && !rootProject.ext.proprietaryFontOptOut) {
+    def protectedVariants = ['PlayRelease', 'InternalRelease']
+
+    protectedVariants.each { variantName ->
+        tasks.register("validateDuckSansFont${variantName}") {
+            doLast {
+                throw new GradleException(
+                    "DUCKSANS: ${variantName} builds require the proprietary DuckSans font.\n" +
+                    "Set DUCKSANS_PACKAGE_AUTH_USER and DUCKSANS_PACKAGE_AUTH_TOKEN environment variables,\n" +
+                    "or ducksans.gpr.user and ducksans.gpr.key in gradle.properties,\n" +
+                    "or pass -PuseProprietaryFont=false to use placeholder fallback fonts.\n" +
+                    "Example: ./gradlew assembleInternalDebug -PuseProprietaryFont=false"
+                )
+            }
+        }
+    }
+
+    tasks.configureEach { task ->
+        protectedVariants.each { variantName ->
+            if (task.name == "assemble${variantName}" || task.name == "bundle${variantName}") {
+                task.dependsOn("validateDuckSansFont${variantName}")
+            }
+        }
     }
 }
 
@@ -219,31 +259,42 @@ fulladleModuleConfig {
     variant.set("playDebug")
 }
 
+def privacyTestDefaults = { config ->
+    config.async.set(false)
+    config.useOrchestrator.set(true)
+    config.environmentVariables.set(["clearPackageData": "true"])
+    config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
+    config.localResultsDir.set("fladleResults")
+    config.flakyTestAttempts.set(2)
+    config.testShards.set(1)
+}
+
 fladle {
     configs {
         privacyTests {
-            async.set(false)
+            privacyTestDefaults(it)
             flankVersion.set("21.+")
-            useOrchestrator.set(true)
-            environmentVariables.set([
-                    "clearPackageData": "true"
-            ])
-            testTargets.set([
-                    "annotation com.duckduckgo.espresso.PrivacyTest"
-            ])
-            devices.set([
-                    ["model": "MediumPhone.arm", "version": "34"],
-            ])
-            localResultsDir.set("fladleResults")
-            flakyTestAttempts.set(2)
-            testShards.set(1)
+            testTargets.set(["annotation com.duckduckgo.espresso.PrivacyTest"])
+        }
+        internalPrivacyTests {
+            privacyTestDefaults(it)
+            flankVersion.set("21.+")
+            testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
+            debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
+            instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/duckduckgo-${buildVersionName()}-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
+            additionalTestApks.set([])
         }
     }
 }
 
 dependencies {
+    ksp project(':anvil-ksp')
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	implementation project(":duckchat-store")
+	implementation project(":data-clearing-api")
+	implementation project(":data-clearing-impl")
+	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
@@ -277,7 +328,6 @@ dependencies {
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
-    anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
     implementation project(':app-build-config-api')
@@ -306,6 +356,11 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
+    implementation project(':tracker-detection-api')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
@@ -354,6 +409,8 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':content-scope-scripts-impl')
 
+    implementation project(':content-scope-privacy-features-impl')
+
     implementation project(':network-protection-api')
     implementation project(':network-protection-impl')
     internalImplementation project(':network-protection-internal')
@@ -362,6 +419,8 @@ dependencies {
     implementation project(':fingerprint-protection-api')
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
+
+    implementation project(':fire-mode-impl')
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
@@ -377,6 +436,12 @@ dependencies {
     implementation project(':sync-lib')
     implementation project(':sync-settings-api')
     implementation project(':sync-settings-impl')
+
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
@@ -399,11 +464,19 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':event-hub-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
     playImplementation project(':subscriptions-impl')
     fdroidImplementation project(':subscriptions-dummy-impl')
+
+    implementation project(':persistent-storage-api')
+
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
 
     internalImplementation project(':subscriptions-internal')
 
@@ -430,11 +503,18 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
+    implementation project(':web-interference-detection-impl')
+
+    implementation project(':web-detection-impl')
+
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
+
+    // Widgets
+    implementation "androidx.core:core-remoteviews:1.1.0"
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -500,7 +580,6 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
@@ -536,6 +615,9 @@ dependencies {
     // Browser
     implementation "androidx.browser:browser:_"
 
+    // PDF Viewer
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
+
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
@@ -544,6 +626,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
+    testImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit
@@ -553,6 +636,7 @@ dependencies {
 
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
@@ -573,6 +657,17 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Export Android connected test results to Develocity
+afterEvaluate {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_CONNECTED
+        )
+    }
 }
 
 tasks.register('fastlaneVersionCode') {
@@ -603,6 +698,10 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('internalAndroidTestsBuild') {
+    dependsOn 'assembleInternalDebug', 'assembleInternalDebugAndroidTest'
 }
 
 tasks.register('releaseTestLocal', Exec) {

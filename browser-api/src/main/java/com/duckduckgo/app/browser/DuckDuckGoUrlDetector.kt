@@ -65,11 +65,4 @@ interface DuckDuckGoUrlDetector {
      * @return the vertical of a given uri and null if it cannot find it.
      */
     fun extractVertical(uriString: String): String?
-
-    /**
-     * This method takes a [uri] and returns `true` or `false`.
-     * @return `true` if the given [uri] is a DuckDuckGo Chat and `false`
-     * otherwise.
-     */
-    fun isDuckDuckGoChatUrl(uri: String): Boolean
 }

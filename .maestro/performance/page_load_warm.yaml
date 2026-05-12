@@ -1,0 +1,32 @@
+appId: com.duckduckgo.mobile.android
+name: "Benchmark: Page load warm cache"
+tags:
+  - benchmark
+---
+# Measures warm-cache page load performance for a configurable list of sites.
+# A single cold load (full state wipe) is performed first solely to seed the
+# HTTP cache. All subsequent warm loads (×warmIterations) are the actual
+# measurements — the app is relaunched without clearing state so the HTTP
+# cache populated by the cold load is available.
+
+- runScript: steps/init_websites.js
+
+- repeat:
+    while:
+      true: ${output.websites.counter < output.websites.urls.length}
+    commands:
+      # ── Cold load (cache seed) ────────────────────────────────────────
+      - runFlow: steps/cold_load.yaml
+
+      # ── Warm loads ──────────────────────────────────────────────────────
+      # Relaunched multiple times without clearing state: onboarding is already
+      # done and the HTTP cache is populated from the cold load above.
+      - evalScript: ${output.websites.iterationCounter = 0}
+      - repeat:
+          while:
+            true: ${output.websites.iterationCounter < output.websites.warmIterations}
+          commands:
+            - runFlow: steps/warm_load.yaml
+            - evalScript: ${output.websites.iterationCounter++}
+
+      - evalScript: ${output.websites.counter++}

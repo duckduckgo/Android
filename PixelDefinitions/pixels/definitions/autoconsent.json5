@@ -1,0 +1,205 @@
+// See https://app.asana.com/1/137249556945/project/1201844467387842/task/1210869336280371
+{
+    "m_autoconsent_init_daily": {
+        "description": "Fires when the autoconsent user-script was initialized in a document and the feature is enabled for the site.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_disabled-for-site_daily": {
+        "description": "Fires when autoconsent is not run because the feature is disabled for the site via config.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_popup-found_daily": {
+        "description": "Fires when autoconsent found an open popup on a page.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_error_optout_daily": {
+        "description": "Fires when the rule opt-out steps hit an error.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_done_daily": {
+        "description": "Fires when autoconsent successfully opts out of a popup.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_done_cosmetic_daily": {
+        "description": "Fires when autoconsent successfully dismisses a cosmetic popup.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_done_heuristic_daily": {
+        "description": "Fires when autoconsent on-device heuristic successfully dismisses a popup.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_animation-shown_daily": {
+        "description": "Fires when the autoconsent URLbar animation is shown after a non-cosmetic opt-out.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_animation-shown_cosmetic_daily": {
+        "description": "Fires when the autoconsent URLbar animation is shown after a cosmetic popup dismissal.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_self-test-ok_daily": {
+        "description": "Fires when the autoconsent self-test passes.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_self-test-fail_daily": {
+        "description": "Fires when the autoconsent self-test fails.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_error_multiple-popups_daily": {
+        "description": "Autoconsent error state when multiple valid rules were matched on a page.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_detected-by-patterns_daily": {
+        "description": "Fires when heuristic patterns match on a page.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_detected-by-both_daily": {
+        "description": "Fires when both heuristic patterns and a popup is found on a page.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_detected-only-rules_daily": {
+        "description": "Fires when a popup is found but no heuristic patterns match on a page.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_error_reload-loop_daily": {
+        "description": "Fires when the autoconsent reload loop is detected.",
+        "owners": ["muodov"],
+        "triggers": ["page_load"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "atb"]
+    },
+    "m_autoconsent_summary": {
+        "description": "Fires periodically with counts of autoconsent metrics accumulated over 2 minutes.",
+        "owners": ["muodov"],
+        "triggers": ["scheduled"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            "atb",
+            {
+                "key": "init",
+                "description": "Number of autoconsent init events.",
+                "type": "number"
+            },
+            {
+                "key": "disabled-for-site",
+                "description": "Number of autoconsent disabled-for-site events.",
+                "type": "number"
+            },
+            {
+                "key": "popup-found",
+                "description": "Number of autoconsent popup-found events.",
+                "type": "number"
+            },
+            {
+                "key": "error_optout",
+                "description": "Number of autoconsent error-optout events.",
+                "type": "number"
+            },
+            {
+                "key": "done",
+                "description": "Number of autoconsent done events.",
+                "type": "number"
+            },
+            {
+                "key": "done_cosmetic",
+                "description": "Number of autoconsent done-cosmetic events.",
+                "type": "number"
+            },
+            {
+                "key": "done_heuristic",
+                "description": "Number of autoconsent done-heuristic events.",
+                "type": "number"
+            },
+            {
+                "key": "animation-shown",
+                "description": "Number of autoconsent animation-shown events.",
+                "type": "number"
+            },
+            {
+                "key": "animation-shown_cosmetic",
+                "description": "Number of autoconsent animation-shown-cosmetic events.",
+                "type": "number"
+            },
+            {
+                "key": "self-test-ok",
+                "description": "Number of autoconsent self-test-ok events.",
+                "type": "number"
+            },
+            {
+                "key": "self-test-fail",
+                "description": "Number of autoconsent self-test-fail events.",
+                "type": "number"
+            },
+            {
+                "key": "error_multiple-popups",
+                "description": "Number of autoconsent error-multiple-popups events.",
+                "type": "number"
+            },
+            {
+                "key": "detected-by-patterns",
+                "description": "Number of autoconsent detected-by-patterns events.",
+                "type": "number"
+            },
+            {
+                "key": "detected-by-both",
+                "description": "Number of autoconsent detected-by-both events.",
+                "type": "number"
+            },
+            {
+                "key": "detected-only-rules",
+                "description": "Number of autoconsent detected-only-rules events.",
+                "type": "number"
+            },
+            {
+                "key": "error_reload-loop",
+                "description": "Number of autoconsent error-reload-loop events.",
+                "type": "number"
+            }
+        ]
+    }
+}

@@ -46,7 +46,7 @@ interface SpecialUrlDetector {
         class ExtractedAmpLink(val extractedUrl: String) : UrlType()
         class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
-        data object ShouldLaunchPrivacyProLink : UrlType()
+        data object ShouldLaunchSubscriptionLink : UrlType()
         data class ShouldLaunchDuckPlayerLink(val url: Uri) : UrlType()
         class DuckScheme(val uriString: String) : UrlType()
         data object ShouldLaunchDuckChatLink : UrlType()

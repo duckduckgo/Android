@@ -191,6 +191,7 @@ class AutoconsentSettingsViewModelTest {
             pixel: PixelName,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels.add(pixel.pixelName)
         }
@@ -199,6 +200,7 @@ class AutoconsentSettingsViewModelTest {
             pixelName: String,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels.add(pixelName)
         }

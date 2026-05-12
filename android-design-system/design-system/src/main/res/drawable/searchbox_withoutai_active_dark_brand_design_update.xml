@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="80dp"
+    android:viewportWidth="128"
+    android:viewportHeight="80">
+  <path
+      android:pathData="M20,0.5L108,0.5A19.5,19.5 0,0 1,127.5 20L127.5,60A19.5,19.5 0,0 1,108 79.5L20,79.5A19.5,19.5 0,0 1,0.5 60L0.5,20A19.5,19.5 0,0 1,20 0.5z"
+      android:fillColor="#A1CFF7"
+      android:fillAlpha="0.08"/>
+  <path
+      android:strokeWidth="1"
+      android:pathData="M20,0.5L108,0.5A19.5,19.5 0,0 1,127.5 20L127.5,60A19.5,19.5 0,0 1,108 79.5L20,79.5A19.5,19.5 0,0 1,0.5 60L0.5,20A19.5,19.5 0,0 1,20 0.5z"
+      android:fillColor="#00000000"
+      android:strokeColor="#75B6EB"/>
+  <path
+      android:pathData="M94.65,14.73C105.33,14.73 114,24.7 114,37.01V78C112.45,78.46 110.67,79 109,79H19C17.33,79 15.55,78.46 14,78V37.01C14,24.7 22.67,14.73 33.35,14.73H94.65Z"
+      android:fillColor="#75B6EB"
+      android:fillAlpha="0.16"/>
+  <path
+      android:pathData="M25.43,39C21.88,39 19,41.93 19,45.55V50.45C19,54.07 21.88,57 25.43,57H102.57C106.12,57 109,54.07 109,50.45V45.55C109,41.93 106.12,39 102.57,39H25.43Z"
+      android:fillColor="#011D34"/>
+  <path
+      android:pathData="M28.2,43.09C30.52,43.09 32.4,45.01 32.4,47.39C32.4,48.43 32.04,49.38 31.44,50.12L33.48,52.21L33.53,52.27C33.64,52.43 33.62,52.65 33.48,52.79C33.35,52.93 33.13,52.95 32.98,52.84L32.92,52.79L30.87,50.7C30.15,51.31 29.22,51.68 28.2,51.68C25.88,51.68 24,49.76 24,47.39C24,45.01 25.88,43.09 28.2,43.09ZM28.2,43.91C26.32,43.91 24.8,45.47 24.8,47.39C24.8,49.31 26.32,50.86 28.2,50.86C30.08,50.86 31.6,49.31 31.6,47.39C31.6,45.47 30.08,43.91 28.2,43.91Z"
+      android:fillColor="#4397E0"/>
+  <path
+      android:pathData="M94.4,13.09C105.89,13.09 115.2,22.61 115.2,34.36V77.56C114.17,77.93 113.1,78.19 112,78.38V34.36C112,24.42 104.12,16.36 94.4,16.36H33.6C23.88,16.36 16,24.42 16,34.36V78.38C14.9,78.19 13.83,77.93 12.8,77.56V34.36C12.8,22.61 22.11,13.09 33.6,13.09H94.4Z"
+      android:fillColor="#75B6EB"/>
+</vector>

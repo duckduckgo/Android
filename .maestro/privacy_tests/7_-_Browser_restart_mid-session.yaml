@@ -88,11 +88,17 @@ tags:
                 text: ".*Ad Company"
             - assertVisible:
                 text: "convert.ad-company.site"
-            - action: back
-            - action: back
+            - pressKey: "home"
             - killApp
             - launchApp:
                 clearState: false
+            - runFlow:
+                when:
+                  visible:
+                    id: "newTabReturnHatchView"
+                commands:
+                  - tapOn:
+                      id: "newTabReturnHatchView"
             - assertVisible:
                 text: "Pay"
             - assertVisible:

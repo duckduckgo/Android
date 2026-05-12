@@ -18,8 +18,8 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">„%1$s” chce uzyskać dostęp do oprogramowania DRM</string>
-    <string name="drmSiteDialogSubtitle">Oprogramowanie Digital Rights Management jest wymagane do odtwarzania chronionych treści multimedialnych, ale zapewnia również dostęp do identyfikatorów urządzeń. Udzielaj zgody na dostęp do tych danych tylko witrynom, którym ufasz. W każdej chwili możesz zarządzać uprawnieniami w ustawieniach. <annotation type="drm_learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="drmSitePermissionDialogTitle" instruction="Placeholder is the name of a website">\"%1$s\" chce otworzyć twoje oprogramowanie do zarządzania prawami cyfrowymi (DRM)</string>
+    <string name="drmSitePermissionDialogSubtitle" instruction="Placeholder is the name of a website">Jeśli wybierzesz „Odmów”, filmy na stronie mogą stać się niedostępne, ale %1$s nie będzie miał dostępu do identyfikatorów urządzeń dostarczanych przez oprogramowanie DRM. W każdej chwili możesz zarządzać uprawnieniami w ustawieniach. <annotation type="drm_learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="drmSiteDialogAllowAlways">Zawsze</string>
     <string name="drmSiteDialogAllowOnce">Tylko dla tej sesji</string>
     <string name="drmSiteDialogDenyAlways">Zawsze odmawiaj</string>

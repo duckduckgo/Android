@@ -52,7 +52,7 @@ class CachedToggleStore constructor(
         // Notify AFTER compute() to avoid deadlocks or re-entrancy into the cache/store.
         // If the store.set() above throws, this never runs (which is what we want).
         // Swallow listener exceptions so they don't break writes.
-        listeners.forEach { listener -> listener.runCatching { onToggleStored(state) } }
+        listeners.forEach { listener -> listener.runCatching { onToggleStored(key, state) } }
     }
 
     /**
@@ -109,6 +109,6 @@ class CachedToggleStore constructor(
     }
 
     interface Listener {
-        fun onToggleStored(newValue: State)
+        fun onToggleStored(key: String, newValue: State)
     }
 }

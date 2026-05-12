@@ -31,8 +31,9 @@ import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.DUCK_AI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
@@ -45,6 +46,10 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_FREE_TRIAL_OFFER_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_FREE_TRIAL_OFFER_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
@@ -54,7 +59,13 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIA
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -78,6 +89,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -88,7 +100,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsChecker: SubscriptionsChecker,
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     private val pirFeature: PirFeature,
 ) : ViewModel() {
 
@@ -129,6 +141,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
+                        isFreeTrial = it.isFreeTrial,
                     )
                 }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
@@ -145,12 +158,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
+        logcat {
+            "SubscriptionWebViewViewModel: processJsCallbackMessage called with featureName: $featureName, method: $method, id: $id, data: $data"
+        }
         when (method) {
             "backToSettings" -> backToSettings()
             "backToSettingsActivateSuccess" -> backToSettingsActiveSuccess()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "getSubscriptionTierOptions" -> id?.let { getSubscriptionTierOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
+            "subscriptionChangeSelected" -> subscriptionChangeSelected(data)
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
@@ -250,6 +267,94 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun subscriptionChangeSelected(data: JSONObject?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val targetPlanId = runCatching { data?.getString("id") }.getOrNull()
+            val change = runCatching { data?.getString("change") }.getOrNull()
+            logcat {
+                "SubscriptionWebViewViewModel: subscriptionChangeSelected called with targetPlanId: $targetPlanId, change: $change"
+            }
+
+            if (targetPlanId.isNullOrBlank()) {
+                logcat {
+                    "SubscriptionWebViewViewModel: subscriptionChangeSelected - targetPlanId is null or blank"
+                }
+                pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                return@launch
+            }
+
+            val subscriptionResult = runCatching { subscriptionsManager.getSubscription() }
+            if (subscriptionResult.isFailure) {
+                pixelSender.reportPurchaseFailureOther(
+                    SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name,
+                    "Failed to retrieve current subscription for plan change.",
+                )
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                return@launch
+            }
+
+            val subscription = subscriptionResult.getOrNull()
+
+            // Expired/inactive subscriptions can't be switched — route to a new purchase instead
+            val canHandleExpiredState = subscriptionsFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
+            if (canHandleExpiredState && (subscription == null || subscription.status.isExpired())) {
+                val offerId = runCatching { data?.getString("offerId") }.getOrNull()
+                val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
+                val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
+                command.send(
+                    SubscriptionSelected(id = targetPlanId, offerId = offerId, experimentName = experimentName, experimentCohort = experimentCohort),
+                )
+                return@launch
+            }
+
+            val currentTier = subscription?.productId?.let { SubscriptionTier.fromPlanId(it) } ?: SubscriptionTier.UNKNOWN
+            val targetTier = SubscriptionTier.fromPlanId(targetPlanId)
+
+            // Fail if either tier is UNKNOWN - this indicates invalid plan IDs
+            if (currentTier == SubscriptionTier.UNKNOWN || targetTier == SubscriptionTier.UNKNOWN) {
+                logcat {
+                    "SubscriptionWebViewViewModel: Invalid tier change selected: currentTier=$currentTier, targetTier=$targetTier"
+                }
+                pixelSender.reportPurchaseFailureOther(
+                    SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name,
+                    "currentTier: $currentTier, targetTier: $targetTier",
+                )
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                return@launch
+            }
+
+            val replacementMode = when {
+                // Within-tier switching (monthly<->yearly)
+                currentTier == targetTier -> SubscriptionReplacementMode.WITHOUT_PRORATION
+                // Upgrade: PLUS → PRO
+                currentTier == PLUS && targetTier == SubscriptionTier.PRO -> SubscriptionReplacementMode.CHARGE_PRORATED_PRICE
+                // Downgrade: PRO → PLUS
+                currentTier == SubscriptionTier.PRO && targetTier == PLUS -> SubscriptionReplacementMode.DEFERRED
+                else -> {
+                    // Unexpected tier combination
+                    logcat {
+                        "SubscriptionWebViewViewModel: subscriptionChangeSelected - Unexpected tier combination:" +
+                            " currentTier=$currentTier, targetTier=$targetTier"
+                    }
+                    pixelSender.reportPurchaseFailureOther(
+                        SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name,
+                        "unexpected tier combination: currentTier=$currentTier, targetTier=$targetTier",
+                    )
+                    _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                    return@launch
+                }
+            }
+
+            logcat {
+                "SubscriptionWebViewViewModel: subscriptionChangeSelected - currentPlanId/Tier: ${subscription?.productId}/$currentTier, " +
+                    "targetPlanId/targetTier: $targetPlanId/$targetTier, replacementMode: $replacementMode"
+            }
+
+            command.send(SubscriptionChangeSelected(planId = targetPlanId, offerId = null, replacementMode = replacementMode))
+        }
+    }
+
     fun purchaseSubscription(
         activity: Activity,
         planId: String,
@@ -260,6 +365,24 @@ class SubscriptionWebViewViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort, origin)
+        }
+    }
+
+    fun switchSubscriptionPlan(
+        activity: Activity,
+        planId: String,
+        offerId: String?,
+        replacementMode: SubscriptionReplacementMode,
+        origin: String?,
+    ) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            subscriptionsManager.switchSubscriptionPlan(
+                activity = activity,
+                planId = planId,
+                offerId = offerId,
+                replacementMode = replacementMode,
+                origin = origin,
+            )
         }
     }
 
@@ -280,7 +403,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 features = emptyList(),
             )
 
-            val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
@@ -335,6 +458,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 id = id,
                 params = JSONObject(tierJsonAdapter.toJson(optionsJson)),
             )
+            logcat {
+                "getSubscriptionTierOptions: JSON Response ${response.params}"
+            }
             command.send(SendResponseToJs(response))
         }
 
@@ -343,53 +469,96 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 products = emptyList(),
             )
 
-            val subscriptionTierOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
+            val subscriptionTierOptions = if (subscriptionsFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
-                when {
+                val isFreeTrialEligible = subscriptionsManager.isFreeTrialEligible()
+
+                logcat {
+                    "getSubscriptionTierOptions: subscriptionOffers contains: $subscriptionOffers"
+                }
+                logcat {
+                    "getSubscriptionTierOptions: isFreeTrialEligible $isFreeTrialEligible"
+                }
+
+                val products = mutableListOf<ProductJson>()
+
+                // Check for Plus tier products (with free trial priority)
+                val plusProduct = when {
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
-                        subscriptionsManager.isFreeTrialEligible() -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        isFreeTrialEligible -> {
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
-                        subscriptionsManager.isFreeTrialEligible() -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        isFreeTrialEligible -> {
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)) -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_US).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_US).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_US),
                         )
                     }
 
                     subscriptionOffers.keys.containsAll(listOf(MONTHLY_PLAN_ROW, YEARLY_PLAN_ROW)) -> {
-                        val tier = subscriptionOffers.getValue(MONTHLY_PLAN_ROW).tier
-                            .takeUnless { it.isNullOrBlank() } ?: subscriptionOffers.getValue(YEARLY_PLAN_ROW).tier
-                        createSubscriptionTierOptions(
-                            tier,
+                        buildProductForTier(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_PLAN_ROW),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_PLAN_ROW),
                         )
                     }
 
-                    else -> defaultOptions
+                    else -> null
                 }
+                plusProduct?.let { products.add(it) }
+
+                // Check for Pro tier products (gated by feature flag - acts as kill switch)
+                val proProduct = if (subscriptionsFeature.allowProTierPurchase().isEnabled()) {
+                    when {
+                        // Pro Free Trial US
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_FREE_TRIAL_OFFER_US, YEARLY_PRO_FREE_TRIAL_OFFER_US)) &&
+                            isFreeTrialEligible -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_FREE_TRIAL_OFFER_US),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_FREE_TRIAL_OFFER_US),
+                            )
+                        }
+                        // Pro Free Trial ROW
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_FREE_TRIAL_OFFER_ROW, YEARLY_PRO_FREE_TRIAL_OFFER_ROW)) &&
+                            isFreeTrialEligible -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_FREE_TRIAL_OFFER_ROW),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_FREE_TRIAL_OFFER_ROW),
+                            )
+                        }
+                        // Pro Base Plan US
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_PLAN_US, YEARLY_PRO_PLAN_US)) -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_PLAN_US),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_PLAN_US),
+                            )
+                        }
+                        // Pro Base Plan ROW
+                        subscriptionOffers.keys.containsAll(listOf(MONTHLY_PRO_PLAN_ROW, YEARLY_PRO_PLAN_ROW)) -> {
+                            buildProductForTier(
+                                monthlyOffer = subscriptionOffers.getValue(MONTHLY_PRO_PLAN_ROW),
+                                yearlyOffer = subscriptionOffers.getValue(YEARLY_PRO_PLAN_ROW),
+                            )
+                        }
+                        else -> null
+                    }
+                } else {
+                    null
+                }
+                proProduct?.let { products.add(it) }
+
+                SubscriptionTierOptionsJson(products = products)
             } else {
                 defaultOptions
             }
@@ -398,11 +567,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createSubscriptionTierOptions(
-        productTier: String,
+    private suspend fun buildProductForTier(
         monthlyOffer: SubscriptionOffer,
         yearlyOffer: SubscriptionOffer,
-    ): SubscriptionTierOptionsJson {
+    ): ProductJson {
+        val tier = monthlyOffer.tier.takeUnless { it.isBlank() } ?: yearlyOffer.tier
+
         val tierFeatures = monthlyOffer.entitlements.map { entitlement ->
             TierFeatureJson(
                 product = entitlement.product,
@@ -410,17 +580,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             )
         }
 
-        val product = ProductJson(
-            tier = productTier,
+        return ProductJson(
+            tier = tier,
             features = tierFeatures,
             options = listOf(
                 createOptionsJson(yearlyOffer, YEARLY.lowercase()),
                 createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
             ),
-        )
-
-        return SubscriptionTierOptionsJson(
-            products = listOf(product),
         )
     }
 
@@ -540,7 +706,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     sealed class PurchaseStateView {
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
-        data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
+        data class Success(val subscriptionEventData: SubscriptionEventData, val isFreeTrial: Boolean) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
         data object Failure : PurchaseStateView()
@@ -556,6 +722,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val offerId: String?,
             val experimentName: String?,
             val experimentCohort: String?,
+        ) : Command()
+
+        data class SubscriptionChangeSelected(
+            val planId: String,
+            val offerId: String?,
+            val replacementMode: SubscriptionReplacementMode,
         ) : Command()
         data object RestoreSubscription : Command()
         data object GoToITR : Command()

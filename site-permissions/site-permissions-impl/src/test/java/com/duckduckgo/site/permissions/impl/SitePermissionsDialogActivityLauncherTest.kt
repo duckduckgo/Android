@@ -17,14 +17,18 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.app.Activity
+import android.net.Uri
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
@@ -42,6 +46,9 @@ class SitePermissionsDialogActivityLauncherTest {
     private val faviconManager: FaviconManager = mock()
     private val pixel: Pixel = mock()
     private val permissionsGrantedListener: SitePermissionsGrantedListener = mock()
+    private val duckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
+        whenever(it.getHost()).thenReturn("duck.ai")
+    }
 
     private val testee = SitePermissionsDialogActivityLauncher(
         systemPermissionsHelper = systemPermissionsHelper,
@@ -50,6 +57,7 @@ class SitePermissionsDialogActivityLauncherTest {
         pixel = pixel,
         dispatcher = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
+        duckAiHostProvider = duckAiHostProvider,
     )
 
     @Test
@@ -97,5 +105,60 @@ class SitePermissionsDialogActivityLauncherTest {
         )
 
         verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenDuckAiRequestsAudioCaptureAndMicNotGrantedThenRequestsMicPermissionWithoutPersisting() {
+        whenever(systemPermissionsHelper.hasMicPermissionsGranted()).thenReturn(false)
+
+        val activity: Activity = mock()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://duck.ai"))
+
+        testee.askForSitePermission(
+            activity = activity,
+            url = "https://duck.ai",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        // No impression pixel — no dialog shown for duck.ai
+        verifyNoMoreInteractions(pixel)
+        verify(systemPermissionsHelper).requestMultiplePermissions(
+            arrayOf(android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.MODIFY_AUDIO_SETTINGS),
+        )
+    }
+
+    @Test
+    fun whenDuckAiRequestsAudioCaptureAndMicGrantedThenGrantsDirectlyWithoutDialog() {
+        whenever(systemPermissionsHelper.hasMicPermissionsGranted()).thenReturn(true)
+
+        val activity: Activity = mock()
+        val request: PermissionRequest = mock()
+        whenever(request.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+        whenever(request.origin).thenReturn(Uri.parse("https://duck.ai"))
+
+        testee.askForSitePermission(
+            activity = activity,
+            url = "https://duck.ai",
+            tabId = "tabId",
+            permissionsRequested = SitePermissions(
+                autoAccept = emptyList(),
+                userHandled = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            ),
+            request = request,
+            permissionsGrantedListener = permissionsGrantedListener,
+        )
+
+        // No impression pixel — no dialog shown for duck.ai
+        verifyNoMoreInteractions(pixel)
+        // System permission not re-requested (already granted)
+        verify(systemPermissionsHelper, never()).requestMultiplePermissions(com.nhaarman.mockitokotlin2.any())
     }
 }

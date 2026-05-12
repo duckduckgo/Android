@@ -35,8 +35,13 @@ interface FireDialog {
     companion object {
         const val REQUEST_KEY = "FireDialogRequestKey"
         const val RESULT_KEY_EVENT = "event"
+        const val RESULT_KEY_ORIGIN = "origin"
         const val EVENT_ON_SHOW = "onShow"
         const val EVENT_ON_CANCEL = "onCancel"
         const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
+        const val EVENT_CLEAR_WITHOUT_RESTART_STARTED = "onClearWithoutRestartStarted"
+        const val EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE = "onSingleTabClearFinished"
+        const val EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED = "onSingleTabClearFeatureNotSupported"
+        const val EVENT_ON_SINGLE_TAB_CLEAR_ERROR = "onSingleTabClearError"
     }
 }

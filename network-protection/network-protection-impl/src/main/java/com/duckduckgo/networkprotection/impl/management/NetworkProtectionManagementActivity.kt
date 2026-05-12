@@ -49,6 +49,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenWithLaunchPixel
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.VPN_SCREEN
@@ -69,8 +70,8 @@ import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoPar
 import com.duckduckgo.networkprotection.impl.settings.custom_dns.VpnCustomDnsScreen
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -79,6 +80,7 @@ import javax.inject.Inject
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, screenName = "vpn.main")
 @ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class, screenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenWithLaunchPixel::class, screenName = "vpn.main")
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -120,6 +122,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             if (shouldEnable) {
                 checkVPNPermission()
             }
+        }
+
+        intent.getActivityParams(NetworkProtectionManagementScreenWithLaunchPixel::class.java)?.let { params ->
+            viewModel.onLaunchedFromNotification(params.pixelName)
         }
 
         observeViewModel()
@@ -181,9 +187,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.connectionState) {
-            ConnectionState.Connecting -> binding.renderConnectingState()
-            ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
-            ConnectionState.Disconnected -> binding.renderDisconnectedState()
+            Connecting -> binding.renderConnectingState()
+            Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
+            Disconnected -> binding.renderDisconnectedState()
             else -> {}
         }
 
@@ -372,7 +378,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
             is Command.ShowUnifiedFeedback -> globalActivityStarter.start(
                 this,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
 
             is Command.ShowExcludeAppPrompt -> showExcludeAppDialog()

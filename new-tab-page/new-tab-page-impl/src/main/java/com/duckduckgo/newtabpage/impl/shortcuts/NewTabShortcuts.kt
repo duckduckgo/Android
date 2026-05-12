@@ -32,6 +32,8 @@ import javax.inject.Inject
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
     priority = NewTabPageShortcutPlugin.PRIORITY_AI_CHAT,
+    featureName = "pluginAIChatNewTabShortcutPlugin",
+    parentFeatureName = "pluginPointNewTabPageShortcutPlugin",
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,

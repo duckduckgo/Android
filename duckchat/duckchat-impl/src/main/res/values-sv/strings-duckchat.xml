@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Duck.ai-genvägar</string>
     <string name="duck_ai_shortcut_settings_description">Välj vilka Duck.ai-genvägar du vill visa</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Placering av reglage i ny flik</string>
+    <string name="duckAiDefaultTogglePositionSearch">Sökning</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Senast använt</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Röstsökning</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Duck.ai i inställningarna för AI-funktioner.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Sammanfatta denna sida</string>
+    <string name="duckAIContextualAutomaticContextTitle">Skicka sidinnehåll automatiskt</string>
+    <string name="duckAIContextualAutomaticContextMessage">Skicka sidinnehåll automatiskt till Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Bifoga sidans innehåll</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Rensa chatt</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Rensa data</string>
+    <string name="duckChatBrowserMenuContentDescription">Fler alternativ</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Röstchatt</string>
 </resources>

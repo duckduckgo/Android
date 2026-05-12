@@ -1,0 +1,640 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.generalsettings.showonapplaunch
+
+import androidx.lifecycle.MutableLiveData
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.autofill.SystemAutofillEngagement
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+
+@RunWith(AndroidJUnit4::class)
+class FirstScreenHandlerImplTest {
+
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
+    private val settingsDataStore: SettingsDataStore = mock()
+    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
+    private lateinit var showOnAppLaunchOptionDataStore: FakeShowOnAppLaunchOptionDataStore
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val duckChat: DuckChat = mock()
+    private val tabRepository: TabRepository = mock()
+    private val systemAutofillEngagement: SystemAutofillEngagement = mock()
+    private val customTabDetector: CustomTabDetector = mock()
+    private val idleReturnToggle: Toggle = mock()
+    private val showOnAppLaunchToggle: Toggle = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
+    private val testScope = coroutineTestRule.testScope
+
+    private lateinit var testee: FirstScreenHandlerImpl
+
+    private val liveSelectedTab = MutableLiveData<TabEntity>()
+
+    @Before
+    fun setup() {
+        showOnAppLaunchOptionDataStore = FakeShowOnAppLaunchOptionDataStore()
+        whenever(androidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(idleReturnToggle)
+        whenever(showOnAppLaunchFeature.self()).thenReturn(showOnAppLaunchToggle)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+        whenever(customTabDetector.isCustomTab()).thenReturn(false)
+        whenever(tabRepository.liveSelectedTab).thenReturn(liveSelectedTab)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee = FirstScreenHandlerImpl(
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
+            showOnAppLaunchFeature = showOnAppLaunchFeature,
+            settingsDataStore = settingsDataStore,
+            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            showOnAppLaunchOptionDataStore = showOnAppLaunchOptionDataStore,
+            appBuildConfig = appBuildConfig,
+            duckChat = duckChat,
+            tabRepository = tabRepository,
+            ntpAfterIdleManager = ntpAfterIdleManager,
+            systemAutofillEngagement = systemAutofillEngagement,
+            customTabDetector = customTabDetector,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = testScope,
+        )
+    }
+
+    // --- new-user default is persisted on onOpen when conditions are met ---
+
+    @Test
+    fun whenOnOpenWithIdleReturnEnabledAndNewInstallAndNoOptionThenPersistsNewTabPage() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(NewTabPage, showOnAppLaunchOptionDataStore.optionFlow.firstOrNull())
+    }
+
+    @Test
+    fun whenOnOpenWithIdleReturnDisabledThenDoesNotPersistDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(showOnAppLaunchOptionDataStore.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOnOpenAndNotNewInstallThenDoesNotPersistDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(showOnAppLaunchOptionDataStore.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOnOpenAndOptionAlreadySelectedThenDoesNotOverwrite() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(LastOpenedTab, showOnAppLaunchOptionDataStore.optionFlow.firstOrNull())
+    }
+
+    // --- Idle return enabled (covers both fresh and non-fresh launches) ---
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndFreshLaunchAndElapsedExceedsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndFreshLaunchAndElapsedUnderTimeoutThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndNoTimestampThenDelegatesWithWasIdleFalse() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = false)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenDelegatesWithWasIdleTrue() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val exactlyFiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(exactlyFiveMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndSettingsNullThenUsesDefaultTimeout() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(null)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndSettingsNullAndUnderDefaultTimeoutThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(null)
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndSettingsMalformedThenUsesDefaultTimeout() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("not json")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndDefaultIdleThresholdSecondsMissingThenUsesDefaultTimeout() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"otherKey": 30}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndTimeoutExceededThenDoesNotCheckShowOnAppLaunch() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchToggle, never()).isEnabled()
+    }
+
+    // --- Idle return disabled (legacy ShowOnAppLaunch behavior) ---
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchDisabledThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnDisabledAndNotFreshLaunchThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+        verify(showOnAppLaunchToggle, never()).isEnabled()
+    }
+
+    // --- Voice session active (idle return path) ---
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndVoiceSessionActiveOnDuckAiTabThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
+        whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndNoVoiceSessionOnSelectedTabThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(duckChat.isVoiceChatSessionActive("tab1")).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive("tab2")).thenReturn(true)
+        val selectedTab = TabEntity(tabId = "tab1", url = "https://example.com")
+        whenever(tabRepository.getSelectedTab()).thenReturn(selectedTab)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndNoVoiceSessionActiveThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    // --- Voice session active (legacy fresh launch path) ---
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndVoiceSessionActiveOnDuckAiTabThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        val duckAiTab = TabEntity(tabId = "tab1", url = "https://duck.ai/?mode=voice-mode")
+        whenever(tabRepository.getSelectedTab()).thenReturn(duckAiTab)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndNoVoiceSessionOnSelectedTabThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive("tab1")).thenReturn(false)
+        whenever(duckChat.isVoiceChatSessionActive("tab2")).thenReturn(true)
+        val selectedTab = TabEntity(tabId = "tab1", url = "https://example.com")
+        whenever(tabRepository.getSelectedTab()).thenReturn(selectedTab)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    @Test
+    fun whenIdleReturnDisabledAndFreshLaunchAndShowOnAppLaunchEnabledAndNoVoiceSessionActiveThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
+        whenever(duckChat.isVoiceChatSessionActive(any())).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    // --- Synchronous onIdleReturnTriggered (only on fresh launch when current tab is already an NTP) ---
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabIsNtpThenNotifiesNtpAfterIdleManagerSynchronously() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = true)
+
+        // Called synchronously from onOpen, before any coroutine advances.
+        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenNotFreshLaunchAndIdleAndCurrentTabIsNtpThenDoesNotNotifyNtpAfterIdleManager() {
+        // On plain background+resume (non-fresh) with the same NTP still selected, no new
+        // onNtpShown will fire to consume the pending flag, so triggering would leak the
+        // classification onto the next manually-shown NTP.
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = false)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnEnabledAndIdleAndCurrentTabHasUrlThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "web", url = "https://example.com")
+
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnEnabledAndNoPriorTimestampThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    @Test
+    fun whenFreshLaunchAndIdleReturnDisabledThenDoesNotNotifyNtpAfterIdleManager() {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        liveSelectedTab.value = TabEntity(tabId = "ntp", url = null)
+
+        testee.onOpen(isFreshLaunch = true)
+
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
+    }
+
+    // --- onClose ---
+
+    @Test
+    fun whenOnCloseThenWritesTimestamp() {
+        testee.onClose()
+
+        verify(settingsDataStore).lastSessionBackgroundTimestamp = org.mockito.kotlin.any()
+    }
+
+    @Test
+    fun whenOnCloseThenClearsAutofillIdleReturnFlag() {
+        testee.onClose()
+
+        verify(systemAutofillEngagement).clearIdleReturnTriggered()
+    }
+
+    // --- User preference overrides RC default ---
+
+    @Test
+    fun whenUserPreferenceSetThenIgnoresRCAndUsesUserValue() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 300}""",
+        )
+        // User set 60s; last backgrounded 61s ago → should trigger (61 >= 60)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(60L)
+        val sixtyOneSecondsAgo = System.currentTimeMillis() - (61 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixtyOneSecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenUserPreferenceSetAndUnderUserThresholdThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 300}""",
+        )
+        // User set 60s; RC says 300s; last backgrounded 30s ago → should NOT trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(60L)
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    // --- RC default used directly ---
+
+    @Test
+    fun whenRCDefaultSetThenUsesRCDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 60}""",
+        )
+        // RC default 60s; last backgrounded 61s ago → should trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        val sixtyOneSecondsAgo = System.currentTimeMillis() - (61 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixtyOneSecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenRCDefaultSetAndUnderThresholdThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 120}""",
+        )
+        // RC default 120s; last backgrounded 60s ago → should NOT trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        val sixtySecondsAgo = System.currentTimeMillis() - (60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndIsCustomTabThenDoesNotDelegate() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(customTabDetector.isCustomTab()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = true)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndNoTimestampAndIsCustomTabThenDoesNotDelegate() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
+        whenever(customTabDetector.isCustomTab()).thenReturn(true)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler, never()).handleAfterInactivityOption(wasIdle = false)
+    }
+
+    @Test
+    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutAndIsNotCustomTabThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+        whenever(customTabDetector.isCustomTab()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAfterInactivityOption(wasIdle = true)
+    }
+}

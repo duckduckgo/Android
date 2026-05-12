@@ -56,4 +56,12 @@
         app:trailingIcon="@drawable/ic_open_in_16"
         app:trailingIconTint="?attr/daxColorSecondaryIcon" />
 
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/getDesktopBrowserSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_device_laptop_install_color_24"
+        app:primaryText="@string/getDesktopBrowserSettingItemTitle"
+        app:secondaryText="@string/getDesktopBrowserSettingItemSubtitleTitle" />
+
 </LinearLayout>

@@ -29,7 +29,7 @@ class CachedToggleStoreListenerTest {
 
     private class RecordingListener : CachedToggleStore.Listener {
         val calls = mutableListOf<State>()
-        override fun onToggleStored(newValue: State) {
+        override fun onToggleStored(key: String, newValue: State) {
             calls += newValue
         }
     }
@@ -94,7 +94,7 @@ class CachedToggleStoreListenerTest {
     @Test
     fun `listener exceptions are swallowed and do not break writes`() {
         val throwing = object : CachedToggleStore.Listener {
-            override fun onToggleStored(newValue: State) {
+            override fun onToggleStored(key: String, newValue: State) {
                 throw RuntimeException("boom")
             }
         }
@@ -178,7 +178,7 @@ class CachedToggleStoreListenerTest {
         lateinit var unsubscribe: () -> Unit
         val listener = object : CachedToggleStore.Listener {
             var calls = 0
-            override fun onToggleStored(newValue: State) {
+            override fun onToggleStored(key: String, newValue: State) {
                 calls++
                 unsubscribe()
             }
@@ -199,7 +199,7 @@ class CachedToggleStoreListenerTest {
         val l1 = RecordingListener()
         lateinit var unsub2: () -> Unit
         val l2 = object : CachedToggleStore.Listener {
-            override fun onToggleStored(newValue: State) {
+            override fun onToggleStored(key: String, newValue: State) {
                 unsub2()
             }
         }
@@ -223,7 +223,7 @@ class CachedToggleStoreListenerTest {
         val l2 = RecordingListener()
         lateinit var unsub1: () -> Unit
         val remover = object : CachedToggleStore.Listener {
-            override fun onToggleStored(newValue: State) {
+            override fun onToggleStored(key: String, newValue: State) {
                 unsub1()
             }
         }

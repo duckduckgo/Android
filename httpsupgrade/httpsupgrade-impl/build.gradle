@@ -18,12 +18,13 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    anvil project(':anvil-compiler')
+    ksp project(':anvil-ksp')
     implementation project(':anvil-annotations')
     implementation project(':app-build-config-api')
     implementation project(':library-loader-api')
@@ -34,6 +35,7 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':httpsupgrade-api')
     implementation project(':httpsupgrade-store')
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.room.runtime
     implementation Google.dagger

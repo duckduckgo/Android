@@ -38,8 +38,8 @@ interface VpnStore {
     fun dismissNotifyMeInAppTp()
     fun isNotifyMeInAppTpDismissed(): Boolean
 
-    fun dismissPproUpsellBanner()
-    fun isPproUpsellBannerDismised(): Boolean
+    fun dismissSubscriptionUpsellBanner()
+    fun isSubscriptionUpsellBannerDismised(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -99,11 +99,11 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_NOTIFY_ME_IN_APP_TP_DISMISSED, false)
     }
 
-    override fun dismissPproUpsellBanner() {
+    override fun dismissSubscriptionUpsellBanner() {
         preferences.edit { putBoolean(KEY_PPRO_UPSELL_BANNER_DISMISSED, true) }
     }
 
-    override fun isPproUpsellBannerDismised(): Boolean {
+    override fun isSubscriptionUpsellBannerDismised(): Boolean {
         return preferences.getBoolean(KEY_PPRO_UPSELL_BANNER_DISMISSED, false)
     }
 

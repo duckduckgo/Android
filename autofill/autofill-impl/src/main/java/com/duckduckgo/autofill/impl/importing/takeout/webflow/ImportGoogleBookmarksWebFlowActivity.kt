@@ -42,7 +42,7 @@ import javax.inject.Inject
 data class ImportBookmarksViaGoogleTakeoutScreen(val launchSource: String) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class)
+@ContributeToActivityStarter(ImportBookmarksViaGoogleTakeoutScreen::class, screenName = "importGoogleBookmarks")
 class ImportGoogleBookmarksWebFlowActivity :
     DuckDuckGoActivity(),
     ImportGoogleBookmarksWebFlowFragment.WebViewVisibilityListener {

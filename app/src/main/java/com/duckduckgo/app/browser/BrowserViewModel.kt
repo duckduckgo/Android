@@ -37,8 +37,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -57,6 +55,7 @@ import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_DECLINED_RATING
 import com.duckduckgo.app.pixels.AppPixelName.APP_RATING_DIALOG_USER_GAVE_RATING
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -69,6 +68,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -79,9 +79,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -103,12 +106,23 @@ class BrowserViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
-    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
-    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel(), CoroutineScope {
+
+    init {
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
+            tabRepository.flowSelectedTab
+                .map { tab -> tab?.let { it.tabId to it.url.isNullOrBlank() } }
+                .distinctUntilChanged()
+                .filter { it?.second == true }
+                .onEach { ntpAfterIdleManager.onNtpShown() }
+                .launchIn(viewModelScope)
+        }
+    }
 
     override val coroutineContext: CoroutineContext
         get() = dispatchers.main()
@@ -413,14 +427,6 @@ class BrowserViewModel @Inject constructor(
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
             tabRepository.select(tabId)
-        }
-    }
-
-    fun handleShowOnAppLaunchOption() {
-        if (showOnAppLaunchFeature.self().isEnabled()) {
-            viewModelScope.launch {
-                showOnAppLaunchOptionHandler.handleAppLaunchOption()
-            }
         }
     }
 

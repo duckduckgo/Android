@@ -35,6 +35,7 @@ import javax.inject.Inject
 
 class PirMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
+    private val pirScript: PirCssScriptLoader,
 ) : JsMessaging {
     private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build() }
     private val handlers = listOf(
@@ -63,7 +64,7 @@ class PirMessagingInterface @Inject constructor(
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, PIRScriptConstants.SCRIPT_FEATURE_NAME)
+        this.webView.addJavascriptInterface(this, pirScript.javascriptInterface)
     }
 
     @JavascriptInterface
@@ -102,8 +103,8 @@ class PirMessagingInterface @Inject constructor(
     }
 
     override val context: String = PIRScriptConstants.SCRIPT_CONTEXT_NAME
-    override val callbackName: String = "messageCallback"
-    override val secret: String = "messageSecret"
+    override val callbackName: String = pirScript.callbackName
+    override val secret: String = pirScript.secret
     override val allowedDomains: List<String> = emptyList()
 
     inner class BrokerProtectionMessageHandler() : JsMessageHandler {

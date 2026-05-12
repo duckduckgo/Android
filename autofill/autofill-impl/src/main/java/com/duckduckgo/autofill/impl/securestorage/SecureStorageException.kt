@@ -28,4 +28,5 @@ sealed class SecureStorageException : Exception() {
         override val message: String,
         override val cause: Throwable? = null,
     ) : SecureStorageException()
+    data class KeyAlreadyExistsException(override val message: String) : SecureStorageException()
 }

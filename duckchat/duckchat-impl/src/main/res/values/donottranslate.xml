@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2025 DuckDuckGo
+  ~ Copyright (c) 2026 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,12 +15,45 @@
   -->
 
 <resources>
+    <string name="duckAiNativeInputFieldTitle">Native Input Field</string>
+    <string name="duckAiNativeInputFieldMessage">Use the native input field for Duck.ai</string>
+    <string name="input_screen_user_pref_without_ai_updated">Search only</string>
+    <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
+    <string name="duckAiChatSearchDuckDuckGo">Search DuckDuckGo</string>
+    <string name="native_input_chat_hint">Ask anything privately…</string>
 
-    <!-- Duck.ai Contextual Bottom Sheet -->
-    <string name="duckAIContextualPromptSummarize">Summarize this Page</string>
-    <string name="duckAIContextualPromptExplain">Explain in simpler terms</string>
-    <string name="duckAIContextualPromptSuggest">Suggest related articles to explore</string>
-    <string name="duckAIContextualAutomaticContextTitle">Automatically Send Context</string>
-    <string name="duckAIContextualAutomaticContextMessage">Automatically send context to Duck.ai</string>
+    <!-- Model Picker -->
+    <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
+    <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
+    <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
+
+    <!-- Duck.ai voice microphone foreground service notification -->
+    <string name="duckAiVoiceNotificationTitle">Duck.ai Voice Chat Active</string>
+    <string name="duckAiVoiceNotificationMessage">Microphone is in use by Duck.ai</string>
+    <string name="duckAiVoiceNotificationChannelName">Duck.ai Voice Chat</string>
+    <string name="duckAiVoiceNotificationActionOpenChat">Open chat</string>
+    <string name="duckAiVoiceNotificationActionEndSession">End session</string>
+
+    <!-- Start chat icon content description -->
+    <string name="duckChatStartChatContentDescription">Start chat</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">You can only attach %1$d images at a time.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">You can only attach %1$d images per conversation.</string>
+
+    <!-- duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">You\'ve got this!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="duckAiEndCtaButton">High five!</string>
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">File exceeds the maximum size of %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">One of the files attached has more pages than we support. Please upload files with %1$d pages or fewer.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">The attached files exceed the total size limit of %1$dMB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Upload a file</string>
 
 </resources>

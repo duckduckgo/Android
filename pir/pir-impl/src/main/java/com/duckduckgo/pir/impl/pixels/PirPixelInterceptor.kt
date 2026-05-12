@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -30,16 +31,35 @@ import javax.inject.Inject
 )
 class PirPixelInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        return if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
+            val newUrl = originalRequest.url.newBuilder()
+                .addQueryParameter(KEY_MANUFACTURER, normalizedManufacturer())
+                .build()
+            val newRequest = originalRequest.newBuilder().url(newUrl).build()
+            chain.proceed(newRequest)
+        } else {
+            chain.proceed(originalRequest)
+        }
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
 
         val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
             chain.request().url.newBuilder()
                 .addQueryParameter(
-                    KEY_MAN,
-                    appBuildConfig.manufacturer,
+                    KEY_MANUFACTURER,
+                    normalizedManufacturer(),
                 ).build()
         } else {
             chain.request().url
@@ -48,17 +68,47 @@ class PirPixelInterceptor @Inject constructor(
         return chain.proceed(request.url(url).build())
     }
 
+    private fun normalizedManufacturer(): String {
+        val raw = appBuildConfig.manufacturer.lowercase()
+        return if (raw in COMMON_MANUFACTURERS) raw else OTHER_MANUFACTURER
+    }
+
     override fun getInterceptor(): Interceptor = this
 
     companion object {
-        private const val KEY_MAN = "man"
+        private const val KEY_MANUFACTURER = "manufacturer"
+        private const val OTHER_MANUFACTURER = "other"
+        private val COMMON_MANUFACTURERS = setOf(
+            "samsung",
+            "google",
+            "xiaomi",
+            "huawei",
+            "honor",
+            "oneplus",
+            "oppo",
+            "vivo",
+            "motorola",
+            "realme",
+            "sony",
+            "lg",
+            "nokia",
+            "lenovo",
+            "asus",
+        )
         private val ALLOWLIST = listOf(
             "m_dbp_foreground-run_started",
             "m_dbp_foreground-run_completed",
+            "m_dbp_foreground-run_start-failed",
+            "m_dbp_foreground-run_low-memory",
             "m_dbp_scheduled-run_started",
             "m_dbp_scheduled-run_completed",
             "m_dbp_email-confirmation_started",
             "m_dbp_email-confirmation_completed",
+            "m_dbp_initial-scan_incomplete",
+            "m_dbp_initial_scan_duration",
+            "wide_pir-initial-scan",
+            "wide_pir-scheduled-scan",
+            "wide_pir-time-to-first-scan-complete",
         )
     }
 }

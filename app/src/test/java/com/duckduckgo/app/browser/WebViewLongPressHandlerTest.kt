@@ -104,9 +104,10 @@ class WebViewLongPressHandlerTest {
         // Show "Download Image" and "Open Image in Background Tab"
         verifyDownloadImageMenuOptionsAdded()
         verifyImageMenuOpenInTabOptionsAdded()
-        // Options not shown: "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Options not shown: "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Copy Link Text", "Share Link"
         verifyLinkMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOtherOptionsNotAdded()
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -114,10 +115,11 @@ class WebViewLongPressHandlerTest {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         // Show "Download Image"
         verifyDownloadImageMenuOptionsAdded()
-        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Copy Link Text", "Share Link"
         verifyImageMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOtherOptionsNotAdded()
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -126,10 +128,11 @@ class WebViewLongPressHandlerTest {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         // Show "Download Image"
         verifyDownloadImageMenuOptionsAdded()
-        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Copy Link Text", "Share Link"
         verifyImageMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOtherOptionsNotAdded()
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -141,6 +144,8 @@ class WebViewLongPressHandlerTest {
         verifyImageMenuOpenInTabOptionsAdded()
         verifyLinkMenuOpenInTabOptionsAdded()
         verifyLinkMenuOtherOptionsAdded()
+        // "Copy Link Text" not shown for image anchor type
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -148,10 +153,11 @@ class WebViewLongPressHandlerTest {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         // Show "Download Image"
         verifyDownloadImageMenuOptionsAdded()
-        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Copy Link Text", "Share Link"
         verifyImageMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOtherOptionsNotAdded()
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -159,10 +165,11 @@ class WebViewLongPressHandlerTest {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         // Show "Download Image"
         verifyDownloadImageMenuOptionsAdded()
-        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Copy Link Text", "Share Link"
         verifyImageMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOtherOptionsNotAdded()
+        verifyCopyLinkTextMenuOptionNotAdded()
     }
 
     @Test
@@ -177,10 +184,17 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
+    fun whenUserLongPressesWithAnchorTypeAndHttpsThenCopyLinkTextOptionAdded() {
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verifyCopyLinkTextMenuOptionAdded()
+    }
+
+    @Test
     fun whenUserLongPressesWithAnchorTypeAndDataUrlThenCorrectOptionsAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
-        // Show "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        // Show "Open In New Tab", "Open in Background Tab", "Copy Link Text", "Copy Link Address", "Share Link"
         verifyLinkMenuOpenInTabOptionsAdded()
+        verifyCopyLinkTextMenuOptionAdded()
         verifyLinkMenuOtherOptionsAdded()
         // Options not shown: "Download Image", "Open Image in Background Tab"
         verifyDownloadImageMenuOptionsNotAdded()
@@ -188,15 +202,29 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
+    fun whenUserLongPressesWithAnchorTypeAndDataUrlThenCopyLinkTextOptionAdded() {
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        verifyCopyLinkTextMenuOptionAdded()
+    }
+
+    @Test
     fun whenInCustomTabAndUserLongPressesWithAnchorTypeAndHttpsThenCorrectOptionsAddedToMenu() {
         whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
         testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        // Show "Copy Link Address", "Share Link"
+        // Show "Copy Link Text", "Copy Link Address", "Share Link"
+        verifyCopyLinkTextMenuOptionAdded()
         verifyLinkMenuOtherOptionsAdded()
         // Options not shown: "Download Image", "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab"
         verifyDownloadImageMenuOptionsNotAdded()
         verifyImageMenuOpenInTabOptionsNotAdded()
         verifyLinkMenuOpenInTabOptionsNotAdded()
+    }
+
+    @Test
+    fun whenInCustomTabAndUserLongPressesWithAnchorTypeAndDataUrlThenCopyLinkTextOptionAdded() {
+        whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        verifyCopyLinkTextMenuOptionAdded()
     }
 
     @Test
@@ -326,6 +354,14 @@ class WebViewLongPressHandlerTest {
             anyInt(),
             eq(R.string.shareLink),
         )
+    }
+
+    private fun verifyCopyLinkTextMenuOptionAdded() {
+        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyLinkText))
+    }
+
+    private fun verifyCopyLinkTextMenuOptionNotAdded() {
+        verify(mockMenu, never()).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyLinkText))
     }
 
     private fun verifyMenuNotAltered() {

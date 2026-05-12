@@ -34,7 +34,7 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
     override fun getUrl(subCategory: SubscriptionFeedbackSubCategory): String {
         return when (subCategory) {
             is SubscriptionFeedbackVpnSubCategory -> getVPNUrl(subCategory)
-            is SubscriptionFeedbackSubsSubCategory -> getSubsUrl()
+            is SubscriptionFeedbackSubsSubCategory -> getSubsUrl(subCategory)
             is SubscriptionFeedbackPirSubCategory -> getPirUrl(subCategory)
             is SubscriptionFeedbackItrSubCategory -> getItrUrl(subCategory)
             is SubscriptionFeedbackDuckAiSubCategory -> getDuckAiSubCategoryUrl(subCategory)
@@ -56,7 +56,12 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
         }
     }
 
-    private fun getSubsUrl(): String = HELP_PAGE_PPRO_PAYMENT
+    private fun getSubsUrl(subCategory: SubscriptionFeedbackSubsSubCategory): String {
+        return when (subCategory) {
+            SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES -> HELP_PAGE_PPRO_ACTIVATING
+            else -> HELP_PAGE_PPRO_PAYMENT
+        }
+    }
 
     private fun getVPNUrl(subcategory: SubscriptionFeedbackVpnSubCategory): String {
         return when (subcategory) {
@@ -74,6 +79,7 @@ class RealFeedbackHelpUrlProvider @Inject constructor(
     }
 
     companion object {
+        private const val HELP_PAGE_PPRO_ACTIVATING = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/activating"
         private const val HELP_PAGE_PPRO_PAYMENT = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/payments/"
         private const val HELP_PAGE_PPRO_VPN_TROUBLESHOOTING = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/troubleshooting/"
         private const val HELP_PAGE_PPRO_VPN = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"

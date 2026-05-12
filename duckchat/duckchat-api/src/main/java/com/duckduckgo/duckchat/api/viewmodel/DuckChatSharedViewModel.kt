@@ -33,6 +33,12 @@ class DuckChatSharedViewModel() : ViewModel() {
         }
     }
 
+    fun onContextualFireButtonClicked() {
+        viewModelScope.launch {
+            _command.send(Command.LaunchContextualChatFire)
+        }
+    }
+
     fun onTabSwitcherClicked() {
         viewModelScope.launch {
             _command.send(Command.LaunchTabSwitcher)
@@ -53,6 +59,7 @@ class DuckChatSharedViewModel() : ViewModel() {
 
     sealed class Command {
         object LaunchFire : Command()
+        object LaunchContextualChatFire : Command()
         object LaunchTabSwitcher : Command()
         data class SearchRequested(val query: String) : Command()
         data class OpenTab(val tabId: String) : Command()

@@ -219,5 +219,15 @@ class TypographyFragment : Fragment() {
                 color = DuckDuckGoTheme.colors.text.destructive,
             )
         }
+
+        // Onboarding Title
+        view.setupThemedComposeView(id = R.id.compose_onboarding_title, isDarkTheme = isDarkTheme) {
+            DaxText(text = "Onboarding Title", style = DuckDuckGoTheme.typography.onboardingTitle)
+        }
+
+        // Onboarding Body
+        view.setupThemedComposeView(id = R.id.compose_onboarding_body, isDarkTheme = isDarkTheme) {
+            DaxText(text = "Onboarding Body", style = DuckDuckGoTheme.typography.onboardingBody)
+        }
     }
 }

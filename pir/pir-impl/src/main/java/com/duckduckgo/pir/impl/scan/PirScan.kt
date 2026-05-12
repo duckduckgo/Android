@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
@@ -56,6 +57,8 @@ interface PirScan {
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        onJobCompleted: (suspend () -> Unit)? = null,
+        onScanJobsResolved: (suspend (Int) -> Unit)? = null,
     ): Result<Unit>
 
     /**
@@ -116,6 +119,7 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -126,6 +130,8 @@ class RealPirScan @Inject constructor(
         jobRecords: List<ScanJobRecord>,
         context: Context,
         runType: RunType,
+        onJobCompleted: (suspend () -> Unit)?,
+        onScanJobsResolved: (suspend (Int) -> Unit)?,
     ) = withContext(dispatcherProvider.io()) {
         logcat { "PIR-SCAN: Running scan on the following records: $jobRecords on ${Thread.currentThread().name}" }
         onJobStarted()
@@ -136,12 +142,14 @@ class RealPirScan @Inject constructor(
         val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-SCAN: No active brokers here." }
+            onScanJobsResolved?.invoke(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
+            onScanJobsResolved?.invoke(0)
             completeScan(runType)
             return@withContext Result.success(Unit)
         }
@@ -150,6 +158,7 @@ class RealPirScan @Inject constructor(
 
         val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
         logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
+        onScanJobsResolved?.invoke(processedJobRecords.size)
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-SCAN: No job records." }
@@ -180,6 +189,7 @@ class RealPirScan @Inject constructor(
                     logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
                     runners[index].start(profile, listOf(step))
                     runners[index].stop()
+                    onJobCompleted?.invoke()
                     logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
                 }
             }
@@ -233,13 +243,14 @@ class RealPirScan @Inject constructor(
         allSteps.forEach { (profileQuery, step) ->
             logcat { "PIR-SCAN: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
             runners[0].startOn(webView, profileQuery, listOf(step))
-            runners[0].stop()
+            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
             logcat { "PIR-SCAN: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
         }
 
         logcat { "PIR-SCAN: Debug scan completed for all profiles" }
 
         onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
@@ -298,6 +309,7 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ) {
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
+        webViewDataCleaner.cleanWebViewData()
         emitScanCompletedPixel(
             runType,
         )
@@ -397,6 +409,7 @@ class RealPirScan @Inject constructor(
         }
         runners.clear()
         onJobStopped()
+        webViewDataCleaner.cleanWebViewData()
     }
 
     private suspend fun emitScanStartPixel(runType: RunType) {

@@ -33,33 +33,35 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.impl.R.*
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PLUS
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.PRO
+import com.duckduckgo.subscriptions.impl.SubscriptionTier.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.switch_plan.SwitchPlanBottomSheetDialogFactory
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SwitchPlanType
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import kotlinx.coroutines.flow.filterIsInstance
@@ -79,9 +81,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
-
-    @Inject
-    lateinit var switchPlanDialogFactory: SwitchPlanBottomSheetDialogFactory
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
@@ -129,6 +128,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToPurchasePage()
         }
 
+        binding.viewAllPlansTop.setClickListener {
+            goToPlansPage()
+        }
+
+        binding.upgradeToProContainer.setOnClickListener {
+            goToUpgradeToProPage()
+        }
+
         binding.privacyPolicy.setOnClickListener {
             goToPrivacyPolicy()
         }
@@ -141,7 +148,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     private fun goToFeedback() {
         globalActivityStarter.start(
             this,
-            PrivacyProFeedbackScreenWithParams(
+            SubscriptionFeedbackScreenWithParams(
                 feedbackSource = SUBSCRIPTION_SETTINGS,
             ),
         )
@@ -158,10 +165,17 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setPrimaryText(getString(string.privacyProFaq))
         binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
 
+        // Reset all tier-related views to default hidden state
+        // This ensures proper state when transitioning between tiers or subscription states
+        binding.tierName.isVisible = false
+        binding.viewAllPlansTop.isVisible = false
+        binding.upgradeToProContainer.isVisible = false
+        binding.verticalTierDivider.isVisible = false
+        binding.pendingDowngradeInfoPanel.gone()
+
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
-            binding.switchPlan.isVisible = false
             binding.subscriptionActiveStatusContainer.isVisible = false
             binding.subscriptionExpiredStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusText.text = getString(string.subscriptionsExpiredData, viewState.date)
@@ -171,19 +185,29 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
-            // Show switch plan option if available (Android only)
-            if (viewState.switchPlanAvailable && viewState.platform.lowercase() == "google") {
-                binding.switchPlan.show()
-                val switchText = when (viewState.duration) {
-                    Monthly -> getString(string.subscriptionSettingSwitchUpgradeDynamic, viewState.savingsPercentage.toString())
-                    Yearly -> getString(string.subscriptionSettingSwitchDowngrade)
+            if (viewState.isProTierEnabled) {
+                val tier = viewState.subscriptionTier
+
+                binding.tierName.isVisible = true
+                binding.verticalTierDivider.isVisible = true
+                binding.viewAllPlansTop.isVisible = true
+                when (tier) {
+                    PRO -> {
+                        binding.tierName.text = getString(string.tierProName)
+                        binding.tierName.setTypography(DaxTextView.Typography.Body2Bold)
+                    }
+
+                    PLUS -> {
+                        binding.tierName.text = getString(string.tierPlusName)
+                        binding.tierName.setTypography(DaxTextView.Typography.Body2)
+                        binding.upgradeToProContainer.isVisible = true
+                    }
+
+                    UNKNOWN -> {
+                        // In case of unknown tier, we hide the pill
+                        binding.tierName.gone()
+                    }
                 }
-                binding.switchPlan.setPrimaryText(switchText)
-                binding.switchPlan.setClickListener {
-                    viewModel.onSwitchPlanClicked(viewState.duration)
-                }
-            } else {
-                binding.switchPlan.gone()
             }
 
             // Free Trial active
@@ -199,8 +223,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
                 binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
 
-                // Active status without a Free Trial
-            } else {
+                // Override with pending plan message if there's a deferred change
+                showPendingPlanMessageIfPresent(viewState)
+            } else { // Active status without a Free Trial
                 binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusSubscribed)
 
                 val status = when (viewState.status) {
@@ -214,6 +239,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
 
                 binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
+
+                // Override with pending plan message if there's a deferred change
+                showPendingPlanMessageIfPresent(viewState)
             }
 
             when (viewState.platform.lowercase()) {
@@ -233,7 +261,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 else -> {
                     binding.changePlan.setClickListener {
                         pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                        val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
+                        val productSKU = if (viewState.subscriptionTier == PRO) {
+                            ADVANCED_SUBSCRIPTION
+                        } else {
+                            BASIC_SUBSCRIPTION
+                        }
+                        val url = String.format(URL, productSKU, applicationContext.packageName)
                         val intent = Intent(Intent.ACTION_VIEW)
                         intent.setData(Uri.parse(url))
                         startActivity(intent)
@@ -297,21 +330,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
-
-            is ShowSwitchPlanDialog -> showSwitchPlanDialog(command.switchType)
         }
-    }
-
-    private fun showSwitchPlanDialog(switchType: SwitchPlanType) {
-        val dialog = switchPlanDialogFactory.create(
-            context = this,
-            lifecycleOwner = this,
-            switchType = switchType,
-            onSwitchSuccess = {
-                viewModel.onSwitchPlanSuccess()
-            },
-        )
-        dialog.show()
     }
 
     private fun goToFaqs() {
@@ -343,6 +362,24 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun goToPlansPage() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.plansUrl,
+            ),
+        )
+    }
+
+    private fun goToUpgradeToProPage() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.upgradeToProUrl,
+            ),
+        )
+    }
+
     private fun goToEditEmail() {
         globalActivityStarter.start(
             this,
@@ -370,6 +407,37 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 screenTitle = getString(string.privacyPolicyAndTermsOfService),
             ),
         )
+    }
+
+    private fun showPendingPlanMessageIfPresent(viewState: ViewState.Ready) {
+        if (viewState.pendingPlanDisplayNameResId != null && viewState.pendingEffectiveDate != null) {
+            val changeTypeString = if (viewState.isPendingDowngrade == true) {
+                string.subscriptionPendingPlanChangeDowngrade
+            } else {
+                string.subscriptionPendingPlanChangeUpgrade
+            }
+            val pendingPlanDisplayName = getString(viewState.pendingPlanDisplayNameResId)
+            binding.changePlan.setSecondaryText(
+                getString(changeTypeString, pendingPlanDisplayName, viewState.pendingEffectiveDate),
+            )
+            if (viewState.isPendingDowngrade == true &&
+                viewState.pendingTierNameResId != null &&
+                viewState.pendingEffectiveDateShort != null
+            ) {
+                binding.pendingDowngradeInfoPanel.show()
+                binding.pendingDowngradeInfoPanel.setText(
+                    getString(
+                        string.subscriptionPendingPlanChangeDowngradePanel,
+                        getString(viewState.pendingTierNameResId),
+                        viewState.pendingEffectiveDateShort,
+                    ),
+                )
+            } else {
+                binding.pendingDowngradeInfoPanel.gone()
+            }
+        } else {
+            binding.pendingDowngradeInfoPanel.gone()
+        }
     }
 
     companion object {

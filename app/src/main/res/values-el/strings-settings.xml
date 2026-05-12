@@ -18,4 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="showExperimentalBrowserMenu">Πειραματικό μενού προγράμματος περιήγησης</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">Μετά από αδράνεια</string>
+    <string name="afterInactivityTimeoutRowTitle">Επιλέξτε ένα χρονόμετρο αδράνειας</string>
+    <string name="afterInactivityScreenSectionHeader">Επιλέξτε τι θα βλέπετε όταν επιστρέφετε μετά από αδράνεια</string>
+    <string name="afterInactivityOptionMessage" instruction="&apos;%1$s&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;after 5 minutes of inactivity&apos;">Επιλέξτε τι θα βλέπετε όταν επιστρέφετε μετά από %1$s λεπτά αδράνειας.</string>
+    <string name="afterInactivityTimeoutAlways">Πάντα</string>
+    <string name="afterInactivityTimeout1Minute">1 λεπτό</string>
+    <string name="afterInactivityTimeoutXMinutes" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of minutes, e.g. &apos;5 minutes&apos;">%1$d λεπτά</string>
+    <string name="afterInactivityTimeout1Hour">1 ώρα</string>
+    <string name="afterInactivityTimeoutXHours" instruction="&apos;%1$d&apos; is a placeholder and will be replaced with the number of hours, e.g. &apos;2 hours&apos;">%1$d ώρες</string>
 </resources>

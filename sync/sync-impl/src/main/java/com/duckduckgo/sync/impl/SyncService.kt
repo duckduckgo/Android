@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
+import okhttp3.RequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
@@ -80,12 +81,6 @@ interface SyncService {
         @Body request: EncryptedMessage,
     ): Call<Void>
 
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
-    fun patch(
-        @Header("Authorization") token: String,
-        @Body request: JSONObject,
-    ): Call<JSONObject>
-
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
@@ -114,6 +109,19 @@ interface SyncService {
     fun deleteAiChats(
         @Header("Authorization") token: String,
         @Query("until") until: String,
+    ): Call<JSONObject>
+
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
+    fun patchData(
+        @Header("Authorization") token: String,
+        @Body body: JSONObject,
+    ): Call<JSONObject>
+
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun patchChats(
+        @Header("Authorization") token: String,
+        @Body body: RequestBody,
+        @Query("since") since: String? = null,
     ): Call<JSONObject>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")

@@ -286,7 +286,7 @@ class BrokerActionFailedEventHandlerTest {
     }
 
     @Test
-    fun whenScanNonExpectationActionFailedThenFailsImmediately() = runTest {
+    fun whenScanNonExpectationActionFailedThenRetryOnce() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -311,10 +311,10 @@ class BrokerActionFailedEventHandlerTest {
 
         val result = testee.invoke(state, event)
 
-        val nextEvent = result.nextEvent as BrokerStepCompleted
-        assertEquals(false, nextEvent.needsEmailConfirmation)
-        val stepStatus = nextEvent.stepStatus as Failure
-        assertEquals(testError, stepStatus.error)
+        assertEquals(0, result.nextState.currentActionIndex)
+        assertEquals(1, result.nextState.actionRetryCount)
+        val nextEvent = result.nextEvent as ExecuteBrokerStepAction
+        assertEquals(testProfileQuery, (nextEvent.actionRequestData as PirScriptRequestData.UserProfile).userProfile)
     }
 
     @Test

@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.settings.impl
 
 import androidx.room.*
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import kotlinx.coroutines.flow.*
 
 @Dao

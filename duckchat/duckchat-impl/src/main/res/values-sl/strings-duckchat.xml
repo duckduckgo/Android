@@ -48,6 +48,12 @@
     <string name="duck_ai_shortcut_settings_title">Bližnjice do Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Izberite, katere bližnjice do Duck.ai naj bodo prikazane</string>
 
+    <!-- Default Toggle Position -->
+    <string name="duckAiDefaultTogglePositionTitle" instruction="&apos;Toggle&apos; refers to the UI tab switcher component (Search/Duck.ai), not the verb &apos;to toggle&apos;.">Preklop položaja za nov zavihek</string>
+    <string name="duckAiDefaultTogglePositionSearch">Iskanje</string>
+    <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
+    <string name="duckAiDefaultTogglePositionLastUsed">Nazadnje uporabljeno</string>
+
     <!-- Duck AI Voice Search Shortcut Setting -->
     <string name="duckAiVoiceSearchVisibilitySetting">Glasovno iskanje</string>
 
@@ -93,4 +99,20 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Omogočite v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>
+    <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
+    <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Počisti klepet</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Počisti podatke</string>
+    <string name="duckChatBrowserMenuContentDescription">Več možnosti</string>
+
+    <!-- Duck AI Voice Chat Shortcut Setting -->
+    <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Glasovni klepet</string>
 </resources>

@@ -28,6 +28,12 @@
         <item quantity="one">Ditt bokmärke för %1$s kan inte synkroniseras eftersom ett av dess fält överskrider teckengränsen.</item>
         <item quantity="other">Dina bokmärken för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Sök bokmärken</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lägg till mapp</string>
+    <string name="bookmarksMenuContentDescription">Fler alternativ</string>
+    <string name="newTabFavoritesToggleContentDescription">Växla synlighet för favoriter</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importera från Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Välj bokmärkesfil …</string>
     <string name="bookmarksImportDialogClose">Stäng</string>
+
 </resources>

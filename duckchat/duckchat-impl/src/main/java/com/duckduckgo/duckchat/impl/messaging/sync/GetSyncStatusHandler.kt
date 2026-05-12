@@ -19,8 +19,8 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -36,6 +36,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class GetSyncStatusHandler @Inject constructor(
     private val syncStatusHelper: SyncStatusHelper,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -72,7 +73,7 @@ class GetSyncStatusHandler @Inject constructor(
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
+                    duckAiHostProvider.getHost(),
                 )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME

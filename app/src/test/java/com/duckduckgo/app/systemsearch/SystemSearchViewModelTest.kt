@@ -51,10 +51,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.*
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
@@ -99,6 +97,7 @@ class SystemSearchViewModelTest {
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
         whenever(mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(false))
 
         testee = SystemSearchViewModel(
             mockDuckAiFeatureState,
@@ -850,6 +849,40 @@ class SystemSearchViewModelTest {
                 issuedCommand,
             )
         }
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and digital assist enabled and duck chat enabled then LaunchDuckAiVoiceChat command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        testee.onDigitalAssistOpened(mock())
+
+        verify(commandObserver).onChanged(Command.LaunchDuckAiVoiceChat)
+        verify(mockPixel).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and duck chat disabled then LaunchAssistSearch command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        val intent = mock<Intent>()
+
+        testee.onDigitalAssistOpened(intent)
+
+        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
+    }
+
+    @Test
+    fun `when onDigitalAssistOpened and kill switch disabled then LaunchAssistSearch command sent`() = runTest {
+        whenever(mockDuckAiFeatureState.allowDuckAiAsDigitalAssistant).thenReturn(MutableStateFlow(false))
+        val intent = mock<Intent>()
+
+        testee.onDigitalAssistOpened(intent)
+
+        verify(commandObserver).onChanged(Command.LaunchAssistSearch(intent))
+        verify(mockPixel, never()).fire(AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED)
     }
 
     companion object {

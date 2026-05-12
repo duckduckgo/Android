@@ -48,6 +48,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -175,7 +176,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
         whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Success(true))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
@@ -190,7 +191,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsError() = runTest {
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -205,7 +206,7 @@ class SyncConnectViewModelTest {
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
         whenever(syncRepository.parseSyncAuthCode(jsonConnectKeyEncoded)).thenReturn(Connect(ConnectCode(jsonConnectKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = CONNECT_FAILED.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = CONNECT_FAILED.code))
 
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)

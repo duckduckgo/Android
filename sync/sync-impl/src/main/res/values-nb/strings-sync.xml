@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Dette oppretter en kryptert sikkerhetskopi av bokmerkene, passordene og Duck.ai-chattene dine på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheter. \n\n Krypteringsnøkkelen lagres bare på enheten din. DuckDuckGo har ikke tilgang til den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisere med de andre enhetene dine senere.</string>
     <string name="sync_intro_enable_cta">Slå på Synkronisering og sikkerhetskopiering</string>
-    <string name="sync_intro_recover_title">Gjenopprett synkroniserte data</string>
-    <string name="sync_intro_recover_content">For å gjenopprette synkroniserte data trenger du gjenopprettingskoden du lagret, da du først satte opp synkronisering. Denne koden kan ha blitt lagret som en PDF-fil på enheten du opprinnelig brukte til å sette opp synkronisering.</string>
-    <string name="sync_intro_recover_cta">Kom i gang</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Gjenopprett synkroniserte data</string>
+    <string name="sync_recover_synced_data_content">Du trenger gjenopprettingskoden du fikk, da du konfigurerte Sync &amp; Backup. Du kan ha lagret den som en PDF på enheten du brukte.</string>
+    <string name="sync_recover_synced_data_cta">Gjenopprett synkroniserte data</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skann QR-kode</string>
@@ -174,8 +175,8 @@
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Vil du slette serverdata?</string>
-    <string name="sync_delete_server_data_dialog_content">Alle enheter blir frakoblet og dine synkroniserte data blir slettet fra serveren.</string>
-    <string name="sync_delete_server_data_dialog_primary_button">Slett data</string>
+    <string name="sync_delete_server_data_dialog_content">Sikkerhetskopien din blir slettet fra serveren. Alle enheter blir koblet fra synkronisering, men ingenting blir slettet fra noen enhet.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Slett serverdata</string>
     <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
 
     <!-- Sync feature promo -->
@@ -215,4 +216,29 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synkroniser bokmerker mellom enheter</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Skjul</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Skaff deg nettleseren for datamaskin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac og Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Gjenoppretting</string>
+    <string name="sync_settings_download_recovery_code_item">Last ned gjenopprettingskoden som PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Bruk denne koden til å gjenopprette dataene dine hvis du mister tilgang til denne enheten. Oppbevar den på et trygt sted.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-data kan ikke gjenopprettes etter 18 måneder med inaktivitet. <annotation type="learn_more_link">Finn ut mer</annotation></string>
+
+    <!-- Previous Session Ready Screen -->
+    <string name="sync_previous_session_ready_title">Vil du gjenopprette Sync &amp; Backup-data fra forrige installasjon?</string>
+    <string name="sync_previous_session_ready_body">Gjenopprett for å få tilbake tidligere bokmerker, passord og andre data i DuckDuckGo.</string>
+    <string name="sync_previous_session_ready_resume_cta">Gjenopprett Sync &amp; Backup</string>
+    <string name="sync_previous_session_ready_continue_cta">Sett opp ny synkronisering</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Gjenopprett dataene dine enkelt</string>
+    <string name="sync_recover_data_content">Bruk denne koden til å gjenopprette dataene dine hvis du mister tilgang til enheten. Sync &amp; Backup-data kan ikke gjenopprettes etter 18 måneder med inaktivitet.</string>
+    <string name="sync_recover_data_recovery_code_label">Gjenopprettingskode</string>
+    <string name="sync_recover_data_download_pdf">Last ned som PDF</string>
+    <string name="sync_restore_on_reinstall_title">Gjenopprett ved ny appinstallasjon</string>
+    <string name="sync_restore_on_reinstall_description">Hvis du installerer DuckDuckGo-appen på nytt, spør vi deg om du vil gjenopprette dataene dine på denne enheten.</string>
 </resources>
