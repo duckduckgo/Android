@@ -330,6 +330,15 @@ interface AndroidBrowserConfigFeature {
     fun sendPageLoadWideEvent(): Toggle
 
     /**
+     * Controls whether post-idle session wide events are sent.
+     * @return `true` when the remote config has the global "sendPostIdleSessionWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPostIdleSessionWideEvent(): Toggle
+
+    /**
      * Controls whether page content is cached in Room for each tab.
      * @return `true` when the remote config has the global "storePageContext" androidBrowserConfig
      * sub-feature flag enabled

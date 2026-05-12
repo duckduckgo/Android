@@ -24,6 +24,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isGone
@@ -61,6 +62,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
@@ -68,6 +70,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
@@ -122,6 +125,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
+    @Inject
+    lateinit var hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin>
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -141,6 +147,16 @@ class NewTabPageView @JvmOverloads constructor(
 
     private var lastSelectedMode: InputMode? = null
     private var logoAnimator: ValueAnimator? = null
+
+    private var pageEngagedFiredForCurrentAttachment = false
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.actionMasked == MotionEvent.ACTION_DOWN && !pageEngagedFiredForCurrentAttachment) {
+            pageEngagedFiredForCurrentAttachment = true
+            hatchInteractionsPlugins.getPlugins().forEach { it.onNtpEngaged() }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -165,6 +181,8 @@ class NewTabPageView @JvmOverloads constructor(
         conflatedChatModeJob += inputModeState.displayedMode
             .onEach { mode -> updateLogoForMode(mode) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
+        pageEngagedFiredForCurrentAttachment = false
 
         disableViewStateSaving()
     }
