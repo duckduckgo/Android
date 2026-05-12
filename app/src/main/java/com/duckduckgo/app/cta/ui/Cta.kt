@@ -26,6 +26,7 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.ContextThemeWrapper
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
@@ -35,6 +36,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -886,6 +888,21 @@ sealed class OnboardingDaxDialogCta(
             hiddenTitle.text = titleView.text
             applyTitleSlotVisibility(container, titleView)
             applyBackground(container)
+            applyOptionsContentHeight(container)
+        }
+
+        private fun applyOptionsContentHeight(container: View) {
+            if (activeIncludeId != R.id.contextualBrandDesignOptionsContent) return
+            val resources = container.resources
+            val capHeight = resources.getBoolean(R.bool.capContextualOptionsHeight)
+            container.findViewById<View>(R.id.contextualBrandDesignOptionsContent)
+                ?.updateLayoutParams {
+                    height = if (capHeight) {
+                        resources.getDimensionPixelSize(R.dimen.contextualOptionsCappedHeight)
+                    } else {
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    }
+                }
         }
 
         /**
