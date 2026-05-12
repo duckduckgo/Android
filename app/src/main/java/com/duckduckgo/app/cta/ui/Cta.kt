@@ -116,7 +116,6 @@ interface OnboardingDaxCta {
         onTypingAnimationFinished: () -> Unit,
         onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)? = null,
         onDismissCtaClicked: () -> Unit,
-        instantShow: Boolean = false,
     )
 
     fun hideOnboardingCta(binding: FragmentBrowserTabBinding)
@@ -230,7 +229,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -270,7 +268,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -336,7 +333,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -394,7 +390,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -432,7 +427,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
 
@@ -471,7 +465,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingInContextDaxDialog
@@ -538,7 +531,6 @@ sealed class OnboardingDaxDialogCta(
             onTypingAnimationFinished: () -> Unit,
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
-            instantShow: Boolean,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -683,6 +675,25 @@ sealed class OnboardingDaxDialogCta(
         }
 
         override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
+        ) {
+            showOnboardingCta(
+                binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+                onSuggestedOptionClicked = onSuggestedOptionClicked,
+                onDismissCtaClicked = onDismissCtaClicked,
+                instantShow = false,
+            )
+        }
+
+        fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,

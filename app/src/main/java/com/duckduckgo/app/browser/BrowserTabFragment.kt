@@ -5888,7 +5888,9 @@ class BrowserTabFragment :
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
-                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration, instantShow = instantShow)
+                is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
+                    showOnboardingDialogCta(configuration, instantShow = instantShow)
+                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
         }
@@ -5973,61 +5975,66 @@ class BrowserTabFragment :
         }
 
         @SuppressLint("ClickableViewAccessibility")
-        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta, instantShow: Boolean = false) {
+        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideNewTab()
-            if (configuration is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
-                    disableTransitionType(LayoutTransition.APPEARING)
-                    disableTransitionType(LayoutTransition.DISAPPEARING)
-                }
-                // Both layouts live in the tree; only one should be visible at a time.
-                daxDialogInContext.root.gone()
-                configuration.showOnboardingCta(
-                    binding = binding,
-                    onPrimaryCtaClicked = { viewModel.onUserClickCtaOkButton(configuration) },
-                    onSecondaryCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
-                    // The base class invokes onTypingAnimationSettled exactly once.
-                    // CTA-type-specific notifications (e.g. DaxTrackersBlocked) live on the
-                    // subclass override, not on the fragment.
-                    onTypingAnimationFinished = { viewModel.onOnboardingDaxTypingAnimationFinished() },
-                    onSuggestedOptionClicked = { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
-                    onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
-                    instantShow = instantShow,
-                )
-            } else {
-                // Brand-design path disables APPEARING/DISAPPEARING on this container; the legacy
-                // path expects them enabled, so restore here. The CTA type itself is the VM-derived
-                // signal of which mode we're in.
-                binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
-                    enableTransitionType(LayoutTransition.APPEARING)
-                    enableTransitionType(LayoutTransition.DISAPPEARING)
-                }
-                // Both layouts live in the tree; only one should be visible at a time.
-                daxDialogInContextBrandDesign.root.gone()
-                val onTypingAnimationFinished =
-                    if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-                        { viewModel.onOnboardingDaxTypingAnimationFinished() }
-                    } else {
-                        {}
-                    }
-                val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
-                    if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                        { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
-                    } else {
-                        null
-                    }
-                configuration.showOnboardingCta(
-                    binding,
-                    { viewModel.onUserClickCtaOkButton(configuration) },
-                    { viewModel.onUserClickCtaSecondaryButton(configuration) },
-                    onTypingAnimationFinished,
-                    onSuggestedOptionsSelected,
-                    {
-                        viewModel.onUserClickCtaDismissButton(configuration)
-                    },
-                    instantShow = false,
-                )
+            // Brand-design path disables APPEARING/DISAPPEARING on this container; the legacy
+            // path expects them enabled, so restore here in case the previous CTA was brand-design.
+            binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
+                enableTransitionType(LayoutTransition.APPEARING)
+                enableTransitionType(LayoutTransition.DISAPPEARING)
             }
+            // Both layouts live in the tree; only one should be visible at a time.
+            daxDialogInContextBrandDesign.root.gone()
+            val onTypingAnimationFinished =
+                if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                    { viewModel.onOnboardingDaxTypingAnimationFinished() }
+                } else {
+                    {}
+                }
+            val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
+                if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+                } else {
+                    null
+                }
+            configuration.showOnboardingCta(
+                binding,
+                { viewModel.onUserClickCtaOkButton(configuration) },
+                { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                onTypingAnimationFinished,
+                onSuggestedOptionsSelected,
+                {
+                    viewModel.onUserClickCtaDismissButton(configuration)
+                },
+            )
+            viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
+            viewModel.onCtaShown()
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun showOnboardingDialogCta(
+            configuration: OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta,
+            instantShow: Boolean = false,
+        ) {
+            hideNewTab()
+            binding.daxDialogOnboardingCtaContent.layoutTransition.apply {
+                disableTransitionType(LayoutTransition.APPEARING)
+                disableTransitionType(LayoutTransition.DISAPPEARING)
+            }
+            // Both layouts live in the tree; only one should be visible at a time.
+            daxDialogInContext.root.gone()
+            configuration.showOnboardingCta(
+                binding = binding,
+                onPrimaryCtaClicked = { viewModel.onUserClickCtaOkButton(configuration) },
+                onSecondaryCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
+                // The base class invokes onTypingAnimationSettled exactly once.
+                // CTA-type-specific notifications (e.g. DaxTrackersBlocked) live on the
+                // subclass override, not on the fragment.
+                onTypingAnimationFinished = { viewModel.onOnboardingDaxTypingAnimationFinished() },
+                onSuggestedOptionClicked = { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
+                onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
+                instantShow = instantShow,
+            )
             viewModel.setOnboardingDialogBackground(appTheme.isLightModeEnabled())
             if (!instantShow) {
                 viewModel.onCtaShown()
