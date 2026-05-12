@@ -219,6 +219,30 @@ class InlinePdfHandlerTest {
         )
     }
 
+    @Test
+    fun whenUrlIsDataUriThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("data:application/pdf;base64,JVBERi0xLjQK", null, "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("file:///sdcard/doc.pdf", null, "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenUrlIsContentSchemeThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("content://media/external/file/doc.pdf", null, "application/pdf"),
+        )
+    }
+
     // endregion
 
     // region feature flag tests
