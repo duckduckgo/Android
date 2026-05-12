@@ -126,6 +126,9 @@ sealed interface LinearOnboardingTransition {
 ```
 
 **Design notes**
+- **Plan construction is synchronous and privacy-config-independent.** `LaunchViewModel` reads the freshly-built plan at launch to route to the right host without waiting on async setup. Flag and experiment reads move into each step's `suspend precondition`, evaluated lazily when the orchestrator is about to advance to that step — same current production flow, no staleness regression.
+- **The orchestrator is decoupled from concrete steps.** Dialog and event types live with the plan provider and hosts in `:app`. `:onboarding-api` describes only the state machine. Adding, removing, or varying steps doesn't touch the API contract.
+
 - The primary `LinearOnboardingPlan` is built **synchronously at app launch**, so `LaunchViewModel` can route to the right host (e.g. `OnboardingActivity` vs `BrowserActivity`) without waiting on async setup. To make this synchronous, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behaviour: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` or its model are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside of the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
 
@@ -304,3 +307,100 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
     )
 }
 ```
+
+### Renderer adapter and fragment wiring
+
+`BrandDesignUpdatePageViewModel` is the renderer adapter: it observes orchestrator state and translates it into UI-shaped surfaces the fragment renders, and it translates fragment callbacks into concrete `OnboardingEvent`s that go back to the orchestrator. The fragment only knows about `IsolatedOnboardingDialog` and `Command` — it never sees the orchestrator directly.
+
+```kotlin
+// in :app
+@ContributesViewModel(FragmentScope::class)
+class BrandDesignUpdatePageViewModel @Inject constructor(
+    private val orchestrator: LinearOnboardingOrchestrator,
+    private val planProvider: LinearOnboardingPlanProvider,
+    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
+    /* … */
+) : ViewModel() {
+
+    // Dialog the fragment renders. Derived from orchestrator state via the
+    // :app-side IsolatedStep#resolveDialog() hook.
+    private val _dialogState = MutableStateFlow<IsolatedOnboardingDialog?>(null)
+    val dialogState: StateFlow<IsolatedOnboardingDialog?> = _dialogState
+
+    // Transient non-dialog signals (Finish, OnboardingSkipped, RequestNotificationPermissions, …)
+    private val _commands = Channel<Command>(1, DROP_OLDEST)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
+
+    init {
+        if (orchestratorFeature.self().isEnabled()) {
+            observeOrchestratorState()
+        } else {
+            // legacy in-VM state machine path (unchanged)
+        }
+    }
+
+    private fun observeOrchestratorState() {
+        orchestrator.state.onEach { state ->
+            when (state) {
+                is InProgress -> {
+                    val step = state.currentStep as? IsolatedStep ?: return@onEach
+                    _dialogState.value = step.resolveDialog()
+                }
+                Completed -> { _dialogState.value = null; _commands.send(Command.Finish) }
+                Skipped   -> { _dialogState.value = null; _commands.send(Command.OnboardingSkipped) }
+                NotStarted -> _dialogState.value = null
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    // Fragment callbacks → concrete events → orchestrator
+    fun onPrimaryCtaClicked()                                 = orchestrator.onEvent(OnboardingEvent.PrimaryClicked)
+    fun onSecondaryCtaClicked()                               = orchestrator.onEvent(OnboardingEvent.SecondaryClicked)
+    fun onOmnibarTypeSelected(type: OmnibarType)              = orchestrator.onEvent(OnboardingEvent.OmnibarTypeSelected(type))
+    fun onInputModeSelected(withAi: Boolean)                  = orchestrator.onEvent(OnboardingEvent.InputModeSelected(withAi))
+    fun onDefaultBrowserSet()                                 = orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
+    fun onDefaultBrowserNotSet()                              = orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+
+    // Called once by the fragment after onCreate. Kicks off the plan.
+    fun startOnboarding() = orchestrator.startOnboardingPlan(planProvider.buildMainPlan())
+}
+```
+
+Fragment side: a `dialogState` observer for what's currently visible, and a slimmer `commands` observer for transient signals. The fragment dispatches on `IsolatedOnboardingDialog` once, with special-case rendering for non-dax dialogs:
+
+```kotlin
+// in :app
+class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.dialogState.flowWithLifecycle(lifecycle, STARTED).onEach { dialog ->
+            dialog?.let { configureDaxCta(it) }
+        }.launchIn(lifecycleScope)
+
+        viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { command ->
+            when (command) {
+                Command.Finish                         -> onContinuePressed()
+                Command.OnboardingSkipped              -> onSkipPressed()
+                Command.RequestNotificationPermissions -> requestNotificationsPermissions()
+                /* … other transient signals … */
+            }
+        }.launchIn(lifecycleScope)
+
+        viewModel.startOnboarding()  // idempotent — orchestrator no-ops if already InProgress
+    }
+
+    private fun configureDaxCta(dialog: IsolatedOnboardingDialog) {
+        when (dialog) {
+            is IsolatedOnboardingDialog.IntroAnimation -> playIntroAnimation { viewModel.onPrimaryCtaClicked() }
+            is IsolatedOnboardingDialog.DefaultBrowser -> startActivityForResult(dialog.intent, REQ_DEFAULT_BROWSER_ROLE)
+            else -> renderDaxDialog(dialog)
+        }
+    }
+}
+```
+
+The full event loop in one trace:
+
+> Fragment renders `Initial` dialog → user taps primary → fragment calls `viewModel.onPrimaryCtaClicked()` → viewmodel sends `OnboardingEvent.PrimaryClicked` to `orchestrator.onEvent()` → orchestrator looks up `currentStep`, calls its `transition()`, gets `Advance` back → orchestrator walks the plan, lands on the next eligible step → state flow emits new `InProgress(currentPlan, currentStepIndex)` → viewmodel resolves the new step's dialog and updates `_dialogState` → fragment renders the next dialog. None of this touches the orchestrator-impl with anything domain-specific.
