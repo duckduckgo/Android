@@ -828,6 +828,7 @@ class BrowserTabViewModelTest {
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
             whenever(mockQueryUrlPredictor.isReady()).thenReturn(true)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
@@ -9569,6 +9570,37 @@ class BrowserTabViewModelTest {
             assertEquals(expectedEvent.featureName, emittedEvent.featureName)
             assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
             assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenDuckChatHistoryAndAvailableThenNativeHistoryOpened() = runTest {
+        whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(true)
+
+        testee.openDuckChatHistory()
+
+        verify(mockDuckChat).openDuckChatHistory()
+        verify(mockDuckChatJSHelper, never()).onNativeAction(NativeAction.SIDEBAR)
+    }
+
+    @Test
+    fun whenOpenDuckChatHistoryAndUnavailableThenSidebarFallbackEmitted() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = "event1",
+            subscriptionName = "subscription1",
+            params = JSONObject(),
+        )
+        whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
+        whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
+
+        testee.openDuckChatHistory()
+
+        verify(mockDuckChat, never()).openDuckChatHistory()
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+            assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
             cancelAndIgnoreRemainingEvents()
         }
     }

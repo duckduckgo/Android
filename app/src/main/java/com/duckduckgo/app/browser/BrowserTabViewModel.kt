@@ -1220,6 +1220,8 @@ class BrowserTabViewModel @Inject constructor(
             refreshOnViewVisible.emit(true)
         }
 
+        refreshShowDuckChatHistoryOption()
+
         // Send pending auth update if returning to duck.ai after subscription change (e.g., after purchase flow)
         // ensures we emit the event even if the WebView was paused
         if (pendingDuckChatAuthUpdate) {
@@ -3207,6 +3209,7 @@ class BrowserTabViewModel @Inject constructor(
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
             val showDuckChat = duckAiFeatureState.showPopupMenuShortcut.value
+            val showDuckChatHistory = duckChat.isChatHistoryAvailable()
 
             withContext(dispatchers.main()) {
                 browserViewState.value =
@@ -3214,6 +3217,7 @@ class BrowserTabViewModel @Inject constructor(
                         addToHomeVisible = addToHomeSupported,
                         showAutofill = showAutofill,
                         showDuckChatOption = showDuckChat,
+                        showDuckChatHistoryOption = showDuckChatHistory,
                     )
             }
         }
@@ -5168,6 +5172,26 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
             _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
+    fun openDuckChatHistory() {
+        viewModelScope.launch {
+            if (duckChat.isChatHistoryAvailable()) {
+                duckChat.openDuckChatHistory()
+            } else {
+                val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
+                _subscriptionEventDataChannel.send(subscriptionEvent)
+            }
+        }
+    }
+
+    private fun refreshShowDuckChatHistoryOption() {
+        viewModelScope.launch {
+            val available = duckChat.isChatHistoryAvailable()
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(showDuckChatHistoryOption = available)
+            }
         }
     }
 

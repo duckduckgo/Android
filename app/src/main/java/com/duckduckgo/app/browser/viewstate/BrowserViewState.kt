@@ -59,6 +59,7 @@ data class BrowserViewState(
     val maliciousSiteBlocked: Boolean = false,
     val maliciousSiteStatus: MaliciousSiteStatus? = null,
     val showDuckChatOption: Boolean = false,
+    val showDuckChatHistoryOption: Boolean = false,
     val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
     val currentPdfCachedUri: Uri? = null,

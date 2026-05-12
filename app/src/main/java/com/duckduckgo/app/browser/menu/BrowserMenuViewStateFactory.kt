@@ -26,6 +26,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -50,6 +51,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val duckChat: DuckChat,
 ) : BrowserMenuViewStateFactory {
     override fun create(
         omnibarViewMode: Omnibar.ViewMode,
@@ -101,6 +103,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     ): BrowserMenuViewState.NewTabPage {
         return BrowserMenuViewState.NewTabPage(
             showDuckChatOption = browserViewState.showDuckChatOption,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             vpnMenuState = browserViewState.vpnMenuState,
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             showAutofill = browserViewState.showAutofill,
@@ -137,6 +140,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
             showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
             canSharePage = browserViewState.canSharePage,
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,

@@ -41,7 +41,9 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
+import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.history.ChatHistoryActivity
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarOptionBottomSheetDialogFactory
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarSelection
@@ -177,6 +179,11 @@ interface DuckChatInternal : DuckChat {
      * Opens DuckChat with a new session.
      */
     fun openNewDuckChatSession()
+
+    /**
+     * Opens Duck.ai with [chatId] pre-loaded.
+     */
+    fun openWithChatId(chatId: String)
 
     /**
      * Calls onClose when a close event is emitted.
@@ -369,6 +376,7 @@ class RealDuckChat @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
     private val appBuildConfig: AppBuildConfig,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     DuckChatInputModeState,
@@ -811,6 +819,22 @@ class RealDuckChat @Inject constructor(
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
+    override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
+        isEnabled() &&
+            duckChatFeature.useNativeStorageChatData().isEnabled() &&
+            duckAiChatHistoryFeature.self().isEnabled() &&
+            duckAiChatHistoryFeature.historyScreen().isEnabled()
+    }
+
+    override fun openDuckChatHistory() {
+        val intent = Intent(context, ChatHistoryActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+        context.startActivity(intent)
+    }
+
+    override fun openWithChatId(chatId: String) {
+        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId))
+    }
+
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }
@@ -966,6 +990,7 @@ class RealDuckChat @Inject constructor(
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
+        private const val CHAT_ID_QUERY_NAME = "chatID"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"

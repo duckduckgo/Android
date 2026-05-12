@@ -24,6 +24,8 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
@@ -53,6 +55,9 @@ interface DuckAiChatStore {
     /** Returns all chats currently in the native store. Skips entries with malformed JSON or missing chatId. */
     suspend fun getChats(): List<DuckAiChat>
 
+    /** Reactive equivalent of [getChats]. Re-emits on insert/update/delete via Room's Flow contract. */
+    fun getChatsFlow(): Flow<List<DuckAiChat>>
+
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
 
@@ -77,6 +82,9 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun getChats(): List<DuckAiChat> =
         withContext(dispatchers.io()) { chatsDao.getAll().mapNotNull { it.toDuckAiChat() } }
+
+    override fun getChatsFlow(): Flow<List<DuckAiChat>> =
+        chatsDao.getAllAsFlow().map { entities -> entities.mapNotNull { it.toDuckAiChat() } }
 
     override suspend fun deleteChat(chatId: String): Boolean =
         withContext(dispatchers.io()) {

@@ -245,7 +245,7 @@ class BrowserMenuBottomSheet(
         )
         fireproofWebsiteMenuItem.label(fireproofLabel)
         fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fireproof_solid_24 else drawable.ic_fireproof_24)
-        duckChatHistoryMenuItem.isVisible = false
+        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
@@ -310,7 +310,7 @@ class BrowserMenuBottomSheet(
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
         downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
-        duckChatHistoryMenuItem.isVisible = false
+        duckChatHistoryMenuItem.isVisible = viewState.showDuckChatHistoryOption
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
