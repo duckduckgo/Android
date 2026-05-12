@@ -1,0 +1,106 @@
+// Wide event pixel for the post-idle session journey (NTP and LUT after idle return)
+// Tracks the full session from "surface shown" to terminal outcome to measure whether the
+// NTP-after-idle hatch reduces friction for new searches vs Last Used Tab.
+{
+    "wide_post_idle_session": {
+        "description": "Captures a post-idle session — NTP (with hatch) or LUT shown after an idle return — from surface shown to terminal user action or app background.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["post_idle_session"]
+            },
+            {
+                "key": "feature.data.ext.surface",
+                "description": "Which surface was shown to the user after the idle return",
+                "enum": ["ntp", "lut"]
+            },
+            {
+                "key": "feature.data.ext.status_reason",
+                "description": "Terminal outcome that ended the session",
+                "enum": ["bar_used", "return_to_page_tapped", "tab_switcher_selected", "favorite_selected", "app_backgrounded"]
+            },
+            {
+                "key": "feature.data.ext.session_duration_ms_bucketed",
+                "description": "Duration from surface_shown to session end, bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.time_to_first_interaction_ms_bucketed",
+                "description": "Duration from surface_shown to the first non-terminal interaction (page_engaged, toggle_used, or back_pressed), bucketed (lower end of bucket, in ms)",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.page_engaged",
+                "description": "User touched the page content during the session (NTP body or WebView)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.toggle_used",
+                "description": "User switched between search and Duck.ai modes during the session",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.back_pressed",
+                "description": "User pressed back at least once during the session",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.surface_shown",
+                "description": "Parameter present when the session starts (always true)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_engaged",
+                "description": "Parameter present when the page_engaged step fired during the session",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.toggle_used",
+                "description": "Parameter present when the toggle_used step fired during the session",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.back_pressed",
+                "description": "Parameter present when the back_pressed step fired during the session",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.bar_used",
+                "description": "Parameter present when the terminal step was bar_used (user submitted a query)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.return_to_page_tapped",
+                "description": "Parameter present when the terminal step was return_to_page_tapped (NTP only)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.tab_switcher_selected",
+                "description": "Parameter present when the terminal step was tab_switcher_selected",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.favorite_selected",
+                "description": "Parameter present when the terminal step was favorite_selected (NTP only)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.app_backgrounded",
+                "description": "Parameter present when the terminal step was app_backgrounded (cancelled outcome)",
+                "type": "boolean"
+            }
+        ]
+    }
+}
