@@ -109,4 +109,15 @@
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
+
+    <!--Onboarding Reinstall Quick Setup-->
+    <string name="preOnboardingReinstallQuickSetupTitle">Welcome back!&lt;br/&gt;Want to customize anything?</string>
+    <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
+    <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add home screen widget</string>
+    <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
+    <string name="preOnboardingReinstallAddressBarTop">Top</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
+    <string name="preOnboardingReinstallAddressBarSearchOptionsValue">Search and Duck.ai</string>
+    <string name="preOnboardingReinstallEditAction">Edit</string>
+    <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
 </resources>

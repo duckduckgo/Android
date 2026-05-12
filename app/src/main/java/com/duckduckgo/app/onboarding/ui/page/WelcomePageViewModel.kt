@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -295,6 +296,9 @@ class WelcomePageViewModel @Inject constructor(
                     _commands.send(Finish)
                 }
             }
+
+            QUICK_SETUP -> {
+            }
         }
     }
 
@@ -340,6 +344,10 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN_PREVIEW -> {
+                // no-op
+            }
+
+            QUICK_SETUP -> {
                 // no-op
             }
         }
@@ -399,6 +407,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             INPUT_SCREEN_PREVIEW -> {
                 // no pixel yet
+            }
+
+            QUICK_SETUP -> {
             }
         }
     }

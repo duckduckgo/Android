@@ -44,7 +44,15 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         if (rootView.height == 0) return false
         if (isInScrollableContainer(dialogView, rootView)) return true
 
-        val dialogWidthSpec = View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        // Prefer the dialog's actual laid-out width with EXACTLY: AT_MOST lets some inner
+        // ConstraintLayouts (e.g. ADS OneLineListItem with its Barrier + match-constraint text)
+        // collapse to a narrow wrap_content width, which makes text reflow tall and explodes
+        // measuredHeight. Fall back to AT_MOST root.width only when the dialog isn't laid out yet.
+        val dialogWidthSpec = if (dialogView.width > 0) {
+            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
+        } else {
+            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        }
         val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         dialogView.measure(dialogWidthSpec, dialogHeightSpec)
 
@@ -79,7 +87,11 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         if (rootView.height == 0) return null
         if (isInScrollableContainer(dialogView, rootView)) return maxHeightPx
 
-        val dialogWidthSpec = View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        val dialogWidthSpec = if (dialogView.width > 0) {
+            View.MeasureSpec.makeMeasureSpec(dialogView.width, View.MeasureSpec.EXACTLY)
+        } else {
+            View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        }
         val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         dialogView.measure(dialogWidthSpec, dialogHeightSpec)
 

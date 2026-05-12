@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdatePageViewModel.Command
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -87,6 +88,9 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
+    private val mockOnboardingQuickSetupToggles: OnboardingQuickSetupToggles = FakeFeatureToggleFactory.create(
+        OnboardingQuickSetupToggles::class.java,
+    )
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -102,6 +106,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
             mockDuckAiOnboardingExperimentManager,
+            mockOnboardingQuickSetupToggles,
         )
     }
 
