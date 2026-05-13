@@ -38,6 +38,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
@@ -72,6 +73,7 @@ class TabDataRepository @Inject constructor(
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val nativeInputStateProvider: MutableNativeInputStateProvider,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -338,6 +340,7 @@ class TabDataRepository @Inject constructor(
         }
         siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
+        nativeInputStateProvider.clearTab(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -365,6 +368,7 @@ class TabDataRepository @Inject constructor(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             duckChatContextualDataStore.clearTabChatUrl(tabId)
+            nativeInputStateProvider.clearTab(tabId)
         }
     }
 
@@ -430,6 +434,7 @@ class TabDataRepository @Inject constructor(
             }
         }
         tabVisitedSitesRepository.clearTab(tabId)
+        nativeInputStateProvider.clearTab(tabId)
     }
 
     override suspend fun deleteAll() {
@@ -442,6 +447,7 @@ class TabDataRepository @Inject constructor(
         siteData.clear()
         duckChatContextualDataStore.clearAll()
         tabVisitedSitesRepository.clearAll()
+        nativeInputStateProvider.clearAll()
     }
 
     override suspend fun getSelectedTab(): TabEntity? =

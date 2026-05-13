@@ -43,6 +43,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -108,6 +109,8 @@ class TabDataRepositoryTest {
     private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
 
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
+
+    private val mockNativeInputStateProvider: MutableNativeInputStateProvider = mock()
 
     @After
     fun after() {
@@ -756,6 +759,16 @@ class TabDataRepositoryTest {
         }
         verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
         verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
+        verify(mockNativeInputStateProvider).clearTab(TAB_ID)
+    }
+
+    @Test
+    fun whenDeleteAllThenNativeInputStateCleared() = runTest {
+        val testee = tabDataRepository()
+
+        testee.deleteAll()
+
+        verify(mockNativeInputStateProvider).clearAll()
     }
 
     private fun tabDataRepository(
@@ -771,6 +784,7 @@ class TabDataRepositoryTest {
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
+        nativeInputStateProvider: MutableNativeInputStateProvider = mockNativeInputStateProvider,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -796,6 +810,7 @@ class TabDataRepositoryTest {
             tabManagerFeatureFlags,
             contextualDataStore,
             tabVisitedSitesRepository,
+            nativeInputStateProvider,
         )
     }
 

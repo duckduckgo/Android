@@ -149,6 +149,27 @@ class RealNativeInputStateProviderTest {
     }
 
     @Test
+    fun whenClearAllThenDisplayedStateResetsToZero() {
+        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
+
+        testee.clearAll()
+
+        assertEquals(NativeInputState.zero(), testee.displayedState.value)
+    }
+
+    @Test
+    fun whenClearAllThenAllPerTabEntriesDropped() {
+        testee.setActiveTab("tab-1", structural())
+        testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
+        testee.update("tab-2") { copy(selectedModelId = "claude-3") }
+
+        testee.clearAll()
+
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-1").value)
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-2").value)
+    }
+
+    @Test
     fun whenClearedTabIsRequestedAgainThenZero() {
         testee.setActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }

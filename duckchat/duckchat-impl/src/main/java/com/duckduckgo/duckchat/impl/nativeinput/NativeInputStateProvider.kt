@@ -86,4 +86,10 @@ interface MutableNativeInputStateProvider {
      * [NativeInputState.zero].
      */
     fun clearTab(tabId: String)
+
+    /**
+     * Drops every in-memory per-tab entry and resets [NativeInputStateProvider.displayedState]
+     * to [NativeInputState.zero]. Call when all tabs are wiped (e.g. fire button).
+     */
+    fun clearAll()
 }

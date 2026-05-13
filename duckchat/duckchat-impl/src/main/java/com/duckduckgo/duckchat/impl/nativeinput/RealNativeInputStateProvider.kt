@@ -78,6 +78,12 @@ class RealNativeInputStateProvider @Inject constructor(
         }
     }
 
+    override fun clearAll() {
+        tabFlows.clear()
+        activeTabId = null
+        _displayedState.value = NativeInputState.zero()
+    }
+
     private fun flowFor(tabId: String): MutableStateFlow<NativeInputState> =
         tabFlows.getOrPut(tabId) { MutableStateFlow(NativeInputState.zero()) }
 }
