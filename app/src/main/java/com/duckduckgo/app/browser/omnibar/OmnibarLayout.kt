@@ -129,7 +129,6 @@ import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.color.MaterialColors.isColorLight
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -920,8 +919,6 @@ class OmnibarLayout @JvmOverloads constructor(
         renderPulseAnimation(viewState)
 
         renderLeadingIconState(viewState)
-
-        omnibarTextInput.hint = context.getString(R.string.search)
     }
 
     private fun renderDuckAiMode(viewState: ViewState) {
