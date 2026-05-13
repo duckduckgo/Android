@@ -23,6 +23,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -107,6 +108,7 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
+    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
     private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -153,6 +155,7 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
             subscriptionPromoCtaShownPlugins = mockSubscriptionPromoCtaShownPlugins,
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
+            duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
         )
     }
 
