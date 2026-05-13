@@ -16,26 +16,35 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealNativeInputStateProviderTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val duckAiChatStore: DuckAiChatStore = mock()
     private lateinit var testee: RealNativeInputStateProvider
 
     @Before
     fun setUp() {
-        testee = RealNativeInputStateProvider(duckAiChatStore)
+        testee = RealNativeInputStateProvider(duckAiChatStore, TestScope(coroutineRule.testDispatcher))
     }
 
     @Test

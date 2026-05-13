@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -23,10 +24,14 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import logcat.logcat
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -35,10 +40,12 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, boundType = MutableNativeInputStateProvider::class)
 class RealNativeInputStateProvider @Inject constructor(
     private val duckAiChatStore: DuckAiChatStore,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NativeInputStateProvider,
     MutableNativeInputStateProvider {
 
     private val tabFlows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
+    private val tabLogJobs = ConcurrentHashMap<String, Job>()
     private val _displayedState = MutableStateFlow(NativeInputState.zero())
     override val displayedState: StateFlow<NativeInputState> = _displayedState.asStateFlow()
 
@@ -74,18 +81,31 @@ class RealNativeInputStateProvider @Inject constructor(
 
     override fun clearTab(tabId: String) {
         tabFlows.remove(tabId)
+        tabLogJobs.remove(tabId)?.cancel()
         if (activeTabId == tabId) {
             activeTabId = null
             _displayedState.value = NativeInputState.zero()
         }
+        logcat { "NativeInputState[$tabId] cleared" }
     }
 
     override fun clearAll() {
         tabFlows.clear()
+        tabLogJobs.values.forEach { it.cancel() }
+        tabLogJobs.clear()
         activeTabId = null
         _displayedState.value = NativeInputState.zero()
+        logcat { "NativeInputState cleared all" }
     }
 
     private fun flowFor(tabId: String): MutableStateFlow<NativeInputState> =
-        tabFlows.getOrPut(tabId) { MutableStateFlow(NativeInputState.zero()) }
+        tabFlows.computeIfAbsent(tabId) {
+            val flow = MutableStateFlow(NativeInputState.zero())
+            tabLogJobs[tabId] = appCoroutineScope.launch {
+                flow.collect { state ->
+                    logcat { "NativeInputState[$tabId] -> $state" }
+                }
+            }
+            flow
+        }
 }
