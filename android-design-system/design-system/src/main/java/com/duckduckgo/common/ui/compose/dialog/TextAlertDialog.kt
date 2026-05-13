@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -29,6 +30,16 @@ import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+
+/**
+ * State for the optional checkbox row in [TextAlertDialog].
+ */
+@Immutable
+data class TextAlertDialogCheckboxState(
+    val text: String,
+    val checked: Boolean = false,
+    val onCheckedChange: ((Boolean) -> Unit)? = null,
+)
 
 /**
  * Convenience wrapper around [DaxAlertDialog] for the most common dialog shape: title + optional
@@ -52,31 +63,17 @@ fun TextAlertDialog(
     @DrawableRes headerImage: Int? = null,
     negativeButtonText: String? = null,
     onNegativeClick: (() -> Unit)? = null,
-    checkboxText: String? = null,
-    checkboxChecked: Boolean = false,
-    onCheckboxChanged: ((Boolean) -> Unit)? = null,
+    checkbox: TextAlertDialogCheckboxState? = null,
     cancellable: Boolean = false,
 ) {
     DaxAlertDialog(
         onDismissRequest = onDismissRequest,
         title = title,
         modifier = modifier,
-        message = message?.let {
-            { DaxText(text = it, style = DuckDuckGoTheme.typography.body1, color = DuckDuckGoTheme.textColors.secondary) }
-        },
+        message = messageSlot(message),
         headerImage = headerImage,
         cancellable = cancellable,
-        content = if (checkboxText != null) {
-            {
-                TextAlertDialogCheckbox(
-                    checkboxText = checkboxText,
-                    checkboxChecked = checkboxChecked,
-                    onCheckboxChanged = onCheckboxChanged,
-                )
-            }
-        } else {
-            null
-        },
+        content = checkbox?.let { state -> { TextAlertDialogCheckboxRow(state) } },
         buttons = {
             TextAlertDialogButtons(
                 positiveButtonText = positiveButtonText,
@@ -85,13 +82,11 @@ fun TextAlertDialog(
                     onDismissRequest()
                 },
                 negativeButtonText = negativeButtonText,
-                onNegativeClick = if (onNegativeClick != null) {
+                onNegativeClick = onNegativeClick?.let {
                     {
-                        onNegativeClick()
+                        it()
                         onDismissRequest()
                     }
-                } else {
-                    null
                 },
             )
         },
@@ -112,28 +107,14 @@ internal fun TextAlertDialogContent(
     @DrawableRes headerImage: Int? = null,
     negativeButtonText: String? = null,
     onNegativeClick: (() -> Unit)? = null,
-    checkboxText: String? = null,
-    checkboxChecked: Boolean = false,
-    onCheckboxChanged: ((Boolean) -> Unit)? = null,
+    checkbox: TextAlertDialogCheckboxState? = null,
 ) {
     DaxAlertDialogContent(
         title = title,
         modifier = modifier,
-        message = message?.let {
-            { DaxText(text = it, style = DuckDuckGoTheme.typography.body1, color = DuckDuckGoTheme.textColors.secondary) }
-        },
+        message = messageSlot(message),
         headerImage = headerImage,
-        content = if (checkboxText != null) {
-            {
-                TextAlertDialogCheckbox(
-                    checkboxText = checkboxText,
-                    checkboxChecked = checkboxChecked,
-                    onCheckboxChanged = onCheckboxChanged,
-                )
-            }
-        } else {
-            null
-        },
+        content = checkbox?.let { state -> { TextAlertDialogCheckboxRow(state) } },
         buttons = {
             TextAlertDialogButtons(
                 positiveButtonText = positiveButtonText,
@@ -145,19 +126,27 @@ internal fun TextAlertDialogContent(
     )
 }
 
+private fun messageSlot(text: String?): (@Composable () -> Unit)? =
+    text?.let { messageText -> { DefaultMessage(messageText) } }
+
 @Composable
-private fun TextAlertDialogCheckbox(
-    checkboxText: String,
-    checkboxChecked: Boolean,
-    onCheckboxChanged: ((Boolean) -> Unit)?,
-) {
+private fun DefaultMessage(text: String) {
+    DaxText(
+        text = text,
+        style = DuckDuckGoTheme.typography.body1,
+        color = DuckDuckGoTheme.textColors.secondary,
+    )
+}
+
+@Composable
+private fun TextAlertDialogCheckboxRow(state: TextAlertDialogCheckboxState) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // TODO: replace with DaxCheckbox once the ADS checkbox is migrated to Compose.
         Checkbox(
-            checked = checkboxChecked,
-            onCheckedChange = onCheckboxChanged,
+            checked = state.checked,
+            onCheckedChange = state.onCheckedChange,
             colors = CheckboxDefaults.colors(
                 checkedColor = DuckDuckGoTheme.colors.brand.accentBlue,
                 uncheckedColor = DuckDuckGoTheme.textColors.secondary,
@@ -165,7 +154,7 @@ private fun TextAlertDialogCheckbox(
             ),
         )
         DaxText(
-            text = checkboxText,
+            text = state.text,
             style = DuckDuckGoTheme.typography.body1,
             color = DuckDuckGoTheme.textColors.primary,
         )
@@ -211,9 +200,11 @@ private fun TextAlertDialogWithCheckboxPreview() {
             onPositiveClick = {},
             negativeButtonText = "Cancel",
             onNegativeClick = {},
-            checkboxText = "Don't ask again",
-            checkboxChecked = true,
-            onCheckboxChanged = {},
+            checkbox = TextAlertDialogCheckboxState(
+                text = "Don't ask again",
+                checked = true,
+                onCheckedChange = {},
+            ),
         )
     }
 }
@@ -237,7 +228,7 @@ private fun TextAlertDialogWithImagePreview() {
     PreviewBox {
         TextAlertDialogContent(
             title = "Dialog Title",
-            message = "Header image rendered above the title at 40dp.",
+            message = "Header image rendered above the title at 24dp.",
             positiveButtonText = "Confirm",
             onPositiveClick = {},
             negativeButtonText = "Cancel",

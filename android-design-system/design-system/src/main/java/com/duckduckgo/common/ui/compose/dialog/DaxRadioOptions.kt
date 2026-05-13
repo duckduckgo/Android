@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -46,26 +47,6 @@ import kotlinx.collections.immutable.persistentListOf
  * Selection is hoisted — the caller owns [selectedIndex] so it can drive button enablement
  * or any other UI state. Scrolls independently when the list exceeds 176dp.
  *
- * Typical usage:
- * ```
- * var selected by rememberSaveable { mutableIntStateOf(-1) }
- * DaxAlertDialog(
- *     onDismissRequest = onDismiss,
- *     title = "Theme",
- *     content = {
- *         DaxRadioOptions(
- *             optionTitles = optionTitles,
- *             selectedIndex = selected,
- *             onOptionSelected = { selected = it },
- *         )
- *     },
- *     buttons = {
- *         DaxGhostButton(text = "Cancel", onClick = onDismiss)
- *         DaxPrimaryButton(text = "Apply", enabled = selected >= 0, onClick = ...)
- *     },
- * )
- * ```
- *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735717504168
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
@@ -80,6 +61,7 @@ fun DaxRadioOptions(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(max = 176.dp)
+            .selectableGroup()
             .verticalScroll(rememberScrollState()),
     ) {
         optionTitles.forEachIndexed { index, optionTitle ->

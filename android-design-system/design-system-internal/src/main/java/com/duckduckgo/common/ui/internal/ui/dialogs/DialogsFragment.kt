@@ -47,6 +47,7 @@ import com.duckduckgo.common.ui.compose.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.compose.dialog.DaxRadioOptions
 import com.duckduckgo.common.ui.compose.dialog.DaxStackedButtons
 import com.duckduckgo.common.ui.compose.dialog.TextAlertDialog
+import com.duckduckgo.common.ui.compose.dialog.TextAlertDialogCheckboxState
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
@@ -475,9 +476,11 @@ class DialogsFragment : Fragment() {
                     onPositiveClick = { showToast("Positive Button Clicked, Checked $checkboxChecked") },
                     negativeButtonText = negativeButtonText,
                     onNegativeClick = { showToast("Negative Button Clicked, Checked $checkboxChecked") },
-                    checkboxText = checkboxText,
-                    checkboxChecked = checkboxChecked,
-                    onCheckboxChanged = { checkboxChecked = it },
+                    checkbox = TextAlertDialogCheckboxState(
+                        text = checkboxText,
+                        checked = checkboxChecked,
+                        onCheckedChange = { checkboxChecked = it },
+                    ),
                 )
             }
         }

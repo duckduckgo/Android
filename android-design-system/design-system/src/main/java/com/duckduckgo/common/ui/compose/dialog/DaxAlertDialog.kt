@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+
 package com.duckduckgo.common.ui.compose.dialog
 
 import androidx.annotation.DrawableRes
@@ -70,7 +72,6 @@ import com.duckduckgo.mobile.android.R
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735717450949
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DaxAlertDialog(
     onDismissRequest: () -> Unit,
@@ -105,7 +106,6 @@ fun DaxAlertDialog(
  * The content of [DaxAlertDialog] extracted for preview support.
  * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun DaxAlertDialogContent(
     title: String,
