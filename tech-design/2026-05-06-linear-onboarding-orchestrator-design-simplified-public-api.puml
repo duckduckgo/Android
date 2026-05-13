@@ -1,0 +1,109 @@
+@startuml
+title Public API surface — `:onboarding-api` types
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+' === Entry-point interfaces ===
+
+interface LinearOnboardingOrchestrator {
+    +state : StateFlow<LinearOnboardingState>
+    +onEvent(event: LinearOnboardingEvent)
+}
+
+note right of LinearOnboardingOrchestrator::onEvent
+  Routes the event to `currentStep.transition()`,
+  then updates `state` from the returned
+  `LinearOnboardingTransition`
+  (Advance / SwitchTo / Return / AbortPlan / Stay).
+  See the event-loop sequence diagram for the full trace.
+end note
+
+interface LinearOnboardingPlanProvider {
+    +buildMainPlan() : LinearOnboardingPlan
+}
+
+' === State hierarchy (sealed) ===
+
+interface LinearOnboardingState <<sealed>>
+
+class "LinearOnboardingState.NotStarted" as State_NotStarted <<data object>>
+class "LinearOnboardingState.InProgress" as State_InProgress <<data class>> {
+    +currentPlan : LinearOnboardingPlan
+    +currentStepIndex : Int
+    +currentStep : LinearOnboardingStep
+}
+class "LinearOnboardingState.Completed" as State_Completed <<data object>>
+class "LinearOnboardingState.Skipped" as State_Skipped <<data object>>
+
+LinearOnboardingState <|.. State_NotStarted
+LinearOnboardingState <|.. State_InProgress
+LinearOnboardingState <|.. State_Completed
+LinearOnboardingState <|.. State_Skipped
+
+' === Plan & Step ===
+
+class LinearOnboardingPlan <<data class>> {
+    +steps : List<LinearOnboardingStep>
+}
+
+interface LinearOnboardingStep {
+    +id : LinearOnboardingStepId
+    +host : LinearOnboardingHost
+    +precondition() : Boolean
+    +transition(event: LinearOnboardingEvent) : LinearOnboardingTransition
+}
+
+note right of LinearOnboardingStep::id
+  typealias LinearOnboardingStepId = String
+end note
+
+enum LinearOnboardingHost {
+    OnboardingActivity
+    BrowserActivity
+}
+
+' === Event (marker) ===
+
+interface LinearOnboardingEvent <<marker>>
+
+note right of LinearOnboardingEvent
+  Opaque marker. The orchestrator never
+  inspects events — it just routes them
+  to `currentStep.transition()`. Concrete
+  event types live with the plan provider
+  impl (`:app`).
+end note
+
+' === Transition hierarchy (sealed) ===
+
+interface LinearOnboardingTransition <<sealed>>
+
+class "LinearOnboardingTransition.Advance" as T_Advance <<data object>>
+class "LinearOnboardingTransition.SwitchTo" as T_SwitchTo <<data class>> {
+    +plan : LinearOnboardingPlan
+}
+class "LinearOnboardingTransition.Return" as T_Return <<data object>>
+class "LinearOnboardingTransition.AbortPlan" as T_AbortPlan <<data object>>
+class "LinearOnboardingTransition.Stay" as T_Stay <<data object>>
+
+LinearOnboardingTransition <|.. T_Advance
+LinearOnboardingTransition <|.. T_SwitchTo
+LinearOnboardingTransition <|.. T_Return
+LinearOnboardingTransition <|.. T_AbortPlan
+LinearOnboardingTransition <|.. T_Stay
+
+' === Cross-group relationships ===
+
+LinearOnboardingOrchestrator ..> LinearOnboardingState : "exposes"
+LinearOnboardingOrchestrator ..> LinearOnboardingEvent : "accepts"
+LinearOnboardingPlanProvider ..> LinearOnboardingPlan : "produces"
+
+State_InProgress "1" *--> "1" LinearOnboardingPlan : currentPlan
+LinearOnboardingPlan "1" o--> "*" LinearOnboardingStep : steps
+LinearOnboardingStep --> "1" LinearOnboardingHost : host
+LinearOnboardingStep ..> LinearOnboardingEvent : "input"
+LinearOnboardingStep ..> LinearOnboardingTransition : "result"
+T_SwitchTo "1" *--> "1" LinearOnboardingPlan : plan
+
+@enduml

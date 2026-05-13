@@ -72,6 +72,8 @@ onboarding/
 
 ## Public API surface (`:onboarding-api`)
 
+See [`2026-05-06-linear-onboarding-orchestrator-design-simplified-public-api.puml`](2026-05-06-linear-onboarding-orchestrator-design-simplified-public-api.puml) for a class-diagram view of the types below.
+
 ```kotlin
 interface LinearOnboardingOrchestrator {
     val state: StateFlow<LinearOnboardingState>
@@ -127,6 +129,7 @@ sealed interface LinearOnboardingTransition {
 **Design notes**
 - `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
+- Plan branches are explicit via `SwitchTo` / `Return`. Onboarding paths can fork on user choice or external state (e.g., the skip-onboarding side plan in the appendix) and rejoin the caller at the step after the fork — branches don't have to be flattened into one mega-plan, and the caller's progress survives the round trip.
 - The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api` so the orchestrator (in `:onboarding-impl`) can depend on it without reaching into `:app`. The concrete impl stays in `:app` because step factories depend on flags/values from `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `DuckChat`, etc. Moving the impl would force moving its dependency closure — a much wider refactor that we can revisit at a different time.
 - The orchestrator self-initializes. `LinearOnboardingOrchestratorImpl.init` reads `AppStage` and starts the main plan if the user is `NEW`.
 
