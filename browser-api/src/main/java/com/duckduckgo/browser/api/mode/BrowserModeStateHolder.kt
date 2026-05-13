@@ -19,16 +19,18 @@ package com.duckduckgo.browser.api.mode
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Source of truth for the user's currently-active [BrowserMode].
+ * Source of truth for the user's currently-active [BrowserMode]. The current value is used
+ * when creating new tabs and display the correct UI state.
  */
 interface BrowserModeStateHolder {
     /**
-     * Current [BrowserMode] used.
+     * Returns current [BrowserMode].
      */
     val currentMode: StateFlow<BrowserMode>
 
     /**
-     * Sets the active [BrowserMode].
+     * Sets the active [BrowserMode]. Used when user explicitly changes the mode or automatically
+     * when a mode change is required for opening a link.
      */
     fun switchTo(mode: BrowserMode)
 }
