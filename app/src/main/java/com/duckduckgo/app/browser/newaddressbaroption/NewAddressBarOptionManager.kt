@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.newaddressbaroption
 
 import android.app.Activity
 import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.onboarding.api.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.onboarding.api.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.DefaultDispatcherProvider

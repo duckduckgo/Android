@@ -26,73 +26,55 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
-import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingActivityDialog
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingActivityStep
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
-import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
-import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
 class BrandDesignUpdatePageViewModel @Inject constructor(
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val context: Context,
     private val pixel: Pixel,
-    private val appInstallStore: AppInstallStore,
-    private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
-    private val appBuildConfig: AppBuildConfig,
     private val onboardingStore: OnboardingStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val duckChat: DuckChat,
-    private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
-    private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val orchestrator: LinearOnboardingOrchestrator,
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val context: Context,
+    private val appInstallStore: AppInstallStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -118,11 +100,28 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
+            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) 3 else 2
+        }
+        seedIntroAnimationFlagFromOrchestrator()
+        observeOrchestrator()
+    }
+
+    // The fragment-scoped VM is recreated on every OnboardingActivity launch. Without
+    // this seed, a re-entry mid-flow (e.g. after the BrowserActivity duck_ai step) would
+    // briefly expose hasPlayedIntroAnimation=false to the fragment — which would replay
+    // the intro animation before observeOrchestrator's async collector corrects state.
+    // Read orchestrator.state.value synchronously here so the initial viewState already
+    // reflects reality by the time the fragment subscribes.
+    private fun seedIntroAnimationFlagFromOrchestrator() {
+        val pastIntroAnimation = when (val state = orchestrator.state.value) {
+            is LinearOnboardingState.InProgress -> state.currentStep.id != STEP_INTRO_ANIMATION
+            LinearOnboardingState.Completed,
+            LinearOnboardingState.Skipped,
+            -> true
+            LinearOnboardingState.NotStarted -> false
+        }
+        if (pastIntroAnimation) {
+            _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
         }
     }
 
@@ -136,48 +135,110 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data object SkipDialogAnimation : Command
     }
 
-    fun onDialogTapped() {
-        skipDialogAnimations()
+    private fun observeOrchestrator() {
+        orchestrator.state
+            .onEach { state ->
+                when (state) {
+                    LinearOnboardingState.NotStarted -> Unit
+                    is LinearOnboardingState.InProgress -> {
+                        val step = state.currentStep as? OnboardingActivityStep ?: return@onEach
+                        applyDialog(step.resolveDialog())
+                    }
+                    LinearOnboardingState.Completed -> _commands.send(Command.Finish)
+                    LinearOnboardingState.Skipped -> _commands.send(Command.OnboardingSkipped)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
-    fun onBackgroundTapped() {
-        skipDialogAnimations()
+    private suspend fun applyDialog(dialog: OnboardingActivityDialog) {
+        when (dialog) {
+            OnboardingActivityDialog.IntroAnimation -> {
+                // Fragment renders the intro animation based on hasPlayedIntroAnimation;
+                // do not overwrite that field — the fragment owns animation progress.
+                _viewState.update { it.copy(currentDialog = null) }
+            }
+            OnboardingActivityDialog.InitialReinstallUser -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = INITIAL_REINSTALL_USER,
+                        hasAnimatedCurrentDialog = false,
+                        isReinstallUser = true,
+                    )
+                }
+                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+            }
+            OnboardingActivityDialog.Initial -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = INITIAL,
+                        hasAnimatedCurrentDialog = false,
+                        isReinstallUser = false,
+                    )
+                }
+                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+            }
+            is OnboardingActivityDialog.InputScreenPreview -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = INPUT_SCREEN_PREVIEW,
+                        hasAnimatedCurrentDialog = false,
+                        inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
+                        inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
+                        inputScreenPreviewIsSearchSelected = dialog.isSearchDefault,
+                    )
+                }
+            }
+            OnboardingActivityDialog.ComparisonChart -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = COMPARISON_CHART,
+                        hasAnimatedCurrentDialog = false,
+                    )
+                }
+                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            }
+            OnboardingActivityDialog.DefaultBrowserPrompt -> {
+                // This "dialog" is an OS-level system intent, not a Dax surface. Build the
+                // intent and ask the fragment to launch it. If we can't build one, synthesise
+                // a "finished" event so the orchestrator can advance past the step.
+                val intent = defaultRoleBrowserDialog.createIntent(context)
+                if (intent != null) {
+                    _commands.send(Command.ShowDefaultBrowserDialog(intent))
+                } else {
+                    pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                    viewModelScope.launch {
+                        // poc: hardcoding isDefaultBrowser = false
+                        orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+                    }
+                }
+            }
+            is OnboardingActivityDialog.AddressBarPosition -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = ADDRESS_BAR_POSITION,
+                        hasAnimatedCurrentDialog = false,
+                        showSplitOption = dialog.showSplitOption,
+                    )
+                }
+            }
+            OnboardingActivityDialog.SkipOnboardingOption -> {
+                _viewState.update {
+                    it.copy(
+                        currentDialog = SKIP_ONBOARDING_OPTION,
+                        hasAnimatedCurrentDialog = false,
+                    )
+                }
+                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
+            }
+        }
     }
+
+    fun onDialogTapped() = skipDialogAnimations()
+    fun onBackgroundTapped() = skipDialogAnimations()
 
     fun onDialogAnimationStarted() {
         _viewState.update { it.copy(hasAnimatedCurrentDialog = true) }
-    }
-
-    private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
-        _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
-        fireDialogShownPixel(dialogType)
-    }
-
-    private fun setInputScreenPreviewDialog(isSearchDefault: Boolean) {
-        _viewState.update {
-            it.copy(
-                currentDialog = INPUT_SCREEN_PREVIEW,
-                hasAnimatedCurrentDialog = false,
-                inputScreenPreviewSearchSuggestions = onboardingStore.getSearchOptions(),
-                inputScreenPreviewChatSuggestions = onboardingStore.getChatSuggestions(),
-                inputScreenPreviewIsSearchSelected = isSearchDefault,
-            )
-        }
-        fireDialogShownPixel(INPUT_SCREEN_PREVIEW)
-    }
-
-    private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
-        when (dialogType) {
-            SYNC_RESTORE -> { } // TODO - SyncRestore: add pixel for dialog shown
-            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
-            SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-            INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
-            INPUT_SCREEN_PREVIEW -> {
-            }
-        }
     }
 
     fun onIntroAnimationFinished() {
@@ -188,155 +249,34 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Called by the fragment after the notification-permission flow settles to advance
+     * past intro_animation. Idempotent: only fires when we are still on intro_animation.
+     */
     fun loadDaxDialog() {
         viewModelScope.launch {
-            val isReinstall = isAppReinstall()
-            val dialogType = if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
-            _viewState.update {
-                it.copy(
-                    isReinstallUser = isReinstall,
-                    currentDialog = dialogType,
-                    hasAnimatedCurrentDialog = false,
-                )
+            val current = orchestrator.state.value as? LinearOnboardingState.InProgress ?: return@launch
+            if (current.currentStep.id == STEP_INTRO_ANIMATION) {
+                orchestrator.onEvent(OnboardingEvent.PrimaryClicked)
             }
-            fireDialogShownPixel(dialogType)
         }
     }
 
     fun onPrimaryCtaClicked() {
-        val currentDialog = _viewState.value.currentDialog ?: return
-        when (currentDialog) {
-            SYNC_RESTORE -> {
-                // TODO - SyncRestore: handle primary CTA click
-            }
+        viewModelScope.launch { orchestrator.onEvent(OnboardingEvent.PrimaryClicked) }
+    }
 
-            INITIAL_REINSTALL_USER, INITIAL -> {
-                setCurrentDialog(COMPARISON_CHART)
-            }
-
-            COMPARISON_CHART -> {
-                viewModelScope.launch {
-                    val isDDGDefaultBrowser =
-                        if (defaultRoleBrowserDialog.shouldShowDialog()) {
-                            val intent = defaultRoleBrowserDialog.createIntent(context)
-                            if (intent != null) {
-                                _commands.send(Command.ShowDefaultBrowserDialog(intent))
-                            } else {
-                                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-                                _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-                                setCurrentDialog(ADDRESS_BAR_POSITION)
-                            }
-                            false
-                        } else {
-                            _commands.send(Command.Finish)
-                            true
-                        }
-                    pixel.fire(
-                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-                        mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
-                    )
-                }
-            }
-
-            SKIP_ONBOARDING_OPTION -> {
-                viewModelScope.launch {
-                    _commands.send(Command.OnboardingSkipped)
-                    pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
-                    duckChat.setInputScreenUserSetting(true)
-                }
-            }
-
-            ADDRESS_BAR_POSITION -> {
-                viewModelScope.launch {
-                    val selectedPosition = _viewState.value.selectedAddressBarPosition
-                    when (selectedPosition) {
-                        OmnibarType.SINGLE_BOTTOM -> {
-                            settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-                            pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-                        }
-                        OmnibarType.SPLIT -> {
-                            if (isSplitOmnibarEnabled()) {
-                                settingsDataStore.omnibarType = OmnibarType.SPLIT
-                                pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
-                            } else {
-                                settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                            }
-                        }
-                        OmnibarType.SINGLE_TOP -> {
-                            settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                        }
-                    }
-                    val showInputScreen = withContext(dispatchers.io()) {
-                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-                    }
-                    if (showInputScreen) {
-                        setCurrentDialog(INPUT_SCREEN)
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
-                }
-            }
-
-            INPUT_SCREEN -> {
-                viewModelScope.launch {
-                    val inputSelected = _viewState.value.inputScreenSelected
-                    val isReinstall = _viewState.value.isReinstallUser
-                    if (inputSelected) {
-                        pixel.fire(PREONBOARDING_AICHAT_SELECTED)
-                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = isReinstall)
-                    } else {
-                        pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
-                    }
-                    duckChat.setCosmeticInputScreenUserSetting(inputSelected)
-                    onboardingStore.storeInputScreenSelection(inputSelected)
-                    if (inputSelected) {
-                        when (duckAiOnboardingExperimentManager.enroll()) {
-                            null,
-                            CONTROL,
-                            -> _commands.send(Command.Finish)
-                            TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
-                            TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
-                        }
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
-                }
-            }
-
-            INPUT_SCREEN_PREVIEW -> {
-                viewModelScope.launch {
-                    _commands.send(Command.Finish)
-                }
-            }
-        }
+    fun onSecondaryCtaClicked() {
+        viewModelScope.launch { orchestrator.onEvent(OnboardingEvent.SecondaryClicked) }
     }
 
     fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
         viewModelScope.launch {
             if (isChat) {
-                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+                orchestrator.onEvent(OnboardingEvent.DuckAiPromptSubmitted(query))
             } else {
-                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
-            }
-        }
-    }
-
-    fun onSecondaryCtaClicked() {
-        val currentDialog = _viewState.value.currentDialog ?: return
-        when (currentDialog) {
-            INITIAL_REINSTALL_USER -> {
-                _viewState.update { it.copy(isReinstallUser = true) }
-                setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
-            }
-
-            SKIP_ONBOARDING_OPTION -> {
-                setCurrentDialog(COMPARISON_CHART)
-                pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-            }
-
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW -> {
-                // no-op
+                // PoC plan covers only the chat path.
+                // _commands.send(Command.FinishAndSubmitSearchQuery(query))
             }
         }
     }
@@ -344,25 +284,32 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onDefaultBrowserSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
-        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        pixel.fire(
+            AppPixelName.DEFAULT_BROWSER_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
         viewModelScope.launch {
-            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-            setCurrentDialog(ADDRESS_BAR_POSITION)
+            orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
         }
     }
 
     fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = false
-        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        pixel.fire(
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()),
+        )
         viewModelScope.launch {
-            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-            setCurrentDialog(ADDRESS_BAR_POSITION)
+            orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
         }
     }
 
     fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {
         _viewState.update { it.copy(selectedAddressBarPosition = selectedOption) }
+        viewModelScope.launch {
+            orchestrator.onEvent(OnboardingEvent.OmnibarTypeSelected(selectedOption))
+        }
     }
 
     fun onInputScreenOptionSelected(withAi: Boolean) {
@@ -380,24 +327,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         )
     }
 
-    fun getMaxPageCount(): Int {
-        return maxPageCount
-    }
-
-    private suspend fun isAppReinstall(): Boolean =
-        withContext(dispatchers.io()) {
-            appBuildConfig.isAppReinstall()
-        }
-
-    private suspend fun isSplitOmnibarEnabled(): Boolean =
-        withContext(dispatchers.io()) {
-            androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
-                androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
-        }
+    fun getMaxPageCount(): Int = maxPageCount
 
     private fun skipDialogAnimations() {
-        viewModelScope.launch {
-            _commands.send(Command.SkipDialogAnimation)
-        }
+        viewModelScope.launch { _commands.send(Command.SkipDialogAnimation) }
+    }
+
+    companion object {
+        private const val STEP_INTRO_ANIMATION = "intro_animation"
     }
 }

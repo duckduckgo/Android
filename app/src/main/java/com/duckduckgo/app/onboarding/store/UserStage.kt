@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.onboarding.api.AppStage
 
 const val USER_STAGE_TABLE_NAME = "userStage"
 
@@ -27,12 +28,6 @@ data class UserStage(
     @PrimaryKey val key: Int = 1,
     val appStage: AppStage,
 )
-
-enum class AppStage {
-    NEW,
-    DAX_ONBOARDING,
-    ESTABLISHED,
-}
 
 class StageTypeConverter {
 

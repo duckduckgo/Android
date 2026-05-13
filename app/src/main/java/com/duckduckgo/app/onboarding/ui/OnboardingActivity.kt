@@ -27,6 +27,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingEvent
+import com.duckduckgo.onboarding.api.LinearOnboardingHost
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -35,16 +39,19 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var linearOnboardingOrchestrator: LinearOnboardingOrchestrator
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -60,12 +67,30 @@ class OnboardingActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureSkipButton()
         observeViewModel()
+        observeOrchestratorHost()
 
         lifecycleScope.launch {
             repeatOnLifecycle(CREATED) {
                 configurePager()
             }
         }
+    }
+
+    // When the orchestrator's current step is hosted by BrowserActivity, hand off to
+    // BrowserActivity (with no step-specific extras) and finish. BrowserActivity is
+    // responsible for reading the current step and executing its action — this
+    // activity stays decoupled from BrowserActivityStep specifics.
+    private fun observeOrchestratorHost() {
+        linearOnboardingOrchestrator.state
+            .onEach { state ->
+                val hostIsBrowserActivity = state is LinearOnboardingState.InProgress && state.currentStep.host == LinearOnboardingHost.BrowserActivity
+                val stateCompleteOrSkipped = state is LinearOnboardingState.Completed || state is LinearOnboardingState.Skipped
+                if (hostIsBrowserActivity || stateCompleteOrSkipped) {
+                    startActivity(BrowserActivity.intent(this@OnboardingActivity))
+                    finish()
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     fun onContinueClicked() {
@@ -147,8 +172,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.devOnlyFullyCompleteAllOnboarding()
-                startActivity(BrowserActivity.intent(this@OnboardingActivity))
-                finish()
+                linearOnboardingOrchestrator.onEvent(OnboardingEvent.SkipOnboardingDevOptionClicked)
             }
         }
         viewModel.initializeOnboardingSkipper()

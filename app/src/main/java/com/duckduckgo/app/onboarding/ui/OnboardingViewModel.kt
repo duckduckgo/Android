@@ -23,9 +23,10 @@ import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionMan
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.onboarding.api.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.onboarding.api.OnboardingSkipper
+import com.duckduckgo.onboarding.api.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -44,6 +45,7 @@ class OnboardingViewModel @Inject constructor(
     private val pageLayoutManager: OnboardingPageManager,
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
+    private val onboardingSkipperReadiness: OnboardingSkipperReadiness,
     private val appBuildConfig: AppBuildConfig,
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
@@ -54,7 +56,8 @@ class OnboardingViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
+        // pageLayoutManager.buildPageBlueprints()
+        pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
     }
 
     fun pageCount(): Int {
@@ -104,7 +107,7 @@ class OnboardingViewModel @Inject constructor(
 
         // delay showing skip button until privacy config downloaded
         viewModelScope.launch {
-            onboardingSkipper.privacyConfigDownloaded.collect {
+            onboardingSkipperReadiness.privacyConfigDownloaded.collect {
                 _viewState.value = _viewState.value.copy(canShowSkipOnboardingButton = it.skipOnboardingPossible)
             }
         }

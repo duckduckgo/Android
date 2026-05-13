@@ -18,8 +18,8 @@ package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.onboarding.api.UserStageStore
+import com.duckduckgo.onboarding.api.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS

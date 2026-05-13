@@ -34,13 +34,13 @@ interface OnboardingBrandDesignUpdateToggles {
      * Main toggle for the onboarding brand design update feature.
      * Default value: false (disabled).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
     /**
      * Toggle for the brand design update variant.
      * Default value: false (disabled).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun brandDesignUpdate(): Toggle
 }

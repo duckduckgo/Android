@@ -86,6 +86,13 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboarding.orchestrator.BrowserActivityAction
+import com.duckduckgo.app.onboarding.orchestrator.BrowserActivityStep
+import com.duckduckgo.onboarding.api.LinearOnboardingHost
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingEvent
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -150,6 +157,9 @@ import javax.inject.Inject
 @HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var linearOnboardingOrchestrator: LinearOnboardingOrchestrator
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -371,6 +381,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
+        observeOrchestratorHost()
 
         viewModel.awaitClearDataFinishedNotification()
         initializeServiceWorker()
@@ -425,6 +436,35 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    // Two-way orchestrator handler:
+    //  * step on another host → hand off to OnboardingActivity and finish here
+    //  * step on this host    → execute the step's action (load Duck.ai, etc.)
+    // OnboardingActivity stays unaware of BrowserActivityStep internals.
+    private fun observeOrchestratorHost() {
+        linearOnboardingOrchestrator.state
+            .onEach { state ->
+                if (state !is LinearOnboardingState.InProgress) return@onEach
+                val step = state.currentStep
+                if (step.host != LinearOnboardingHost.BrowserActivity) {
+                    startActivity(OnboardingActivity.intent(this@BrowserActivity))
+                    finish()
+                    return@onEach
+                }
+                if (step is BrowserActivityStep) {
+                    when (val action = step.resolveAction()) {
+                        is BrowserActivityAction.OpenDuckChat -> {
+                            if (swipingTabsFeature.isEnabled) {
+                                launchNewTab(query = action.url, skipHome = true)
+                            } else {
+                                lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = action.url, skipHome = true) }
+                            }
+                        }
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
     private fun setupFireDialogListener() {
         supportFragmentManager.setFragmentResultListener(FireDialog.REQUEST_KEY, this) { _, bundle ->
             when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
@@ -461,6 +501,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     if (pendingDuckAiOnboardingFire) {
                         pendingDuckAiOnboardingFire = false
                         closeDuckChatFullScreen()
+                        lifecycleScope.launch {
+                            linearOnboardingOrchestrator.onEvent(OnboardingEvent.DuckAiFireCompleted)
+                        }
                     }
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
