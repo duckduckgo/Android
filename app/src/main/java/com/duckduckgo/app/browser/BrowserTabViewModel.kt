@@ -2381,6 +2381,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun syncNativeInputChatState(isDuckChatUrl: Boolean, uri: Uri) {
+        logcat { "syncNativeInputChatState NativeInputState[$tabId] isDuckChatUrl [$isDuckChatUrl] uri [$uri]" }
         if (!::tabId.isInitialized) return
         if (!isDuckChatUrl) {
             mutableNativeInputStateProvider.update(tabId) { copy(chatId = null) }
