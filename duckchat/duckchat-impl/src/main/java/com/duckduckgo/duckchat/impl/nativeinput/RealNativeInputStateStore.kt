@@ -51,6 +51,10 @@ class RealNativeInputStateStore @Inject constructor() :
         flows.remove(tabId)
     }
 
+    override fun clearAll() {
+        flows.clear()
+    }
+
     // Seed unpublished tabs with [NativeInputState.zero] only because StateFlow requires an initial
     // value. The native input widget overwrites it on configure; see the TODO on zero() — once the
     // widget is wired to publish first, this seed becomes unreachable and can be replaced with a

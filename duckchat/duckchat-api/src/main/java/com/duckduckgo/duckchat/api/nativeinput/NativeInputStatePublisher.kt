@@ -24,4 +24,5 @@ interface NativeInputStatePublisher {
     fun publish(tabId: String, state: NativeInputState)
     fun update(tabId: String, transform: (NativeInputState) -> NativeInputState)
     fun clearTab(tabId: String)
+    fun clearAll()
 }

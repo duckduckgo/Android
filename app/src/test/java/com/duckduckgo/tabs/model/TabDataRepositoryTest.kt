@@ -249,6 +249,7 @@ class TabDataRepositoryTest {
         verify(mockWebViewSessionStorage).deleteAllSessions()
         verify(mockDuckChatContextualDataStore).clearAll()
         verify(mockTabVisitedSitesRepository).clearAll()
+        verify(mockNativeInputStatePublisher).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -650,6 +651,7 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
+            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -668,6 +670,7 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
+            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -759,6 +762,7 @@ class TabDataRepositoryTest {
         }
         verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
         verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
+        verify(mockNativeInputStatePublisher).clearTab(TAB_ID)
     }
 
     private fun tabDataRepository(

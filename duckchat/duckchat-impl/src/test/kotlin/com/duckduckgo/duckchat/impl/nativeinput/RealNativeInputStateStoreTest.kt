@@ -133,4 +133,29 @@ class RealNativeInputStateStoreTest {
 
         assertEquals(stateB, testee.stateForTab("tab-b").value)
     }
+
+    @Test
+    fun whenClearAllCalledThenAllTabsAreEvicted() {
+        testee.publish(
+            "tab-a",
+            NativeInputState(
+                inputMode = InputMode.SEARCH_ONLY,
+                inputContext = InputContext.DUCK_AI,
+                tabId = "tab-a",
+            ),
+        )
+        testee.publish(
+            "tab-b",
+            NativeInputState(
+                inputMode = InputMode.SEARCH_ONLY,
+                inputContext = InputContext.DUCK_AI,
+                tabId = "tab-b",
+            ),
+        )
+
+        testee.clearAll()
+
+        assertEquals(NativeInputState.zero("tab-a"), testee.stateForTab("tab-a").value)
+        assertEquals(NativeInputState.zero("tab-b"), testee.stateForTab("tab-b").value)
+    }
 }
