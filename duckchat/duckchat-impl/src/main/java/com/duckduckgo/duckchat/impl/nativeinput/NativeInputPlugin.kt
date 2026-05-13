@@ -21,7 +21,7 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 
 sealed class PromptContribution {
     data class ModelSelection(val modelId: String) : PromptContribution()

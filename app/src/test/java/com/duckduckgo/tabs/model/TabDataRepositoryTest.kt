@@ -43,6 +43,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -108,6 +109,8 @@ class TabDataRepositoryTest {
     private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
 
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
+
+    private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
 
     @After
     fun after() {
@@ -771,6 +774,7 @@ class TabDataRepositoryTest {
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
+        nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -796,6 +800,7 @@ class TabDataRepositoryTest {
             tabManagerFeatureFlags,
             contextualDataStore,
             tabVisitedSitesRepository,
+            nativeInputStatePublisher,
         )
     }
 
