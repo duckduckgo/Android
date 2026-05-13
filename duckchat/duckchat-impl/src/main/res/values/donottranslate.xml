@@ -71,7 +71,5 @@
     <string name="duckChatOptionsMenuCreateImageSubtitle">Turn text into images</string>
     <string name="duckChatOptionsMenuWebSearch">Web Search</string>
     <string name="duckChatOptionsMenuWebSearchSubtitle">Source answers from the web</string>
-    <string name="duckChatOptionsMenuCustomizeResponses">Customize Responses</string>
-    <string name="duckChatOptionsMenuCustomizeResponsesSubtitle">Set tone, length, and behavior</string>
 
 </resources>

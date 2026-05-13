@@ -51,11 +51,6 @@ class OptionsView(context: Context) : FrameLayout(context) {
             subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
             showTick = true,
         ),
-        MenuItem(
-            iconRes = R.drawable.ic_glasses_24,
-            titleRes = R.string.duckChatOptionsMenuCustomizeResponses,
-            subtitleRes = R.string.duckChatOptionsMenuCustomizeResponsesSubtitle,
-        ),
     )
 
     private val tappedIndices = mutableSetOf<Int>()
@@ -106,7 +101,6 @@ class OptionsView(context: Context) : FrameLayout(context) {
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow) {
-        val hMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
         menuItems.forEachIndexed { index, item ->
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
@@ -126,14 +120,6 @@ class OptionsView(context: Context) : FrameLayout(context) {
                 row.postDelayed({ popup.dismiss() }, 150)
             }
             container.addView(row)
-            if (index == 1) {
-                val divider = LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false)
-                (divider.layoutParams as LinearLayout.LayoutParams).also {
-                    it.marginStart = hMargin
-                    it.marginEnd = hMargin
-                }
-                container.addView(divider)
-            }
         }
     }
 
