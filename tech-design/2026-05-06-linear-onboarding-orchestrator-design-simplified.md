@@ -8,7 +8,7 @@ Two structural wins delivered together: the linear onboarding state machine is n
 
 ## Context
 
-The trigger is [Android: AI onboarding for custom store listings](https://app.asana.com/1/137249556945/project/1208671518894266/task/1213551217308374). We want the user to do a few linear onboarding steps (which live in `OnboardingActivity`), transition to some Duck.ai-flavoured steps (rely on implementation from `BrowserActivity`), then return to `OnboardingActivity` to finish. ([Figma](https://www.figma.com/design/5QvJbyUBbeonblsjViDIkf/Mobile-Onboarding-AI-First?node-id=173-50969&t=w51SVY4Lvfst0gyJ-1).)
+The trigger is [Android: AI onboarding for custom store listings](https://app.asana.com/1/137249556945/project/1208671518894266/task/1213551217308374). We want the user to do a few linear onboarding steps (which live in `OnboardingActivity`), transition to some Duck.ai-flavored steps (rely on implementation from `BrowserActivity`), then return to `OnboardingActivity` to finish. ([Figma](https://www.figma.com/design/5QvJbyUBbeonblsjViDIkf/Mobile-Onboarding-AI-First?node-id=173-50969&t=w51SVY4Lvfst0gyJ-1).)
 
 Today's linear onboarding state lives on a fragment-scoped ViewModel — it cannot survive that transition.
 
@@ -42,7 +42,7 @@ onboarding/
 ├── onboarding-api/
 │   ├── LinearOnboardingOrchestrator
 │   ├── LinearOnboardingPlanProvider
-│   ├── LinearOnboardingState, LinearStep, StepTransition, etc.
+│   ├── LinearOnboardingState, LinearOnboardingStep, LinearOnboardingTransition, etc.
 │   ├── UserStageStore  (moved from :app)
 │   └── OnboardingSkipper (moved from :app)
 │
@@ -56,12 +56,10 @@ onboarding/
     └── BrandDesignUpdatePageVM (thinned to a renderer adapter)
 ```
 
-The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api`; its impl stays in `:app` because step factories depend on flags/values from `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `DuckChat`, etc. Moving the impl would force moving its dependency closure — a much wider refactor that we can revisit at a different time.
-
 ### Other minor wins
 
-- Provide a single readable place where plan composition expresses itself.
-- Make each step a self-contained descriptor (precondition, params, transition rules) — cheaper experiment-driven variation.
+- Provide a single readable place where onboarding plan composition expresses itself.
+- Make each step a self-contained descriptor (precondition, params, transition rules) — makes experiment-driven variation cheaper.
 - Keep today's user-visible behavior (dialog sequence, pixels, side effects) unchanged.
 
 ## Non-goals
@@ -80,10 +78,6 @@ interface LinearOnboardingOrchestrator {
     suspend fun onEvent(event: LinearOnboardingEvent)
 }
 
-interface LinearOnboardingPlanProvider {
-    suspend fun buildMainPlan(): LinearOnboardingPlan
-}
-
 sealed interface LinearOnboardingState {
     data object NotStarted : LinearOnboardingState
     data class InProgress(
@@ -98,6 +92,10 @@ sealed interface LinearOnboardingState {
 }
 
 data class LinearOnboardingPlan(val steps: List<LinearOnboardingStep>)
+
+interface LinearOnboardingPlanProvider {
+    suspend fun buildMainPlan(): LinearOnboardingPlan
+}
 
 typealias LinearOnboardingStepId = String
 
@@ -114,24 +112,23 @@ enum class LinearOnboardingHost {
 }
 
 // Opaque marker. The orchestrator never inspects events; it just routes them.
-// Concrete event types live with the plan provider in :app, so consumers outside :app don't inherit onboarding's event vocabulary.
+// Concrete event types live with the plan provider impl in :app, so consumers outside :app don't inherit onboarding's event vocabulary.
 interface LinearOnboardingEvent
 
 sealed interface LinearOnboardingTransition {
     data object Advance : LinearOnboardingTransition                                 // next step in current plan
-    data class SwitchTo(val plan: LinearOnboardingPlan) : LinearOnboardingTransition // push frame, run plan from first eligible step
+    data class SwitchTo(val plan: LinearOnboardingPlan) : LinearOnboardingTransition // push frame, run new plan from first eligible step
     data object Return : LinearOnboardingTransition                                  // pop frame, resume and step forward on the previous plan
-    data object AbortPlan : LinearOnboardingTransition                               // terminates linear as Skipped
+    data object AbortPlan : LinearOnboardingTransition                               // terminates as Skipped
     data object Stay : LinearOnboardingTransition                                    // explicit no-op
 }
-
 ```
 
 **Design notes**
 - `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
-- The orchestrator self-initialises at construction (see [Lifecycle & rollout](#lifecycle--rollout)): on first injection it reads `AppStage` and starts the main plan if the user is `NEW`.
-- The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api` so the orchestrator (in `:onboarding-impl`) can depend on it without reaching into `:app`. The concrete impl stays in `:app` because step factories pull on flags / experiments / stores that live there (see [Extract onboarding contracts out of `:app`](#extract-onboarding-contracts-out-of-app)).
+- The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api` so the orchestrator (in `:onboarding-impl`) can depend on it without reaching into `:app`. The concrete impl stays in `:app` because step factories depend on flags/values from `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `DuckChat`, etc. Moving the impl would force moving its dependency closure — a much wider refactor that we can revisit at a different time.
+- The orchestrator self-initializes. `LinearOnboardingOrchestratorImpl.init` reads `AppStage` and starts the main plan if the user is `NEW`.
 
 ## Host coordination
 
@@ -139,7 +136,7 @@ See [`2026-05-06-linear-onboarding-orchestrator-design-simplified-host-coordinat
 
 - Each activity (`OnboardingActivity`, `BrowserActivity`) observes `orchestrator.state`. When `state.currentStep.host` doesn't match its own host, the activity launches the matching host activity and `finish()`es itself. No central coordinator; both activities run the same observer logic symmetrically.
 - Back action (button/gesture) during the linear flow closes the app - this is matching existing behavior.
-- Process death is unchanged from today's behaviour: orchestrator state is in-memory, so process kill mid-flow restarts linear from scratch.
+- Process death is unchanged from today's behavior: orchestrator state is in-memory, so process kill mid-flow restarts linear from scratch.
 
 ## AppStage interaction
 
@@ -167,51 +164,9 @@ The reactive `DAX_ONBOARDING → ESTABLISHED` write continues to come from `CtaV
 
 The `DAX_ONBOARDING` / `ESTABLISHED` rows protect existing users (already past linear) from accidentally re-entering it after this lands.
 
-## Lifecycle & rollout
+### Kill switch and rollout
 
-### Orchestrator start
-
-The orchestrator self-initialises. `LinearOnboardingOrchestratorImpl.init` reads `AppStage` and starts the main plan if the user is `NEW`. Renderers do not call `startOnboardingPlan` themselves — they only observe `state`.
-
-```kotlin
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class LinearOnboardingOrchestratorImpl @Inject constructor(
-    private val userStageStore: UserStageStore,
-    private val planProvider: LinearOnboardingPlanProvider,
-    private val onboardingSkipper: OnboardingSkipper,
-    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
-    @AppCoroutineScope private val appScope: CoroutineScope,
-) : LinearOnboardingOrchestrator {
-
-    private val _state = MutableStateFlow<LinearOnboardingState>(NotStarted)
-    override val state: StateFlow<LinearOnboardingState> = _state.asStateFlow()
-    private val mutex = Mutex()
-
-    init {
-        appScope.launch {
-            mutex.withLock {
-                if (_state.value is NotStarted &&
-                    orchestratorFeature.self().isEnabled() &&
-                    userStageStore.isNewUser()
-                ) {
-                    advanceFrom(planProvider.buildMainPlan(), fromIndex = 0)
-                }
-            }
-        }
-    }
-
-    // onEvent / advanceFrom — see Public API surface.
-}
-```
-
-`NEW` is the only stage that triggers a start; `DAX_ONBOARDING` / `ESTABLISHED` users keep the orchestrator in `NotStarted` (matching the init table above).
-
-The orchestrator depending on `LinearOnboardingPlanProvider` is a deliberate trade — it pulls plan-construction into the impl rather than having an external boss orchestrate the orchestrator. In return, we eliminate a separate bootstrapper class and tighten the construction-vs-first-activity race window: by the time DI hands the orchestrator to any activity, its `init` has already kicked off plan resolution.
-
-### Kill switch and dual-path window
-
-The migration ships behind a new `LinearOnboardingOrchestratorFeature` toggle (default `INTERNAL`, ramped from there). During the rollout window, `BrandDesignUpdatePageViewModel` carries both paths:
+The migration ships behind a new `LinearOnboardingOrchestratorFeature` toggle. During the rollout window, `BrandDesignUpdatePageViewModel` carries both paths:
 
 ```kotlin
 init {
@@ -223,7 +178,7 @@ init {
 }
 ```
 
-This roughly doubles the VM's surface area for the duration of the rollout — accepted cost. The legacy block is removed in a tracked cleanup once the toggle is permanently on. The orchestrator's self-init is gated on the same flag (see `init` above), so when the toggle is off the orchestrator stays `NotStarted` and the legacy machine drives the flow unimpeded — no double-driving.
+The legacy block is removed in a tracked cleanup once the toggle is permanently on. The orchestrator's self-init is gated on the same flag, so when the toggle is off the orchestrator stays `NotStarted` and the legacy machine drives the flow unimpeded.
 
 ## Appendix: example step factories
 
@@ -454,6 +409,40 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
 The full event loop is in [`2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml`](2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml) — a single primary tap on `Initial` traced from fragment through viewmodel → orchestrator → step transition → state re-emission → re-render as `ComparisonChart`. The orchestrator never inspects the event content; everything domain-specific stays on the `:app` side of the boundary.
 
 An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately.
+
+### Orchestrator start
+
+```kotlin
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class LinearOnboardingOrchestratorImpl @Inject constructor(
+    private val userStageStore: UserStageStore,
+    private val planProvider: LinearOnboardingPlanProvider,
+    private val onboardingSkipper: OnboardingSkipper,
+    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+) : LinearOnboardingOrchestrator {
+
+    private val _state = MutableStateFlow<LinearOnboardingState>(NotStarted)
+    override val state: StateFlow<LinearOnboardingState> = _state.asStateFlow()
+    private val mutex = Mutex()
+
+    init {
+        appScope.launch {
+            mutex.withLock {
+                if (_state.value is NotStarted &&
+                    orchestratorFeature.self().isEnabled() &&
+                    userStageStore.isNewUser()
+                ) {
+                    advanceFrom(planProvider.buildMainPlan(), fromIndex = 0)
+                }
+            }
+        }
+    }
+
+    // onEvent / advanceFrom — see Public API surface.
+}
+```
 
 ## Appendix: future multi-module step contributions
 
