@@ -526,7 +526,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
@@ -543,7 +543,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
-        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.Browser)
 
         testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
