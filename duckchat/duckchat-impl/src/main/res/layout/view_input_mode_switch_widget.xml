@@ -204,6 +204,15 @@
                         android:orientation="horizontal">
 
                         <FrameLayout
+                            android:id="@id/reasoningModePickerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
                             android:id="@id/modelPickerContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

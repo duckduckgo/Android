@@ -33,9 +33,11 @@ import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -45,13 +47,14 @@ class AttachmentView(
     context: Context,
 ) : FrameLayout(context) {
 
-    var onAction: ((Action) -> Unit)? = null
+    var host: NativeInputHost? = null
     var onCameraCaptureRequested: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
+    private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
 
     init {
@@ -72,7 +75,11 @@ class AttachmentView(
 
     fun getImageAttachments(): List<ImageAttachment> = viewModel?.getImageAttachments() ?: emptyList()
 
+    fun getFileAttachments(): List<FileAttachment> = viewModel?.getFileAttachments() ?: emptyList()
+
     fun getImageAttachmentsJson(): JSONArray? = viewModel?.getImageAttachmentsJson()
+
+    fun getFileAttachmentsJson(): JSONArray? = viewModel?.getFileAttachmentsJson()
 
     fun clearAttachments() = viewModel?.clearAttachments()
 
@@ -104,11 +111,11 @@ class AttachmentView(
         container.addView(layout)
         thumbnailsLayout = layout
 
-        addScrollableImageContainer(layout, vm)
+        addScrollableAttachmentsRow(layout, vm)
         limitErrorView = buildLimitErrorView(layout)
     }
 
-    private fun addScrollableImageContainer(parent: LinearLayout, vm: AttachmentViewModel) {
+    private fun addScrollableAttachmentsRow(parent: LinearLayout, vm: AttachmentViewModel) {
         val scroll = HorizontalScrollView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -118,11 +125,26 @@ class AttachmentView(
         }
         parent.addView(scroll)
 
+        val row = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            )
+        }
+        scroll.addView(row)
+
         val imagesContainer = ImageAttachmentsContainerView(context).also {
             it.onAttachmentRemoved = { id -> vm.removeImageAttachment(id) }
         }
-        scroll.addView(imagesContainer)
+        row.addView(imagesContainer)
         imageAttachmentsContainer = imagesContainer
+
+        val filesContainer = FileAttachmentsContainerView(context).also {
+            it.onAttachmentRemoved = { attachment -> vm.removeFileAttachment(attachment.id) }
+        }
+        row.addView(filesContainer)
+        fileAttachmentsContainer = filesContainer
     }
 
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
@@ -138,8 +160,15 @@ class AttachmentView(
     private fun applyState(state: AttachmentViewModel.AttachmentState, container: FrameLayout) {
         val imagesView = imageAttachmentsContainer ?: return
         syncImages(imagesView, state)
-        container.isVisible = state.hasAttachments
-        updateLimitError(state.imageLimitError)
+        syncFiles(state)
+        val errorMessage =
+            state.imageLimitError
+                ?: state.fileLimitError
+                ?: state.fileSizeError
+                ?: state.filePageCountError
+                ?: state.fileTotalSizeError
+        container.isVisible = state.hasAttachments || errorMessage != null
+        updateLimitError(errorMessage)
         notifyStateChanged(state)
     }
 
@@ -152,44 +181,84 @@ class AttachmentView(
         }
     }
 
+    private fun syncFiles(state: AttachmentViewModel.AttachmentState) {
+        val filesView = fileAttachmentsContainer ?: return
+        val stateFileIds = state.files.map { it.id }.toSet()
+        val containerFileIds = filesView.getAttachments().map { it.id }.toSet()
+        (containerFileIds - stateFileIds).forEach { id ->
+            filesView.getAttachments().find { it.id == id }?.let { filesView.removeAttachment(it) }
+        }
+        (stateFileIds - containerFileIds).forEach { id ->
+            state.files.find { it.id == id }?.let { filesView.addAttachment(it) }
+        }
+    }
+
     private fun updateLimitError(errorMessage: String?) {
         limitErrorView?.text = errorMessage
         limitErrorView?.visibility = if (errorMessage != null) VISIBLE else GONE
     }
 
     private fun notifyStateChanged(state: AttachmentViewModel.AttachmentState) {
-        onAction?.invoke(
-            Action.AttachmentStateChanged(
-                hasAttachments = state.hasAttachments,
-                limitExceeded = state.imageLimitError != null && state.hasAttachments,
-                supportsUpload = state.supportsUpload,
-            ),
+        host?.attachmentChanged(
+            hasAttachments = state.hasAttachments,
+            limitExceeded = (
+                state.imageLimitError != null ||
+                    state.fileLimitError != null ||
+                    state.fileSizeError != null ||
+                    state.filePageCountError != null ||
+                    state.fileTotalSizeError != null
+                ) && state.hasAttachments,
+            supportsUpload = state.supportsUpload,
         )
     }
 
     private fun showChooserDialog() {
-        onAction?.invoke(Action.ShowAttachmentChooser(true))
+        val state = viewModel?.attachmentState?.value
+        val supportedFileTypes = state?.supportedFileTypes.orEmpty()
+        val supportsImages = state?.supportsImageUpload == true
+        val mimeTypes = state?.acceptedMimeTypes ?: listOf("image/*")
 
+        host?.showAttachmentChooser(true)
+        val title = if (supportsImages) {
+            context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle)
+        } else {
+            context.getString(R.string.fileCaptureBrowseDisambiguationTitle)
+        }
         ActionBottomSheetDialog.Builder(context)
-            .setTitle(context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
+            .setTitle(title)
             .setPrimaryItem(
                 context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption),
                 com.duckduckgo.mobile.android.R.drawable.ic_image_24,
             )
-            .setSecondaryItem(
-                context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
-                com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
-            )
-            .addEventListener(buildDialogListener())
+            .apply {
+                if (supportsImages) {
+                    setSecondaryItem(
+                        context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
+                        com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
+                    )
+                }
+            }
+            .addEventListener(buildDialogListener(supportsImages, supportedFileTypes, mimeTypes))
             .show()
     }
 
-    private fun buildDialogListener() = object : ActionBottomSheetDialog.EventListener() {
+    private fun buildDialogListener(
+        supportsImages: Boolean,
+        supportedFileTypes: List<String>,
+        mimeTypes: List<String>,
+    ) = object : ActionBottomSheetDialog.EventListener() {
         private var pickerLaunched = false
 
         override fun onPrimaryItemClicked() {
             pickerLaunched = true
-            onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+            val callback = if (supportsImages && supportedFileTypes.isNotEmpty()) {
+                buildCombinedPickerCallback()
+            } else if (supportedFileTypes.isNotEmpty()) {
+                buildFilePickerCallback()
+            } else {
+                buildImagePickerCallback()
+            }
+            onFilePickerRequested?.invoke(callback, mimeTypes)
         }
 
         override fun onSecondaryItemClicked() {
@@ -198,12 +267,22 @@ class AttachmentView(
         }
 
         override fun onBottomSheetDismissed() {
-            if (!pickerLaunched) onAction?.invoke(Action.ShowAttachmentChooser(false))
+            if (!pickerLaunched) host?.showAttachmentChooser(false)
         }
     }
 
     private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onImagesPicked(list)
+    }
+
+    private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+        val list = uris?.toList()
+        if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+    }
+
+    private fun buildCombinedPickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+        val list = uris?.toList() ?: return@ValueCallback
+        if (list.isNotEmpty()) viewModel?.onMixedAttachmentsPicked(list)
     }
 }

@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
+import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -110,6 +111,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
 
+    private val _modelPickerEnabled = MutableStateFlow(true)
+    val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
+
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -126,9 +130,20 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun setModelPickerEnabled(enabled: Boolean) {
+        _modelPickerEnabled.value = enabled
+    }
+
     fun getSelectedModelId(): String? {
+        if (!_modelPickerEnabled.value) return null
         return _plugins.value.firstNotNullOfOrNull { plugin ->
             (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
+        }
+    }
+
+    fun getResolvedReasoningEffort(): String? {
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
+            (plugin.getPromptContribution() as? PromptContribution.ReasoningEffortSelection)?.effort
         }
     }
 
@@ -194,9 +209,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun storePendingPrompt(
         query: String,
         modelId: String?,
+        reasoningEffort: String?,
         images: List<PendingNativeImage> = emptyList(),
+        files: List<PendingNativeFile> = emptyList(),
     ) {
-        pendingNativePromptStore.store(query, modelId, images)
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, images, files)
     }
 
     fun configureContextual() {

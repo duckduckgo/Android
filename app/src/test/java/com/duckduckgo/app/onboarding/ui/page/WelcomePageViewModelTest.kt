@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
@@ -94,6 +95,7 @@ class WelcomePageViewModelTest {
     private val mockDeviceInfo: DeviceInfo = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
+    private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -111,6 +113,7 @@ class WelcomePageViewModelTest {
             mockDeviceInfo,
             mockSyncAutoRestore,
             mockDuckAiOnboardingExperimentManager,
+            mockDuckAiOnboardingExperimentMetrics,
         )
     }
 
@@ -130,6 +133,7 @@ class WelcomePageViewModelTest {
             mockDeviceInfo,
             mockSyncAutoRestore,
             mockDuckAiOnboardingExperimentManager,
+            mockDuckAiOnboardingExperimentMetrics,
         )
     }
 
@@ -763,6 +767,34 @@ class WelcomePageViewModelTest {
                 Assert.assertFalse((command as ShowInputScreenPreviewDialog).duckAiDefault)
             }
         }
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedForChatWithOptionIndexThenFireAiChatTypeMetric() = runTest {
+        testee.onInputModeDemoQuerySubmitted("hello", isChat = true, optionIndex = 2)
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireAiChatType(2)
+    }
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedForChatWithCustomQueryThenFireAiChatTypeMetricWithNull() = runTest {
+        testee.onInputModeDemoQuerySubmitted("custom", isChat = true, optionIndex = null)
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireAiChatType(null)
+    }
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedForSearchWithOptionIndexThenFireSearchTypeMetric() = runTest {
+        testee.onInputModeDemoQuerySubmitted("hello", isChat = false, optionIndex = 3)
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireSearchType(3)
+    }
+
+    @Test
+    fun whenInputModeDemoQuerySubmittedForSearchWithCustomQueryThenFireSearchTypeMetricWithNull() = runTest {
+        testee.onInputModeDemoQuerySubmitted("custom", isChat = false, optionIndex = null)
+
+        verify(mockDuckAiOnboardingExperimentMetrics).fireSearchType(null)
+    }
 
     @Test
     fun givenAddressBarPositionDialogWhenInputScreenDisabledThenFinishFlow() = runTest {

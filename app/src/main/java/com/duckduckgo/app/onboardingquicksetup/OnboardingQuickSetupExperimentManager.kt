@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboardingquicksetup
 
 import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupToggles.QuickSetupCohorts
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,20 +45,14 @@ class OnboardingQuickSetupExperimentManagerImpl @Inject constructor(
 ) : OnboardingQuickSetupExperimentManager {
 
     override suspend fun enroll(): QuickSetupExperimentVariant? = withContext(dispatcherProvider.io()) {
-        toggles.quickSetup().enroll()
+        toggles.onboardingQuickSetupExperimentMay26().enroll()
         when {
-            // toggles.quickSetup().isEnrolledAndEnabled(QuickSetupCohorts.TREATMENT) -> {
-            //     QuickSetupExperimentVariant.TREATMENT
-            // }
-            //
-            // toggles.quickSetup().isEnrolledAndEnabled(QuickSetupCohorts.CONTROL) -> {
-            //     QuickSetupExperimentVariant.CONTROL
-            // }
-
-            toggles.quickSetup().isEnabled() -> {
-                // If the experiment is enabled but the user is not enrolled in either cohort, we will enroll them in the treatment cohort by default.
-                // This is temporary and will be changed in the future
+            toggles.onboardingQuickSetupExperimentMay26().isEnrolledAndEnabled(QuickSetupCohorts.TREATMENT) -> {
                 QuickSetupExperimentVariant.TREATMENT
+            }
+
+            toggles.onboardingQuickSetupExperimentMay26().isEnrolledAndEnabled(QuickSetupCohorts.CONTROL) -> {
+                QuickSetupExperimentVariant.CONTROL
             }
 
             else -> {

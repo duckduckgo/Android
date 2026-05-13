@@ -132,6 +132,7 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.shieldIcon)?.gone()
         omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.gone()
         omnibarView.findViewById<View?>(R.id.pageLoadingIndicator)?.gone()
+        omnibarView.findViewById<View?>(R.id.pageLoadProgressBar)?.gone()
     }
 
     private var currentTier: DuckAiTier = DuckAiTier.Unknown

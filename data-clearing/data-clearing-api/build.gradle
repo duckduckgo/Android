@@ -29,5 +29,6 @@ android {
 }
 
 dependencies {
+    implementation AndroidX.fragment.ktx
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

@@ -1,0 +1,314 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+
+    <View
+        android:id="@+id/backgroundLayer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/daxColorBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/inputModeUnifiedBack"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/selectable_circular_container_ripple"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/ic_arrow_left_24"
+        app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/inputModeWidgetLayout" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/inputModeWidgetLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="@dimen/inputScreenOmnibarCardMarginHorizontal">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/inputModeWidgetCard"
+            style="@style/Widget.DuckDuckGo.OmnibarCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/daxColorAccentBlue"
+            app:strokeWidth="@dimen/omnibarOutlineWidth"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/inputModeMainButtonsContainer"
+            app:layout_goneMarginEnd="@dimen/keyline_empty">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/inputModeSwitchRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/inputModeWidgetBack"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_arrow_left_24" />
+
+                    <com.duckduckgo.browser.ui.inputmode.NativeInputModeTabLayout
+                        android:id="@+id/inputModeSwitch"
+                        style="@style/Widget.DuckDuckGo.TabLayout.Rounded.Native"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/inputModeSwitchHeight"
+                        android:layout_weight="1">
+
+                        <com.google.android.material.tabs.TabItem
+                            android:id="@+id/tabSearch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout="@layout/view_native_search_tab_indicator" />
+
+                        <com.google.android.material.tabs.TabItem
+                            android:id="@+id/tabDuckAi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout="@layout/view_native_chat_tab_indicator" />
+
+                    </com.duckduckgo.browser.ui.inputmode.NativeInputModeTabLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/inputModeWidgetCardContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/keyline_0"
+                    android:paddingTop="@dimen/keyline_empty"
+                    android:paddingEnd="@dimen/keyline_empty"
+                    android:paddingBottom="@dimen/keyline_empty">
+
+                    <EditText
+                        android:id="@+id/inputField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start|center_vertical"
+                        android:hint="@string/input_screen_search_hint"
+                        android:lineSpacingMultiplier="1.2"
+                        android:maxLines="1"
+                        android:minHeight="44dp"
+                        android:paddingVertical="@dimen/keyline_empty"
+                        android:textColor="?attr/daxColorPrimaryText"
+                        android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
+                        android:textColorHint="?attr/daxColorSecondaryText"
+                        android:textCursorDrawable="@drawable/text_cursor"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldVoiceInputButton"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_microphone_24"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/inputFieldClearText"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/selectable_item_rounded_corner_background"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:scaleType="centerInside"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
+
+                    <FrameLayout
+                        android:id="@id/startChatContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+                <FrameLayout
+                    android:id="@id/attachmentsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <Space
+                    android:id="@+id/rowSpacer"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <FrameLayout
+                    android:id="@+id/inputModeWidgetBottomRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <FrameLayout
+                        android:id="@id/attachButtonContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:id="@id/reasoningModePickerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@id/modelPickerContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@+id/inputScreenButtonsContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/inputModeMainButtonsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/toolbarIcon"
+            android:layout_marginStart="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
+            app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
+
+            <FrameLayout
+                android:id="@+id/inputFieldFireButton"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatFireButtonContentDescription"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/fireIconImageView"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_fire_24" />
+            </FrameLayout>
+
+            <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
+                android:id="@+id/inputFieldTabsMenu"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
+                app:layout_constraintStart_toEndOf="@id/inputFieldFireButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
+                android:id="@+id/inputFieldBrowserMenu"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatBrowserMenuContentDescription"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/browserMenuImageView"
+                    android:layout_width="@dimen/bottomNavIcon"
+                    android:layout_height="@dimen/bottomNavIcon"
+                    android:layout_gravity="center"
+                    android:scaleType="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_menu_vertical_24" />
+
+                <View
+                    android:id="@+id/browserMenuHighlight"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_gravity="end"
+                    android:layout_margin="@dimen/keyline_2"
+                    android:background="@drawable/ic_dot_indicator_7"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</merge>

@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +47,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
 import javax.inject.Inject
@@ -54,7 +57,13 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (query: String, modelId: String?, imagesJson: JSONArray?) -> Unit,
+    val onDuckAiChatSubmitted: (
+        query: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        imagesJson: JSONArray?,
+        filesJson: JSONArray?,
+    ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -81,6 +90,7 @@ interface NativeInputManager {
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
@@ -187,10 +197,20 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
-            animator.animateExit(card, widgetView, omnibarCard, isBottom) {
-                isExiting = false
-                onHide()
-            }
+            layoutCoordinator.setWidgetAnimating(true)
+            animator.animateExit(
+                widgetCard = card,
+                widgetView = widgetView,
+                omnibarCard = omnibarCard,
+                isBottom = isBottom,
+                onUpdate = { layoutCoordinator.onWidgetAnimationFrame(card) },
+                onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+                onComplete = {
+                    layoutCoordinator.setWidgetAnimating(false)
+                    isExiting = false
+                    onHide()
+                },
+            )
         } else {
             isExiting = false
             onHide()
@@ -283,6 +303,7 @@ class RealNativeInputManager @Inject constructor(
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
     ) {
@@ -303,7 +324,7 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
         val prefillText = query.ifEmpty { omnibarController.getText() }
-        bindWidget(widgetView, lifecycleOwner, tabs, callbacks, isBottom)
+        bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             callbacks.onClearAutocomplete()
             widgetFrom(widgetView)?.apply {
@@ -346,10 +367,17 @@ class RealNativeInputManager @Inject constructor(
                 } else if (omnibarController.isDuckAiMode()) {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
+                    val filesJson = widget.getFileAttachmentsJson()
                     widget.text = ""
-                    widget.clearImageAttachments()
+                    widget.clearAttachments()
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId(), imagesJson)
+                    callbacks.onDuckAiChatSubmitted(
+                        query,
+                        widget.getSelectedModelId(),
+                        widget.getResolvedReasoningEffort(),
+                        imagesJson,
+                        filesJson,
+                    )
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)
@@ -427,6 +455,7 @@ class RealNativeInputManager @Inject constructor(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         callbacks: NativeInputCallbacks,
         isBottom: Boolean,
     ) {
@@ -452,7 +481,10 @@ class RealNativeInputManager @Inject constructor(
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
-        layoutCoordinator.applyBottomCardShape(widgetView, isBottom)
+        // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
+        widgetFrom(widgetView)?.bindModelPickerEnabledSource(
+            currentTabUrl.map { !isExistingDuckAiChat(it) },
+        )
     }
 
     private fun bindVoiceButtons(
@@ -575,11 +607,24 @@ class RealNativeInputManager @Inject constructor(
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
-        animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) { onEnterComplete(widgetView) }
+        layoutCoordinator.setWidgetAnimating(true)
+        animator.animateEnter(
+            widgetCard = widgetCard,
+            omnibarCard = omnibarCard,
+            widgetView = widgetView,
+            margins = margins,
+            onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
+            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+            onComplete = {
+                layoutCoordinator.setWidgetAnimating(false)
+                onEnterComplete(widgetView)
+            },
+        )
         return true
     }
 
     private fun onEnterComplete(widgetView: View) {
+        layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
         widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
@@ -659,6 +704,14 @@ class RealNativeInputManager @Inject constructor(
 
     private fun launchUpgrade() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */
+    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean {
+        if (rawUrl.isNullOrBlank()) return false
+        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return false
+        if (!duckChat.isDuckChatUrl(uri)) return false
+        return !uri.getQueryParameter("chatID").isNullOrBlank()
     }
 
     companion object {

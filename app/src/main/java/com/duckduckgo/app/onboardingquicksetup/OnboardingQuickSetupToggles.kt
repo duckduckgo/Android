@@ -20,7 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 /**
@@ -44,8 +43,7 @@ interface OnboardingQuickSetupToggles {
      * cohort should be shown the quick-setup screen during onboarding.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Experiment
-    fun quickSetup(): Toggle
+    fun onboardingQuickSetupExperimentMay26(): Toggle
 
     enum class QuickSetupCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),

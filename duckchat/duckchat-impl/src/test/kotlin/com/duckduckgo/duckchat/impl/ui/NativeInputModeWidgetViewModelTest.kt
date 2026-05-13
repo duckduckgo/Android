@@ -40,7 +40,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -337,18 +337,27 @@ class NativeInputModeWidgetViewModelTest {
         val plugin = fakePlugin(containerId = 1, modelId = "model-1")
         val viewModel = createViewModel(plugins = listOf(plugin))
 
-        viewModel.storePendingPrompt("hello", "model-1")
+        viewModel.storePendingPrompt("hello", "model-1", null)
 
-        verify(pendingNativePromptStore).store("hello", "model-1", emptyList())
+        verify(pendingNativePromptStore).store("hello", "model-1", null, emptyList(), emptyList())
     }
 
     @Test
     fun whenStorePendingPromptWithNoPluginsThenModelIdIsNull() = runTest {
         val viewModel = createViewModel(plugins = emptyList())
 
-        viewModel.storePendingPrompt("hello", null)
+        viewModel.storePendingPrompt("hello", null, null)
 
-        verify(pendingNativePromptStore).store("hello", null, emptyList())
+        verify(pendingNativePromptStore).store("hello", null, null, emptyList(), emptyList())
+    }
+
+    @Test
+    fun whenStorePendingPromptWithReasoningEffortThenForwardsEffort() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello", "model-1", "low")
+
+        verify(pendingNativePromptStore).store("hello", "model-1", "low", emptyList(), emptyList())
     }
 
     @Test
@@ -473,6 +482,53 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenModelPickerDisabledThenGetSelectedModelIdReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.setModelPickerEnabled(false)
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenModelPickerReEnabledThenGetSelectedModelIdReturnsSelection() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.setModelPickerEnabled(false)
+        assertNull(viewModel.getSelectedModelId())
+
+        viewModel.setModelPickerEnabled(true)
+        assertEquals("claude-3", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPluginReturnsReasoningEffortSelectionThenGetResolvedReasoningEffortReturnsIt() = runTest {
+        val plugin = fakeReasoningPlugin(containerId = 7, effort = "low")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenNoPluginContributesReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertNull(viewModel.getResolvedReasoningEffort())
+    }
+
+    private fun fakeReasoningPlugin(containerId: Int, effort: String?): NativeInputPlugin {
+        return object : NativeInputPlugin {
+            override val containerId: Int = containerId
+            override fun createView(context: Context, host: NativeInputHost): View = View(context)
+            override fun getPromptContribution(): PromptContribution? =
+                effort?.let { PromptContribution.ReasoningEffortSelection(it) }
+        }
+    }
+
+    @Test
     fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
         val plugin = fakePlugin(containerId = 99, modelId = null)
         val viewModel = createViewModel(plugins = listOf(plugin))
@@ -489,7 +545,7 @@ class NativeInputModeWidgetViewModelTest {
     private fun fakePlugin(containerId: Int, modelId: String?): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
-            override fun createView(context: Context, onAction: (Action) -> Unit): View = View(context)
+            override fun createView(context: Context, host: NativeInputHost): View = View(context)
             override fun getPromptContribution(): PromptContribution? =
                 modelId?.let { PromptContribution.ModelSelection(it) }
         }

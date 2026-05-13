@@ -59,6 +59,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private var isNativeInputEnabled = false
     private var card: MaterialCardView? = null
     private var jsMessaging: JsMessaging? = null
+    private var widget: NativeInputModeWidget? = null
 
     override fun init(
         card: MaterialCardView,
@@ -71,6 +72,7 @@ class RealContextualNativeInputManager @Inject constructor(
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
+        this.widget = widget
 
         applyCardShape(card)
         setupWidget(widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
@@ -79,10 +81,15 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onWebViewMode() {
         if (isNativeInputEnabled) card?.show() else card?.gone()
+        // WEBVIEW mode means a chat is in progress.
+        // Hide the picker so the user can't change models mid-chat.
+        widget?.setModelPickerEnabled(false)
     }
 
     override fun onInputMode() {
         card?.gone()
+        // INPUT mode is a new chat: restore the picker
+        widget?.setModelPickerEnabled(true)
     }
 
     private fun applyCardShape(card: MaterialCardView) {
@@ -118,8 +125,9 @@ class RealContextualNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { prompt ->
                 val imagesJson = widget.getImageAttachmentsJson()
-                widget.clearImageAttachments()
-                sendPrompt(prompt, widget.getSelectedModelId(), imagesJson)
+                val filesJson = widget.getFileAttachmentsJson()
+                widget.clearAttachments()
+                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), imagesJson, filesJson)
                 widget.text = ""
             },
         )
@@ -131,7 +139,13 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String, modelId: String? = null, imagesJson: JSONArray? = null) {
+    private fun sendPrompt(
+        prompt: String,
+        modelId: String? = null,
+        reasoningEffort: String? = null,
+        imagesJson: JSONArray? = null,
+        filesJson: JSONArray? = null,
+    ) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -143,8 +157,14 @@ class RealContextualNativeInputManager @Inject constructor(
                     if (modelId != null) {
                         put("modelId", modelId)
                     }
+                    if (reasoningEffort != null) {
+                        put("reasoningEffort", reasoningEffort)
+                    }
                     if (imagesJson != null) {
                         put("images", imagesJson)
+                    }
+                    if (filesJson != null) {
+                        put("files", filesJson)
                     }
                 },
             )

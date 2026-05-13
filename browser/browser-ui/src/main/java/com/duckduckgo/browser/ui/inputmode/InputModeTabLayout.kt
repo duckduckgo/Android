@@ -33,10 +33,12 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
 import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.HasMemberInjections
 import javax.inject.Inject
 
+@HasMemberInjections
 @InjectWith(scope = ViewScope::class)
-class InputModeTabLayout @JvmOverloads constructor(
+open class InputModeTabLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.tabStyle,
@@ -58,19 +60,25 @@ class InputModeTabLayout @JvmOverloads constructor(
         outlineProvider = ViewOutlineProvider.BACKGROUND
         clipToOutline = true
     }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        applySearchIconForTheme()
+    }
 
-        val searchTabView = getTabAt(0)!!.view
-        val searchTabIcon = searchTabView.findViewById<ImageView>(R.id.tab_icon)
-        // We're changing the selector to ensure that the right icon is used even if user manually changes the theme,
-        // without relying on the system theme. For these cases, using "drawable-night" directory is not sufficient.
-        if (appTheme.isLightModeEnabled()) {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector))
-        } else {
-            searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
-        }
+    /**
+     * Swaps the search-tab icon for the dark variant when running under the dark app theme. The
+     * drawable-night qualifier is not sufficient because users can override the app theme
+     * independently of the system day/night setting.
+     *
+     * Subclasses that ship a theme-agnostic icon (e.g. the native input toggle) override this
+     * as a no-op.
+     */
+    protected open fun applySearchIconForTheme() {
+        if (appTheme.isLightModeEnabled()) return
+        val searchTabIcon = getTabAt(0)?.view?.findViewById<ImageView>(R.id.tab_icon) ?: return
+        searchTabIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_search_tab_selector_dark))
     }
 
     private fun buildShadowedTabIndicator(
