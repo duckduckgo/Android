@@ -17,18 +17,13 @@
 package com.duckduckgo.common.ui.compose.dialog
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -158,8 +153,8 @@ private fun TextAlertDialogCheckbox(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(top = 8.dp),
     ) {
+        // TODO: replace with DaxCheckbox once the ADS checkbox is migrated to Compose.
         Checkbox(
             checked = checkboxChecked,
             onCheckedChange = onCheckboxChanged,
@@ -177,7 +172,6 @@ private fun TextAlertDialogCheckbox(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TextAlertDialogButtons(
     positiveButtonText: String,
@@ -185,15 +179,10 @@ private fun TextAlertDialogButtons(
     negativeButtonText: String?,
     onNegativeClick: (() -> Unit)?,
 ) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        if (negativeButtonText != null && onNegativeClick != null) {
-            DaxGhostButton(text = negativeButtonText, onClick = onNegativeClick)
-        }
-        DaxPrimaryButton(text = positiveButtonText, onClick = onPositiveClick)
+    if (negativeButtonText != null && onNegativeClick != null) {
+        DaxGhostButton(text = negativeButtonText, onClick = onNegativeClick)
     }
+    DaxPrimaryButton(text = positiveButtonText, onClick = onPositiveClick)
 }
 
 @PreviewLightDark
@@ -238,6 +227,22 @@ private fun AlertDialogSingleButtonPreview() {
             message = "This is an informational dialog with only one button.",
             positiveButtonText = "OK",
             onPositiveClick = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TextAlertDialogWithImagePreview() {
+    PreviewBox {
+        TextAlertDialogContent(
+            title = "Dialog Title",
+            message = "Header image rendered above the title at 40dp.",
+            positiveButtonText = "Confirm",
+            onPositiveClick = {},
+            negativeButtonText = "Cancel",
+            onNegativeClick = {},
+            headerImage = com.duckduckgo.mobile.android.R.drawable.ic_dax_icon,
         )
     }
 }

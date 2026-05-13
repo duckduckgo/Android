@@ -20,9 +20,14 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
@@ -30,10 +35,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 
 /**
  * Base alert dialog composable for the DuckDuckGo design system.
@@ -60,7 +70,7 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735717450949
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DaxAlertDialog(
     onDismissRequest: () -> Unit,
@@ -82,7 +92,7 @@ fun DaxAlertDialog(
     ) {
         DaxAlertDialogContent(
             title = title,
-            modifier = modifier.fillMaxWidth(0.83f),
+            modifier = modifier.widthIn(min = 280.dp, max = 560.dp),
             message = message,
             headerImage = headerImage,
             content = content,
@@ -95,6 +105,7 @@ fun DaxAlertDialog(
  * The content of [DaxAlertDialog] extracted for preview support.
  * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun DaxAlertDialogContent(
     title: String,
@@ -111,16 +122,16 @@ internal fun DaxAlertDialogContent(
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (headerImage != null) {
                 Image(
                     painter = painterResource(id = headerImage),
                     contentDescription = null,
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .size(40.dp),
+                        .align(Alignment.CenterHorizontally)
+                        .size(24.dp),
                 )
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             DaxText(
@@ -149,15 +160,37 @@ internal fun DaxAlertDialogContent(
                 }
             }
 
-            Column(
+            FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                horizontalAlignment = Alignment.End,
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 buttons()
             }
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxAlertDialogAllSlotsPreview() {
+    PreviewBox {
+        DaxAlertDialogContent(
+            title = "Dialog Title",
+            message = {
+                DaxText(
+                    text = "This dialog uses every slot the base composable exposes.",
+                    style = DuckDuckGoTheme.typography.body1,
+                    color = DuckDuckGoTheme.textColors.secondary,
+                )
+            },
+            headerImage = R.drawable.ic_dax_icon,
+            buttons = {
+                DaxGhostButton(text = "Cancel", onClick = {})
+                DaxPrimaryButton(text = "Confirm", onClick = {})
+            },
+        )
     }
 }

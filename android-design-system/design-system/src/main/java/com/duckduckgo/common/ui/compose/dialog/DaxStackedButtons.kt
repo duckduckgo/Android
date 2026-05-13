@@ -18,10 +18,12 @@ package com.duckduckgo.common.ui.compose.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
@@ -50,7 +52,9 @@ fun DaxStackedButtons(
     destructiveButtonIndex: Int? = null,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
         horizontalAlignment = Alignment.End,
     ) {
         buttonTitles.forEachIndexed { index, buttonTitle ->
@@ -105,6 +109,29 @@ private fun DaxStackedButtonsDestructivePreview() {
                     buttonTitles = persistentListOf("Keep", "Delete"),
                     onButtonClick = {},
                     destructiveButtonIndex = 1,
+                )
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxStackedButtonsFourButtonsPreview() {
+    PreviewBox {
+        DaxAlertDialogContent(
+            title = "Pick An Option",
+            message = {
+                DaxText(
+                    text = "Four-button variant — stacked vertically, end-aligned.",
+                    style = DuckDuckGoTheme.typography.body1,
+                    color = DuckDuckGoTheme.textColors.secondary,
+                )
+            },
+            buttons = {
+                DaxStackedButtons(
+                    buttonTitles = persistentListOf("Option 1", "Option 2", "Option 3", "Cancel"),
+                    onButtonClick = {},
                 )
             },
         )

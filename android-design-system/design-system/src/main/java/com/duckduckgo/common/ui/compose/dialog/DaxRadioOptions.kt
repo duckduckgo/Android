@@ -92,8 +92,9 @@ fun DaxRadioOptions(
                         onClick = { onOptionSelected(index) },
                         role = Role.RadioButton,
                     )
-                    .padding(vertical = 4.dp),
+                    .padding(12.dp),
             ) {
+                // TODO: replace with DaxRadioButton once the ADS radio button is migrated to Compose.
                 RadioButton(
                     selected = selectedIndex == index,
                     onClick = null,
@@ -135,6 +136,34 @@ private fun DaxRadioOptionsInDialogPreview() {
             buttons = {
                 DaxGhostButton(text = "Cancel", onClick = {})
                 DaxPrimaryButton(text = "Apply", onClick = {})
+            },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxRadioOptionsUnselectedPreview() {
+    PreviewBox {
+        DaxAlertDialogContent(
+            title = "Select Theme",
+            message = {
+                DaxText(
+                    text = "Nothing chosen yet — apply button stays disabled.",
+                    style = DuckDuckGoTheme.typography.body1,
+                    color = DuckDuckGoTheme.textColors.secondary,
+                )
+            },
+            content = {
+                DaxRadioOptions(
+                    optionTitles = persistentListOf("Light", "Dark", "System Default"),
+                    selectedIndex = -1,
+                    onOptionSelected = {},
+                )
+            },
+            buttons = {
+                DaxGhostButton(text = "Cancel", onClick = {})
+                DaxPrimaryButton(text = "Apply", enabled = false, onClick = {})
             },
         )
     }
