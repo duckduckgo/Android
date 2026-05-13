@@ -29,8 +29,8 @@ import androidx.test.espresso.web.sugar.Web
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
