@@ -125,10 +125,7 @@ class OptionsView(context: Context) : FrameLayout(context) {
 
     private fun showAtPosition(popup: PopupWindow) {
         val loc = IntArray(2).also { getLocationOnScreen(it) }
-        val x = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
-        val y = resources.displayMetrics.heightPixels - loc[1] +
-            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
-        popup.showAtLocation(rootView, Gravity.BOTTOM or Gravity.START, x, y)
+        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
     }
 
     private fun dismissPopup() {
