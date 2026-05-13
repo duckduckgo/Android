@@ -67,6 +67,7 @@ class RealNativeInputStateProvider @Inject constructor(
 
     override suspend fun updateFromChat(tabId: String, chatId: String) {
         val modelId = duckAiChatStore.getChat(chatId)?.model?.takeIf { it.isNotEmpty() }
+        logcat { "NativeInputState[$tabId] updateFromChat [$chatId] with model [$modelId]" }
         update(tabId) {
             copy(chatId = chatId, selectedModelId = modelId ?: selectedModelId)
         }
