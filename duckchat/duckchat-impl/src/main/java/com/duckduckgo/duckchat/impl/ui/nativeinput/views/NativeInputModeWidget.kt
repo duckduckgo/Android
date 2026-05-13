@@ -64,6 +64,8 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -109,6 +111,12 @@ interface NativeInputWidget {
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun getResolvedReasoningEffort(): String?
+    fun setModelPickerEnabled(enabled: Boolean)
+
+    /**
+     * Binds a reactive source of "should the model picker be enabled?"
+     */
+    fun bindModelPickerEnabledSource(source: Flow<Boolean>)
     fun getImageAttachmentsJson(): JSONArray?
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
@@ -180,6 +188,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+    private var modelPickerEnabledJob: Job? = null
+    private var modelPickerEnabledSource: Flow<Boolean>? = null
+    private var modelPickerView: ModelPicker? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -226,6 +237,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setupPlugins()
+        observeModelPickerEnabledSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -247,6 +259,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected()
                         }
+                        if (pluginView is ModelPicker) {
+                            modelPickerView = pluginView
+                            // Apply the current enabled state. The host may have set it
+                            // before plugins were created.
+                            pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
+                        }
                         wirePluginView(pluginView, scope)
                     }
                 }
@@ -263,6 +281,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
                                 command.visible && hasAttachments
                         }
                     }
+                }
+            }
+            launch {
+                viewModel.modelPickerEnabled.collect { enabled ->
+                    modelPickerView?.setPickerEnabled(enabled)
                 }
             }
         }
@@ -305,6 +328,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         nativeInputStateJob = null
         pluginsJob?.cancel()
         pluginsJob = null
+        modelPickerEnabledJob?.cancel()
+        modelPickerEnabledJob = null
+        modelPickerView = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -638,6 +664,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
     override fun getResolvedReasoningEffort(): String? = viewModel.getResolvedReasoningEffort()
+
+    override fun setModelPickerEnabled(enabled: Boolean) {
+        viewModel.setModelPickerEnabled(enabled)
+    }
+
+    override fun bindModelPickerEnabledSource(source: Flow<Boolean>) {
+        modelPickerEnabledSource = source
+        if (isAttachedToWindow) observeModelPickerEnabledSource()
+    }
+
+    private fun observeModelPickerEnabledSource() {
+        val source = modelPickerEnabledSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        modelPickerEnabledJob?.cancel()
+        modelPickerEnabledJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setModelPickerEnabled(it) }
+            .launchIn(scope)
+    }
 
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 

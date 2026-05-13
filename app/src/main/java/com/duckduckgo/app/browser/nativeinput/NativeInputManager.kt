@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +47,9 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
 import javax.inject.Inject
@@ -87,6 +90,7 @@ interface NativeInputManager {
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
@@ -289,6 +293,7 @@ class RealNativeInputManager @Inject constructor(
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         query: String,
         callbacks: NativeInputCallbacks,
     ) {
@@ -309,7 +314,7 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = omnibarController.isDuckAiMode() || omnibarController.isOmnibarBottom()
         val widgetView = createWidgetView(layoutInflater, isBottom)
         val prefillText = query.ifEmpty { omnibarController.getText() }
-        bindWidget(widgetView, lifecycleOwner, tabs, callbacks, isBottom)
+        bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
             callbacks.onClearAutocomplete()
             widgetFrom(widgetView)?.apply {
@@ -440,6 +445,7 @@ class RealNativeInputManager @Inject constructor(
         widgetView: View,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
+        currentTabUrl: Flow<String?>,
         callbacks: NativeInputCallbacks,
         isBottom: Boolean,
     ) {
@@ -465,6 +471,10 @@ class RealNativeInputManager @Inject constructor(
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
+        // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
+        widgetFrom(widgetView)?.bindModelPickerEnabledSource(
+            currentTabUrl.map { !isExistingDuckAiChat(it) },
+        )
     }
 
     private fun bindVoiceButtons(
@@ -671,6 +681,14 @@ class RealNativeInputManager @Inject constructor(
 
     private fun launchUpgrade() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
+    /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */
+    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean {
+        if (rawUrl.isNullOrBlank()) return false
+        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return false
+        if (!duckChat.isDuckChatUrl(uri)) return false
+        return !uri.getQueryParameter("chatID").isNullOrBlank()
     }
 
     companion object {

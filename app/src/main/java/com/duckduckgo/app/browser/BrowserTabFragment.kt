@@ -89,6 +89,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -1322,6 +1323,7 @@ class BrowserTabFragment :
             layoutInflater = layoutInflater,
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
+            currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
@@ -1347,10 +1349,9 @@ class BrowserTabFragment :
                                     JSONObject().apply {
                                         put("prompt", query)
                                         put("autoSubmit", true)
-                                        // TODO: This currently causes a new chat to be sent if set
-                                        // if (modelId != null) {
-                                        //     put("modelId", modelId)
-                                        // }
+                                        if (modelId != null) {
+                                            put("modelId", modelId)
+                                        }
                                         if (reasoningEffort != null) {
                                             put("reasoningEffort", reasoningEffort)
                                         }
