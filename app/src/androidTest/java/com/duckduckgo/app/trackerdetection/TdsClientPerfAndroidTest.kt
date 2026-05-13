@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -187,6 +188,7 @@ class TdsClientPerfAndroidTest {
      * /proc/cpuinfo gives a fallback hardware/board hint and the actual core count seen by the
      * kernel (which may differ from Runtime.availableProcessors() if the process is restricted).
      */
+    @SuppressLint("DenyListedApi")
     private fun logSocDetails() {
         val soc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             "${Build.SOC_MANUFACTURER} / ${Build.SOC_MODEL}"
