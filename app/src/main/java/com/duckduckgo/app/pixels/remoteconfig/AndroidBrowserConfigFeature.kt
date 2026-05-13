@@ -53,12 +53,12 @@ interface AndroidBrowserConfigFeature {
     fun screenLock(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV2" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
+     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV3" androidBrowserConfig
+     * sub-feature flag enabled. Controls the HashMap label-walk tracker-domain lookup path.
+     * If the remote feature is not present defaults to `false`. Always-on for internal builds.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun optimizeTrackerEvaluationV2(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun optimizeTrackerEvaluationV3(): Toggle
 
     /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
