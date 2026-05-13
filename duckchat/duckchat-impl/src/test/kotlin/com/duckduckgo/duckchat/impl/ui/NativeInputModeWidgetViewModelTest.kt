@@ -482,6 +482,28 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenModelPickerDisabledThenGetSelectedModelIdReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.setModelPickerEnabled(false)
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenModelPickerReEnabledThenGetSelectedModelIdReturnsSelection() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        viewModel.setModelPickerEnabled(false)
+        assertNull(viewModel.getSelectedModelId())
+
+        viewModel.setModelPickerEnabled(true)
+        assertEquals("claude-3", viewModel.getSelectedModelId())
+    }
+
+    @Test
     fun whenPluginReturnsReasoningEffortSelectionThenGetResolvedReasoningEffortReturnsIt() = runTest {
         val plugin = fakeReasoningPlugin(containerId = 7, effort = "low")
         val viewModel = createViewModel(plugins = listOf(plugin))

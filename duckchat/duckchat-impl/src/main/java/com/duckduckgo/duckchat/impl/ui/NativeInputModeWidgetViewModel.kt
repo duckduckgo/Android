@@ -111,6 +111,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _plugins = MutableStateFlow<List<NativeInputPlugin>>(emptyList())
     val plugins: StateFlow<List<NativeInputPlugin>> = _plugins.asStateFlow()
 
+    private val _modelPickerEnabled = MutableStateFlow(true)
+    val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
+
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -127,7 +130,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun setModelPickerEnabled(enabled: Boolean) {
+        _modelPickerEnabled.value = enabled
+    }
+
     fun getSelectedModelId(): String? {
+        if (!_modelPickerEnabled.value) return null
         return _plugins.value.firstNotNullOfOrNull { plugin ->
             (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
         }
