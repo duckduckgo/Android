@@ -283,8 +283,9 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
         transition = { event -> if (event is OnboardingEvent.PrimaryClicked) Advance else Stay },
     )
 
-    // Step in the side plan: Primary terminates; Secondary returns to the caller.
-    // Advance off the single-step plan pops the call stack → main resumes past the caller.
+    // Step in the side plan: Primary terminates the linear flow entirely;
+    // Secondary returns to the caller plan (Return pops the call stack →
+    // main resumes past the step that did SwitchTo).
     private fun skipOnboardingOptionStep() = IsolatedStep(
         id = "skip_onboarding_option",
         resolveDialog = { IsolatedOnboardingDialog.SkipOnboardingOption },
@@ -295,7 +296,7 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
             }
             is OnboardingEvent.SecondaryClicked -> {
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
-                Advance
+                Return
             }
             else -> Stay
         }},
@@ -396,8 +397,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
 }
 ```
 
-The full event loop in one trace:
-
-> Fragment renders `Initial` dialog → user taps primary → fragment calls `viewModel.onPrimaryCtaClicked()` → viewmodel sends `OnboardingEvent.PrimaryClicked` to `orchestrator.onEvent()` → orchestrator looks up `currentStep`, calls its `transition()`, gets `Advance` back → orchestrator walks the plan, lands on the next eligible step → state flow emits new `InProgress(currentPlan, currentStepIndex)` → viewmodel resolves the new step's dialog and updates `_dialogState` → fragment renders the next dialog. None of this touches the orchestrator-impl with anything domain-specific.
+The full event loop is in [`2026-05-06-linear-onboarding-orchestrator-design-event-loop.puml`](2026-05-06-linear-onboarding-orchestrator-design-event-loop.puml) — a single primary tap on `Initial` traced from fragment through viewmodel → orchestrator → step transition → state re-emission → re-render as `ComparisonChart`. The orchestrator never inspects the event content; everything domain-specific stays on the `:app` side of the boundary.
 
 An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately. 

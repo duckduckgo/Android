@@ -1,0 +1,49 @@
+@startuml
+title Event loop — primary click on `Initial` advances to `ComparisonChart`
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+actor User
+participant "BrandDesignUpdate-\nWelcomePage\n(Fragment)" as Frag
+participant "BrandDesignUpdate-\nPageViewModel" as VM
+participant "LinearOnboarding-\nOrchestrator" as Orch
+participant "currentStep\n(IsolatedStep)" as Step
+
+== Initial render (already InProgress(Initial)) ==
+
+Orch --> VM : state = InProgress(plan, idx)
+VM -> Step : currentStep.resolveDialog()
+Step --> VM : IsolatedOnboardingDialog.Initial(...)
+VM --> Frag : dialogState = Initial(...)
+Frag -> Frag : configureDaxCta(Initial(...))
+
+== User taps primary ==
+
+User -> Frag : tap primary CTA
+Frag -> VM : onPrimaryCtaClicked()
+VM -> Orch : onEvent(OnboardingEvent.PrimaryClicked)
+note right of Orch
+  Orchestrator never inspects the event.
+  Just routes it to currentStep.transition().
+end note
+
+Orch -> Step : currentStep.transition(event)
+Step --> Orch : Advance
+
+Orch -> Orch : walk plan from idx+1,\nskip steps whose precondition()\nreturns false
+Orch -> Orch : update state = InProgress(plan, newIdx)
+Orch --> VM : state = InProgress(plan, newIdx)\n[currentStep is now ComparisonChart]
+
+== Re-render ==
+
+VM -> Step : currentStep.resolveDialog()
+note right of Step
+  Now this is the
+  ComparisonChart step.
+end note
+Step --> VM : IsolatedOnboardingDialog.ComparisonChart(...)
+VM --> Frag : dialogState = ComparisonChart(...)
+Frag -> Frag : configureDaxCta(ComparisonChart(...))
+
+@enduml
