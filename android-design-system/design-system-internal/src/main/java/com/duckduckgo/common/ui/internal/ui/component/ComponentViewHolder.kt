@@ -41,7 +41,6 @@ import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
@@ -112,26 +111,24 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.setupThemedComposeView(id = R.id.compose_dax_radio_button, isDarkTheme = isDarkTheme) {
                 var indexSelected by remember { mutableIntStateOf(0) }
 
-                DuckDuckGoTheme {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        DaxRadioButton(
-                            selected = indexSelected == 0,
-                            onClick = { indexSelected = 0 },
-                        )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    DaxRadioButton(
+                        selected = indexSelected == 0,
+                        onClick = { indexSelected = 0 },
+                    )
 
-                        DaxRadioButton(
-                            selected = indexSelected == 1,
-                            onClick = { indexSelected = 1 },
-                        )
+                    DaxRadioButton(
+                        selected = indexSelected == 1,
+                        onClick = { indexSelected = 1 },
+                    )
 
-                        DaxRadioButton(selected = false, onClick = {}, enabled = false)
+                    DaxRadioButton(selected = false, onClick = {}, enabled = false)
 
-                        DaxRadioButton(selected = true, onClick = {}, enabled = false)
-                    }
+                    DaxRadioButton(selected = true, onClick = {}, enabled = false)
                 }
             }
         }
