@@ -64,19 +64,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -88,7 +86,7 @@ data class ChatTabSuggestions(
 @ContributesViewModel(ViewScope::class)
 class NativeInputModeWidgetViewModel @Inject constructor(
     private val duckChatInternal: DuckChatInternal,
-    duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiFeatureState: DuckAiFeatureState,
     subscriptions: Subscriptions,
     private val pendingNativePromptStore: PendingNativePromptStore,
     private val chatSuggestionsReader: ChatSuggestionsReader,
@@ -107,8 +105,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     // Null until configure()/configureContextual() is called.
     private val tabIdFlow = MutableStateFlow<String?>(null)
 
+    /**
+     * The active tab's state, as held by the provider. Emits [NativeInputState.zero] until
+     * configure()/configureContextual() sets a tab.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val tabState: StateFlow<NativeInputState> = tabIdFlow
+    val state: StateFlow<NativeInputState> = tabIdFlow
         .flatMapLatest { id ->
             if (id == null) flowOf(NativeInputState.zero()) else nativeInputStateProvider.stateForTab(id)
         }
@@ -137,6 +139,29 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         viewModelScope.launch {
             _plugins.value = nativeInputPlugins.getPlugins().toList()
         }
+        observeInputModeAndPushToProvider()
+    }
+
+    /**
+     * Push the [NativeInputState.inputMode] for the active tab into the provider whenever the
+     * upstream flag flows emit. configure()/configureContextual() cannot compute inputMode
+     * synchronously because the flag sources are plain Flow<Boolean> with no `.value` — this
+     * collector observes them and keeps the provider in sync.
+     * inputContext / inputPosition are written directly by configure()/setDuckAiMode()/setWidgetPosition().
+     */
+    private fun observeInputModeAndPushToProvider() {
+        viewModelScope.launch {
+            combine(
+                duckAiFeatureState.showSettings,
+                duckChatInternal.observeEnableDuckChatUserSetting(),
+                duckChatInternal.observeInputScreenUserSettingEnabled(),
+                tabIdFlow.filterNotNull(),
+            ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, tabId ->
+                tabId to getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled)
+            }.collect { (tabId, mode) ->
+                mutableNativeInputStateProvider.update(tabId) { copy(inputMode = mode) }
+            }
+        }
     }
 
     fun updatePluginContainerVisibility(isChatTab: Boolean) {
@@ -146,7 +171,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun getSelectedModelId(): String? = tabState.value.selectedModelId
+    fun getSelectedModelId(): String? = state.value.selectedModelId
         ?: _plugins.value.firstNotNullOfOrNull { plugin ->
             @Suppress("DEPRECATION")
             (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
@@ -157,34 +182,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             (plugin.getPromptContribution() as? PromptContribution.ReasoningEffortSelection)?.effort
         }
     }
-
-    private data class WidgetConfig(
-        val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
-        val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
-    )
-
-    private val widgetConfig = MutableStateFlow(WidgetConfig())
-
-    val state: SharedFlow<NativeInputState> = combine(
-        duckAiFeatureState.showSettings,
-        duckChatInternal.observeEnableDuckChatUserSetting(),
-        duckChatInternal.observeInputScreenUserSettingEnabled(),
-        widgetConfig,
-        tabState,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, perTab ->
-        NativeInputState(
-            inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
-            inputContext = config.inputContext,
-            inputPosition = config.inputPosition,
-            selectedModelId = perTab.selectedModelId,
-            chatId = perTab.chatId,
-            fileRefs = perTab.fileRefs,
-        )
-    }.shareIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        replay = 1,
-    )
 
     val chatState: Flow<ChatState> = duckChatInternal.chatState
 
@@ -207,22 +204,24 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun setDuckAiMode(isDuckAiMode: Boolean) {
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
-        widgetConfig.update { it.copy(inputContext = context) }
+        tabIdFlow.value?.let { tabId ->
+            mutableNativeInputStateProvider.update(tabId) { copy(inputContext = context) }
+        }
     }
 
     fun setWidgetPosition(isBottom: Boolean) {
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
-        widgetConfig.update { it.copy(inputPosition = position) }
+        tabIdFlow.value?.let { tabId ->
+            mutableNativeInputStateProvider.update(tabId) { copy(inputPosition = position) }
+        }
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
-        tabIdFlow.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
-        widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
-        val currentMode = state.replayCache.lastOrNull()?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY
-        val structural = NativeInputState(inputMode = currentMode, inputContext = context, inputPosition = position)
-        mutableNativeInputStateProvider.updateActiveTab(tabId, structural)
+        mutableNativeInputStateProvider.update(tabId) { copy(inputContext = context, inputPosition = position) }
+        mutableNativeInputStateProvider.updateActiveTab(tabId)
+        tabIdFlow.value = tabId
     }
 
     fun storePendingPrompt(
@@ -236,15 +235,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun configureContextual(tabId: String) {
+        mutableNativeInputStateProvider.update(tabId) {
+            copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL)
+        }
+        mutableNativeInputStateProvider.updateActiveTab(tabId)
         tabIdFlow.value = tabId
-        widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
-        val snapshot = state.replayCache.lastOrNull()
-        val structural = NativeInputState(
-            inputMode = snapshot?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY,
-            inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
-            inputPosition = snapshot?.inputPosition ?: NativeInputState.InputPosition.TOP,
-        )
-        mutableNativeInputStateProvider.updateActiveTab(tabId, structural)
     }
 
     fun cancelChatSuggestions() {

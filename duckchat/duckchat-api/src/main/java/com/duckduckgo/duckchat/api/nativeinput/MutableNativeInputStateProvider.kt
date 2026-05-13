@@ -24,13 +24,10 @@ package com.duckduckgo.duckchat.api.nativeinput
 interface MutableNativeInputStateProvider {
 
     /**
-     * Marks [tabId] as the active tab and writes the structural fields the widget owns:
-     * [NativeInputState.inputMode], [NativeInputState.inputContext], [NativeInputState.inputPosition].
-     * Per-tab fields already known for [tabId] (e.g. [NativeInputState.selectedModelId],
-     * [NativeInputState.chatId]) are preserved.
-     * Drives [NativeInputStateProvider.displayedState] to reflect this tab.
+     * Marks [tabId] as the active tab. The tab's existing state is unchanged — to write fields,
+     * call [update] separately. Drives [NativeInputStateProvider.displayedState] to mirror this tab.
      */
-    fun updateActiveTab(tabId: String, structural: NativeInputState)
+    fun updateActiveTab(tabId: String)
 
     /**
      * Applies [patch] to the current state for [tabId], creating the entry from

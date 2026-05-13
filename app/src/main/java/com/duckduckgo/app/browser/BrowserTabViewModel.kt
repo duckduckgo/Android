@@ -1886,6 +1886,10 @@ class BrowserTabViewModel @Inject constructor(
             is WebNavigationStateChange.PageCleared -> pageCleared()
             is WebNavigationStateChange.UrlUpdated -> {
                 val uri = stateChange.url.toUri()
+                // Duck.ai is a SPA: when a chat starts, the chatID query param is appended via
+                // history.pushState, which fires UrlUpdated (not NewPage). Re-evaluate so the
+                // native input state picks up the new chatId.
+                evaluateDuckAIPage(stateChange.url)
                 viewModelScope.launch(dispatchers.io()) {
                     if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
                         duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)?.let {

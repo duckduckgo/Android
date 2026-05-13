@@ -54,16 +54,9 @@ class RealNativeInputStateProvider @Inject constructor(
     override fun stateForTab(tabId: String): StateFlow<NativeInputState> =
         flowFor(tabId).asStateFlow()
 
-    override fun updateActiveTab(tabId: String, structural: NativeInputState) {
+    override fun updateActiveTab(tabId: String) {
         activeTabId = tabId
-        val flow = flowFor(tabId)
-        val merged = flow.value.copy(
-            inputMode = structural.inputMode,
-            inputContext = structural.inputContext,
-            inputPosition = structural.inputPosition,
-        )
-        flow.value = merged
-        _displayedState.value = merged
+        _displayedState.value = flowFor(tabId).value
     }
 
     override fun update(tabId: String, patch: NativeInputState.() -> NativeInputState) {

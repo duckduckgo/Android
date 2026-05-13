@@ -65,6 +65,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -151,213 +152,100 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenInitialStateThenInputModeReflectsObservedSources() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-
-        val freshTestee = createViewModel()
-
-        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, freshTestee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenInitialContextThenBrowser() = runTest {
-        assertEquals(NativeInputState.InputContext.BROWSER, testee.state.firstOrNull()!!.inputContext)
-    }
-
-    @Test
-    fun whenIsEnabledFlowEmitsTrueAndInputScreenSettingTrueThenSearchAndDuckAi() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-
-        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenIsEnabledFlowFlipsToFalseThenSearchOnly() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.state.firstOrNull()!!.inputMode)
-
-        setIsEnabled(false)
-
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenInputScreenUserSettingFlipsToFalseThenSearchOnly() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.state.firstOrNull()!!.inputMode)
-
-        inputScreenUserSettingFlow.value = false
-
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenIsEnabledTrueButInputScreenSettingFalseThenSearchOnly() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = false
-
-        assertEquals(NativeInputState.InputMode.SEARCH_ONLY, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenSearchAndDuckAiThenToggleVisible() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-
-        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
-    }
-
-    @Test
-    fun whenSearchOnlyThenToggleNotVisible() = runTest {
-        setIsEnabled(false)
-        inputScreenUserSettingFlow.value = false
-
-        assertFalse(testee.state.firstOrNull()!!.toggleVisible)
-    }
-
-    @Test
-    fun whenSetDuckAiModeTrueThenContextIsDuckAi() = runTest {
-        testee.setDuckAiMode(true)
-
-        assertEquals(NativeInputState.InputContext.DUCK_AI, testee.state.firstOrNull()!!.inputContext)
-    }
-
-    @Test
-    fun whenSetDuckAiModeFalseThenContextIsBrowser() = runTest {
-        testee.setDuckAiMode(true)
-        testee.setDuckAiMode(false)
-
-        assertEquals(NativeInputState.InputContext.BROWSER, testee.state.firstOrNull()!!.inputContext)
-    }
-
-    @Test
-    fun whenContextIsDuckAiThenDefaultToggleSelectionIsDuckAi() = runTest {
-        testee.setDuckAiMode(true)
-
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
-    }
-
-    @Test
-    fun whenContextIsBrowserThenDefaultToggleSelectionIsSearch() = runTest {
-        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.state.firstOrNull()!!.defaultToggleSelection)
-    }
-
-    @Test
-    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleVisible() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        testee.setDuckAiMode(true)
-
-        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
-    }
-
-    @Test
-    fun whenConfigureContextualThenContextIsDuckAiContextual() = runTest {
-        testee.configureContextual("tab-1")
-
-        assertEquals(NativeInputState.InputContext.DUCK_AI_CONTEXTUAL, testee.state.firstOrNull()!!.inputContext)
-    }
-
-    @Test
-    fun whenContextIsDuckAiContextualAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        testee.configureContextual("tab-1")
-
-        assertFalse(testee.state.firstOrNull()!!.toggleVisible)
-    }
-
-    @Test
-    fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
-        testee.configureContextual("tab-1")
-
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
-    }
-
-    @Test
-    fun whenSetDuckAiModeThenInputModeUnchanged() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        val initialMode = testee.state.firstOrNull()!!.inputMode
-
-        testee.setDuckAiMode(true)
-
-        assertEquals(initialMode, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenInitialPositionThenTop() = runTest {
-        assertEquals(NativeInputState.InputPosition.TOP, testee.state.firstOrNull()!!.inputPosition)
-    }
-
-    @Test
-    fun whenSetInputPositionBottomThenPositionIsBottom() = runTest {
-        testee.setWidgetPosition(isBottom = true)
-
-        assertEquals(NativeInputState.InputPosition.BOTTOM, testee.state.firstOrNull()!!.inputPosition)
-    }
-
-    @Test
-    fun whenSetInputPositionTopThenPositionIsTop() = runTest {
-        testee.setWidgetPosition(isBottom = true)
-        testee.setWidgetPosition(isBottom = false)
-
-        assertEquals(NativeInputState.InputPosition.TOP, testee.state.firstOrNull()!!.inputPosition)
-    }
-
-    @Test
-    fun whenPositionIsBottomThenIsBottomTrue() = runTest {
-        testee.setWidgetPosition(isBottom = true)
-
-        assertTrue(testee.state.firstOrNull()!!.isBottom)
-    }
-
-    @Test
-    fun whenPositionIsTopThenIsBottomFalse() = runTest {
-        assertFalse(testee.state.firstOrNull()!!.isBottom)
-    }
-
-    @Test
-    fun whenSetInputPositionThenInputModeUnchanged() = runTest {
-        setIsEnabled(true)
-        inputScreenUserSettingFlow.value = true
-        val initialMode = testee.state.firstOrNull()!!.inputMode
-
-        testee.setWidgetPosition(isBottom = true)
-
-        assertEquals(initialMode, testee.state.firstOrNull()!!.inputMode)
-    }
-
-    @Test
-    fun whenConfigureThenBothContextAndPositionSetAtomically() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = true)
-
-        val state = testee.state.firstOrNull()!!
-        assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)
-        assertEquals(NativeInputState.InputPosition.BOTTOM, state.inputPosition)
-    }
-
-    @Test
-    fun whenConfigureCalledThenSetActiveTabCalledOnProvider() = runTest {
+    fun whenConfigureCalledThenUpdateActiveTabCalledOnProvider() = runTest {
         testee.configure("tab-abc", isDuckAiMode = false, isBottom = false)
 
-        verify(mutableNativeInputStateProvider).updateActiveTab(
+        verify(mutableNativeInputStateProvider).updateActiveTab("tab-abc")
+    }
+
+    @Test
+    fun whenConfigureCalledThenInputContextAndPositionPushedToProvider() = runTest {
+        testee.configure("tab-abc", isDuckAiMode = true, isBottom = true)
+
+        verify(mutableNativeInputStateProvider).update(
             eq("tab-abc"),
-            any(),
+            argThat {
+                val patched = invoke(NativeInputState.zero())
+                patched.inputContext == NativeInputState.InputContext.DUCK_AI &&
+                    patched.inputPosition == NativeInputState.InputPosition.BOTTOM
+            },
         )
     }
 
     @Test
-    fun whenConfigureWithDuckAiModeThenSetActiveTabWithDuckAiContext() = runTest {
-        testee.configure("tab-abc", isDuckAiMode = true, isBottom = false)
+    fun whenConfigureContextualCalledThenInputContextPushedAsContextual() = runTest {
+        testee.configureContextual("tab-1")
 
-        verify(mutableNativeInputStateProvider).updateActiveTab(
-            eq("tab-abc"),
-            argThat { inputContext == NativeInputState.InputContext.DUCK_AI },
+        verify(mutableNativeInputStateProvider).update(
+            eq("tab-1"),
+            argThat {
+                invoke(NativeInputState.zero()).inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+            },
+        )
+        verify(mutableNativeInputStateProvider).updateActiveTab("tab-1")
+    }
+
+    @Test
+    fun whenSetDuckAiModeWithoutConfigureThenNothingPushed() = runTest {
+        testee.setDuckAiMode(true)
+
+        verify(mutableNativeInputStateProvider, never()).update(any(), any())
+    }
+
+    @Test
+    fun whenSetDuckAiModeAfterConfigureThenInputContextPushedToProvider() = runTest {
+        testee.configure("tab-1", isDuckAiMode = false, isBottom = false)
+
+        testee.setDuckAiMode(true)
+
+        verify(mutableNativeInputStateProvider).update(
+            eq("tab-1"),
+            argThat { invoke(NativeInputState.zero()).inputContext == NativeInputState.InputContext.DUCK_AI },
+        )
+    }
+
+    @Test
+    fun whenSetWidgetPositionWithoutConfigureThenNothingPushed() = runTest {
+        testee.setWidgetPosition(isBottom = true)
+
+        verify(mutableNativeInputStateProvider, never()).update(any(), any())
+    }
+
+    @Test
+    fun whenSetWidgetPositionAfterConfigureThenInputPositionPushedToProvider() = runTest {
+        testee.configure("tab-1", isDuckAiMode = false, isBottom = false)
+
+        testee.setWidgetPosition(isBottom = true)
+
+        verify(mutableNativeInputStateProvider).update(
+            eq("tab-1"),
+            argThat { invoke(NativeInputState.zero()).inputPosition == NativeInputState.InputPosition.BOTTOM },
+        )
+    }
+
+    @Test
+    fun whenFeatureAndUserSettingsEnableInputScreenThenInputModePushedAsSearchAndDuckAi() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = true
+
+        testee.configure("tab-1", isDuckAiMode = false, isBottom = false)
+
+        verify(mutableNativeInputStateProvider, atLeastOnce()).update(
+            eq("tab-1"),
+            argThat { invoke(NativeInputState.zero()).inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI },
+        )
+    }
+
+    @Test
+    fun whenInputScreenSettingDisabledThenNoSearchAndDuckAiPushed() = runTest {
+        setIsEnabled(true)
+        inputScreenUserSettingFlow.value = false
+
+        testee.configure("tab-1", isDuckAiMode = false, isBottom = false)
+
+        verify(mutableNativeInputStateProvider, never()).update(
+            eq("tab-1"),
+            argThat { invoke(NativeInputState.zero()).inputMode == NativeInputState.InputMode.SEARCH_AND_DUCK_AI },
         )
     }
 
