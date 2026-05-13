@@ -194,11 +194,13 @@ class FireButtonViewModel @Inject constructor(
 
     fun userRequestedToChangeFireAnimation() {
         viewModelScope.launch {
-            val state = viewState.value
+            val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
+                brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+            }
             command.send(
                 Command.LaunchFireAnimationSettings(
-                    animation = state.selectedFireAnimation,
-                    isFireAnimationUpdateEnabled = state.isFireAnimationUpdateEnabled,
+                    animation = viewState.value.selectedFireAnimation,
+                    isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
                 ),
             )
         }
