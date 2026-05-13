@@ -16,6 +16,13 @@
 
 package com.duckduckgo.browser.api.mode
 
+/**
+ * Resolves a mode-specific instance of [T] given a [BrowserMode].
+ *
+ * Use to expose a resource that has independent [REGULAR][BrowserMode.REGULAR] and
+ * [FIRE][BrowserMode.FIRE] variants without referencing either backing implementation directly.
+ */
 interface BrowserModeDataProvider<T> {
+    /** Returns the [T] bound to [mode]. */
     fun forMode(mode: BrowserMode): T
 }

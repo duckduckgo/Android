@@ -20,14 +20,10 @@ package com.duckduckgo.firemode.api
  * Single facade for whether Fire Mode is available to the user right now.
  *
  * Combines two independent checks:
- *  - the `fireTabs` RemoteFeature flag (server-side rollout / kill-switch), and
- *  - whether the installed WebView reports support for the `MultiProfile` capability,
- *    which is the hard prerequisite for keeping Fire data isolated.
- *
- * On older WebView versions the capability check fails and Fire Mode is silently
- * unavailable. Call sites — entry points, settings menu, RMF banner, etc. —
- * should consume this facade rather than re-checking the underlying flags.
+ *  1. The Fire mode feature flag
+ *  2. Whether the installed WebView reports support for the `MultiProfile` capability
  */
 interface FireModeAvailability {
+    /** Returns true if the prerequisites are satisfied, false otherwise **/
     suspend fun isAvailable(): Boolean
 }
