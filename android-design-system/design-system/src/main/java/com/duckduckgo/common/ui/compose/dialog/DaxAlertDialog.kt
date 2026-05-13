@@ -93,7 +93,9 @@ fun DaxAlertDialog(
     ) {
         DaxAlertDialogContent(
             title = title,
-            modifier = modifier.widthIn(min = 280.dp, max = 560.dp),
+            modifier = modifier
+                .fillMaxWidth(0.79f)
+                .widthIn(min = 280.dp, max = 560.dp),
             message = message,
             headerImage = headerImage,
             content = content,
