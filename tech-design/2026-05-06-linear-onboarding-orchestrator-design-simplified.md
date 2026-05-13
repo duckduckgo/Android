@@ -110,9 +110,8 @@ enum class LinearOnboardingHost {
     BrowserActivity,
 }
 
-// Opaque marker. The orchestrator never inspects events; it just routes them to
-// step.transition(). Concrete event types live with the plan provider in :app, so
-// consumers outside :app don't inherit onboarding's event vocabulary.
+// Opaque marker. The orchestrator never inspects events; it just routes them.
+// Concrete event types live with the plan provider in :app, so consumers outside :app don't inherit onboarding's event vocabulary.
 interface LinearOnboardingEvent
 
 sealed interface LinearOnboardingTransition {
@@ -126,11 +125,8 @@ sealed interface LinearOnboardingTransition {
 ```
 
 **Design notes**
-- **Plan construction is synchronous and privacy-config-independent.** `LaunchViewModel` reads the freshly-built plan at launch to route to the right host without waiting on async setup. Flag and experiment reads move into each step's `suspend precondition`, evaluated lazily when the orchestrator is about to advance to that step — same current production flow, no staleness regression.
-- **The orchestrator is decoupled from concrete steps.** Dialog and event types live with the plan provider and hosts in `:app`. `:onboarding-api` describes only the state machine. Adding, removing, or varying steps doesn't touch the API contract.
-
-- The primary `LinearOnboardingPlan` is built **synchronously at app launch**, so `LaunchViewModel` can route to the right host (e.g. `OnboardingActivity` vs `BrowserActivity`) without waiting on async setup. To make this synchronous, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behaviour: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
-- `LinearOnboardingOrchestrator` or its model are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside of the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
+- `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
+- `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
 
 ## Host coordination
 
@@ -148,10 +144,11 @@ OnboardingActivity foreground          BrowserActivity foreground
 ```
 - Each activity (`OnboardingActivity`, `BrowserActivity`) observes `orchestrator.state`. When `state.currentStep.host` doesn't match its own host, the activity launches the matching host activity and `finish()`es itself. No central coordinator; both activities run the same observer logic symmetrically.
 - Back action (button/gesture) during the linear flow closes the app - this is matching existing behavior.
+- Process death is unchanged from today's behaviour: orchestrator state is in-memory, so process kill mid-flow restarts linear from scratch.
 
 ## AppStage interaction
 
-Existing readers of `AppStage` keep working unchanged. The orchestrator just writes to `AppStage` at the right moments via the interfaces it injects.
+Existing readers of `AppStage` keep working unchanged. The orchestrator just writes to `AppStage` at the right moments.
 
 **Writes on terminal transitions:**
 
@@ -173,11 +170,9 @@ The reactive `DAX_ONBOARDING → ESTABLISHED` write continues to come from `CtaV
 
 The `DAX_ONBOARDING` / `ESTABLISHED` rows protect existing users (already past linear) from accidentally re-entering it after this lands.
 
-Process death is unchanged from today's behaviour: orchestrator state is in-memory, so process kill mid-flow restarts linear from scratch. Persistence is an additive follow-up if product asks.
-
 ## Appendix: example step factories
 
-A few representative step factories from `LinearOnboardingPlanProvider` (in `:app`), showing how the generic `:onboarding-api` step interface gets specialised for the brand-design flow. Not exhaustive — these cover the load-bearing patterns.
+A few representative step factories from `LinearOnboardingPlanProvider` (in `:app`), showing how the generic `:onboarding-api` step interface gets specialized for the brand-design flow. Not exhaustive — these cover the load-bearing patterns.
 
 `:app` defines its own event vocabulary, its own dialog vocabulary, and a concrete step type that adds a rendering hook to the generic `LinearOnboardingStep`:
 
@@ -404,3 +399,5 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
 The full event loop in one trace:
 
 > Fragment renders `Initial` dialog → user taps primary → fragment calls `viewModel.onPrimaryCtaClicked()` → viewmodel sends `OnboardingEvent.PrimaryClicked` to `orchestrator.onEvent()` → orchestrator looks up `currentStep`, calls its `transition()`, gets `Advance` back → orchestrator walks the plan, lands on the next eligible step → state flow emits new `InProgress(currentPlan, currentStepIndex)` → viewmodel resolves the new step's dialog and updates `_dialogState` → fragment renders the next dialog. None of this touches the orchestrator-impl with anything domain-specific.
+
+An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately. 
