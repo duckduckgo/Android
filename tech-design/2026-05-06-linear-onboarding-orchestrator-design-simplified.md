@@ -127,7 +127,7 @@ sealed interface LinearOnboardingTransition {
 **Design notes**
 - `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
-- `startOnboardingPlan` is called exactly once per process, from an `AppScope` bootstrapper (see [Lifecycle & rollout](#lifecycle--rollout)). Renderers only observe `state`; they never start the orchestrator themselves. This keeps idempotency structural (single call site) rather than a contract every host has to honor, and lets future hosts (e.g., `BrowserActivity`) plug in by observing without defensive start logic.
+- The orchestrator self-initialises at construction (see [Lifecycle & rollout](#lifecycle--rollout)): on first injection it reads `AppStage` and starts the main plan if the user is `NEW`. Renderers only observe `state`; they never call `startOnboardingPlan`. `startOnboardingPlan` stays on the interface for tests and explicit overrides — idempotent (no-op unless state is `NotStarted`). The "started exactly once per process" guarantee is structural, not a contract every host has to honour.
 
 ## Host coordination
 
@@ -167,29 +167,43 @@ The `DAX_ONBOARDING` / `ESTABLISHED` rows protect existing users (already past l
 
 ### Orchestrator start
 
-The orchestrator is started once per process by an `AppScope` lifecycle observer in `:app`. Renderers do not call `startOnboardingPlan` themselves — they only observe `state`.
+The orchestrator self-initialises. `LinearOnboardingOrchestratorImpl.init` reads `AppStage` and starts the main plan if the user is `NEW`. Renderers do not call `startOnboardingPlan` themselves — they only observe `state`.
 
 ```kotlin
-// in :app
-@ContributesMultibinding(AppScope::class)
-class LinearOnboardingBootstrapper @Inject constructor(
-    private val orchestrator: LinearOnboardingOrchestrator,
-    private val planProvider: LinearOnboardingPlanProvider,
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class LinearOnboardingOrchestratorImpl @Inject constructor(
     private val userStageStore: UserStageStore,
+    private val planProvider: LinearOnboardingPlanProvider,
+    private val onboardingSkipper: OnboardingSkipper,
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
-    override fun onCreate(owner: LifecycleOwner) {
+) : LinearOnboardingOrchestrator {
+
+    private val _state = MutableStateFlow<LinearOnboardingState>(NotStarted)
+    override val state: StateFlow<LinearOnboardingState> = _state.asStateFlow()
+    private val mutex = Mutex()
+
+    init {
         appScope.launch {
-            if (orchestratorFeature.self().isEnabled() && userStageStore.isNewUser()) {
-                orchestrator.startOnboardingPlan(planProvider.buildMainPlan())
+            mutex.withLock {
+                if (_state.value is NotStarted &&
+                    orchestratorFeature.self().isEnabled() &&
+                    userStageStore.isNewUser()
+                ) {
+                    advanceFrom(planProvider.buildMainPlan(), fromIndex = 0)
+                }
             }
         }
     }
+
+    // startOnboardingPlan / onEvent / advanceFrom — see Public API surface.
 }
 ```
 
 `NEW` is the only stage that triggers a start; `DAX_ONBOARDING` / `ESTABLISHED` users keep the orchestrator in `NotStarted` (matching the init table above).
+
+The orchestrator depending on `LinearOnboardingPlanProvider` is a deliberate trade — it pulls plan-construction into the impl rather than having an external boss orchestrate the orchestrator. In return, we eliminate a separate bootstrapper class and tighten the construction-vs-first-activity race window: by the time DI hands the orchestrator to any activity, its `init` has already kicked off plan resolution.
 
 ### Kill switch and dual-path window
 
@@ -205,7 +219,7 @@ init {
 }
 ```
 
-This roughly doubles the VM's surface area for the duration of the rollout — accepted cost. The legacy block is removed in a tracked cleanup once the toggle is permanently on. The bootstrapper is gated on the same flag, so when the toggle is off the orchestrator stays `NotStarted` and the legacy machine drives the flow unimpeded — no double-driving.
+This roughly doubles the VM's surface area for the duration of the rollout — accepted cost. The legacy block is removed in a tracked cleanup once the toggle is permanently on. The orchestrator's self-init is gated on the same flag (see `init` above), so when the toggle is off the orchestrator stays `NotStarted` and the legacy machine drives the flow unimpeded — no double-driving.
 
 ## Appendix: example step factories
 
@@ -435,4 +449,115 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
 
 The full event loop is in [`2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml`](2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml) — a single primary tap on `Initial` traced from fragment through viewmodel → orchestrator → step transition → state re-emission → re-render as `ComparisonChart`. The orchestrator never inspects the event content; everything domain-specific stays on the `:app` side of the boundary.
 
-An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately. 
+An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately.
+
+## Appendix: future multi-module step contributions
+
+Today every step factory lives in `:app`'s `LinearOnboardingPlanProvider`. This section sketches a known-good growth path for the day a second module wants to contribute steps — **not committed to this design**, just kept here so we don't paint ourselves into a corner.
+
+Two orthogonal pieces. They can be adopted independently and on demand.
+
+### Step aggregation via `PluginPoint`
+
+`LinearOnboardingPlanProvider` becomes an aggregator over a `PluginPoint<LinearOnboardingStepContribution>`. Each contributing module declares its own steps; the planner just orders and flattens.
+
+```kotlin
+// :onboarding-api — one-time addition
+@ContributesPluginPoint(AppScope::class)
+interface LinearOnboardingStepContribution {
+    suspend fun steps(): List<LinearOnboardingStep>
+}
+```
+
+```kotlin
+// :duck-ai-onboarding-impl (example contributor)
+@ContributesMultibinding(AppScope::class)
+@PriorityKey(200)
+class DuckAiOnboardingSteps @Inject constructor(/* …feature-local deps… */) : LinearOnboardingStepContribution {
+    override suspend fun steps() = listOf(duckAiPromptStep(), duckAiFireCtaStep())
+}
+```
+
+```kotlin
+// :app — planner becomes a thin aggregator
+@SingleInstanceIn(AppScope::class)
+class LinearOnboardingPlanProvider @Inject constructor(
+    private val contributions: PluginPoint<LinearOnboardingStepContribution>,
+) {
+    suspend fun buildMainPlan() = LinearOnboardingPlan(
+        steps = contributions.getPlugins().flatMap { it.steps() },
+    )
+}
+```
+
+Step ordering is provided by `@PriorityKey(n)` (lower = earlier), matching the project-wide pattern from `:lint-rules` and `feature-toggles-internal`. The api gains one interface and never grows when new contributors land.
+
+### Cross-module data flow via typed context slots
+
+When step A in module X writes data that step B in module Y reads, neither `:onboarding-api` nor `:app` should learn the data type. Typed-slot context:
+
+```kotlin
+// :onboarding-api — one-time addition
+interface OnboardingContextSlot<T : Any> {
+    val name: String  // debug only — slot identity is via singleton object
+}
+
+interface OnboardingContext {
+    operator fun <T : Any> get(slot: OnboardingContextSlot<T>): T?
+    operator fun <T : Any> set(slot: OnboardingContextSlot<T>, value: T)
+}
+
+// Step transitions and BrowserActivityStep.resolveAction gain a context parameter:
+interface LinearOnboardingStep {
+    val transition: suspend (LinearOnboardingEvent, OnboardingContext) -> LinearOnboardingTransition
+}
+```
+
+The slot definitions live in a thin shared seam that both producer and consumer modules can depend on (an existing `*-api` module — e.g., `:duckchat-api` — or a new `*-onboarding-api`):
+
+```kotlin
+// :duck-ai-onboarding-api  (shared seam)
+object DuckAiPromptSlot : OnboardingContextSlot<String> {
+    override val name = "duck_ai.prompt"
+}
+```
+
+```kotlin
+// :input-screen-onboarding-impl  (producer)
+private fun inputScreenStep() = OnboardingActivityStep(
+    id = "input_screen_preview",
+    resolveDialog = { OnboardingActivityDialog.InputScreenPreview(false) },
+    transition = { event, ctx -> when (event) {
+        is InputScreenEvent.PromptSubmitted -> {
+            ctx[DuckAiPromptSlot] = event.prompt
+            Advance
+        }
+        else -> Stay
+    }},
+)
+
+// :duck-ai-onboarding-impl  (consumer)
+private fun duckAiStep() = BrowserActivityStep(
+    id = "duck_ai",
+    resolveAction = { ctx ->
+        val prompt = ctx[DuckAiPromptSlot]
+            ?: error("duck_ai requires DuckAiPromptSlot to be set upstream")
+        BrowserActivityAction.OpenDuckChat(buildUrl(prompt))
+    },
+    transition = { event, _ -> if (event is OnboardingEvent.DuckAiFireCompleted) Advance else Stay },
+)
+```
+
+`OnboardingContext` is an `AppScope` singleton in `:onboarding-impl` — typed `ConcurrentHashMap<OnboardingContextSlot<*>, Any>` keyed by slot identity. Slots are singletons (`object`), so identity is the key and there's no string-collision risk between modules.
+
+### When to adopt
+
+Both patterns are zero-cost to think about, non-zero to implement.
+
+| Trigger | Action |
+|---|---|
+| Single module contributes all steps | Don't adopt. Keep the planner concrete. |
+| Second module wants to contribute its own steps | Adopt the `PluginPoint` aggregation. Cheap, additive. |
+| Cross-module data flow between contributed steps | Adopt typed-slot context. Touches every step's `transition` signature — pay this tax only when there is a real producer/consumer pair across modules. |
+
+Until the second contributor arrives, the planner stays a concrete class in `:app` with a private typed context for any cross-step data (a `data class` held in a `MutableStateFlow` on the planner singleton, written from step transitions, read from `resolveAction` / `resolveDialog`). The growth path above is what we'd reach for, not what we're committing to today.
