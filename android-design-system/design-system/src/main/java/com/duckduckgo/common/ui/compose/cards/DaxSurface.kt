@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -103,11 +104,10 @@ fun DaxSurface(
 
 private object DaxSurfaceDefaults {
     /**
-     * The default shape for Dax surfaces is the medium shape from the DuckDuckGo theme, which provides a balanced appearance that works well for card-like components.
+     * The default shape for Dax surfaces is rectangular, matching the Material3 [Surface] default.
+     * Callers that want a rounded surface should pass an explicit [Shape].
      */
-    val shape: Shape
-        @Composable
-        get() = DuckDuckGoTheme.shapes.medium
+    val shape: Shape = RectangleShape
 
     /**
      * The default colors for Dax surfaces are derived from the DuckDuckGo theme.

@@ -21,6 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
+/**
+ * Inline banner message with a primary and secondary action.
+ *
+ * Built on top of [DaxMessage] with a start-aligned title and body and a right-aligned
+ * primary/secondary action pair. Has no elevation or rounded corners by default — intended
+ * to be embedded inline within a screen.
+ *
+ * @param title The message title.
+ * @param body The message body text.
+ * @param primaryAction The primary call-to-action.
+ * @param secondaryAction The secondary ghost action.
+ * @param modifier Modifier for this message card.
+ */
 @Composable
 fun DaxBannerMessage(
     title: String,
@@ -32,13 +45,11 @@ fun DaxBannerMessage(
     DaxMessage(
         title = title,
         body = body,
-        contentAlignment = ContentAlignment.Start,
-        buttonRow = {
-            RightAlignButtons(
-                primary = primaryAction,
-                secondary = secondaryAction,
-            )
-        },
+        contentAlignment = DaxMessageContentAlignment.Start,
+        actions = DaxMessageActions.RightAligned(
+            primary = primaryAction,
+            secondary = secondaryAction,
+        ),
         modifier = modifier,
     )
 }

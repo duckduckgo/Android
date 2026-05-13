@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.message.DaxAction
-import com.duckduckgo.common.ui.compose.message.SmallSingleButton
+import com.duckduckgo.common.ui.compose.message.DaxMessageActions
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -34,7 +34,7 @@ import com.duckduckgo.mobile.android.R
  * action button, and a dismiss button. Use this overload when the illustration cannot be
  * expressed as a [Painter] (for example, a Lottie animation).
  *
- * For static images, prefer the [BigSingleActionMessage] overload that takes a [Painter].
+ * For static images, prefer the [DaxBigSingleActionMessage] overload that takes a [Painter].
  *
  * @param title The message title.
  * @param body The message body text.
@@ -46,29 +46,27 @@ import com.duckduckgo.mobile.android.R
  * @param modifier Modifier for this message card.
  */
 @Composable
-fun BigSingleActionMessage(
+fun DaxBigSingleActionMessage(
     title: String,
     body: String,
-    topIllustration: @Composable () -> Unit,
+    topIllustration: @Composable ColumnScope.() -> Unit,
     actionText: String,
     onActionClick: () -> Unit,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessageWithIllustration(
+    DaxRemoteMessageWithIllustration(
         title = title,
         body = body,
         onDismissClicked = onDismissed,
         modifier = modifier,
         topIllustration = topIllustration,
-        bottomContent = {
-            SmallSingleButton(
-                primary = DaxAction(
-                    text = actionText,
-                    onClick = onActionClick,
-                ),
-            )
-        },
+        actions = DaxMessageActions.SmallSingle(
+            primary = DaxAction(
+                text = actionText,
+                onClick = onActionClick,
+            ),
+        ),
     )
 }
 
@@ -88,7 +86,7 @@ fun BigSingleActionMessage(
  * @param modifier Modifier for this message card.
  */
 @Composable
-fun BigSingleActionMessage(
+fun DaxBigSingleActionMessage(
     title: String,
     body: String,
     topIllustration: Painter,
@@ -97,28 +95,26 @@ fun BigSingleActionMessage(
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessageWithIllustration(
+    DaxRemoteMessageWithIllustration(
         title = title,
         body = body,
         modifier = modifier,
         topIllustration = topIllustration,
         onDismissClicked = onDismissed,
-        bottomContent = {
-            SmallSingleButton(
-                primary = DaxAction(
-                    text = actionText,
-                    onClick = onActionClick,
-                ),
-            )
-        },
+        actions = DaxMessageActions.SmallSingle(
+            primary = DaxAction(
+                text = actionText,
+                onClick = onActionClick,
+            ),
+        ),
     )
 }
 
 @PreviewLightDark
 @Composable
-private fun BigSingleActionMessagePreview() {
+private fun DaxBigSingleActionMessagePreview() {
     PreviewBox {
-        BigSingleActionMessage(
+        DaxBigSingleActionMessage(
             title = "Big Single Message",
             body = "Body text goes here. This component has one button",
             topIllustration = painterResource(R.drawable.ic_ddg_announce),

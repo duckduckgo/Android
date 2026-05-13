@@ -18,6 +18,7 @@ package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,42 +28,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.message.DaxMessage
-import com.duckduckgo.common.ui.compose.message.DaxMessageButtonRowScope
+import com.duckduckgo.common.ui.compose.message.DaxMessageActions
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
 /**
  * Internal base for remote message cards that include a top illustration.
  *
  * This is *not* part of the design system and should *only* be used when creating a *new*
- * design system compliant remote message variant. See [MediumMessage], [BigSingleActionMessage],
- * [BigTwoActionsMessage] for example usage.
+ * design system compliant remote message variant. See [DaxMediumMessage], [DaxBigSingleActionMessage],
+ * [DaxBigTwoActionsMessage] for example usage.
  *
  * @param title The message title.
  * @param body The message body text.
  * @param topIllustration Composable slot rendered above the title.
  * @param onDismissClicked Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
- * @param bottomContent Composable slot rendered below the body — typically action buttons.
+ * @param actions Optional action row.
  */
 @Composable
-internal fun RemoteMessageWithIllustration(
+internal fun DaxRemoteMessageWithIllustration(
     title: String,
     body: String,
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    topIllustration: @Composable () -> Unit = {},
-    bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
+    topIllustration: @Composable ColumnScope.() -> Unit = {},
+    actions: DaxMessageActions? = null,
 ) {
-    RemoteMessage(
+    DaxRemoteMessage(
         title = title,
         body = body,
         onDismissClicked = onDismissClicked,
         modifier = modifier,
         topIllustration = topIllustration,
-        bottomActions = bottomContent,
+        actions = actions,
     )
 }
 
@@ -78,18 +81,18 @@ internal fun RemoteMessageWithIllustration(
  * @param topIllustration The illustration drawn above the title.
  * @param onDismissClicked Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
- * @param bottomContent Composable slot rendered below the body — typically action buttons.
+ * @param actions Optional action row.
  */
 @Composable
-internal fun RemoteMessageWithIllustration(
+internal fun DaxRemoteMessageWithIllustration(
     title: String,
     body: String,
     topIllustration: Painter,
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    bottomContent: @Composable DaxMessageButtonRowScope.() -> Unit = {},
+    actions: DaxMessageActions? = null,
 ) {
-    RemoteMessage(
+    DaxRemoteMessage(
         title = title,
         body = body,
         onDismissClicked = onDismissClicked,
@@ -110,7 +113,7 @@ internal fun RemoteMessageWithIllustration(
                 )
             }
         },
-        bottomActions = bottomContent,
+        actions = actions,
     )
 }
 
@@ -120,33 +123,57 @@ internal fun RemoteMessageWithIllustration(
  * This is *not* part of the design system and should *only* be used when creating a *new*
  * design system compliant remote message variant. Provides the shared card layout — title,
  * body, dismiss button, and slots for content above the title and below the body — used
- * by [SmallMessage] and the [RemoteMessageWithIllustration] variants.
+ * by [DaxSmallMessage] and the [DaxRemoteMessageWithIllustration] variants.
  *
  * @param title The message title.
  * @param body The message body text.
  * @param onDismissClicked Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  * @param topIllustration Composable slot rendered above the title — typically an illustration.
- * @param bottomActions Composable slot rendered below the body — typically action buttons.
+ * @param actions Optional action row.
  */
 @Composable
-internal fun RemoteMessage(
+internal fun DaxRemoteMessage(
     title: String,
     body: String,
     onDismissClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    topIllustration: (@Composable () -> Unit)? = null,
-    bottomActions: (@Composable DaxMessageButtonRowScope.() -> Unit)? = null,
+    topIllustration: (@Composable ColumnScope.() -> Unit)? = null,
+    actions: DaxMessageActions? = null,
 ) {
     DaxMessage(
         title = title,
         body = body,
-        elevation = 4.dp,
+        elevation = dimensionResource(R.dimen.keyline_1),
         topContent = topIllustration?.let { { it() } },
-        isDismissable = true,
         onDismiss = onDismissClicked,
         modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
-        buttonRow = bottomActions,
+        actions = actions,
         shape = DuckDuckGoTheme.shapes.large,
     )
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxRemoteMessagePreview() {
+    PreviewBox {
+        DaxRemoteMessage(
+            title = "Remote Message",
+            body = "Body text goes here.",
+            onDismissClicked = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxRemoteMessageWithIllustrationPreview() {
+    PreviewBox {
+        DaxRemoteMessageWithIllustration(
+            title = "Remote Message With Illustration",
+            body = "Body text goes here.",
+            topIllustration = painterResource(R.drawable.ic_critical_update),
+            onDismissClicked = {},
+        )
+    }
 }

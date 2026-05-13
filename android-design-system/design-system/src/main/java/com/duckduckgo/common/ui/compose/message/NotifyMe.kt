@@ -21,11 +21,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
+/**
+ * Card prompting the user to enable a notification-related feature.
+ *
+ * Built on top of [DaxMessage] with a start-aligned title and body, a right-aligned
+ * primary/secondary action pair, and a rounded, elevated card surface.
+ *
+ * @param title The message title.
+ * @param body The message body text.
+ * @param primaryAction The primary call-to-action (e.g. "Notify me").
+ * @param secondaryAction The secondary ghost action (e.g. "Not now").
+ * @param modifier Modifier for this message card.
+ */
 @Composable
 fun NotifyMe(
     title: String,
@@ -37,16 +48,14 @@ fun NotifyMe(
     DaxMessage(
         title = title,
         body = body,
-        elevation = 4.dp,
+        elevation = dimensionResource(R.dimen.keyline_1),
         shape = DuckDuckGoTheme.shapes.large,
-        contentAlignment = ContentAlignment.Start,
+        contentAlignment = DaxMessageContentAlignment.Start,
         modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
-        buttonRow = {
-            RightAlignButtons(
-                primary = primaryAction,
-                secondary = secondaryAction,
-            )
-        },
+        actions = DaxMessageActions.RightAligned(
+            primary = primaryAction,
+            secondary = secondaryAction,
+        ),
     )
 }
 

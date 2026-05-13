@@ -17,20 +17,14 @@
 package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -38,8 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
+import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxCardElevation
@@ -66,7 +60,7 @@ import com.duckduckgo.mobile.android.R
  * @param modifier Modifier for this message card.
  */
 @Composable
-fun PromoSingleActionMessage(
+fun DaxPromoSingleActionMessage(
     title: String,
     body: String,
     illustration: Painter,
@@ -81,39 +75,27 @@ fun PromoSingleActionMessage(
             end = dimensionResource(R.dimen.keyline_4),
             bottom = dimensionResource(R.dimen.keyline_4),
         ),
-        elevation = DaxCardElevation(4.dp),
+        elevation = DaxCardElevation(dimensionResource(R.dimen.keyline_1)),
         shape = DuckDuckGoTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.keyline_4)),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_close_24),
+            DaxIconButton(
+                onClick = onDismissed,
+                iconPainter = painterResource(R.drawable.ic_close_24),
                 contentDescription = stringResource(R.string.closeButtonContentDescription),
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .size(dimensionResource(R.dimen.messageCtaCloseButtonSize))
-                    .clip(CircleShape)
-                    .clickable(
-                        onClick = onDismissed,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(bounded = true),
-                    )
-                    .padding(dimensionResource(R.dimen.keyline_2)),
+                modifier = Modifier.align(Alignment.End),
             )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             DaxText(
                 text = title,
                 style = DuckDuckGoTheme.typography.h2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(
-                        top = dimensionResource(R.dimen.keyline_2),
-                        start = dimensionResource(R.dimen.keyline_4),
-                        end = dimensionResource(R.dimen.keyline_4),
-                    )
+                    .padding(horizontal = dimensionResource(R.dimen.keyline_4))
                     .fillMaxWidth(),
             )
             Image(
@@ -121,36 +103,34 @@ fun PromoSingleActionMessage(
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
             )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             DaxText(
                 text = body,
                 style = DuckDuckGoTheme.typography.body1,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(
-                        top = dimensionResource(R.dimen.keyline_2),
-                        start = dimensionResource(R.dimen.keyline_4),
-                        end = dimensionResource(R.dimen.keyline_4),
-                    )
+                    .padding(horizontal = dimensionResource(R.dimen.keyline_4))
                     .fillMaxWidth(),
             )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_4)))
             DaxPrimaryButton(
                 text = actionText,
                 onClick = onActionClick,
                 size = DaxButtonSize.Small,
                 leadingIconPainter = painterResource(R.drawable.ic_share_android_16),
                 modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.keyline_4), bottom = dimensionResource(R.dimen.keyline_2))
                     .align(Alignment.CenterHorizontally),
             )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_5)))
         }
     }
 }
 
 @PreviewLightDark
 @Composable
-private fun PromoSingleActionMessagePreview() {
+private fun DaxPromoSingleActionMessagePreview() {
     PreviewBox {
-        PromoSingleActionMessage(
+        DaxPromoSingleActionMessage(
             title = "Promo Single Action Message",
             body = "Body text goes here. This component has two buttons and showcases and app update",
             illustration = painterResource(R.drawable.promo_mac_and_windows),

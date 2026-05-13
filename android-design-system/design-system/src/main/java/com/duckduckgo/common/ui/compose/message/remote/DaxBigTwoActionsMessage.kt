@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import com.duckduckgo.common.ui.compose.message.CenterAlignedButtons
 import com.duckduckgo.common.ui.compose.message.DaxAction
+import com.duckduckgo.common.ui.compose.message.DaxMessageActions
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
@@ -44,7 +44,7 @@ import com.duckduckgo.mobile.android.R
  * @param modifier Modifier for this message card.
  */
 @Composable
-fun BigTwoActionsMessage(
+fun DaxBigTwoActionsMessage(
     title: String,
     body: String,
     topIllustration: Painter,
@@ -55,32 +55,30 @@ fun BigTwoActionsMessage(
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    RemoteMessageWithIllustration(
+    DaxRemoteMessageWithIllustration(
         title = title,
         body = body,
         topIllustration = topIllustration,
         modifier = modifier,
         onDismissClicked = onDismissed,
-        bottomContent = {
-            CenterAlignedButtons(
-                primary = DaxAction(
-                    text = primaryActionText,
-                    onClick = onPrimaryActionClick,
-                ),
-                secondary = DaxAction(
-                    text = secondaryActionText,
-                    onClick = onSecondaryActionClick,
-                ),
-            )
-        },
+        actions = DaxMessageActions.CenterAligned(
+            primary = DaxAction(
+                text = primaryActionText,
+                onClick = onPrimaryActionClick,
+            ),
+            secondary = DaxAction(
+                text = secondaryActionText,
+                onClick = onSecondaryActionClick,
+            ),
+        ),
     )
 }
 
 @PreviewLightDark
 @Composable
-private fun BigTwoActionsMessagePreview() {
+private fun DaxBigTwoActionsMessagePreview() {
     PreviewBox {
-        BigTwoActionsMessage(
+        DaxBigTwoActionsMessage(
             title = "Big Two Actions Message",
             body = "Body text goes here. This component has two buttons and showcases and app update",
             topIllustration = painterResource(R.drawable.ic_app_update),

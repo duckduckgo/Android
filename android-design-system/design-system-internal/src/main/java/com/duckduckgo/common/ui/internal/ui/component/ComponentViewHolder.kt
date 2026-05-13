@@ -44,11 +44,11 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
-import com.duckduckgo.common.ui.compose.message.remote.BigSingleActionMessage
-import com.duckduckgo.common.ui.compose.message.remote.BigTwoActionsMessage
-import com.duckduckgo.common.ui.compose.message.remote.MediumMessage
-import com.duckduckgo.common.ui.compose.message.remote.PromoSingleActionMessage
-import com.duckduckgo.common.ui.compose.message.remote.SmallMessage
+import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
+import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
+import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
+import com.duckduckgo.common.ui.compose.message.remote.DaxPromoSingleActionMessage
+import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -193,7 +193,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.promo_single_remote_message_compose, isDarkTheme = isDarkTheme) {
-                PromoSingleActionMessage(
+                DaxPromoSingleActionMessage(
                     title = "Promo Single Action Message",
                     body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                     illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
@@ -206,7 +206,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.small_remote_message_compose, isDarkTheme = isDarkTheme) {
-                SmallMessage(
+                DaxSmallMessage(
                     title = "Compose Small Message",
                     body = "Body text goes here. This component doesn't have buttons",
                     onDismissed = {
@@ -216,7 +216,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.medium_remote_message_compose, isDarkTheme = isDarkTheme) {
-                MediumMessage(
+                DaxMediumMessage(
                     title = "Compose Medium Message",
                     body = "Body text goes here. This component doesn't have buttons",
                     topIllustration = painterResource(CommonR.drawable.ic_critical_update),
@@ -227,7 +227,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.big_single_remote_message_compose, isDarkTheme = isDarkTheme) {
-                BigSingleActionMessage(
+                DaxBigSingleActionMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_announce),
                     title = "Compose Big Single Message",
                     body = "Body text goes here. This component has one button",
@@ -240,7 +240,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.big_single_lottie_remote_message_compose, isDarkTheme = isDarkTheme) {
-                BigSingleActionMessage(
+                DaxBigSingleActionMessage(
                     topIllustration = {
                         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.anim_password_keys))
                         val progress by animateLottieCompositionAsState(
@@ -250,8 +250,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                             composition = composition,
                             progress = { progress },
                             modifier = Modifier
-                                .heightIn(max = 96.dp)
-                                .padding(top = 8.dp),
+                                .padding(top = 8.dp)
+                                .heightIn(max = 96.dp),
                         )
                     },
                     title = "Bring your passwords from Google to DuckDuckGo",
@@ -265,7 +265,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.big_two_actions_remote_message_compose, isDarkTheme = isDarkTheme) {
-                BigTwoActionsMessage(
+                DaxBigTwoActionsMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
@@ -280,7 +280,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.big_two_actions_update_remote_message_compose, isDarkTheme = isDarkTheme) {
-                BigTwoActionsMessage(
+                DaxBigTwoActionsMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_app_update),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons and showcases and app update",
@@ -295,7 +295,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
 
             view.setupThemedComposeView(R.id.big_two_actions_server_image_remote_message_compose, isDarkTheme = isDarkTheme) {
-                BigTwoActionsMessage(
+                DaxBigTwoActionsMessage(
                     topIllustration = rememberAsyncImagePainter(
                         model = "https://staticcdn.duckduckgo.com/remotemessaging/illustrations/image2.png",
                         error = painterResource(CommonR.drawable.ic_app_update),
