@@ -29,6 +29,7 @@ import androidx.test.espresso.web.sugar.Web
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -45,6 +46,7 @@ class RequestBlocklistTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections",
         ),
     )

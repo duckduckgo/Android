@@ -33,6 +33,7 @@ import androidx.test.espresso.web.webdriver.Locator.ID
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.espresso.JsObjectIdlingResource
 import com.duckduckgo.espresso.PrivacyTest
@@ -52,6 +53,7 @@ class GpcTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections",
         ),
     )

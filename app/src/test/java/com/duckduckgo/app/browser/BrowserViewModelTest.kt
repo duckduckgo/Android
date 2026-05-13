@@ -708,6 +708,8 @@ class BrowserViewModelTest {
 
     @Test
     fun whenSwitchToRegularThenAvailabilityNotConsulted() = runTest {
+        clearInvocations(mockFireModeAvailability)
+
         testee.switchToMode(BrowserMode.REGULAR)
 
         verifyNoInteractions(mockFireModeAvailability)
@@ -731,29 +733,6 @@ class BrowserViewModelTest {
 
         assertFalse(result)
         verify(mockBrowserModeStateHolder, never()).switchTo(any())
-    }
-
-    // --- Fire mode: external-intent gate ---
-
-    @Test
-    fun whenIntentIsNotExternalThenShouldNotSwitchToRegularEvenInFire() {
-        browserModeFlow.value = BrowserMode.FIRE
-
-        assertFalse(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = false))
-    }
-
-    @Test
-    fun whenIntentIsExternalAndModeIsRegularThenShouldNotSwitch() {
-        browserModeFlow.value = BrowserMode.REGULAR
-
-        assertFalse(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = true))
-    }
-
-    @Test
-    fun whenIntentIsExternalAndModeIsFireThenShouldSwitchToRegular() {
-        browserModeFlow.value = BrowserMode.FIRE
-
-        assertTrue(testee.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal = true))
     }
 
     private fun initTestee() {
