@@ -13,22 +13,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/keyline_4">
+    android:layout_marginTop="@dimen/keyline_4"
+    android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/quickSetupTitleContainer"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_6"
-        android:layout_marginEnd="@dimen/keyline_6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginEnd="@dimen/keyline_6">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/quickSetupTitleHidden"
@@ -56,14 +54,11 @@
 
     <LinearLayout
         android:id="@+id/quickSetupOptionsContainer"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_5"
         android:alpha="0"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/quickSetupTitleContainer">
+        android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/setDefaultBrowserItem"
@@ -73,6 +68,12 @@
             app:primaryText="@string/preOnboardingReinstallSetDefaultLabel"
             app:showSwitch="true" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
         <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/addWidgetItem"
             android:layout_width="match_parent"
@@ -81,64 +82,100 @@
             app:primaryText="@string/preOnboardingReinstallAddHomeScreenWidgetLabel"
             app:showSwitch="true" />
 
-        <LinearLayout
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarPositionContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:background="?selectableItemBackground">
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/addressBarPositionItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:clickable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/addressBarPositionEditButton"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:leadingIcon="@drawable/ic_address_bar_bottom_color_24"
                 app:primaryText="@string/preOnboardingReinstallAddressBarLabel"
+                app:primaryTextTruncated="false"
                 app:secondaryText="@string/preOnboardingReinstallAddressBarTop"
                 tools:secondaryText="Top" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/addressBarPositionEditButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/keyline_2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:paddingHorizontal="@dimen/keyline_4"
                 android:text="@string/preOnboardingReinstallEditAction"
-                app:buttonSize="standard" />
+                android:gravity="center"
+                android:textColor="?attr/onboardingAccentTextAlt"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/addressBarPositionItem"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_default="wrap"
+                app:typography="body1_bold" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarSearchOptionsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:background="?selectableItemBackground">
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/addressBarSearchOptionsItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:clickable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/addressBarSearchOptionsEditButton"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:leadingIcon="@drawable/ic_ai_chat_color_24"
                 app:primaryText="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
+                app:primaryTextTruncated="false"
                 app:secondaryText="@string/preOnboardingReinstallAddressBarSearchOptionsValue"
                 tools:secondaryText="Search and Duck.ai" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/addressBarSearchOptionsEditButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/keyline_2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:paddingHorizontal="@dimen/keyline_4"
                 android:text="@string/preOnboardingReinstallEditAction"
-                app:buttonSize="standard" />
+                android:gravity="center"
+                android:textColor="?attr/onboardingAccentTextAlt"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/addressBarSearchOptionsItem"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_default="wrap"
+                app:typography="body1_bold" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

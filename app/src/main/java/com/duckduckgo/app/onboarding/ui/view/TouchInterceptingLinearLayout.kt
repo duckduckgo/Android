@@ -41,4 +41,15 @@ class TouchInterceptingLinearLayout @JvmOverloads constructor(
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         return interceptChildTouches || super.onInterceptTouchEvent(ev)
     }
+
+    /**
+     * The tap-to-skip [OnClickListener] makes this view clickable, which sends `pressed=true`
+     * through dispatchSetPressed to every non-clickable descendant. That fires the
+     * ripple on any child whose background is `?attr/selectableItemBackground` (ADS list items,
+     * Dax CTA includes) even when the user is tapping in the empty space between rows. Swallow
+     * the dispatch so the container can be tapped without flashing unrelated children.
+     */
+    override fun dispatchSetPressed(pressed: Boolean) {
+        // intentionally empty — see kdoc
+    }
 }
