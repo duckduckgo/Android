@@ -110,6 +110,12 @@ tags:
             id: "com.duckduckgo.mobile.android:id/dax_switch_one"
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/radio_button_two"
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Remember my choice"
+            direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/checkbox_one"
         - tapOn:

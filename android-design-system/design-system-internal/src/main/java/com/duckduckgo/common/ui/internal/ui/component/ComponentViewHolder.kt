@@ -24,19 +24,24 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
@@ -99,8 +104,38 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class RadioButtonComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_radio_button))
+    class RadioButtonComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_radio_button)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_radio_button, isDarkTheme = isDarkTheme) {
+                var indexSelected by remember { mutableIntStateOf(0) }
+
+                DuckDuckGoTheme {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        DaxRadioButton(
+                            selected = indexSelected == 0,
+                            onClick = { indexSelected = 0 },
+                        )
+
+                        DaxRadioButton(
+                            selected = indexSelected == 1,
+                            onClick = { indexSelected = 1 },
+                        )
+
+                        DaxRadioButton(selected = false, onClick = {}, enabled = false)
+
+                        DaxRadioButton(selected = true, onClick = {}, enabled = false)
+                    }
+                }
+            }
+        }
+    }
 
     class CheckboxComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
@@ -451,7 +486,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.BUTTON -> ButtonComponentViewHolder(parent)
                 Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
                 Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
-                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
+                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
