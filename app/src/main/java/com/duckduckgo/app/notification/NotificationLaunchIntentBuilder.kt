@@ -40,6 +40,9 @@ class RealNotificationLaunchIntentBuilder @Inject constructor(
         launchIntent.putExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, true)
         return taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(launchIntent)
+            for (i in 0 until intentCount) {
+                editIntentAt(i)?.putExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, true)
+            }
             getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
     }
