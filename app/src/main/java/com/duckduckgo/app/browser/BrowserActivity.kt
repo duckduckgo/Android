@@ -269,6 +269,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var instanceStateBundles: CombinedInstanceState? = null
 
+    /**
+     * Holds an [Intent] that arrived in [onNewIntent] while [dataClearer] was still clearing,
+     * deferred until it finishes. Read once by [BrowserStateRenderer.showWebContent] and cleared.
+     */
     private var lastIntent: Intent? = null
 
     /**
