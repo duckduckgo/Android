@@ -29,13 +29,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -83,6 +84,9 @@ fun DaxAlertDialog(
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
 ) {
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+    val dialogWidth = (screenWidthDp * 0.79f).coerceIn(minimumValue = 280.dp, maximumValue = 560.dp)
+
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
@@ -93,9 +97,7 @@ fun DaxAlertDialog(
     ) {
         DaxAlertDialogContent(
             title = title,
-            modifier = modifier
-                .fillMaxWidth(0.79f)
-                .widthIn(min = 280.dp, max = 560.dp),
+            modifier = modifier.width(dialogWidth),
             message = message,
             headerImage = headerImage,
             content = content,
