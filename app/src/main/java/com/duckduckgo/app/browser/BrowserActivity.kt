@@ -1075,10 +1075,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             DuckChatWebViewFragment().apply {
                 arguments =
                     Bundle().apply {
-                        duckChatUrl?.let {
-                            putString(KEY_DUCK_AI_URL, duckChatUrl)
-                            putInt(KEY_DUCK_AI_TABS, tabs)
-                        }
+                        duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
+                        putInt(KEY_DUCK_AI_TABS, tabs)
                         putString(KEY_DUCK_AI_BROWSER_MODE, mode.name)
                     }
             }
