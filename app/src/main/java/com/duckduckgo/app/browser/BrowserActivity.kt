@@ -56,6 +56,7 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity.Companion.DUCK_AI_ANIM_READY_DELAY_MS
 import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
@@ -128,6 +129,7 @@ import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -204,6 +206,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var externalIntentProcessingState: ExternalIntentProcessingState
 
     @Inject
+    lateinit var fireModeAvailability: FireModeAvailability
+
+    @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
@@ -267,11 +272,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var lastIntent: Intent? = null
 
     /**
-     * External [Intent] received while in FIRE mode, deferred until the REGULAR-bound activity
-     * comes up. Survives the mode-switch [recreate] via [onSaveInstanceState]; consumed by
-     * [BrowserStateRenderer.showWebContent].
+     * Holds an [Intent] that arrived while in [BrowserMode.FIRE] and must be processed in
+     * [BrowserMode.REGULAR]. Read once by [BrowserStateRenderer.showWebContent] and cleared;
+     * takes precedence over [lastIntent].
      */
-    private var pendingExternalIntent: Intent? = null
+    private var pendingFireToRegularIntent: Intent? = null
 
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
@@ -366,7 +371,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
-        pendingExternalIntent = savedInstanceState?.let { BundleCompat.getParcelable(it, KEY_PENDING_EXTERNAL_INTENT, Intent::class.java) }
+        pendingFireToRegularIntent = savedInstanceState?.let {
+            BundleCompat.getParcelable(it, KEY_PENDING_FIRE_TO_REGULAR_INTENT, Intent::class.java)
+        }
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
 
@@ -415,7 +422,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
-        pendingExternalIntent?.let { outState.putParcelable(KEY_PENDING_EXTERNAL_INTENT, it) }
+        pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
     }
 
     private suspend fun configureFlowCollectors() {
@@ -672,16 +679,26 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        // External intents always open in REGULAR mode, so we must stash the intent and carry it
-        // to the recreated REGULAR-bound instance, where showWebContent() consumes it.
-        val isExternal = intent.getBooleanExtra(LAUNCH_FROM_EXTERNAL_EXTRA, false)
-        if (viewModel.shouldSwitchToRegularModeBeforeProcessingIntent(isExternal)) {
-            logcat(INFO) { "External intent received in FIRE — switching to REGULAR before processing" }
-            pendingExternalIntent = intent
-            lifecycleScope.launch { viewModel.switchToMode(BrowserMode.REGULAR) }
+        // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
+        // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
+        val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
+        if (requiresRegularBrowserMode && viewModel.currentMode.value != BrowserMode.REGULAR) {
+            lifecycleScope.launch {
+                if (fireModeAvailability.isAvailable()) {
+                    logcat(INFO) { "Intent requires REGULAR mode while in FIRE — switching before processing" }
+                    pendingFireToRegularIntent = intent
+                    viewModel.switchToMode(BrowserMode.REGULAR)
+                } else {
+                    processIntent(intent)
+                }
+            }
             return
         }
 
+        processIntent(intent)
+    }
+
+    private fun processIntent(intent: Intent) {
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             logcat(INFO) { "launch from default browser" }
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
@@ -1209,11 +1226,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
-     * one mode at a time (single adapter, single currentTab, single lastActiveTabs)
+     * one mode at a time (single adapter, single currentTab, single lastActiveTabs).
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
-            viewModel.currentMode.drop(1).collect { recreate() }
+            viewModel.currentMode.drop(1).collect {
+                if (fireModeAvailability.isAvailable()) recreate()
+            }
         }
     }
 
@@ -1256,6 +1275,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     companion object {
         fun intent(
             context: Context,
+            launchSource: BrowserLaunchSource,
             queryExtra: String? = null,
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
@@ -1288,6 +1308,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
+            intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             return intent
         }
 
@@ -1304,6 +1325,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val OPEN_EXISTING_TAB_ID_EXTRA = "OPEN_EXISTING_TAB_ID_EXTRA"
 
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
+
+        /**
+         * Stamped by entry points that must reach BrowserActivity in [BrowserMode.REGULAR].
+         */
+        const val LAUNCH_REQUIRES_REGULAR_MODE = "LAUNCH_REQUIRES_REGULAR_MODE"
+        
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
@@ -1312,7 +1339,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
-        private const val KEY_PENDING_EXTERNAL_INTENT = "pendingExternalIntent"
+        private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
@@ -1353,9 +1380,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             configureObservers()
             binding.clearingInProgressView.gone()
 
-            pendingExternalIntent?.let { pending ->
-                logcat(INFO) { "External intent deferred across mode-switch recreate; handling now" }
-                pendingExternalIntent = null
+            pendingFireToRegularIntent?.let { pending ->
+                logcat(INFO) { "Intent deferred across FIRE→REGULAR recreate; handling now" }
+                pendingFireToRegularIntent = null
                 processedOriginalIntent = true
                 launchNewSearchOrQuery(pending)
                 return
