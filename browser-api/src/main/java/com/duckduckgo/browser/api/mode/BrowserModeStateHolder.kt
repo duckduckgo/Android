@@ -19,18 +19,16 @@ package com.duckduckgo.browser.api.mode
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * In-memory holder of the user's currently-active [BrowserMode].
- *
- * App-scoped singleton with no persistence: cold-start always reconstructs as
- * [BrowserMode.REGULAR]; hot-start retains the last value. [switchTo] is the only
- * mutator. Consumers either collect [currentMode] for reactive updates, or read
- * [StateFlow.value] for a snapshot.
- *
- * Tab-level code should not consume this directly — capture the active mode at tab
- * construction time instead, so a mid-session switch cannot race with tab-bound writes.
+ * Source of truth for the user's currently-active [BrowserMode].
  */
 interface BrowserModeStateHolder {
+    /**
+     * Current [BrowserMode] used.
+     */
     val currentMode: StateFlow<BrowserMode>
 
+    /**
+     * Sets the active [BrowserMode].
+     */
     fun switchTo(mode: BrowserMode)
 }

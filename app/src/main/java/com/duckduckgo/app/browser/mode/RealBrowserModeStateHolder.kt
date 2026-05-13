@@ -24,16 +24,16 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealBrowserModeStateHolder @Inject constructor() : BrowserModeStateHolder {
-
     private val _currentMode = MutableStateFlow(BrowserMode.REGULAR)
     override val currentMode: StateFlow<BrowserMode> = _currentMode.asStateFlow()
 
     override fun switchTo(mode: BrowserMode) {
-        _currentMode.value = mode
+        _currentMode.update { mode }
     }
 }
