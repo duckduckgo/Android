@@ -23,6 +23,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
@@ -30,6 +31,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
@@ -57,6 +59,23 @@ class BrokerActionFailedEventHandler @Inject constructor(
          * This means we have received an error from the JS layer for the last action we pushed.
          * We end the run for the broker.
          */
+        if (!isEventValid(state)) {
+            // Stale event: arrived after the broker step / action was already considered completed.
+            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
+                Broker.unknown()
+            } else {
+                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
+            }
+
+            pirRunStateHandler.handleState(
+                BrokerStepInvalidEvent(
+                    broker = broker,
+                    runType = state.runType,
+                ),
+            )
+            return Next(nextState = state)
+        }
+
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBrokerStep.step.actions[state.currentActionIndex]
         val error = (event as BrokerActionFailed).error
@@ -89,6 +108,16 @@ class BrokerActionFailedEventHandler @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun isEventValid(state: State): Boolean {
+        // Broker steps has probably been considered completed before the js error arrived
+        if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
+
+        // Broker step actions has probably been considered completed before the js error arrived
+        if (state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions.size <= state.currentActionIndex) return false
+
+        return true
     }
 
     private fun shouldRetryFailedAction(
