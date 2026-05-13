@@ -125,6 +125,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
+    private var quickSetupFadeInAnimatorSet: AnimatorSet? = null
     private var stepIndicatorFadeOutAnimator: ObjectAnimator? = null
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var inputToggleLottieJob: Job? = null
@@ -542,6 +543,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
         binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
+        binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
         inputScreenFadeInAnimatorSet?.removeAllListeners()
@@ -550,6 +552,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenPreviewFadeInAnimatorSet?.removeAllListeners()
         inputScreenPreviewFadeInAnimatorSet?.cancel()
         inputScreenPreviewFadeInAnimatorSet = null
+        quickSetupFadeInAnimatorSet?.removeAllListeners()
+        quickSetupFadeInAnimatorSet?.cancel()
+        quickSetupFadeInAnimatorSet = null
         stepIndicatorFadeOutAnimator?.removeAllListeners()
         stepIndicatorFadeOutAnimator?.cancel()
         stepIndicatorFadeOutAnimator = null
@@ -718,7 +723,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.startOnboardingTypingAnimation(
                                 getString(R.string.preOnboardingReinstallQuickSetupTitle),
                             ) {
-                                AnimatorSet().apply {
+                                quickSetupFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
                                         ObjectAnimator.ofFloat(
                                             binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupOptionsContainer,
@@ -1832,6 +1837,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         addressBarFadeInAnimatorSet?.end()
         inputScreenFadeInAnimatorSet?.end()
         inputScreenPreviewFadeInAnimatorSet?.end()
+        quickSetupFadeInAnimatorSet?.end()
         suggestionButtonsAnimatorSet?.end()
 
         // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
