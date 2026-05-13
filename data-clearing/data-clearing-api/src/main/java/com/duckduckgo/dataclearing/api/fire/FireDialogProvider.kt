@@ -59,5 +59,14 @@ interface FireDialogProvider {
          * @property tabId The id of the tab the Hatch is offering to burn.
          */
         data class Hatch(val tabId: String) : FireDialogOrigin()
+
+        /**
+         * Chat history screen — bulk-delete confirmation. Overrides the user's stored
+         * fire-options with `DUCKAI_CHATS` only; browser tabs are kept, but any open
+         * Duck.ai chat tabs are closed alongside the chat data.
+         *
+         * @property count Number of chats shown in the title ("Delete N chats?").
+         */
+        data class ChatHistory(val count: Int) : FireDialogOrigin()
     }
 }

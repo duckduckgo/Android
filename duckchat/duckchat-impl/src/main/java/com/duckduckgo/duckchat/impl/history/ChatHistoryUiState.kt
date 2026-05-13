@@ -34,7 +34,13 @@ sealed interface ChatHistoryUiState {
     }
 
     sealed interface PendingConfirmation {
-        data object FireAll : PendingConfirmation
+        /** Fire-all confirmation; set when count ≥ 2 (count == 1 deletes directly). */
+        data class FireAll(val count: Int) : PendingConfirmation
+
+        /**
+         * Delete-selected confirmation — placeholder for future selection-mode work. No caller
+         * sets it yet; the current dialog path clears every Duck.ai chat and cannot scope to a subset.
+         */
         data class DeleteSelected(val count: Int) : PendingConfirmation
     }
 }

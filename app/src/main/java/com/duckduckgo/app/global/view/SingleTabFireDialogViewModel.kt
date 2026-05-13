@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.fire.ManualDataClearing
@@ -145,13 +146,14 @@ class SingleTabFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-                val clearOptions = fireDataStore.getManualClearOptions()
+                val fireOptionsOverride = (viewState.value as? ViewState.Loaded)?.stateData?.fireOptionsOverride
+                val clearOptions = fireOptionsOverride ?: fireDataStore.getManualClearOptions()
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions()
+                    dataClearing.clearDataUsingManualFireOptions(options = fireOptionsOverride)
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
@@ -230,28 +232,57 @@ class SingleTabFireDialogViewModel @Inject constructor(
     }
 
     private suspend fun mapToViewState(dialogOrigin: FireDialogOrigin): ViewState.Loaded {
+        // Non-tab origins skip tab/download/WebView probes and show a simplified dialog with only the "Clear all" option
+        val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory
+
         val isDuckAiChatsSelected =
-            fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
-        val isDeleteBrowsingDataSupported = webViewCapabilityChecker.isSupported(DeleteBrowsingData)
-        val shownCount = settingsDataStore.singleTabFireDialogShownCount
-        val downloads = downloadsRepository.getDownloads()
-        val targetTabUrl = resolveTargetTabUrl(dialogOrigin)
+            isTabAware && fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
+        val isDeleteBrowsingDataSupported = isTabAware && webViewCapabilityChecker.isSupported(DeleteBrowsingData)
+        val downloads = if (isTabAware) downloadsRepository.getDownloads() else emptyList()
+        val targetTabUrl = if (isTabAware) resolveTargetTabUrl(dialogOrigin) else null
+        val tabCount = if (isTabAware) tabRepository.getOpenTabCount() else 0
         val isDuckAiTab = dialogOrigin == DuckAiContextualChat ||
-            targetTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
-        val tabCount = tabRepository.getOpenTabCount()
+            targetTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } == true
         val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
             brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
         }
+        val isDeleteThisTabAvailable = (isDeleteBrowsingDataSupported && dialogOrigin == Browser) ||
+            dialogOrigin == DuckAiContextualChat ||
+            dialogOrigin is Hatch
+        val shownCount = settingsDataStore.singleTabFireDialogShownCount
+
+        val titleSource: TitleSource = when (dialogOrigin) {
+            is FireDialogOrigin.ChatHistory -> TitleSource.Plural(
+                pluralsId = R.plurals.fireDialogDeleteCountTitle,
+                count = dialogOrigin.count,
+            )
+            else -> {
+                val titleResId = when {
+                    isDuckAiTab && isDeleteThisTabAvailable -> R.string.singleTabFireDialogTitleDuckAi
+                    isDuckAiChatsSelected -> R.string.singleTabFireDialogTitleWithChats
+                    else -> R.string.singleTabFireDialogTitle
+                }
+                TitleSource.Static(titleResId)
+            }
+        }
+
+        val fireOptionsOverride: Set<FireClearOption>? = when (dialogOrigin) {
+            is FireDialogOrigin.ChatHistory -> setOf(FireClearOption.DUCKAI_CHATS)
+            else -> null
+        }
+
         return ViewState.Loaded(
             stateData = ViewState.Loaded.StateData(
                 isDuckAiChatsSelected = isDuckAiChatsSelected,
                 isSingleTabEnabled = isDeleteBrowsingDataSupported,
                 isDuckAiTab = isDuckAiTab,
                 tabCount = tabCount,
-                isSiteDataSubtitleEligible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
+                isSiteDataSubtitleEligible = isTabAware && shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                 isDownloadsSubtitleEligible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
                 isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
                 isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
+                titleSource = titleSource,
+                fireOptionsOverride = fireOptionsOverride,
             ),
             origin = dialogOrigin,
         )
@@ -322,8 +353,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val isDownloadsSubtitleEligible: Boolean = false,
                 val isFirePictogramVisible: Boolean = true,
                 val isFireAnimationUpdateEnabled: Boolean = false,
+                val titleSource: TitleSource = TitleSource.Static(R.string.singleTabFireDialogTitle),
+                val fireOptionsOverride: Set<FireClearOption>? = null,
             )
         }
+    }
+
+    sealed class TitleSource {
+        data class Static(val resId: Int) : TitleSource()
+        data class Plural(val pluralsId: Int, val count: Int) : TitleSource()
     }
 
     sealed class Command {

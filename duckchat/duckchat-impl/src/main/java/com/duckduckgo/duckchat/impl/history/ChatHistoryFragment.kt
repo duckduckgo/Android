@@ -35,6 +35,8 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
@@ -42,6 +44,7 @@ import com.duckduckgo.duckchat.impl.databinding.FragmentChatHistoryBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
@@ -56,6 +59,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var fireDialogProvider: FireDialogProvider
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
@@ -96,6 +102,13 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
 
+        childFragmentManager.setFragmentResultListener(FireDialog.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            when (bundle.getString(FireDialog.RESULT_KEY_EVENT)) {
+                FireDialog.EVENT_ON_CLEAR_STARTED -> viewModel.onFireAllConfirmed()
+                FireDialog.EVENT_ON_CANCEL -> viewModel.onConfirmationCancelled()
+            }
+        }
+
         viewModel.uiState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach(::render)
@@ -108,16 +121,22 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             ChatHistoryUiState.Loading -> {
                 binding.chatHistoryList.visibility = View.GONE
                 binding.chatHistoryEmptyState.visibility = View.GONE
+                setFireActionVisible(false)
             }
             ChatHistoryUiState.Empty -> {
                 binding.chatHistoryList.visibility = View.GONE
                 binding.chatHistoryEmptyState.visibility = View.VISIBLE
                 adapter.submitList(emptyList())
+                setFireActionVisible(false)
             }
             is ChatHistoryUiState.Loaded -> {
                 binding.chatHistoryList.visibility = View.VISIBLE
                 binding.chatHistoryEmptyState.visibility = View.GONE
                 adapter.submitList(buildEntries(state))
+                // Hide when Recent is empty — the title counts Recent chats, so a Pinned-only
+                // state would render "Delete 0 chats?".
+                setFireActionVisible(state.recent.isNotEmpty())
+                renderConfirmation(state.confirmation)
             }
         }
     }
@@ -133,6 +152,27 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
     }
 
+    private fun renderConfirmation(confirmation: ChatHistoryUiState.PendingConfirmation?) {
+        if (confirmation == null) return
+        // Idempotent: skip if a dialog is already attached.
+        if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return
+
+        val count = when (confirmation) {
+            is ChatHistoryUiState.PendingConfirmation.FireAll -> confirmation.count
+            is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> confirmation.count
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog(
+                FireDialogProvider.FireDialogOrigin.ChatHistory(count),
+            )
+            dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
+        }
+    }
+
+    private fun setFireActionVisible(visible: Boolean) {
+        binding.toolbar.menu.findItem(R.id.chat_history_action_fire)?.isVisible = visible
+    }
+
     private fun onMenuItemClicked(item: MenuItem): Boolean = when (item.itemId) {
         R.id.chat_history_action_overflow -> {
             showToolbarOverflowPopup()
@@ -143,7 +183,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             true
         }
         R.id.chat_history_action_fire -> {
-            showComingSoonSnackbar()
+            viewModel.onFireAllRequested()
             true
         }
         else -> false
@@ -187,6 +227,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     companion object {
+        private const val FIRE_DIALOG_TAG = "chat_history_fire_dialog"
+
         fun newInstance(): ChatHistoryFragment = ChatHistoryFragment()
     }
 }

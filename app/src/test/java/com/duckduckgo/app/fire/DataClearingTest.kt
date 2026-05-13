@@ -19,6 +19,7 @@
 package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
@@ -123,6 +124,7 @@ class DataClearingTest {
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
+            whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
         }
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
@@ -192,6 +194,41 @@ class DataClearingTest {
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+    }
+
+    @Test
+    fun whenDuckAiChatsOnlyAndOpenDuckAiTabExists_thenCloseOnlyTheDuckAiTab() = runTest {
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        val duckAiTab = TabEntity(tabId = "duck-ai", url = "https://duck.ai")
+        val browserTab = TabEntity(tabId = "browser", url = "https://example.com")
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(duckAiTab, browserTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockTabRepository).deleteTabs(listOf("duck-ai"))
+    }
+
+    @Test
+    fun whenDuckAiChatsOnlyAndNoDuckAiTabs_thenDoNotCallDeleteTabs() = runTest {
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "browser", url = "https://example.com")))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun whenTabsAndDuckAiChats_thenDoNotCloseDuckAiTabsSeparately() = runTest {
+        configureManualOptions(setOf(FireClearOption.TABS, FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockClearDataAction).clearTabsOnly()
+        verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test

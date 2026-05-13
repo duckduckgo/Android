@@ -35,7 +35,7 @@ class ChatHistoryViewModelTest {
 
     private val source = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val repository = FakeChatHistoryRepository(source)
-    private val viewModel = ChatHistoryViewModel(repository)
+    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope)
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -209,6 +209,144 @@ class ChatHistoryViewModelTest {
         }
     }
 
+    // --- Fire-all ---
+
+    @Test
+    fun `onFireAllRequested with two or more Recent chats sets FireAll confirmation with the Recent count`() = runTest {
+        source.value = listOf(
+            item("p", pinned = true),
+            item("r1"),
+            item("r2"),
+            item("r3"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+
+            val confirming = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 3), confirming.confirmation)
+            assertTrue(repository.deletedChatIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onFireAllRequested with exactly one Recent chat deletes immediately without setting confirmation`() = runTest {
+        source.value = listOf(
+            item("p", pinned = true),
+            item("r1"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+
+            val afterDelete = awaitItem() as Loaded
+            assertEquals(null, afterDelete.confirmation)
+            assertEquals(listOf("r1"), repository.deletedChatIds)
+            assertEquals(listOf("p"), afterDelete.pinned.map { it.chatId })
+            assertEquals(emptyList<String>(), afterDelete.recent.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `onFireAllRequested with no Recent chats is a no-op`() = runTest {
+        source.value = listOf(
+            item("p1", pinned = true),
+            item("p2", pinned = true),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            val initial = awaitItem() as Loaded
+            assertEquals(null, initial.confirmation)
+
+            viewModel.onFireAllRequested()
+
+            expectNoEvents()
+            assertTrue(repository.deletedChatIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onFireAllConfirmed only clears the confirmation state — dialog options path handles deletion`() = runTest {
+        source.value = listOf(
+            item("p1", pinned = true),
+            item("p2", pinned = true),
+            item("r1"),
+            item("r2"),
+            item("r3"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+            awaitItem() // confirmation = FireAll(3)
+
+            viewModel.onFireAllConfirmed()
+
+            // ViewModel doesn't touch the repository — the dialog drives the deletion.
+            val cleared = awaitItem() as Loaded
+            assertEquals(null, cleared.confirmation)
+            assertTrue(repository.deletedChatIds.isEmpty())
+            assertEquals(listOf("p1", "p2"), cleared.pinned.map { it.chatId })
+            assertEquals(listOf("r1", "r2", "r3"), cleared.recent.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `onConfirmationCancelled clears the FireAll confirmation without deleting`() = runTest {
+        source.value = listOf(
+            item("r1"),
+            item("r2"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+            val confirming = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 2), confirming.confirmation)
+
+            viewModel.onConfirmationCancelled()
+
+            val cancelled = awaitItem() as Loaded
+            assertEquals(null, cancelled.confirmation)
+            assertTrue(repository.deletedChatIds.isEmpty())
+            assertEquals(listOf("r1", "r2"), cancelled.recent.map { it.chatId })
+        }
+    }
+
+    @Test
+    fun `onFireAllConfirmed does not call the repository directly — dialog drives the deletion`() = runTest {
+        source.value = listOf(
+            item("p", pinned = true),
+            item("r1"),
+            item("r2"),
+        )
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+            awaitItem() // confirmation = FireAll(2)
+            viewModel.onFireAllConfirmed()
+            awaitItem() // confirmation cleared
+        }
+
+        // ViewModel never touches the repository on the dialog path — production wipes Pinned too.
+        assertEquals(false, repository.deleteAllChatsCalled)
+        assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.
@@ -238,9 +376,21 @@ class ChatHistoryViewModelTest {
 }
 
 private class FakeChatHistoryRepository(
-    private val source: Flow<List<ChatHistoryItem>>,
+    private val source: MutableStateFlow<List<ChatHistoryItem>>,
 ) : ChatHistoryRepository {
+    val deletedChatIds: MutableList<String> = mutableListOf()
+    var deleteAllChatsCalled: Boolean = false
+        private set
+
     override fun observeChats(): Flow<List<ChatHistoryItem>> = source
-    override suspend fun deleteChat(chatId: String) = Unit
-    override suspend fun deleteAllChats() = Unit
+
+    override suspend fun deleteChat(chatId: String) {
+        deletedChatIds += chatId
+        source.value = source.value.filterNot { it.chatId == chatId }
+    }
+
+    override suspend fun deleteAllChats() {
+        deleteAllChatsCalled = true
+        source.value = emptyList()
+    }
 }

@@ -140,18 +140,22 @@ class DataClearing @Inject constructor(
         dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(setOf(tabUrl))))
     }
 
-    override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
-        val options = fireDataStore.getManualClearOptions()
+    override suspend fun clearDataUsingManualFireOptions(
+        shouldRestartIfRequired: Boolean,
+        wasAppUsedSinceLastClear: Boolean,
+        options: Set<FireClearOption>?,
+    ) {
+        val effectiveOptions = options ?: fireDataStore.getManualClearOptions()
         performGranularClear(
-            options = options,
+            options = effectiveOptions,
             shouldFireDataClearPixel = true,
         )
 
         clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
 
-        val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
+        val wasDuckAiChatsCleared = effectiveOptions.contains(FireClearOption.DUCKAI_CHATS) &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
-        val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
+        val wasDataCleared = effectiveOptions.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (shouldRestartIfRequired && wasDataCleared) {
             dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
@@ -243,12 +247,12 @@ class DataClearing @Inject constructor(
     ) {
         logcat { "Performing granular clear with options: $options" }
 
-        val shouldClearTabs = FireClearOption.TABS in options
+        val shouldClearAllTabs = FireClearOption.TABS in options
         val shouldClearData = FireClearOption.DATA in options
         val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
 
-        if (shouldClearTabs) {
+        if (shouldClearAllTabs) {
             clearDataAction.clearTabsOnly()
         }
 
@@ -258,9 +262,20 @@ class DataClearing @Inject constructor(
 
         if (shouldClearDuckAiChats) {
             clearDataAction.clearDuckAiChatsOnly()
+            if (!shouldClearAllTabs) closeOnlyDuckAiTabs()
             dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.All))
         }
 
         logcat { "Granular clear completed" }
+    }
+
+    private suspend fun closeOnlyDuckAiTabs() {
+        val duckAiTabIds = tabRepository.getTabs()
+            .filter { tab -> tab.url?.toUri()?.let(duckChat::isDuckChatUrl) == true }
+            .map { it.tabId }
+        if (duckAiTabIds.isNotEmpty()) {
+            logcat { "Closing ${duckAiTabIds.size} open Duck.ai tab(s) after chat clear" }
+            tabRepository.deleteTabs(duckAiTabIds)
+        }
     }
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.global.view.ClearDataResult
+import com.duckduckgo.app.settings.clear.FireClearOption
 
 /**
  * Interface for manual data clearing operations triggered by user actions (e.g., Fire button).
@@ -26,8 +27,14 @@ interface ManualDataClearing {
      * Clears data when user requests data clearing using the FireDialog.
      * @param shouldRestartIfRequired whether to restart the app process after clearing data, if required (when data or chats cleared)
      * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
+     * @param options when non-null, drives the clear instead of the user's stored fire-data-store
+     *  options; the store is not mutated.
      */
-    suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
+    suspend fun clearDataUsingManualFireOptions(
+        shouldRestartIfRequired: Boolean = false,
+        wasAppUsedSinceLastClear: Boolean = false,
+        options: Set<FireClearOption>? = null,
+    )
 
     /**
      * Clears all data associated with tab:

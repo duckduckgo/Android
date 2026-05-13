@@ -19,28 +19,39 @@ package com.duckduckgo.duckchat.impl.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
+import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class ChatHistoryViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
+    @AppCoroutineScope private val appScope: CoroutineScope,
 ) : ViewModel() {
 
     private val searchState = MutableStateFlow(SearchState())
+    private val confirmationState = MutableStateFlow<PendingConfirmation?>(null)
+
+    /** Cached snapshot so non-suspend action methods can read Recent without re-subscribing. */
+    private var latestItems: List<ChatHistoryItem> = emptyList()
 
     val uiState: StateFlow<ChatHistoryUiState> = combine(
-        chatHistoryRepository.observeChats(),
+        chatHistoryRepository.observeChats().onEach { latestItems = it },
         searchState,
+        confirmationState,
         ::reduce,
     ).stateIn(
         scope = viewModelScope,
@@ -60,8 +71,44 @@ class ChatHistoryViewModel @Inject constructor(
         searchState.value = SearchState()
     }
 
-    private fun reduce(items: List<ChatHistoryItem>, search: SearchState): ChatHistoryUiState {
-        logcat { "ChatHistory: reduce ${items.size} item(s), searchActive=${search.active}" }
+    /**
+     * 0 Recent → no-op; 1 → delete directly (spares Pinned); ≥2 → confirmation dialog,
+     * which clears every Duck.ai chat (Pinned included) via the options-driven path.
+     */
+    fun onFireAllRequested() {
+        val recent = latestItems.filter { !it.pinned }
+        when {
+            recent.isEmpty() -> {
+                logcat { "ChatHistory: Fire-all no-op (Recent empty)" }
+            }
+            recent.size == 1 -> {
+                logcat { "ChatHistory: Fire-all single-chat fast-path" }
+                appScope.launch { chatHistoryRepository.deleteChat(recent.single().chatId) }
+            }
+            else -> {
+                logcat { "ChatHistory: Fire-all confirmation requested (count=${recent.size})" }
+                confirmationState.value = PendingConfirmation.FireAll(count = recent.size)
+            }
+        }
+    }
+
+    /** Clears the confirmation state. The dialog performs the actual deletion via the options-driven path. */
+    fun onFireAllConfirmed() {
+        logcat { "ChatHistory: Fire-all confirmed (options-driven path handles deletion)" }
+        confirmationState.value = null
+    }
+
+    fun onConfirmationCancelled() {
+        logcat { "ChatHistory: confirmation cancelled" }
+        confirmationState.value = null
+    }
+
+    private fun reduce(
+        items: List<ChatHistoryItem>,
+        search: SearchState,
+        confirmation: PendingConfirmation?,
+    ): ChatHistoryUiState {
+        logcat { "ChatHistory: reduce ${items.size} item(s), searchActive=${search.active}, confirmation=$confirmation" }
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
         return Loaded(
@@ -70,6 +117,7 @@ class ChatHistoryViewModel @Inject constructor(
             searchQuery = search.query,
             searchActive = search.active,
             mode = Mode.Default,
+            confirmation = confirmation,
         )
     }
 
