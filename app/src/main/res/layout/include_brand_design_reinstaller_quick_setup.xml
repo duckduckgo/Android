@@ -91,14 +91,12 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarPositionContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground">
+            android:layout_height="wrap_content">
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/addressBarPositionItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:clickable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/addressBarPositionEditButton"
                 app:layout_constraintHorizontal_chainStyle="spread"
@@ -139,8 +137,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarSearchOptionsContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground">
+            android:layout_height="wrap_content">
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/addressBarSearchOptionsItem"
