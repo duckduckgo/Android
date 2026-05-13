@@ -63,6 +63,7 @@
                     android:id="@+id/inputModeSwitchRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:visibility="gone"
@@ -174,17 +175,11 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
 
-                <Space
-                    android:id="@+id/rowSpacer"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
                 <FrameLayout
                     android:id="@+id/inputModeWidgetBottomRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:visibility="gone"
