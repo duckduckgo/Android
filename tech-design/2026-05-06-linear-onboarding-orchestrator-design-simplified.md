@@ -4,7 +4,7 @@
 
 Lift the linear-onboarding state machine from `BrandDesignUpdatePageViewModel` into an `AppScope` orchestrator and extract the linear onboarding-state contracts out of `:app`.
 
-Two structural wins delivered together: the linear onboarding state machine can now span multiple activities, and onboarding contracts (`UserStageStore`, `OnboardingSkipper`, the orchestrator surface) get a real home outside `:app`.
+Two structural wins delivered together: the linear onboarding state machine is no longer tied to a single ViewModel — clearing the path for multi-activity onboarding once `BrowserActivity` is wired up in a follow-up — and onboarding contracts (`UserStageStore`, `OnboardingSkipper`, the orchestrator surface) get a real home outside `:app`.
 
 ## Context
 
@@ -78,7 +78,7 @@ interface LinearOnboardingOrchestrator {
     val state: StateFlow<LinearOnboardingState>
 
     fun startOnboardingPlan(plan: LinearOnboardingPlan)
-    fun onEvent(event: LinearOnboardingEvent)
+    suspend fun onEvent(event: LinearOnboardingEvent)
 }
 
 sealed interface LinearOnboardingState {
@@ -127,6 +127,7 @@ sealed interface LinearOnboardingTransition {
 **Design notes**
 - `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
+- `startOnboardingPlan` is called exactly once per process, from an `AppScope` bootstrapper (see [Lifecycle & rollout](#lifecycle--rollout)). Renderers only observe `state`; they never start the orchestrator themselves. This keeps idempotency structural (single call site) rather than a contract every host has to honor, and lets future hosts (e.g., `BrowserActivity`) plug in by observing without defensive start logic.
 
 ## Host coordination
 
@@ -150,6 +151,8 @@ Existing readers of `AppStage` keep working unchanged. The orchestrator just wri
 
 The reactive `DAX_ONBOARDING → ESTABLISHED` write continues to come from `CtaViewModel.completeStageIfDaxOnboardingCompleted()`. The orchestrator only owns the linear portion.
 
+`AppStage` writes complete *before* the orchestrator emits the corresponding terminal state. A renderer reacting to `Completed` by routing into `BrowserActivity` therefore sees `AppStage == DAX_ONBOARDING` (not `NEW`) downstream — `LaunchViewModel`-style stage checks can't accidentally re-enter linear onboarding mid-handoff.
+
 **Init from `AppStage`:**
 
 | `AppStage` at orchestrator init | Initial state | Behaviour |
@@ -159,6 +162,50 @@ The reactive `DAX_ONBOARDING → ESTABLISHED` write continues to come from `CtaV
 | `ESTABLISHED` | `Completed` | Orchestrator stays inactive |
 
 The `DAX_ONBOARDING` / `ESTABLISHED` rows protect existing users (already past linear) from accidentally re-entering it after this lands.
+
+## Lifecycle & rollout
+
+### Orchestrator start
+
+The orchestrator is started once per process by an `AppScope` lifecycle observer in `:app`. Renderers do not call `startOnboardingPlan` themselves — they only observe `state`.
+
+```kotlin
+// in :app
+@ContributesMultibinding(AppScope::class)
+class LinearOnboardingBootstrapper @Inject constructor(
+    private val orchestrator: LinearOnboardingOrchestrator,
+    private val planProvider: LinearOnboardingPlanProvider,
+    private val userStageStore: UserStageStore,
+    private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+) : MainProcessLifecycleObserver {
+    override fun onCreate(owner: LifecycleOwner) {
+        appScope.launch {
+            if (orchestratorFeature.self().isEnabled() && userStageStore.isNewUser()) {
+                orchestrator.startOnboardingPlan(planProvider.buildMainPlan())
+            }
+        }
+    }
+}
+```
+
+`NEW` is the only stage that triggers a start; `DAX_ONBOARDING` / `ESTABLISHED` users keep the orchestrator in `NotStarted` (matching the init table above).
+
+### Kill switch and dual-path window
+
+The migration ships behind a new `LinearOnboardingOrchestratorFeature` toggle (default `INTERNAL`, ramped from there). During the rollout window, `BrandDesignUpdatePageViewModel` carries both paths:
+
+```kotlin
+init {
+    if (orchestratorFeature.self().isEnabled()) {
+        observeOrchestratorState()           // new path — orchestrator owns state
+    } else {
+        // legacy in-VM state machine (unchanged)
+    }
+}
+```
+
+This roughly doubles the VM's surface area for the duration of the rollout — accepted cost. The legacy block is removed in a tracked cleanup once the toggle is permanently on. The bootstrapper is gated on the same flag, so when the toggle is off the orchestrator stays `NotStarted` and the legacy machine drives the flow unimpeded — no double-driving.
 
 ## Appendix: example step factories
 
@@ -303,7 +350,6 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
 @ContributesViewModel(FragmentScope::class)
 class BrandDesignUpdatePageViewModel @Inject constructor(
     private val orchestrator: LinearOnboardingOrchestrator,
-    private val planProvider: LinearOnboardingPlanProvider,
     private val orchestratorFeature: LinearOnboardingOrchestratorFeature,
     /* … */
 ) : ViewModel() {
@@ -339,16 +385,18 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    // Fragment callbacks → concrete events → orchestrator
-    fun onPrimaryCtaClicked()                                 = orchestrator.onEvent(OnboardingEvent.PrimaryClicked)
-    fun onSecondaryCtaClicked()                               = orchestrator.onEvent(OnboardingEvent.SecondaryClicked)
-    fun onOmnibarTypeSelected(type: OmnibarType)              = orchestrator.onEvent(OnboardingEvent.OmnibarTypeSelected(type))
-    fun onInputModeSelected(withAi: Boolean)                  = orchestrator.onEvent(OnboardingEvent.InputModeSelected(withAi))
-    fun onDefaultBrowserSet()                                 = orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
-    fun onDefaultBrowserNotSet()                              = orchestrator.onEvent(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+    // Fragment callbacks → concrete events → orchestrator. onEvent is suspending,
+    // so each callback launches into viewModelScope.
+    fun onPrimaryCtaClicked()                    = emit(OnboardingEvent.PrimaryClicked)
+    fun onSecondaryCtaClicked()                  = emit(OnboardingEvent.SecondaryClicked)
+    fun onOmnibarTypeSelected(type: OmnibarType) = emit(OnboardingEvent.OmnibarTypeSelected(type))
+    fun onInputModeSelected(withAi: Boolean)     = emit(OnboardingEvent.InputModeSelected(withAi))
+    fun onDefaultBrowserSet()                    = emit(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = true))
+    fun onDefaultBrowserNotSet()                 = emit(OnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
 
-    // Called once by the fragment after onCreate. Kicks off the plan.
-    fun startOnboarding() = orchestrator.startOnboardingPlan(planProvider.buildMainPlan())
+    private fun emit(event: OnboardingEvent) {
+        viewModelScope.launch { orchestrator.onEvent(event) }
+    }
 }
 ```
 
@@ -373,8 +421,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
                 /* … other transient signals … */
             }
         }.launchIn(lifecycleScope)
-
-        viewModel.startOnboarding()  // idempotent — orchestrator no-ops if already InProgress
     }
 
     private fun configureDaxCta(dialog: OnboardingActivityDialog) {
