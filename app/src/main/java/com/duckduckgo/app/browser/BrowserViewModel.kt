@@ -127,13 +127,6 @@ class BrowserViewModel @Inject constructor(
         return true
     }
 
-    /**
-     * Returns true when an incoming external intent must trigger a switch to REGULAR before being
-     * processed.
-     */
-    fun shouldSwitchToRegularModeBeforeProcessingIntent(isExternal: Boolean): Boolean =
-        isExternal && currentMode.value == BrowserMode.FIRE
-
     init {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             tabRepository.flowSelectedTab
