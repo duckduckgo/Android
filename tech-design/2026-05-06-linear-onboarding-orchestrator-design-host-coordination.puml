@@ -1,0 +1,34 @@
+@startuml
+title Host coordination — handoff on `currentStep.host` change
+
+skinparam shadowing false
+
+actor User
+participant "OnboardingActivity\n(host observer)" as OA
+participant "LinearOnboarding-\nOrchestrator" as Orch
+participant "BrowserActivity\n(host observer)" as BA
+
+== OnboardingActivity foreground (currentStep.host = OnboardingActivity) ==
+
+User -> OA : taps primary on last\nOnboardingActivity-hosted step
+OA -> Orch : onEvent(...)
+Orch -> Orch : advance →\ncurrentStep changes\nhost = BrowserActivity
+Orch --> OA : state emits\nInProgress(..., currentStep.host = BrowserActivity)
+OA -> OA : host mismatch
+OA -> BA : startActivity(intent)
+OA -> OA : finish()
+
+== BrowserActivity foreground ==
+
+BA -> Orch : observe orchestrator.state
+Orch --> BA : InProgress(..., currentStep.host = BrowserActivity)
+BA -> BA : host matches → render
+
+note over OA, BA
+  Both activities run the same observer logic symmetrically.
+  When the user finishes a BrowserActivity-hosted step and the
+  next step's host is OnboardingActivity, the roles flip:
+  BrowserActivity launches OnboardingActivity and finish()es.
+end note
+
+@enduml

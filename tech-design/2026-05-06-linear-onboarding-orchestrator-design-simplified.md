@@ -130,18 +130,8 @@ sealed interface LinearOnboardingTransition {
 
 ## Host coordination
 
-```
-OnboardingActivity foreground          BrowserActivity foreground
-  ┌──────────────────┐                ┌──────────────────┐
-  │ observes state   │                │ observes state   │
-  │ currentStep.host │                │ currentStep.host │
-  │  == BrowserAct.? │                │  == OnboardingA? │
-  │       │          │                │       │          │
-  │       ▼ yes      │                │       ▼ yes      │
-  │  start(Browser-) │ ─────────────▶ │  start(Onboard-) │
-  │  finish()        │                │  finish()        │
-  └──────────────────┘                └──────────────────┘
-```
+See [`2026-05-06-linear-onboarding-orchestrator-design-host-coordination.puml`](2026-05-06-linear-onboarding-orchestrator-design-host-coordination.puml) for the handoff sequence.
+
 - Each activity (`OnboardingActivity`, `BrowserActivity`) observes `orchestrator.state`. When `state.currentStep.host` doesn't match its own host, the activity launches the matching host activity and `finish()`es itself. No central coordinator; both activities run the same observer logic symmetrically.
 - Back action (button/gesture) during the linear flow closes the app - this is matching existing behavior.
 - Process death is unchanged from today's behaviour: orchestrator state is in-memory, so process kill mid-flow restarts linear from scratch.
