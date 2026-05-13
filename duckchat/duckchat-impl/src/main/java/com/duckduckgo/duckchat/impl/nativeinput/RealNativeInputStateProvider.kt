@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.MutableNativeInputStateProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -45,7 +47,7 @@ class RealNativeInputStateProvider @Inject constructor(
     override fun stateForTab(tabId: String): StateFlow<NativeInputState> =
         flowFor(tabId).asStateFlow()
 
-    override fun setActiveTab(tabId: String, structural: NativeInputState) {
+    override fun updateActiveTab(tabId: String, structural: NativeInputState) {
         activeTabId = tabId
         val flow = flowFor(tabId)
         val merged = flow.value.copy(
@@ -63,7 +65,7 @@ class RealNativeInputStateProvider @Inject constructor(
         if (tabId == activeTabId) _displayedState.value = flow.value
     }
 
-    override suspend fun loadChatState(tabId: String, chatId: String) {
+    override suspend fun updateFromChat(tabId: String, chatId: String) {
         val modelId = duckAiChatStore.getChat(chatId)?.model?.takeIf { it.isNotEmpty() }
         update(tabId) {
             copy(chatId = chatId, selectedModelId = modelId ?: selectedModelId)

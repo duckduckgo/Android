@@ -36,6 +36,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.nativeinput.MutableNativeInputStateProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -47,9 +50,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
-import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
@@ -177,7 +178,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             inputPosition = config.inputPosition,
             selectedModelId = perTab.selectedModelId,
             chatId = perTab.chatId,
-            attachedImages = perTab.attachedImages,
+            fileRefs = perTab.fileRefs,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -221,7 +222,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
         val currentMode = state.replayCache.lastOrNull()?.inputMode ?: NativeInputState.InputMode.SEARCH_ONLY
         val structural = NativeInputState(inputMode = currentMode, inputContext = context, inputPosition = position)
-        mutableNativeInputStateProvider.setActiveTab(tabId, structural)
+        mutableNativeInputStateProvider.updateActiveTab(tabId, structural)
     }
 
     fun storePendingPrompt(
@@ -243,7 +244,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
             inputPosition = snapshot?.inputPosition ?: NativeInputState.InputPosition.TOP,
         )
-        mutableNativeInputStateProvider.setActiveTab(tabId, structural)
+        mutableNativeInputStateProvider.updateActiveTab(tabId, structural)
     }
 
     fun cancelChatSuggestions() {

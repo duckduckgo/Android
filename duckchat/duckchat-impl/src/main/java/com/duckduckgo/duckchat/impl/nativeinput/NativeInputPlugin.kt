@@ -21,7 +21,7 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 
 /** State a plugin appends to the prompt at send time. Returned by [NativeInputPlugin.getPromptContribution]; null if it has nothing to add. */
 sealed class PromptContribution {

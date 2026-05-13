@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.flow.first
@@ -54,7 +54,7 @@ class RealNativeInputStateProviderTest {
             inputMode = NativeInputState.InputMode.SEARCH_AND_DUCK_AI,
             inputContext = NativeInputState.InputContext.DUCK_AI,
         )
-        testee.setActiveTab("tab-1", structural)
+        testee.updateActiveTab("tab-1", structural)
 
         assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, testee.displayedState.value.inputMode)
         assertEquals(NativeInputState.InputContext.DUCK_AI, testee.displayedState.value.inputContext)
@@ -62,10 +62,10 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenSetActiveTabThenExistingTabFieldsPreserved() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "claude-3", chatId = "chat-1") }
 
-        testee.setActiveTab(
+        testee.updateActiveTab(
             "tab-1",
             structural(context = NativeInputState.InputContext.DUCK_AI),
         )
@@ -78,14 +78,14 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenSetActiveTabFirstTimeThenSelectedModelIdIsNull() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
 
         assertNull(testee.displayedState.value.selectedModelId)
     }
 
     @Test
     fun whenUpdateOnActiveTabThenDisplayedStateReflectsChange() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
 
         testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
 
@@ -94,7 +94,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenUpdateChatIdOnActiveTabThenDisplayedStateReflectsChange() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
 
         testee.update("tab-1") { copy(chatId = "chat-42") }
 
@@ -114,7 +114,7 @@ class RealNativeInputStateProviderTest {
     fun whenUpdateBeforeSetActiveTabThenSetActiveTabPreservesPatchedFields() {
         testee.update("tab-1") { copy(chatId = "chat-77", selectedModelId = "claude-3") }
 
-        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
+        testee.updateActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
 
         val state = testee.displayedState.value
         assertEquals("chat-77", state.chatId)
@@ -124,7 +124,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenClearActiveTabThenDisplayedStateResetsToZero() {
-        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
+        testee.updateActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
         testee.clearTab("tab-1")
 
         assertEquals(NativeInputState.zero(), testee.displayedState.value)
@@ -132,8 +132,8 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenClearNonActiveTabThenDisplayedStateUnchanged() {
-        testee.setActiveTab("tab-1", structural())
-        testee.setActiveTab("tab-2", structural(context = NativeInputState.InputContext.DUCK_AI))
+        testee.updateActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-2", structural(context = NativeInputState.InputContext.DUCK_AI))
 
         testee.clearTab("tab-1")
 
@@ -142,7 +142,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenStateForTabAfterUpdateThenReturnsUpdatedState() = runTest {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "llama-3") }
 
         assertEquals("llama-3", testee.stateForTab("tab-1").first().selectedModelId)
@@ -150,7 +150,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenClearAllThenDisplayedStateResetsToZero() {
-        testee.setActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
+        testee.updateActiveTab("tab-1", structural(context = NativeInputState.InputContext.DUCK_AI))
 
         testee.clearAll()
 
@@ -159,7 +159,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenClearAllThenAllPerTabEntriesDropped() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
         testee.update("tab-2") { copy(selectedModelId = "claude-3") }
 
@@ -171,7 +171,7 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenClearedTabIsRequestedAgainThenZero() {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "gpt-4o") }
         testee.clearTab("tab-1")
 
@@ -180,10 +180,10 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenLoadChatStateWithKnownChatThenChatIdAndModelHydrated() = runTest {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = "gpt-4o"))
 
-        testee.loadChatState("tab-1", "chat-1")
+        testee.updateFromChat("tab-1", "chat-1")
 
         val state = testee.displayedState.value
         assertEquals("chat-1", state.chatId)
@@ -192,11 +192,11 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenLoadChatStateWithUnknownChatThenChatIdSetAndExistingModelKept() = runTest {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "user-pick") }
         whenever(duckAiChatStore.getChat("chat-1")).thenReturn(null)
 
-        testee.loadChatState("tab-1", "chat-1")
+        testee.updateFromChat("tab-1", "chat-1")
 
         val state = testee.displayedState.value
         assertEquals("chat-1", state.chatId)
@@ -205,11 +205,11 @@ class RealNativeInputStateProviderTest {
 
     @Test
     fun whenLoadChatStateWithChatMissingModelThenExistingModelKept() = runTest {
-        testee.setActiveTab("tab-1", structural())
+        testee.updateActiveTab("tab-1", structural())
         testee.update("tab-1") { copy(selectedModelId = "user-pick") }
         whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = ""))
 
-        testee.loadChatState("tab-1", "chat-1")
+        testee.updateFromChat("tab-1", "chat-1")
 
         val state = testee.displayedState.value
         assertEquals("chat-1", state.chatId)
@@ -220,8 +220,8 @@ class RealNativeInputStateProviderTest {
     fun whenLoadChatStateBeforeWidgetAttachesThenStateBufferedForLaterSetActiveTab() = runTest {
         whenever(duckAiChatStore.getChat("chat-1")).thenReturn(chatWith(id = "chat-1", model = "gpt-4o"))
 
-        testee.loadChatState("tab-1", "chat-1")
-        testee.setActiveTab("tab-1", structural())
+        testee.updateFromChat("tab-1", "chat-1")
+        testee.updateActiveTab("tab-1", structural())
 
         val state = testee.displayedState.value
         assertEquals("chat-1", state.chatId)

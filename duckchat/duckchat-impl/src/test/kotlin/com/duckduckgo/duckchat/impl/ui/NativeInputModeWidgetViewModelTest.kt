@@ -33,6 +33,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.nativeinput.MutableNativeInputStateProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
@@ -40,10 +43,8 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
-import com.duckduckgo.duckchat.impl.nativeinput.MutableNativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.subscriptions.api.Product
@@ -344,7 +345,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenConfigureCalledThenSetActiveTabCalledOnProvider() = runTest {
         testee.configure("tab-abc", isDuckAiMode = false, isBottom = false)
 
-        verify(mutableNativeInputStateProvider).setActiveTab(
+        verify(mutableNativeInputStateProvider).updateActiveTab(
             eq("tab-abc"),
             any(),
         )
@@ -354,7 +355,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenConfigureWithDuckAiModeThenSetActiveTabWithDuckAiContext() = runTest {
         testee.configure("tab-abc", isDuckAiMode = true, isBottom = false)
 
-        verify(mutableNativeInputStateProvider).setActiveTab(
+        verify(mutableNativeInputStateProvider).updateActiveTab(
             eq("tab-abc"),
             argThat { inputContext == NativeInputState.InputContext.DUCK_AI },
         )
