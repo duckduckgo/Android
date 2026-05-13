@@ -38,6 +38,7 @@ import javax.inject.Inject
 
 interface ContextualNativeInputManager {
     fun init(
+        tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
@@ -62,6 +63,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private var widget: NativeInputModeWidget? = null
 
     override fun init(
+        tabId: String,
         card: MaterialCardView,
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
@@ -75,7 +77,7 @@ class RealContextualNativeInputManager @Inject constructor(
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
+        setupWidget(tabId, widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -105,12 +107,13 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     private fun setupWidget(
+        tabId: String,
         widget: NativeInputModeWidget,
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
-        widget.configureContextual()
+        widget.configureContextual(tabId)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.bindAttachmentCallbacks(

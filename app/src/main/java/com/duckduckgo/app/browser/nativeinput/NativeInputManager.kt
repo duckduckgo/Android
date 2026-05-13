@@ -87,6 +87,7 @@ interface NativeInputManager {
     fun isChatTabSelected(): Boolean
 
     fun showNativeInput(
+        tabId: String,
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
@@ -300,6 +301,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun showNativeInput(
+        tabId: String,
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,
         tabs: LiveData<List<TabEntity>>,
@@ -332,7 +334,7 @@ class RealNativeInputManager @Inject constructor(
                 selectAllText()
             }
         }
-        attachWidget(widgetView, isBottom)
+        attachWidget(widgetView, isBottom, tabId)
         val isNewTab = query.isEmpty() && omnibarController.getText().isEmpty()
         applyInitialTabSelection(widgetView, isNewTab)
         if (omnibarController.isDuckAiMode()) {
@@ -570,13 +572,13 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun attachWidget(widgetView: View, isBottom: Boolean) {
+    private fun attachWidget(widgetView: View, isBottom: Boolean, tabId: String) {
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams(isBottom))
         widgetRoot = widgetView
 
         widgetFrom(widgetView)?.apply {
             setWidgetRootView(widgetView)
-            configure(isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
+            configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
         applyWindowChrome(widgetView, isBottom)

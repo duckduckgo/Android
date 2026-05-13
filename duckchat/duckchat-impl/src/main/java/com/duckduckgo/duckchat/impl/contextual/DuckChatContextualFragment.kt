@@ -424,7 +424,9 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         setupBackPressHandling()
+        val tabId = requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)
         contextualNativeInputManager.init(
+            tabId = tabId.orEmpty(),
             card = binding.contextualNativeInputCard,
             widget = binding.contextualNativeInputWidget,
             jsMessaging = contentScopeScripts,
@@ -442,8 +444,8 @@ class DuckChatContextualFragment :
         )
         observeViewModel()
 
-        requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
-            viewModel.onSheetOpened(tabId)
+        tabId?.let {
+            viewModel.onSheetOpened(it)
             setupKeyboardVisibilityListener()
         }
     }

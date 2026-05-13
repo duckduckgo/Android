@@ -51,6 +51,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -122,8 +123,8 @@ interface NativeInputWidget {
     fun getFileAttachmentsJson(): JSONArray?
     fun clearAttachments()
     fun storePendingPrompt(query: String)
-    fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
-    fun configureContextual()
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
+    fun configureContextual(tabId: String)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -178,6 +179,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
+
+    @Inject
+    lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    private var activeTabId: String? = null
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
@@ -243,7 +249,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
-        observeNativeInputState()
+        // observeNativeInputState() is started from configure()/configureContextual() once
+        // the tabId is known — the widget reads its state from NativeInputStateProvider per-tab.
+        if (activeTabId != null) observeNativeInputState()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -725,21 +733,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
         attachmentView?.clearAttachmentsForNewChat()
     }
 
-    override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+        activeTabId = tabId
         pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
-            viewModel.configure(isDuckAiMode, isBottom)
-            viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
+            viewModel.configure(tabId, isDuckAiMode, isBottom)
+            observeNativeInputState()
             if (isDuckAiMode) selectChatTab()
             applyOmnibarShape(isBottom)
             attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
 
-    override fun configureContextual() {
+    override fun configureContextual(tabId: String) {
+        activeTabId = tabId
         pendingIsDuckAiMode = true
         doOnAttach {
-            viewModel.configureContextual()
+            viewModel.configureContextual(tabId)
+            observeNativeInputState()
             selectChatTab()
             attachmentView?.setDuckAiMode(true)
         }
@@ -867,8 +878,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeNativeInputState() {
         nativeInputStateJob?.cancel()
+        val tabId = activeTabId ?: return
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
-        nativeInputStateJob = viewModel.state
+        nativeInputStateJob = nativeInputStateProvider.stateForTab(tabId)
             .onEach(::applyState)
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -972,7 +984,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    override fun getInputState(): NativeInputState = nativeInputState
+    override fun getInputState(): NativeInputState =
+        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value } ?: nativeInputState
 
     private fun configureSubmitButtons() {
         if (submitButtons == null) {
