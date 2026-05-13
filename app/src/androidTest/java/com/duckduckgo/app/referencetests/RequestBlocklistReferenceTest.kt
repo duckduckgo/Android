@@ -314,7 +314,13 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
+        val client = TdsClient(
+            name = Client.ClientName.TDS,
+            trackers = trackers,
+            urlToTypeMapper = RealUrlToTypeMapper(),
+            optimizeTrackerEvaluationV3 = false,
+            precompileRegex = false,
+        )
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
