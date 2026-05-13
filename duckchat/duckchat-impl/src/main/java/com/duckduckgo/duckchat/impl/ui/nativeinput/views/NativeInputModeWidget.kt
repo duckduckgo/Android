@@ -27,6 +27,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.webkit.ValueCallback
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -181,6 +182,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
+    private var floatingButtons: InputScreenButtons? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
@@ -211,13 +213,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            submitButtons?.onVoiceSearchClick = value
+            voiceHostButtons()?.onVoiceSearchClick = value
             onVoiceClick = value
         }
     override var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            submitButtons?.onVoiceChatClick = value
+            voiceHostButtons()?.onVoiceChatClick = value
         }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
@@ -381,6 +383,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
+            updateNewLineButtonVisibility()
         }
     }
 
@@ -413,11 +416,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val rowSpacer = findViewById<View?>(R.id.rowSpacer)
-        val chatActive = isDuckAiPageContext() || (nativeInputState.toggleVisible && isChatTabSelected())
-        val visible = chatActive && (inputField.hasFocus() || isStreaming)
-        bottomRow.isVisible = visible
-        rowSpacer?.isVisible = visible
+        val visible = isChatTabSelected() && (inputField.hasFocus() || isStreaming)
+        bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
     private fun updateToggleVisibilityForState() {
@@ -462,8 +462,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateVoiceButtonVisibility() {
         val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
         setVoiceButtonVisible(voiceSearchAvailable && isBlank)
-        submitButtons?.setVoiceSearchVisible(false)
-        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
+        val host = voiceHostButtons()
+        host?.setVoiceSearchVisible(false)
+        host?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
     }
 
     private fun updateSendButtonVisibility() {
@@ -475,7 +476,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun updateNewLineButtonVisibility() {
+        val isBrowserContext = nativeInputState.inputContext == NativeInputState.InputContext.BROWSER
+        val hasText = inputField.text.isNotBlank()
+        val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
+        floatingButtons?.setNewLineButtonVisible(visible)
+    }
+
     private fun applyState(state: NativeInputState) {
+        val contextChanged = nativeInputState.inputContext != state.inputContext
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
@@ -484,6 +493,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBackButtons(state)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
+        updateNewLineButtonVisibility()
+        if (contextChanged && isChatTabSelected()) {
+            inputField.applyChatInputType()
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
+        }
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
@@ -574,13 +588,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
-        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+        val isDuckAiChat = isDuckAiPageContext()
+        val actionFlag = if (isDuckAiChat) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
+        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
+        val baseInputType = InputType.TYPE_CLASS_TEXT or
+            InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         setRawInputType(
-            InputType.TYPE_CLASS_TEXT or
-                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+            if (isDuckAiChat) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
         )
         setHorizontallyScrolling(false)
     }
+
+    override fun shouldSubmitOnHardwareEnter(): Boolean =
+        !(isDuckAiPageContext() && isChatTabSelected())
 
     override fun submitMessage(message: String?) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
@@ -900,6 +920,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
+        updateNewLineButtonVisibility()
     }
 
     private fun applyTabUi() {
@@ -912,6 +933,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             inputField.maxLines = MAX_LINES
         }
         updateSendButtonVisibility()
+        updateNewLineButtonVisibility()
         updateBottomRowVisibility()
     }
 
@@ -953,29 +975,42 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getInputState(): NativeInputState = nativeInputState
 
     private fun configureSubmitButtons() {
-        if (submitButtons != null) return
+        if (submitButtons == null) {
+            val bottomContainer = findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return
+            val buttons = InputScreenButtons(
+                context = context,
+                useTopBar = false,
+                layoutResId = R.layout.view_native_input_screen_buttons,
+            ).apply {
+                onSendClick = { submitMessage() }
+                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+                setSendButtonVisible(false)
+                setNewLineButtonVisible(false)
+            }
+            bottomContainer.addView(buttons)
+            submitButtons = buttons
+        }
+
         val floating = floatingSubmitContainer
-        val (container, useTopBar) = if (floating != null) {
-            floating to true
-        } else {
-            (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
+        if (floating != null && floatingButtons == null) {
+            val buttons = InputScreenButtons(
+                context = context,
+                useTopBar = true,
+                layoutResId = R.layout.view_native_input_screen_buttons,
+            ).apply {
+                onNewLineClick = { printNewLine() }
+                onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
+                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
+                setSendButtonVisible(false)
+                setNewLineButtonVisible(false)
+            }
+            floating.addView(buttons)
+            floatingButtons = buttons
         }
-        val buttons = InputScreenButtons(
-            context = context,
-            useTopBar = useTopBar,
-            layoutResId = R.layout.view_native_input_screen_buttons,
-        ).apply {
-            onSendClick = { submitMessage() }
-            onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-            onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
-            onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
-            setSendButtonVisible(false)
-            setNewLineButtonVisible(false)
-        }
-        container.addView(buttons)
-        submitButtons = buttons
         updateVoiceButtonVisibility()
     }
+
+    private fun voiceHostButtons(): InputScreenButtons? = floatingButtons ?: submitButtons
 
     companion object {
         private const val MAX_LINES = 5
