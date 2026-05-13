@@ -362,9 +362,9 @@ class TdsClientTest {
         }
 
         for (useUri in listOf(false, true)) {
-            for (useTestee in listOf(true, false)) {
+            for (useV3 in listOf(true, false)) {
                 val tdsTracker = TdsTracker(trackerDomain, action, OWNER, CATEGORY, rule?.let { listOf(it) } ?: emptyList())
-                val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper, useTestee)
+                val testee = TdsClient(TDS, listOf(tdsTracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = useV3)
                 val result = if (useUri) {
                     testee.matches(url.toUri(), DOCUMENT_URL, mapOf())
                 } else {
@@ -379,10 +379,128 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
         val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js", null)
 
-        val testee = TdsClient(TDS, listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))), mockUrlToTypeMapper, false)
+        val testee =
+            TdsClient(
+                TDS,
+                listOf(TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, listOf(rule))),
+                mockUrlToTypeMapper,
+                optimizeTrackerEvaluationV3 = false,
+            )
 
         assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).surrogate)
         assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js".toUri(), DOCUMENT_URL, mapOf()).surrogate)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlHasExactHostMatchThenTrackerIsFound() {
+        val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        assertEquals(true, testee.matches("http://tracker.com/script.js", DOCUMENT_URL, mapOf()).matches)
+        assertEquals(true, testee.matches("http://tracker.com/script.js".toUri(), DOCUMENT_URL, mapOf()).matches)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlIsSubdomainOfTrackerThenTrackerIsFound() {
+        val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        assertEquals(true, testee.matches("http://a.b.tracker.com/script.js", DOCUMENT_URL, mapOf()).matches)
+        assertEquals(true, testee.matches("http://a.b.tracker.com/script.js".toUri(), DOCUMENT_URL, mapOf()).matches)
+    }
+
+    @Test
+    fun whenV3EnabledAndOverlappingDomainsExistThenLongestSuffixWins() {
+        val parent = TdsTracker(Domain("tracker.com"), IGNORE, OWNER, CATEGORY, emptyList())
+        val child = TdsTracker(Domain("sub.tracker.com"), BLOCK, "ChildOwner", CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(parent, child), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        // api.sub.tracker.com matches both entries; longest-suffix-wins selects sub.tracker.com (BLOCK).
+        val result = testee.matches("http://api.sub.tracker.com/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(true, result.matches)
+        assertEquals("ChildOwner", result.entityName)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlHostHasNoMatchThenResultIsNoMatch() {
+        val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://nontracker.com/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlHasNoHostThenResultIsNoMatch() {
+        val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("not-a-url", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlIsSingleLabelHostThenResultIsNoMatch() {
+        val tracker = TdsTracker(Domain("tracker.com"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://localhost/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
+    @Test
+    fun whenV3EnabledAndHostHasNonLabelAlignedSuffixThenNoMatch() {
+        // tracker domain is "com.example" — request to "evilcom.example" must NOT match
+        // because label-walk only follows whole labels, not suffix substrings.
+        val tracker = TdsTracker(Domain("com.example"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://evilcom.example/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
+    @Test
+    fun whenV3EnabledAndUrlIsSubdomainOfTrackerWithMultiLabelSuffixThenTrackerIsFound() {
+        val tracker = TdsTracker(Domain("tracker.co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        assertEquals(true, testee.matches("http://static.tracker.co.uk/script.js", DOCUMENT_URL, mapOf()).matches)
+    }
+
+    @Test
+    fun whenV3EnabledAndHostIsExactlyETldPlusOneThenTrackerIsFound() {
+        val tracker = TdsTracker(Domain("tracker.co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        assertEquals(true, testee.matches("http://tracker.co.uk/script.js", DOCUMENT_URL, mapOf()).matches)
+    }
+
+    @Test
+    fun whenV3EnabledAndTrackerDomainIsAPublicSuffixThenWalkStopsAtETldPlusOne() {
+        // Walk for "static.tracker.co.uk" must stop after checking "tracker.co.uk" (the eTLD+1)
+        // and must not match a tracker whose domain is a public suffix like "co.uk".
+        val tracker = TdsTracker(Domain("co.uk"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://static.tracker.co.uk/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
+    }
+
+    @Test
+    fun whenV3EnabledAndHostHasNoETldPlusOneThenResultIsNoMatch() {
+        // Hosts without a resolvable eTLD+1 (single-label, IPs, public-suffix-only) must never
+        // match — even if a tracker entry exists at the exact host key.
+        val tracker = TdsTracker(Domain("localhost"), BLOCK, OWNER, CATEGORY, emptyList())
+        val testee = TdsClient(TDS, listOf(tracker), mockUrlToTypeMapper, optimizeTrackerEvaluationV3 = true)
+
+        val result = testee.matches("http://localhost/script.js", DOCUMENT_URL, mapOf())
+        assertEquals(false, result.matches)
+        assertEquals(false, result.isATracker)
     }
 
     companion object {

@@ -106,6 +106,9 @@ class PirPixelInterceptor @Inject constructor(
             "m_dbp_email-confirmation_completed",
             "m_dbp_initial-scan_incomplete",
             "m_dbp_initial_scan_duration",
+            "wide_pir-initial-scan",
+            "wide_pir-scheduled-scan",
+            "wide_pir-time-to-first-scan-complete",
         )
     }
 }

@@ -41,6 +41,8 @@ import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
+import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
+import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
@@ -131,6 +133,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun getResolvedReasoningEffort(): String? {
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
+            (plugin.getPromptContribution() as? PromptContribution.ReasoningEffortSelection)?.effort
+        }
+    }
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
@@ -190,8 +198,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
     }
 
-    fun storePendingPrompt(query: String) {
-        pendingNativePromptStore.store(query, getSelectedModelId())
+    fun storePendingPrompt(
+        query: String,
+        modelId: String?,
+        reasoningEffort: String?,
+        images: List<PendingNativeImage> = emptyList(),
+        files: List<PendingNativeFile> = emptyList(),
+    ) {
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, images, files)
     }
 
     fun configureContextual() {

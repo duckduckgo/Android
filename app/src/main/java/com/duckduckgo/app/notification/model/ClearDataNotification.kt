@@ -131,8 +131,8 @@ class ClearDataNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): Intent {
-        return if (runBlocking { useSingleTabFireDialog.await() }) {
+    override suspend fun getLaunchIntent(): Intent {
+        return if (useSingleTabFireDialog.await()) {
             DataClearingSettingsActivity.intent(context).apply {
                 putExtra(DataClearingSettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
             }

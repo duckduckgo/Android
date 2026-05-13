@@ -184,7 +184,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(PURCHASE_FAILURE_ACCOUNT_CREATION)
 
     override fun reportPurchaseSuccess(isFreeTrial: Boolean) =
-        fire(PURCHASE_SUCCESS, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
+        fire(
+            PURCHASE_SUCCESS,
+            mapOf(
+                SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
+                SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
+            ),
+        )
 
     override fun reportPurchaseSuccessOrigin(origin: String?, isFreeTrial: Boolean) {
         val map = mutableMapOf(

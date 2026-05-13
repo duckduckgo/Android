@@ -107,7 +107,7 @@ class AvailableSurveyNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): Intent {
+    override suspend fun getLaunchIntent(): Intent {
         return SurveyActivity.intent(
             context,
             surveyRepository.getScheduledSurvey(),

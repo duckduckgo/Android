@@ -26,7 +26,7 @@ import javax.inject.Inject
 const val EXTRA_LAUNCHED_FROM_NOTIFICATION = "com.duckduckgo.notification.launched_from_notification"
 
 interface NotificationLaunchIntentBuilder {
-    fun build(launchIntent: Intent?): PendingIntent?
+    fun createLaunchPendingIntent(launchIntent: Intent?, requestCode: Int): PendingIntent?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -35,12 +35,15 @@ class RealNotificationLaunchIntentBuilder @Inject constructor(
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
 ) : NotificationLaunchIntentBuilder {
 
-    override fun build(launchIntent: Intent?): PendingIntent? {
+    override fun createLaunchPendingIntent(launchIntent: Intent?, requestCode: Int): PendingIntent? {
         if (launchIntent == null) return null
         launchIntent.putExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, true)
         return taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(launchIntent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            for (i in 0 until intentCount) {
+                editIntentAt(i)?.putExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, true)
+            }
+            getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
     }
 }

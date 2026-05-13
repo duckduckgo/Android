@@ -97,7 +97,7 @@ class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
         return runBlocking { deferred.await() }
     }
 
-    override fun getLaunchIntent(): Intent {
+    override suspend fun getLaunchIntent(): Intent {
         val survey = Survey(
             surveyId = DefaultBrowserChangedSurveyManager.SURVEY_ID_PUSH,
             url = defaultBrowserChangedSurveyManager.buildSurveyUrl("push"),

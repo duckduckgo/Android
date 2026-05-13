@@ -26,6 +26,9 @@ import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
 import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
+import com.duckduckgo.lint.MissingContributesToOnModuleDetector.Companion.MISSING_CONTRIBUTES_TO_ON_MODULE
+import com.duckduckgo.lint.MissingExplicitReturnTypeOnProvidesBindsDetector.Companion.MISSING_EXPLICIT_RETURN_TYPE
+import com.duckduckgo.lint.MissingHasMemberInjectionsDetector.Companion.MISSING_HAS_MEMBER_INJECTIONS
 import com.duckduckgo.lint.NoMetricsPixelExtensionUsageDetector.Companion.NO_METRICS_PIXEL_EXTENSION_USAGE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
 import com.duckduckgo.lint.NoLifecycleScopeInFragmentDetector.Companion.NO_LIFECYCLE_SCOPE_IN_FRAGMENT
@@ -85,6 +88,9 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             DenyListedApiDetector.ISSUE,
             NO_LIFECYCLE_SCOPE_IN_FRAGMENT,
             NO_POST_VALUE_ON_SINGLE_LIVE_EVENT,
+            MISSING_CONTRIBUTES_TO_ON_MODULE,
+            MISSING_HAS_MEMBER_INJECTIONS,
+            MISSING_EXPLICIT_RETURN_TYPE,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,

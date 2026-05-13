@@ -32,5 +32,5 @@ interface SchedulableNotificationPlugin {
      * Returns the [Intent] that should be launched when the user taps the notification, or `null`
      * if the notification cannot be launched right now.
      */
-    fun getLaunchIntent(): Intent?
+    suspend fun getLaunchIntent(): Intent?
 }

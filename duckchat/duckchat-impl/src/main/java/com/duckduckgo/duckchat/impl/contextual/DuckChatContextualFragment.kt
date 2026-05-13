@@ -433,8 +433,11 @@ class DuckChatContextualFragment :
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
-            onImageButtonPressed = {
-                // To be implemented
+            onCameraCaptureRequested = { callback ->
+                launchCameraCapture(callback)
+            },
+            onFilePickerRequested = { callback, mimeTypes ->
+                launchNativeFilePicker(callback, mimeTypes)
             },
         )
         observeViewModel()
@@ -701,6 +704,22 @@ class DuckChatContextualFragment :
         viewModel.viewModelScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, pageUrl, binding.duckAiContextualFavicon)
         }
+    }
+
+    private fun launchCameraCapture(callback: ValueCallback<Array<Uri>>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = listOf("image/*"),
+        )
+        launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+    }
+
+    private fun launchNativeFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+        val fileChooserParams = FileChooserRequestedParams(
+            filePickingMode = WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE,
+            acceptMimeTypes = mimeTypes.ifEmpty { listOf("*/*") },
+        )
+        launchFilePicker(callback, fileChooserParams)
     }
 
     data class FileChooserRequestedParams(

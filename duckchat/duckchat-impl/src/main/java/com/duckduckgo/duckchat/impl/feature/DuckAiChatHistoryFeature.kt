@@ -29,4 +29,19 @@ interface DuckAiChatHistoryFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
+
+    /**
+     * @return `true` when the native chat history screen can be launched.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun historyScreen(): Toggle
+
+    /**
+     * @return `true` when the per-row Fire-icon delete affordance on Duck.ai chat-history
+     * suggestions in the omnibar autocomplete is visible.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun deleteFromAutocomplete(): Toggle
 }

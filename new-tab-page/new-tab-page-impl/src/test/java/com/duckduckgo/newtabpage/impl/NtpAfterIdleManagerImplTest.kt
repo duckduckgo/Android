@@ -19,6 +19,8 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.newtabpage.api.interactions.HatchInteractionsPlugin
 import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE_DAILY
@@ -43,12 +45,13 @@ class NtpAfterIdleManagerImplTest {
 
     private val pixel: Pixel = mock()
     private val hatchPixels: HatchPixels = mock()
+    private val hatchInteractionsPlugins: PluginPoint<HatchInteractionsPlugin> = mock()
 
     private lateinit var testee: NtpAfterIdleManagerImpl
 
     @Before
     fun setup() {
-        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels)
+        testee = NtpAfterIdleManagerImpl(pixel, hatchPixels, hatchInteractionsPlugins)
     }
 
     // --- onNtpShown classification ---
@@ -118,7 +121,7 @@ class NtpAfterIdleManagerImplTest {
         verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
     }
 
-    // --- onClose resets transient state across sessions ---
+    // --- onClose / onOpen lifecycle behaviour ---
 
     @Test
     fun whenOnCloseThenPendingAfterIdleIsCleared() {
@@ -132,14 +135,16 @@ class NtpAfterIdleManagerImplTest {
     }
 
     @Test
-    fun whenOnCloseThenCurrentAfterIdleIsCleared() {
+    fun whenOnCloseThenCurrentAfterIdleIsPreserved() {
+        // When the auto-NTP is still selected on resume, BrowserViewModel.flowSelectedTab won't
+        // re-emit and onNtpShown() won't fire — so the state must survive the background.
         testee.onIdleReturnTriggered()
         testee.onNtpShown() // currentAfterIdle = true
 
         testee.onClose()
         testee.onReturnToPageTapped()
 
-        verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
     }
 
     @Test
@@ -157,14 +162,43 @@ class NtpAfterIdleManagerImplTest {
     }
 
     @Test
-    fun whenOnOpenThenCurrentAfterIdleIsCleared() {
+    fun whenOnOpenNotFreshLaunchThenCurrentAfterIdleIsPreserved() {
         testee.onIdleReturnTriggered()
         testee.onNtpShown() // currentAfterIdle = true
 
         testee.onOpen(isFreshLaunch = false)
         testee.onReturnToPageTapped()
 
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
+    }
+
+    @Test
+    fun whenOnOpenFreshLaunchThenCurrentAfterIdleIsCleared() {
+        // The singleton can carry stale _isAfterIdleReturn=true from a previous session in the
+        // same process. A fresh launch must reset it so the next onNtpShown() classification
+        // doesn't inherit the previous session's state.
+        testee.onIdleReturnTriggered()
+        testee.onNtpShown() // currentAfterIdle = true (stale from prior session)
+
+        testee.onOpen(isFreshLaunch = true)
+        testee.onReturnToPageTapped()
+
         verify(hatchPixels).fireReturnToPageTapped(afterIdle = false)
+    }
+
+    @Test
+    fun whenBackgroundedAndResumedOnSameAutoNtpThenAfterIdleStateSurvives() {
+        // Regression: hatch was disappearing on the second background+resume because the manager
+        // cleared currentAfterIdle on every onClose/onOpen and BrowserViewModel's flowSelectedTab
+        // doesn't re-emit when the same NTP tab stays selected.
+        testee.onIdleReturnTriggered()
+        testee.onNtpShown() // auto-NTP shown, currentAfterIdle = true
+
+        testee.onClose()
+        testee.onOpen(isFreshLaunch = false)
+        testee.onReturnToPageTapped()
+
+        verify(hatchPixels).fireReturnToPageTapped(afterIdle = true)
     }
 
     // --- onNtpSearchSubmitted classification ---
