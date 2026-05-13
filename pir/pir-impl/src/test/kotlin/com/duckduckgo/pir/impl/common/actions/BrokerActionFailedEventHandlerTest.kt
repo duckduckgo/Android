@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOut
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_OPTOUT
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler.Companion.MAX_RETRY_COUNT_SCAN
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionFailed
@@ -348,6 +349,80 @@ class BrokerActionFailedEventHandlerTest {
         assertEquals(2, result.nextState.actionRetryCount)
         val nextEvent = result.nextEvent as ExecuteBrokerStepAction
         assertEquals(testProfileQuery, (nextEvent.actionRequestData as PirScriptRequestData.UserProfile).userProfile)
+    }
+
+    @Test
+    fun whenBrokerStepIndexExceedsBrokerStepsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testClickAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 1, // Exceeds broker steps size (1)
+            currentActionIndex = 0,
+            actionRetryCount = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = BrokerActionFailed(error = testError, allowRetry = true)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = Broker.unknown(),
+                runType = RunType.MANUAL,
+            ),
+        )
+    }
+
+    @Test
+    fun whenActionIndexExceedsActionsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(testClickAction),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 10, // Exceeds actions size (1)
+            actionRetryCount = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = BrokerActionFailed(error = testError, allowRetry = true)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testBroker,
+                runType = RunType.MANUAL,
+            ),
+        )
     }
 
     @Test
