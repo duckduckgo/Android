@@ -130,7 +130,7 @@ sealed interface LinearOnboardingTransition {
 
 ## Host coordination
 
-See [`2026-05-06-linear-onboarding-orchestrator-design-host-coordination.puml`](2026-05-06-linear-onboarding-orchestrator-design-host-coordination.puml) for the handoff sequence.
+See [`2026-05-06-linear-onboarding-orchestrator-design-simplified-host-coordination.puml`](2026-05-06-linear-onboarding-orchestrator-design-simplified-host-coordination.puml) for the handoff sequence.
 
 - Each activity (`OnboardingActivity`, `BrowserActivity`) observes `orchestrator.state`. When `state.currentStep.host` doesn't match its own host, the activity launches the matching host activity and `finish()`es itself. No central coordinator; both activities run the same observer logic symmetrically.
 - Back action (button/gesture) during the linear flow closes the app - this is matching existing behavior.
@@ -177,22 +177,22 @@ sealed interface OnboardingEvent : LinearOnboardingEvent {
 }
 
 // in :app — domain-specific dialogs the renderer observes
-sealed interface IsolatedOnboardingDialog {
-    data object IntroAnimation : IsolatedOnboardingDialog
-    data class InitialReinstallUser(val showDuckAiCopy: Boolean) : IsolatedOnboardingDialog
-    data class AddressBarPosition(val showSplitOption: Boolean) : IsolatedOnboardingDialog
-    data class InputScreenPreview(val isSearchDefault: Boolean) : IsolatedOnboardingDialog
-    data object SkipOnboardingOption : IsolatedOnboardingDialog
+sealed interface OnboardingActivityDialog {
+    data object IntroAnimation : OnboardingActivityDialog
+    data class InitialReinstallUser(val showDuckAiCopy: Boolean) : OnboardingActivityDialog
+    data class AddressBarPosition(val showSplitOption: Boolean) : OnboardingActivityDialog
+    data class InputScreenPreview(val isSearchDefault: Boolean) : OnboardingActivityDialog
+    data object SkipOnboardingOption : OnboardingActivityDialog
     // … other variants for SyncRestore, Initial, ComparisonChart, DefaultBrowser, InputScreen
 }
 
 // in :app — concrete step descriptor with rendering hook
-data class IsolatedStep(
+data class OnboardingActivityStep(
     override val id: LinearOnboardingStepId,
     override val host: LinearOnboardingHost = LinearOnboardingHost.OnboardingActivity,
     override val precondition: suspend () -> Boolean = { true },
     override val transition: suspend (LinearOnboardingEvent) -> LinearOnboardingTransition,
-    val resolveDialog: suspend () -> IsolatedOnboardingDialog,
+    val resolveDialog: suspend () -> OnboardingActivityDialog,
 ) : LinearOnboardingStep
 ```
 
@@ -219,17 +219,17 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
     // Simple step: PrimaryClicked → Advance.
     // Modelled as a plan step (not a fragment-side prelude) so it's not re-played
     // when the user returns to OnboardingActivity from a BrowserActivity step.
-    private fun introAnimationStep() = IsolatedStep(
+    private fun introAnimationStep() = OnboardingActivityStep(
         id = "intro_animation",
-        resolveDialog = { IsolatedOnboardingDialog.IntroAnimation },
+        resolveDialog = { OnboardingActivityDialog.IntroAnimation },
         transition = { event -> if (event is OnboardingEvent.PrimaryClicked) Advance else Stay },
     )
 
     // Step with a side-plan entry on Secondary
-    private fun initialReinstallUserStep() = IsolatedStep(
+    private fun initialReinstallUserStep() = OnboardingActivityStep(
         id = "initial_reinstall_user",
         precondition = { !syncAutoRestore.canRestore() && appBuildConfig.isAppReinstall() },
-        resolveDialog = { IsolatedOnboardingDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
+        resolveDialog = { OnboardingActivityDialog.InitialReinstallUser(showDuckAiCopy = isDuckAiCopyEnabled()) },
         transition = { event -> when (event) {
             is OnboardingEvent.PrimaryClicked -> Advance
             is OnboardingEvent.SecondaryClicked -> {
@@ -241,10 +241,10 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
     )
 
     // Step with a state-carrying event (selection persists before Advance)
-    private fun addressBarPositionStep() = IsolatedStep(
+    private fun addressBarPositionStep() = OnboardingActivityStep(
         id = "address_bar_position",
         precondition = { defaultRoleBrowserDialog.shouldShowDialog() },
-        resolveDialog = { IsolatedOnboardingDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
+        resolveDialog = { OnboardingActivityDialog.AddressBarPosition(showSplitOption = isSplitOmnibarEnabled()) },
         transition = { event -> when (event) {
             is OnboardingEvent.OmnibarTypeSelected -> {
                 settingsDataStore.omnibarType = event.type
@@ -257,7 +257,7 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
     )
 
     // Step gated by both prior selection AND experiment assignment
-    private fun inputScreenPreviewStep() = IsolatedStep(
+    private fun inputScreenPreviewStep() = OnboardingActivityStep(
         id = "input_screen_preview",
         precondition = {
             onboardingStore.getInputScreenSelection() == true &&
@@ -268,7 +268,7 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
         },
         resolveDialog = {
             val variant = duckAiOnboardingExperimentManager.enroll()
-            IsolatedOnboardingDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
+            OnboardingActivityDialog.InputScreenPreview(isSearchDefault = variant == TREATMENT_WITH_SEARCH_DEFAULT)
         },
         transition = { event -> if (event is OnboardingEvent.PrimaryClicked) Advance else Stay },
     )
@@ -276,9 +276,9 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
     // Step in the side plan: Primary terminates the linear flow entirely;
     // Secondary returns to the caller plan (Return pops the call stack →
     // main resumes past the step that did SwitchTo).
-    private fun skipOnboardingOptionStep() = IsolatedStep(
+    private fun skipOnboardingOptionStep() = OnboardingActivityStep(
         id = "skip_onboarding_option",
-        resolveDialog = { IsolatedOnboardingDialog.SkipOnboardingOption },
+        resolveDialog = { OnboardingActivityDialog.SkipOnboardingOption },
         transition = { event -> when (event) {
             is OnboardingEvent.PrimaryClicked -> {
                 pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
@@ -296,7 +296,7 @@ class LinearOnboardingPlanProvider @Inject constructor(/* … */) {
 
 ### Renderer adapter and fragment wiring
 
-`BrandDesignUpdatePageViewModel` is the renderer adapter: it observes orchestrator state and translates it into UI-shaped surfaces the fragment renders, and it translates fragment callbacks into concrete `OnboardingEvent`s that go back to the orchestrator. The fragment only knows about `IsolatedOnboardingDialog` and `Command` — it never sees the orchestrator directly.
+`BrandDesignUpdatePageViewModel` is the renderer adapter: it observes orchestrator state and translates it into UI-shaped surfaces the fragment renders, and it translates fragment callbacks into concrete `OnboardingEvent`s that go back to the orchestrator. The fragment only knows about `OnboardingActivityDialog` and `Command` — it never sees the orchestrator directly.
 
 ```kotlin
 // in :app
@@ -309,9 +309,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Dialog the fragment renders. Derived from orchestrator state via the
-    // :app-side IsolatedStep#resolveDialog() hook.
-    private val _dialogState = MutableStateFlow<IsolatedOnboardingDialog?>(null)
-    val dialogState: StateFlow<IsolatedOnboardingDialog?> = _dialogState
+    // :app-side OnboardingActivityStep#resolveDialog() hook.
+    private val _dialogState = MutableStateFlow<OnboardingActivityDialog?>(null)
+    val dialogState: StateFlow<OnboardingActivityDialog?> = _dialogState
 
     // Transient non-dialog signals (Finish, OnboardingSkipped, RequestNotificationPermissions, …)
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -329,7 +329,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         orchestrator.state.onEach { state ->
             when (state) {
                 is InProgress -> {
-                    val step = state.currentStep as? IsolatedStep ?: return@onEach
+                    val step = state.currentStep as? OnboardingActivityStep ?: return@onEach
                     _dialogState.value = step.resolveDialog()
                 }
                 Completed -> { _dialogState.value = null; _commands.send(Command.Finish) }
@@ -352,7 +352,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 }
 ```
 
-Fragment side: a `dialogState` observer for what's currently visible, and a slimmer `commands` observer for transient signals. The fragment dispatches on `IsolatedOnboardingDialog` once, with special-case rendering for non-dax dialogs:
+Fragment side: a `dialogState` observer for what's currently visible, and a slimmer `commands` observer for transient signals. The fragment dispatches on `OnboardingActivityDialog` once, with special-case rendering for non-dax dialogs:
 
 ```kotlin
 // in :app
@@ -377,16 +377,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(/* … */) {
         viewModel.startOnboarding()  // idempotent — orchestrator no-ops if already InProgress
     }
 
-    private fun configureDaxCta(dialog: IsolatedOnboardingDialog) {
+    private fun configureDaxCta(dialog: OnboardingActivityDialog) {
         when (dialog) {
-            is IsolatedOnboardingDialog.IntroAnimation -> playIntroAnimation { viewModel.onPrimaryCtaClicked() }
-            is IsolatedOnboardingDialog.DefaultBrowser -> startActivityForResult(dialog.intent, REQ_DEFAULT_BROWSER_ROLE)
+            is OnboardingActivityDialog.IntroAnimation -> playIntroAnimation { viewModel.onPrimaryCtaClicked() }
+            is OnboardingActivityDialog.DefaultBrowser -> startActivityForResult(dialog.intent, REQ_DEFAULT_BROWSER_ROLE)
             else -> renderDaxDialog(dialog)
         }
     }
 }
 ```
 
-The full event loop is in [`2026-05-06-linear-onboarding-orchestrator-design-event-loop.puml`](2026-05-06-linear-onboarding-orchestrator-design-event-loop.puml) — a single primary tap on `Initial` traced from fragment through viewmodel → orchestrator → step transition → state re-emission → re-render as `ComparisonChart`. The orchestrator never inspects the event content; everything domain-specific stays on the `:app` side of the boundary.
+The full event loop is in [`2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml`](2026-05-06-linear-onboarding-orchestrator-design-simplified-event-loop.puml) — a single primary tap on `Initial` traced from fragment through viewmodel → orchestrator → step transition → state re-emission → re-render as `ComparisonChart`. The orchestrator never inspects the event content; everything domain-specific stays on the `:app` side of the boundary.
 
 An integration with `BrowserActivity` and the existing Duck.ai onboarding step will be considered separately. 

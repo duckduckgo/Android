@@ -8,13 +8,13 @@ actor User
 participant "BrandDesignUpdate-\nWelcomePage\n(Fragment)" as Frag
 participant "BrandDesignUpdate-\nPageViewModel" as VM
 participant "LinearOnboarding-\nOrchestrator" as Orch
-participant "currentStep\n(IsolatedStep)" as Step
+participant "currentStep\n(OnboardingActivityStep)" as Step
 
 == Initial render (already InProgress(Initial)) ==
 
 Orch --> VM : state = InProgress(plan, idx)
 VM -> Step : currentStep.resolveDialog()
-Step --> VM : IsolatedOnboardingDialog.Initial(...)
+Step --> VM : OnboardingActivityDialog.Initial(...)
 VM --> Frag : dialogState = Initial(...)
 Frag -> Frag : configureDaxCta(Initial(...))
 
@@ -42,7 +42,7 @@ note right of Step
   Now this is the
   ComparisonChart step.
 end note
-Step --> VM : IsolatedOnboardingDialog.ComparisonChart(...)
+Step --> VM : OnboardingActivityDialog.ComparisonChart(...)
 VM --> Frag : dialogState = ComparisonChart(...)
 Frag -> Frag : configureDaxCta(ComparisonChart(...))
 
