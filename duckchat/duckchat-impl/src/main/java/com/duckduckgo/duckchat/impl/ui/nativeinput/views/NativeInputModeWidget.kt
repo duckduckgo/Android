@@ -366,7 +366,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
             // driven on duck.ai). Re-evaluating it from the focus listener would race with
             // setToggleVisible — e.g. re-show the toggle after the keyboard has been dismissed.
-            beginFocusTransition()
+            // Only animate on focus-gain — focus-loss pairs with an instant setToggleVisible hide,
+            // and animating the padding shrink afterwards looks like a two-step collapse.
+            if (hasFocus) beginFocusTransition()
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
             if (!hasFocus && isDuckAiPageContext()) {

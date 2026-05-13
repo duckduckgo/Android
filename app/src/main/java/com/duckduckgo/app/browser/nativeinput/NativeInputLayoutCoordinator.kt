@@ -174,12 +174,13 @@ class NativeInputLayoutCoordinator(
         }
 
         fun applyPadding(view: View, padding: Padding, deltaTop: Int, deltaBottom: Int) {
-            view.setPadding(
-                padding.left,
-                padding.top + deltaTop,
-                padding.right,
-                padding.bottom + deltaBottom,
-            )
+            val newTop = padding.top + deltaTop
+            val newBottom = padding.bottom + deltaBottom
+            if (view.paddingTop == newTop && view.paddingBottom == newBottom) return
+            view.setPadding(padding.left, newTop, padding.right, newBottom)
+            // Force a layout pass for children (e.g. WebView) that cache their measured size and
+            // otherwise leave a gap until the next user interaction.
+            view.post { view.requestLayout() }
         }
 
         fun isLogoOnlyContent(view: View): Boolean {
