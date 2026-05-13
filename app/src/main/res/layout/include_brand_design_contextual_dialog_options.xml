@@ -39,7 +39,7 @@
             android:id="@+id/contextualBrandDesignSiteOption2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/keyline_0"
             android:gravity="start|center_vertical"
             app:icon="@drawable/ic_globe_16"
             tools:text="@string/onboardingSitesDaxDialogOption2" />
@@ -48,7 +48,7 @@
             android:id="@+id/contextualBrandDesignSiteOption3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/keyline_0"
             android:gravity="start|center_vertical"
             app:icon="@drawable/ic_globe_16"
             tools:text="@string/onboardingSitesDaxDialogOption3" />
@@ -57,7 +57,7 @@
             android:id="@+id/contextualBrandDesignSiteOption4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="@dimen/keyline_0"
             android:gravity="start|center_vertical"
             app:icon="@drawable/ic_wand_16"
             tools:text="@string/onboardingSitesDaxDialogOption4" />
