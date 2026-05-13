@@ -20,6 +20,7 @@ import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
+import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -35,7 +36,8 @@ class ChatHistoryViewModelTest {
 
     private val source = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val repository = FakeChatHistoryRepository(source)
-    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope)
+    private val duckChat = FakeDuckChatInternal()
+    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat)
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -345,6 +347,324 @@ class ChatHistoryViewModelTest {
         // ViewModel never touches the repository on the dialog path — production wipes Pinned too.
         assertEquals(false, repository.deleteAllChatsCalled)
         assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
+    // --- Chat resume / Duck.ai open (centralised on the ViewModel) ---
+
+    @Test
+    fun `onChatRowClicked in default mode resumes the chat in DuckAi`() = runTest {
+        viewModel.onChatRowClicked("abc")
+
+        assertEquals(listOf("abc"), duckChat.openWithChatIdCalls)
+    }
+
+    @Test
+    fun `onChatRowLongClicked in default mode enters select mode with the row pre-selected`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded (Default)
+
+            val consumed = viewModel.onChatRowLongClicked("a")
+
+            assertTrue(consumed)
+            val loaded = awaitItem() as Loaded
+            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("a"), mode.selectedChatIds)
+            assertTrue(duckChat.openWithChatIdCalls.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onChatRowLongClicked in select mode toggles the row like a tap`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onChatRowLongClicked("a")
+            awaitItem() // Selecting({a})
+
+            val consumed = viewModel.onChatRowLongClicked("b")
+
+            assertTrue(consumed)
+            val loaded = awaitItem() as Loaded
+            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("a", "b"), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onChatRowClicked in select mode toggles selection instead of opening DuckAi`() = runTest {
+        source.value = listOf(item("a"))
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+
+            viewModel.onChatRowClicked("a")
+
+            val loaded = awaitItem() as Loaded
+            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("a"), mode.selectedChatIds)
+            assertTrue(duckChat.openWithChatIdCalls.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onOpenDuckAiClicked delegates to DuckChat`() = runTest {
+        viewModel.onOpenDuckAiClicked()
+
+        assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
+    fun `onFireIconClicked in default mode triggers Fire-all`() = runTest {
+        source.value = listOf(item("r1"), item("r2"))
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireIconClicked()
+
+            val confirming = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 2), confirming.confirmation)
+        }
+    }
+
+    @Test
+    fun `onFireIconClicked in select mode triggers Delete-selected`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onSelectionToggled("b")
+            awaitItem()
+
+            viewModel.onFireIconClicked()
+
+            val confirming = awaitItem() as Loaded
+            val confirmation = confirming.confirmation as ChatHistoryUiState.PendingConfirmation.DeleteSelected
+            assertEquals(setOf("a", "b"), confirmation.chatIds)
+        }
+    }
+
+    // --- Select-mode (FR-013, FR-013a) ---
+
+    @Test
+    fun `onEnterSelectMode transitions to Selecting with empty selection`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded (Default)
+
+            viewModel.onEnterSelectMode()
+
+            val loaded = awaitItem() as Loaded
+            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(emptySet<String>(), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onSelectionToggled adds and removes ids and empty selection stays in select mode`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+
+            viewModel.onSelectionToggled("a")
+            val afterAdd = awaitItem() as Loaded
+            assertEquals(setOf("a"), (afterAdd.mode as ChatHistoryUiState.Mode.Selecting).selectedChatIds)
+
+            viewModel.onSelectionToggled("a")
+            val afterRemove = awaitItem() as Loaded
+            val mode = afterRemove.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(emptySet<String>(), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onSelectAllToggled fills the selection with every visible chat id`() = runTest {
+        source.value = listOf(item("p", pinned = true), item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+
+            viewModel.onSelectAllToggled()
+
+            val loaded = awaitItem() as Loaded
+            val mode = loaded.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("p", "a", "b"), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onSelectAllToggled with everything selected clears the selection but stays in select mode`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+            viewModel.onSelectAllToggled()
+            awaitItem() // Selecting({a, b})
+
+            viewModel.onSelectAllToggled()
+
+            val cleared = awaitItem() as Loaded
+            val mode = cleared.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(emptySet<String>(), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onSelectModeCancelled returns to Default mode with no deletion`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+
+            viewModel.onSelectModeCancelled()
+
+            val cancelled = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, cancelled.mode)
+            assertTrue(repository.deletedChatIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onDeleteSelectedRequested with empty selection is a no-op`() = runTest {
+        source.value = listOf(item("a"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+
+            viewModel.onDeleteSelectedRequested()
+
+            expectNoEvents()
+            assertTrue(repository.deletedChatIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onDeleteSelectedRequested with one selected deletes directly and exits select mode`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+
+            viewModel.onDeleteSelectedRequested()
+            cancelAndConsumeRemainingEvents()
+        }
+        // After the runTest scheduler drains: mode reset to Default + delete propagated.
+        assertEquals(listOf("a"), repository.deletedChatIds)
+        val finalState = viewModel.uiState.value as Loaded
+        assertEquals(ChatHistoryUiState.Mode.Default, finalState.mode)
+        assertEquals(listOf("b"), finalState.recent.map { it.chatId })
+    }
+
+    @Test
+    fun `onDeleteSelectedRequested with two or more sets DeleteSelected with the captured ids`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onSelectionToggled("b")
+            awaitItem()
+
+            viewModel.onDeleteSelectedRequested()
+
+            val confirming = awaitItem() as Loaded
+            val confirmation = confirming.confirmation as ChatHistoryUiState.PendingConfirmation.DeleteSelected
+            assertEquals(setOf("a", "b"), confirmation.chatIds)
+            assertEquals(2, confirmation.count)
+            assertTrue(repository.deletedChatIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `onDeleteSelectedConfirmed deletes the captured ids and returns to Default mode`() = runTest {
+        source.value = listOf(item("p", pinned = true), item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onSelectionToggled("c")
+            awaitItem()
+            viewModel.onDeleteSelectedRequested()
+            awaitItem() // DeleteSelected({a, c})
+
+            viewModel.onDeleteSelectedConfirmed()
+
+            // Drain all subsequent emissions until the list reflects both deletes — state-flow
+            // batching can fold the mode + confirmation + per-delete emissions in any order.
+            cancelAndConsumeRemainingEvents()
+        }
+        // After the runTest scheduler drains all coroutines:
+        assertEquals(setOf("a", "c"), repository.deletedChatIds.toSet())
+        val finalState = viewModel.uiState.value as Loaded
+        assertEquals(ChatHistoryUiState.Mode.Default, finalState.mode)
+        assertEquals(null, finalState.confirmation)
+        assertEquals(listOf("p"), finalState.pinned.map { it.chatId })
+        assertEquals(listOf("b"), finalState.recent.map { it.chatId })
+    }
+
+    @Test
+    fun `concurrent repository emission removing a selected id reconciles the selection`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectAllToggled()
+            awaitItem() // Selecting({a, b, c})
+
+            // Simulate an external delete (e.g. omnibar Fire-icon) removing chat "b"
+            source.value = listOf(item("a"), item("c"))
+
+            val reconciled = awaitItem() as Loaded
+            val mode = reconciled.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("a", "c"), mode.selectedChatIds)
+        }
     }
 
     /**

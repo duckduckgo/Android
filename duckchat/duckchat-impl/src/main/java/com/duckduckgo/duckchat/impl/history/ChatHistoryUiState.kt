@@ -38,9 +38,12 @@ sealed interface ChatHistoryUiState {
         data class FireAll(val count: Int) : PendingConfirmation
 
         /**
-         * Delete-selected confirmation — placeholder for future selection-mode work. No caller
-         * sets it yet; the current dialog path clears every Duck.ai chat and cannot scope to a subset.
+         * Delete-selected confirmation. `chatIds` is the captured selection snapshot at the
+         * moment Delete-selected was tapped — a concurrent repository emission between
+         * "tapped" and "confirmed" can't change what gets deleted.
          */
-        data class DeleteSelected(val count: Int) : PendingConfirmation
+        data class DeleteSelected(val chatIds: Set<String>) : PendingConfirmation {
+            val count: Int get() = chatIds.size
+        }
     }
 }

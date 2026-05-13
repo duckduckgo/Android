@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.history
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -28,18 +29,30 @@ class ChatHistoryViewHolder(
     itemView: View,
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val iconContainer: FrameLayout = itemView.findViewById(R.id.chatHistoryIconContainer)
     private val typeIcon: ImageView = itemView.findViewById(R.id.chatHistoryTypeIcon)
     private val title: DaxTextView = itemView.findViewById(R.id.chatHistoryTitle)
     private val moreButton: ImageView = itemView.findViewById(R.id.chatHistoryMore)
 
     fun bind(
         item: ChatHistoryItem,
+        selected: Boolean,
         onClick: (ChatHistoryItem) -> Unit,
         onMoreClick: (ChatHistoryItem, View) -> Unit,
         onLongClick: (ChatHistoryItem) -> Boolean = { false },
     ) {
         title.text = item.displayTitle
-        typeIcon.setImageResource(iconFor(item.type, item.pinned))
+        if (selected) {
+            iconContainer.setBackgroundResource(R.drawable.bg_chat_history_circle_accent)
+            typeIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
+            typeIcon.setColorFilter(itemView.context.getColor(com.duckduckgo.mobile.android.R.color.white))
+            iconContainer.contentDescription = itemView.context.getString(R.string.duck_ai_chat_history_row_selected_content_description)
+        } else {
+            iconContainer.setBackgroundResource(R.drawable.bg_chat_history_circle_solid)
+            typeIcon.setImageResource(iconFor(item.type, item.pinned))
+            typeIcon.colorFilter = null
+            iconContainer.contentDescription = null
+        }
         itemView.setOnClickListener { onClick(item) }
         itemView.setOnLongClickListener { onLongClick(item) }
         moreButton.setOnClickListener { anchor -> onMoreClick(item, anchor) }

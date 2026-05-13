@@ -97,4 +97,9 @@
     <string name="duck_ai_chat_history_search_close_content_description">Close search</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
     <string name="duck_ai_chat_history_action_fire_content_description">Delete chats</string>
+    <string name="duck_ai_chat_history_select_all">Select all</string>
+    <string name="duck_ai_chat_history_unselect_all">Unselect all</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Selected</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Not selected</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Exit selection mode</string>
 </resources>

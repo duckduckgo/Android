@@ -184,6 +184,13 @@ interface DuckChatInternal : DuckChat {
     fun openWithChatId(chatId: String)
 
     /**
+     * Returns the Duck.ai URL that addresses the chat with [chatId]. Single source of truth for
+     * the `chatID=<id>` URL shape — callers that need a chat-URL representation (e.g. dispatching
+     * `ClearableData.DuckChats.Selected(urls)`) go through this helper.
+     */
+    fun buildChatUrl(chatId: String): String
+
+    /**
      * Calls onClose when a close event is emitted.
      */
     fun observeCloseEvent(
@@ -827,6 +834,10 @@ class RealDuckChat @Inject constructor(
 
     override fun openWithChatId(chatId: String) {
         openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
+    }
+
+    override fun buildChatUrl(chatId: String): String {
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
