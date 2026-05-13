@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.compose.dialog
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -24,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
@@ -32,10 +33,10 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 
 /**
- * State for the optional checkbox row in [TextAlertDialog].
+ * State for the optional checkbox row in [DaxTextAlertDialog].
  */
 @Immutable
-data class TextAlertDialogCheckboxState(
+data class DaxTextAlertDialogCheckboxState(
     val text: String,
     val checked: Boolean = false,
     val onCheckedChange: ((Boolean) -> Unit)? = null,
@@ -53,17 +54,17 @@ data class TextAlertDialogCheckboxState(
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
 @Composable
-fun TextAlertDialog(
+fun DaxTextAlertDialog(
     onDismissRequest: () -> Unit,
     title: String,
     positiveButtonText: String,
     onPositiveClick: () -> Unit,
     modifier: Modifier = Modifier,
     message: String? = null,
-    @DrawableRes headerImage: Int? = null,
+    headerImage: Painter? = null,
     negativeButtonText: String? = null,
     onNegativeClick: (() -> Unit)? = null,
-    checkbox: TextAlertDialogCheckboxState? = null,
+    checkbox: DaxTextAlertDialogCheckboxState? = null,
     cancellable: Boolean = false,
 ) {
     DaxAlertDialog(
@@ -73,9 +74,9 @@ fun TextAlertDialog(
         message = messageSlot(message),
         headerImage = headerImage,
         cancellable = cancellable,
-        content = checkbox?.let { state -> { TextAlertDialogCheckboxRow(state) } },
+        content = checkbox?.let { state -> { DaxTextAlertDialogCheckboxRow(state) } },
         buttons = {
-            TextAlertDialogButtons(
+            DaxTextAlertDialogButtons(
                 positiveButtonText = positiveButtonText,
                 onPositiveClick = {
                     onPositiveClick()
@@ -94,29 +95,29 @@ fun TextAlertDialog(
 }
 
 /**
- * Content composable for [TextAlertDialog] that can be used in previews.
+ * Content composable for [DaxTextAlertDialog] that can be used in previews.
  * Dialogs don't render in Compose previews, so this allows previewing the dialog content.
  */
 @Composable
-internal fun TextAlertDialogContent(
+internal fun DaxTextAlertDialogContent(
     title: String,
     positiveButtonText: String,
     onPositiveClick: () -> Unit,
     modifier: Modifier = Modifier,
     message: String? = null,
-    @DrawableRes headerImage: Int? = null,
+    headerImage: Painter? = null,
     negativeButtonText: String? = null,
     onNegativeClick: (() -> Unit)? = null,
-    checkbox: TextAlertDialogCheckboxState? = null,
+    checkbox: DaxTextAlertDialogCheckboxState? = null,
 ) {
     DaxAlertDialogContent(
         title = title,
         modifier = modifier,
         message = messageSlot(message),
         headerImage = headerImage,
-        content = checkbox?.let { state -> { TextAlertDialogCheckboxRow(state) } },
+        content = checkbox?.let { state -> { DaxTextAlertDialogCheckboxRow(state) } },
         buttons = {
-            TextAlertDialogButtons(
+            DaxTextAlertDialogButtons(
                 positiveButtonText = positiveButtonText,
                 onPositiveClick = onPositiveClick,
                 negativeButtonText = negativeButtonText,
@@ -139,7 +140,7 @@ private fun DefaultMessage(text: String) {
 }
 
 @Composable
-private fun TextAlertDialogCheckboxRow(state: TextAlertDialogCheckboxState) {
+private fun DaxTextAlertDialogCheckboxRow(state: DaxTextAlertDialogCheckboxState) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -162,7 +163,7 @@ private fun TextAlertDialogCheckboxRow(state: TextAlertDialogCheckboxState) {
 }
 
 @Composable
-private fun TextAlertDialogButtons(
+private fun DaxTextAlertDialogButtons(
     positiveButtonText: String,
     onPositiveClick: () -> Unit,
     negativeButtonText: String?,
@@ -176,9 +177,9 @@ private fun TextAlertDialogButtons(
 
 @PreviewLightDark
 @Composable
-private fun TextAlertDialogPreview() {
+private fun DaxTextAlertDialogPreview() {
     PreviewBox {
-        TextAlertDialogContent(
+        DaxTextAlertDialogContent(
             title = "Dialog Title",
             message = "This is the dialog message explaining what's happening.",
             positiveButtonText = "Confirm",
@@ -191,16 +192,16 @@ private fun TextAlertDialogPreview() {
 
 @PreviewLightDark
 @Composable
-private fun TextAlertDialogWithCheckboxPreview() {
+private fun DaxTextAlertDialogWithCheckboxPreview() {
     PreviewBox {
-        TextAlertDialogContent(
+        DaxTextAlertDialogContent(
             title = "Remember Choice",
             message = "Would you like to save this preference?",
             positiveButtonText = "Save",
             onPositiveClick = {},
             negativeButtonText = "Cancel",
             onNegativeClick = {},
-            checkbox = TextAlertDialogCheckboxState(
+            checkbox = DaxTextAlertDialogCheckboxState(
                 text = "Don't ask again",
                 checked = true,
                 onCheckedChange = {},
@@ -211,9 +212,9 @@ private fun TextAlertDialogWithCheckboxPreview() {
 
 @PreviewLightDark
 @Composable
-private fun AlertDialogSingleButtonPreview() {
+private fun DaxTextAlertDialogSingleButtonPreview() {
     PreviewBox {
-        TextAlertDialogContent(
+        DaxTextAlertDialogContent(
             title = "Information",
             message = "This is an informational dialog with only one button.",
             positiveButtonText = "OK",
@@ -224,16 +225,16 @@ private fun AlertDialogSingleButtonPreview() {
 
 @PreviewLightDark
 @Composable
-private fun TextAlertDialogWithImagePreview() {
+private fun DaxTextAlertDialogWithImagePreview() {
     PreviewBox {
-        TextAlertDialogContent(
+        DaxTextAlertDialogContent(
             title = "Dialog Title",
             message = "Header image rendered above the title at 24dp.",
             positiveButtonText = "Confirm",
             onPositiveClick = {},
             negativeButtonText = "Cancel",
             onNegativeClick = {},
-            headerImage = com.duckduckgo.mobile.android.R.drawable.ic_dax_icon,
+            headerImage = painterResource(com.duckduckgo.mobile.android.R.drawable.ic_dax_icon),
         )
     }
 }
