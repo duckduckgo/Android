@@ -6,6 +6,7 @@ skinparam shadowing false
 actor User
 participant "OnboardingActivity\n(host observer)" as OA
 participant "LinearOnboarding-\nOrchestrator" as Orch
+participant "currentStep\n(BrowserActivityStep)" as Step
 participant "BrowserActivity\n(host observer)" as BA
 
 == OnboardingActivity foreground (currentStep.host = OnboardingActivity) ==
@@ -15,20 +16,30 @@ OA -> Orch : onEvent(...)
 Orch -> Orch : advance →\ncurrentStep changes\nhost = BrowserActivity
 Orch --> OA : state emits\nInProgress(..., currentStep.host = BrowserActivity)
 OA -> OA : host mismatch
-OA -> BA : startActivity(intent)
+OA -> BA : startActivity(BrowserActivity.intent(this))
+note right of OA
+  Plain intent — no step-specific extras.
+  OnboardingActivity does not inspect the step;
+  BrowserActivity reads orchestrator state itself.
+end note
 OA -> OA : finish()
 
 == BrowserActivity foreground ==
 
 BA -> Orch : observe orchestrator.state
 Orch --> BA : InProgress(..., currentStep.host = BrowserActivity)
-BA -> BA : host matches → render
+BA -> BA : host matches
+BA -> Step : (step as BrowserActivityStep).resolveAction()
+Step --> BA : BrowserActivityAction.OpenDuckChat(url)
+BA -> BA : execute action\n(e.g., viewModel.openDuckChat(url, ...))
 
 note over OA, BA
   Both activities run the same observer logic symmetrically.
   When the user finishes a BrowserActivity-hosted step and the
   next step's host is OnboardingActivity, the roles flip:
-  BrowserActivity launches OnboardingActivity and finish()es.
+  BrowserActivity launches OnboardingActivity (plain intent) and finish()es;
+  OnboardingActivity reads currentStep (OnboardingActivityStep) and renders
+  via resolveDialog().
 end note
 
 @enduml

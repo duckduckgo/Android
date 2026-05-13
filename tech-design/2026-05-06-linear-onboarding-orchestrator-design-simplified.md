@@ -41,6 +41,7 @@ This contributes to our goal of modularizing the `:app` module (refs [AOI: Modul
 onboarding/
 ├── onboarding-api/
 │   ├── LinearOnboardingOrchestrator
+│   ├── LinearOnboardingPlanProvider
 │   ├── LinearOnboardingState, LinearStep, StepTransition, etc.
 │   ├── UserStageStore  (moved from :app)
 │   └── OnboardingSkipper (moved from :app)
@@ -49,13 +50,13 @@ onboarding/
 │   └── LinearOnboardingOrchestratorImpl
 │
 └── :app
-    ├── LinearOnboardingPlanProvider (step factories)
+    ├── LinearOnboardingPlanProviderImpl (step factories)
     ├── AppUserStageStore impl + Room entity (stays)
     ├── FullOnboardingSkipper impl (stays)
     └── BrandDesignUpdatePageVM (thinned to a renderer adapter)
 ```
 
-`LinearOnboardingPlanProvider` stays in `:app` because steps depend on flags/values form `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `DuckChat`, etc. Moving it would force moving its dependency closure — a much wider refactor that we can revisit at a different time.
+The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api`; its impl stays in `:app` because step factories depend on flags/values from `SyncAutoRestore`, `DefaultRoleBrowserDialog`, `OnboardingStore`, `DuckChat`, etc. Moving the impl would force moving its dependency closure — a much wider refactor that we can revisit at a different time.
 
 ### Other minor wins
 
@@ -76,9 +77,11 @@ onboarding/
 ```kotlin
 interface LinearOnboardingOrchestrator {
     val state: StateFlow<LinearOnboardingState>
-
-    fun startOnboardingPlan(plan: LinearOnboardingPlan)
     suspend fun onEvent(event: LinearOnboardingEvent)
+}
+
+interface LinearOnboardingPlanProvider {
+    suspend fun buildMainPlan(): LinearOnboardingPlan
 }
 
 sealed interface LinearOnboardingState {
@@ -127,7 +130,8 @@ sealed interface LinearOnboardingTransition {
 **Design notes**
 - `LinearOnboardingPlan` needs to be available as soon as the app launches for the first time. To make this possible, plan construction is privacy-config-independent — flag and experiment reads happen lazily inside each step's `suspend precondition`, evaluated when the orchestrator is about to advance onto that step. The alternative (block plan construction until privacy config arrives, or a timeout elapses) would delay the initial onboarding experience. The current design matches today's production behavior: any given step's flag check still risks reading a stale config value, but it's read at the latest possible moment, which is the same window today's flow has.
 - `LinearOnboardingOrchestrator` and its models are not coupled to concrete onboarding steps. A plan provider and hosts are responsible for rendering the right dialogs and executing the right actions based on the provided `stepId`. This prevents leaking all available steps outside the hosts that can execute them, and allows us to add/remove steps without modifying the `:onboarding-api` contract.
-- The orchestrator self-initialises at construction (see [Lifecycle & rollout](#lifecycle--rollout)): on first injection it reads `AppStage` and starts the main plan if the user is `NEW`. Renderers only observe `state`; they never call `startOnboardingPlan`. `startOnboardingPlan` stays on the interface for tests and explicit overrides — idempotent (no-op unless state is `NotStarted`). The "started exactly once per process" guarantee is structural, not a contract every host has to honour.
+- The orchestrator self-initialises at construction (see [Lifecycle & rollout](#lifecycle--rollout)): on first injection it reads `AppStage` and starts the main plan if the user is `NEW`.
+- The `LinearOnboardingPlanProvider` interface lives in `:onboarding-api` so the orchestrator (in `:onboarding-impl`) can depend on it without reaching into `:app`. The concrete impl stays in `:app` because step factories pull on flags / experiments / stores that live there (see [Extract onboarding contracts out of `:app`](#extract-onboarding-contracts-out-of-app)).
 
 ## Host coordination
 
@@ -197,7 +201,7 @@ class LinearOnboardingOrchestratorImpl @Inject constructor(
         }
     }
 
-    // startOnboardingPlan / onEvent / advanceFrom — see Public API surface.
+    // onEvent / advanceFrom — see Public API surface.
 }
 ```
 
@@ -479,12 +483,13 @@ class DuckAiOnboardingSteps @Inject constructor(/* …feature-local deps… */) 
 ```
 
 ```kotlin
-// :app — planner becomes a thin aggregator
+// :app — impl becomes a thin aggregator over contributions
 @SingleInstanceIn(AppScope::class)
-class LinearOnboardingPlanProvider @Inject constructor(
+@ContributesBinding(AppScope::class)
+class LinearOnboardingPlanProviderImpl @Inject constructor(
     private val contributions: PluginPoint<LinearOnboardingStepContribution>,
-) {
-    suspend fun buildMainPlan() = LinearOnboardingPlan(
+) : LinearOnboardingPlanProvider {
+    override suspend fun buildMainPlan() = LinearOnboardingPlan(
         steps = contributions.getPlugins().flatMap { it.steps() },
     )
 }
