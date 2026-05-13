@@ -684,7 +684,10 @@ class BrowserTabFragment :
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private val autoCompleteKeyboardDismissScrollListener =
         object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int,
+            ) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     if (nativeInputManager.isNativeInputEnabled()) {
                         hideKeyboardImmediatelyRetainFocus()
@@ -1403,7 +1406,11 @@ class BrowserTabFragment :
         )
     }
 
-    private fun launchInputScreen(query: String, isNewTab: Boolean = false, showDuckAiEndCta: Boolean = false) {
+    private fun launchInputScreen(
+        query: String,
+        isNewTab: Boolean = false,
+        showDuckAiEndCta: Boolean = false,
+    ) {
         logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
@@ -1858,7 +1865,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun fireMenuOpenedPixels(isFocusedNtp: Boolean, viewState: BrowserViewState?) {
+    private fun fireMenuOpenedPixels(
+        isFocusedNtp: Boolean,
+        viewState: BrowserViewState?,
+    ) {
         if (isActiveCustomTab()) {
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
         } else if (omnibar.viewMode == ViewMode.DuckAI) {
@@ -2189,7 +2199,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showPdf(url: String, cachedFileUri: Uri) {
+    private fun showPdf(
+        url: String,
+        cachedFileUri: Uri,
+    ) {
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabRootLayout.gone()
         binding.browserLayout.show()
@@ -2643,7 +2656,16 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                if (!nativeInputManager.isNativeInputEnabled()) {
+                if (nativeInputManager.isNativeInputEnabled()) {
+                    // Surface the native input widget so its onEnterComplete focuses the input
+                    // and brings up the keyboard via the same path as a manual omnibar tap.
+                    // Skip if the widget is already attached — Command.ShowKeyboard can fire
+                    // multiple times per session (e.g. CTA refresh) and showNativeInput()
+                    // tears down and re-animates the widget on each call.
+                    if (binding.rootView.findViewById<View?>(com.duckduckgo.app.browser.R.id.inputModeTopRoot) == null) {
+                        showNativeInput()
+                    }
+                } else {
                     showKeyboard()
                 }
             }
@@ -2840,6 +2862,7 @@ class BrowserTabFragment :
                     setNewTabBackgroundColor(it.backgroundColorAttr)
                 }
             }
+
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2950,7 +2973,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun setBrowserBackgroundRes(@DrawableRes backgroundRes: Int, useRebrandBackground: Boolean) {
+    private fun setBrowserBackgroundRes(
+        @DrawableRes backgroundRes: Int,
+        useRebrandBackground: Boolean,
+    ) {
         if (useRebrandBackground) {
             newBrowserTab.browserBackground.apply {
                 setImageResource(0)
@@ -4990,7 +5016,10 @@ class BrowserTabFragment :
         launchCameraCapture(callback, fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
     }
 
-    private fun launchFilePicker(callback: ValueCallback<Array<Uri>>, mimeTypes: List<String>) {
+    private fun launchFilePicker(
+        callback: ValueCallback<Array<Uri>>,
+        mimeTypes: List<String>,
+    ) {
         nativeInputManager.setPickingImage(true)
         val fileChooserParams = FileChooserRequestedParams(
             filePickingMode = FileChooserParams.MODE_OPEN_MULTIPLE,
