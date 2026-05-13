@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
@@ -97,18 +98,29 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRepository: PirRepository,
     private val pirSchedulingRepository: PirSchedulingRepository,
+    private val brokerStepsParser: BrokerStepsParser,
     private val context: Context,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository),
     PirDashboardInitialScanStateProvider {
     override suspend fun getActiveBrokersAndMirrorSitesTotal(): Int = withContext(dispatcherProvider.io()) {
         val currentTime = currentTimeProvider.currentTimeMillis()
-        val activeBrokerNames = pirRepository.getAllActiveBrokers().toHashSet()
-        // Take all extant mirror sites whose parent is currently active
+        val scannableBrokerNames = getScannableActiveBrokerNames()
+        // Take all extant mirror sites whose parent broker can actually be scanned
         val activeMirrorSites = getAllExtantMirrorSites(currentTime).filter {
-            activeBrokerNames.contains(it.parentSite)
+            scannableBrokerNames.contains(it.parentSite)
         }
 
-        return@withContext activeBrokerNames.size + activeMirrorSites.size
+        return@withContext scannableBrokerNames.size + activeMirrorSites.size
+    }
+
+    private suspend fun getScannableActiveBrokerNames(): Set<String> {
+        return pirRepository.getAllActiveBrokerObjects().mapNotNullTo(hashSetOf()) { broker ->
+            // Only count brokers whose scan step can actually be parsed and executed. Brokers with unknown
+            // actions in their scan step are silently skipped at scan time, so including them in the total
+            // would cause the dashboard to report the initial scan as incomplete forever.
+            val stepsJson = pirRepository.getBrokerScanSteps(broker.name) ?: return@mapNotNullTo null
+            if (brokerStepsParser.parseStep(broker, stepsJson).isNotEmpty()) broker.name else null
+        }
     }
 
     override suspend fun getFullyCompletedBrokersTotal(): Int {
