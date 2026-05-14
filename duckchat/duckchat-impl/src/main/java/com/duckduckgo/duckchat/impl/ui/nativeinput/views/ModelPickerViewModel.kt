@@ -25,9 +25,9 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

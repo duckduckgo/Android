@@ -26,21 +26,33 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
+@InjectWith(ViewScope::class)
 @SuppressLint("ViewConstructor")
 class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
 
-    private enum class Option { CREATE_IMAGE, WEB_SEARCH }
+    @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
+    }
 
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,
         val subtitleRes: Int,
-        val option: Option,
+        val tool: Tool,
     )
 
     private val menuItems = listOf(
@@ -48,19 +60,17 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             iconRes = R.drawable.ic_images_24,
             titleRes = R.string.duckChatOptionsMenuCreateImage,
             subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
-            option = Option.CREATE_IMAGE,
+            tool = Tool.IMAGE_GENERATION,
         ),
         MenuItem(
             iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
             titleRes = R.string.duckChatOptionsMenuWebSearch,
             subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
-            option = Option.WEB_SEARCH,
+            tool = Tool.WEB_SEARCH,
         ),
     )
 
-    private val tappedIndices = mutableSetOf<Int>()
     private var popupWindow: PopupWindow? = null
-    private var visibleMenuItems = menuItems.withIndex().toList()
     private var optionsButton: ImageView
 
     init {
@@ -70,17 +80,19 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         addView(optionsButton)
     }
 
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+    }
+
     fun getSelectedTool(): Tool? {
-        val index = tappedIndices.firstOrNull() ?: return null
-        return when (menuItems[index].option) {
-            Option.CREATE_IMAGE -> Tool.IMAGE_GENERATION
-            Option.WEB_SEARCH -> Tool.WEB_SEARCH
-        }
+        if (!isAttachedToWindow) return null
+        return viewModel.selectedTool.value
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        if (visibility == VISIBLE && tappedIndices.any { menuItems[it].option == Option.CREATE_IMAGE }) {
+        if (visibility == VISIBLE && !viewModel.shouldShowPickers) {
             post {
                 host.showModelPicker(false)
                 host.showReasoningPicker(false)
@@ -89,34 +101,20 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     fun updateCapabilitiesFrom(picker: ModelPicker?) {
-        val supportsImageGeneration = picker?.isImageGenerationSupported() ?: true
-        val supportsWebSearch = picker?.isWebSearchSupported() ?: true
+        val visibleTools = buildSet {
+            if (picker?.isImageGenerationSupported() ?: true) add(Tool.IMAGE_GENERATION)
+            if (picker?.isWebSearchSupported() ?: true) add(Tool.WEB_SEARCH)
+        }
 
-        visibleMenuItems = menuItems.withIndex()
-            .filter { (_, item) ->
-                when (item.option) {
-                    Option.CREATE_IMAGE -> supportsImageGeneration
-                    Option.WEB_SEARCH -> supportsWebSearch
-                }
-            }
-            .toList()
-
-        menuItems.forEachIndexed { index, item ->
-            val supported = when (item.option) {
-                Option.CREATE_IMAGE -> supportsImageGeneration
-                Option.WEB_SEARCH -> supportsWebSearch
-            }
-            if (!supported && index in tappedIndices) {
-                tappedIndices.remove(index)
-                removeChipForIndex(index)
-                if (item.option == Option.CREATE_IMAGE) {
-                    host.showModelPicker(true)
-                    host.showReasoningPicker(true)
-                }
+        if (isAttachedToWindow) {
+            val selectionCleared = viewModel.updateVisibleTools(visibleTools)
+            if (selectionCleared) {
+                removeChip()
+                applyPickerVisibility()
             }
         }
 
-        optionsButton.isVisible = visibleMenuItems.isNotEmpty()
+        optionsButton.isVisible = visibleTools.isNotEmpty()
     }
 
     override fun onDetachedFromWindow() {
@@ -160,59 +158,55 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow) {
-        val trailingIcons = mutableMapOf<Int, ImageView>()
-        for ((index, item) in visibleMenuItems) {
+        val selectedTool = viewModel.selectedTool.value
+        val trailingIcons = mutableMapOf<Tool, ImageView>()
+        for (item in menuItems.filter { it.tool in viewModel.visibleTools.value }) {
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
-            trailingIcons[index] = trailingIcon
+
+            trailingIcons[item.tool] = trailingIcon
             row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(item.iconRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(item.titleRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(item.subtitleRes)
-            trailingIcon.visibility = if (index in tappedIndices) VISIBLE else GONE
+            trailingIcon.visibility = if (item.tool == selectedTool) VISIBLE else GONE
+
             row.setOnClickListener {
-                val nowSelected = index !in tappedIndices
+                val nowSelected = item.tool != viewModel.selectedTool.value
                 trailingIcons.values.forEach { it.visibility = GONE }
                 if (nowSelected) trailingIcon.visibility = VISIBLE
-                toggleOption(index)
+                onOptionTapped(item)
                 row.postDelayed({ popup.dismiss() }, 150)
             }
             container.addView(row)
         }
     }
 
-    private fun toggleOption(index: Int) {
-        if (tappedIndices.contains(index)) {
-            tappedIndices.remove(index)
-            removeChipForIndex(index)
-            host.showModelPicker(true)
-            host.showReasoningPicker(true)
-        } else {
-            tappedIndices.firstOrNull()?.let { other ->
-                tappedIndices.remove(other)
-                removeChipForIndex(other)
-            }
-            tappedIndices.add(index)
-            addView(buildChip(index, menuItems[index]), 1)
-            val show = menuItems[index].option != Option.CREATE_IMAGE
-            host.showModelPicker(show)
-            host.showReasoningPicker(show)
-        }
+    private fun onOptionTapped(item: MenuItem) {
+        val hadChip = viewModel.selectedTool.value != null
+        viewModel.toggleTool(item.tool)
+        if (hadChip) removeChip()
+        if (viewModel.selectedTool.value != null) addView(buildChip(item), 1)
+        applyPickerVisibility()
     }
 
-    private fun removeChipForIndex(index: Int) {
-        (0 until childCount).map { getChildAt(it) }.firstOrNull { it.tag == index }?.let { removeView(it) }
+    private fun applyPickerVisibility() {
+        val show = viewModel.shouldShowPickers
+        host.showModelPicker(show)
+        host.showReasoningPicker(show)
     }
 
-    private fun buildChip(index: Int, item: MenuItem): View {
+    private fun removeChip() {
+        if (childCount > 1) removeViewAt(1)
+    }
+
+    private fun buildChip(item: MenuItem): View {
         val view = LayoutInflater.from(context).inflate(R.layout.view_options_chip, this, false)
-        view.tag = index
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            tappedIndices.remove(index)
+            viewModel.clearTool()
             removeView(view)
-            host.showModelPicker(true)
-            host.showReasoningPicker(true)
+            applyPickerVisibility()
         }
         return view
     }
