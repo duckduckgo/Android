@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.mode
 
-import com.duckduckgo.browser.api.mode.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserMode
 
 /**
  * Identifies where a BrowserActivity launch originated. Drives the decision of whether the
