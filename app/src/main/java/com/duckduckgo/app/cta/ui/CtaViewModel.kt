@@ -300,11 +300,10 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
-                // TODO: replace in stage 2 (DaxSiteSuggestionsCta brand-design migration).
-                return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                return@withContext DaxSiteSuggestionsBrandDesignUpdateContextualCta(
                     onboardingStore,
                     appInstallStore,
-                    onSiteSuggestionOptionClicked,
+                    isLightTheme = appTheme.isLightModeEnabled(),
                 )
             }
             OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
