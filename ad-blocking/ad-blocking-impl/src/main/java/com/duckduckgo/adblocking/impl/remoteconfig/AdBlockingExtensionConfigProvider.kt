@@ -44,8 +44,18 @@ data class ScriptletEntry(
     val signature: String,
 )
 
+data class ScriptletsSettings(
+    val version: String,
+    val scriptlets: Map<String, ScriptletEntry>,
+)
+
+data class DomainsSettings(
+    val domains: List<Domain>,
+)
+
 interface AdBlockingExtensionConfigProvider {
-    val settings: StateFlow<AdBlockingExtensionSettings?>
+    val scriptletsSettings: StateFlow<ScriptletsSettings?>
+    val domainsSettings: StateFlow<DomainsSettings?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -56,22 +66,31 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
     private val settingsAdapter: JsonAdapter<AdBlockingExtensionSettings>,
 ) : AdBlockingExtensionConfigProvider, PrivacyConfigCallbackPlugin {
 
-    private val settingsFlow = MutableStateFlow<AdBlockingExtensionSettings?>(null)
+    private val scriptletsFlow = MutableStateFlow<ScriptletsSettings?>(null)
+    private val domainsFlow = MutableStateFlow<DomainsSettings?>(null)
 
     init {
-        settingsFlow.value = computeSettings()
+        refresh()
     }
 
-    override val settings: StateFlow<AdBlockingExtensionSettings?> = settingsFlow.asStateFlow()
+    override val scriptletsSettings: StateFlow<ScriptletsSettings?> = scriptletsFlow.asStateFlow()
+    override val domainsSettings: StateFlow<DomainsSettings?> = domainsFlow.asStateFlow()
 
     override fun onPrivacyConfigDownloaded() {
-        settingsFlow.value = computeSettings()
+        logcat { "onPrivacyConfigDownloaded" }
+        refresh()
+    }
+
+    private fun refresh() {
+        val settings = computeSettings()
+        scriptletsFlow.value = settings?.let { ScriptletsSettings(it.version, it.scriptlets) }
+        domainsFlow.value = settings?.let { DomainsSettings(it.domains) }
     }
 
     private fun computeSettings(): AdBlockingExtensionSettings? {
         val settingsJson = feature.self().getSettings() ?: return null
         return runCatching { settingsAdapter.fromJson(settingsJson) }
-            .onFailure { logcat(WARN) { "AdBlockingExtensionConfigProvider: failed to parse settings: ${it.asLog()}" } }
+            .onFailure { logcat(WARN) { "failed to parse settings: ${it.asLog()}" } }
             .getOrNull()
             ?.takeIf { it.version.isNotEmpty() }
     }

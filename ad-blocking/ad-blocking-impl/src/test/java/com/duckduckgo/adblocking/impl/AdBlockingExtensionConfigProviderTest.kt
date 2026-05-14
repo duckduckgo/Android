@@ -60,62 +60,76 @@ class AdBlockingExtensionConfigProviderTest {
     """.trimIndent()
 
     @Test
-    fun `settings is null when settings are missing`() = runTest {
+    fun whenSettingsAreMissingThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = null))
         provider.onPrivacyConfigDownloaded()
 
-        assertNull(provider.settings.value)
+        assertNull(provider.scriptletsSettings.value)
+        assertNull(provider.domainsSettings.value)
     }
 
     @Test
-    fun `settings is null when settings JSON is malformed`() = runTest {
+    fun whenSettingsJsonIsMalformedThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = "{ not valid json"))
         provider.onPrivacyConfigDownloaded()
 
-        assertNull(provider.settings.value)
+        assertNull(provider.scriptletsSettings.value)
+        assertNull(provider.domainsSettings.value)
     }
 
     @Test
-    fun `settings is null when version is missing`() = runTest {
+    fun whenVersionIsMissingThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(
             Toggle.State(remoteEnableState = true, settings = """{"scriptlets": {}, "domains": []}"""),
         )
         provider.onPrivacyConfigDownloaded()
 
-        assertNull(provider.settings.value)
+        assertNull(provider.scriptletsSettings.value)
+        assertNull(provider.domainsSettings.value)
     }
 
     @Test
-    fun `settings is null when scriptlets is missing`() = runTest {
+    fun whenScriptletsIsMissingThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(
             Toggle.State(remoteEnableState = true, settings = """{"version": "1.0", "domains": []}"""),
         )
         provider.onPrivacyConfigDownloaded()
 
-        assertNull(provider.settings.value)
+        assertNull(provider.scriptletsSettings.value)
+        assertNull(provider.domainsSettings.value)
     }
 
     @Test
-    fun `settings reflects parsed config for valid settings`() = runTest {
+    fun whenSettingsAreValidThenScriptletsSettingsReflectsParsedConfig() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         provider.onPrivacyConfigDownloaded()
 
-        val config = provider.settings.value
+        val scriptlets = provider.scriptletsSettings.value
 
-        assertEquals("2026.3.9", config?.version)
+        assertEquals("2026.3.9", scriptlets?.version)
         assertEquals(
             setOf("scriptlets/isolated/ublock-filters.js", "scriptlets/main/ublock-filters.js"),
-            config?.scriptlets?.keys,
+            scriptlets?.scriptlets?.keys,
         )
         assertEquals(
             ScriptletEntry(url = "https://cdn.example/isolated.js", signature = "iso-sig"),
-            config?.scriptlets?.get("scriptlets/isolated/ublock-filters.js"),
+            scriptlets?.scriptlets?.get("scriptlets/isolated/ublock-filters.js"),
         )
-        assertEquals(listOf(Domain("youtube.com"), Domain("m.youtube.com")), config?.domains)
     }
 
     @Test
-    fun `settings has empty domains when domains field is absent`() = runTest {
+    fun whenSettingsAreValidThenDomainsSettingsReflectsParsedConfig() = runTest {
+        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
+        provider.onPrivacyConfigDownloaded()
+
+        assertEquals(
+            listOf(Domain("youtube.com"), Domain("m.youtube.com")),
+            provider.domainsSettings.value?.domains,
+        )
+    }
+
+    @Test
+    fun whenDomainsFieldIsAbsentThenDomainsSettingsHasEmptyDomains() = runTest {
         feature.self().setRawStoredState(
             Toggle.State(
                 remoteEnableState = true,
@@ -124,28 +138,26 @@ class AdBlockingExtensionConfigProviderTest {
         )
         provider.onPrivacyConfigDownloaded()
 
-        val config = provider.settings.value
-
-        assertEquals(emptyList<Domain>(), config?.domains)
+        assertEquals(emptyList<Domain>(), provider.domainsSettings.value?.domains)
     }
 
     @Test
-    fun `settings emits initial value when settings are valid at construction`() = runTest {
+    fun whenSettingsAreValidAtConstructionThenScriptletsSettingsEmitsInitialValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
 
-        freshProvider.settings.filterNotNull().test {
+        freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `settings emits new value when onPrivacyConfigDownloaded fires after a settings change`() = runTest {
+    fun whenOnPrivacyConfigDownloadedFiresAfterSettingsChangeThenScriptletsSettingsEmitsNewValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
 
-        freshProvider.settings.filterNotNull().test {
+        freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
 
             val newSettingsJson = validSettingsJson.replace("2026.3.9", "2026.4.0")
@@ -158,11 +170,11 @@ class AdBlockingExtensionConfigProviderTest {
     }
 
     @Test
-    fun `settings does not emit duplicates when onPrivacyConfigDownloaded fires with unchanged settings`() = runTest {
+    fun whenOnPrivacyConfigDownloadedFiresWithUnchangedSettingsThenScriptletsSettingsDoesNotEmitDuplicates() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
         val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
 
-        freshProvider.settings.filterNotNull().test {
+        freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
 
             freshProvider.onPrivacyConfigDownloaded()
