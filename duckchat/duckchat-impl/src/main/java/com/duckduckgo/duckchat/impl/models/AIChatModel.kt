@@ -34,6 +34,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
     @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
     @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
+    @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
 )
 
 data class RemoteTierAttachmentLimits(
@@ -90,6 +91,16 @@ data class AIChatAttachmentUsage(
     val fileSizeBytesUsed: Long = 0L,
 )
 
+enum class SupportedTool(val rawValue: String) {
+    WEB_SEARCH("WebSearch"),
+    IMAGE_GENERATION("GenerateImage"),
+    ;
+
+    companion object {
+        fun from(raw: String): SupportedTool? = entries.firstOrNull { it.rawValue == raw }
+    }
+}
+
 data class AIChatModel(
     val id: String,
     val name: String,
@@ -102,9 +113,12 @@ data class AIChatModel(
     val supportedImageFormats: List<String> = emptyList(),
     val supportedFileTypes: List<String> = emptyList(),
     val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
+    val supportedTools: List<SupportedTool> = emptyList(),
 ) {
     val supportsFileUpload: Boolean
         get() = supportedFileTypes.isNotEmpty()
+
+    fun supportsTool(tool: SupportedTool): Boolean = supportedTools.contains(tool)
 
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
