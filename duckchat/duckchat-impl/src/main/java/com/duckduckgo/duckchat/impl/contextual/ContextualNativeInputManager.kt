@@ -130,7 +130,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
                 widget.clearAttachments()
-                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), imagesJson, filesJson)
+                sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), widget.getSelectedTool(), imagesJson, filesJson)
                 widget.text = ""
             },
         )
@@ -146,6 +146,7 @@ class RealContextualNativeInputManager @Inject constructor(
         prompt: String,
         modelId: String? = null,
         reasoningEffort: String? = null,
+        selectedTool: String? = null,
         imagesJson: JSONArray? = null,
         filesJson: JSONArray? = null,
     ) {
@@ -162,6 +163,9 @@ class RealContextualNativeInputManager @Inject constructor(
                     }
                     if (reasoningEffort != null) {
                         put("reasoningEffort", reasoningEffort)
+                    }
+                    if (selectedTool != null) {
+                        put("toolChoice", JSONArray().apply { put(selectedTool) })
                     }
                     if (imagesJson != null) {
                         put("images", imagesJson)

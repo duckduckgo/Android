@@ -61,6 +61,7 @@ class NativeInputCallbacks(
         query: String,
         modelId: String?,
         reasoningEffort: String?,
+        selectedTool: String?,
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
     ) -> Unit,
@@ -377,6 +378,7 @@ class RealNativeInputManager @Inject constructor(
                         query,
                         widget.getSelectedModelId(),
                         widget.getResolvedReasoningEffort(),
+                        widget.getSelectedTool(),
                         imagesJson,
                         filesJson,
                     )

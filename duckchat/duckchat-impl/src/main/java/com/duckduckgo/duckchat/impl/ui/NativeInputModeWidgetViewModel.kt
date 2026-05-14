@@ -151,6 +151,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun getSelectedTool(): String? {
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
+            (plugin.getPromptContribution() as? PromptContribution.ToolSelection)?.tool
+        }
+    }
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
@@ -225,10 +231,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         query: String,
         modelId: String?,
         reasoningEffort: String?,
+        selectedTool: String? = null,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
     ) {
-        pendingNativePromptStore.store(query, modelId, reasoningEffort, images, files)
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files)
     }
 
     fun configureContextual(tabId: String) {

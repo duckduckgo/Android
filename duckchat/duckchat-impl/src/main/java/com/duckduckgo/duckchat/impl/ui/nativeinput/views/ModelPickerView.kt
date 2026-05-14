@@ -43,6 +43,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.SupportedTool
 import com.google.android.material.chip.Chip
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
@@ -55,6 +56,8 @@ interface ModelPicker {
     var onMenuDismissed: (() -> Unit)?
     var onModelSelected: (() -> Unit)?
     fun getSelectedModelId(): String?
+    fun isImageGenerationSupported(): Boolean
+    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
 }
 
@@ -82,7 +85,20 @@ class ModelPickerView @JvmOverloads constructor(
         inflate(context, R.layout.view_model_picker, this)
     }
 
+    private val selectedModel: AIChatModel?
+        get() {
+            if (!::viewModelFactory.isInitialized) return null
+            val state = viewModel.state.value
+            return state.models.find { it.id == state.selectedModelId }
+        }
+
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
+
+    override fun isImageGenerationSupported(): Boolean =
+        selectedModel?.supportsTool(SupportedTool.IMAGE_GENERATION) ?: true
+
+    override fun isWebSearchSupported(): Boolean =
+        selectedModel?.supportsTool(SupportedTool.WEB_SEARCH) ?: true
 
     private var pickerEnabled = false
 

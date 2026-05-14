@@ -25,8 +25,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
+import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.SupportedTool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 
 @SuppressLint("ViewConstructor")
@@ -58,11 +60,53 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private val tappedIndices = mutableSetOf<Int>()
     private var popupWindow: PopupWindow? = null
+    private var visibleMenuItems = menuItems.withIndex().toList()
+    private var optionsButton: ImageView
 
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-        addView(buildOptionsButton())
+        optionsButton = buildOptionsButton()
+        addView(optionsButton)
+    }
+
+    fun getSelectedTool(): SupportedTool? {
+        val index = tappedIndices.firstOrNull() ?: return null
+        return when (menuItems[index].option) {
+            Option.CREATE_IMAGE -> SupportedTool.IMAGE_GENERATION
+            Option.WEB_SEARCH -> SupportedTool.WEB_SEARCH
+        }
+    }
+
+    fun updateCapabilitiesFrom(picker: ModelPicker?) {
+        val supportsImageGeneration = picker?.isImageGenerationSupported() ?: true
+        val supportsWebSearch = picker?.isWebSearchSupported() ?: true
+
+        visibleMenuItems = menuItems.withIndex()
+            .filter { (_, item) ->
+                when (item.option) {
+                    Option.CREATE_IMAGE -> supportsImageGeneration
+                    Option.WEB_SEARCH -> supportsWebSearch
+                }
+            }
+            .toList()
+
+        menuItems.forEachIndexed { index, item ->
+            val supported = when (item.option) {
+                Option.CREATE_IMAGE -> supportsImageGeneration
+                Option.WEB_SEARCH -> supportsWebSearch
+            }
+            if (!supported && index in tappedIndices) {
+                tappedIndices.remove(index)
+                removeChipForIndex(index)
+                if (item.option == Option.CREATE_IMAGE) {
+                    host.showModelPicker(true)
+                    host.showReasoningPicker(true)
+                }
+            }
+        }
+
+        optionsButton.isVisible = visibleMenuItems.isNotEmpty()
     }
 
     override fun onDetachedFromWindow() {
@@ -84,7 +128,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private fun showMenu() {
         val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
+            orientation = VERTICAL
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
         val popup = PopupWindow(
@@ -107,7 +151,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private fun populate(container: LinearLayout, popup: PopupWindow) {
         val trailingIcons = mutableMapOf<Int, ImageView>()
-        menuItems.forEachIndexed { index, item ->
+        for ((index, item) in visibleMenuItems) {
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
             trailingIcons[index] = trailingIcon

@@ -345,7 +345,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.storePendingPrompt("hello", "model-1", null)
 
-        verify(pendingNativePromptStore).store("hello", "model-1", null, emptyList(), emptyList())
+        verify(pendingNativePromptStore).store("hello", "model-1", null, null, emptyList(), emptyList())
     }
 
     @Test
@@ -354,7 +354,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.storePendingPrompt("hello", null, null)
 
-        verify(pendingNativePromptStore).store("hello", null, null, emptyList(), emptyList())
+        verify(pendingNativePromptStore).store("hello", null, null, null, emptyList(), emptyList())
     }
 
     @Test
@@ -363,7 +363,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.storePendingPrompt("hello", "model-1", "low")
 
-        verify(pendingNativePromptStore).store("hello", "model-1", "low", emptyList(), emptyList())
+        verify(pendingNativePromptStore).store("hello", "model-1", "low", null, emptyList(), emptyList())
     }
 
     @Test
@@ -525,12 +525,53 @@ class NativeInputModeWidgetViewModelTest {
         assertNull(viewModel.getResolvedReasoningEffort())
     }
 
+    @Test
+    fun whenNoPluginsThenGetSelectedToolReturnsNull() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        assertNull(viewModel.getSelectedTool())
+    }
+
+    @Test
+    fun whenPluginReturnsToolSelectionThenGetSelectedToolReturnsIt() = runTest {
+        val plugin = fakeToolPlugin(containerId = 3, tool = "WebSearch")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertEquals("WebSearch", viewModel.getSelectedTool())
+    }
+
+    @Test
+    fun whenNoPluginContributesToolSelectionThenGetSelectedToolReturnsNull() = runTest {
+        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
+        val viewModel = createViewModel(plugins = listOf(plugin))
+
+        assertNull(viewModel.getSelectedTool())
+    }
+
+    @Test
+    fun whenStorePendingPromptWithSelectedToolThenForwardsTool() = runTest {
+        val viewModel = createViewModel(plugins = emptyList())
+
+        viewModel.storePendingPrompt("hello", "model-1", null, selectedTool = "GenerateImage")
+
+        verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
+    }
+
     private fun fakeReasoningPlugin(containerId: Int, effort: String?): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
             override fun createView(context: Context, host: NativeInputHost): View = View(context)
             override fun getPromptContribution(): PromptContribution? =
                 effort?.let { PromptContribution.ReasoningEffortSelection(it) }
+        }
+    }
+
+    private fun fakeToolPlugin(containerId: Int, tool: String?): NativeInputPlugin {
+        return object : NativeInputPlugin {
+            override val containerId: Int = containerId
+            override fun createView(context: Context, host: NativeInputHost): View = View(context)
+            override fun getPromptContribution(): PromptContribution? =
+                tool?.let { PromptContribution.ToolSelection(it) }
         }
     }
 

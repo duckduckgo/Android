@@ -113,6 +113,7 @@ interface NativeInputWidget {
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun getResolvedReasoningEffort(): String?
+    fun getSelectedTool(): String?
     fun setModelPickerEnabled(enabled: Boolean)
 
     /**
@@ -199,6 +200,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var modelPickerEnabledJob: Job? = null
     private var modelPickerEnabledSource: Flow<Boolean>? = null
     private var modelPickerView: ModelPicker? = null
+    private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
@@ -272,8 +274,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
                             // before plugins were created.
                             pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
                         }
+                        if (pluginView is OptionsView) {
+                            optionsView = pluginView
+                        }
                         wirePluginView(pluginView, scope)
                     }
+                    optionsView?.updateCapabilitiesFrom(modelPickerView)
                 }
             }
             launch {
@@ -310,6 +316,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
             picker.onMenuDismissed = { isModelMenuVisible = false }
+            picker.onModelSelected = {
+                optionsView?.updateCapabilitiesFrom(picker)
+            }
         }
     }
 
@@ -338,6 +347,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob?.cancel()
         modelPickerEnabledJob = null
         modelPickerView = null
+        optionsView = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -697,6 +707,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getResolvedReasoningEffort(): String? = viewModel.getResolvedReasoningEffort()
 
+    override fun getSelectedTool(): String? = viewModel.getSelectedTool()
+
     override fun setModelPickerEnabled(enabled: Boolean) {
         viewModel.setModelPickerEnabled(enabled)
     }
@@ -731,7 +743,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val files = attachmentView?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), images, files)
+        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
     }
 

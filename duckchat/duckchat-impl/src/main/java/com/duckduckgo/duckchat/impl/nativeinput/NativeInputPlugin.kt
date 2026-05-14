@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 sealed class PromptContribution {
     data class ModelSelection(val modelId: String) : PromptContribution()
     data class ReasoningEffortSelection(val effort: String) : PromptContribution()
+    data class ToolSelection(val tool: String) : PromptContribution()
 }
 
 /**
