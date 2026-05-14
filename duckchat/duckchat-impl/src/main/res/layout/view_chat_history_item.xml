@@ -61,10 +61,11 @@
 
     <ImageView
         android:id="@+id/chatHistoryMore"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/duck_ai_chat_history_more_options"
+        android:padding="12dp"
         android:src="@drawable/ic_menu_vertical_24"
         app:layout_constraintBottom_toBottomOf="@+id/chatHistoryIconContainer"
         app:layout_constraintEnd_toEndOf="parent"
