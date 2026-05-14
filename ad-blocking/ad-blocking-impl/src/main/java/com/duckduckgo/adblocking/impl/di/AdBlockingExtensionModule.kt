@@ -19,6 +19,7 @@ package com.duckduckgo.adblocking.impl.di
 import com.duckduckgo.adblocking.impl.domain.PublicKeyProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.DomainJsonAdapter
+import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
 import com.duckduckgo.adblocking.impl.store.AD_BLOCKING_EXTENSION_MIGRATIONS
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDao
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDatabase
@@ -86,10 +87,22 @@ object AdBlockingExtensionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAdBlockingExtensionSettingsAdapter(): JsonAdapter<AdBlockingExtensionSettings> =
-        Moshi.Builder()
+    fun provideMoshiBuilder(): Moshi.Builder = Moshi.Builder()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAdBlockingExtensionSettingsAdapter(moshiBuilder: Moshi.Builder): JsonAdapter<AdBlockingExtensionSettings> =
+        moshiBuilder
             .add(Domain::class.java, DomainJsonAdapter().nullSafe())
             .add(KotlinJsonAdapterFactory())
             .build()
             .adapter(AdBlockingExtensionSettings::class.java)
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideScriptletsSettingsAdapter(moshiBuilder: Moshi.Builder): JsonAdapter<ScriptletsSettings> =
+        moshiBuilder
+            .add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(ScriptletsSettings::class.java)
 }
