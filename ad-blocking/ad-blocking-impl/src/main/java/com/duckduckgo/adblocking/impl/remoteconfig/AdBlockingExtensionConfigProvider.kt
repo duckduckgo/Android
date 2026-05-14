@@ -88,6 +88,9 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
     }
 
     private fun computeSettings(): AdBlockingExtensionSettings? {
+        if (!feature.self().isEnabled()) {
+            return null
+        }
         val settingsJson = feature.self().getSettings() ?: return null
         return runCatching { settingsAdapter.fromJson(settingsJson) }
             .onFailure { logcat(WARN) { "failed to parse settings: ${it.asLog()}" } }
