@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.FrameLayout
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -29,13 +29,12 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 
 @SuppressLint("ViewConstructor")
-class OptionsView(context: Context) : FrameLayout(context) {
+class OptionsView(context: Context) : LinearLayout(context) {
 
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,
         val subtitleRes: Int,
-        val showTick: Boolean = false,
     )
 
     private val menuItems = listOf(
@@ -43,13 +42,11 @@ class OptionsView(context: Context) : FrameLayout(context) {
             iconRes = R.drawable.ic_images_24,
             titleRes = R.string.duckChatOptionsMenuCreateImage,
             subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
-            showTick = true,
         ),
         MenuItem(
             iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
             titleRes = R.string.duckChatOptionsMenuWebSearch,
             subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
-            showTick = true,
         ),
     )
 
@@ -57,8 +54,9 @@ class OptionsView(context: Context) : FrameLayout(context) {
     private var popupWindow: PopupWindow? = null
 
     init {
+        orientation = HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
         addView(buildOptionsButton())
-        setOnClickListener { showMenu() }
     }
 
     override fun onDetachedFromWindow() {
@@ -74,6 +72,7 @@ class OptionsView(context: Context) : FrameLayout(context) {
             contentDescription = context.getString(R.string.duckChatOptionsButtonContentDescription)
             scaleType = ImageView.ScaleType.CENTER
             setImageResource(R.drawable.ic_options_24)
+            setOnClickListener { showMenu() }
         }
     }
 
@@ -101,30 +100,59 @@ class OptionsView(context: Context) : FrameLayout(context) {
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow) {
+        val trailingIcons = mutableMapOf<Int, ImageView>()
         menuItems.forEachIndexed { index, item ->
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
+            trailingIcons[index] = trailingIcon
             row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(item.iconRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(item.titleRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(item.subtitleRes)
-            trailingIcon.visibility = if (item.showTick && index in tappedIndices) VISIBLE else GONE
+            trailingIcon.visibility = if (index in tappedIndices) VISIBLE else GONE
             row.setOnClickListener {
-                if (item.showTick) {
-                    if (tappedIndices.add(index)) {
-                        trailingIcon.visibility = VISIBLE
-                    } else {
-                        tappedIndices.remove(index)
-                        trailingIcon.visibility = GONE
-                    }
-                }
+                val nowSelected = index !in tappedIndices
+                trailingIcons.values.forEach { it.visibility = GONE }
+                if (nowSelected) trailingIcon.visibility = VISIBLE
+                toggleOption(index)
                 row.postDelayed({ popup.dismiss() }, 150)
             }
             container.addView(row)
         }
     }
 
+    private fun toggleOption(index: Int) {
+        if (tappedIndices.contains(index)) {
+            tappedIndices.remove(index)
+            removeChipForIndex(index)
+        } else {
+            tappedIndices.firstOrNull()?.let { other ->
+                tappedIndices.remove(other)
+                removeChipForIndex(other)
+            }
+            tappedIndices.add(index)
+            addView(buildChip(index, menuItems[index]), 1)
+        }
+    }
+
+    private fun removeChipForIndex(index: Int) {
+        (0 until childCount).map { getChildAt(it) }.firstOrNull { it.tag == index }?.let { removeView(it) }
+    }
+
+    private fun buildChip(index: Int, item: MenuItem): View {
+        val view = LayoutInflater.from(context).inflate(R.layout.view_options_chip, this, false)
+        view.tag = index
+        view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
+        view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
+        view.setOnClickListener {
+            tappedIndices.remove(index)
+            removeView(view)
+        }
+        return view
+    }
+
     private fun showAtPosition(popup: PopupWindow) {
-        val loc = IntArray(2).also { getLocationOnScreen(it) }
+        val button = getChildAt(0) ?: this
+        val loc = IntArray(2).also { button.getLocationOnScreen(it) }
         popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
     }
 
