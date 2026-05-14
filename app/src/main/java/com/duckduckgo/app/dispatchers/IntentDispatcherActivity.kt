@@ -70,7 +70,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         startActivity(
             CustomTabActivity.intent(
                 context = this,
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
                 text = intentText,
                 toolbarColor = toolbarColor,
                 isExternal = isExternal,
