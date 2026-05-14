@@ -56,7 +56,12 @@ class OnboardingDevSettingsViewModel @Inject constructor(
 
     private suspend fun visibleCtaIds(): List<CtaId> {
         val requiredDialogs = ctaViewModel.requiredDaxOnboardingCtas()
-        val extraDialogs = listOf(CtaId.DAX_INTRO_VISIT_SITE, CtaId.ADD_WIDGET).filterNot { it in requiredDialogs }
+        val extraDialogs = listOf(
+            CtaId.DAX_INTRO_VISIT_SITE,
+            CtaId.DAX_DIALOG_NETWORK,
+            CtaId.DAX_DIALOG_OTHER,
+            CtaId.ADD_WIDGET,
+        ).filterNot { it in requiredDialogs }
         return requiredDialogs + extraDialogs
     }
 

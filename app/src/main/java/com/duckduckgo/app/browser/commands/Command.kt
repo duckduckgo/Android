@@ -472,6 +472,8 @@ sealed class Command {
         @ColorRes val colorRes: Int,
     ) : Command()
 
+    data object ReinflateBrandDesignContextualDialog : Command()
+
     data class LaunchFireDialogFromOnboardingDialog(
         val onboardingCta: OnboardingDaxDialogCta,
     ) : Command()

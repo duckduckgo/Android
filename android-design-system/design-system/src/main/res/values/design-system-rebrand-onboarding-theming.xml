@@ -35,6 +35,8 @@
     <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
     <attr name="onboardingControlFillTertiary" format="color" />
+    <attr name="onboardingShadowPurple" format="color" />
+    <attr name="onboardingShadowBlue" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
 
     <attr name="selectionButtonStyle" format="reference"/>
@@ -58,6 +60,8 @@
         <item name="onboardingAccentGlowPrimary">#332F95EE</item> <!--20% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater60</item>
         <item name="onboardingControlFillTertiary">@color/black12</item>
+        <item name="onboardingShadowPurple">#0F3E228C</item> <!--6% Alpha-->
+        <item name="onboardingShadowBlue">#171E42A4</item> <!--9% Alpha-->
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6242323</item> <!--84% Alpha-->
@@ -121,6 +125,8 @@
         <item name="onboardingAccentGlowPrimary">#2975B6EB</item> <!--16% Alpha-->
         <item name="onboardingAccentTextPrimary">@color/pondwater40</item>
         <item name="onboardingControlFillTertiary">@color/white24</item>
+        <item name="onboardingShadowPurple">#0F070019</item> <!--6% Alpha-->
+        <item name="onboardingShadowBlue">#17051133</item> <!--9% Alpha-->
 
         <!--Icons-->
         <item name="onboardingIconsPrimary">#D6FBFAF9</item> <!--84% Alpha-->
