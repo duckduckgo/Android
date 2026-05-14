@@ -24,23 +24,23 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_2"
+    android:paddingBottom="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/optionsChipIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         android:importantForAccessibility="no"
         android:scaleType="center" />
 
     <ImageView
         android:id="@+id/optionsChipClose"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="@dimen/keyline_4"
+        android:layout_height="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_2"
         android:importantForAccessibility="no"
         android:scaleType="center"
         app:srcCompat="@drawable/ic_close_16" />

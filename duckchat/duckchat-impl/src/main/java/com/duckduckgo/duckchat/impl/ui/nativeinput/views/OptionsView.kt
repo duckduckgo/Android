@@ -175,7 +175,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
                 trailingIcons.values.forEach { it.visibility = GONE }
                 if (nowSelected) trailingIcon.visibility = VISIBLE
                 onOptionTapped(item)
-                row.postDelayed({ popup.dismiss() }, 150)
+                row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
             }
             container.addView(row)
         }
@@ -223,5 +223,9 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             if (it.isShowing) it.dismiss()
         }
         popupWindow = null
+    }
+
+    companion object {
+        private const val MENU_DISMISS_DELAY_MS = 150L
     }
 }
