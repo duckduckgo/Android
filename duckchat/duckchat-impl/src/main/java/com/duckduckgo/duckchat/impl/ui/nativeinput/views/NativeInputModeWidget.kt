@@ -502,6 +502,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
+        applyOmnibarShape()
         if (contextChanged && isChatTabSelected()) {
             inputField.applyChatInputType()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
@@ -740,7 +741,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configure(tabId, isDuckAiMode, isBottom)
             observeNativeInputState()
             if (isDuckAiMode) selectChatTab()
-            applyOmnibarShape(isBottom)
             attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
@@ -764,8 +764,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun applyOmnibarShape(isBottom: Boolean) {
-        if (isBottom) return
+    private fun applyOmnibarShape() {
+        if (nativeInputState.isBottom) return
         if (nativeInputState.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
