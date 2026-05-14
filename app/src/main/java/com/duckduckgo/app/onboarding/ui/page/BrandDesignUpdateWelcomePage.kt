@@ -1673,10 +1673,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun setQuickSetupListeners() {
-        binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserSwitch.setOnCheckedChangeListener { _, checked ->
+        binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
         }
 
-        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetSwitch.setOnCheckedChangeListener { _, checked ->
+        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem.setOnCheckedChangeListener { checked ->
         }
     }
 
