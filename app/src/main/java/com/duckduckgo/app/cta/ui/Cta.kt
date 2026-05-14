@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
@@ -38,6 +39,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -63,6 +65,7 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
@@ -1427,12 +1430,15 @@ sealed class DaxBubbleCta(
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
             private const val HEADER_IMAGE_FADE_IN_DURATION = 300L
+            private const val ARROW_DEPTH_ANIMATION_DURATION = 200L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
             private const val DISMISS_BORDER_WIDTH_DP = 1.5f
         }
 
         abstract val activeIncludeId: Int
+
+        abstract val showArrow: Boolean
 
         abstract fun configureContentViews(view: View)
 
@@ -1446,6 +1452,7 @@ sealed class DaxBubbleCta(
 
         private var contentFadeInAnimator: AnimatorSet? = null
         private var fadeOutAnimator: AnimatorSet? = null
+        private var arrowDepthAnimator: ValueAnimator? = null
 
         protected fun resolveOnboardingContext(context: Context): Context {
             val themeRes = if (isLightTheme) {
@@ -1495,6 +1502,9 @@ sealed class DaxBubbleCta(
             cancelRunningAnimations()
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
+            val targetDepth = if (showArrow) 1f else 0f
+
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
 
@@ -1537,6 +1547,17 @@ sealed class DaxBubbleCta(
                             ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                         )
+                        // Read depth live: the first-show arm synchronously sets it before this lambda runs,
+                        // so a value captured at function entry would animate from a stale snapshot.
+                        val currentDepth = cardView.arrowDepthFraction
+                        if (targetDepth != currentDepth) {
+                            arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                                duration = ARROW_DEPTH_ANIMATION_DURATION
+                                interpolator = FastOutSlowInInterpolator()
+                                addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                            }
+                            animators.add(arrowDepthAnimator!!)
+                        }
                         contentFadeInAnimator = AnimatorSet().apply {
                             playTogether(animators.toList())
                             addListener(object : AnimatorListenerAdapter() {
@@ -1581,6 +1602,7 @@ sealed class DaxBubbleCta(
                 if (headerImage?.isVisible == true) {
                     headerImage.alpha = 1f
                 }
+                cardView.setArrowDepthFraction(targetDepth)
             }
 
             if (isContentTransition) {
@@ -1627,6 +1649,7 @@ sealed class DaxBubbleCta(
                 descriptionView.text = daxDescription.html(container.context)
                 resetHeaderState()
                 configureContentViews(container)
+                cardView.setArrowDepthFraction(targetDepth)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
@@ -1652,6 +1675,7 @@ sealed class DaxBubbleCta(
                     applySettledState()
                 }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+                cardView.setArrowDepthFraction(targetDepth)
                 if (wasAnimating) {
                     onTypingAnimationFinished()
                 }
@@ -1667,6 +1691,9 @@ sealed class DaxBubbleCta(
             fadeOutAnimator?.removeAllListeners()
             fadeOutAnimator?.cancel()
             fadeOutAnimator = null
+            arrowDepthAnimator?.removeAllUpdateListeners()
+            arrowDepthAnimator?.cancel()
+            arrowDepthAnimator = null
             ctaView?.animate()?.cancel()
         }
 

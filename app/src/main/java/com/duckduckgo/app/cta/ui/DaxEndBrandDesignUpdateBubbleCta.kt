@@ -42,6 +42,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     isLightTheme = isLightTheme,
 ) {
     override val activeIncludeId: Int = R.id.primaryCta
+    override val showArrow: Boolean = false
 
     override fun configureContentViews(view: View) {
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)

@@ -47,6 +47,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     isLightTheme = isLightTheme,
 ) {
     override val activeIncludeId: Int = R.id.primaryCta
+    override val showArrow: Boolean = false
 
     override fun configureContentViews(view: View) {
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true

@@ -46,6 +46,7 @@ abstract class OptionsBubbleCta(
     onboardingStore: OnboardingStore,
     appInstallStore: AppInstallStore,
     isLightTheme: Boolean,
+    showArrow: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = ctaId,
     title = title,
@@ -60,6 +61,7 @@ abstract class OptionsBubbleCta(
     isLightTheme = isLightTheme,
 ) {
     override val activeIncludeId: Int = R.id.optionsContent
+    override val showArrow: Boolean = showArrow
 
     override fun configureContentViews(view: View) {
         val optionViews: List<OnboardingSelectionButton> = listOf(

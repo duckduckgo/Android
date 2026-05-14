@@ -36,4 +36,5 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    showArrow = true,
 )

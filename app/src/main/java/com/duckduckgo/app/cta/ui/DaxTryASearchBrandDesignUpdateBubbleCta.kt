@@ -36,4 +36,5 @@ data class DaxTryASearchBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    showArrow = false,
 )
