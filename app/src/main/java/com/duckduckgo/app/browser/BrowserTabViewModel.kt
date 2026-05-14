@@ -5176,10 +5176,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openDuckChatHistory() {
-        viewModelScope.launch {
-            if (duckChat.isChatHistoryAvailable()) {
-                command.value = Command.LaunchDuckChatHistory
-            } else {
+        if (currentBrowserViewState().showDuckChatHistoryOption) {
+            command.value = Command.LaunchDuckChatHistory
+        } else {
+            viewModelScope.launch {
                 val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)
                 _subscriptionEventDataChannel.send(subscriptionEvent)
             }

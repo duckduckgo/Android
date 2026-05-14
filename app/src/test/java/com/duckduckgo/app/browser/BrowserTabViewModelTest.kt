@@ -9576,7 +9576,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOpenDuckChatHistoryAndAvailableThenLaunchDuckChatHistoryCommandEmitted() = runTest {
-        whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(true)
+        testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = true)
 
         testee.openDuckChatHistory()
 
@@ -9591,7 +9591,7 @@ class BrowserTabViewModelTest {
             subscriptionName = "subscription1",
             params = JSONObject(),
         )
-        whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
+        testee.browserViewState.value = browserViewState().copy(showDuckChatHistoryOption = false)
         whenever(mockDuckChatJSHelper.onNativeAction(NativeAction.SIDEBAR)).thenReturn(expectedEvent)
 
         testee.openDuckChatHistory()
