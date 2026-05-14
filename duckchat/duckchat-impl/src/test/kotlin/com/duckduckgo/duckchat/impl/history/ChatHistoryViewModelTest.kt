@@ -37,12 +37,12 @@ class ChatHistoryViewModelTest {
     private val viewModel = ChatHistoryViewModel(repository)
 
     @Test
-    fun `initial state is Loading`() = runTest {
+    fun `initial state is Loading`() = coroutineRule.testScope.runTest {
         assertEquals(ChatHistoryUiState.Loading, viewModel.uiState.value)
     }
 
     @Test
-    fun `empty source emits Empty state`() = runTest {
+    fun `empty source emits Empty state`() = coroutineRule.testScope.runTest {
         viewModel.uiState.test {
             assertEquals(ChatHistoryUiState.Loading, awaitItem())
             assertEquals(ChatHistoryUiState.Empty, awaitItem())
@@ -50,7 +50,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `non-empty source emits Loaded with pinned and recent partition`() = runTest {
+    fun `non-empty source emits Loaded with pinned and recent partition`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("a", pinned = false, lastEdit = 100L),
             item("b", pinned = true, lastEdit = 200L),
@@ -66,7 +66,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `Loaded state defaults to Default mode with no search and no confirmation`() = runTest {
+    fun `Loaded state defaults to Default mode with no search and no confirmation`() = coroutineRule.testScope.runTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
@@ -80,7 +80,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `pinned and recent each sort independently by date descending`() = runTest {
+    fun `pinned and recent each sort independently by date descending`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("p1", pinned = true, lastEdit = 100L),
             item("p2", pinned = true, lastEdit = 300L),
@@ -97,7 +97,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `transition from Loaded to Empty when source clears`() = runTest {
+    fun `transition from Loaded to Empty when source clears`() = coroutineRule.testScope.runTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
@@ -109,7 +109,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSearchActivated marks Loaded as searchActive without filtering`() = runTest {
+    fun `onSearchActivated marks Loaded as searchActive without filtering`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("a", title = "Apple"),
             item("b", title = "Banana"),
@@ -129,7 +129,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSearchQueryChanged filters recent by case-insensitive substring`() = runTest {
+    fun `onSearchQueryChanged filters recent by case-insensitive substring`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("a", title = "Apple pie"),
             item("b", title = "Banana bread"),
@@ -152,7 +152,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSearchQueryChanged filters pinned section independently of recent`() = runTest {
+    fun `onSearchQueryChanged filters pinned section independently of recent`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("p1", pinned = true, title = "Pinned apple"),
             item("p2", pinned = true, title = "Pinned banana"),
@@ -175,7 +175,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `query with no matches keeps Loaded with empty sections so search UI stays visible`() = runTest {
+    fun `query with no matches keeps Loaded with empty sections so search UI stays visible`() = coroutineRule.testScope.runTest {
         source.value = listOf(item("a", title = "Apple"))
 
         viewModel.uiState.test {
@@ -195,7 +195,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onSearchClosed resets searchActive and searchQuery to restore unfiltered list`() = runTest {
+    fun `onSearchClosed resets searchActive and searchQuery to restore unfiltered list`() = coroutineRule.testScope.runTest {
         source.value = listOf(
             item("a", title = "Apple"),
             item("b", title = "Banana"),
