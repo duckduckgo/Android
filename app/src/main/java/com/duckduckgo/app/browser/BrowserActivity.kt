@@ -129,7 +129,6 @@ import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
-import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -204,9 +203,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var externalIntentProcessingState: ExternalIntentProcessingState
-
-    @Inject
-    lateinit var fireModeAvailability: FireModeAvailability
 
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
@@ -687,14 +683,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
         if (requiresRegularBrowserMode && viewModel.currentMode.value != BrowserMode.REGULAR) {
+            logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
+            pendingFireToRegularIntent = intent
             lifecycleScope.launch {
-                if (fireModeAvailability.isAvailable()) {
-                    logcat(INFO) { "Intent requires REGULAR mode while in FIRE — switching before processing" }
-                    pendingFireToRegularIntent = intent
-                    viewModel.switchToMode(BrowserMode.REGULAR)
-                } else {
-                    processIntent(intent)
-                }
+                viewModel.switchToMode(BrowserMode.REGULAR)
             }
             return
         }
@@ -1233,7 +1225,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
             viewModel.currentMode.drop(1).collect {
-                if (fireModeAvailability.isAvailable()) recreate()
+                recreate()
             }
         }
     }
