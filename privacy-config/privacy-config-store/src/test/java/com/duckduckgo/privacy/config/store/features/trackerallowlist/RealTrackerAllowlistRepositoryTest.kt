@@ -103,6 +103,55 @@ class RealTrackerAllowlistRepositoryTest {
             assertEquals(0, testee.exceptions.size)
         }
 
+    @Test
+    fun whenUpdateAllThenRulesByDomainReflectsNewData() =
+        runTest {
+            whenever(mockTrackerAllowlistDao.getAll()).thenReturn(listOf(trackerAllowlistEntity))
+            testee.updateAll(listOf(trackerAllowlistEntity))
+
+            assertEquals(setOf("domain"), testee.rulesByDomain.keys)
+            assertEquals(1, testee.rulesByDomain["domain"]?.size)
+            assertNotNull(testee.rulesByDomain["domain"]?.first()?.regex)
+
+            val replacement = TrackerAllowlistEntity(
+                domain = "other.com",
+                rules = listOf(AllowlistRuleEntity(rule = "other.com/x", domains = listOf("<all>"), reason = "")),
+            )
+            whenever(mockTrackerAllowlistDao.getAll()).thenReturn(listOf(replacement))
+            testee.updateAll(listOf(replacement))
+
+            assertEquals(setOf("other.com"), testee.rulesByDomain.keys)
+        }
+
+    @Test
+    fun whenRuleRegexInvalidThenCompiledRuleHasNullRegex() {
+        val bad = TrackerAllowlistEntity(
+            domain = "bad.com",
+            rules = listOf(AllowlistRuleEntity(rule = "bad.com/[unterminated", domains = listOf("<all>"), reason = "")),
+        )
+
+        val result = buildRulesByDomain(listOf(bad))
+
+        assertNull(result["bad.com"]?.first()?.regex)
+    }
+
+    @Test
+    fun whenEntitiesShareNormalizedKeyThenRulesAreMerged() {
+        val a = TrackerAllowlistEntity(
+            domain = "tracker.com",
+            rules = listOf(AllowlistRuleEntity(rule = "tracker.com/a", domains = listOf("<all>"), reason = "")),
+        )
+        val b = TrackerAllowlistEntity(
+            domain = "www.tracker.com",
+            rules = listOf(AllowlistRuleEntity(rule = "tracker.com/b", domains = listOf("<all>"), reason = "")),
+        )
+
+        val result = buildRulesByDomain(listOf(a, b))
+
+        assertEquals(setOf("tracker.com"), result.keys)
+        assertEquals(2, result["tracker.com"]?.size)
+    }
+
     private fun givenHttpsDaoContainsExceptions() {
         whenever(mockTrackerAllowlistDao.getAll()).thenReturn(listOf(trackerAllowlistEntity))
     }

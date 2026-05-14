@@ -17,16 +17,23 @@
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
+import logcat.logcat
 
 interface TrackerAllowlistRepository {
     fun updateAll(exceptions: List<TrackerAllowlistEntity>)
-    val exceptions: CopyOnWriteArrayList<TrackerAllowlistEntity>
+    val exceptions: List<TrackerAllowlistEntity>
+    val rulesByDomain: Map<String, List<CompiledRule>>
 }
+
+data class CompiledRule(
+    val rule: AllowlistRuleEntity,
+    val regex: Regex?,
+)
 
 class RealTrackerAllowlistRepository(
     database: PrivacyConfigDatabase,
@@ -36,7 +43,12 @@ class RealTrackerAllowlistRepository(
 ) : TrackerAllowlistRepository {
 
     private val trackerAllowlistDao: TrackerAllowlistDao = database.trackerAllowlistDao()
-    override val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
+
+    @Volatile
+    private var snapshot: Snapshot = Snapshot(emptyList(), emptyMap())
+
+    override val exceptions get() = snapshot.exceptions
+    override val rulesByDomain get() = snapshot.rulesByDomain
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -52,7 +64,30 @@ class RealTrackerAllowlistRepository(
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        trackerAllowlistDao.getAll().map { exceptions.add(it) }
+        val fresh = trackerAllowlistDao.getAll()
+        snapshot = Snapshot(fresh, buildRulesByDomain(fresh))
     }
+
+    private data class Snapshot(
+        val exceptions: List<TrackerAllowlistEntity>,
+        val rulesByDomain: Map<String, List<CompiledRule>>,
+    )
+}
+
+internal fun buildRulesByDomain(exceptions: List<TrackerAllowlistEntity>): Map<String, List<CompiledRule>> {
+    val map = HashMap<String, List<CompiledRule>>(exceptions.size)
+    exceptions.forEach { entity ->
+        // Keys are www-stripped to match UriString.host(), which strips a leading "www." via
+        // Uri.baseHost. Lookups always arrive www-stripped, so entities stored as "www.foo.com"
+        // must live at key "foo.com" or they'd never be hit.
+        val key = entity.domain.removePrefix("www.")
+        val compiledRules = entity.rules.map { rule ->
+            val regex = runCatching { ".*${rule.rule}.*".toRegex() }
+                .onFailure { logcat(tag = "TrackerAllowlistRepository") { "Rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
+                .getOrNull()
+            CompiledRule(rule = rule, regex = regex)
+        }
+        map.merge(key, compiledRules) { existing, new -> existing + new }
+    }
+    return map
 }
