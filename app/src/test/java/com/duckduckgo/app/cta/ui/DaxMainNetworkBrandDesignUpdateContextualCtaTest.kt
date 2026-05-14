@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.ui
 
 import android.content.Context
+import android.content.res.Resources
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.asFlow
@@ -66,6 +67,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -73,6 +75,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -271,6 +274,62 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
         testee.onUserDismissedCta(cta)
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_NETWORK))
+    }
+
+    @Test
+    fun whenSameNetworkFacebookDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "www.facebook.com")
+    }
+
+    @Test
+    fun whenSameNetworkMobileFacebookDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "m.facebook.com")
+    }
+
+    @Test
+    fun whenSameNetworkGoogleDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Google", siteHost = "www.google.com")
+    }
+
+    @Test
+    fun whenFacebookOwnedDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "www.instagram.com")
+    }
+
+    @Test
+    fun whenGoogleOwnedDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Google", siteHost = "www.youtube.com")
+    }
+
+    private fun assertDescriptionMatchesLegacy(network: String, siteHost: String) {
+        val resourceContext = mockContextEncodingResourceArgs()
+        val brandDesignCta = DaxMainNetworkBrandDesignUpdateContextualCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            network = network,
+            siteHost = siteHost,
+            isLightTheme = true,
+        )
+        val legacyCta = OnboardingDaxDialogCta.DaxMainNetworkCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            network = network,
+            siteHost = siteHost,
+        )
+
+        assertEquals(
+            legacyCta.getTrackersDescription(resourceContext),
+            brandDesignCta.getTrackersDescription(resourceContext),
+        )
+    }
+
+    private fun mockContextEncodingResourceArgs(): Context {
+        val resources: Resources = mock {
+            on { getString(any(), any(), any(), any()) } doAnswer { invocation ->
+                "string:${invocation.arguments.joinToString(",")}"
+            }
+        }
+        return mock { on { this.resources } doReturn resources }
     }
 
     private fun newCta(): DaxMainNetworkBrandDesignUpdateContextualCta =

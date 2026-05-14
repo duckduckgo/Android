@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -35,6 +38,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -56,12 +60,14 @@ import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -242,6 +248,87 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         testee.onUserDismissedCta(cta)
 
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
+    }
+
+    @Test
+    fun whenSingleTrackerWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(
+            trackers = listOf(entity("Facebook")),
+            omnibarType = OmnibarType.SINGLE_TOP,
+        )
+    }
+
+    @Test
+    fun whenMaxTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(
+            trackers = listOf(entity("Facebook"), entity("Google")),
+            omnibarType = OmnibarType.SINGLE_TOP,
+        )
+    }
+
+    @Test
+    fun whenMoreThanMaxTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(
+            trackers = listOf(entity("Facebook"), entity("Google"), entity("Amazon"), entity("Microsoft")),
+            omnibarType = OmnibarType.SINGLE_TOP,
+        )
+    }
+
+    @Test
+    fun whenDuplicateTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(
+            trackers = listOf(entity("Facebook"), entity("Facebook"), entity("Google")),
+            omnibarType = OmnibarType.SINGLE_TOP,
+        )
+    }
+
+    @Test
+    fun whenSingleTrackerWithBottomOmnibarThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(
+            trackers = listOf(entity("Facebook")),
+            omnibarType = OmnibarType.SINGLE_BOTTOM,
+        )
+    }
+
+    private fun entity(displayName: String): Entity = TdsEntity(displayName, displayName, 9.0)
+
+    private fun assertDescriptionMatchesLegacy(
+        trackers: List<Entity>,
+        omnibarType: OmnibarType,
+    ) {
+        whenever(mockSettingsDataStore.omnibarType).thenReturn(omnibarType)
+        val resourceContext = mockContextEncodingResourceArgs()
+
+        val brandDesignCta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = trackers,
+            settingsDataStore = mockSettingsDataStore,
+            isLightTheme = true,
+        )
+        val legacyCta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = trackers,
+            settingsDataStore = mockSettingsDataStore,
+        )
+
+        assertEquals(
+            legacyCta.getTrackersDescription(resourceContext, trackers),
+            brandDesignCta.getTrackersDescription(resourceContext, trackers),
+        )
+    }
+
+    private fun mockContextEncodingResourceArgs(): Context {
+        val resources: Resources = mock {
+            on { getQuantityString(any(), any()) } doAnswer { invocation ->
+                "plural:${invocation.arguments.joinToString(",")}"
+            }
+            on { getQuantityString(any(), any(), any()) } doAnswer { invocation ->
+                "plural:${invocation.arguments.joinToString(",")}"
+            }
+        }
+        return mock { on { this.resources } doReturn resources }
     }
 
     private fun newCta() = DaxTrackersBlockedBrandDesignUpdateContextualCta(

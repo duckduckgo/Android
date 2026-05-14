@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -53,14 +55,8 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
 
     override fun configureContentViews(view: View) {
         val context = view.context
-        val descriptionHtml = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
-            onboardingStore = onboardingStore,
-            appInstallStore = appInstallStore,
-            trackers = trackers,
-            settingsDataStore = settingsDataStore,
-        ).getTrackersDescription(context, trackers)
-
-        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text = descriptionHtml.html(context)
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
+            getTrackersDescription(context, trackers).html(context)
     }
 
     override fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {
@@ -71,5 +67,34 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
         ctaView?.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
+    }
+
+    @VisibleForTesting
+    fun getTrackersDescription(
+        context: Context,
+        trackersEntities: List<Entity>,
+    ): String {
+        val trackers = trackersEntities
+            .map { it.displayName }
+            .distinct()
+
+        val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
+        val trackersText = trackersFiltered.joinToString(", ")
+        val size = trackers.size - trackersFiltered.size
+        val quantityString =
+            if (size == 0) {
+                context.resources
+                    .getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
+                    .getStringForOmnibarPosition(settingsDataStore.omnibarType)
+            } else {
+                context.resources
+                    .getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
+                    .getStringForOmnibarPosition(settingsDataStore.omnibarType)
+            }
+        return "<b>$trackersText</b>$quantityString"
+    }
+
+    private companion object {
+        private const val MAX_TRACKERS_SHOWS = 2
     }
 }
