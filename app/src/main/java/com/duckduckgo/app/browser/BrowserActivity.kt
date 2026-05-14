@@ -371,7 +371,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
-        pendingFireToRegularIntent = savedInstanceState?.let {
+        pendingFireToRegularIntent = newInstanceState?.let {
             BundleCompat.getParcelable(it, KEY_PENDING_FIRE_TO_REGULAR_INTENT, Intent::class.java)
         }
 
