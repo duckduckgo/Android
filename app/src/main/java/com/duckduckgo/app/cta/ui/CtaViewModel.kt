@@ -114,8 +114,7 @@ class CtaViewModel @Inject constructor(
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     private suspend fun isBrandDesignUpdateEnabled(): Boolean = withContext(dispatchers.io()) {
-        onboardingBrandDesignUpdateToggles.self().isEnabled() &&
-            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
     }
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
@@ -289,6 +288,10 @@ class CtaViewModel @Inject constructor(
     suspend fun getFireDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // TODO: replace in stage 2 (DaxFireButtonCta brand-design migration).
+                return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+            }
             OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
         }
     }
@@ -296,6 +299,14 @@ class CtaViewModel @Inject constructor(
     suspend fun getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked: (index: Int) -> Unit): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // TODO: replace in stage 2 (DaxSiteSuggestionsCta brand-design migration).
+                return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onSiteSuggestionOptionClicked,
+                )
+            }
             OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
                 onboardingStore,
                 appInstallStore,
@@ -304,9 +315,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta.DaxEndCta? {
+    suspend fun getEndStaticDialogCta(): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() && daxDialogEndShown()) return@withContext null
+            if (isBrandDesignUpdateEnabled()) {
+                // TODO: replace in stage 2 (DaxEndCta brand-design migration).
+                return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
             return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
         }
     }
@@ -473,6 +488,15 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // TODO: replace in stage 2 (DaxTrackersBlockedCta brand-design migration).
+                    return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                        settingsDataStore,
+                    )
+                }
                 return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
                     onboardingStore,
                     appInstallStore,
@@ -487,6 +511,15 @@ class CtaViewModel @Inject constructor(
                     if (!daxDialogNetworkShown() && !daxDialogTrackersFoundShown() &&
                         OnboardingDaxDialogCta.mainTrackerNetworks.any { mainNetwork -> entity.displayName.contains(mainNetwork) }
                     ) {
+                        if (isBrandDesignUpdateEnabled()) {
+                            // TODO: replace in stage 2 (DaxMainNetworkCta brand-design migration).
+                            return OnboardingDaxDialogCta.DaxMainNetworkCta(
+                                onboardingStore,
+                                appInstallStore,
+                                entity.displayName,
+                                host,
+                            )
+                        }
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(
                             onboardingStore,
                             appInstallStore,
@@ -499,16 +532,31 @@ class CtaViewModel @Inject constructor(
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    return DaxSerpBrandDesignUpdateContextualCta(
+                        onboardingStore,
+                        appInstallStore,
+                        isLightTheme = appTheme.isLightModeEnabled(),
+                    )
+                }
                 return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
 
             // No trackers blocked
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // TODO: replace in stage 2 (DaxNoTrackersCta brand-design migration).
+                    return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                }
                 return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
             }
 
             // End
             if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                if (isBrandDesignUpdateEnabled()) {
+                    // TODO: replace in stage 2 (DaxEndCta brand-design migration).
+                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
                 return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
