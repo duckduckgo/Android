@@ -60,13 +60,46 @@
         android:alpha="0"
         android:orientation="vertical">
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setDefaultBrowserItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_default_browser_mobile_color_24"
-            app:primaryText="@string/preOnboardingReinstallSetDefaultLabel"
-            app:showSwitch="true" />
+            android:minHeight="@dimen/twoLineItemHeight">
+
+            <ImageView
+                android:id="@+id/setDefaultBrowserIcon"
+                android:layout_width="@dimen/listItemImageMediumSize"
+                android:layout_height="@dimen/listItemImageMediumSize"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_default_browser_mobile_color_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/setDefaultBrowserPrimaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_2"
+                android:text="@string/preOnboardingReinstallSetDefaultLabel"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setDefaultBrowserSwitch"
+                app:layout_constraintStart_toEndOf="@id/setDefaultBrowserIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.DaxSwitch
+                android:id="@+id/setDefaultBrowserSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -74,13 +107,46 @@
             app:defaultPadding="false"
             app:fullWidth="false" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addWidgetItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_add_widget_color_24"
-            app:primaryText="@string/preOnboardingReinstallAddHomeScreenWidgetLabel"
-            app:showSwitch="true" />
+            android:minHeight="@dimen/twoLineItemHeight">
+
+            <ImageView
+                android:id="@+id/addWidgetIcon"
+                android:layout_width="@dimen/listItemImageMediumSize"
+                android:layout_height="@dimen/listItemImageMediumSize"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_add_widget_color_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/addWidgetPrimaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_2"
+                android:text="@string/preOnboardingReinstallAddHomeScreenWidgetLabel"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/addWidgetSwitch"
+                app:layout_constraintStart_toEndOf="@id/addWidgetIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.DaxSwitch
+                android:id="@+id/addWidgetSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -91,40 +157,59 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarPositionContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_2">
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/addressBarPositionItem"
+            <ImageView
+                android:id="@+id/addressBarPositionIcon"
+                android:layout_width="@dimen/listItemImageMediumSize"
+                android:layout_height="@dimen/listItemImageMediumSize"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_address_bar_top_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/addressBarPositionPrimaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:text="@string/preOnboardingReinstallAddressBarLabel"
                 app:layout_constraintEnd_toStartOf="@id/addressBarPositionEditButton"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:leadingIcon="@drawable/ic_address_bar_top_24"
-                app:primaryText="@string/preOnboardingReinstallAddressBarLabel"
-                app:primaryTextTruncated="false"
-                app:secondaryText="@string/preOnboardingReinstallAddressBarTop"
-                tools:secondaryText="Top" />
+                app:layout_constraintStart_toEndOf="@id/addressBarPositionIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/addressBarPositionSecondaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/preOnboardingReinstallAddressBarTop"
+                app:layout_constraintEnd_toEndOf="@id/addressBarPositionPrimaryText"
+                app:layout_constraintStart_toStartOf="@id/addressBarPositionPrimaryText"
+                app:layout_constraintTop_toBottomOf="@id/addressBarPositionPrimaryText"
+                app:textType="secondary" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/addressBarPositionEditButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:fontFamily="@font/ducksansproduct_bold"
+                android:gravity="center"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:text="@string/preOnboardingReinstallEditAction"
-                android:gravity="center"
                 android:textColor="?attr/onboardingAccentTextAlt"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/addressBarPositionItem"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_default="wrap"
-                app:typography="body1_bold" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -137,39 +222,59 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addressBarSearchOptionsContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_2">
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/addressBarSearchOptionsItem"
+            <ImageView
+                android:id="@+id/addressBarSearchOptionsIcon"
+                android:layout_width="@dimen/listItemImageMediumSize"
+                android:layout_height="@dimen/listItemImageMediumSize"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_ai_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/addressBarSearchOptionsPrimaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:text="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
                 app:layout_constraintEnd_toStartOf="@id/addressBarSearchOptionsEditButton"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:leadingIcon="@drawable/ic_ai_24"
-                app:primaryText="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
-                app:primaryTextTruncated="false"
-                app:secondaryText="@string/preOnboardingReinstallAddressBarSearchOptionsValue"
-                tools:secondaryText="Search and Duck.ai" />
+                app:layout_constraintStart_toEndOf="@id/addressBarSearchOptionsIcon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/addressBarSearchOptionsSecondaryText"
+                style="@style/Typography.DuckDuckGo.Onboarding.Label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/preOnboardingReinstallAddressBarSearchOptionsValue"
+                app:layout_constraintEnd_toEndOf="@id/addressBarSearchOptionsPrimaryText"
+                app:layout_constraintStart_toStartOf="@id/addressBarSearchOptionsPrimaryText"
+                app:layout_constraintTop_toBottomOf="@id/addressBarSearchOptionsPrimaryText"
+                app:textType="secondary" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/addressBarSearchOptionsEditButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:fontFamily="@font/ducksansproduct_bold"
+                android:gravity="center"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:text="@string/preOnboardingReinstallEditAction"
-                android:gravity="center"
                 android:textColor="?attr/onboardingAccentTextAlt"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/addressBarSearchOptionsItem"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_default="wrap"
-                app:typography="body1_bold" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
