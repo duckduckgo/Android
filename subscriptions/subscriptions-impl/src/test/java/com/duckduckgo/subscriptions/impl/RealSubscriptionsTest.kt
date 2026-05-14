@@ -34,9 +34,9 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
 import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
