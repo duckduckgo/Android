@@ -115,6 +115,11 @@ enum class UserTier(val rawValue: String) {
     FREE("free"),
     PLUS("plus"),
     PRO("pro"),
+    ;
+
+    companion object {
+        fun from(raw: String?): UserTier? = entries.firstOrNull { it.rawValue == raw }
+    }
 }
 
 enum class ModelProvider {

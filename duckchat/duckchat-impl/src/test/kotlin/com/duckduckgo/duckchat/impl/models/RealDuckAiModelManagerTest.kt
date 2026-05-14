@@ -20,11 +20,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
-import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,13 +52,13 @@ class RealDuckAiModelManagerTest {
     private val subscriptions: Subscriptions = mock()
     private val duckAiHostProvider: DuckAiHostProvider = mock()
 
-    private val entitlementFlow = MutableSharedFlow<List<Product>>()
+    private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
 
     private lateinit var testee: RealDuckAiModelManager
 
     @Before
     fun setUp() {
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementFlow)
+        whenever(subscriptions.getEntitlements()).thenReturn(entitlementFlow)
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
     }
 
@@ -151,7 +152,7 @@ class RealDuckAiModelManagerTest {
     fun whenNonEmptyAccessTierAndTierMatchesThenAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus", "pro"), entityHasAccess = false)),
@@ -221,7 +222,7 @@ class RealDuckAiModelManagerTest {
     fun whenSelectedModelStillAccessibleThenSelectionPreserved() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id", "model"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(
             AIChatModelsResponse(
                 listOf(remoteModel("id", accessTier = listOf("plus"), entityHasAccess = true)),
@@ -348,7 +349,7 @@ class RealDuckAiModelManagerTest {
     fun whenSubscriptionActiveWithDuckAiPlusThenTierIsPlus() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
@@ -358,16 +359,75 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenSubscriptionActiveWithDuckAiProThenTierIsPro() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "pro", product = "Duck.ai"))))
+        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(UserTier.PRO, testee.modelState.value.userTier)
+    }
+
+    @Test
     fun whenSubscriptionActiveWithoutDuckAiPlusThenTierIsFree() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.NetP))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "subscriber", product = "Network Protection"))))
         whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
         testee.fetchModels()
 
         assertEquals(UserTier.FREE, testee.modelState.value.userTier)
+    }
+
+    @Test
+    fun whenDuckAiEntitlementHasUnknownTierNameThenTierIsFree() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "premium", product = "Duck.ai"))))
+        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(UserTier.FREE, testee.modelState.value.userTier)
+    }
+
+    @Test
+    fun whenSubscriptionActiveWithEmptyEntitlementsThenTierIsFree() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
+        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(UserTier.FREE, testee.modelState.value.userTier)
+    }
+
+    @Test
+    fun whenMultipleEntitlementsThenDuckAiTierIsResolved() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(
+            flowOf(
+                setOf(
+                    Entitlement(name = "subscriber", product = "Network Protection"),
+                    Entitlement(name = "pro", product = "Duck.ai"),
+                ),
+            ),
+        )
+        whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(UserTier.PRO, testee.modelState.value.userTier)
     }
 
     @Test
@@ -386,7 +446,7 @@ class RealDuckAiModelManagerTest {
     fun whenSubscriptionInGracePeriodWithDuckAiPlusThenTierIsPlus() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.GRACE_PERIOD)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
@@ -446,7 +506,7 @@ class RealDuckAiModelManagerTest {
 
         testee = createManager()
 
-        entitlementFlow.emit(listOf(Product.DuckAiPlus))
+        entitlementFlow.emit(setOf(Entitlement(name = "plus", product = "Duck.ai")))
 
         assertEquals(1, testee.modelState.value.models.size)
     }
@@ -509,7 +569,7 @@ class RealDuckAiModelManagerTest {
     fun whenAttachmentLimitsProvidedThenResolvedForPlusTier() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(
             AIChatModelsResponse(
                 models = listOf(remoteModel("id")),
@@ -558,7 +618,7 @@ class RealDuckAiModelManagerTest {
     fun whenAttachmentLimitsMissingTierThenDefaultsUsed() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-        whenever(subscriptions.getAvailableProducts()).thenReturn(setOf(Product.DuckAiPlus))
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
         whenever(modelsService.getModels(any())).thenReturn(
             AIChatModelsResponse(
                 models = listOf(remoteModel("id")),
@@ -702,7 +762,7 @@ class RealDuckAiModelManagerTest {
         whenever(modelsService.getModels(any())).thenReturn(AIChatModelsResponse(emptyList()))
 
         testee = createManager()
-        entitlementFlow.emit(emptyList())
+        entitlementFlow.emit(emptySet())
 
         verify(modelsService).getModels(any())
     }
