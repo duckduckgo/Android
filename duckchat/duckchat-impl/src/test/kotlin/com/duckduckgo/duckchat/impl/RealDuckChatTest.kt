@@ -1776,6 +1776,9 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenWithChatIdThenDuckChatOpenedWithChatIdUrlParameterAndForcedFreshSession() = runTest {
+        // Stub an active session so the test fails if forceNewSession is not propagated.
+        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
         val urlCaptor = argumentCaptor<String>()
         val sessionCaptor = argumentCaptor<Boolean>()
 

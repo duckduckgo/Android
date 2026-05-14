@@ -823,7 +823,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openWithChatId(chatId: String) {
-        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId))
+        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
