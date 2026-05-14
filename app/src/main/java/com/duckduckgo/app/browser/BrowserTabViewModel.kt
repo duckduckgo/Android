@@ -3473,7 +3473,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.origin}".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.flow.origin}".toUri())
                     }
                     null
                 }

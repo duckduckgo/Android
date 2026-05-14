@@ -1080,7 +1080,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenOnUserClickCtaOkButtonWithSubscriptionPromoModalCtaThenDismissedCtaIsInserted() = runTest {
-        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
     }
 
@@ -1092,7 +1092,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSubscriptionPromoModalCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockSubscriptionPromoCtaShownPlugin).onSubscriptionPromoCtaShown()
     }
 
@@ -1220,7 +1220,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSubscriptionPromoModalCtaIsShownThenDismissedCtaIsInserted() = runTest {
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
     }
 
@@ -1356,7 +1356,7 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
 
         // After modal is shown, DAX_INTRO_PRIVACY_PRO is in dismissed_cta, so bubble must not show
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)

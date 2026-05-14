@@ -1266,9 +1266,26 @@ class BrokenSitePromptDialogCta : Cta {
     }
 }
 
+enum class SubscriptionPromoFlow(
+    val origin: String,
+    val shownPixel: Pixel.PixelName,
+    val subscribeClickPixel: Pixel.PixelName,
+) {
+    SKIPPED_ONBOARDING(
+        "funnel_modal_android__skippedonboardingupsell",
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SHOWN,
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SUBSCRIBE_CLICKED,
+    ),
+    NUDGE(
+        "funnel_modal_android__subscriptionnudge",
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_NUDGE_SHOWN,
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_NUDGE_SUBSCRIBE_CLICKED,
+    ),
+}
+
 class SubscriptionPromoModalCta(
     val isFreeTrialCopy: Boolean,
-    val origin: String,
+    val flow: SubscriptionPromoFlow,
 ) : Cta {
     override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
     override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN

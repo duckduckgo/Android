@@ -175,6 +175,7 @@ class CtaViewModel @Inject constructor(
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
             if (cta is SubscriptionPromoModalCta) {
+                pixel.fire(cta.flow.shownPixel, cta.pixelShownParameters())
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
@@ -216,6 +217,7 @@ class CtaViewModel @Inject constructor(
             brokenSitePrompt.userAcceptedPrompt()
         }
         if (cta is SubscriptionPromoModalCta) {
+            pixel.fire(cta.flow.subscribeClickPixel, cta.pixelOkParameters())
             withContext(dispatchers.io()) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -275,11 +277,11 @@ class CtaViewModel @Inject constructor(
             when {
                 canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_modal_android__skippedonboardingupsell",
+                    flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING,
                 )
                 canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_modal_android__subscriptionnudge",
+                    flow = SubscriptionPromoFlow.NUDGE,
                 )
                 else -> null
             }
