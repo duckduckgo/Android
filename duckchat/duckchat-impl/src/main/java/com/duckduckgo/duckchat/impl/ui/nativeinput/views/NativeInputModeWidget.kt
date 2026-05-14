@@ -114,6 +114,7 @@ interface NativeInputWidget {
     fun getSelectedModelId(): String?
     fun getResolvedReasoningEffort(): String?
     fun getSelectedTool(): String?
+    fun clearSelectedTool()
     fun setModelPickerEnabled(enabled: Boolean)
 
     /**
@@ -709,6 +710,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getSelectedTool(): String? = viewModel.getSelectedTool()
 
+    override fun clearSelectedTool() {
+        optionsView?.clearSelection()
+    }
+
     override fun setModelPickerEnabled(enabled: Boolean) {
         viewModel.setModelPickerEnabled(enabled)
     }
@@ -745,6 +750,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         } ?: emptyList()
         viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
+        optionsView?.clearSelection()
     }
 
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {

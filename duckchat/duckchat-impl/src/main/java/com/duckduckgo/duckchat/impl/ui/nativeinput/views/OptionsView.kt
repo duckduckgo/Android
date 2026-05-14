@@ -90,8 +90,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         return viewModel.selectedTool.value
     }
 
+    fun clearSelection() {
+        if (!isAttachedToWindow) return
+        viewModel.clearTool()
+        removeChip()
+        applyPickerVisibility()
+    }
+
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
+        if (!isAttachedToWindow) return
         if (visibility == VISIBLE && !viewModel.shouldShowPickers) {
             post {
                 host.showModelPicker(false)

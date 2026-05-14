@@ -382,6 +382,7 @@ class RealNativeInputManager @Inject constructor(
                         imagesJson,
                         filesJson,
                     )
+                    widget.clearSelectedTool()
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)

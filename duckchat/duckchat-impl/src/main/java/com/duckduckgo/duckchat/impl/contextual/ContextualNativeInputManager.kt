@@ -131,6 +131,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 val filesJson = widget.getFileAttachmentsJson()
                 widget.clearAttachments()
                 sendPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), widget.getSelectedTool(), imagesJson, filesJson)
+                widget.clearSelectedTool()
                 widget.text = ""
             },
         )
