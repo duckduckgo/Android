@@ -276,6 +276,7 @@ class RealDuckAiModelManager @Inject constructor(
             supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
             supportedFileTypes = remote.supportedFileTypes.orEmpty(),
             supportedReasoningEfforts = remote.supportedReasoningEffort.orEmpty().mapNotNull(ReasoningEffort::from),
+            supportedTools = remote.supportedTools.orEmpty().mapNotNull(SupportedTool::from),
         )
     }
 
