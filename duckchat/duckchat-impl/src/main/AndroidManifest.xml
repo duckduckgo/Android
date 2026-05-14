@@ -36,6 +36,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="com.duckduckgo.duckchat.impl.history.ChatHistoryActivity"
+            android:exported="false"
+            android:label="@string/duck_ai_chat_history_title" />
+        <activity
             android:name=".subscription.DuckAiPaidSettingsActivity"
             android:exported="false"
             android:label="@string/duck_ai_paid_settings_title"/>

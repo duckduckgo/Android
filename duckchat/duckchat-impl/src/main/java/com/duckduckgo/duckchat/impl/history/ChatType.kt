@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.feature
+package com.duckduckgo.duckchat.impl.history
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "duckAiChatHistory",
-)
-interface DuckAiChatHistoryFeature {
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
+enum class ChatType {
+    Discussion,
+    ImageGeneration,
+    Voice,
 }

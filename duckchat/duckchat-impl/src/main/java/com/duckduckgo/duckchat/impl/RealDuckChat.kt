@@ -179,6 +179,11 @@ interface DuckChatInternal : DuckChat {
     fun openNewDuckChatSession()
 
     /**
+     * Opens Duck.ai with [chatId] pre-loaded.
+     */
+    fun openWithChatId(chatId: String)
+
+    /**
      * Calls onClose when a close event is emitted.
      */
     fun observeCloseEvent(
@@ -811,6 +816,16 @@ class RealDuckChat @Inject constructor(
 
     override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = voiceSessionStateManager.observeTriggerVoiceSessionEnd()
 
+    override suspend fun isChatHistoryAvailable(): Boolean = withContext(dispatchers.io()) {
+        isEnabled() &&
+            duckChatFeature.useNativeStorageChatData().isEnabled() &&
+            duckChatFeature.historyScreen().isEnabled()
+    }
+
+    override fun openWithChatId(chatId: String) {
+        openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
+    }
+
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }
@@ -966,6 +981,7 @@ class RealDuckChat @Inject constructor(
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
+        private const val CHAT_ID_QUERY_NAME = "chatID"
         private const val PROMPT_QUERY_NAME = "prompt"
         private const val PROMPT_QUERY_VALUE = "1"
         private const val PLACEMENT_QUERY_NAME = "placement"
