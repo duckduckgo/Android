@@ -16,49 +16,86 @@
 
 package com.duckduckgo.common.ui.compose.dialog
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 /**
- * Vertically-stacked buttons usable inside the [DaxAlertDialog] `buttons` slot.
+ * Vertically-stacked buttons with a destructive action at the top, usable inside the
+ * [DaxAlertDialog] `buttons` slot.
  *
- * - All buttons render as ghost.
- * - When [destructiveButtonIndex] is non-null, that button uses the destructive ghost style and
- *   the rest use the muted alt-ghost style.
+ * - Index 0 renders as [DaxDestructiveGhostButton] (the destructive action).
+ * - All other indices render as [DaxDestructiveGhostAltButton] (muted siblings).
  * - End-aligned.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735768823555
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
  */
 @Composable
-fun DaxStackedButtons(
+fun DaxDestructiveStackedButtons(
     buttonTitles: ImmutableList<String>,
     onButtonClick: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
-    destructiveButtonIndex: Int? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
     ) {
         buttonTitles.forEachIndexed { index, buttonTitle ->
             val onClick = { onButtonClick(index) }
-            when {
-                destructiveButtonIndex == index -> DaxDestructiveGhostButton(text = buttonTitle, onClick = onClick)
-                destructiveButtonIndex != null -> DaxDestructiveGhostAltButton(text = buttonTitle, onClick = onClick)
-                else -> DaxGhostButton(text = buttonTitle, onClick = onClick)
+            if (index == 0) {
+                DaxDestructiveGhostButton(text = buttonTitle, onClick = onClick)
+            } else {
+                DaxDestructiveGhostAltButton(text = buttonTitle, onClick = onClick)
+            }
+        }
+    }
+}
+
+/**
+ * Vertically-stacked buttons with a primary action at the top, usable inside the
+ * [DaxAlertDialog] `buttons` slot.
+ *
+ * - Index 0 renders as [DaxPrimaryButton] (the main action).
+ * - All other indices render as [DaxGhostButton] (secondary actions).
+ * - End-aligned.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735768823555
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=685-956&t=DvV3Fi7Mi45nLle2-4
+ */
+@Composable
+fun DaxPrimaryStackedButtons(
+    buttonTitles: ImmutableList<String>,
+    onButtonClick: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
+    ) {
+        buttonTitles.forEachIndexed { index, buttonTitle ->
+            val onClick = { onButtonClick(index) }
+            if (index == 0) {
+                DaxPrimaryButton(text = buttonTitle, onClick = onClick)
+            } else {
+                DaxGhostButton(text = buttonTitle, onClick = onClick)
             }
         }
     }
@@ -66,30 +103,7 @@ fun DaxStackedButtons(
 
 @PreviewLightDark
 @Composable
-private fun DaxStackedButtonsInDialogPreview() {
-    PreviewBox {
-        DaxAlertDialogContent(
-            title = "Choose an Option",
-            message = {
-                DaxText(
-                    text = "Select one of the options below to continue.",
-                    style = DuckDuckGoTheme.typography.body1,
-                    color = DuckDuckGoTheme.textColors.secondary,
-                )
-            },
-            buttons = {
-                DaxStackedButtons(
-                    buttonTitles = persistentListOf("Option 1", "Option 2", "Option 3"),
-                    onButtonClick = {},
-                )
-            },
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxStackedButtonsDestructivePreview() {
+private fun DaxDestructiveStackedButtonsPreview() {
     PreviewBox {
         DaxAlertDialogContent(
             title = "Delete Item?",
@@ -101,10 +115,9 @@ private fun DaxStackedButtonsDestructivePreview() {
                 )
             },
             buttons = {
-                DaxStackedButtons(
-                    buttonTitles = persistentListOf("Keep", "Delete"),
+                DaxDestructiveStackedButtons(
+                    buttonTitles = persistentListOf("Delete", "Move to trash", "Cancel"),
                     onButtonClick = {},
-                    destructiveButtonIndex = 1,
                 )
             },
         )
@@ -113,20 +126,20 @@ private fun DaxStackedButtonsDestructivePreview() {
 
 @PreviewLightDark
 @Composable
-private fun DaxStackedButtonsFourButtonsPreview() {
+private fun DaxPrimaryStackedButtonsPreview() {
     PreviewBox {
         DaxAlertDialogContent(
-            title = "Pick An Option",
+            title = "Choose an Option",
             message = {
                 DaxText(
-                    text = "Four-button variant — stacked vertically, end-aligned.",
+                    text = "Select one of the options below to continue.",
                     style = DuckDuckGoTheme.typography.body1,
                     color = DuckDuckGoTheme.textColors.secondary,
                 )
             },
             buttons = {
-                DaxStackedButtons(
-                    buttonTitles = persistentListOf("Option 1", "Option 2", "Option 3", "Cancel"),
+                DaxPrimaryStackedButtons(
+                    buttonTitles = persistentListOf("Continue", "Option 2", "Cancel"),
                     onButtonClick = {},
                 )
             },

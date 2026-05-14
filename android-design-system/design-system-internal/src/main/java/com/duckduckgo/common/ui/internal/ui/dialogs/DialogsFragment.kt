@@ -44,10 +44,11 @@ import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
 import com.duckduckgo.common.ui.compose.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.compose.dialog.DaxDestructiveStackedButtons
+import com.duckduckgo.common.ui.compose.dialog.DaxPrimaryStackedButtons
 import com.duckduckgo.common.ui.compose.dialog.DaxRadioOptions
-import com.duckduckgo.common.ui.compose.dialog.DaxStackedButtons
-import com.duckduckgo.common.ui.compose.dialog.TextAlertDialog
-import com.duckduckgo.common.ui.compose.dialog.TextAlertDialogCheckboxState
+import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialog
+import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialogCheckboxState
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
 import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
 import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
@@ -127,11 +128,11 @@ class DialogsFragment : Fragment() {
         }
 
         view.setupComposeDialogShowcase(R.id.composeTextAlertDialogWithImageButton, isDarkTheme, "Text Alert Dialog With Image") { onDismiss ->
-            TextAlertDialog(
+            DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = dialogMessage,
-                headerImage = CommonR.drawable.ic_dax_icon,
+                headerImage = painterResource(CommonR.drawable.ic_dax_icon),
                 positiveButtonText = positiveButtonText,
                 onPositiveClick = { showToast("Positive Button Clicked") },
                 negativeButtonText = negativeButtonText,
@@ -266,7 +267,7 @@ class DialogsFragment : Fragment() {
         }
 
         view.setupComposeDialogShowcase(R.id.composeTextAlertDialogButton, isDarkTheme, "Text Alert Dialog") { onDismiss ->
-            TextAlertDialog(
+            DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = dialogMessage,
@@ -389,7 +390,7 @@ class DialogsFragment : Fragment() {
         }
 
         view.setupComposeDialogShowcase(R.id.composeTextAlertDialogCancellable, isDarkTheme, "Text Alert Dialog Cancellable") { onDismiss ->
-            TextAlertDialog(
+            DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = dialogMessage,
@@ -420,7 +421,7 @@ class DialogsFragment : Fragment() {
         }
 
         view.setupComposeDialogShowcase(R.id.composeTextAlertDialogOneButton, isDarkTheme, "Text Alert Dialog With One Button") { onDismiss ->
-            TextAlertDialog(
+            DaxTextAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = dialogMessage,
@@ -468,7 +469,7 @@ class DialogsFragment : Fragment() {
                 modifier = Modifier.fillMaxWidth(),
             )
             if (showDialog) {
-                TextAlertDialog(
+                DaxTextAlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = dialogTitle,
                     message = dialogMessage,
@@ -476,7 +477,7 @@ class DialogsFragment : Fragment() {
                     onPositiveClick = { showToast("Positive Button Clicked, Checked $checkboxChecked") },
                     negativeButtonText = negativeButtonText,
                     onNegativeClick = { showToast("Negative Button Clicked, Checked $checkboxChecked") },
-                    checkbox = TextAlertDialogCheckboxState(
+                    checkbox = DaxTextAlertDialogCheckboxState(
                         text = checkboxText,
                         checked = checkboxChecked,
                         onCheckedChange = { checkboxChecked = it },
@@ -518,9 +519,9 @@ class DialogsFragment : Fragment() {
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = { DaxText(text = dialogMessage) },
-                headerImage = CommonR.drawable.ic_dax_icon,
+                headerImage = painterResource(CommonR.drawable.ic_dax_icon),
                 buttons = {
-                    DaxStackedButtons(
+                    DaxPrimaryStackedButtons(
                         buttonTitles = List(3) { positiveButtonText }.toImmutableList(),
                         onButtonClick = { index ->
                             showToast("Button $index Clicked")
@@ -565,7 +566,7 @@ class DialogsFragment : Fragment() {
                 title = dialogTitle,
                 message = { DaxText(text = dialogMessage) },
                 buttons = {
-                    DaxStackedButtons(
+                    DaxPrimaryStackedButtons(
                         buttonTitles = List(4) { positiveButtonText }.toImmutableList(),
                         onButtonClick = { index ->
                             showToast("Button $index Clicked")
@@ -606,15 +607,13 @@ class DialogsFragment : Fragment() {
             isDarkTheme,
             "Stacked Text Alert Destructive Dialog With 4 buttons",
         ) { onDismiss ->
-            val stackedButtonTitles = List(4) { positiveButtonText }.toImmutableList()
             DaxAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = { DaxText(text = dialogMessage) },
                 buttons = {
-                    DaxStackedButtons(
-                        buttonTitles = stackedButtonTitles,
-                        destructiveButtonIndex = stackedButtonTitles.lastIndex,
+                    DaxDestructiveStackedButtons(
+                        buttonTitles = List(4) { positiveButtonText }.toImmutableList(),
                         onButtonClick = { index ->
                             showToast("Button $index Clicked")
                             onDismiss()

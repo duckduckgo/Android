@@ -18,9 +18,12 @@ package com.duckduckgo.common.ui.compose.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -30,6 +33,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -38,6 +42,7 @@ import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -74,7 +79,9 @@ fun DaxRadioOptions(
                         onClick = { onOptionSelected(index) },
                         role = Role.RadioButton,
                     )
-                    .padding(12.dp),
+                    .padding(
+                        vertical = dimensionResource(R.dimen.keyline_3),
+                    ),
             ) {
                 // TODO: replace with DaxRadioButton once the ADS radio button is migrated to Compose.
                 RadioButton(
@@ -85,6 +92,7 @@ fun DaxRadioOptions(
                         unselectedColor = DuckDuckGoTheme.textColors.secondary,
                     ),
                 )
+                Spacer(modifier = Modifier.width(16.dp))
                 DaxText(
                     text = optionTitle,
                     style = DuckDuckGoTheme.typography.body1,

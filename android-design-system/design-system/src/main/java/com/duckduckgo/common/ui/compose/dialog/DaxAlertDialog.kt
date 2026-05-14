@@ -18,7 +18,6 @@
 
 package com.duckduckgo.common.ui.compose.dialog
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,17 +31,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.cards.DaxSurface
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -51,10 +52,10 @@ import com.duckduckgo.mobile.android.R
 /**
  * Base alert dialog composable for the DuckDuckGo design system.
  *
- * Slot-based: use this directly for any dialog. The convenience wrapper [TextAlertDialog]
+ * Slot-based: use this directly for any dialog. The convenience wrapper [DaxTextAlertDialog]
  * exists for the common title/message/positive/negative shape. For richer dialogs, use
  * this composable directly with helpers like [DaxRadioOptions] (content slot) or
- * [DaxStackedButtons] (buttons slot).
+ * [DaxPrimaryStackedButtons] / [DaxDestructiveStackedButtons] (buttons slot).
  *
  * Buttons are pinned at the bottom and never scroll. The [content] slot is responsible for
  * its own scrolling when needed (see [DaxRadioOptions]).
@@ -65,7 +66,7 @@ import com.duckduckgo.mobile.android.R
  * @param message Optional message slot rendered below the title. Use a plain [DaxText] for
  *  static text or pass any composable (e.g. an annotated [androidx.compose.material3.Text]
  *  with link annotations) for clickable spans.
- * @param headerImage Optional drawable resource ID for an image displayed above the title
+ * @param headerImage Optional [Painter] for an image displayed above the title
  * @param cancellable Whether the dialog can be dismissed by clicking outside or pressing back (default: false)
  * @param content Optional composable slot for custom content between message and buttons
  * @param buttons Composable slot for dialog buttons (pinned, won't scroll)
@@ -79,7 +80,7 @@ fun DaxAlertDialog(
     title: String,
     modifier: Modifier = Modifier,
     message: (@Composable () -> Unit)? = null,
-    @DrawableRes headerImage: Int? = null,
+    headerImage: Painter? = null,
     cancellable: Boolean = false,
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
@@ -115,27 +116,23 @@ internal fun DaxAlertDialogContent(
     title: String,
     modifier: Modifier = Modifier,
     message: (@Composable () -> Unit)? = null,
-    @DrawableRes headerImage: Int? = null,
+    headerImage: Painter? = null,
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
 ) {
-    Surface(
-        modifier = modifier,
-        shape = DuckDuckGoTheme.shapes.medium,
-        color = DuckDuckGoTheme.colors.backgrounds.surface,
-    ) {
+    DaxSurface(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_5)),
         ) {
             if (headerImage != null) {
                 Image(
-                    painter = painterResource(id = headerImage),
+                    painter = headerImage,
                     contentDescription = null,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .size(24.dp),
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_4)))
             }
 
             DaxText(
@@ -144,32 +141,28 @@ internal fun DaxAlertDialogContent(
                 modifier = Modifier.fillMaxWidth(),
             )
 
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
+
             if (message != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     message()
                 }
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             }
 
             if (content != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     content()
                 }
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             }
 
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
+
             FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2), Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
             ) {
                 buttons()
             }
@@ -190,7 +183,7 @@ private fun DaxAlertDialogAllSlotsPreview() {
                     color = DuckDuckGoTheme.textColors.secondary,
                 )
             },
-            headerImage = R.drawable.ic_dax_icon,
+            headerImage = painterResource(R.drawable.ic_dax_icon),
             buttons = {
                 DaxGhostButton(text = "Cancel", onClick = {})
                 DaxPrimaryButton(text = "Confirm", onClick = {})
