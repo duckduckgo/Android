@@ -278,7 +278,7 @@ class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             network = "Facebook",
-            siteHost = "http://www.facebook.com",
+            siteHost = "www.facebook.com",
             isLightTheme = true,
         )
 
