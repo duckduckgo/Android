@@ -39,10 +39,10 @@ interface NativeInputHost {
     fun submit()
 
     fun showAttachmentChooser(showing: Boolean)
-    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
-
     fun showModelPicker(showing: Boolean)
     fun showReasoningPicker(showing: Boolean)
+
+    fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /** Current input state of the host widget (mode, context, position). */
     fun getInputState(): NativeInputState
