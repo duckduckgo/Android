@@ -4983,7 +4983,6 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxMainNetworkCta,
             is DaxMainNetworkBrandDesignUpdateContextualCta,
             -> {
-                // TODO: replace in stage 2 (DaxMainNetworkCta brand-design migration).
                 viewModelScope.launch {
                     val cta =
                         withContext(dispatchers.io()) {

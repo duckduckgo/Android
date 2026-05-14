@@ -18,13 +18,17 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.content.res.Resources
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.asFlow
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
-import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
@@ -35,13 +39,15 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_NETWORK_CTA_1
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
-import com.duckduckgo.app.trackerdetection.model.TrackerStatus
-import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
@@ -60,6 +66,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -67,6 +74,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -78,7 +86,7 @@ import java.util.concurrent.TimeUnit
 
 @FlowPreview
 @RunWith(AndroidJUnit4::class)
-class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
+class DaxMainNetworkBrandDesignUpdateContextualCtaTest {
 
     @get:Rule
     @Suppress("unused")
@@ -91,6 +99,8 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    private lateinit var db: AppDatabase
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockDismissedCtaDao: DismissedCtaDao = mock()
@@ -113,19 +123,26 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
+    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
-    private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
+    val context: Context = ApplicationProvider.getApplicationContext()
 
     private lateinit var testee: CtaViewModel
 
     @Before
     fun before() = runTest {
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
+        whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().liveTabs().asFlow())
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
@@ -135,6 +152,8 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -160,80 +179,87 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         )
     }
 
+    @After
+    fun after() {
+        db.close()
+    }
+
     @Test
-    fun whenBrandDesignUpdateEnabledAndTrackersBlockedConditionsMetThenReturnBrandDesignCta() = runTest {
+    fun whenBrandDesignEnabledAndBrowsingMajorTrackerSiteThenReturnBrandDesignMainNetworkCta() = runTest {
         givenDaxOnboardingActive()
-        givenBrandDesignUpdateEnabled()
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
-            site = siteWithBlockedTrackers(),
+            site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
         )
 
-        assertTrue(value is DaxTrackersBlockedBrandDesignUpdateContextualCta)
+        assertTrue(value is DaxMainNetworkBrandDesignUpdateContextualCta)
     }
 
     @Test
-    fun whenBrandDesignUpdateDisabledAndTrackersBlockedConditionsMetThenReturnLegacyCta() = runTest {
-        givenDaxOnboardingActive()
-        givenBrandDesignUpdateDisabled()
-
-        val value = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = true,
-            site = siteWithBlockedTrackers(),
-            detectedRefreshPatterns = detectedRefreshPatterns,
-        )
-
-        assertTrue(value is OnboardingDaxDialogCta.DaxTrackersBlockedCta)
-    }
-
-    @Test
-    fun whenCtaShownThenShownPixelFired() = runTest {
+    fun whenCtaShownThenShownPixelFiresWithNetworkParam() = runTest {
         val cta = newCta()
 
         testee.onCtaShown(cta)
 
         verify(mockPixel).fire(
             eq(AppPixelName.ONBOARDING_DAX_CTA_SHOWN),
+            argThat { get(CTA_SHOWN)?.startsWith(DAX_NETWORK_CTA_1) == true },
             any(),
-            any(),
-            any(),
+            eq(Count),
         )
     }
 
     @Test
-    fun whenUserClicksOkButtonThenOkPixelFiredWithTrackersBlockedCtaPixelParam() = runTest {
+    fun whenOkButtonClickedThenOkPixelFiresWithNetworkParam() = runTest {
         val cta = newCta()
 
         testee.onUserClickCtaOkButton(cta)
 
         verify(mockPixel).fire(
             eq(AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON),
-            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA)),
+            eq(mapOf(CTA_SHOWN to DAX_NETWORK_CTA_1)),
             any(),
-            any(),
+            eq(Count),
         )
     }
 
     @Test
-    fun whenUserDismissesViaCloseButtonThenClosePixelFiredWithTrackersBlockedCtaPixelParam() = runTest {
+    fun whenDismissedViaCloseButtonThenClosePixelFiresWithNetworkParam() = runTest {
         val cta = newCta()
 
         testee.onUserDismissedCta(cta, viaCloseBtn = true)
 
         verify(mockPixel).fire(
             eq(AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON),
-            eq(mapOf(Pixel.PixelParameter.CTA_SHOWN to Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA)),
+            eq(mapOf(CTA_SHOWN to DAX_NETWORK_CTA_1)),
             any(),
-            any(),
+            eq(Count),
         )
     }
 
     @Test
-    fun whenUserDismissesWithoutCloseButtonThenNoCancelPixelFired() = runTest {
+    fun whenBrandDesignDisabledAndBrowsingMajorTrackerSiteThenReturnLegacyMainNetworkCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site,
+            detectedRefreshPatterns = detectedRefreshPatterns,
+        )
+
+        assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
+    }
+
+    @Test
+    fun whenDismissedWithoutCloseButtonThenNoClosePixelFired() = runTest {
         val cta = newCta()
 
         testee.onUserDismissedCta(cta, viaCloseBtn = false)
@@ -242,134 +268,102 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     }
 
     @Test
-    fun whenUserDismissesThenDismissalPersisted() = runTest {
+    fun whenDismissedThenDismissalPersistedWithNetworkCtaId() = runTest {
         val cta = newCta()
 
         testee.onUserDismissedCta(cta)
 
-        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_DIALOG_NETWORK))
     }
 
     @Test
-    fun whenSingleTrackerWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
-        assertDescriptionMatchesLegacy(
-            trackers = listOf(entity("Facebook")),
-            omnibarType = OmnibarType.SINGLE_TOP,
-        )
+    fun whenSameNetworkFacebookDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "www.facebook.com")
     }
 
     @Test
-    fun whenMaxTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
-        assertDescriptionMatchesLegacy(
-            trackers = listOf(entity("Facebook"), entity("Google")),
-            omnibarType = OmnibarType.SINGLE_TOP,
-        )
+    fun whenSameNetworkMobileFacebookDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "m.facebook.com")
     }
 
     @Test
-    fun whenMoreThanMaxTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
-        assertDescriptionMatchesLegacy(
-            trackers = listOf(entity("Facebook"), entity("Google"), entity("Amazon"), entity("Microsoft")),
-            omnibarType = OmnibarType.SINGLE_TOP,
-        )
+    fun whenSameNetworkGoogleDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Google", siteHost = "www.google.com")
     }
 
     @Test
-    fun whenDuplicateTrackersWithTopOmnibarThenBrandDesignDescriptionMatchesLegacy() {
-        assertDescriptionMatchesLegacy(
-            trackers = listOf(entity("Facebook"), entity("Facebook"), entity("Google")),
-            omnibarType = OmnibarType.SINGLE_TOP,
-        )
+    fun whenFacebookOwnedDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Facebook", siteHost = "www.instagram.com")
     }
 
     @Test
-    fun whenSingleTrackerWithBottomOmnibarThenBrandDesignDescriptionMatchesLegacy() {
-        assertDescriptionMatchesLegacy(
-            trackers = listOf(entity("Facebook")),
-            omnibarType = OmnibarType.SINGLE_BOTTOM,
-        )
+    fun whenGoogleOwnedDomainThenBrandDesignDescriptionMatchesLegacy() {
+        assertDescriptionMatchesLegacy(network = "Google", siteHost = "www.youtube.com")
     }
 
-    private fun entity(displayName: String): Entity = TdsEntity(displayName, displayName, 9.0)
-
-    private fun assertDescriptionMatchesLegacy(
-        trackers: List<Entity>,
-        omnibarType: OmnibarType,
-    ) {
-        whenever(mockSettingsDataStore.omnibarType).thenReturn(omnibarType)
+    private fun assertDescriptionMatchesLegacy(network: String, siteHost: String) {
         val resourceContext = mockContextEncodingResourceArgs()
-
-        val brandDesignCta = DaxTrackersBlockedBrandDesignUpdateContextualCta(
+        val brandDesignCta = DaxMainNetworkBrandDesignUpdateContextualCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
-            trackers = trackers,
-            settingsDataStore = mockSettingsDataStore,
+            network = network,
+            siteHost = siteHost,
             isLightTheme = true,
         )
-        val legacyCta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+        val legacyCta = OnboardingDaxDialogCta.DaxMainNetworkCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
-            trackers = trackers,
-            settingsDataStore = mockSettingsDataStore,
+            network = network,
+            siteHost = siteHost,
         )
 
         assertEquals(
-            legacyCta.getTrackersDescription(resourceContext, trackers),
-            brandDesignCta.getTrackersDescription(resourceContext, trackers),
+            legacyCta.getTrackersDescription(resourceContext),
+            brandDesignCta.getTrackersDescription(resourceContext),
         )
     }
 
     private fun mockContextEncodingResourceArgs(): Context {
         val resources: Resources = mock {
-            on { getQuantityString(any(), any()) } doAnswer { invocation ->
-                "plural:${invocation.arguments.joinToString(",")}"
-            }
-            on { getQuantityString(any(), any(), any()) } doAnswer { invocation ->
-                "plural:${invocation.arguments.joinToString(",")}"
+            on { getString(any(), any(), any(), any()) } doAnswer { invocation ->
+                "string:${invocation.arguments.joinToString(",")}"
             }
         }
         return mock { on { this.resources } doReturn resources }
     }
 
-    private fun newCta() = DaxTrackersBlockedBrandDesignUpdateContextualCta(
-        onboardingStore = mockOnboardingStore,
-        appInstallStore = mockAppInstallStore,
-        trackers = emptyList(),
-        settingsDataStore = mockSettingsDataStore,
-        isLightTheme = true,
-    )
+    private fun newCta(): DaxMainNetworkBrandDesignUpdateContextualCta =
+        DaxMainNetworkBrandDesignUpdateContextualCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            network = "Facebook",
+            siteHost = "www.facebook.com",
+            isLightTheme = true,
+        )
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
-    private fun givenBrandDesignUpdateEnabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockEnabledToggle)
-    }
-
-    private fun givenBrandDesignUpdateDisabled() {
-        whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
-        whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
-    }
-
-    private fun siteWithBlockedTrackers(): Site {
-        val trackingEvent = TrackingEvent(
-            documentUrl = "test.com",
-            trackerUrl = "test.com",
-            categories = null,
-            entity = TdsEntity("Test Tracker", "Test Tracker", 9.0),
-            surrogateId = null,
-            status = TrackerStatus.BLOCKED,
-            type = TrackerType.OTHER,
-        )
+    private fun site(
+        url: String = "http://www.test.com",
+        uri: Uri? = Uri.parse(url),
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        events: List<TrackingEvent> = emptyList(),
+        majorNetworkCount: Int = 0,
+        allTrackersBlocked: Boolean = true,
+        entity: Entity? = null,
+    ): Site {
         val site: Site = mock()
-        whenever(site.url).thenReturn("http://www.cnn.com")
-        whenever(site.uri).thenReturn(android.net.Uri.parse("http://www.cnn.com"))
-        whenever(site.trackingEvents).thenReturn(listOf(trackingEvent))
-        whenever(site.trackerCount).thenReturn(1)
-        whenever(site.majorNetworkCount).thenReturn(0)
-        whenever(site.allTrackersBlocked).thenReturn(true)
+        whenever(site.url).thenReturn(url)
+        whenever(site.uri).thenReturn(uri)
+        whenever(site.https).thenReturn(https)
+        whenever(site.entity).thenReturn(entity)
+        whenever(site.trackingEvents).thenReturn(events)
+        whenever(site.trackerCount).thenReturn(trackerCount)
+        whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
+        whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         return site
     }
 }
