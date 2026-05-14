@@ -25,4 +25,5 @@ enum class PreOnboardingDialogType {
     ADDRESS_BAR_POSITION,
     INPUT_SCREEN,
     INPUT_SCREEN_PREVIEW,
+    QUICK_SETUP,
 }

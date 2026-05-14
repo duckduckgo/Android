@@ -53,6 +53,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.InputMode.*
@@ -498,6 +499,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 }
 
                 INPUT_SCREEN_PREVIEW -> return@let // handled by configureInputScreenPreviewDialog()
+                QUICK_SETUP -> return@let
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }

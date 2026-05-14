@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/keyline_4"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/quickSetupTitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_6"
+        android:layout_marginEnd="@dimen/keyline_6">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/quickSetupTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:visibility="invisible"
+            app:typography="onboarding_title"
+            tools:text="@string/preOnboardingReinstallQuickSetupTitle" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/quickSetupTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="?attr/daxColorPrimaryText"
+            tools:text="@string/preOnboardingReinstallQuickSetupTitle" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/quickSetupOptionsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:alpha="0"
+        android:orientation="vertical">
+
+        <com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSwitchRow
+            android:id="@+id/setDefaultBrowserItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:quickSetupRowIcon="@drawable/ic_default_browser_mobile_color_24"
+            app:quickSetupRowPrimaryText="@string/preOnboardingReinstallSetDefaultLabel" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
+        <com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSwitchRow
+            android:id="@+id/addWidgetItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:quickSetupRowIcon="@drawable/ic_add_widget_color_24"
+            app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddHomeScreenWidgetLabel" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
+        <com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupEditRow
+            android:id="@+id/addressBarPositionItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:quickSetupRowIcon="@drawable/ic_address_bar_top_24"
+            app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddressBarLabel"
+            app:quickSetupRowSecondaryText="@string/preOnboardingReinstallAddressBarTop" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:defaultPadding="false"
+            app:fullWidth="false" />
+
+        <com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupEditRow
+            android:id="@+id/addressBarSearchOptionsItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:quickSetupRowIcon="@drawable/ic_ai_24"
+            app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
+            app:quickSetupRowSecondaryText="@string/preOnboardingReinstallAddressBarSearchOptionsValue" />
+
+    </LinearLayout>
+
+</LinearLayout>
