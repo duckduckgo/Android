@@ -150,8 +150,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                     onBackPressedCallback.isEnabled = true
                 } else {
                     applyDefaultToolbar()
-                    // In default mode the fire icon drives Fire-all; hide when Recent is empty —
-                    // the title counts Recent chats, so a Pinned-only state would render "Delete 0 chats?".
+                    // Hide fire when Recent is empty — title is "Delete N chats?" of the Recent count.
                     setFireActionVisible(state.recent.isNotEmpty())
                     onBackPressedCallback.isEnabled = binding.searchBar.isVisible
                 }
@@ -205,16 +204,20 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun renderConfirmation(confirmation: ChatHistoryUiState.PendingConfirmation?) {
         if (confirmation == null) return
-        // Idempotent: skip if a dialog is already attached.
         if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return
 
         val count = when (confirmation) {
             is ChatHistoryUiState.PendingConfirmation.FireAll -> confirmation.count
             is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> confirmation.count
         }
+        val selectedChatUrls = if (confirmation is ChatHistoryUiState.PendingConfirmation.DeleteSelected) {
+            viewModel.chatUrlsForDialog()
+        } else {
+            null
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             val dialog = fireDialogProvider.createFireDialog(
-                FireDialogProvider.FireDialogOrigin.ChatHistory(count),
+                FireDialogProvider.FireDialogOrigin.ChatHistory(count = count, selectedChatUrls = selectedChatUrls),
             )
             dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
         }
@@ -252,7 +255,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         requireActivity().hideKeyboard()
         binding.toolbar.show()
         viewModel.onSearchClosed()
-        // Leave onBackPressedCallback.isEnabled to render() — select mode may still be active.
+        // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
     }
 
     private fun showToolbarOverflowPopup() {

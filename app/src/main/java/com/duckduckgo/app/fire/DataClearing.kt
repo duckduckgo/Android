@@ -237,10 +237,12 @@ class DataClearing @Inject constructor(
         return fireDataStore.getAutomaticClearOptions().isNotEmpty()
     }
 
-    /**
-     * Performs granular data clearing based on the provided options
-     * @return true if process needs to be restarted
-     */
+    override suspend fun clearSelectedDuckAiChats(chatUrls: Set<String>) {
+        if (chatUrls.isEmpty()) return
+        if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(chatUrls)))
+    }
+
     private suspend fun performGranularClear(
         options: Set<FireClearOption>,
         shouldFireDataClearPixel: Boolean,
@@ -262,20 +264,10 @@ class DataClearing @Inject constructor(
 
         if (shouldClearDuckAiChats) {
             clearDataAction.clearDuckAiChatsOnly()
-            if (!shouldClearAllTabs) closeOnlyDuckAiTabs()
+            // DuckAiTabsCleanupPlugin closes any open Duck.ai tabs via the All dispatch.
             dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.All))
         }
 
         logcat { "Granular clear completed" }
-    }
-
-    private suspend fun closeOnlyDuckAiTabs() {
-        val duckAiTabIds = tabRepository.getTabs()
-            .filter { tab -> tab.url?.toUri()?.let(duckChat::isDuckChatUrl) == true }
-            .map { it.tabId }
-        if (duckAiTabIds.isNotEmpty()) {
-            logcat { "Closing ${duckAiTabIds.size} open Duck.ai tab(s) after chat clear" }
-            tabRepository.deleteTabs(duckAiTabIds)
-        }
     }
 }

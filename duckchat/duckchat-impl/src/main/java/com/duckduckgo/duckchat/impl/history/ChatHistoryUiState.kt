@@ -37,11 +37,7 @@ sealed interface ChatHistoryUiState {
         /** Fire-all confirmation; set when count ≥ 2 (count == 1 deletes directly). */
         data class FireAll(val count: Int) : PendingConfirmation
 
-        /**
-         * Delete-selected confirmation. `chatIds` is the captured selection snapshot at the
-         * moment Delete-selected was tapped — a concurrent repository emission between
-         * "tapped" and "confirmed" can't change what gets deleted.
-         */
+        /** Captured selection snapshot — concurrent emissions can't change the deletion target. */
         data class DeleteSelected(val chatIds: Set<String>) : PendingConfirmation {
             val count: Int get() = chatIds.size
         }

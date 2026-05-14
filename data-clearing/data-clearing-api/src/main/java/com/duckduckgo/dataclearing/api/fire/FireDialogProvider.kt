@@ -28,9 +28,7 @@ interface FireDialogProvider {
     /**
      * Creates a Fire dialog instance.
      *
-     * @param origin Where the dialog is being launched from. Determines which buttons
-     *  are shown and which tab(s) the dialog operates on.
-     * @return A FireDialog (Granular or NonGranular variant, selected by remote feature flag).
+     * @param origin Where the dialog is being launched from; also carries any per-call destructive scope.
      */
     suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
 
@@ -61,12 +59,15 @@ interface FireDialogProvider {
         data class Hatch(val tabId: String) : FireDialogOrigin()
 
         /**
-         * Chat history screen — bulk-delete confirmation. Overrides the user's stored
-         * fire-options with `DUCKAI_CHATS` only; browser tabs are kept, but any open
-         * Duck.ai chat tabs are closed alongside the chat data.
+         * Chat history screen — bulk-delete confirmation.
          *
          * @property count Number of chats shown in the title ("Delete N chats?").
+         * @property selectedChatUrls Non-null scopes the clear to this subset (Delete-selected);
+         *  `null` clears every Duck.ai chat (Fire-all).
          */
-        data class ChatHistory(val count: Int) : FireDialogOrigin()
+        data class ChatHistory(
+            val count: Int,
+            val selectedChatUrls: Set<String>? = null,
+        ) : FireDialogOrigin()
     }
 }

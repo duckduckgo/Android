@@ -73,6 +73,7 @@ private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
 private const val ARG_TAB_ID = "tabId"
 private const val ARG_CHAT_HISTORY_COUNT = "chatHistoryCount"
+private const val ARG_SELECTED_CHAT_URLS = "selectedChatUrls"
 internal const val ORIGIN_BROWSER = "Browser"
 internal const val ORIGIN_SETTINGS = "Settings"
 internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
@@ -440,7 +441,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             }
             ORIGIN_CHAT_HISTORY -> {
                 val count = arguments?.getInt(ARG_CHAT_HISTORY_COUNT) ?: 0
-                FireDialogProvider.FireDialogOrigin.ChatHistory(count)
+                val urls = arguments?.getStringArrayList(ARG_SELECTED_CHAT_URLS)
+                    ?.toSet()
+                    ?.takeIf { it.isNotEmpty() }
+                FireDialogProvider.FireDialogOrigin.ChatHistory(count = count, selectedChatUrls = urls)
             }
             else -> FireDialogProvider.FireDialogOrigin.Browser
         }
@@ -453,6 +457,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                     ARG_ORIGIN to origin.tag(),
                     ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
                     ARG_CHAT_HISTORY_COUNT to (origin as? FireDialogProvider.FireDialogOrigin.ChatHistory)?.count,
+                    ARG_SELECTED_CHAT_URLS to (origin as? FireDialogProvider.FireDialogOrigin.ChatHistory)
+                        ?.selectedChatUrls?.let { ArrayList(it) },
                 )
             }
         }

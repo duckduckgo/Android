@@ -146,6 +146,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+                val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls
                 val fireOptionsOverride = (viewState.value as? ViewState.Loaded)?.stateData?.fireOptionsOverride
                 val clearOptions = fireOptionsOverride ?: fireDataStore.getManualClearOptions()
                 dataClearingWideEvent.start(
@@ -153,7 +154,11 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     clearOptions = clearOptions,
                 )
                 try {
-                    dataClearing.clearDataUsingManualFireOptions(options = fireOptionsOverride)
+                    if (selectedChatUrls != null) {
+                        dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
+                    } else {
+                        dataClearing.clearDataUsingManualFireOptions(options = fireOptionsOverride)
+                    }
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
@@ -232,7 +237,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
     }
 
     private suspend fun mapToViewState(dialogOrigin: FireDialogOrigin): ViewState.Loaded {
-        // Non-tab origins skip tab/download/WebView probes and show a simplified dialog with only the "Clear all" option
+        // Non-tab origins skip the tab/download/WebView probes — there's no tab to reason about.
         val isTabAware = dialogOrigin !is FireDialogOrigin.ChatHistory
 
         val isDuckAiChatsSelected =

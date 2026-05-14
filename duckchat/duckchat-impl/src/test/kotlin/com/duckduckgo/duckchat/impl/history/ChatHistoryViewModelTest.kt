@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.history
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +39,8 @@ class ChatHistoryViewModelTest {
     private val source = MutableStateFlow<List<ChatHistoryItem>>(emptyList())
     private val repository = FakeChatHistoryRepository(source)
     private val duckChat = FakeDuckChatInternal()
-    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat)
+    private val dataClearingTrigger = RecordingDataClearingTrigger()
+    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat, dataClearingTrigger)
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -235,7 +238,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onFireAllRequested with exactly one Recent chat deletes immediately without setting confirmation`() = runTest {
+    fun `onFireAllRequested with exactly one Recent chat dispatches DuckChats Selected with that chat url`() = runTest {
         source.value = listOf(
             item("p", pinned = true),
             item("r1"),
@@ -247,12 +250,13 @@ class ChatHistoryViewModelTest {
 
             viewModel.onFireAllRequested()
 
-            val afterDelete = awaitItem() as Loaded
-            assertEquals(null, afterDelete.confirmation)
-            assertEquals(listOf("r1"), repository.deletedChatIds)
-            assertEquals(listOf("p"), afterDelete.pinned.map { it.chatId })
-            assertEquals(emptyList<String>(), afterDelete.recent.map { it.chatId })
+            expectNoEvents()
         }
+        assertEquals(
+            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=r1")))),
+            dataClearingTrigger.calls,
+        )
+        assertTrue(repository.deletedChatIds.isEmpty())
     }
 
     @Test
@@ -349,7 +353,7 @@ class ChatHistoryViewModelTest {
         assertTrue(repository.deletedChatIds.isEmpty())
     }
 
-    // --- Chat resume / Duck.ai open (centralised on the ViewModel) ---
+    // --- Chat resume / Duck.ai open ---
 
     @Test
     fun `onChatRowClicked in default mode resumes the chat in DuckAi`() = runTest {
@@ -455,7 +459,7 @@ class ChatHistoryViewModelTest {
         }
     }
 
-    // --- Select-mode (FR-013, FR-013a) ---
+    // --- Select-mode ---
 
     @Test
     fun `onEnterSelectMode transitions to Selecting with empty selection`() = runTest {
@@ -570,7 +574,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onDeleteSelectedRequested with one selected deletes directly and exits select mode`() = runTest {
+    fun `onDeleteSelectedRequested with one selected dispatches DuckChats Selected and exits select mode`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
@@ -582,13 +586,15 @@ class ChatHistoryViewModelTest {
             awaitItem()
 
             viewModel.onDeleteSelectedRequested()
-            cancelAndConsumeRemainingEvents()
+
+            val final = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
         }
-        // After the runTest scheduler drains: mode reset to Default + delete propagated.
-        assertEquals(listOf("a"), repository.deletedChatIds)
-        val finalState = viewModel.uiState.value as Loaded
-        assertEquals(ChatHistoryUiState.Mode.Default, finalState.mode)
-        assertEquals(listOf("b"), finalState.recent.map { it.chatId })
+        assertEquals(
+            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a")))),
+            dataClearingTrigger.calls,
+        )
+        assertTrue(repository.deletedChatIds.isEmpty())
     }
 
     @Test
@@ -616,7 +622,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onDeleteSelectedConfirmed deletes the captured ids and returns to Default mode`() = runTest {
+    fun `onDeleteSelectedConfirmed clears confirmation and exits select mode without dispatching`() = runTest {
         source.value = listOf(item("p", pinned = true), item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
@@ -632,18 +638,49 @@ class ChatHistoryViewModelTest {
             awaitItem() // DeleteSelected({a, c})
 
             viewModel.onDeleteSelectedConfirmed()
-
-            // Drain all subsequent emissions until the list reflects both deletes — state-flow
-            // batching can fold the mode + confirmation + per-delete emissions in any order.
             cancelAndConsumeRemainingEvents()
         }
-        // After the runTest scheduler drains all coroutines:
-        assertEquals(setOf("a", "c"), repository.deletedChatIds.toSet())
         val finalState = viewModel.uiState.value as Loaded
         assertEquals(ChatHistoryUiState.Mode.Default, finalState.mode)
         assertEquals(null, finalState.confirmation)
-        assertEquals(listOf("p"), finalState.pinned.map { it.chatId })
-        assertEquals(listOf("b"), finalState.recent.map { it.chatId })
+        // ViewModel must not dispatch — the dialog drives the clear via selectedChatUrls.
+        assertTrue(dataClearingTrigger.calls.isEmpty())
+        assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
+    @Test
+    fun `chatUrlsForDialog returns the captured chatIds mapped through DuckChat buildChatUrl`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+            viewModel.onEnterSelectMode()
+            awaitItem()
+            viewModel.onSelectionToggled("a")
+            awaitItem()
+            viewModel.onSelectionToggled("c")
+            awaitItem()
+            viewModel.onDeleteSelectedRequested()
+            awaitItem() // DeleteSelected({a, c})
+
+            assertEquals(
+                setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=c"),
+                viewModel.chatUrlsForDialog(),
+            )
+        }
+    }
+
+    @Test
+    fun `chatUrlsForDialog returns null when no DeleteSelected confirmation is pending`() = runTest {
+        source.value = listOf(item("a"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            assertEquals(null, viewModel.chatUrlsForDialog())
+        }
     }
 
     @Test
@@ -660,11 +697,10 @@ class ChatHistoryViewModelTest {
 
             // Simulate an external delete (e.g. omnibar Fire-icon) removing chat "b"
             source.value = listOf(item("a"), item("c"))
-
-            val reconciled = awaitItem() as Loaded
-            val mode = reconciled.mode as ChatHistoryUiState.Mode.Selecting
-            assertEquals(setOf("a", "c"), mode.selectedChatIds)
+            cancelAndConsumeRemainingEvents()
         }
+        val mode = (viewModel.uiState.value as Loaded).mode as ChatHistoryUiState.Mode.Selecting
+        assertEquals(setOf("a", "c"), mode.selectedChatIds)
     }
 
     /**
@@ -712,5 +748,13 @@ private class FakeChatHistoryRepository(
     override suspend fun deleteAllChats() {
         deleteAllChatsCalled = true
         source.value = emptyList()
+    }
+}
+
+private class RecordingDataClearingTrigger : DataClearingTrigger {
+    val calls: MutableList<Set<ClearableData>> = mutableListOf()
+
+    override suspend fun clearData(types: Set<ClearableData>) {
+        calls += types
     }
 }
