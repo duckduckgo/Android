@@ -28,7 +28,7 @@ import android.widget.ScrollView
 import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.models.SupportedTool
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 
 @SuppressLint("ViewConstructor")
@@ -70,11 +70,11 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         addView(optionsButton)
     }
 
-    fun getSelectedTool(): SupportedTool? {
+    fun getSelectedTool(): Tool? {
         val index = tappedIndices.firstOrNull() ?: return null
         return when (menuItems[index].option) {
-            Option.CREATE_IMAGE -> SupportedTool.IMAGE_GENERATION
-            Option.WEB_SEARCH -> SupportedTool.WEB_SEARCH
+            Option.CREATE_IMAGE -> Tool.IMAGE_GENERATION
+            Option.WEB_SEARCH -> Tool.WEB_SEARCH
         }
     }
 
