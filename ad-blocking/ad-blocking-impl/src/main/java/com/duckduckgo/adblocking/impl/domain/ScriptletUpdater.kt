@@ -63,14 +63,19 @@ class RealScriptletUpdater @Inject constructor(
                         }
 
                         when (val validationResult = validator.validate(bytes, entry.signature)) {
-                            ScriptletValidationResult.Valid -> name to bytes
+                            ScriptletValidationResult.Valid -> if (bytes.isEmpty()) {
+                                logcat { "ScriptletUpdater: skipping empty scriptlet $name" }
+                                null
+                            } else {
+                                name to bytes
+                            }
                             is ScriptletValidationResult.Invalid -> {
                                 logcat(WARN) { "ScriptletUpdater: validation failed for $name: $validationResult" }
                                 throw ScriptletFailure()
                             }
                         }
                     }
-                }.awaitAll().toMap()
+                }.awaitAll().filterNotNull().toMap()
             }
         } catch (_: ScriptletFailure) {
             return ScriptletUpdateResult.Retry

@@ -119,6 +119,25 @@ class RealScriptletUpdaterTest {
     }
 
     @Test
+    fun whenScriptletContentIsEmptyThenItIsNotStored() = runTest {
+        val emptyBytes = ByteArray(0)
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(emptyBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(emptyBytes, isolatedEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+        whenever(validator.validate(mainBytes, mainEntry.signature)).thenReturn(ScriptletValidationResult.Valid)
+
+        assertEquals(ScriptletUpdateResult.Success, updater.update(validSettings))
+        verify(repository).storeScriptlets(
+            eq("2026.3.9"),
+            check { stored ->
+                assertEquals(setOf(mainPath), stored.keys)
+                assertEquals(String(mainBytes), String(stored.getValue(mainPath)))
+            },
+        )
+    }
+
+    @Test
     fun whenOneDownloadFailsThenUpdateShortCircuitsAndCancelsInFlightDownloads() = runTest {
         whenever(repository.getStoredVersion()).thenReturn("0.0.0")
         val isolatedDownloadStarted = CompletableDeferred<Unit>()
