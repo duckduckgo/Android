@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
@@ -44,8 +45,7 @@ class ChatHistoryViewModelTest {
     @Test
     fun `empty source emits Empty state`() = coroutineRule.testScope.runTest {
         viewModel.uiState.test {
-            assertEquals(ChatHistoryUiState.Loading, awaitItem())
-            assertEquals(ChatHistoryUiState.Empty, awaitItem())
+            assertEquals(ChatHistoryUiState.Empty, awaitInitialNonLoading())
         }
     }
 
@@ -58,8 +58,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            val loaded = awaitItem() as ChatHistoryUiState.Loaded
+            val loaded = awaitInitialLoaded()
             assertEquals(listOf("b"), loaded.pinned.map { it.chatId })
             assertEquals(listOf("c", "a"), loaded.recent.map { it.chatId })
         }
@@ -70,8 +69,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            val loaded = awaitItem() as ChatHistoryUiState.Loaded
+            val loaded = awaitInitialLoaded()
             assertEquals(ChatHistoryUiState.Mode.Default, loaded.mode)
             assertEquals("", loaded.searchQuery)
             assertEquals(false, loaded.searchActive)
@@ -89,8 +87,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            val loaded = awaitItem() as ChatHistoryUiState.Loaded
+            val loaded = awaitInitialLoaded()
             assertEquals(listOf("p2", "p1"), loaded.pinned.map { it.chatId })
             assertEquals(listOf("r2", "r1"), loaded.recent.map { it.chatId })
         }
@@ -101,8 +98,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            assertTrue(awaitItem() is ChatHistoryUiState.Loaded)
+            awaitInitialLoaded()
             source.value = emptyList()
             assertEquals(ChatHistoryUiState.Empty, awaitItem())
         }
@@ -116,8 +112,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            assertEquals(false, (awaitItem() as Loaded).searchActive)
+            assertEquals(false, awaitInitialLoaded().searchActive)
 
             viewModel.onSearchActivated()
 
@@ -137,8 +132,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onSearchActivated()
             awaitItem() // searchActive=true
@@ -161,8 +155,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onSearchActivated()
             awaitItem() // searchActive=true
@@ -179,8 +172,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a", title = "Apple"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onSearchActivated()
             awaitItem()
@@ -202,8 +194,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onSearchActivated()
             awaitItem()
@@ -216,6 +207,20 @@ class ChatHistoryViewModelTest {
             assertEquals("", restored.searchQuery)
             assertEquals(listOf("a", "b"), restored.recent.map { it.chatId })
         }
+    }
+
+    /**
+     * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
+     * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.
+     */
+    private suspend fun TurbineTestContext<ChatHistoryUiState>.awaitInitialLoaded(): Loaded {
+        val first = awaitItem()
+        return (first as? Loaded) ?: (awaitItem() as Loaded)
+    }
+
+    private suspend fun TurbineTestContext<ChatHistoryUiState>.awaitInitialNonLoading(): ChatHistoryUiState {
+        val first = awaitItem()
+        return if (first is ChatHistoryUiState.Loading) awaitItem() else first
     }
 
     private fun item(
