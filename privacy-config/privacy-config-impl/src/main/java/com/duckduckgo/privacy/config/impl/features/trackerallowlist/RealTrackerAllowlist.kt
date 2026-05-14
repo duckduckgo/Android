@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -74,9 +75,11 @@ class RealTrackerAllowlist @Inject constructor(
         host: String,
         rulesByDomain: Map<String, List<CompiledRule>>,
     ): List<CompiledRule>? {
+        val eTldPlusOne = host.toTldPlusOne() ?: return null
         var candidate = host
         while (true) {
             rulesByDomain[candidate]?.let { return it }
+            if (candidate == eTldPlusOne) return null
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
             candidate = candidate.substring(dot + 1)
