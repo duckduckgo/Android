@@ -67,7 +67,7 @@
 
     <!-- Options button -->
     <string name="duckChatOptionsButtonContentDescription">Duck.ai options</string>
-    <string name="duckChatOptionsChipDismissContentDescription">Remove %1$s</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Remove %1$s</string>
     <string name="duckChatOptionsMenuCreateImage">Create Image</string>
     <string name="duckChatOptionsMenuCreateImageSubtitle">Turn text into images</string>
     <string name="duckChatOptionsMenuWebSearch">Web Search</string>

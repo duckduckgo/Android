@@ -78,6 +78,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         }
     }
 
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (visibility == VISIBLE && tappedIndices.any { menuItems[it].option == Option.CREATE_IMAGE }) {
+            post {
+                host.showModelPicker(false)
+                host.showReasoningPicker(false)
+            }
+        }
+    }
+
     fun updateCapabilitiesFrom(picker: ModelPicker?) {
         val supportsImageGeneration = picker?.isImageGenerationSupported() ?: true
         val supportsWebSearch = picker?.isWebSearchSupported() ?: true
