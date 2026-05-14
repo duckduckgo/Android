@@ -990,6 +990,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getInputState(): NativeInputState =
         activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }
             ?: error("getInputState called before widget was configured")
+    override fun showModelPicker(showing: Boolean) {
+        findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
+    }
+
+    override fun showReasoningPicker(showing: Boolean) {
+        findViewById<FrameLayout?>(R.id.reasoningModePickerContainer)?.isVisible = showing
+    }
 
     private fun configureSubmitButtons() {
         if (submitButtons == null) {

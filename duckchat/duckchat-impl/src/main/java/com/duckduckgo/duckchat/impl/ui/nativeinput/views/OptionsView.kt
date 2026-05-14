@@ -27,14 +27,18 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 
 @SuppressLint("ViewConstructor")
-class OptionsView(context: Context) : LinearLayout(context) {
+class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
+
+    private enum class Option { CREATE_IMAGE, WEB_SEARCH }
 
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,
         val subtitleRes: Int,
+        val option: Option,
     )
 
     private val menuItems = listOf(
@@ -42,11 +46,13 @@ class OptionsView(context: Context) : LinearLayout(context) {
             iconRes = R.drawable.ic_images_24,
             titleRes = R.string.duckChatOptionsMenuCreateImage,
             subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
+            option = Option.CREATE_IMAGE,
         ),
         MenuItem(
             iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
             titleRes = R.string.duckChatOptionsMenuWebSearch,
             subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
+            option = Option.WEB_SEARCH,
         ),
     )
 
@@ -124,6 +130,8 @@ class OptionsView(context: Context) : LinearLayout(context) {
         if (tappedIndices.contains(index)) {
             tappedIndices.remove(index)
             removeChipForIndex(index)
+            host.showModelPicker(true)
+            host.showReasoningPicker(true)
         } else {
             tappedIndices.firstOrNull()?.let { other ->
                 tappedIndices.remove(other)
@@ -131,6 +139,9 @@ class OptionsView(context: Context) : LinearLayout(context) {
             }
             tappedIndices.add(index)
             addView(buildChip(index, menuItems[index]), 1)
+            val show = menuItems[index].option != Option.CREATE_IMAGE
+            host.showModelPicker(show)
+            host.showReasoningPicker(show)
         }
     }
 
@@ -146,6 +157,8 @@ class OptionsView(context: Context) : LinearLayout(context) {
         view.setOnClickListener {
             tappedIndices.remove(index)
             removeView(view)
+            host.showModelPicker(true)
+            host.showReasoningPicker(true)
         }
         return view
     }
