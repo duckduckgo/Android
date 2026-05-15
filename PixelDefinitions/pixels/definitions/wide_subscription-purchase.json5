@@ -109,7 +109,7 @@
             },
             {
                 "key": "feature.data.ext.loaded_products_count",
-                "description": "Number of products loaded from Play at the time of a missing-product-details failure (string-encoded integer because wide-event metadata is Map<String, String>).",
+                "description": "Number of products loaded from Play at the time of a missing-product-details failure.",
                 "type": "string"
             },
             {
