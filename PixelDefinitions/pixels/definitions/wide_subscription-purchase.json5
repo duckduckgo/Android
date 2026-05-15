@@ -2,7 +2,7 @@
 {
     "wide_subscription-purchase": {
         "description": "Monitors the subscription purchase flow from initiation through confirmation",
-        "owners": ["lmac012"],
+        "owners": ["lmac012", "cmonfortep"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
