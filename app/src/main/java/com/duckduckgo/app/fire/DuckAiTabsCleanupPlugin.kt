@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository

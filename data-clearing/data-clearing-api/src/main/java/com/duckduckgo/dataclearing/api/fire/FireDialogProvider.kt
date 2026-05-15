@@ -61,15 +61,15 @@ interface FireDialogProvider {
         data class Hatch(val tabId: String) : FireDialogOrigin()
 
         /**
-         * Chat history screen — bulk-delete confirmation.
+         * Chat history screen — bulk-delete confirmation. Scopes the clear to [selectedChatUrls].
+         * An empty set is a valid no-op shape; the dialog still renders but the destructive
+         * action does nothing.
          *
-         * @property count Number of chats shown in the title ("Delete N chats?").
-         * @property selectedChatUrls Non-null scopes the clear to this subset (Delete-selected);
-         *  `null` clears every Duck.ai chat (Fire-all).
+         * @property selectedChatUrls The chat URLs to clear on confirm. Title count
+         *  ("Delete N chats?") is derived from this set's size.
          */
-        data class ChatHistory(
-            val count: Int,
-            val selectedChatUrls: Set<String>? = null,
-        ) : FireDialogOrigin()
+        data class ChatHistory(val selectedChatUrls: Set<String>) : FireDialogOrigin() {
+            val count: Int get() = selectedChatUrls.size
+        }
     }
 }
