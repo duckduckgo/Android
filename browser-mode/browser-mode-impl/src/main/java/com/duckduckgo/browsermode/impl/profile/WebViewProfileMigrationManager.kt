@@ -22,6 +22,7 @@ import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -35,12 +36,14 @@ interface WebViewProfileMigrationManager {
 @ContributesBinding(AppScope::class)
 class RealWebViewProfileMigrationManager @Inject constructor(
     private val fireproofRepository: FireproofRepository,
+    private val duckAiHostProvider: DuckAiHostProvider,
     private val dispatchers: DispatcherProvider,
 ) : WebViewProfileMigrationManager {
 
     @SuppressLint("RequiresFeature")
     override suspend fun migrate(old: Profile, new: Profile) {
-        val domains = (fireproofRepository.fireproofWebsites() + DDG_DOMAINS).distinct()
+        val ddgDomains = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
+        val domains = (fireproofRepository.fireproofWebsites() + ddgDomains).distinct()
         withContext(dispatchers.main()) {
             val oldCookies = old.cookieManager
             val newCookies = new.cookieManager
@@ -52,13 +55,5 @@ class RealWebViewProfileMigrationManager @Inject constructor(
                 }
             }
         }
-    }
-
-    private companion object {
-        val DDG_DOMAINS = listOf(
-            AppUrl.Url.COOKIES,
-            AppUrl.Url.SURVEY_COOKIES,
-            "https://duck.ai",
-        )
     }
 }
