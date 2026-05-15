@@ -79,6 +79,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
@@ -908,7 +909,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
                                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
+                                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
                                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
@@ -1094,7 +1095,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = false
 
-                    val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                    val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                     binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
                     binding.daxDialogCta.inputScreenContent.root.isVisible = true
@@ -1353,7 +1354,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.isVisible = true
                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
+                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
                 binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
@@ -1499,7 +1500,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                 binding.daxDialogCta.addressBarContent.root.isVisible = false
 
-                val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
                 binding.daxDialogCta.inputScreenContent.root.isVisible = true

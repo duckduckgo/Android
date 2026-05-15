@@ -68,6 +68,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
@@ -1495,7 +1496,7 @@ sealed class DaxBubbleCta(
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val daxTitle = container.context.getString(title)
-            val daxDescription = container.context.getString(description)
+            val daxDescription = container.context.getString(description).preventWidows()
 
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
