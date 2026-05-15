@@ -147,8 +147,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
                 val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls
-                val fireOptionsOverride = (viewState.value as? ViewState.Loaded)?.stateData?.fireOptionsOverride
-                val clearOptions = fireOptionsOverride ?: fireDataStore.getManualClearOptions()
+                val clearOptions = fireDataStore.getManualClearOptions()
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
                     clearOptions = clearOptions,
@@ -157,7 +156,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     if (selectedChatUrls != null) {
                         dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
                     } else {
-                        dataClearing.clearDataUsingManualFireOptions(options = fireOptionsOverride)
+                        dataClearing.clearDataUsingManualFireOptions()
                     }
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
@@ -271,11 +270,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
         }
 
-        val fireOptionsOverride: Set<FireClearOption>? = when (dialogOrigin) {
-            is FireDialogOrigin.ChatHistory -> setOf(FireClearOption.DUCKAI_CHATS)
-            else -> null
-        }
-
         return ViewState.Loaded(
             stateData = ViewState.Loaded.StateData(
                 isDuckAiChatsSelected = isDuckAiChatsSelected,
@@ -287,7 +281,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
                 isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
                 titleSource = titleSource,
-                fireOptionsOverride = fireOptionsOverride,
             ),
             origin = dialogOrigin,
         )

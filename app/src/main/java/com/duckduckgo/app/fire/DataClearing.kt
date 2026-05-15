@@ -143,19 +143,18 @@ class DataClearing @Inject constructor(
     override suspend fun clearDataUsingManualFireOptions(
         shouldRestartIfRequired: Boolean,
         wasAppUsedSinceLastClear: Boolean,
-        options: Set<FireClearOption>?,
     ) {
-        val effectiveOptions = options ?: fireDataStore.getManualClearOptions()
+        val options = fireDataStore.getManualClearOptions()
         performGranularClear(
-            options = effectiveOptions,
+            options = options,
             shouldFireDataClearPixel = true,
         )
 
         clearDataAction.setAppUsedSinceLastClearFlag(wasAppUsedSinceLastClear)
 
-        val wasDuckAiChatsCleared = effectiveOptions.contains(FireClearOption.DUCKAI_CHATS) &&
+        val wasDuckAiChatsCleared = options.contains(FireClearOption.DUCKAI_CHATS) &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
-        val wasDataCleared = effectiveOptions.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
+        val wasDataCleared = options.contains(FireClearOption.DATA) || wasDuckAiChatsCleared
         if (shouldRestartIfRequired && wasDataCleared) {
             dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)

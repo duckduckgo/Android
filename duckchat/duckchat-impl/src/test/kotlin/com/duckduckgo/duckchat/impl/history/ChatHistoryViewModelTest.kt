@@ -232,7 +232,7 @@ class ChatHistoryViewModelTest {
             viewModel.onFireAllRequested()
 
             val confirming = awaitItem() as Loaded
-            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 3), confirming.confirmation)
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("r1", "r2", "r3")), confirming.confirmation)
             assertTrue(repository.deletedChatIds.isEmpty())
         }
     }
@@ -319,7 +319,7 @@ class ChatHistoryViewModelTest {
 
             viewModel.onFireAllRequested()
             val confirming = awaitItem() as Loaded
-            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 2), confirming.confirmation)
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("r1", "r2")), confirming.confirmation)
 
             viewModel.onConfirmationCancelled()
 
@@ -434,7 +434,7 @@ class ChatHistoryViewModelTest {
             viewModel.onFireIconClicked()
 
             val confirming = awaitItem() as Loaded
-            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(count = 2), confirming.confirmation)
+            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("r1", "r2")), confirming.confirmation)
         }
     }
 
@@ -672,7 +672,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `chatUrlsForDialog returns null when no DeleteSelected confirmation is pending`() = runTest {
+    fun `chatUrlsForDialog returns null when no confirmation is pending`() = runTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
@@ -680,6 +680,24 @@ class ChatHistoryViewModelTest {
             awaitItem() // initial Loaded
 
             assertEquals(null, viewModel.chatUrlsForDialog())
+        }
+    }
+
+    @Test
+    fun `chatUrlsForDialog returns Recent URLs while a FireAll confirmation is pending`() = runTest {
+        source.value = listOf(item("p", pinned = true), item("r1"), item("r2"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onFireAllRequested()
+            awaitItem() // FireAll({r1, r2})
+
+            assertEquals(
+                setOf("https://duck.ai?chatID=r1", "https://duck.ai?chatID=r2"),
+                viewModel.chatUrlsForDialog(),
+            )
         }
     }
 

@@ -34,12 +34,13 @@ sealed interface ChatHistoryUiState {
     }
 
     sealed interface PendingConfirmation {
-        /** Fire-all confirmation; set when count ≥ 2 (count == 1 deletes directly). */
-        data class FireAll(val count: Int) : PendingConfirmation
+        val chatIds: Set<String>
+        val count: Int get() = chatIds.size
 
-        /** Captured selection snapshot — concurrent emissions can't change the deletion target. */
-        data class DeleteSelected(val chatIds: Set<String>) : PendingConfirmation {
-            val count: Int get() = chatIds.size
-        }
+        /** Fire-all confirmation — captured Recent chat IDs at the moment Fire-all was tapped. */
+        data class FireAll(override val chatIds: Set<String>) : PendingConfirmation
+
+        /** Delete-selected confirmation — captured selection snapshot. */
+        data class DeleteSelected(override val chatIds: Set<String>) : PendingConfirmation
     }
 }

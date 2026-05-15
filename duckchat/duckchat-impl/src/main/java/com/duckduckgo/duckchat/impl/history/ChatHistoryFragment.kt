@@ -206,18 +206,13 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         if (confirmation == null) return
         if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return
 
-        val count = when (confirmation) {
-            is ChatHistoryUiState.PendingConfirmation.FireAll -> confirmation.count
-            is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> confirmation.count
-        }
-        val selectedChatUrls = if (confirmation is ChatHistoryUiState.PendingConfirmation.DeleteSelected) {
-            viewModel.chatUrlsForDialog()
-        } else {
-            null
-        }
+        val selectedChatUrls = viewModel.chatUrlsForDialog()
         viewLifecycleOwner.lifecycleScope.launch {
             val dialog = fireDialogProvider.createFireDialog(
-                FireDialogProvider.FireDialogOrigin.ChatHistory(count = count, selectedChatUrls = selectedChatUrls),
+                FireDialogProvider.FireDialogOrigin.ChatHistory(
+                    count = confirmation.count,
+                    selectedChatUrls = selectedChatUrls,
+                ),
             )
             dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
         }

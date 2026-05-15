@@ -130,7 +130,9 @@ class ChatHistoryViewModel @Inject constructor(
         when {
             recent.isEmpty() -> Unit
             recent.size == 1 -> dispatchSelectedClear(setOf(recent.single().chatId))
-            else -> confirmationState.value = PendingConfirmation.FireAll(count = recent.size)
+            else -> confirmationState.value = PendingConfirmation.FireAll(
+                chatIds = recent.mapTo(mutableSetOf()) { it.chatId },
+            )
         }
     }
 
@@ -142,7 +144,7 @@ class ChatHistoryViewModel @Inject constructor(
         }
     }
 
-    /** The dialog drives the actual deletion via its options-driven path. */
+    /** The dialog drives the actual deletion via the URL set surfaced by [chatUrlsForDialog]. */
     fun onFireAllConfirmed() {
         confirmationState.value = null
     }
@@ -195,9 +197,9 @@ class ChatHistoryViewModel @Inject constructor(
         modeState.value = Mode.Default
     }
 
-    /** Snapshot of the captured chat IDs (resolved to URLs) for the pending DeleteSelected confirmation. */
+    /** Snapshot of the captured chat IDs (resolved to URLs) for the pending confirmation. */
     fun chatUrlsForDialog(): Set<String>? {
-        val ids = (confirmationState.value as? PendingConfirmation.DeleteSelected)?.chatIds ?: return null
+        val ids = confirmationState.value?.chatIds ?: return null
         if (ids.isEmpty()) return null
         return ids.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
     }

@@ -17,20 +17,15 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.global.view.ClearDataResult
-import com.duckduckgo.app.settings.clear.FireClearOption
 
 /**
  * Interface for manual data clearing operations triggered by user actions (e.g., Fire button).
  */
 interface ManualDataClearing {
-    /**
-     * Clears data when user requests data clearing using the FireDialog.
-     * @param options when non-null, drives the clear instead of the user's stored options.
-     */
+    /** Clears data when user requests data clearing using the FireDialog. */
     suspend fun clearDataUsingManualFireOptions(
         shouldRestartIfRequired: Boolean = false,
         wasAppUsedSinceLastClear: Boolean = false,
-        options: Set<FireClearOption>? = null,
     )
 
     /** Deletes only the chats addressed by [chatUrls] and closes any browser tabs pointing at them. */
