@@ -600,6 +600,14 @@ sealed class OnboardingDaxDialogCta(
      *  - [setOnPrimaryCtaClicked] / [setOnSecondaryCtaClicked] / [setOnOptionClicked]: override only
      *    for the buttons the subclass actually renders.
      */
+
+    /**
+     * Marker interface for [BrandDesignContextualDaxDialogCta] subclasses that render the
+     * bottom-wing Lottie alongside their contextual dialog. Opting in via this supertype
+     * keeps the wing hooks out of CTAs that don't use them.
+     */
+    interface ShowsWingBottom
+
     abstract class BrandDesignContextualDaxDialogCta(
         ctaId: CtaId,
         @StringRes description: Int?,
@@ -686,6 +694,7 @@ sealed class OnboardingDaxDialogCta(
             arrowDepthAnimator?.removeAllUpdateListeners()
             arrowDepthAnimator?.cancel()
             arrowDepthAnimator = null
+            wingPlayInGeneration++
             ctaView?.animate()?.cancel()
             ctaView?.let { bannerFor(it)?.cancel() }
             ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
@@ -758,6 +767,7 @@ sealed class OnboardingDaxDialogCta(
 
             val typeAndFadeIn = {
                 bannerFor(container)?.slideIn()
+                startWingBottomPlayIn(container)
                 val daxTitle = titleView.text?.toString().orEmpty()
                 val startContentFadeIn = {
                     val animators = mutableListOf<Animator>(
@@ -926,10 +936,72 @@ sealed class OnboardingDaxDialogCta(
             resetAllIncludesExcept(container, activeInclude)
             applyPrimaryCtaText(container)
             configureContentViews(container)
+            applyWingBottomState(container)
             hiddenTitle.text = titleView.text
             applyTitleSlotVisibility(container, titleView)
             bannerFor(container)?.show()
             applyOptionsContentHeight(container)
+        }
+
+        private fun applyWingBottomState(container: View) {
+            wingPlayInGeneration++
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            val showsWing = this is ShowsWingBottom
+            when {
+                showsWing && !wing.isVisible -> {
+                    // Stage only; [startWingBottomPlayIn] kicks off playback after the banner slides in.
+                    wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                    wing.progress = 0f
+                    wing.isVisible = true
+                }
+                showsWing && wing.isVisible -> {
+                    // Persist across same-wing content transitions: leave at resting state, no replay.
+                    // Abort any in-flight exit from a prior non-wing CTA — its end-listener would otherwise hide the wing.
+                    if (wing.isAnimating && wing.progress >= WING_STOP_PROGRESS) {
+                        wing.removeAllAnimatorListeners()
+                        wing.cancelAnimation()
+                        wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                        wing.progress = WING_STOP_PROGRESS
+                    }
+                }
+                !showsWing && wing.isVisible -> {
+                    wing.setMinAndMaxProgress(WING_STOP_PROGRESS, 1f)
+                    wing.progress = WING_STOP_PROGRESS
+                    wing.addAnimatorListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            wing.isVisible = false
+                            wing.removeAnimatorListener(this)
+                        }
+                    })
+                    wing.playAnimation()
+                }
+                else -> wing.isVisible = false
+            }
+        }
+
+        private fun startWingBottomPlayIn(container: View) {
+            if (this !is ShowsWingBottom) return
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (!wing.isVisible || wing.isAnimating || wing.progress >= WING_STOP_PROGRESS) return
+            val generation = wingPlayInGeneration
+            wing.postDelayed(
+                {
+                    if (wingPlayInGeneration != generation) return@postDelayed
+                    if (wing.isVisible && !wing.isAnimating && wing.progress < WING_STOP_PROGRESS) {
+                        wing.playAnimation()
+                    }
+                },
+                WING_PLAY_IN_DELAY,
+            )
+        }
+
+        private fun snapWingBottomToResting(container: View) {
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (this !is ShowsWingBottom) return
+            if (wing.isAnimating) wing.cancelAnimation()
+            wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+            wing.progress = WING_STOP_PROGRESS
+            wing.isVisible = true
         }
 
         private fun applyOptionsContentHeight(container: View) {
@@ -986,6 +1058,7 @@ sealed class OnboardingDaxDialogCta(
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
             container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
                 ?.setArrowDepthFraction(if (showArrow) 1f else 0f)
+            snapWingBottomToResting(container)
             if (!alreadySettled) {
                 onSettled()
             }
@@ -1161,6 +1234,13 @@ sealed class OnboardingDaxDialogCta(
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
+            private const val WING_STOP_PROGRESS = 0.5f
+            private const val WING_PLAY_IN_DELAY = 300L
+
+            // Shared across CTA instances because the fragment swaps contextual CTAs without
+            // calling hideOnboardingCta on the previous one — a per-instance ref couldn't
+            // reach the pending runnable posted on the shared wingBottom view.
+            private var wingPlayInGeneration = 0
 
             /**
              * Cancels the title typing animation and hides the brand-design root, without

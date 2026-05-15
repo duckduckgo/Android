@@ -51,10 +51,11 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
-) {
+),
+    OnboardingDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
-    override val showArrow: Boolean = false
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
