@@ -42,6 +42,7 @@ import androidx.core.widget.ImageViewCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -629,6 +630,7 @@ sealed class OnboardingDaxDialogCta(
 
         private var runningFadeIn: AnimatorSet? = null
         private var runningFadeOut: AnimatorSet? = null
+        private var arrowDepthAnimator: ValueAnimator? = null
         private var cardContainer: TouchInterceptingLinearLayout? = null
 
         private var isAnimating: Boolean = false
@@ -639,6 +641,8 @@ sealed class OnboardingDaxDialogCta(
 
         /** Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]). */
         abstract val activeIncludeId: Int
+
+        abstract val showArrow: Boolean
 
         /**
          * Populate the card with subclass-specific content: set title/description text, configure
@@ -679,6 +683,9 @@ sealed class OnboardingDaxDialogCta(
             runningFadeOut?.removeAllListeners()
             runningFadeOut?.cancel()
             runningFadeOut = null
+            arrowDepthAnimator?.removeAllUpdateListeners()
+            arrowDepthAnimator?.cancel()
+            arrowDepthAnimator = null
             ctaView?.animate()?.cancel()
             ctaView?.let { bannerFor(it)?.cancel() }
             ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
@@ -735,6 +742,8 @@ sealed class OnboardingDaxDialogCta(
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+            val targetDepth = if (showArrow) 1f else 0f
             this.cardContainer = cardContainer
             isAnimating = true
 
@@ -763,6 +772,15 @@ sealed class OnboardingDaxDialogCta(
                     if (dismissButton.alpha < 1f) {
                         animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                    }
+                    val currentDepth = cardView.arrowDepthFraction
+                    if (targetDepth != currentDepth) {
+                        arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                            duration = DIALOG_CONTENT_FADE_IN_DURATION
+                            interpolator = FastOutSlowInInterpolator()
+                            addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                        }
+                        animators.add(arrowDepthAnimator!!)
                     }
                     runningFadeIn = AnimatorSet().apply {
                         playTogether(animators.toList())
@@ -966,6 +984,8 @@ sealed class OnboardingDaxDialogCta(
             container.alpha = 1f
             bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+            container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+                ?.setArrowDepthFraction(if (showArrow) 1f else 0f)
             if (!alreadySettled) {
                 onSettled()
             }
@@ -1088,7 +1108,10 @@ sealed class OnboardingDaxDialogCta(
             }
             if (!isContentTransition) {
                 container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.alpha = 0f
+                container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+                    ?.setArrowDepthFraction(0f)
             }
+            container.findViewById<View>(R.id.wavingDax)?.visibility = View.GONE
         }
 
         protected open val allContentIncludeIds: List<Int> = listOf(
@@ -1401,6 +1424,13 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
+    /**
+     * Marker interface for [BrandDesignUpdateBubbleCta] subclasses that render the waving Dax
+     * Lottie alongside their dialog. Opting in via this supertype keeps the animation hooks
+     * out of CTAs that don't use them.
+     */
+    interface ShowsWavingDax
+
     abstract class BrandDesignUpdateBubbleCta(
         ctaId: CtaId,
         @StringRes title: Int,
@@ -1527,6 +1557,20 @@ sealed class DaxBubbleCta(
                 headerImage?.alpha = 0f
             }
 
+            val showsWavingDax = this is ShowsWavingDax
+            val applyWavingDaxState = {
+                container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                    if (showsWavingDax) {
+                        if (!dax.isVisible) {
+                            dax.isVisible = true
+                            dax.post { dax.playAnimation() }
+                        }
+                    } else {
+                        dax.isVisible = false
+                    }
+                }
+            }
+
             // Helper: type title then fade in content
             val typeAndFadeIn = {
                 hiddenTitle.text = daxTitle.html(container.context)
@@ -1630,6 +1674,7 @@ sealed class DaxBubbleCta(
                             // button alpha causing a flicker. Instead, selectively reset content only.
                             resetAllIncludesExcept(container, activeInclude)
                             resetHeaderState()
+                            applyWavingDaxState()
                             configureContentViews(container)
                             // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
@@ -1648,6 +1693,7 @@ sealed class DaxBubbleCta(
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = daxDescription.html(container.context)
                 resetHeaderState()
+                applyWavingDaxState()
                 configureContentViews(container)
                 cardView.setArrowDepthFraction(targetDepth)
                 container.show()

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.cta.ui
 
 import android.view.View
+import androidx.core.view.isVisible
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -50,6 +52,8 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignOptionsContent
 
+    override val showArrow: Boolean = true
+
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
@@ -68,6 +72,12 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
             if (index < options.size) {
                 options[index].setOptionView(buttonView)
             }
+        }
+
+        view.findViewById<LottieAnimationView>(R.id.wavingDax).apply {
+            isVisible = true
+            // Container is still GONE here; Lottie.playAnimation() no-ops unless isShown() is true.
+            post { playAnimation() }
         }
     }
 

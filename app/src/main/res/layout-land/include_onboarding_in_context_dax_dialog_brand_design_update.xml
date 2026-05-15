@@ -62,7 +62,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="@dimen/getDesktopBrowserMaxItemWidth"
-        app:showArrow="false">
+        app:arrowOffsetStart="80dp"
+        app:showArrow="true">
 
         <com.duckduckgo.app.onboarding.ui.view.TouchInterceptingLinearLayout
             android:id="@+id/contextualBrandDesignCardContainer"

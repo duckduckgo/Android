@@ -47,6 +47,8 @@ data class DaxSerpBrandDesignUpdateContextualCta(
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
+    override val showArrow: Boolean = false
+
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)

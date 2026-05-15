@@ -37,4 +37,5 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
     showArrow = true,
-)
+),
+    DaxBubbleCta.ShowsWavingDax

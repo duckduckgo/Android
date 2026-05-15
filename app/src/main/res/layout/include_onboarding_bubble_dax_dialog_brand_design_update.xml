@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
         android:layout_marginBottom="36dp"
-        app:arrowOffsetStart="96dp"
+        app:arrowOffsetStart="80dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -131,5 +131,18 @@
         app:srcCompat="@drawable/ic_close_16"
         tools:alpha="1" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/wavingDax"
+        android:layout_width="wrap_content"
+        android:layout_height="178dp"
+        android:adjustViewBounds="true"
+        android:translationX="-54dp"
+        android:translationY="-110dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:lottie_rawRes="@raw/onboarding_dax_waving"
+        tools:lottie_progress="1"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

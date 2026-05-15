@@ -53,6 +53,8 @@ data class DaxMainNetworkBrandDesignUpdateContextualCta(
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
+    override val showArrow: Boolean = false
+
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
