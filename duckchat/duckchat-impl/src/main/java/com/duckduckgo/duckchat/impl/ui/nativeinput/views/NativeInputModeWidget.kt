@@ -237,6 +237,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     private var pendingIsDuckAiMode: Boolean = false
 
+    // True when this widget instance hosts the contextual sheet. Set in configureContextual();
+    // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
+    // BROWSER-state mutations from the main widget into the contextual UI: both widgets
+    // observe the same `tabId` slot, so the contextual widget can briefly receive a state
+    // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
+    // toggle row and reset the parent card's corners.
+    private var isContextualWidget: Boolean = false
+
     private var attachmentView: AttachmentView? = null
 
     override fun onAttachedToWindow() {
@@ -431,7 +439,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyToggleVisibility(visible: Boolean) {
-        findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (visible) VISIBLE else GONE
+        // Contextual sheet always hides the toggle row, regardless of what state the per-tab
+        // store emits — the main widget can publish toggleVisible=true for the same tabId.
+        val effective = visible && !isContextualWidget
+        findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
     }
 
     private fun applyVerticalPaddingForFocus() {
@@ -749,6 +760,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun configureContextual(tabId: String) {
         activeTabId = tabId
         pendingIsDuckAiMode = true
+        isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
             observeNativeInputState()
@@ -766,6 +778,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
+        // The contextual sheet's parent card has a top-only rounded shape applied by
+        // ContextualNativeInputManager.applyCardShape(); never overwrite it from here. The
+        // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
+        // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
+        // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
+        if (isContextualWidget) return
         val state = nativeInputState ?: return
         if (state.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
         if (state.isBottom) return
