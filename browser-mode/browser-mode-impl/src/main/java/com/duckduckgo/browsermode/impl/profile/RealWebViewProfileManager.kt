@@ -105,20 +105,19 @@ class RealWebViewProfileManager @Inject constructor(
 
         return mutex.withLock {
             val oldName = activeProfiles[mode]?.name ?: return@withLock false
-            val newIndex = dataStore.incrementProfileIndex(mode)
+            val newIndex = dataStore.getProfileIndex(mode) + 1
             val newName = mode.prefix() + newIndex
-            val migrationData = withContext(dispatchers.main()) {
+            val (old, new) = withContext(dispatchers.main()) {
                 val store = ProfileStore.getInstance()
-
-                val old = store.getOrCreateProfile(oldName)
-                val new = store.getOrCreateProfile(newName)
-                activeProfiles = activeProfiles + (mode to ActiveProfile(newName, new.webStorage, new.cookieManager))
-                old to new
+                store.getOrCreateProfile(oldName) to store.getOrCreateProfile(newName)
             }
 
             if (mode == BrowserMode.REGULAR) {
-                migrationManager.migrate(migrationData.first, migrationData.second)
+                migrationManager.migrate(old, new)
             }
+
+            dataStore.incrementProfileIndex(mode)
+            activeProfiles = activeProfiles + (mode to ActiveProfile(newName, new.webStorage, new.cookieManager))
 
             appScope.launch { cleanupStaleProfiles() }
             true
@@ -128,7 +127,9 @@ class RealWebViewProfileManager @Inject constructor(
     override suspend fun cleanupStaleProfiles() {
         initLatch.await()
 
-        if (fireModeAvailability.isAvailable()) {
+        if (!fireModeAvailability.isAvailable()) return
+
+        mutex.withLock {
             withContext(dispatchers.main()) {
                 val active = activeProfiles.values.map { it.name }.toSet()
                 val store = ProfileStore.getInstance()
