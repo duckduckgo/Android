@@ -64,6 +64,7 @@ class TrackerDataLoaderTest {
     private val mockContext: Context = mock()
     private val mockAppDatabase: AppDatabase = mock()
     private val mockUrlToTypeMapper: UrlToTypeMapper = mock()
+    private val mockEntityLookupRefresher: EntityLookupRefresher = mock()
 
     private val runnableCaptor = argumentCaptor<Runnable>()
     private val tdsMetaDataCaptor = argumentCaptor<TdsMetadata>()
@@ -82,6 +83,7 @@ class TrackerDataLoaderTest {
             appDatabase = mockAppDatabase,
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
+            entityLookupRefresher = mockEntityLookupRefresher,
             coroutineRule.testDispatcherProvider,
             object : OptimizeTrackerEvaluationRCWrapper {
                 override val enabled: Boolean
