@@ -640,16 +640,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun applyDefaultTogglePosition() {
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
-            val resolved = if (position == DefaultTogglePosition.LAST_USED) {
-                DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
-            } else {
-                position
-            }
-            if (resolved == DefaultTogglePosition.DUCK_AI) {
-                selectChatTab()
+        doOnAttach {
+            if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
+            findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
+                val resolved = if (position == DefaultTogglePosition.LAST_USED) {
+                    DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
+                } else {
+                    position
+                }
+                if (resolved == DefaultTogglePosition.DUCK_AI) {
+                    selectChatTab()
+                }
             }
         }
     }
