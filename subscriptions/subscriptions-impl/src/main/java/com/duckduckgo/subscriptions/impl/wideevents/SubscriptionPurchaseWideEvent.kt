@@ -52,7 +52,10 @@ interface SubscriptionPurchaseWideEvent {
 
     suspend fun onBillingFlowInitSuccess()
 
-    suspend fun onBillingFlowInitFailure(error: String)
+    suspend fun onBillingFlowInitFailure(
+        error: String,
+        metadata: Map<String, String> = emptyMap(),
+    )
 
     suspend fun onBillingFlowPurchaseSuccess()
 
@@ -189,7 +192,10 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         )
     }
 
-    override suspend fun onBillingFlowInitFailure(error: String) {
+    override suspend fun onBillingFlowInitFailure(
+        error: String,
+        metadata: Map<String, String>,
+    ) {
         if (!isFeatureEnabled()) return
         val wideEventId = getCurrentWideEventId() ?: return
 
@@ -197,6 +203,7 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
             wideEventId = wideEventId,
             stepName = STEP_BILLING_FLOW_INIT,
             success = false,
+            metadata = metadata,
         )
 
         wideEventClient.flowFinish(

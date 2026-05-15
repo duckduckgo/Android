@@ -179,6 +179,60 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
+    fun `onBillingFlowInitFailure with metadata forwards metadata to flowStep and keeps reason on flowFinish`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            val metadata = mapOf(
+                "missing_product_failure_reason" to "offer_not_found",
+                "requested_product_id" to "ddg_privacy_pro",
+                "requested_plan_id" to "ddg-privacy-pro-monthly-renews-us",
+                "requested_offer_id" to "free-trial",
+                "loaded_products_count" to "1",
+                "billing_client_ready" to "true",
+            )
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = "Missing product details",
+                metadata = metadata,
+            )
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = metadata,
+            )
+            verify(wideEventClient).flowFinish(
+                wideEventId = 123L,
+                status = FlowStatus.Failure(reason = "Missing product details"),
+            )
+        }
+
+    @Test
+    fun `onBillingFlowInitFailure without metadata passes empty map to flowStep and keeps reason on flowFinish`() =
+        runTest {
+            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+                .thenReturn(Result.success(123L))
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
+
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = "Billing error: SERVICE_UNAVAILABLE")
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 123L,
+                stepName = "billing_flow_init",
+                success = false,
+                metadata = emptyMap(),
+            )
+            verify(wideEventClient).flowFinish(
+                wideEventId = 123L,
+                status = FlowStatus.Failure(reason = "Billing error: SERVICE_UNAVAILABLE"),
+            )
+        }
+
+    @Test
     fun `onBillingFlowPurchaseFailure sends flowStep and flowFinish`() =
         runTest {
             whenever(wideEventClient.getFlowIds(any()))
