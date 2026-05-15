@@ -26,6 +26,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -138,6 +139,23 @@ class RealWebViewProfileManagerTest {
         testee.initialize()
 
         testee.cleanupStaleProfiles() // should not throw
+    }
+
+    @Test
+    fun `initialize completes latch even when initialization throws so callers do not hang`() = runTest {
+        val testee = newManager()
+        fireModeAvailability.stub { onBlocking { isAvailable() }.thenThrow(RuntimeException("boom")) }
+
+        try {
+            testee.initialize()
+            fail("Expected initialize() to rethrow")
+        } catch (expected: RuntimeException) {
+            // Latch must be completed in `finally` so awaiters do not suspend forever.
+        }
+
+        assertEquals(Profile.DEFAULT_PROFILE_NAME, testee.getProfileName(BrowserMode.REGULAR))
+        assertNotNull(testee.getWebStorage(BrowserMode.REGULAR))
+        assertNotNull(testee.getCookieManager(BrowserMode.REGULAR))
     }
 }
 
