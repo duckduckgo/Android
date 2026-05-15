@@ -62,23 +62,25 @@ class RealWebViewProfileManager @Inject constructor(
         mutex.withLock {
             if (initLatch.isCompleted) return@withLock
 
-            if (fireModeAvailability.isAvailable()) {
-                withContext(dispatchers.main()) {
-                    val store = ProfileStore.getInstance()
-                    BrowserMode.entries.forEach { mode ->
-                        val index = dataStore.getProfileIndex(mode)
-                        val name = mode.prefix() + index
-                        val profile = store.getOrCreateProfile(name)
-                        activeProfiles = activeProfiles + (mode to ActiveProfile(name, profile.webStorage, profile.cookieManager))
+            try {
+                if (fireModeAvailability.isAvailable()) {
+                    withContext(dispatchers.main()) {
+                        val store = ProfileStore.getInstance()
+                        BrowserMode.entries.forEach { mode ->
+                            val index = dataStore.getProfileIndex(mode)
+                            val name = mode.prefix() + index
+                            val profile = store.getOrCreateProfile(name)
+                            activeProfiles = activeProfiles + (mode to ActiveProfile(name, profile.webStorage, profile.cookieManager))
+                        }
+                    }
+                } else {
+                    logcat(LogPriority.WARN) {
+                        "Fire mode unavailable; WebViewProfileManager will fall back to Default profile."
                     }
                 }
-            } else {
-                logcat(LogPriority.WARN) {
-                    "Fire mode unavailable; WebViewProfileManager will fall back to Default profile."
-                }
+            } finally {
+                initLatch.complete(Unit)
             }
-
-            initLatch.complete(Unit)
             appScope.launch { cleanupStaleProfiles() }
         }
     }
@@ -127,8 +129,8 @@ class RealWebViewProfileManager @Inject constructor(
         initLatch.await()
 
         if (fireModeAvailability.isAvailable()) {
-            val active = activeProfiles.values.map { it.name }.toSet()
             withContext(dispatchers.main()) {
+                val active = activeProfiles.values.map { it.name }.toSet()
                 val store = ProfileStore.getInstance()
                 store.allProfileNames
                     .filter { name -> name.isManagedByUs() && name !in active }
