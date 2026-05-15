@@ -22,18 +22,39 @@ import com.duckduckgo.app.browser.UriString.Companion.host
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
+import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import logcat.logcat
 
 class TdsClient(
     override val name: Client.ClientName,
-    private val trackers: List<TdsTracker>,
+    trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val optimizeTrackerEvaluationV3: Boolean,
+    precompileRegex: Boolean = false,
 ) : Client {
 
-    private val trackerByDomain: Map<String, TdsTracker> by lazy {
-        trackers.associateBy { it.domain.value }
+    private val precompileRegex: Boolean = precompileRegex && optimizeTrackerEvaluationV3
+
+    private val compiledTrackers: List<CompiledTracker> = trackers.map { tracker ->
+        CompiledTracker(
+            tracker = tracker,
+            rules = tracker.rules.map { rule ->
+                val regex = if (precompileRegex) {
+                    runCatching { ".*${rule.rule}.*".toRegex() }
+                        .onFailure { logcat { "TDS rule failed to compile, skipping: ${rule.rule} (${it.message})" } }
+                        .getOrNull()
+                } else {
+                    null
+                }
+                CompiledRule(rule = rule, regex = regex)
+            },
+        )
+    }
+
+    private val compiledTrackerByDomain: Map<String, CompiledTracker> by lazy {
+        compiledTrackers.associateBy { it.tracker.domain.value }
     }
 
     override fun matches(
@@ -41,12 +62,12 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = findTracker(host(url)) ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
+        val compiled = findCompiledTracker(host(url)) ?: return Client.Result(matches = false, isATracker = false)
+        val matches = matchesTrackerEntry(compiled, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
-            entityName = tracker.ownerName,
-            categories = tracker.categories,
+            entityName = compiled.tracker.ownerName,
+            categories = compiled.tracker.categories,
             surrogate = matches.surrogate,
             isATracker = matches.isATracker,
         )
@@ -57,32 +78,32 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = findTracker(url.host) ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, url.toString(), documentUrl, requestHeaders)
+        val compiled = findCompiledTracker(url.host) ?: return Client.Result(matches = false, isATracker = false)
+        val matches = matchesTrackerEntry(compiled, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
-            entityName = tracker.ownerName,
-            categories = tracker.categories,
+            entityName = compiled.tracker.ownerName,
+            categories = compiled.tracker.categories,
             surrogate = matches.surrogate,
             isATracker = matches.isATracker,
         )
     }
 
-    private fun findTracker(host: String?): TdsTracker? {
+    private fun findCompiledTracker(host: String?): CompiledTracker? {
         if (host.isNullOrEmpty()) return null
         return if (optimizeTrackerEvaluationV3) {
-            findTrackerByLabelWalk(host)
+            findCompiledTrackerByLabelWalk(host)
         } else {
             val domain = Domain(host)
-            trackers.firstOrNull { sameOrSubdomain(domain, it.domain) }
+            compiledTrackers.firstOrNull { sameOrSubdomain(domain, it.tracker.domain) }
         }
     }
 
-    private fun findTrackerByLabelWalk(host: String): TdsTracker? {
+    private fun findCompiledTrackerByLabelWalk(host: String): CompiledTracker? {
         val eTldPlusOne = host.toTldPlusOne() ?: return null
         var candidate: String = host
         while (true) {
-            trackerByDomain[candidate]?.let { return it }
+            compiledTrackerByDomain[candidate]?.let { return it }
             if (candidate == eTldPlusOne) return null
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
@@ -91,13 +112,18 @@ class TdsClient(
     }
 
     private fun matchesTrackerEntry(
-        tracker: TdsTracker,
+        compiled: CompiledTracker,
         url: String,
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): MatchedResult {
-        tracker.rules.forEach { rule ->
-            val regex = ".*${rule.rule}.*".toRegex()
+        compiled.rules.forEach { compiledRule ->
+            val rule = compiledRule.rule
+            val regex = if (precompileRegex) {
+                compiledRule.regex ?: return@forEach
+            } else {
+                ".*${rule.rule}.*".toRegex()
+            }
             if (url.matches(regex)) {
                 val type = urlToTypeMapper.map(url, requestHeaders)
 
@@ -128,7 +154,7 @@ class TdsClient(
             }
         }
 
-        return MatchedResult(shouldBlock = (tracker.defaultAction == BLOCK), isATracker = true)
+        return MatchedResult(shouldBlock = (compiled.tracker.defaultAction == BLOCK), isATracker = true)
     }
 
     private fun matchedDomainAndTypes(
@@ -153,6 +179,16 @@ class TdsClient(
             else -> false
         }
     }
+
+    private data class CompiledRule(
+        val rule: Rule,
+        val regex: Regex?,
+    )
+
+    private data class CompiledTracker(
+        val tracker: TdsTracker,
+        val rules: List<CompiledRule>,
+    )
 
     private data class MatchedResult(
         val shouldBlock: Boolean,
