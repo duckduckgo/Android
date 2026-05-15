@@ -114,6 +114,20 @@
                 "key": "feature.data.ext.billing_client_ready",
                 "description": "Whether the Play billing client was ready at the time of a missing-product-details failure.",
                 "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.last_load_products_outcome",
+                "description": "Outcome of the most recent loadProducts() call before the missing-product-details failure. Distinguishes 'Play returned empty for this user' from 'loadProducts() failed with a Play BillingError we swallowed'. Format: 'never_attempted' (we never called Play, likely lifecycle issue), 'success_n=<count>' (Play replied success with this many products), 'failure_<BillingError>' (Play replied with this billing error enum).",
+                "type": "string",
+                "pattern": "^(never_attempted|success_n=\\d+|failure_[A-Z_]+)$",
+                "examples": [
+                    "never_attempted",
+                    "success_n=0",
+                    "success_n=2",
+                    "failure_BILLING_UNAVAILABLE",
+                    "failure_DEVELOPER_ERROR",
+                    "failure_NETWORK_ERROR"
+                ]
             }
         ]
     }

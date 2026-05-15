@@ -159,6 +159,7 @@ class RealPlayBillingManagerTest {
                 "requested_offer_id" to "none",
                 "loaded_products_count" to "0",
                 "billing_client_ready" to "false",
+                "last_load_products_outcome" to "never_attempted",
             ),
         )
     }
@@ -184,6 +185,7 @@ class RealPlayBillingManagerTest {
                 "requested_offer_id" to "none",
                 "loaded_products_count" to "1",
                 "billing_client_ready" to "true",
+                "last_load_products_outcome" to "success_n=1",
             ),
         )
     }
@@ -209,6 +211,7 @@ class RealPlayBillingManagerTest {
                 "requested_offer_id" to "nonexistent_offer",
                 "loaded_products_count" to "1",
                 "billing_client_ready" to "true",
+                "last_load_products_outcome" to "success_n=1",
             ),
         )
     }

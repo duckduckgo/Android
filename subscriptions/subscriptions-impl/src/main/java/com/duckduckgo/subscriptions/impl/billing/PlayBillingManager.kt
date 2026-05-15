@@ -128,6 +128,8 @@ class RealPlayBillingManager @Inject constructor(
     // New Subscription ProductDetails
     private var _products = MutableStateFlow(emptyList<ProductDetails>())
 
+    private var lastLoadProductsOutcome: String = LOAD_PRODUCTS_OUTCOME_NEVER_ATTEMPTED
+
     override val products: List<ProductDetails>
         get() = _products.value
 
@@ -242,6 +244,7 @@ class RealPlayBillingManager @Inject constructor(
                     META_KEY_REQUESTED_OFFER_ID to (offerId ?: "none"),
                     META_KEY_LOADED_PRODUCTS_COUNT to products.size.toString(),
                     META_KEY_BILLING_CLIENT_READY to billingClient.ready.toString(),
+                    META_KEY_LAST_LOAD_PRODUCTS_OUTCOME to lastLoadProductsOutcome,
                 ),
             )
             _purchaseState.emit(PurchaseState.Failure(error))
@@ -369,6 +372,7 @@ class RealPlayBillingManager @Inject constructor(
     private suspend fun loadProducts() {
         when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
             is SubscriptionsResult.Success -> {
+                lastLoadProductsOutcome = "${LOAD_PRODUCTS_OUTCOME_SUCCESS_PREFIX}${result.products.size}"
                 if (result.products.isEmpty()) {
                     logcat { "No products found" }
                 }
@@ -376,6 +380,7 @@ class RealPlayBillingManager @Inject constructor(
             }
 
             is SubscriptionsResult.Failure -> {
+                lastLoadProductsOutcome = "${LOAD_PRODUCTS_OUTCOME_FAILURE_PREFIX}${result.billingError}"
                 logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
             }
         }
@@ -434,6 +439,11 @@ class RealPlayBillingManager @Inject constructor(
         const val META_KEY_REQUESTED_OFFER_ID = "requested_offer_id"
         const val META_KEY_LOADED_PRODUCTS_COUNT = "loaded_products_count"
         const val META_KEY_BILLING_CLIENT_READY = "billing_client_ready"
+        const val META_KEY_LAST_LOAD_PRODUCTS_OUTCOME = "last_load_products_outcome"
+
+        const val LOAD_PRODUCTS_OUTCOME_NEVER_ATTEMPTED = "never_attempted"
+        const val LOAD_PRODUCTS_OUTCOME_SUCCESS_PREFIX = "success_n="
+        const val LOAD_PRODUCTS_OUTCOME_FAILURE_PREFIX = "failure_"
     }
 }
 
