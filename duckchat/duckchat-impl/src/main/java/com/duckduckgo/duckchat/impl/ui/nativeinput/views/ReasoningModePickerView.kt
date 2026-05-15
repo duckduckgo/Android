@@ -138,7 +138,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     private fun showAtPosition(popup: PopupWindow) {
         val loc = IntArray(2).also { button.getLocationOnScreen(it) }
-        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
+        val menuWidth = resources.getDimensionPixelSize(R.dimen.reasoningModePickerMenuWidth)
+        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0] + button.width - menuWidth, loc[1])
     }
 
     private fun dismissPopup() {
