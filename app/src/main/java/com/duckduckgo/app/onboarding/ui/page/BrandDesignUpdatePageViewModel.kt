@@ -340,6 +340,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 _viewState.update { it.copy(isReinstallUser = true) }
                 viewModelScope.launch {
                     if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
                         setCurrentDialog(QUICK_SETUP)
                     } else {
                         setCurrentDialog(SKIP_ONBOARDING_OPTION)

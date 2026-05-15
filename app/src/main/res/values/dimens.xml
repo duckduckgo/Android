@@ -27,4 +27,5 @@
     <dimen name="onboardingContextualBackgroundOverlap">56dp</dimen>
     <dimen name="onboardingContextualBackgroundOverlapNegative">-56dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
+    <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
 </resources>

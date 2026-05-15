@@ -119,9 +119,14 @@
     <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
     <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add home screen widget</string>
     <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
-    <string name="preOnboardingReinstallAddressBarTop">Top</string>
     <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
-    <string name="preOnboardingReinstallAddressBarSearchOptionsValue">Search and Duck.ai</string>
     <string name="preOnboardingReinstallEditAction">Edit</string>
     <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
+
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Where do you want your address bar?</string>
+    <string name="quickSetupAddressBarPositionCaption">You can make changes in Settings > Appearance.</string>
+    <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
+    <string name="quickSetupSearchOptionsCaption">AI features are private and optional. You can make changes in Settings > AI Features.</string>
+    <string name="quickSetupBottomSheetDone">Done</string>
 </resources>
