@@ -16,7 +16,6 @@
 
 package com.duckduckgo.browsermode.impl.profile
 
-import android.webkit.CookieManager
 import android.webkit.WebStorage
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,7 +28,4 @@ import dagger.Module
 abstract class ProfileProvidersModule {
     @Binds
     abstract fun bindWebStorageProvider(impl: WebStorageProvider): BrowserModeDataProvider<WebStorage>
-
-    @Binds
-    abstract fun bindCookieManagerProvider(impl: CookieManagerProvider): BrowserModeDataProvider<CookieManager>
 }
