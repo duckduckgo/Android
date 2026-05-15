@@ -23,11 +23,9 @@ import androidx.webkit.WebViewCompat
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewProfileBinder
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SuppressLint("RequiresFeature")
@@ -35,13 +33,10 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealWebViewProfileBinder @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
-    private val dispatchers: DispatcherProvider,
 ) : WebViewProfileBinder {
-    override suspend fun bind(webView: WebView, mode: BrowserMode) {
+    override fun bind(webView: WebView, mode: BrowserMode) {
         if (!fireModeAvailability.isAvailable()) return
-        withContext(dispatchers.main()) {
-            ProfileStore.getInstance().getOrCreateProfile(mode.profileName)
-            WebViewCompat.setProfile(webView, mode.profileName)
-        }
+        ProfileStore.getInstance().getOrCreateProfile(mode.profileName)
+        WebViewCompat.setProfile(webView, mode.profileName)
     }
 }

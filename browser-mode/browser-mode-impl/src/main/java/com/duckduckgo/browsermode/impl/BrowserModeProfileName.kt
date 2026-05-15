@@ -16,10 +16,11 @@
 
 package com.duckduckgo.browsermode.impl
 
+import androidx.webkit.Profile
 import com.duckduckgo.browsermode.api.BrowserMode
 
 internal val BrowserMode.profileName: String
     get() = when (this) {
-        BrowserMode.REGULAR -> "regular"
-        BrowserMode.FIRE -> "fire"
+        BrowserMode.REGULAR -> Profile.DEFAULT_PROFILE_NAME
+        BrowserMode.FIRE -> "Fire"
     }

@@ -273,6 +273,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewProfileBinder
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -440,6 +441,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webChromeClient: BrowserChromeClient
+
+    @Inject
+    lateinit var webViewProfileBinder: WebViewProfileBinder
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -3994,6 +3998,8 @@ class BrowserTabFragment :
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
+
+            webViewProfileBinder.bind(it, browserMode)
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)

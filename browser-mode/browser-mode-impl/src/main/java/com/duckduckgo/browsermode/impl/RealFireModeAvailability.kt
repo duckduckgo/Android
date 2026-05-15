@@ -49,7 +49,9 @@ class RealFireModeAvailability @Inject constructor(
     override fun isAvailable(): Boolean = cachedAvailability ?: computeAndCache()
 
     private fun computeAndCache(): Boolean =
-        (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
-                fireModeFeature.fireTabs().isEnabled())
+        (
+            WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
+                fireModeFeature.fireTabs().isEnabled()
+            )
             .also { cachedAvailability = it }
 }

@@ -32,8 +32,10 @@ import android.webkit.WebView
 interface WebViewProfileBinder {
 
     /**
+     * Must be called on the main thread.
+     *
      * @param webView a freshly-created [WebView] that has not yet been used.
      * @param mode the [BrowserMode] whose profile should back this [WebView].
      */
-    suspend fun bind(webView: WebView, mode: BrowserMode)
+    fun bind(webView: WebView, mode: BrowserMode)
 }
