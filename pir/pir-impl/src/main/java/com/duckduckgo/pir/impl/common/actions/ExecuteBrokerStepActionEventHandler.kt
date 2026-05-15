@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailData
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
@@ -48,6 +49,7 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.FillForm
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetEmailData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
 import com.duckduckgo.pir.impl.scripts.models.PirError
@@ -123,6 +125,23 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     sideEffect = GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
+                    ),
+                )
+            } else if (actionToExecute is GetEmailData) {
+                Next(
+                    nextState = state.copy(
+                        stageStatus = PirStageStatus(
+                            currentStage = PirStage.EMAIL_DATA_POLL,
+                            stageStartMs = currentTimeProvider.currentTimeMillis(),
+                        ),
+                    ),
+                    sideEffect = AwaitEmailData(
+                        actionId = actionToExecute.id,
+                        brokerName = currentBrokerStep.broker.name,
+                        emailAddress = state.generatedEmailData?.emailAddress.orEmpty(),
+                        attemptId = state.attemptId,
+                        extractFields = actionToExecute.extract,
+                        pollingIntervalSeconds = actionToExecute.pollingTime.toIntOrNull() ?: DEFAULT_EMAIL_DATA_POLL_INTERVAL_SECONDS,
                     ),
                 )
             } else {
@@ -304,5 +323,9 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         } else {
             requestData
         }
+    }
+
+    companion object {
+        private const val DEFAULT_EMAIL_DATA_POLL_INTERVAL_SECONDS = 5
     }
 }
