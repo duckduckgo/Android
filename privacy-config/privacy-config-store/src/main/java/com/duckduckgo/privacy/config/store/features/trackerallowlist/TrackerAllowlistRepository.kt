@@ -74,7 +74,7 @@ class RealTrackerAllowlistRepository(
     )
 }
 
-internal fun buildRulesByDomain(exceptions: List<TrackerAllowlistEntity>): Map<String, List<CompiledRule>> {
+fun buildRulesByDomain(exceptions: List<TrackerAllowlistEntity>): Map<String, List<CompiledRule>> {
     val map = HashMap<String, List<CompiledRule>>(exceptions.size)
     exceptions.forEach { entity ->
         // Keys are www-stripped to match UriString.host(), which strips a leading "www." via
