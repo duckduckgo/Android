@@ -228,7 +228,22 @@ class RealPlayBillingManager @Inject constructor(
 
         if (productDetails == null || offerToken == null) {
             val error = "Missing product details"
-            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = error)
+            val reason = when {
+                products.isEmpty() -> MissingProductReason.NO_PRODUCTS_LOADED
+                productDetails == null -> MissingProductReason.PRODUCT_ID_NOT_FOUND
+                else -> MissingProductReason.OFFER_NOT_FOUND
+            }
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = error,
+                metadata = mapOf(
+                    META_KEY_MISSING_PRODUCT_REASON to reason.raw,
+                    META_KEY_REQUESTED_PRODUCT_ID to subscriptionProduct,
+                    META_KEY_REQUESTED_PLAN_ID to planId,
+                    META_KEY_REQUESTED_OFFER_ID to (offerId ?: "none"),
+                    META_KEY_LOADED_PRODUCTS_COUNT to products.size.toString(),
+                    META_KEY_BILLING_CLIENT_READY to billingClient.ready.toString(),
+                ),
+            )
             _purchaseState.emit(PurchaseState.Failure(error))
             return@withContext
         }
@@ -404,6 +419,21 @@ class RealPlayBillingManager @Inject constructor(
             logcat { "Billing: No active purchase token found" }
             null
         }
+    }
+
+    private enum class MissingProductReason(val raw: String) {
+        NO_PRODUCTS_LOADED("no_products_loaded"),
+        PRODUCT_ID_NOT_FOUND("product_id_not_found"),
+        OFFER_NOT_FOUND("offer_not_found"),
+    }
+
+    private companion object {
+        const val META_KEY_MISSING_PRODUCT_REASON = "missing_product_failure_reason"
+        const val META_KEY_REQUESTED_PRODUCT_ID = "requested_product_id"
+        const val META_KEY_REQUESTED_PLAN_ID = "requested_plan_id"
+        const val META_KEY_REQUESTED_OFFER_ID = "requested_offer_id"
+        const val META_KEY_LOADED_PRODUCTS_COUNT = "loaded_products_count"
+        const val META_KEY_BILLING_CLIENT_READY = "billing_client_ready"
     }
 }
 

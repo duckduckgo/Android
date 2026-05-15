@@ -33,7 +33,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -45,6 +47,7 @@ class RealPlayBillingManagerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val billingClientAdapter = FakeBillingClientAdapter()
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
 
     private lateinit var processLifecycleOwner: TestLifecycleOwner
 
@@ -53,7 +56,7 @@ class RealPlayBillingManagerTest {
         pixelSender = mock(),
         billingClient = billingClientAdapter,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
-        subscriptionPurchaseWideEvent = mock(),
+        subscriptionPurchaseWideEvent = subscriptionPurchaseWideEvent,
         subscriptionSwitchWideEvent = mock(),
     )
 
@@ -138,6 +141,76 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyConnectInvoked()
         billingClientAdapter.verifyLaunchBillingFlowNotInvoked()
+    }
+
+    @Test
+    fun `when products empty then billing flow init failure metadata indicates no products loaded`() = runTest {
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId = "external_id", offerId = null)
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            metadata = mapOf(
+                "missing_product_failure_reason" to "no_products_loaded",
+                "requested_product_id" to "ddg_privacy_pro",
+                "requested_plan_id" to MONTHLY_PLAN_US,
+                "requested_offer_id" to "none",
+                "loaded_products_count" to "0",
+                "billing_client_ready" to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun `when product id does not match any loaded product then metadata indicates product id not found`() = runTest {
+        // load a product whose productId does NOT match BASIC_SUBSCRIPTION (the one MONTHLY_PLAN_US resolves to)
+        billingClientAdapter.subscriptions = listOf(
+            mock {
+                whenever(it.productId).thenReturn("some_unrelated_product_id")
+            },
+        )
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId = "external_id", offerId = null)
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            metadata = mapOf(
+                "missing_product_failure_reason" to "product_id_not_found",
+                "requested_product_id" to "ddg_privacy_pro",
+                "requested_plan_id" to MONTHLY_PLAN_US,
+                "requested_offer_id" to "none",
+                "loaded_products_count" to "1",
+                "billing_client_ready" to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun `when offer id does not match any offer on the matched product then metadata indicates offer not found`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        // The default fake product matches BASIC_SUBSCRIPTION; its offers do NOT include "nonexistent_offer".
+
+        subject.launchBillingFlow(
+            activity = mock(),
+            planId = MONTHLY_PLAN_US,
+            externalId = "external_id",
+            offerId = "nonexistent_offer",
+        )
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            metadata = mapOf(
+                "missing_product_failure_reason" to "offer_not_found",
+                "requested_product_id" to "ddg_privacy_pro",
+                "requested_plan_id" to MONTHLY_PLAN_US,
+                "requested_offer_id" to "nonexistent_offer",
+                "loaded_products_count" to "1",
+                "billing_client_ready" to "true",
+            ),
+        )
     }
 
     @Test
