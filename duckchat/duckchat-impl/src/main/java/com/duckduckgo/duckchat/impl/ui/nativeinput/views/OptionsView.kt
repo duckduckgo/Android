@@ -83,6 +83,14 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
+        restoreChip()
+    }
+
+    private fun restoreChip() {
+        val tool = viewModel.selectedTool.value ?: return
+        val item = menuItems.firstOrNull { it.tool == tool } ?: return
+        addView(buildChip(item), 1)
+        applyPickerVisibility()
     }
 
     fun getSelectedTool(): Tool? {
