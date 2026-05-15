@@ -765,6 +765,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
+        if (nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
         if (nativeInputState.isBottom) return
         if (nativeInputState.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
