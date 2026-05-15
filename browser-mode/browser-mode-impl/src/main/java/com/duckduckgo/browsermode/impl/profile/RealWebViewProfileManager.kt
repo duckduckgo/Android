@@ -17,20 +17,17 @@
 package com.duckduckgo.browsermode.impl.profile
 
 import android.annotation.SuppressLint
+import android.webkit.CookieManager
 import android.webkit.WebStorage
 import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profile.WebViewProfileManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -51,7 +48,7 @@ class RealWebViewProfileManager @Inject constructor(
     private val migrationManager: WebViewProfileMigrationManager,
     private val dispatchers: DispatcherProvider,
     @param:AppCoroutineScope private val appScope: CoroutineScope,
-) : WebViewProfileManager, BrowserModeDataProvider<WebStorage> {
+) : WebViewProfileManager {
 
     private val initLatch = CompletableDeferred<Unit>()
     private val mutex = Mutex()
@@ -72,7 +69,7 @@ class RealWebViewProfileManager @Inject constructor(
                         val index = dataStore.getProfileIndex(mode)
                         val name = mode.prefix() + index
                         val profile = store.getOrCreateProfile(name)
-                        activeProfiles = activeProfiles + (mode to ActiveProfile(name, profile.webStorage))
+                        activeProfiles = activeProfiles + (mode to ActiveProfile(name, profile.webStorage, profile.cookieManager))
                     }
                 }
             } else {
@@ -91,9 +88,14 @@ class RealWebViewProfileManager @Inject constructor(
         return activeProfiles[mode]?.name ?: Profile.DEFAULT_PROFILE_NAME
     }
 
-    override suspend fun forMode(mode: BrowserMode): WebStorage {
+    suspend fun getWebStorage(mode: BrowserMode): WebStorage {
         initLatch.await()
         return activeProfiles[mode]?.webStorage ?: WebStorage.getInstance()
+    }
+
+    suspend fun getCookieManager(mode: BrowserMode): CookieManager {
+        initLatch.await()
+        return activeProfiles[mode]?.cookieManager ?: CookieManager.getInstance()
     }
 
     override suspend fun clearAndRotateProfile(mode: BrowserMode): Boolean {
@@ -108,7 +110,7 @@ class RealWebViewProfileManager @Inject constructor(
 
                 val old = store.getOrCreateProfile(oldName)
                 val new = store.getOrCreateProfile(newName)
-                activeProfiles = activeProfiles + (mode to ActiveProfile(newName, new.webStorage))
+                activeProfiles = activeProfiles + (mode to ActiveProfile(newName, new.webStorage, new.cookieManager))
                 old to new
             }
 
@@ -147,12 +149,9 @@ class RealWebViewProfileManager @Inject constructor(
     private fun String.isManagedByUs(): Boolean =
         BrowserMode.entries.map { it.prefix() }.any { startsWith(it) }
 
-    private data class ActiveProfile(val name: String, val webStorage: WebStorage)
-}
-
-@ContributesTo(AppScope::class)
-@Module
-abstract class WebStorageBindingModule {
-    @Binds
-    abstract fun bindWebStorage(impl: RealWebViewProfileManager): BrowserModeDataProvider<WebStorage>
+    private data class ActiveProfile(
+        val name: String,
+        val webStorage: WebStorage,
+        val cookieManager: CookieManager,
+    )
 }

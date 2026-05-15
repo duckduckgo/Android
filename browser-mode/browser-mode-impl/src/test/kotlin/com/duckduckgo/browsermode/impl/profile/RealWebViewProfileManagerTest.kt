@@ -71,10 +71,21 @@ class RealWebViewProfileManagerTest {
     }
 
     @Test
-    fun `forMode suspends until initialize completes`() = runTest {
+    fun `getWebStorage suspends until initialize completes`() = runTest {
         val testee = newManager()
 
-        val pending = async { testee.forMode(BrowserMode.REGULAR) }
+        val pending = async { testee.getWebStorage(BrowserMode.REGULAR) }
+        assertFalse(pending.isCompleted)
+
+        testee.initialize()
+        assertNotNull(pending.await())
+    }
+
+    @Test
+    fun `getCookieManager suspends until initialize completes`() = runTest {
+        val testee = newManager()
+
+        val pending = async { testee.getCookieManager(BrowserMode.REGULAR) }
         assertFalse(pending.isCompleted)
 
         testee.initialize()
