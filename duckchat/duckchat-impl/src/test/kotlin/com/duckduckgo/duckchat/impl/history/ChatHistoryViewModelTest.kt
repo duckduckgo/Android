@@ -805,6 +805,19 @@ class ChatHistoryViewModelTest {
         assertTrue(dataClearingTrigger.calls.isEmpty())
     }
 
+    @Test
+    fun `onRenameRequested emits OpenRename navigation event with chatId and currentTitle`() = coroutineRule.testScope.runTest {
+        viewModel.navigationEvents.test {
+            viewModel.onRenameRequested("chat-42", "My favourite chat")
+
+            val event = awaitItem()
+            assertTrue(event is ChatHistoryViewModel.NavigationEvent.OpenRename)
+            event as ChatHistoryViewModel.NavigationEvent.OpenRename
+            assertEquals("chat-42", event.chatId)
+            assertEquals("My favourite chat", event.currentTitle)
+        }
+    }
+
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.
@@ -837,6 +850,7 @@ private class FakeChatHistoryRepository(
     private val source: MutableStateFlow<List<ChatHistoryItem>>,
 ) : ChatHistoryRepository {
     val deletedChatIds: MutableList<String> = mutableListOf()
+    val renamedChats: MutableList<Pair<String, String>> = mutableListOf()
     var deleteAllChatsCalled: Boolean = false
         private set
 
@@ -850,6 +864,10 @@ private class FakeChatHistoryRepository(
     override suspend fun deleteAllChats() {
         deleteAllChatsCalled = true
         source.value = emptyList()
+    }
+
+    override suspend fun renameChat(chatId: String, newTitle: String) {
+        renamedChats += chatId to newTitle
     }
 }
 

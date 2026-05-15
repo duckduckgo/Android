@@ -102,4 +102,8 @@
     <string name="duck_ai_chat_history_row_selected_content_description">Selected</string>
     <string name="duck_ai_chat_history_row_unselected_content_description">Not selected</string>
     <string name="duck_ai_chat_history_exit_select_mode_content_description">Exit selection mode</string>
+    <string name="duck_ai_chat_history_rename_title">Rename Chat</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Chat Title</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Save</string>
+    <string name="duck_ai_chat_history_rename_error">Couldn\'t rename chat</string>
 </resources>

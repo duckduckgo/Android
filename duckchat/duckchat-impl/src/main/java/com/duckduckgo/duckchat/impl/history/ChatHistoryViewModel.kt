@@ -29,11 +29,15 @@ import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,6 +53,9 @@ class ChatHistoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
+
+    private val navigationChannel = Channel<NavigationEvent>(capacity = Channel.BUFFERED, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val navigationEvents: Flow<NavigationEvent> = navigationChannel.receiveAsFlow()
 
     /** Cached snapshot so non-suspend action methods can read Recent without re-subscribing. */
     private var latestItems: List<ChatHistoryItem> = emptyList()
@@ -121,6 +128,10 @@ class ChatHistoryViewModel @Inject constructor(
     /** Per-row overflow Delete — fires immediately, no confirmation. */
     fun onDeleteSingleChat(chatId: String) {
         dispatchSelectedClear(setOf(chatId))
+    }
+
+    fun onRenameRequested(chatId: String, currentTitle: String) {
+        navigationChannel.trySend(NavigationEvent.OpenRename(chatId = chatId, currentTitle = currentTitle))
     }
 
     private fun dispatchSelectedClear(chatIds: Set<String>) {
@@ -246,6 +257,10 @@ class ChatHistoryViewModel @Inject constructor(
         val active: Boolean = false,
         val query: String = "",
     )
+
+    sealed interface NavigationEvent {
+        data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
+    }
 
     private companion object {
         const val STOP_TIMEOUT_MILLIS = 5_000L

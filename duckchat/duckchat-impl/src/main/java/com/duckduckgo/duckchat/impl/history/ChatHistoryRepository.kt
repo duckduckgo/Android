@@ -35,6 +35,7 @@ interface ChatHistoryRepository {
 
     suspend fun deleteChat(chatId: String)
     suspend fun deleteAllChats()
+    suspend fun renameChat(chatId: String, newTitle: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,6 +58,10 @@ class RealChatHistoryRepository @Inject constructor(
 
     override suspend fun deleteAllChats() {
         withContext(dispatchers.io()) { chatStore.deleteAllChats() }
+    }
+
+    override suspend fun renameChat(chatId: String, newTitle: String) {
+        withContext(dispatchers.io()) { chatStore.renameChat(chatId, newTitle) }
     }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
