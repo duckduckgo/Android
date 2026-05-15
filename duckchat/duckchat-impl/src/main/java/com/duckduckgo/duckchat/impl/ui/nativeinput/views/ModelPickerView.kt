@@ -55,6 +55,8 @@ interface ModelPicker {
     var onMenuDismissed: (() -> Unit)?
     var onModelSelected: (() -> Unit)?
     fun getSelectedModelId(): String?
+    fun isImageGenerationSupported(): Boolean
+    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
 }
 
@@ -83,6 +85,16 @@ class ModelPickerView @JvmOverloads constructor(
     }
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
+
+    override fun isImageGenerationSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isImageGenerationSupported()
+    }
+
+    override fun isWebSearchSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isWebSearchSupported()
+    }
 
     private var pickerEnabled = false
 

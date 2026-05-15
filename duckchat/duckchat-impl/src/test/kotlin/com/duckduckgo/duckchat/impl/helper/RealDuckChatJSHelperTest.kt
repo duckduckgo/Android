@@ -1815,6 +1815,55 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativePromptWithSelectedToolThenToolChoiceIncluded() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = "WebSearch",
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertTrue(query.has("toolChoice"))
+        val toolChoice = query.getJSONArray("toolChoice")
+        assertEquals(1, toolChoice.length())
+        assertEquals("WebSearch", toolChoice.getString(0))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoSelectedToolThenToolChoiceAbsent() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = null,
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("toolChoice"))
+    }
+
+    @Test
     fun whenGetAIChatNativePromptWithNoImagesThenImagesKeyAbsent() = runTest {
         val pending = PendingNativePrompt(
             prompt = "test prompt",

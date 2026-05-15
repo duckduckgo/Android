@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -44,6 +45,12 @@ class ModelPickerViewModel @Inject constructor(
     var menuShowing = false
 
     fun getSelectedModelId(): String? = modelManager.getSelectedModelId()
+
+    fun getSelectedModel(): AIChatModel? = state.value.run { models.find { it.id == selectedModelId } }
+
+    fun isImageGenerationSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.IMAGE_GENERATION) ?: true
+
+    fun isWebSearchSupported(): Boolean = getSelectedModel()?.supportsTool(Tool.WEB_SEARCH) ?: true
 
     fun fetchModels() {
         viewModelScope.launch {

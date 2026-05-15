@@ -61,6 +61,7 @@ class NativeInputCallbacks(
         query: String,
         modelId: String?,
         reasoningEffort: String?,
+        selectedTool: String?,
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
     ) -> Unit,
@@ -377,9 +378,11 @@ class RealNativeInputManager @Inject constructor(
                         query,
                         widget.getSelectedModelId(),
                         widget.getResolvedReasoningEffort(),
+                        widget.getSelectedTool(),
                         imagesJson,
                         filesJson,
                     )
+                    widget.clearSelectedTool()
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)

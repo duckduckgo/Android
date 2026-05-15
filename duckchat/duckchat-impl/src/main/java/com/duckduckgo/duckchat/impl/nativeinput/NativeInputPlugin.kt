@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 sealed class PromptContribution {
     data class ModelSelection(val modelId: String) : PromptContribution()
     data class ReasoningEffortSelection(val effort: String) : PromptContribution()
+    data class ToolSelection(val tool: String) : PromptContribution()
 }
 
 /**
@@ -38,6 +39,9 @@ interface NativeInputHost {
     fun submit()
 
     fun showAttachmentChooser(showing: Boolean)
+    fun showModelPicker(showing: Boolean)
+    fun showReasoningPicker(showing: Boolean)
+
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
 
     /** Current input state of the host widget (mode, context, position). */

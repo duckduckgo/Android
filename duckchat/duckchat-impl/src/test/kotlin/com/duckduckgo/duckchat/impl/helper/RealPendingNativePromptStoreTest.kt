@@ -80,4 +80,22 @@ class RealPendingNativePromptStoreTest {
 
         assertNull(result?.reasoningEffort)
     }
+
+    @Test
+    fun whenPromptStoredWithSelectedToolThenConsumeReturnsTool() {
+        testee.store("hello", "model", null, selectedTool = "WebSearch")
+
+        val result = testee.consume()
+
+        assertEquals("WebSearch", result?.selectedTool)
+    }
+
+    @Test
+    fun whenPromptStoredWithoutSelectedToolThenConsumeReturnsNullTool() {
+        testee.store("hello", "model", null)
+
+        val result = testee.consume()
+
+        assertNull(result?.selectedTool)
+    }
 }

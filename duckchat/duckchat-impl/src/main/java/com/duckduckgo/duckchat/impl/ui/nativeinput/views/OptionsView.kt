@@ -20,22 +20,39 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.FrameLayout
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
+import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
+@InjectWith(ViewScope::class)
 @SuppressLint("ViewConstructor")
-class OptionsView(context: Context) : FrameLayout(context) {
+class OptionsView(context: Context, private val host: NativeInputHost) : LinearLayout(context) {
+
+    @Inject lateinit var viewModelFactory: ViewViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[OptionsViewModel::class.java]
+    }
 
     private data class MenuItem(
         val iconRes: Int,
         val titleRes: Int,
         val subtitleRes: Int,
-        val showTick: Boolean = false,
+        val tool: Tool,
     )
 
     private val menuItems = listOf(
@@ -43,22 +60,77 @@ class OptionsView(context: Context) : FrameLayout(context) {
             iconRes = R.drawable.ic_images_24,
             titleRes = R.string.duckChatOptionsMenuCreateImage,
             subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
-            showTick = true,
+            tool = Tool.IMAGE_GENERATION,
         ),
         MenuItem(
             iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
             titleRes = R.string.duckChatOptionsMenuWebSearch,
             subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
-            showTick = true,
+            tool = Tool.WEB_SEARCH,
         ),
     )
 
-    private val tappedIndices = mutableSetOf<Int>()
     private var popupWindow: PopupWindow? = null
+    private var optionsButton: ImageView
 
     init {
-        addView(buildOptionsButton())
-        setOnClickListener { showMenu() }
+        orientation = HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        optionsButton = buildOptionsButton()
+        addView(optionsButton)
+    }
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+        restoreChip()
+    }
+
+    private fun restoreChip() {
+        val tool = viewModel.selectedTool.value ?: return
+        val item = menuItems.firstOrNull { it.tool == tool } ?: return
+        addView(buildChip(item), 1)
+        applyPickerVisibility()
+    }
+
+    fun getSelectedTool(): Tool? {
+        if (!isAttachedToWindow) return null
+        return viewModel.selectedTool.value
+    }
+
+    fun clearSelection() {
+        if (!isAttachedToWindow) return
+        viewModel.clearTool()
+        removeChip()
+        applyPickerVisibility()
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (!isAttachedToWindow) return
+        if (visibility == VISIBLE && !viewModel.shouldShowPickers) {
+            post {
+                host.showModelPicker(false)
+                host.showReasoningPicker(false)
+            }
+        }
+    }
+
+    fun updateCapabilitiesFrom(picker: ModelPicker?) {
+        val visibleTools = buildSet {
+            if (picker?.isImageGenerationSupported() ?: true) add(Tool.IMAGE_GENERATION)
+            if (picker?.isWebSearchSupported() ?: true) add(Tool.WEB_SEARCH)
+        }
+
+        if (isAttachedToWindow) {
+            val selectionCleared = viewModel.updateVisibleTools(visibleTools)
+            if (selectionCleared) {
+                removeChip()
+                applyPickerVisibility()
+            }
+        }
+
+        optionsButton.isVisible = visibleTools.isNotEmpty()
     }
 
     override fun onDetachedFromWindow() {
@@ -74,12 +146,13 @@ class OptionsView(context: Context) : FrameLayout(context) {
             contentDescription = context.getString(R.string.duckChatOptionsButtonContentDescription)
             scaleType = ImageView.ScaleType.CENTER
             setImageResource(R.drawable.ic_options_24)
+            setOnClickListener { showMenu() }
         }
     }
 
     private fun showMenu() {
         val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
+            orientation = VERTICAL
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
         val popup = PopupWindow(
@@ -101,30 +174,62 @@ class OptionsView(context: Context) : FrameLayout(context) {
     }
 
     private fun populate(container: LinearLayout, popup: PopupWindow) {
-        menuItems.forEachIndexed { index, item ->
+        val selectedTool = viewModel.selectedTool.value
+        val trailingIcons = mutableMapOf<Tool, ImageView>()
+        for (item in menuItems.filter { it.tool in viewModel.visibleTools.value }) {
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
+
+            trailingIcons[item.tool] = trailingIcon
             row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(item.iconRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(item.titleRes)
             row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).setText(item.subtitleRes)
-            trailingIcon.visibility = if (item.showTick && index in tappedIndices) VISIBLE else GONE
+            trailingIcon.visibility = if (item.tool == selectedTool) VISIBLE else GONE
+
             row.setOnClickListener {
-                if (item.showTick) {
-                    if (tappedIndices.add(index)) {
-                        trailingIcon.visibility = VISIBLE
-                    } else {
-                        tappedIndices.remove(index)
-                        trailingIcon.visibility = GONE
-                    }
-                }
-                row.postDelayed({ popup.dismiss() }, 150)
+                val nowSelected = item.tool != viewModel.selectedTool.value
+                trailingIcons.values.forEach { it.visibility = GONE }
+                if (nowSelected) trailingIcon.visibility = VISIBLE
+                onOptionTapped(item)
+                row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
             }
             container.addView(row)
         }
     }
 
+    private fun onOptionTapped(item: MenuItem) {
+        val hadChip = viewModel.selectedTool.value != null
+        viewModel.toggleTool(item.tool)
+        if (hadChip) removeChip()
+        if (viewModel.selectedTool.value != null) addView(buildChip(item), 1)
+        applyPickerVisibility()
+    }
+
+    private fun applyPickerVisibility() {
+        val show = viewModel.shouldShowPickers
+        host.showModelPicker(show)
+        host.showReasoningPicker(show)
+    }
+
+    private fun removeChip() {
+        if (childCount > 1) removeViewAt(1)
+    }
+
+    private fun buildChip(item: MenuItem): View {
+        val view = LayoutInflater.from(context).inflate(R.layout.view_options_chip, this, false)
+        view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
+        view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
+        view.setOnClickListener {
+            viewModel.clearTool()
+            removeView(view)
+            applyPickerVisibility()
+        }
+        return view
+    }
+
     private fun showAtPosition(popup: PopupWindow) {
-        val loc = IntArray(2).also { getLocationOnScreen(it) }
+        val button = getChildAt(0) ?: this
+        val loc = IntArray(2).also { button.getLocationOnScreen(it) }
         popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
     }
 
@@ -134,5 +239,9 @@ class OptionsView(context: Context) : FrameLayout(context) {
             if (it.isShowing) it.dismiss()
         }
         popupWindow = null
+    }
+
+    companion object {
+        private const val MENU_DISMISS_DELAY_MS = 150L
     }
 }

@@ -390,6 +390,7 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
+import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -1362,7 +1363,7 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, imagesJson, filesJson ->
+                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -1380,6 +1381,9 @@ class BrowserTabFragment :
                                         }
                                         if (reasoningEffort != null) {
                                             put("reasoningEffort", reasoningEffort)
+                                        }
+                                        if (selectedTool != null) {
+                                            put("toolChoice", JSONArray().apply { put(selectedTool) })
                                         }
                                         if (imagesJson != null) {
                                             put("images", imagesJson)
