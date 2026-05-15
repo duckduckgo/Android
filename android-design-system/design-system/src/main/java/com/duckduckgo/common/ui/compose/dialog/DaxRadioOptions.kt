@@ -27,8 +27,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -86,14 +85,9 @@ fun DaxRadioOptions(
                         vertical = dimensionResource(R.dimen.keyline_3),
                     ),
             ) {
-                // TODO: replace with DaxRadioButton once the ADS radio button is migrated to Compose.
-                RadioButton(
+                DaxRadioButton(
                     selected = selectedIndex == index,
                     onClick = null,
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = DuckDuckGoTheme.colors.brand.accentBlue,
-                        unselectedColor = DuckDuckGoTheme.textColors.secondary,
-                    ),
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 DaxText(
