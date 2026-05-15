@@ -74,7 +74,7 @@ class RealWebViewProfileManager @Inject constructor(
                 }
             } else {
                 logcat(LogPriority.WARN) {
-                    "Multi-profile unavailable; WebViewProfileManager will fall back to Default profile."
+                    "Fire mode unavailable; WebViewProfileManager will fall back to Default profile."
                 }
             }
 
