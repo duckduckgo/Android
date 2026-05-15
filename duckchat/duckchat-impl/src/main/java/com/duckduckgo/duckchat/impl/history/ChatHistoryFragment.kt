@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -286,7 +287,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
         val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
+        val pinAction = view.findViewById<PopupMenuItemView>(R.id.pin)
+        val pinLabel = if (item.pinned) R.string.duck_ai_chat_history_action_unpin else R.string.duck_ai_chat_history_action_pin
+        pinAction.setPrimaryText(getString(pinLabel))
+        popup.onMenuItemClicked(pinAction) { viewModel.onTogglePin(item.chatId) }
         popup.onMenuItemClicked(view.findViewById(R.id.rename)) {
             viewModel.onRenameRequested(item.chatId, item.displayTitle)
         }

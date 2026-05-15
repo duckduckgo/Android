@@ -818,6 +818,46 @@ class ChatHistoryViewModelTest {
         }
     }
 
+    @Test
+    fun `onTogglePin flips pinned to true when row was unpinned`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = false))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("a")
+            val updated = awaitItem() as Loaded
+            assertEquals(listOf("a"), updated.pinned.map { it.chatId })
+            assertEquals(emptyList<String>(), updated.recent.map { it.chatId })
+        }
+        assertEquals(listOf("a" to true), repository.pinnedChats)
+    }
+
+    @Test
+    fun `onTogglePin flips pinned to false when row was pinned`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = true))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("a")
+            val updated = awaitItem() as Loaded
+            assertEquals(emptyList<String>(), updated.pinned.map { it.chatId })
+            assertEquals(listOf("a"), updated.recent.map { it.chatId })
+        }
+        assertEquals(listOf("a" to false), repository.pinnedChats)
+    }
+
+    @Test
+    fun `onTogglePin is a no-op when chatId is unknown`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = false))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("missing")
+            expectNoEvents()
+        }
+        assertTrue(repository.pinnedChats.isEmpty())
+    }
+
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.
@@ -851,6 +891,7 @@ private class FakeChatHistoryRepository(
 ) : ChatHistoryRepository {
     val deletedChatIds: MutableList<String> = mutableListOf()
     val renamedChats: MutableList<Pair<String, String>> = mutableListOf()
+    val pinnedChats: MutableList<Pair<String, Boolean>> = mutableListOf()
     var deleteAllChatsCalled: Boolean = false
         private set
 
@@ -869,6 +910,11 @@ private class FakeChatHistoryRepository(
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean {
         renamedChats += chatId to newTitle
         return true
+    }
+
+    override suspend fun setPinned(chatId: String, pinned: Boolean) {
+        pinnedChats += chatId to pinned
+        source.value = source.value.map { if (it.chatId == chatId) it.copy(pinned = pinned) else it }
     }
 }
 

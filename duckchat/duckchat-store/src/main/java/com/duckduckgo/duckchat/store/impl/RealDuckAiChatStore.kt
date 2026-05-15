@@ -66,6 +66,9 @@ interface DuckAiChatStore {
 
     /** Renames [chatId] in the FE-owned JSON blob. Returns true if the chat existed and was updated, false otherwise. */
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
+
+    /** Sets the pinned flag on [chatId]. Returns true if the chat existed and was updated, false otherwise. */
+    suspend fun setPinned(chatId: String, pinned: Boolean): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -138,6 +141,17 @@ class RealDuckAiChatStore @Inject constructor(
             val entity = chatsDao.getById(chatId) ?: return@withContext false
             val updatedJson = runCatching {
                 JSONObject(entity.data).put("title", newTitle).toString()
+            }.getOrNull() ?: return@withContext false
+            chatsDao.upsert(entity.copy(data = updatedJson))
+            true
+        }
+
+    override suspend fun setPinned(chatId: String, pinned: Boolean): Boolean =
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.setPinned($chatId, $pinned)" }
+            val entity = chatsDao.getById(chatId) ?: return@withContext false
+            val updatedJson = runCatching {
+                JSONObject(entity.data).put("pinned", pinned).toString()
             }.getOrNull() ?: return@withContext false
             chatsDao.upsert(entity.copy(data = updatedJson))
             true

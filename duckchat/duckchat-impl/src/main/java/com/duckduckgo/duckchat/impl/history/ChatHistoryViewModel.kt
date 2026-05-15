@@ -134,6 +134,11 @@ class ChatHistoryViewModel @Inject constructor(
         navigationChannel.trySend(NavigationEvent.OpenRename(chatId = chatId, currentTitle = currentTitle))
     }
 
+    fun onTogglePin(chatId: String) {
+        val current = latestItems.firstOrNull { it.chatId == chatId } ?: return
+        appScope.launch { chatHistoryRepository.setPinned(chatId, !current.pinned) }
+    }
+
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
