@@ -150,8 +150,6 @@ class NativeInputLayoutCoordinator(
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
 
-        val overlap = widgetView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
-
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
         // The transition is staged here but only assigned to the parent once the enter animation
         // completes (see enableContentLayoutTransition). Otherwise the per-frame setPadding
@@ -198,11 +196,7 @@ class NativeInputLayoutCoordinator(
 
         fun computeDeltaBottom(): Int {
             if (!isBottom) return 0
-            return if (omnibarState.isOmnibarBottom()) {
-                maxOf(0, overlap)
-            } else {
-                maxOf(0, anchor.height - overlap)
-            }
+            return maxOf(0, widgetView.height)
         }
 
         fun applyOffsetWithBottom(anchorBottomInWindow: Int) {
