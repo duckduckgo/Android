@@ -95,16 +95,19 @@ class DataClearing @Inject constructor(
         val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
         val tabUrl = tabRepository.getTab(tabId)?.url
 
-        clearDuckAiChatIfNeeded(tabUrl)
-        clearContextualChatDataIfNeeded(tabId)
-        navigationHistory.removeHistoryForTab(tabId)
-
+        // Reset this tab's URL before dispatching the chat clear: the tabs-cleanup plugin matches
+        // tabs by chatID, and we don't want this tab caught by that match — it stays open with a
+        // new chat URL. Other tabs at the same chatID (duplicates) do get closed, which is desired.
         if (replaceCurrentTab) {
             val url = getNewTabUrl(tabUrl)
             tabOperations.replaceTabWithNewTab(tabId, url)
         } else {
             tabRepository.deleteTabs(listOf(tabId))
         }
+
+        clearDuckAiChatIfNeeded(tabUrl)
+        clearContextualChatDataIfNeeded(tabId)
+        navigationHistory.removeHistoryForTab(tabId)
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
