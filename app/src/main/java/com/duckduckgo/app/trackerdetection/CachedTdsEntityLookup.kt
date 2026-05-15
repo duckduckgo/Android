@@ -23,6 +23,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -59,11 +60,13 @@ class CachedTdsEntityLookup @Inject constructor(
 
     private fun labelWalk(host: String): Entity? {
         val snap = activeSnapshot()
+        val eTldPlusOne = host.toTldPlusOne() ?: return null
         var candidate = host
         while (true) {
             snap.domainToEntityName[candidate]?.let { entityName ->
                 return snap.entityByName[entityName]
             }
+            if (candidate == eTldPlusOne) return null
             val dot = candidate.indexOf('.')
             if (dot < 0) return null
             candidate = candidate.substring(dot + 1)
