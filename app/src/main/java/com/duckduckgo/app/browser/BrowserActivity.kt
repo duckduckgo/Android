@@ -105,7 +105,6 @@ import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
