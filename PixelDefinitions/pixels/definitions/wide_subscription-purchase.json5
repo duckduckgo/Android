@@ -2,7 +2,7 @@
 {
     "wide_subscription-purchase": {
         "description": "Monitors the subscription purchase flow from initiation through confirmation",
-        "owners": ["cmonforte"],
+        "owners": ["lmac012"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
@@ -21,8 +21,10 @@
             },
             {
                 "key": "context.name",
-                "description": "Entry point to the purchase flow",
-                "enum": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
+                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. FE-controlled — new funnel names can be introduced without a schema change as long as they match the pattern. Empty string is allowed (sent when the URL carries `?origin=` with no value).",
+                "type": "string",
+                "pattern": "^(funnel_[a-z0-9_]+_android)?$",
+                "examples": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
             },
             {
                 "key": "feature.data.ext.subscription_identifier",
