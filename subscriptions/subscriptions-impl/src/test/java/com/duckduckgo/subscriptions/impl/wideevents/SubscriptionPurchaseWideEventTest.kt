@@ -208,6 +208,7 @@ class SubscriptionPurchaseWideEventTest {
             verify(wideEventClient).flowFinish(
                 wideEventId = 123L,
                 status = FlowStatus.Failure(reason = "Missing product details"),
+                metadata = emptyMap(),
             )
         }
 
@@ -229,6 +230,7 @@ class SubscriptionPurchaseWideEventTest {
             verify(wideEventClient).flowFinish(
                 wideEventId = 123L,
                 status = FlowStatus.Failure(reason = "Billing error: SERVICE_UNAVAILABLE"),
+                metadata = emptyMap(),
             )
         }
 
