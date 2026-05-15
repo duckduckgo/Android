@@ -226,8 +226,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
 
@@ -245,8 +244,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
 
@@ -267,8 +265,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            val initial = awaitItem() as Loaded
+            val initial = awaitInitialLoaded()
             assertEquals(null, initial.confirmation)
 
             viewModel.onFireAllRequested()
@@ -289,8 +286,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
             awaitItem() // confirmation = FireAll(3)
@@ -314,8 +310,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
             val confirming = awaitItem() as Loaded
@@ -339,8 +334,7 @@ class ChatHistoryViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
             awaitItem() // confirmation = FireAll(2)
@@ -367,8 +361,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded (Default)
+            awaitInitialLoaded()
 
             val consumed = viewModel.onChatRowLongClicked("a")
 
@@ -385,8 +378,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onChatRowLongClicked("a")
             awaitItem() // Selecting({a})
 
@@ -403,8 +395,7 @@ class ChatHistoryViewModelTest {
     fun `onChatRowClicked in select mode toggles selection instead of opening DuckAi`() = runTest {
         source.value = listOf(item("a"))
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
 
@@ -428,8 +419,7 @@ class ChatHistoryViewModelTest {
     fun `onFireIconClicked in default mode triggers Fire-all`() = runTest {
         source.value = listOf(item("r1"), item("r2"))
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireIconClicked()
 
@@ -442,8 +432,7 @@ class ChatHistoryViewModelTest {
     fun `onFireIconClicked in select mode triggers Delete-selected`() = runTest {
         source.value = listOf(item("a"), item("b"), item("c"))
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -466,8 +455,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded (Default)
+            awaitInitialLoaded()
 
             viewModel.onEnterSelectMode()
 
@@ -482,8 +470,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem() // Selecting({})
 
@@ -503,8 +490,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("p", pinned = true), item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem() // Selecting({})
 
@@ -521,8 +507,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem() // Selecting({})
             viewModel.onSelectAllToggled()
@@ -541,8 +526,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -561,8 +545,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem() // Selecting({})
 
@@ -578,8 +561,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -602,8 +584,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -626,8 +607,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("p", pinned = true), item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -653,8 +633,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectionToggled("a")
@@ -676,8 +655,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             assertEquals(null, viewModel.chatUrlsForDialog())
         }
@@ -688,8 +666,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("p", pinned = true), item("r1"), item("r2"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
             awaitItem() // FireAll({r1, r2})
@@ -708,8 +685,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
 
             viewModel.onDeleteSingleChat("a")
 
@@ -727,8 +703,7 @@ class ChatHistoryViewModelTest {
         source.value = listOf(item("a"), item("b"), item("c"))
 
         viewModel.uiState.test {
-            awaitItem() // Loading
-            awaitItem() // initial Loaded
+            awaitInitialLoaded()
             viewModel.onEnterSelectMode()
             awaitItem()
             viewModel.onSelectAllToggled()
