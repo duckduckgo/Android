@@ -49,6 +49,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.mode.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
@@ -120,6 +121,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     private val browseSharedViewModel: DuckChatSharedViewModel by activityViewModels()
+
+    val browserMode: BrowserMode? get() = arguments?.getString(KEY_DUCK_AI_BROWSER_MODE)?.let(BrowserMode::valueOf)
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -745,5 +748,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
         const val KEY_DUCK_AI_TABS: String = "KEY_DUCK_AI_TABS"
+        const val KEY_DUCK_AI_BROWSER_MODE: String = "KEY_DUCK_AI_BROWSER_MODE"
     }
 }

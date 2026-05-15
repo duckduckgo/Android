@@ -61,6 +61,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.mode.BrowserMode
+import com.duckduckgo.browser.api.mode.BrowserModeStateHolder
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -68,6 +70,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.firemode.api.FireModeAvailability
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -76,6 +79,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -111,7 +115,17 @@ class BrowserViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val fireModeAvailability: FireModeAvailability,
 ) : ViewModel(), CoroutineScope {
+
+    val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
+
+    suspend fun switchToMode(mode: BrowserMode): Boolean {
+        if (mode != BrowserMode.REGULAR && !fireModeAvailability.isAvailable()) return false
+        browserModeStateHolder.switchTo(mode)
+        return true
+    }
 
     init {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
