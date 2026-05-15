@@ -34,6 +34,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
@@ -88,6 +89,7 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
+    private val nativeInputStatePublisher: NativeInputStatePublisher = mock()
 
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
@@ -133,6 +135,7 @@ class NativeInputModeWidgetViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
+            nativeInputStatePublisher = nativeInputStatePublisher,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -249,7 +252,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureContextualThenContextIsDuckAiContextual() = runTest {
-        testee.configureContextual()
+        testee.configureContextual(tabId = "test-tab")
 
         assertEquals(NativeInputState.InputContext.DUCK_AI_CONTEXTUAL, testee.state.firstOrNull()!!.inputContext)
     }
@@ -258,14 +261,14 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiContextualAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
-        testee.configureContextual()
+        testee.configureContextual(tabId = "test-tab")
 
         assertFalse(testee.state.firstOrNull()!!.toggleVisible)
     }
 
     @Test
     fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
-        testee.configureContextual()
+        testee.configureContextual(tabId = "test-tab")
 
         assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
     }
@@ -326,7 +329,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenConfigureThenBothContextAndPositionSetAtomically() = runTest {
-        testee.configure(isDuckAiMode = true, isBottom = true)
+        testee.configure(tabId = "test-tab", isDuckAiMode = true, isBottom = true)
 
         val state = testee.state.firstOrNull()!!
         assertEquals(NativeInputState.InputContext.DUCK_AI, state.inputContext)

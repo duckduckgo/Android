@@ -1345,6 +1345,7 @@ class BrowserTabFragment :
 
     private fun showNativeInput(query: String = "") {
         nativeInputManager.showNativeInput(
+            tabId = tabId,
             layoutInflater = layoutInflater,
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
