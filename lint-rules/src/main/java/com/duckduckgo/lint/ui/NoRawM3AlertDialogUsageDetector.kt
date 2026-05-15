@@ -71,10 +71,10 @@ class NoRawM3AlertDialogUsageDetector : Detector(), SourceCodeScanner {
         val NO_RAW_M3_ALERT_DIALOG_USAGE = Issue
             .create(
                 id = "NoRawM3AlertDialogUsage",
-                briefDescription = "Use DaxAlertDialog or TextAlertDialog instead of raw Material3 alert dialogs",
+                briefDescription = "Use DaxAlertDialog or DaxTextAlertDialog instead of raw Material3 alert dialogs",
                 explanation = """
                     Use DuckDuckGo design system dialog components (DaxAlertDialog for slot-based dialogs, \
-                    TextAlertDialog for the common title/message/buttons shape) instead of raw Material3 \
+                    DaxTextAlertDialog for the common title/message/buttons shape) instead of raw Material3 \
                     AlertDialog or BasicAlertDialog composables.
 
                     Raw M3 dialogs bypass the design system's shape, surface, padding, and button helpers \

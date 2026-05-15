@@ -18,7 +18,10 @@ package com.duckduckgo.lint.ui
 
 import com.android.tools.lint.checks.infrastructure.TestFiles
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.android.tools.lint.detector.api.TextFormat
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NoRawM3AlertDialogUsageDetectorTest {
@@ -154,5 +157,17 @@ class NoRawM3AlertDialogUsageDetectorTest {
             .issues(NO_RAW_M3_ALERT_DIALOG_USAGE)
             .run()
             .expectClean()
+    }
+
+    @Test
+    fun whenIssueTextReadThenItReferencesPublicDesignSystemDialogApis() {
+        val briefDescription = NO_RAW_M3_ALERT_DIALOG_USAGE.getBriefDescription(TextFormat.RAW)
+        val explanation = NO_RAW_M3_ALERT_DIALOG_USAGE.getExplanation(TextFormat.RAW)
+        val standaloneTextAlertDialogApi = Regex("\\bTextAlertDialog\\b")
+
+        assertTrue(briefDescription.contains("DaxTextAlertDialog"))
+        assertTrue(explanation.contains("DaxTextAlertDialog"))
+        assertFalse(standaloneTextAlertDialogApi.containsMatchIn(briefDescription))
+        assertFalse(standaloneTextAlertDialogApi.containsMatchIn(explanation))
     }
 }
