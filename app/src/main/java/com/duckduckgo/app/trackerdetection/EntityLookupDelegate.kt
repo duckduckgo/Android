@@ -20,10 +20,13 @@ import android.net.Uri
 import com.duckduckgo.app.pixels.remoteconfig.CachedEntityLookupRCWrapper
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Provider
 
+@ContributesBinding(AppScope::class, boundType = EntityLookup::class)
+@ContributesBinding(AppScope::class, boundType = EntityLookupRefresher::class)
 @SingleInstanceIn(AppScope::class)
 class EntityLookupDelegate @Inject constructor(
     private val legacy: Provider<TdsEntityLookup>,

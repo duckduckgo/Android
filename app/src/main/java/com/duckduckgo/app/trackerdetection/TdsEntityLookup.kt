@@ -26,11 +26,9 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = EntityLookupRefresher::class)
 @SingleInstanceIn(AppScope::class)
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
