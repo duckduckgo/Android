@@ -16,31 +16,40 @@
 
 package com.duckduckgo.browsermode.impl
 
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.MultiProfile
+import androidx.lifecycle.LifecycleOwner
+import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealFireModeAvailability @Inject constructor(
     private val fireModeFeature: FireModeFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val dispatchers: DispatcherProvider,
-) : FireModeAvailability {
+    @param:AppCoroutineScope private val appScope: CoroutineScope,
+) : FireModeAvailability, MainProcessLifecycleObserver {
 
     @Volatile
     private var cachedAvailability: Boolean? = null
 
-    override suspend fun isAvailable(): Boolean = withContext(dispatchers.io()) {
-        cachedAvailability ?: (
-            fireModeFeature.fireTabs().isEnabled() &&
-                webViewCapabilityChecker.isSupported(MultiProfile)
-            ).also { cachedAvailability = it }
+    override fun onCreate(owner: LifecycleOwner) {
+        appScope.launch(dispatchers.io()) { computeAndCache() }
     }
+
+    override fun isAvailable(): Boolean = cachedAvailability ?: computeAndCache()
+
+    private fun computeAndCache(): Boolean =
+        (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
+                fireModeFeature.fireTabs().isEnabled())
+            .also { cachedAvailability = it }
 }
