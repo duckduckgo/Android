@@ -140,10 +140,7 @@ class DataClearing @Inject constructor(
         dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(setOf(tabUrl))))
     }
 
-    override suspend fun clearDataUsingManualFireOptions(
-        shouldRestartIfRequired: Boolean,
-        wasAppUsedSinceLastClear: Boolean,
-    ) {
+    override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
         val options = fireDataStore.getManualClearOptions()
         performGranularClear(
             options = options,
@@ -242,18 +239,22 @@ class DataClearing @Inject constructor(
         dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(chatUrls)))
     }
 
+    /**
+     * Performs granular data clearing based on the provided options
+     * @return true if process needs to be restarted
+     */
     private suspend fun performGranularClear(
         options: Set<FireClearOption>,
         shouldFireDataClearPixel: Boolean,
     ) {
         logcat { "Performing granular clear with options: $options" }
 
-        val shouldClearAllTabs = FireClearOption.TABS in options
+        val shouldClearTabs = FireClearOption.TABS in options
         val shouldClearData = FireClearOption.DATA in options
         val shouldClearDuckAiChats = FireClearOption.DUCKAI_CHATS in options &&
             duckAiFeatureState.showClearDuckAIChatHistory.value
 
-        if (shouldClearAllTabs) {
+        if (shouldClearTabs) {
             clearDataAction.clearTabsOnly()
         }
 
@@ -263,7 +264,6 @@ class DataClearing @Inject constructor(
 
         if (shouldClearDuckAiChats) {
             clearDataAction.clearDuckAiChatsOnly()
-            // DuckAiTabsCleanupPlugin closes any open Duck.ai tabs via the All dispatch.
             dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.All))
         }
 

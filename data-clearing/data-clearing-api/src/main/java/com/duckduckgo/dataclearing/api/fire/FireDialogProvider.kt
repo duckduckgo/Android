@@ -28,7 +28,9 @@ interface FireDialogProvider {
     /**
      * Creates a Fire dialog instance.
      *
-     * @param origin Where the dialog is being launched from; also carries any per-call destructive scope.
+     * @param origin Where the dialog is being launched from. Determines which buttons
+     *  are shown and which tab(s) the dialog operates on.
+     * @return A FireDialog (Granular or NonGranular variant, selected by remote feature flag).
      */
     suspend fun createFireDialog(origin: FireDialogOrigin): FireDialog
 
