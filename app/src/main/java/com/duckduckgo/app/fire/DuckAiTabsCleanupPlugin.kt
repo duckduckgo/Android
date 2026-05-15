@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -53,14 +55,26 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
         }
     }
 
+    /**
+     * Match by `chatID` query param rather than full URL equality — tabs drift (server redirects,
+     * extra query params accumulated during the session) so multiple tabs of the same chat would
+     * otherwise miss the match.
+     */
     private suspend fun closeTabsMatching(chatUrls: Set<String>) {
         if (chatUrls.isEmpty()) return
+        val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { it.toUri().chatIdOrNull() }
+        if (targetChatIds.isEmpty()) return
         val ids = tabRepository.getTabs()
-            .filter { it.url in chatUrls }
+            .filter { tab -> tab.url?.toUri()?.chatIdOrNull() in targetChatIds }
             .map { it.tabId }
         if (ids.isNotEmpty()) {
             logcat { "Closing ${ids.size} Duck.ai tab(s) matching the cleared subset" }
             tabRepository.deleteTabs(ids)
         }
+    }
+
+    private fun Uri.chatIdOrNull(): String? {
+        if (!duckChat.isDuckChatUrl(this)) return null
+        return getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
     }
 }

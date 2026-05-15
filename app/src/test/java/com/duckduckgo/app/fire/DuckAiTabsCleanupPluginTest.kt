@@ -91,6 +91,9 @@ class DuckAiTabsCleanupPluginTest {
         val unrelatedDuckAiTab = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=zzz")
         val browserTab = TabEntity(tabId = "tab3", url = "https://example.com")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(matchingTab, unrelatedDuckAiTab, browserTab))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=abc".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=zzz".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
 
@@ -103,6 +106,9 @@ class DuckAiTabsCleanupPluginTest {
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=b")
         val t3 = TabEntity(tabId = "tab3", url = "https://example.com")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=a".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=b".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(
             setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"))),
@@ -115,8 +121,49 @@ class DuckAiTabsCleanupPluginTest {
     fun whenDuckChatsSelectedAndNoTabMatches_thenDoNotCallDeleteTabs() = runTest {
         val unrelated = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=other")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(unrelated))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+
+        verify(mockTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun whenDuckChatsSelectedAndMultipleTabsShareTheSameChatId_thenCloseAllOfThem() = runTest {
+        val t1 = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
+        val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=abc")
+        val t3 = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc")
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3"))
+    }
+
+    @Test
+    fun whenTabUrlDriftedFromCanonicalChatUrl_thenStillCloseTheTabByChatId() = runTest {
+        // Tab URLs that share the same chatID but differ in path, extra params, fragments —
+        // the kinds of drift that happen as the user interacts with the chat over a session.
+        val original = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
+        val withPath = TabEntity(tabId = "tab2", url = "https://duck.ai/chat?chatID=abc")
+        val withExtraParams = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc&model=gpt&session=xyz")
+        val withFragment = TabEntity(tabId = "tab4", url = "https://duck.ai?chatID=abc#message-5")
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(original, withPath, withExtraParams, withFragment))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1", "tab2", "tab3", "tab4"))
+    }
+
+    @Test
+    fun whenSelectedUrlHasNoChatIdQueryParam_thenNoOp() = runTest {
+        val anyTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(anyTab))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai"))))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }
