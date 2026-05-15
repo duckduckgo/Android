@@ -27,29 +27,26 @@ import com.duckduckgo.browsermode.api.BrowserMode
 interface WebViewProfileManager {
 
     /**
-     * Loads persisted profile state and removes any stale profiles from disk. Called once at
-     * startup; subsequent calls return immediately.
+     * Loads persisted profile state. Called once at startup; subsequent calls return immediately.
      */
     suspend fun initialize()
 
     /**
-     * Profile name currently bound to [mode]. Returns
-     * [androidx.webkit.Profile.DEFAULT_PROFILE_NAME] when `MultiProfile` is unsupported on the
-     * device. Suspends until [initialize] has completed.
+     * Profile name currently bound to [mode]. Returns "Default" when
+     * MultiProfile is unsupported on the device. Suspends until [initialize] has completed.
      */
     suspend fun getProfileName(mode: BrowserMode): String
 
     /**
      * Schedule async profile removal and creation of a new one for the supplied [mode].
-     *
-     * No-op when `MultiProfile` is unsupported. Returns true if the clear succeeded. Suspends
+     * No-op when MultiProfile is unsupported. Returns true if the rotation succeeded. Suspends
      * until [initialize] has completed.
      */
     suspend fun clearAndRotateProfile(mode: BrowserMode): Boolean
 
     /**
-     * Removes any profiles on disk that aren't the currently-active one for their mode. Suspends
-     * until [initialize] has completed.
+     * Removes any profiles on disk that aren't the currently-active one for their mode.
+     * Suspends until [initialize] has completed.
      */
     suspend fun cleanupStaleProfiles()
 }
