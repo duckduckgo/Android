@@ -67,12 +67,24 @@ class RealFireModeAvailabilityTest {
     }
 
     @Test
-    fun `multi-profile capability check is cached across calls`() = runTest {
+    fun `availability checks are cached across calls`() = runTest {
         fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
         webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
 
         repeat(5) { testee.isAvailable() }
 
         verifyBlocking(webViewCapabilityChecker, times(1)) { isSupported(MultiProfile) }
+    }
+
+    @Test
+    fun `availability is frozen on first computation even if flag flips later`() = runTest {
+        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = false))
+        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
+
+        assertFalse(testee.isAvailable())
+
+        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
+
+        assertFalse(testee.isAvailable())
     }
 }

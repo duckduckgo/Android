@@ -33,13 +33,14 @@ class RealFireModeAvailability @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val dispatchers: DispatcherProvider,
 ) : FireModeAvailability {
+
     @Volatile
-    private var multiProfileSupported: Boolean? = null
+    private var cachedAvailability: Boolean? = null
 
     override suspend fun isAvailable(): Boolean = withContext(dispatchers.io()) {
-        if (!fireModeFeature.fireTabs().isEnabled()) return@withContext false
-        multiProfileSupported ?: webViewCapabilityChecker.isSupported(MultiProfile).also {
-            multiProfileSupported = it
-        }
+        cachedAvailability ?: (
+            fireModeFeature.fireTabs().isEnabled() &&
+                webViewCapabilityChecker.isSupported(MultiProfile)
+            ).also { cachedAvailability = it }
     }
 }
