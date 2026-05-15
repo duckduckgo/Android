@@ -16,6 +16,7 @@
 
 package com.duckduckgo.browsermode.impl.profile
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.Profile
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -26,7 +27,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,6 +45,7 @@ class RealWebViewProfileManagerTest {
     private val fireModeAvailability: FireModeAvailability = mock()
     private val dataStore: WebViewProfileDataStore = mock()
     private val migrationManager: WebViewProfileMigrationManager = mock()
+    private val lifecycleOwner: LifecycleOwner = mock()
 
     private fun newManager() = RealWebViewProfileManager(
         fireModeAvailability,
@@ -67,7 +68,7 @@ class RealWebViewProfileManagerTest {
         val pending = async { testee.getProfileName(BrowserMode.REGULAR) }
         assertFalse(pending.isCompleted)
 
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
         assertEquals(Profile.DEFAULT_PROFILE_NAME, pending.await())
     }
 
@@ -78,7 +79,7 @@ class RealWebViewProfileManagerTest {
         val pending = async { testee.getWebStorage(BrowserMode.REGULAR) }
         assertFalse(pending.isCompleted)
 
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
         assertNotNull(pending.await())
     }
 
@@ -89,7 +90,7 @@ class RealWebViewProfileManagerTest {
         val pending = async { testee.getCookieManager(BrowserMode.REGULAR) }
         assertFalse(pending.isCompleted)
 
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
         assertNotNull(pending.await())
     }
 
@@ -97,7 +98,7 @@ class RealWebViewProfileManagerTest {
     fun `initialize with multi-profile unavailable returns Default profile name`() = runTest {
         val testee = newManager()
 
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
 
         assertEquals(Profile.DEFAULT_PROFILE_NAME, testee.getProfileName(BrowserMode.REGULAR))
         assertEquals(Profile.DEFAULT_PROFILE_NAME, testee.getProfileName(BrowserMode.FIRE))
@@ -107,7 +108,7 @@ class RealWebViewProfileManagerTest {
     fun `initialize does not touch DataStore when multi-profile unavailable`() = runTest {
         val testee = newManager()
 
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
 
         verify(dataStore, never()).getProfileIndex(BrowserMode.REGULAR)
         verify(dataStore, never()).getProfileIndex(BrowserMode.FIRE)
@@ -116,7 +117,7 @@ class RealWebViewProfileManagerTest {
     @Test
     fun `clear returns false when multi-profile unavailable`() = runTest {
         val testee = newManager()
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
 
         assertFalse(testee.clearAndRotateProfile(BrowserMode.FIRE))
         assertFalse(testee.clearAndRotateProfile(BrowserMode.REGULAR))
@@ -125,7 +126,7 @@ class RealWebViewProfileManagerTest {
     @Test
     fun `clear does not consult DataStore or migrationManager when unavailable`() = runTest {
         val testee = newManager()
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
 
         testee.clearAndRotateProfile(BrowserMode.FIRE)
 
@@ -136,7 +137,7 @@ class RealWebViewProfileManagerTest {
     @Test
     fun `cleanupStaleProfiles is a no-op when unavailable`() = runTest {
         val testee = newManager()
-        testee.initialize()
+        testee.onCreate(lifecycleOwner)
 
         testee.cleanupStaleProfiles() // should not throw
     }
@@ -146,12 +147,7 @@ class RealWebViewProfileManagerTest {
         val testee = newManager()
         fireModeAvailability.stub { onBlocking { isAvailable() }.thenThrow(RuntimeException("boom")) }
 
-        try {
-            testee.initialize()
-            fail("Expected initialize() to rethrow")
-        } catch (expected: RuntimeException) {
-            // Latch must be completed in `finally` so awaiters do not suspend forever.
-        }
+        testee.onCreate(lifecycleOwner)
 
         assertEquals(Profile.DEFAULT_PROFILE_NAME, testee.getProfileName(BrowserMode.REGULAR))
         assertNotNull(testee.getWebStorage(BrowserMode.REGULAR))

@@ -19,15 +19,18 @@ package com.duckduckgo.browsermode.impl.profile
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import android.webkit.WebStorage
+import androidx.lifecycle.LifecycleOwner
 import androidx.webkit.Profile
 import androidx.webkit.ProfileStore
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profile.WebViewProfileManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -42,13 +45,14 @@ import javax.inject.Inject
 @SuppressLint("RequiresFeature")
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = WebViewProfileManager::class)
+@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealWebViewProfileManager @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
     private val dataStore: WebViewProfileDataStore,
     private val migrationManager: WebViewProfileMigrationManager,
     private val dispatchers: DispatcherProvider,
     @param:AppCoroutineScope private val appScope: CoroutineScope,
-) : WebViewProfileManager {
+) : WebViewProfileManager, MainProcessLifecycleObserver {
 
     private val initLatch = CompletableDeferred<Unit>()
     private val mutex = Mutex()
@@ -56,7 +60,11 @@ class RealWebViewProfileManager @Inject constructor(
     @Volatile
     private var activeProfiles: Map<BrowserMode, ActiveProfile> = emptyMap()
 
-    override suspend fun initialize() {
+    override fun onCreate(owner: LifecycleOwner) {
+        appScope.launch { initialize() }
+    }
+
+    private suspend fun initialize() {
         if (initLatch.isCompleted) return
 
         mutex.withLock {
