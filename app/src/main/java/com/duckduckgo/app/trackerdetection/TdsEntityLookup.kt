@@ -35,7 +35,7 @@ import javax.inject.Inject
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
     private val domainEntityDao: TdsDomainEntityDao,
-) : EntityLookup, EntityLookupRefresher {
+) : EntityLookupWithRefresh {
 
     var entities: List<TdsEntity> = emptyList()
 
