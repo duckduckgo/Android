@@ -63,7 +63,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private val adapter = ChatHistoryAdapter(
         onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
-        onChatMoreClicked = { _, anchor -> showRowPopup(anchor) },
+        onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
         onChatLongClicked = { item -> viewModel.onChatRowLongClicked(item.chatId) },
         onSelectAllClicked = { viewModel.onSelectAllToggled() },
     )
@@ -257,13 +257,13 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         popup.show(binding.root, anchor)
     }
 
-    private fun showRowPopup(anchor: View) {
+    private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
         val view = popup.contentView
         popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.rename)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
-        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { showComingSoonSnackbar() }
+        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
         popup.show(binding.root, anchor)
     }
 

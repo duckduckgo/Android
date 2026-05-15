@@ -136,6 +136,11 @@ class ChatHistoryViewModel @Inject constructor(
         }
     }
 
+    /** Per-row overflow Delete — fires immediately, no confirmation. */
+    fun onDeleteSingleChat(chatId: String) {
+        dispatchSelectedClear(setOf(chatId))
+    }
+
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
         val urls = chatIds.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }

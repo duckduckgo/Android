@@ -701,6 +701,27 @@ class ChatHistoryViewModelTest {
         }
     }
 
+    // --- Per-row overflow Delete ---
+
+    @Test
+    fun `onDeleteSingleChat dispatches DuckChats Selected with that one chat url and no confirmation`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitItem() // Loading
+            awaitItem() // initial Loaded
+
+            viewModel.onDeleteSingleChat("a")
+
+            expectNoEvents() // no confirmation state set
+        }
+        assertEquals(
+            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a")))),
+            dataClearingTrigger.calls,
+        )
+        assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
     @Test
     fun `concurrent repository emission removing a selected id reconciles the selection`() = runTest {
         source.value = listOf(item("a"), item("b"), item("c"))
