@@ -23,6 +23,8 @@ package com.duckduckgo.browsermode.api
  * [FIRE][BrowserMode.FIRE] variants without referencing either backing implementation directly.
  */
 interface BrowserModeDataProvider<T> {
-    /** Returns the [T] bound to [mode]. */
-    fun forMode(mode: BrowserMode): T
+    /**
+     * Returns the [T] bound to [mode]. Suspends until the underlying provider is ready.
+     */
+    suspend fun forMode(mode: BrowserMode): T
 }
