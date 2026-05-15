@@ -45,6 +45,11 @@ import com.duckduckgo.mobile.android.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+data class DaxRadioOption(
+    val text: String,
+    val onSelected: () -> Unit,
+)
+
 /**
  * Radio button list usable inside the [DaxAlertDialog] `content` slot.
  *
@@ -56,9 +61,8 @@ import kotlinx.collections.immutable.persistentListOf
  */
 @Composable
 fun DaxRadioOptions(
-    optionTitles: ImmutableList<String>,
+    options: ImmutableList<DaxRadioOption>,
     selectedIndex: Int,
-    onOptionSelected: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -68,14 +72,14 @@ fun DaxRadioOptions(
             .selectableGroup()
             .verticalScroll(rememberScrollState()),
     ) {
-        optionTitles.forEachIndexed { index, optionTitle ->
+        options.forEachIndexed { index, option ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .selectable(
                         selected = selectedIndex == index,
-                        onClick = { onOptionSelected(index) },
+                        onClick = option.onSelected,
                         role = Role.RadioButton,
                     )
                     .padding(
@@ -93,7 +97,7 @@ fun DaxRadioOptions(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 DaxText(
-                    text = optionTitle,
+                    text = option.text,
                     style = DuckDuckGoTheme.typography.body1,
                     color = DuckDuckGoTheme.textColors.primary,
                 )
@@ -117,9 +121,12 @@ private fun DaxRadioOptionsInDialogPreview() {
             },
             content = {
                 DaxRadioOptions(
-                    optionTitles = persistentListOf("Light", "Dark", "System Default"),
+                    options = persistentListOf(
+                        DaxRadioOption(text = "Light", onSelected = {}),
+                        DaxRadioOption(text = "Dark", onSelected = {}),
+                        DaxRadioOption(text = "System Default", onSelected = {}),
+                    ),
                     selectedIndex = 2,
-                    onOptionSelected = {},
                 )
             },
             buttons = {
@@ -145,9 +152,12 @@ private fun DaxRadioOptionsUnselectedPreview() {
             },
             content = {
                 DaxRadioOptions(
-                    optionTitles = persistentListOf("Light", "Dark", "System Default"),
+                    options = persistentListOf(
+                        DaxRadioOption(text = "Light", onSelected = {}),
+                        DaxRadioOption(text = "Dark", onSelected = {}),
+                        DaxRadioOption(text = "System Default", onSelected = {}),
+                    ),
                     selectedIndex = -1,
-                    onOptionSelected = {},
                 )
             },
             buttons = {

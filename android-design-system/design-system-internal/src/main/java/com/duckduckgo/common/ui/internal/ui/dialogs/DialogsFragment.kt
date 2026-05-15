@@ -46,7 +46,9 @@ import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
 import com.duckduckgo.common.ui.compose.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.compose.dialog.DaxDestructiveStackedButtons
 import com.duckduckgo.common.ui.compose.dialog.DaxPrimaryStackedButtons
+import com.duckduckgo.common.ui.compose.dialog.DaxRadioOption
 import com.duckduckgo.common.ui.compose.dialog.DaxRadioOptions
+import com.duckduckgo.common.ui.compose.dialog.DaxStackedButton
 import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialog
 import com.duckduckgo.common.ui.compose.dialog.DaxTextAlertDialogCheckboxState
 import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
@@ -166,17 +168,18 @@ class DialogsFragment : Fragment() {
         }
 
         view.setupComposeDialogShowcase(R.id.composeRadioButtonAlertDialog, isDarkTheme, "Single Choice Alert Dialog") { onDismiss ->
-            val optionTitles = List(3) { optionText }.toImmutableList()
             var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+            val options = List(3) { index ->
+                DaxRadioOption(text = optionText, onSelected = { selectedIndex = index })
+            }.toImmutableList()
             DaxAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = { DaxText(text = dialogMessage) },
                 content = {
                     DaxRadioOptions(
-                        optionTitles = optionTitles,
+                        options = options,
                         selectedIndex = selectedIndex,
-                        onOptionSelected = { selectedIndex = it },
                     )
                 },
                 buttons = {
@@ -217,17 +220,18 @@ class DialogsFragment : Fragment() {
             isDarkTheme,
             "Single Choice Destructive Alert Dialog",
         ) { onDismiss ->
-            val optionTitles = List(3) { optionText }.toImmutableList()
             var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
+            val options = List(3) { index ->
+                DaxRadioOption(text = optionText, onSelected = { selectedIndex = index })
+            }.toImmutableList()
             DaxAlertDialog(
                 onDismissRequest = onDismiss,
                 title = dialogTitle,
                 message = { DaxText(text = dialogMessage) },
                 content = {
                     DaxRadioOptions(
-                        optionTitles = optionTitles,
+                        options = options,
                         selectedIndex = selectedIndex,
-                        onOptionSelected = { selectedIndex = it },
                     )
                 },
                 buttons = {
@@ -522,11 +526,15 @@ class DialogsFragment : Fragment() {
                 headerImage = painterResource(CommonR.drawable.ic_dax_icon),
                 buttons = {
                     DaxPrimaryStackedButtons(
-                        buttonTitles = List(3) { positiveButtonText }.toImmutableList(),
-                        onButtonClick = { index ->
-                            showToast("Button $index Clicked")
-                            onDismiss()
-                        },
+                        buttons = List(3) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
+                                },
+                            )
+                        }.toImmutableList(),
                     )
                 },
             )
@@ -567,11 +575,15 @@ class DialogsFragment : Fragment() {
                 message = { DaxText(text = dialogMessage) },
                 buttons = {
                     DaxPrimaryStackedButtons(
-                        buttonTitles = List(4) { positiveButtonText }.toImmutableList(),
-                        onButtonClick = { index ->
-                            showToast("Button $index Clicked")
-                            onDismiss()
-                        },
+                        buttons = List(4) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
+                                },
+                            )
+                        }.toImmutableList(),
                     )
                 },
             )
@@ -613,11 +625,15 @@ class DialogsFragment : Fragment() {
                 message = { DaxText(text = dialogMessage) },
                 buttons = {
                     DaxDestructiveStackedButtons(
-                        buttonTitles = List(4) { positiveButtonText }.toImmutableList(),
-                        onButtonClick = { index ->
-                            showToast("Button $index Clicked")
-                            onDismiss()
-                        },
+                        buttons = List(4) { index ->
+                            DaxStackedButton(
+                                text = positiveButtonText,
+                                onClick = {
+                                    showToast("Button $index Clicked")
+                                    onDismiss()
+                                },
+                            )
+                        }.toImmutableList(),
                     )
                 },
             )

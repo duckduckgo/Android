@@ -35,12 +35,17 @@ import com.duckduckgo.mobile.android.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+data class DaxStackedButton(
+    val text: String,
+    val onClick: () -> Unit,
+)
+
 /**
  * Vertically-stacked buttons with a destructive action at the top, usable inside the
  * [DaxAlertDialog] `buttons` slot.
  *
- * - Index 0 renders as [DaxDestructiveGhostButton] (the destructive action).
- * - All other indices render as [DaxDestructiveGhostAltButton] (muted siblings).
+ * - The first button renders as [DaxDestructiveGhostButton] (the destructive action).
+ * - All other buttons render as [DaxDestructiveGhostAltButton] (muted siblings).
  * - End-aligned.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735768823555
@@ -48,8 +53,7 @@ import kotlinx.collections.immutable.persistentListOf
  */
 @Composable
 fun DaxDestructiveStackedButtons(
-    buttonTitles: ImmutableList<String>,
-    onButtonClick: (index: Int) -> Unit,
+    buttons: ImmutableList<DaxStackedButton>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -57,12 +61,11 @@ fun DaxDestructiveStackedButtons(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
     ) {
-        buttonTitles.forEachIndexed { index, buttonTitle ->
-            val onClick = { onButtonClick(index) }
+        buttons.forEachIndexed { index, button ->
             if (index == 0) {
-                DaxDestructiveGhostButton(text = buttonTitle, onClick = onClick)
+                DaxDestructiveGhostButton(text = button.text, onClick = button.onClick)
             } else {
-                DaxDestructiveGhostAltButton(text = buttonTitle, onClick = onClick)
+                DaxDestructiveGhostAltButton(text = button.text, onClick = button.onClick)
             }
         }
     }
@@ -72,8 +75,8 @@ fun DaxDestructiveStackedButtons(
  * Vertically-stacked buttons with a primary action at the top, usable inside the
  * [DaxAlertDialog] `buttons` slot.
  *
- * - Index 0 renders as [DaxPrimaryButton] (the main action).
- * - All other indices render as [DaxGhostButton] (secondary actions).
+ * - The first button renders as [DaxPrimaryButton] (the main action).
+ * - All other buttons render as [DaxGhostButton] (secondary actions).
  * - End-aligned.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214735768823555
@@ -81,8 +84,7 @@ fun DaxDestructiveStackedButtons(
  */
 @Composable
 fun DaxPrimaryStackedButtons(
-    buttonTitles: ImmutableList<String>,
-    onButtonClick: (index: Int) -> Unit,
+    buttons: ImmutableList<DaxStackedButton>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -90,12 +92,11 @@ fun DaxPrimaryStackedButtons(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
     ) {
-        buttonTitles.forEachIndexed { index, buttonTitle ->
-            val onClick = { onButtonClick(index) }
+        buttons.forEachIndexed { index, button ->
             if (index == 0) {
-                DaxPrimaryButton(text = buttonTitle, onClick = onClick)
+                DaxPrimaryButton(text = button.text, onClick = button.onClick)
             } else {
-                DaxGhostButton(text = buttonTitle, onClick = onClick)
+                DaxGhostButton(text = button.text, onClick = button.onClick)
             }
         }
     }
@@ -116,8 +117,11 @@ private fun DaxDestructiveStackedButtonsPreview() {
             },
             buttons = {
                 DaxDestructiveStackedButtons(
-                    buttonTitles = persistentListOf("Delete", "Move to trash", "Cancel"),
-                    onButtonClick = {},
+                    buttons = persistentListOf(
+                        DaxStackedButton(text = "Delete", onClick = {}),
+                        DaxStackedButton(text = "Move to trash", onClick = {}),
+                        DaxStackedButton(text = "Cancel", onClick = {}),
+                    ),
                 )
             },
         )
@@ -139,8 +143,11 @@ private fun DaxPrimaryStackedButtonsPreview() {
             },
             buttons = {
                 DaxPrimaryStackedButtons(
-                    buttonTitles = persistentListOf("Continue", "Option 2", "Cancel"),
-                    onButtonClick = {},
+                    buttons = persistentListOf(
+                        DaxStackedButton(text = "Continue", onClick = {}),
+                        DaxStackedButton(text = "Option 2", onClick = {}),
+                        DaxStackedButton(text = "Cancel", onClick = {}),
+                    ),
                 )
             },
         )
