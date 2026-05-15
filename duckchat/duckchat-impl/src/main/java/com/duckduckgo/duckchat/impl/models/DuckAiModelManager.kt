@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -90,7 +91,7 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            subscriptions.getEntitlementStatus()
+            subscriptions.getEntitlements()
                 .distinctUntilChanged()
                 .collect {
                     logcat { "Duck.ai Model Manager: entitlements changed, re-fetching models" }
@@ -217,14 +218,10 @@ class RealDuckAiModelManager @Inject constructor(
 
     private suspend fun resolveUserTier(): UserTier {
         return try {
-            val status = subscriptions.getSubscriptionStatus()
-            if (!status.isActiveOrWaiting()) return UserTier.FREE
-
-            val products = subscriptions.getAvailableProducts()
-            when {
-                products.contains(Product.DuckAiPlus) -> UserTier.PLUS
-                else -> UserTier.FREE
-            }
+            if (!subscriptions.getSubscriptionStatus().isActiveOrWaiting()) return UserTier.FREE
+            val entitlements = subscriptions.getEntitlements().firstOrNull().orEmpty()
+            val duckAiTier = entitlements.firstOrNull { it.product == Product.DuckAiPlus.value }?.name
+            UserTier.from(duckAiTier) ?: UserTier.FREE
         } catch (e: Exception) {
             logcat { "Duck.ai Model Manager: failed to resolve user tier, defaulting to FREE: ${e.message}" }
             UserTier.FREE
