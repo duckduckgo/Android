@@ -58,6 +58,7 @@ class NoRawM3AlertDialogUsageDetectorTest {
     @Test
     fun whenRawM3AlertDialogUsedThenError() {
         lint()
+            .allowMissingSdk()
             .files(
                 TestFiles.kt(
                     """
@@ -84,6 +85,7 @@ class NoRawM3AlertDialogUsageDetectorTest {
     @Test
     fun whenRawM3BasicAlertDialogUsedThenError() {
         lint()
+            .allowMissingSdk()
             .files(
                 TestFiles.kt(
                     """
@@ -110,6 +112,7 @@ class NoRawM3AlertDialogUsageDetectorTest {
     @Test
     fun whenDaxAlertDialogUsedThenNoError() {
         lint()
+            .allowMissingSdk()
             .files(
                 TestFiles.kt(
                     """
@@ -136,6 +139,7 @@ class NoRawM3AlertDialogUsageDetectorTest {
     @Test
     fun whenNonM3FunctionNamedAlertDialogThenNoError() {
         lint()
+            .allowMissingSdk()
             .files(
                 TestFiles.kt(
                     """
