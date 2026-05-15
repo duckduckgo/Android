@@ -236,7 +236,7 @@ class RealPlayBillingManager @Inject constructor(
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = error,
                 metadata = mapOf(
-                    META_KEY_MISSING_PRODUCT_REASON to reason.raw,
+                    META_KEY_MISSING_PRODUCT_FAILURE_REASON to reason.raw,
                     META_KEY_REQUESTED_PRODUCT_ID to subscriptionProduct,
                     META_KEY_REQUESTED_PLAN_ID to planId,
                     META_KEY_REQUESTED_OFFER_ID to (offerId ?: "none"),
@@ -428,7 +428,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     private companion object {
-        const val META_KEY_MISSING_PRODUCT_REASON = "missing_product_failure_reason"
+        const val META_KEY_MISSING_PRODUCT_FAILURE_REASON = "missing_product_failure_reason"
         const val META_KEY_REQUESTED_PRODUCT_ID = "requested_product_id"
         const val META_KEY_REQUESTED_PLAN_ID = "requested_plan_id"
         const val META_KEY_REQUESTED_OFFER_ID = "requested_offer_id"
