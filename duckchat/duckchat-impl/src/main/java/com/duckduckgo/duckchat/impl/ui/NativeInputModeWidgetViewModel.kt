@@ -165,11 +165,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
         widgetConfig,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config ->
+        activeTabId.filterNotNull(),
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, tabId ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
+            tabId = tabId,
         )
     }.shareIn(
         scope = viewModelScope,
@@ -179,11 +181,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            combine(state, activeTabId) { current, tabId ->
-                tabId?.let { it to current.copy(tabId = it) }
-            }
-                .filterNotNull()
-                .collect { (tabId, published) -> nativeInputStatePublisher.publish(tabId, published) }
+            state.collect { nativeInputStatePublisher.publish(it.tabId, it) }
         }
     }
 

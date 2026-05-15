@@ -118,6 +118,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
 
         testee = createViewModel()
+        testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
     }
 
     private fun createViewModel(plugins: List<NativeInputPlugin> = emptyList()): NativeInputModeWidgetViewModel {
@@ -151,6 +152,7 @@ class NativeInputModeWidgetViewModelTest {
         inputScreenUserSettingFlow.value = true
 
         val freshTestee = createViewModel()
+        freshTestee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
 
         assertEquals(NativeInputState.InputMode.SEARCH_AND_DUCK_AI, freshTestee.state.firstOrNull()!!.inputMode)
     }

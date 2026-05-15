@@ -20,7 +20,7 @@ data class NativeInputState(
     val inputMode: InputMode,
     val inputContext: InputContext,
     val inputPosition: InputPosition = InputPosition.TOP,
-    val tabId: String? = null,
+    val tabId: String,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
@@ -48,11 +48,8 @@ data class NativeInputState(
          * Placeholder state used by [NativeInputStateProvider] for a tab that has not yet been
          * published to. Observers should not rely on these values: the native input widget overwrites
          * them via [NativeInputStatePublisher.publish] as soon as it is configured for the tab.
-         *
-         * TODO: once the widget is wired to publish on configure (follow-up PR), tighten [tabId] to
-         * non-null and remove this default; the store will key off the publisher-supplied state.
          */
-        fun zero(tabId: String? = null): NativeInputState = NativeInputState(
+        fun zero(tabId: String): NativeInputState = NativeInputState(
             inputMode = InputMode.SEARCH_AND_DUCK_AI,
             inputContext = InputContext.BROWSER,
             inputPosition = InputPosition.TOP,

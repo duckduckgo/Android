@@ -204,10 +204,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
     private var supportsUpload: Boolean = true
-    private var nativeInputState: NativeInputState = NativeInputState(
-        inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-        inputContext = NativeInputState.InputContext.BROWSER,
-    )
+    private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
@@ -430,7 +427,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateToggleVisibilityForState() {
         if (isDuckAiPageContext()) return
-        applyToggleVisibility(nativeInputState.toggleVisible)
+        applyToggleVisibility(nativeInputState?.toggleVisible ?: false)
     }
 
     private fun applyToggleVisibility(visible: Boolean) {
@@ -441,8 +438,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // 4dp when minimized, 8dp when expanded on focus. The browser omnibar with the toggle
         // disabled stays minimized regardless of focus; everywhere else (duck.ai omnibar,
         // duck.ai contextual, browser omnibar with toggle enabled) expands on focus.
-        val isBrowserOmnibarMinimized =
-            nativeInputState.inputContext == NativeInputState.InputContext.BROWSER && !nativeInputState.toggleVisible
+        val isBrowserOmnibarMinimized = nativeInputState?.let {
+            it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
+        } ?: true
         val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
@@ -453,9 +451,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setPadding(paddingLeft, verticalPad, paddingRight, verticalPad)
     }
 
-    private fun isDuckAiPageContext(): Boolean =
-        nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI ||
-            nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+    private fun isDuckAiPageContext(): Boolean = nativeInputState?.let {
+        it.inputContext == NativeInputState.InputContext.DUCK_AI ||
+            it.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+    } ?: false
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
@@ -485,14 +484,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateNewLineButtonVisibility() {
-        val isBrowserContext = nativeInputState.inputContext == NativeInputState.InputContext.BROWSER
+        val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
         val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
         floatingButtons?.setNewLineButtonVisible(visible)
     }
 
     private fun applyState(state: NativeInputState) {
-        val contextChanged = nativeInputState.inputContext != state.inputContext
+        val contextChanged = nativeInputState?.inputContext != state.inputContext
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
@@ -678,7 +677,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setToggleVisible(visible: Boolean) {
-        val isVisible = visible && nativeInputState.toggleVisible
+        val isVisible = visible && (nativeInputState?.toggleVisible ?: false)
         suspendLayoutTransitions {
             applyToggleVisibility(isVisible)
         }
@@ -758,7 +757,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
+    override fun isWidgetBottom(): Boolean = nativeInputState?.isBottom ?: false
 
     override fun setWidgetPosition(isBottom: Boolean) {
         doOnAttach {
@@ -767,9 +766,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyOmnibarShape() {
-        if (nativeInputState.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
-        if (nativeInputState.isBottom) return
-        if (nativeInputState.toggleVisible) return
+        val state = nativeInputState ?: return
+        if (state.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
+        if (state.isBottom) return
+        if (state.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
@@ -988,7 +988,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun getInputState(): NativeInputState =
-        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value } ?: nativeInputState
+        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }
+            ?: error("getInputState called before widget was configured")
 
     private fun configureSubmitButtons() {
         if (submitButtons == null) {
