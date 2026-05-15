@@ -44,4 +44,5 @@ data class ExtractedProfileParams(
     val profileUrl: String? = null,
     val email: String? = null,
     val fullName: String? = null,
+    val emailExtractedData: Map<String, String>? = null,
 )

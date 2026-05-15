@@ -40,7 +40,6 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.impl.common.toParams
-import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
@@ -52,10 +51,10 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetEmailData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
+import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
-import com.duckduckgo.pir.impl.store.PirRepository.GeneratedEmailData
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -283,7 +282,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                             actionToExecute.id,
                             actionToExecute,
                             pushDelay,
-                            completeRequestData(currentBrokerStep, actionToExecute, state.profileQuery, requestData, state.generatedEmailData),
+                            completeRequestData(currentBrokerStep, actionToExecute, state, requestData),
                         ),
                     )
                 }
@@ -294,35 +293,36 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
     private fun completeRequestData(
         brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
-        profileQuery: ProfileQuery,
+        state: State,
         requestData: PirScriptRequestData,
-        generatedEmailData: GeneratedEmailData?,
     ): PirScriptRequestData {
-        val extractedProfile = if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
-            (requestData as UserProfile).extractedProfile == null
-        ) {
-            brokerStep.profileToOptOut
-        } else if (brokerStep is EmailConfirmationStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
-            (requestData as UserProfile).extractedProfile == null
-        ) {
-            brokerStep.profileToOptOut
-        } else {
-            null
+        if (requestData !is UserProfile || requestData.extractedProfile != null) {
+            return requestData
+        }
+        if (actionToExecute.dataSource != EXTRACTED_PROFILE) {
+            return requestData
         }
 
-        return if (extractedProfile != null && requestData is UserProfile) {
-            val params = extractedProfile.toParams(profileQuery.fullName)
-            UserProfile(
-                userProfile = requestData.userProfile,
-                extractedProfile = if (generatedEmailData != null) {
-                    params.copy(email = generatedEmailData.emailAddress)
-                } else {
-                    params
-                },
-            )
-        } else {
-            requestData
+        val baseParams: ExtractedProfileParams = when (brokerStep) {
+            is OptOutStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+            is EmailConfirmationStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+            is ScanStep -> if (state.generatedEmailData != null) ExtractedProfileParams() else return requestData
         }
+
+        val withEmail = state.generatedEmailData?.let {
+            baseParams.copy(email = it.emailAddress)
+        } ?: baseParams
+
+        val withEmailExtractedData = if (state.emailExtractedData.isNotEmpty()) {
+            withEmail.copy(emailExtractedData = state.emailExtractedData)
+        } else {
+            withEmail
+        }
+
+        return UserProfile(
+            userProfile = requestData.userProfile,
+            extractedProfile = withEmailExtractedData,
+        )
     }
 
     companion object {
