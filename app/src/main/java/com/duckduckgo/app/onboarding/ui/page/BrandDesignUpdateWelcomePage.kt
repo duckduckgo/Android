@@ -1245,6 +1245,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
+                binding.daxDialogCta.secondaryCta.visibility =
+                    if (onboardingDialogType == INITIAL_REINSTALL_USER) View.INVISIBLE else View.GONE
+
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
                     with(binding.welcomeScreenWalkingDax) {
@@ -1346,6 +1349,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = true
+                binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
+                binding.daxDialogCta.welcomeContent.bodyText1.text =
+                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
+                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
                     with(binding.welcomeScreenWalkingDax) {
@@ -1356,24 +1369,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.welcomeContent.root.isVisible = true
-                binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
-                binding.daxDialogCta.welcomeContent.bodyText1.text =
-                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
-                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.secondaryCta.isVisible = true
                 binding.daxDialogCta.secondaryCta.alpha = 1f
-                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
