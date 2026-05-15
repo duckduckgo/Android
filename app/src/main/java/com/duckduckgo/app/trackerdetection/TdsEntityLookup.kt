@@ -26,14 +26,16 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class, boundType = EntityLookupRefresher::class)
 @SingleInstanceIn(AppScope::class)
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
     private val domainEntityDao: TdsDomainEntityDao,
-) : EntityLookup {
+) : EntityLookup, EntityLookupRefresher {
 
     var entities: List<TdsEntity> = emptyList()
 
@@ -67,6 +69,11 @@ class TdsEntityLookup @Inject constructor(
     @WorkerThread
     override fun entityForName(name: String): Entity? {
         return entityDao.get(name)
+    }
+
+    override fun refresh() {
+        // No-op. Legacy DB-walking lookup has no in-memory cache to rebuild;
+        // every request hits the DAOs directly.
     }
 
     @WorkerThread
