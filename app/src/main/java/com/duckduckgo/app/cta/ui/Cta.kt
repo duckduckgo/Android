@@ -26,6 +26,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
@@ -1508,8 +1509,30 @@ sealed class DaxBubbleCta(
      * Marker interface for [BrandDesignUpdateBubbleCta] subclasses that render the waving Dax
      * Lottie alongside their dialog. Opting in via this supertype keeps the animation hooks
      * out of CTAs that don't use them.
+     *
+     * When [restartWavingDax] is TRUE, a content transition landing on this CTA fades out the
+     * existing wavingDax before re-playing it at the new position. Override on CTAs that
+     * render the Dax at a visibly different orientation from the previous CTA — without it,
+     * the Dax would jump-cut between positions.
+     *
+     * Override [configureWavingDax] to position the Dax differently. The default matches the
+     * XML defaults; reapplying it every play prevents earlier CTAs' transforms (e.g.
+     * subscription's rotation) from leaking onto the shared view after a reset.
      */
-    interface ShowsWavingDax
+    interface ShowsWavingDax {
+        val restartWavingDax: Boolean get() = false
+        fun configureWavingDax(dax: LottieAnimationView) {
+            val density = dax.resources.displayMetrics.density
+            dax.rotation = 0f
+            dax.translationX = DEFAULT_WAVING_DAX_TRANSLATION_X_DP * density
+            dax.translationY = DEFAULT_WAVING_DAX_TRANSLATION_Y_DP * density
+        }
+
+        companion object {
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -54f
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -110f
+        }
+    }
 
     abstract class BrandDesignUpdateBubbleCta(
         ctaId: CtaId,
@@ -1637,11 +1660,20 @@ sealed class DaxBubbleCta(
                 headerImage?.alpha = 0f
             }
 
-            val showsWavingDax = this is ShowsWavingDax
+            val resetTextAlignment = {
+                titleView.gravity = Gravity.START
+                hiddenTitle.gravity = Gravity.START
+                descriptionView.gravity = Gravity.START
+            }
+
+            val wavingDax = this as? ShowsWavingDax
             val applyWavingDaxState = {
                 container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
-                    if (showsWavingDax) {
-                        if (!dax.isVisible) {
+                    if (wavingDax != null) {
+                        wavingDax.configureWavingDax(dax)
+                        if (!dax.isVisible || dax.alpha == 0f) {
+                            dax.progress = 0f
+                            dax.alpha = 1f
                             dax.isVisible = true
                             dax.post { dax.playAnimation() }
                         }
@@ -1745,6 +1777,14 @@ sealed class DaxBubbleCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
+                // Fade out the wavingDax when the new CTA either doesn't show it or needs a
+                // fresh restart (e.g. a different position). Persisted-Dax transitions skip this.
+                container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                    if (dax.isVisible && dax.alpha > 0f && (wavingDax == null || wavingDax.restartWavingDax)) {
+                        fadeOutAnimators += ObjectAnimator.ofFloat(dax, View.ALPHA, 0f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                    }
+                }
                 fadeOutAnimator = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
@@ -1754,8 +1794,9 @@ sealed class DaxBubbleCta(
                             // button alpha causing a flicker. Instead, selectively reset content only.
                             resetAllIncludesExcept(container, activeInclude)
                             resetHeaderState()
-                            applyWavingDaxState()
+                            resetTextAlignment()
                             configureContentViews(container)
+                            applyWavingDaxState()
                             // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
                             if (!isAnimating) {
@@ -1773,8 +1814,9 @@ sealed class DaxBubbleCta(
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = daxDescription.html(container.context)
                 resetHeaderState()
-                applyWavingDaxState()
+                resetTextAlignment()
                 configureContentViews(container)
+                applyWavingDaxState()
                 cardView.setArrowDepthFraction(targetDepth)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
