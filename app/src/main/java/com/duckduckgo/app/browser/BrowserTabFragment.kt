@@ -3995,11 +3995,11 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            webViewProfileBinder.bind(it, browserMode)
+            
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
-
-            webViewProfileBinder.bind(it, browserMode)
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)
