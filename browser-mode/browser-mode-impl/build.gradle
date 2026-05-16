@@ -49,7 +49,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.webkit
     implementation AndroidX.dataStore.preferences
-    implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
     testImplementation KotlinX.coroutines.test
