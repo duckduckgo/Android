@@ -51,7 +51,7 @@ class RealFireModeAvailability @Inject constructor(
     private fun computeAndCache(): Boolean {
         cachedAvailability?.let { return it }
         val value = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
-                fireModeFeature.fireTabs().isEnabled()
+            fireModeFeature.fireTabs().isEnabled()
         cachedAvailability = value
         return value
     }

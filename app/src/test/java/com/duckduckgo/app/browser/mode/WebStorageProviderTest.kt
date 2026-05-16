@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browsermode.impl
+package com.duckduckgo.app.browser.mode
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import junit.framework.TestCase.assertNotNull
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock

@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browsermode.impl
+package com.duckduckgo.browsermode.api
 
 import androidx.webkit.Profile
-import com.duckduckgo.browsermode.api.BrowserMode
 
-internal val BrowserMode.profileName: String
+/**
+ * Stable mapping from a [BrowserMode] to its WebView profile name.
+ *
+ * [REGULAR][BrowserMode.REGULAR] shares the default WebView profile;
+ * [FIRE][BrowserMode.FIRE] gets its own isolated profile.
+ */
+val BrowserMode.profileName: String
     get() = when (this) {
         BrowserMode.REGULAR -> Profile.DEFAULT_PROFILE_NAME
         BrowserMode.FIRE -> "Fire"

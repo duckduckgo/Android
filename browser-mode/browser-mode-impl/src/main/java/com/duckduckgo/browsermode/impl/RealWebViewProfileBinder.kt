@@ -23,6 +23,7 @@ import androidx.webkit.WebViewCompat
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewProfileBinder
+import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
