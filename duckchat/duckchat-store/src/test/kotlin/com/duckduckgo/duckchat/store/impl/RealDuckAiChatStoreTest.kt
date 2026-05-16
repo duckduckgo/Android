@@ -594,4 +594,21 @@ class RealDuckAiChatStoreTest {
 
         verify(chatsDao, never()).upsert(any())
     }
+
+    // --- getChatContent ---
+
+    @Test
+    fun `getChatContent returns raw JSON blob when chat exists`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","messages":[]}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        assertEquals(json, store.getChatContent("abc"))
+    }
+
+    @Test
+    fun `getChatContent returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        assertEquals(null, store.getChatContent("missing"))
+    }
 }

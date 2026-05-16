@@ -148,6 +148,14 @@ class ChatHistoryViewModel @Inject constructor(
         appScope.launch { chatHistoryRepository.setPinned(chatId, restorePinned) }
     }
 
+    fun onDownloadRequested(chatId: String, displayTitle: String) {
+        viewModelScope.launch {
+            runCatching { chatHistoryRepository.exportChat(chatId, displayTitle) }
+                .onSuccess { file -> navigationChannel.trySend(NavigationEvent.ShowDownloadComplete(file.name)) }
+                .onFailure { navigationChannel.trySend(NavigationEvent.ShowExportError) }
+        }
+    }
+
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
         if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
@@ -274,6 +282,8 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
+        data class ShowDownloadComplete(val fileName: String) : NavigationEvent
+        data object ShowExportError : NavigationEvent
     }
 
     sealed interface MessageEvent {

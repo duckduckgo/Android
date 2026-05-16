@@ -807,6 +807,34 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `onDownloadRequested emits ShowDownloadComplete with the saved file name`() =
+        coroutineRule.testScope.runTest {
+            repository.exportResult = java.io.File("/tmp/My fave chat.txt")
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadRequested("chat-7", "My fave chat")
+
+                val event = awaitItem()
+                assertTrue(event is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete)
+                event as ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete
+                assertEquals("My fave chat.txt", event.fileName)
+            }
+            assertEquals(listOf("chat-7" to "My fave chat"), repository.exportedChats)
+        }
+
+    @Test
+    fun `onDownloadRequested emits ShowExportError when repository throws`() =
+        coroutineRule.testScope.runTest {
+            repository.exportError = IllegalStateException("boom")
+
+            viewModel.navigationEvents.test {
+                viewModel.onDownloadRequested("chat-7", "Title")
+
+                assertEquals(ChatHistoryViewModel.NavigationEvent.ShowExportError, awaitItem())
+            }
+        }
+
+    @Test
     fun `onRenameRequested emits OpenRename navigation event with chatId and currentTitle`() = coroutineRule.testScope.runTest {
         viewModel.navigationEvents.test {
             viewModel.onRenameRequested("chat-42", "My favourite chat")
@@ -953,6 +981,9 @@ private class FakeChatHistoryRepository(
     val deletedChatIds: MutableList<String> = mutableListOf()
     val renamedChats: MutableList<Pair<String, String>> = mutableListOf()
     val pinnedChats: MutableList<Pair<String, Boolean>> = mutableListOf()
+    val exportedChats: MutableList<Pair<String, String>> = mutableListOf()
+    var exportResult: java.io.File = java.io.File("/tmp/chat-export.txt")
+    var exportError: Throwable? = null
     var deleteAllChatsCalled: Boolean = false
         private set
 
@@ -976,6 +1007,12 @@ private class FakeChatHistoryRepository(
     override suspend fun setPinned(chatId: String, pinned: Boolean) {
         pinnedChats += chatId to pinned
         source.value = source.value.map { if (it.chatId == chatId) it.copy(pinned = pinned) else it }
+    }
+
+    override suspend fun exportChat(chatId: String, displayTitle: String): java.io.File {
+        exportedChats += chatId to displayTitle
+        exportError?.let { throw it }
+        return exportResult
     }
 }
 

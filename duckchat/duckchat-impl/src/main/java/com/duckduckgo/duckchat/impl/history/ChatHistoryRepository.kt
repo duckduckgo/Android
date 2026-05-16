@@ -30,6 +30,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.time.Instant
 import javax.inject.Inject
 
@@ -40,6 +41,13 @@ interface ChatHistoryRepository {
     suspend fun deleteAllChats()
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
     suspend fun setPinned(chatId: String, pinned: Boolean)
+
+    /**
+     * Formats [chatId] per FR-016f and writes it as a `.txt` file to the public Downloads
+     * directory, registering it in the in-app Downloads list. Returns the resulting file.
+     * Throws if the chat is missing or the write fails.
+     */
+    suspend fun exportChat(chatId: String, displayTitle: String): File
 }
 
 @ContributesBinding(AppScope::class)
@@ -50,7 +58,10 @@ class RealChatHistoryRepository @Inject constructor(
     private val context: Context,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
+    private val chatExportWriter: ChatExportWriter,
 ) : ChatHistoryRepository {
+
+    private val chatExporter = ChatExporter()
 
     private val fallbackTitle: String by lazy { context.getString(R.string.duck_ai_chat_history_untitled) }
 
@@ -78,6 +89,14 @@ class RealChatHistoryRepository @Inject constructor(
             syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
         }
     }
+
+    override suspend fun exportChat(chatId: String, displayTitle: String): File =
+        withContext(dispatchers.io()) {
+            val rawJson = chatStore.getChatContent(chatId)
+                ?: throw IllegalStateException("Chat $chatId not found")
+            val text = chatExporter.export(rawJson)
+            chatExportWriter.write(text, displayTitle)
+        }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
         chatId = chat.chatId,

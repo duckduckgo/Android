@@ -40,9 +40,11 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.DownloadsScreens
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentChatHistoryBinding
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,6 +70,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
@@ -157,6 +162,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
+            is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar()
+            ChatHistoryViewModel.NavigationEvent.ShowExportError ->
+                Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_error, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -171,6 +179,14 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .replace(R.id.chatHistoryFragmentContainer, RenameChatFragment.newInstance(chatId, currentTitle))
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun showDownloadCompleteSnackbar() {
+        Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_complete, Snackbar.LENGTH_LONG)
+            .setAction(R.string.duck_ai_chat_history_download_view) {
+                globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
+            }
+            .show()
     }
 
     private fun showPinToggledSnackbar(event: ChatHistoryViewModel.MessageEvent.PinToggled) {
@@ -348,7 +364,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             } else {
                 renameAction.gone()
             }
-            popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
+            popup.onMenuItemClicked(view.findViewById(R.id.download)) {
+                viewModel.onDownloadRequested(item.chatId, item.displayTitle)
+            }
             popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
             popup.show(binding.root, anchor)
         }

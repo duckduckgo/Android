@@ -80,6 +80,9 @@ interface DuckAiChatStore {
 
     /** Unpins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
     suspend fun unpinChat(chatId: String)
+
+    /** Returns the raw FE-owned JSON blob stored for [chatId], or null if the chat does not exist. */
+    suspend fun getChatContent(chatId: String): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -174,6 +177,9 @@ class RealDuckAiChatStore @Inject constructor(
             chatsDao.upsert(entity.copy(data = updatedJson))
         }
     }
+
+    override suspend fun getChatContent(chatId: String): String? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)
