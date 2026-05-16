@@ -18,26 +18,23 @@ package com.duckduckgo.browsermode.impl
 
 import android.annotation.SuppressLint
 import android.webkit.WebStorage
+import androidx.annotation.UiThread
 import androidx.webkit.ProfileStore
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SuppressLint("RequiresFeature")
 @SingleInstanceIn(AppScope::class)
 class WebStorageProvider @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
-    private val dispatchers: DispatcherProvider,
 ) : BrowserModeDataProvider<WebStorage> {
-    override suspend fun forMode(mode: BrowserMode): WebStorage {
+    @UiThread
+    override fun forMode(mode: BrowserMode): WebStorage {
         if (!fireModeAvailability.isAvailable()) return WebStorage.getInstance()
-        return withContext(dispatchers.main()) {
-            ProfileStore.getInstance().getOrCreateProfile(mode.profileName).webStorage
-        }
+        return ProfileStore.getInstance().getOrCreateProfile(mode.profileName).webStorage
     }
 }

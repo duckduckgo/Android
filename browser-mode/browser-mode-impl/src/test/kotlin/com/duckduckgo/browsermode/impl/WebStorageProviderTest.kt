@@ -19,28 +19,21 @@ package com.duckduckgo.browsermode.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.common.test.CoroutineTestRule
 import junit.framework.TestCase.assertNotNull
-import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class WebStorageProviderTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
     private val fireModeAvailability: FireModeAvailability = mock()
-    private val testee =
-        WebStorageProvider(fireModeAvailability, coroutineRule.testDispatcherProvider)
+    private val testee = WebStorageProvider(fireModeAvailability)
 
     @Test
-    fun `forMode returns default WebStorage when multi-profile is unavailable`() = runTest {
-        fireModeAvailability.stub { onBlocking { isAvailable() }.thenReturn(false) }
+    fun `forMode returns default WebStorage when multi-profile is unavailable`() {
+        whenever(fireModeAvailability.isAvailable()).thenReturn(false)
 
         assertNotNull(testee.forMode(BrowserMode.REGULAR))
         assertNotNull(testee.forMode(BrowserMode.FIRE))

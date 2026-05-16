@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = FireModeAvailability::class)
 @ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealFireModeAvailability @Inject constructor(
     private val fireModeFeature: FireModeFeature,
@@ -48,10 +48,11 @@ class RealFireModeAvailability @Inject constructor(
 
     override fun isAvailable(): Boolean = cachedAvailability ?: computeAndCache()
 
-    private fun computeAndCache(): Boolean =
-        (
-            WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
+    private fun computeAndCache(): Boolean {
+        cachedAvailability?.let { return it }
+        val value = WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE) &&
                 fireModeFeature.fireTabs().isEnabled()
-            )
-            .also { cachedAvailability = it }
+        cachedAvailability = value
+        return value
+    }
 }
