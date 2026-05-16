@@ -618,11 +618,10 @@ class ChatHistoryViewModelTest {
             awaitItem() // DeleteSelected({a, c})
 
             viewModel.onDeleteSelectedConfirmed()
-            cancelAndConsumeRemainingEvents()
+            val final = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.Mode.Default, final.mode)
+            assertEquals(null, final.confirmation)
         }
-        val finalState = viewModel.uiState.value as Loaded
-        assertEquals(ChatHistoryUiState.Mode.Default, finalState.mode)
-        assertEquals(null, finalState.confirmation)
         // ViewModel must not dispatch — the dialog drives the clear via selectedChatUrls.
         assertTrue(dataClearingTrigger.calls.isEmpty())
         assertTrue(repository.deletedChatIds.isEmpty())
