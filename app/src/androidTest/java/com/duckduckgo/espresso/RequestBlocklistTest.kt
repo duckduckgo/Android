@@ -16,10 +16,13 @@
 
 package com.duckduckgo.espresso
 
+import android.view.View
 import android.webkit.WebView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.typeText
@@ -35,6 +38,8 @@ import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import org.hamcrest.Matcher
+import org.hamcrest.Matchers.instanceOf
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -62,12 +67,11 @@ class RequestBlocklistTest {
     fun whenRequestBlocklistIsEnabledRequestsAreHandledCorrectly() {
         preparationsForPrivacyTest()
 
-        var webView: WebView? = null
-        activityScenarioRule.scenario.onActivity {
-            webView = it.findViewById(R.id.browserWebView)
-        }
+        val grabber = WebViewGrabber()
+        onView(withId(R.id.browserWebView)).perform(grabber)
+        val webView = grabber.webView ?: error("browserWebView not present after waitForView")
 
-        WebViewIdlingResource(webView!!).track()
+        WebViewIdlingResource(webView).track()
 
         onView(withId(R.id.omnibarTextInput)).perform(
             clearText(),
@@ -75,10 +79,10 @@ class RequestBlocklistTest {
             pressImeActionButton(),
         )
 
-        WebViewIdlingResource(webView!!).track()
+        WebViewIdlingResource(webView).track()
 
         // Now register — window.results won't exist until the new page's finished() fires
-        JsObjectIdlingResource(webView!!, "window.results").track()
+        JsObjectIdlingResource(webView, "window.results").track()
 
         val results = Web.onWebView()
             .perform(Atoms.script(SCRIPT))
@@ -131,4 +135,13 @@ class RequestBlocklistTest {
         val status: String,
         val actual: String,
     )
+
+    private class WebViewGrabber : ViewAction {
+        var webView: WebView? = null
+        override fun getConstraints(): Matcher<View> = instanceOf(WebView::class.java)
+        override fun getDescription(): String = "grab WebView reference"
+        override fun perform(uiController: UiController, view: View) {
+            webView = view as WebView
+        }
+    }
 }
