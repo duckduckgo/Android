@@ -34,6 +34,7 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -60,7 +61,7 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
-    private val tabsDao: TabsDao,
+    @RegularMode private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
