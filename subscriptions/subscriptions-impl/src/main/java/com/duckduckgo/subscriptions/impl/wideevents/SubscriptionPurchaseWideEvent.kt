@@ -31,14 +31,21 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.hours
 
-data class MissingProductDetailsContext(
+data class BillingFlowInitFailureContext(
+    val reason: Reason,
     val requestedProductId: String,
     val requestedPlanId: String,
     val requestedOfferId: String?,
     val loadedProductIds: List<String>,
     val billingClientReady: Boolean,
     val lastLoadProductsOutcome: LastLoadProductsOutcome,
-)
+) {
+    enum class Reason {
+        NO_PRODUCTS_LOADED,
+        PRODUCT_ID_NOT_FOUND,
+        OFFER_NOT_FOUND,
+    }
+}
 
 sealed class LastLoadProductsOutcome {
     data object NeverAttempted : LastLoadProductsOutcome()
@@ -69,7 +76,7 @@ interface SubscriptionPurchaseWideEvent {
 
     suspend fun onBillingFlowInitFailure(
         error: String,
-        missingProductDetails: MissingProductDetailsContext? = null,
+        failureContext: BillingFlowInitFailureContext? = null,
     )
 
     suspend fun onBillingFlowPurchaseSuccess()
@@ -209,29 +216,29 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
 
     override suspend fun onBillingFlowInitFailure(
         error: String,
-        missingProductDetails: MissingProductDetailsContext?,
+        failureContext: BillingFlowInitFailureContext?,
     ) {
         if (!isFeatureEnabled()) return
         val wideEventId = getCurrentWideEventId() ?: return
 
-        val metadata = if (missingProductDetails != null) {
-            val reason = when {
-                missingProductDetails.loadedProductIds.isEmpty() -> "no_products_loaded"
-                missingProductDetails.requestedProductId !in missingProductDetails.loadedProductIds -> "product_id_not_found"
-                else -> "offer_not_found"
+        val metadata = if (failureContext != null) {
+            val reason = when (failureContext.reason) {
+                BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED -> "no_products_loaded"
+                BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND -> "product_id_not_found"
+                BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND -> "offer_not_found"
             }
-            val outcome = when (val o = missingProductDetails.lastLoadProductsOutcome) {
+            val outcome = when (val o = failureContext.lastLoadProductsOutcome) {
                 LastLoadProductsOutcome.NeverAttempted -> "never_attempted"
                 is LastLoadProductsOutcome.Success -> "success_n=${o.productsCount}"
                 is LastLoadProductsOutcome.Failure -> "failure_${o.billingError}"
             }
             mapOf(
                 KEY_MISSING_PRODUCT_FAILURE_REASON to reason,
-                KEY_REQUESTED_PRODUCT_ID to missingProductDetails.requestedProductId,
-                KEY_REQUESTED_PLAN_ID to missingProductDetails.requestedPlanId,
-                KEY_REQUESTED_OFFER_ID to (missingProductDetails.requestedOfferId ?: "none"),
-                KEY_LOADED_PRODUCTS_COUNT to missingProductDetails.loadedProductIds.size.toString(),
-                KEY_BILLING_CLIENT_READY to missingProductDetails.billingClientReady.toString(),
+                KEY_REQUESTED_PRODUCT_ID to failureContext.requestedProductId,
+                KEY_REQUESTED_PLAN_ID to failureContext.requestedPlanId,
+                KEY_REQUESTED_OFFER_ID to (failureContext.requestedOfferId ?: "none"),
+                KEY_LOADED_PRODUCTS_COUNT to failureContext.loadedProductIds.size.toString(),
+                KEY_BILLING_CLIENT_READY to failureContext.billingClientReady.toString(),
                 KEY_LAST_LOAD_PRODUCTS_OUTCOME to outcome,
             )
         } else {

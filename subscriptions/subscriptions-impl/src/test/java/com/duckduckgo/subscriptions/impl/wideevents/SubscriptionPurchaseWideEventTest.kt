@@ -179,7 +179,7 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onBillingFlowInitFailure without missingProductDetails sends empty-metadata flowStep`() =
+    fun `onBillingFlowInitFailure without failureContext sends empty-metadata flowStep`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
@@ -187,7 +187,7 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Billing error: SERVICE_UNAVAILABLE",
-                missingProductDetails = null,
+                failureContext = null,
             )
 
             verify(wideEventClient).flowStep(
@@ -204,7 +204,7 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onBillingFlowInitFailure with missingProductDetails and empty loadedProductIds emits no_products_loaded reason`() =
+    fun `onBillingFlowInitFailure with failureContext and empty loadedProductIds emits no_products_loaded reason`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
@@ -212,7 +212,8 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Missing product details",
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
                     requestedProductId = "ddg_privacy_pro",
                     requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
                     requestedOfferId = null,
@@ -244,7 +245,7 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onBillingFlowInitFailure with missingProductDetails where requestedProductId not in loadedProductIds emits product_id_not_found reason`() =
+    fun `onBillingFlowInitFailure with failureContext where requestedProductId not in loadedProductIds emits product_id_not_found reason`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
@@ -252,7 +253,8 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Missing product details",
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND,
                     requestedProductId = "ddg_privacy_pro",
                     requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
                     requestedOfferId = null,
@@ -279,7 +281,7 @@ class SubscriptionPurchaseWideEventTest {
         }
 
     @Test
-    fun `onBillingFlowInitFailure with missingProductDetails where requestedProductId is in loadedProductIds emits offer_not_found reason`() =
+    fun `onBillingFlowInitFailure with failureContext where requestedProductId is in loadedProductIds emits offer_not_found reason`() =
         runTest {
             whenever(wideEventClient.flowStart(any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
@@ -287,7 +289,8 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Missing product details",
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
                     requestedProductId = "ddg_privacy_pro",
                     requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
                     requestedOfferId = null,
@@ -322,7 +325,8 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Missing product details",
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
                     requestedProductId = "ddg_privacy_pro",
                     requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
                     requestedOfferId = null,
@@ -357,7 +361,8 @@ class SubscriptionPurchaseWideEventTest {
 
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = "Missing product details",
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
                     requestedProductId = "ddg_privacy_pro",
                     requestedPlanId = "ddg-privacy-pro-monthly-renews-us",
                     requestedOfferId = "free-trial",

@@ -24,8 +24,8 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContext
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
-import com.duckduckgo.subscriptions.impl.wideevents.MissingProductDetailsContext
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -154,7 +154,8 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            missingProductDetails = MissingProductDetailsContext(
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
                 requestedProductId = "ddg_privacy_pro",
                 requestedPlanId = MONTHLY_PLAN_US,
                 requestedOfferId = null,
@@ -179,7 +180,8 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            missingProductDetails = MissingProductDetailsContext(
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND,
                 requestedProductId = "ddg_privacy_pro",
                 requestedPlanId = MONTHLY_PLAN_US,
                 requestedOfferId = null,
@@ -204,7 +206,8 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            missingProductDetails = MissingProductDetailsContext(
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
                 requestedProductId = "ddg_privacy_pro",
                 requestedPlanId = MONTHLY_PLAN_US,
                 requestedOfferId = "nonexistent_offer",

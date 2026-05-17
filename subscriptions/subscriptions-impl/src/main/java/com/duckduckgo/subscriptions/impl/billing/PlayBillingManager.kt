@@ -43,8 +43,8 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseA
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContext
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
-import com.duckduckgo.subscriptions.impl.wideevents.MissingProductDetailsContext
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
@@ -232,9 +232,15 @@ class RealPlayBillingManager @Inject constructor(
 
         if (productDetails == null || offerToken == null) {
             val error = "Missing product details"
+            val reason = when {
+                products.isEmpty() -> BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED
+                productDetails == null -> BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND
+                else -> BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND
+            }
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = error,
-                missingProductDetails = MissingProductDetailsContext(
+                failureContext = BillingFlowInitFailureContext(
+                    reason = reason,
                     requestedProductId = subscriptionProduct,
                     requestedPlanId = planId,
                     requestedOfferId = offerId,
