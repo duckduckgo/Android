@@ -34,7 +34,6 @@ import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Key
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_EVER_ENABLED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_LAST_USED_TOGGLE_POSITION
-import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_NATIVE_INPUT_FIELD_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_TERMS_ACCEPTED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_BACKGROUND_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_FULLSCREEN_MODE_SETTING
@@ -82,8 +81,6 @@ interface DuckChatDataStore {
 
     suspend fun setAutomaticPageContextAttachment(enabled: Boolean)
 
-    suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
-
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
@@ -91,8 +88,6 @@ interface DuckChatDataStore {
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
-
-    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
 
     suspend fun isCosmeticInputScreenUserSettingEnabled(): Boolean
 
@@ -143,8 +138,6 @@ interface DuckChatDataStore {
     suspend fun isAIChatHistoryEnabled(): Boolean
 
     suspend fun isAutomaticPageContextAttachmentEnabled(): Boolean
-
-    suspend fun isNativeInputFieldUserSettingEnabled(): Boolean
 
     suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 
@@ -201,7 +194,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_BACKGROUND_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_BACKGROUND_TIMESTAMP")
         val DUCK_CHAT_HISTORY_ENABLED = booleanPreferencesKey(name = "DUCK_CHAT_HISTORY_ENABLED")
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
-        val DUCK_AI_NATIVE_INPUT_FIELD_SETTING = booleanPreferencesKey(name = "DUCK_AI_NATIVE_INPUT_FIELD_SETTING")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
         val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
         val DUCK_AI_DEFAULT_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_DEFAULT_TOGGLE_POSITION")
@@ -253,12 +245,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     private val automaticContextAttachment: StateFlow<Boolean> =
         store.data
             .map { prefs -> prefs[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] ?: false }
-            .distinctUntilChanged()
-            .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
-
-    private val nativeInputFieldUserSettingEnabled: StateFlow<Boolean> =
-        store.data
-            .map { prefs -> prefs[DUCK_AI_NATIVE_INPUT_FIELD_SETTING] ?: false }
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 
@@ -346,10 +332,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         store.edit { prefs -> prefs[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] = enabled }
     }
 
-    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
-        store.edit { prefs -> prefs[DUCK_AI_NATIVE_INPUT_FIELD_SETTING] = enabled }
-    }
-
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatUserEnabled
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
@@ -357,8 +339,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
 
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
-
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatShowInBrowserMenu
 
@@ -457,9 +437,6 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun isAutomaticPageContextAttachmentEnabled() =
         store.data.firstOrNull()?.let { it[DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT] } ?: false
-
-    override suspend fun isNativeInputFieldUserSettingEnabled() =
-        store.data.firstOrNull()?.let { it[DUCK_AI_NATIVE_INPUT_FIELD_SETTING] } ?: false
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING] = enabled }
