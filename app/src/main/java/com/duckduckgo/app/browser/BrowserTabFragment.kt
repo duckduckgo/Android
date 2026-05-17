@@ -3996,7 +3996,7 @@ class BrowserTabFragment :
 
         webView?.let {
             webViewProfileBinder.bind(it, browserMode)
-            
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
