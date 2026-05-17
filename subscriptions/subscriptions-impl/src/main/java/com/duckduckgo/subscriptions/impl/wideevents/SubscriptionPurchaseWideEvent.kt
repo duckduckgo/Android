@@ -31,6 +31,21 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.hours
 
+data class MissingProductDetailsContext(
+    val requestedProductId: String,
+    val requestedPlanId: String,
+    val requestedOfferId: String?,
+    val loadedProductIds: List<String>,
+    val billingClientReady: Boolean,
+    val lastLoadProductsOutcome: LastLoadProductsOutcome,
+)
+
+sealed class LastLoadProductsOutcome {
+    data object NeverAttempted : LastLoadProductsOutcome()
+    data class Success(val productsCount: Int) : LastLoadProductsOutcome()
+    data class Failure(val billingError: String) : LastLoadProductsOutcome()
+}
+
 interface SubscriptionPurchaseWideEvent {
     suspend fun onPurchaseFlowStarted(
         subscriptionIdentifier: String,
@@ -54,7 +69,7 @@ interface SubscriptionPurchaseWideEvent {
 
     suspend fun onBillingFlowInitFailure(
         error: String,
-        metadata: Map<String, String> = emptyMap(),
+        missingProductDetails: MissingProductDetailsContext? = null,
     )
 
     suspend fun onBillingFlowPurchaseSuccess()
@@ -194,10 +209,34 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
 
     override suspend fun onBillingFlowInitFailure(
         error: String,
-        metadata: Map<String, String>,
+        missingProductDetails: MissingProductDetailsContext?,
     ) {
         if (!isFeatureEnabled()) return
         val wideEventId = getCurrentWideEventId() ?: return
+
+        val metadata = if (missingProductDetails != null) {
+            val reason = when {
+                missingProductDetails.loadedProductIds.isEmpty() -> "no_products_loaded"
+                missingProductDetails.requestedProductId !in missingProductDetails.loadedProductIds -> "product_id_not_found"
+                else -> "offer_not_found"
+            }
+            val outcome = when (val o = missingProductDetails.lastLoadProductsOutcome) {
+                LastLoadProductsOutcome.NeverAttempted -> "never_attempted"
+                is LastLoadProductsOutcome.Success -> "success_n=${o.productsCount}"
+                is LastLoadProductsOutcome.Failure -> "failure_${o.billingError}"
+            }
+            mapOf(
+                KEY_MISSING_PRODUCT_FAILURE_REASON to reason,
+                KEY_REQUESTED_PRODUCT_ID to missingProductDetails.requestedProductId,
+                KEY_REQUESTED_PLAN_ID to missingProductDetails.requestedPlanId,
+                KEY_REQUESTED_OFFER_ID to (missingProductDetails.requestedOfferId ?: "none"),
+                KEY_LOADED_PRODUCTS_COUNT to missingProductDetails.loadedProductIds.size.toString(),
+                KEY_BILLING_CLIENT_READY to missingProductDetails.billingClientReady.toString(),
+                KEY_LAST_LOAD_PRODUCTS_OUTCOME to outcome,
+            )
+        } else {
+            emptyMap()
+        }
 
         wideEventClient.flowStep(
             wideEventId = wideEventId,
@@ -341,6 +380,15 @@ class SubscriptionPurchaseWideEventImpl @Inject constructor(
         const val STEP_BILLING_FLOW_INIT = "billing_flow_init"
         const val STEP_BILLING_FLOW_PURCHASE = "billing_flow_purchase"
         const val STEP_CONFIRM_PURCHASE = "confirm_purchase"
+
+        // metadata keys for missing-product-details failure
+        const val KEY_MISSING_PRODUCT_FAILURE_REASON = "missing_product_failure_reason"
+        const val KEY_REQUESTED_PRODUCT_ID = "requested_product_id"
+        const val KEY_REQUESTED_PLAN_ID = "requested_plan_id"
+        const val KEY_REQUESTED_OFFER_ID = "requested_offer_id"
+        const val KEY_LOADED_PRODUCTS_COUNT = "loaded_products_count"
+        const val KEY_BILLING_CLIENT_READY = "billing_client_ready"
+        const val KEY_LAST_LOAD_PRODUCTS_OUTCOME = "last_load_products_outcome"
     }
 }
 

@@ -24,6 +24,8 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
+import com.duckduckgo.subscriptions.impl.wideevents.MissingProductDetailsContext
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -152,14 +154,13 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            metadata = mapOf(
-                "missing_product_failure_reason" to "no_products_loaded",
-                "requested_product_id" to "ddg_privacy_pro",
-                "requested_plan_id" to MONTHLY_PLAN_US,
-                "requested_offer_id" to "none",
-                "loaded_products_count" to "0",
-                "billing_client_ready" to "false",
-                "last_load_products_outcome" to "never_attempted",
+            missingProductDetails = MissingProductDetailsContext(
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = null,
+                loadedProductIds = emptyList(),
+                billingClientReady = false,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.NeverAttempted,
             ),
         )
     }
@@ -178,14 +179,13 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            metadata = mapOf(
-                "missing_product_failure_reason" to "product_id_not_found",
-                "requested_product_id" to "ddg_privacy_pro",
-                "requested_plan_id" to MONTHLY_PLAN_US,
-                "requested_offer_id" to "none",
-                "loaded_products_count" to "1",
-                "billing_client_ready" to "true",
-                "last_load_products_outcome" to "success_n=1",
+            missingProductDetails = MissingProductDetailsContext(
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = null,
+                loadedProductIds = listOf("some_unrelated_product_id"),
+                billingClientReady = true,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
             ),
         )
     }
@@ -204,14 +204,13 @@ class RealPlayBillingManagerTest {
 
         verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
             error = "Missing product details",
-            metadata = mapOf(
-                "missing_product_failure_reason" to "offer_not_found",
-                "requested_product_id" to "ddg_privacy_pro",
-                "requested_plan_id" to MONTHLY_PLAN_US,
-                "requested_offer_id" to "nonexistent_offer",
-                "loaded_products_count" to "1",
-                "billing_client_ready" to "true",
-                "last_load_products_outcome" to "success_n=1",
+            missingProductDetails = MissingProductDetailsContext(
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = "nonexistent_offer",
+                loadedProductIds = listOf(BASIC_SUBSCRIPTION),
+                billingClientReady = true,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
             ),
         )
     }

@@ -43,6 +43,8 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseA
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
+import com.duckduckgo.subscriptions.impl.wideevents.MissingProductDetailsContext
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
@@ -128,7 +130,7 @@ class RealPlayBillingManager @Inject constructor(
     // New Subscription ProductDetails
     private var _products = MutableStateFlow(emptyList<ProductDetails>())
 
-    private var lastLoadProductsOutcome: String = LOAD_PRODUCTS_OUTCOME_NEVER_ATTEMPTED
+    private var lastLoadProductsOutcome: LastLoadProductsOutcome = LastLoadProductsOutcome.NeverAttempted
 
     override val products: List<ProductDetails>
         get() = _products.value
@@ -230,21 +232,15 @@ class RealPlayBillingManager @Inject constructor(
 
         if (productDetails == null || offerToken == null) {
             val error = "Missing product details"
-            val reason = when {
-                products.isEmpty() -> MissingProductReason.NO_PRODUCTS_LOADED
-                productDetails == null -> MissingProductReason.PRODUCT_ID_NOT_FOUND
-                else -> MissingProductReason.OFFER_NOT_FOUND
-            }
             subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
                 error = error,
-                metadata = mapOf(
-                    META_KEY_MISSING_PRODUCT_FAILURE_REASON to reason.raw,
-                    META_KEY_REQUESTED_PRODUCT_ID to subscriptionProduct,
-                    META_KEY_REQUESTED_PLAN_ID to planId,
-                    META_KEY_REQUESTED_OFFER_ID to (offerId ?: "none"),
-                    META_KEY_LOADED_PRODUCTS_COUNT to products.size.toString(),
-                    META_KEY_BILLING_CLIENT_READY to billingClient.ready.toString(),
-                    META_KEY_LAST_LOAD_PRODUCTS_OUTCOME to lastLoadProductsOutcome,
+                missingProductDetails = MissingProductDetailsContext(
+                    requestedProductId = subscriptionProduct,
+                    requestedPlanId = planId,
+                    requestedOfferId = offerId,
+                    loadedProductIds = products.map { it.productId },
+                    billingClientReady = billingClient.ready,
+                    lastLoadProductsOutcome = lastLoadProductsOutcome,
                 ),
             )
             _purchaseState.emit(PurchaseState.Failure(error))
@@ -372,7 +368,7 @@ class RealPlayBillingManager @Inject constructor(
     private suspend fun loadProducts() {
         when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
             is SubscriptionsResult.Success -> {
-                lastLoadProductsOutcome = "${LOAD_PRODUCTS_OUTCOME_SUCCESS_PREFIX}${result.products.size}"
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(result.products.size)
                 if (result.products.isEmpty()) {
                     logcat { "No products found" }
                 }
@@ -380,7 +376,7 @@ class RealPlayBillingManager @Inject constructor(
             }
 
             is SubscriptionsResult.Failure -> {
-                lastLoadProductsOutcome = "${LOAD_PRODUCTS_OUTCOME_FAILURE_PREFIX}${result.billingError}"
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Failure(result.billingError.toString())
                 logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
             }
         }
@@ -424,26 +420,6 @@ class RealPlayBillingManager @Inject constructor(
             logcat { "Billing: No active purchase token found" }
             null
         }
-    }
-
-    private enum class MissingProductReason(val raw: String) {
-        NO_PRODUCTS_LOADED("no_products_loaded"),
-        PRODUCT_ID_NOT_FOUND("product_id_not_found"),
-        OFFER_NOT_FOUND("offer_not_found"),
-    }
-
-    private companion object {
-        const val META_KEY_MISSING_PRODUCT_FAILURE_REASON = "missing_product_failure_reason"
-        const val META_KEY_REQUESTED_PRODUCT_ID = "requested_product_id"
-        const val META_KEY_REQUESTED_PLAN_ID = "requested_plan_id"
-        const val META_KEY_REQUESTED_OFFER_ID = "requested_offer_id"
-        const val META_KEY_LOADED_PRODUCTS_COUNT = "loaded_products_count"
-        const val META_KEY_BILLING_CLIENT_READY = "billing_client_ready"
-        const val META_KEY_LAST_LOAD_PRODUCTS_OUTCOME = "last_load_products_outcome"
-
-        const val LOAD_PRODUCTS_OUTCOME_NEVER_ATTEMPTED = "never_attempted"
-        const val LOAD_PRODUCTS_OUTCOME_SUCCESS_PREFIX = "success_n="
-        const val LOAD_PRODUCTS_OUTCOME_FAILURE_PREFIX = "failure_"
     }
 }
 
