@@ -24,6 +24,9 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContext
+import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -34,6 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -45,6 +49,7 @@ class RealPlayBillingManagerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val billingClientAdapter = FakeBillingClientAdapter()
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
 
     private lateinit var processLifecycleOwner: TestLifecycleOwner
 
@@ -53,7 +58,7 @@ class RealPlayBillingManagerTest {
         pixelSender = mock(),
         billingClient = billingClientAdapter,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
-        subscriptionPurchaseWideEvent = mock(),
+        subscriptionPurchaseWideEvent = subscriptionPurchaseWideEvent,
         subscriptionSwitchWideEvent = mock(),
     )
 
@@ -138,6 +143,79 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyConnectInvoked()
         billingClientAdapter.verifyLaunchBillingFlowNotInvoked()
+    }
+
+    @Test
+    fun `when products empty then billing flow init failure metadata indicates no products loaded`() = runTest {
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId = "external_id", offerId = null)
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED,
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = null,
+                loadedProductIds = emptyList(),
+                billingClientReady = false,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.NeverAttempted,
+            ),
+        )
+    }
+
+    @Test
+    fun `when product id does not match any loaded product then metadata indicates product id not found`() = runTest {
+        // load a product whose productId does NOT match BASIC_SUBSCRIPTION (the one MONTHLY_PLAN_US resolves to)
+        billingClientAdapter.subscriptions = listOf(
+            mock {
+                whenever(it.productId).thenReturn("some_unrelated_product_id")
+            },
+        )
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN_US, externalId = "external_id", offerId = null)
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND,
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = null,
+                loadedProductIds = listOf("some_unrelated_product_id"),
+                billingClientReady = true,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
+            ),
+        )
+    }
+
+    @Test
+    fun `when offer id does not match any offer on the matched product then metadata indicates offer not found`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        // The default fake product matches BASIC_SUBSCRIPTION; its offers do NOT include "nonexistent_offer".
+
+        subject.launchBillingFlow(
+            activity = mock(),
+            planId = MONTHLY_PLAN_US,
+            externalId = "external_id",
+            offerId = "nonexistent_offer",
+        )
+
+        verify(subscriptionPurchaseWideEvent).onBillingFlowInitFailure(
+            error = "Missing product details",
+            failureContext = BillingFlowInitFailureContext(
+                reason = BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND,
+                requestedProductId = "ddg_privacy_pro",
+                requestedPlanId = MONTHLY_PLAN_US,
+                requestedOfferId = "nonexistent_offer",
+                loadedProductIds = listOf(BASIC_SUBSCRIPTION),
+                billingClientReady = true,
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(1),
+            ),
+        )
     }
 
     @Test
