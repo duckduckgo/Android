@@ -24,6 +24,7 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
@@ -47,20 +48,66 @@ abstract class TabRepositoryModule {
 
     @Binds
     @RegularMode
-    abstract fun bindRegularTabRepository(impl: TabDataRepository): TabRepository
+    abstract fun bindRegularTabRepository(@RegularMode impl: TabDataRepository): TabRepository
+
+    @Binds
+    @FireMode
+    abstract fun bindFireTabRepository(@FireMode impl: TabDataRepository): TabRepository
+
+    @Binds
+    abstract fun bindUnqualifiedTabRepository(@RegularMode impl: TabRepository): TabRepository
+
+    @Binds
+    abstract fun bindTabAtomicOperations(@RegularMode impl: TabDataRepository): TabAtomicOperations
 
     companion object {
 
+        @Provides
+        @SingleInstanceIn(AppScope::class)
+        @RegularMode
+        fun provideRegularTabRepository(
+            @RegularMode tabsDao: TabsDao,
+            siteFactory: SiteFactory,
+            webViewPreviewPersister: WebViewPreviewPersister,
+            faviconManager: FaviconManager,
+            tabSwitcherDataStore: TabSwitcherDataStore,
+            timeProvider: CurrentTimeProvider,
+            @AppCoroutineScope appCoroutineScope: CoroutineScope,
+            dispatchers: DispatcherProvider,
+            adClickManager: AdClickManager,
+            webViewSessionStorage: WebViewSessionStorage,
+            tabManagerFeatureFlags: TabManagerFeatureFlags,
+            duckChatContextualDataStore: DuckChatContextualDataStore,
+            tabVisitedSitesRepository: TabVisitedSitesRepository,
+            nativeInputStatePublisher: NativeInputStatePublisher,
+        ): TabDataRepository = TabDataRepository(
+            tabsDao = tabsDao,
+            siteFactory = siteFactory,
+            webViewPreviewPersister = webViewPreviewPersister,
+            faviconManager = faviconManager,
+            tabSwitcherDataStore = tabSwitcherDataStore,
+            timeProvider = timeProvider,
+            appCoroutineScope = appCoroutineScope,
+            dispatchers = dispatchers,
+            adClickManager = adClickManager,
+            webViewSessionStorage = webViewSessionStorage,
+            tabManagerFeatureFlags = tabManagerFeatureFlags,
+            duckChatContextualDataStore = duckChatContextualDataStore,
+            tabVisitedSitesRepository = tabVisitedSitesRepository,
+            nativeInputStatePublisher = nativeInputStatePublisher,
+        )
+
         /**
-         * Fire-mode [TabRepository] singleton backed by the fire-mode [TabsDao].
+         * Fire-mode [TabDataRepository] singleton backed by the fire-mode [TabsDao].
          *
-         * WARNING: [TabRepository.deleteAll] on this instance fans out to the same clearing targets
-         * as the regular-mode instance and is UNSAFE to call until the Tabs.* clearing plugin lands.
+         * WARNING: [TabRepository.deleteAll] on this instance shares fan-out targets with the
+         * regular-mode instance (it clears app-global singletons like sessions / duck-chat /
+         * favicons / ad-click). It is UNSAFE to call until the Tabs.* clearing plugin lands.
          * Do not invoke deleteAll() from any new code in this plan.
          */
         @Provides
-        @FireMode
         @SingleInstanceIn(AppScope::class)
+        @FireMode
         fun provideFireTabRepository(
             @FireMode tabsDao: TabsDao,
             siteFactory: SiteFactory,
@@ -76,7 +123,7 @@ abstract class TabRepositoryModule {
             duckChatContextualDataStore: DuckChatContextualDataStore,
             tabVisitedSitesRepository: TabVisitedSitesRepository,
             nativeInputStatePublisher: NativeInputStatePublisher,
-        ): TabRepository = TabDataRepository(
+        ): TabDataRepository = TabDataRepository(
             tabsDao = tabsDao,
             siteFactory = siteFactory,
             webViewPreviewPersister = webViewPreviewPersister,
