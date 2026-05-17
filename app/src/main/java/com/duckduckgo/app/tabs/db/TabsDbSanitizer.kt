@@ -21,6 +21,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
@@ -30,7 +31,7 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class TabsDbSanitizer @Inject constructor(
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val adClickManager: AdClickManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
