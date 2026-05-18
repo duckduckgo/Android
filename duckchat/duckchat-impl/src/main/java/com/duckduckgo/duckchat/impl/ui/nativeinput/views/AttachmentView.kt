@@ -227,6 +227,8 @@ class AttachmentView(
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
 
+        if (!supportsImages && supportedFileTypes.isEmpty()) return
+
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
