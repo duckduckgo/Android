@@ -117,16 +117,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var maxPageCount: Int = 2
+    private var inputScreenOnboardingEnabled: Boolean? = null
 
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
+    private suspend fun resolveInputScreenOnboardingEnabled(): Boolean {
+        val cached = inputScreenOnboardingEnabled
+        if (cached != null) return cached
+        val value = withContext(dispatchers.io()) {
+            androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
         }
+        inputScreenOnboardingEnabled = value
+        return value
     }
 
     sealed interface Command {
@@ -154,6 +154,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
         _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
         fireDialogShownPixel(dialogType)
+    }
+
+    private fun navigateToComparisonChart() {
+        viewModelScope.launch {
+            resolveInputScreenOnboardingEnabled()
+            setCurrentDialog(COMPARISON_CHART)
+        }
     }
 
     private fun setInputScreenPreviewDialog(isSearchDefault: Boolean) {
@@ -217,7 +224,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INITIAL_REINSTALL_USER, INITIAL -> {
-                setCurrentDialog(COMPARISON_CHART)
+                navigateToComparisonChart()
             }
 
             COMPARISON_CHART -> {
@@ -272,10 +279,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                         }
                     }
-                    val showInputScreen = withContext(dispatchers.io()) {
-                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-                    }
-                    if (showInputScreen) {
+                    if (resolveInputScreenOnboardingEnabled()) {
                         setCurrentDialog(INPUT_SCREEN)
                     } else {
                         _commands.send(Command.Finish)
@@ -349,7 +353,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             SKIP_ONBOARDING_OPTION -> {
-                setCurrentDialog(COMPARISON_CHART)
+                navigateToComparisonChart()
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
@@ -399,7 +403,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     fun getMaxPageCount(): Int {
-        return maxPageCount
+        return if (inputScreenOnboardingEnabled == true) 3 else 2
     }
 
     private suspend fun isAppReinstall(): Boolean =

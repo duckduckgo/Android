@@ -579,18 +579,38 @@ class BrandDesignUpdatePageViewModelTest {
     // region maxPageCount
 
     @Test
-    fun whenInputScreenOnboardingEnabledThenMaxPageCountIs3() = runTest {
+    fun whenInputScreenOnboardingEnabledAtComparisonChartEntryThenMaxPageCountIs3() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART (resolves input-screen toggle)
         advanceUntilIdle()
         assertEquals(3, testee.getMaxPageCount())
     }
 
     @Test
-    fun whenInputScreenOnboardingDisabledThenMaxPageCountIs2() = runTest {
+    fun whenInputScreenOnboardingDisabledAtComparisonChartEntryThenMaxPageCountIs2() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
         mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
         val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART (resolves input-screen toggle)
         advanceUntilIdle()
+        assertEquals(2, testee.getMaxPageCount())
+    }
+
+    @Test
+    fun whenToggleFlipsTrueAfterComparisonChartEntryThenMaxPageCountStaysAtCachedValue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART captures toggle=false
+        advanceUntilIdle()
+
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+
         assertEquals(2, testee.getMaxPageCount())
     }
 
