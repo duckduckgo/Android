@@ -162,7 +162,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
-            is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar()
+            is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
             ChatHistoryViewModel.NavigationEvent.ShowExportError ->
                 Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_error, Snackbar.LENGTH_SHORT).show()
         }
@@ -181,8 +181,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .commit()
     }
 
-    private fun showDownloadCompleteSnackbar() {
-        Snackbar.make(binding.root, R.string.duck_ai_chat_history_download_complete, Snackbar.LENGTH_LONG)
+    private fun showDownloadCompleteSnackbar(fileName: String) {
+        val message = getString(R.string.duck_ai_chat_history_download_complete, fileName)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setAction(R.string.duck_ai_chat_history_download_view) {
                 globalActivityStarter.start(requireContext(), DownloadsScreens.DownloadsScreenNoParams)
             }
