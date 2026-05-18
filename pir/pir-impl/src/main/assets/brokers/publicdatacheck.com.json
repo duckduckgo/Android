@@ -1,9 +1,10 @@
 {
-  "name": "SpyFly",
-  "url": "spyfly.com",
-  "version": "0.8.0",
-  "addedDatetime": 1775214750818,
-  "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
+  "name": "Public Data Check",
+  "url": "publicdatacheck.com",
+  "version": "0.2.0",
+  "parent": "spyfly.com",
+  "addedDatetime": 1778777242134,
+  "optOutUrl": "https://www.publicdatacheck.com/help-center/privacy-requests",
   "steps": [
     {
       "stepType": "scan",
@@ -11,8 +12,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://www.spyfly.com/help-center/privacy-requests",
-          "id": "192af9bf-ba6f-4fb3-9bda-c72f8b489f8e"
+          "url": "https://www.publicdatacheck.com/help-center/privacy-requests",
+          "id": "16b8ebc5-afbe-4309-8677-d50f2ddac56d"
         },
         {
           "actionType": "expectation",
@@ -22,7 +23,7 @@
               "selector": ".main"
             }
           ],
-          "id": "9423632f-b0d0-4d66-be94-4fbb23085e9d"
+          "id": "f0abc890-b94a-436a-badb-01fa5c2c022a"
         },
         {
           "actionType": "fillForm",
@@ -35,7 +36,6 @@
             },
             {
               "type": "lastName",
-              "_comment": "This input doesn't follow the same id pattern as the rest",
               "selector": ".//input[@placeholder='Last Name']"
             },
             {
@@ -55,19 +55,18 @@
               "selector": "#age"
             }
           ],
-          "id": "97679943-0b17-41e7-9916-6774a8163bc3"
+          "id": "19920e38-7265-4bc5-857e-c0cc4a33a4df"
         },
         {
           "actionType": "expectation",
           "expectations": [
             {
               "type": "element",
-              "_comment": "Ensure the captcha checkbox is checked before proceeding",
               "selector": ".//input[@name='cf-turnstile-response' and @value and @value != '']",
               "parent": ".form__captcha"
             }
           ],
-          "id": "04d2e2c3-688c-486a-8c4d-920d31c4677f"
+          "id": "dbb50c04-48e9-4039-98fe-92880cb9a44b"
         },
         {
           "actionType": "click",
@@ -77,10 +76,9 @@
               "selector": ".//button[@type='submit']"
             }
           ],
-          "id": "b5774ac1-d743-490c-b738-f9a70b63ada5"
+          "id": "a7024123-d145-40f5-a98d-e18f444ce76d"
         },
         {
-          "_comment": "After Continue, the email verification page loads.",
           "actionType": "expectation",
           "expectations": [
             {
@@ -88,12 +86,11 @@
               "selector": "#email-address"
             }
           ],
-          "id": "a5ffc9fd-1ddf-4f5f-8c91-37db9f142ab5"
+          "id": "753ab729-85cb-42c9-97e1-00ca23079920"
         },
         {
-          "_comment": "Generate a disposable email address before filling the email field",
           "actionType": "generateEmail",
-          "id": "63c07f1a-fa0c-4c64-a516-4e9701a209cc"
+          "id": "88b47f1d-af9a-46b2-be49-3151854b8557"
         },
         {
           "actionType": "fillForm",
@@ -105,10 +102,9 @@
               "selector": "#email-address"
             }
           ],
-          "id": "a63daf34-fd46-46b9-abeb-ea54c0b65494"
+          "id": "9e16ba9a-f5f3-46b1-8afd-e1849d560c3c"
         },
         {
-          "_comment": "Wait for Turnstile on email page",
           "actionType": "expectation",
           "expectations": [
             {
@@ -117,10 +113,9 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "fbe8687d-caf5-48c7-9572-4401141e1cf7"
+          "id": "56cd0d0d-22dd-43f8-a65e-1513831a77b6"
         },
         {
-          "_comment": "Submit the email",
           "actionType": "click",
           "elements": [
             {
@@ -128,17 +123,15 @@
               "selector": "#continue-button"
             }
           ],
-          "id": "38d0e82c-5d6e-4c69-8695-17b957537854"
+          "id": "27667068-ca68-4f68-9be2-55c53d87a05c"
         },
         {
-          "_comment": "SpyFly sends a verification code to the generated email. Poll the backend until it arrives.",
           "actionType": "getEmailData",
           "pollingTime": 3,
           "extract": ["verificationCode"],
-          "id": "6d78ef56-d2cb-4ba2-b521-0d0127cbfe48"
+          "id": "447885fc-609b-4a02-a45d-ea0372a02cc7"
         },
         {
-          "_comment": "Wait for the verification code page to load",
           "actionType": "expectation",
           "expectations": [
             {
@@ -146,10 +139,9 @@
               "selector": "#unique-code"
             }
           ],
-          "id": "d25356d5-1585-40bb-99f0-b31f5b8f8558"
+          "id": "673fb221-a548-4e64-ac4e-9016555de3f1"
         },
         {
-          "_comment": "Fill the verification code from the email",
           "actionType": "fillForm",
           "selector": ".form-contact-help form",
           "dataSource": "emailData",
@@ -159,10 +151,9 @@
               "selector": "#unique-code"
             }
           ],
-          "id": "d032386d-3cec-4598-b154-9ebe0689bbc3"
+          "id": "3428b55b-53d8-47eb-82cc-6024601dd5a2"
         },
         {
-          "_comment": "Wait for Turnstile on verification code page",
           "actionType": "expectation",
           "expectations": [
             {
@@ -171,10 +162,9 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "bd28f924-1c63-4e4b-9107-bf414a51146d"
+          "id": "bdf95164-b8e9-4043-a58e-65de0d900666"
         },
         {
-          "_comment": "Submit the verification code",
           "actionType": "click",
           "elements": [
             {
@@ -182,10 +172,9 @@
               "selector": "#continue-button"
             }
           ],
-          "id": "386c4ff6-c057-4d8e-a587-f7de9832882c"
+          "id": "27c4e3f5-8dfa-45e3-aa6f-90b68b1f160d"
         },
         {
-          "_comment": "Wait for the results page to load",
           "actionType": "expectation",
           "expectations": [
             {
@@ -194,7 +183,7 @@
               "expect": "Select Data for Removal"
             }
           ],
-          "id": "90deb9b3-42b1-4377-be87-f7da82c07f9d"
+          "id": "33a52736-da2d-4292-92d4-ba485711743f"
         },
         {
           "actionType": "extract",
@@ -220,7 +209,7 @@
               "identifierType": "hash"
             }
           },
-          "id": "22b645d1-9504-4350-8031-0fa8268e4a2e"
+          "id": "a6bf4ba0-21f9-4428-a724-038e07db4cc1"
         }
       ]
     },
@@ -230,8 +219,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "url": "https://www.spyfly.com/help-center/privacy-requests",
-          "id": "bfb6652e-20d1-4b5b-9123-ae234fe1c48d"
+          "url": "https://www.publicdatacheck.com/help-center/privacy-requests",
+          "id": "24d46c0d-da23-4606-8880-9383ede6b0fb"
         },
         {
           "actionType": "expectation",
@@ -241,7 +230,7 @@
               "selector": ".main"
             }
           ],
-          "id": "928fdd3b-69c8-48f2-9d52-6f30a82a0bbc"
+          "id": "71509921-e351-4b33-a018-41e84645308b"
         },
         {
           "actionType": "fillForm",
@@ -273,7 +262,7 @@
               "selector": "#age"
             }
           ],
-          "id": "098032c0-d8c0-40b3-b9f1-d9a4883fc338"
+          "id": "30e8042e-e085-4358-bfca-82b72c8db0b8"
         },
         {
           "actionType": "expectation",
@@ -284,7 +273,7 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "3aa26942-a743-49a4-ad5e-277ee726ac2e"
+          "id": "7771e80f-1465-46e5-8783-0c97adb91bd1"
         },
         {
           "actionType": "click",
@@ -294,7 +283,7 @@
               "selector": ".//button[@type='submit']"
             }
           ],
-          "id": "6b012cd0-d1e7-4969-a24d-05be01123084"
+          "id": "96d21d70-729e-40e4-9d6d-6804a996272b"
         },
         {
           "actionType": "expectation",
@@ -304,11 +293,11 @@
               "selector": "#email-address"
             }
           ],
-          "id": "a540257d-17ff-4c31-b0ce-6bf0934ba503"
+          "id": "95405418-3e85-4493-ac22-067d2c2ba73a"
         },
         {
           "actionType": "generateEmail",
-          "id": "82af023b-7bd8-449d-94a6-449ec2144882"
+          "id": "2a05a32e-d57d-48eb-a305-eda6204967a9"
         },
         {
           "actionType": "fillForm",
@@ -320,7 +309,7 @@
               "selector": "#email-address"
             }
           ],
-          "id": "b2129acb-6d7b-4e9a-8a15-1692f897f0a3"
+          "id": "a4cd4034-75a0-45b7-9765-2e6d18705daf"
         },
         {
           "actionType": "expectation",
@@ -331,7 +320,7 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "d5adefdd-b519-414a-b4d3-424000bed137"
+          "id": "7491c371-48f3-4c0b-b173-7814f4c90cb7"
         },
         {
           "actionType": "click",
@@ -341,13 +330,13 @@
               "selector": "#continue-button"
             }
           ],
-          "id": "8056bd39-9db2-4ddf-bd7b-f138171821ca"
+          "id": "c3593195-abfa-4492-8a60-e6947777e787"
         },
         {
           "actionType": "getEmailData",
           "pollingTime": 3,
           "extract": ["verificationCode"],
-          "id": "08f0eddc-1ade-4a57-85e9-d51f8175245e"
+          "id": "594bdae7-693a-42a3-8775-2622faee55e2"
         },
         {
           "actionType": "expectation",
@@ -357,7 +346,7 @@
               "selector": "#unique-code"
             }
           ],
-          "id": "50ca8d93-c3b5-4cc3-a43b-5e24667df7df"
+          "id": "88e0bbd7-4779-44f5-a40b-a4feb6f18b54"
         },
         {
           "actionType": "fillForm",
@@ -369,7 +358,7 @@
               "selector": "#unique-code"
             }
           ],
-          "id": "a94edfa1-9bc3-4c93-8dbe-bb98d7d25613"
+          "id": "58950ae1-62a7-4e4b-b933-bf1b4e7f79fd"
         },
         {
           "actionType": "expectation",
@@ -380,7 +369,7 @@
               "parent": ".form__captcha"
             }
           ],
-          "id": "66fff0ae-7f55-4560-9d54-d29404536e92"
+          "id": "8c5a9fe9-359d-4bcd-ba05-3a687ad7df39"
         },
         {
           "actionType": "click",
@@ -390,7 +379,7 @@
               "selector": "#continue-button"
             }
           ],
-          "id": "6807275b-f28c-4c9b-afcf-4bccefc28ca5"
+          "id": "f27b0dae-cfcc-473e-be5c-a420177a8819"
         },
         {
           "actionType": "expectation",
@@ -401,10 +390,9 @@
               "expect": "Select Data for Removal"
             }
           ],
-          "id": "9a5f702f-2218-4090-9bf9-b9182df979b6"
+          "id": "73cc7194-1dd7-4630-b2f6-88fde48f7bcb"
         },
         {
-          "_comment": "Click Remove on the matched profile using profileMatch",
           "actionType": "click",
           "elements": [
             {
@@ -430,7 +418,7 @@
               }
             }
           ],
-          "id": "eab75fe5-15be-429d-98ce-10f206759066"
+          "id": "fafc1b71-7f82-435b-822e-1dde6689bcb8"
         },
         {
           "actionType": "expectation",
@@ -441,16 +429,14 @@
               "expect": "Request Submitted"
             }
           ],
-          "id": "798a9f5a-1e55-4541-b729-9b8544e003d6"
+          "id": "d049175b-e41a-4736-ba29-29b60d2d2788"
         },
         {
-          "_comment": "SpyFly sends a confirmation link. Decoupled: native releases the webview and picks up the link later.",
           "actionType": "emailConfirmation",
           "pollingTime": 30,
-          "id": "dce5999c-ad7a-4050-b92f-8bc4e945e68d"
+          "id": "d3bc1138-c001-49a5-a908-a8be6b0c4db3"
         },
         {
-          "_comment": "After clicking the confirmation link, verify the success page",
           "actionType": "expectation",
           "expectations": [
             {
@@ -459,7 +445,7 @@
               "expect": "Verification Complete"
             }
           ],
-          "id": "7d78b439-ce6e-4660-b20a-04d10ca817bc"
+          "id": "355d44c5-22f4-4120-bb5d-0f4a51d05e70"
         }
       ]
     }
