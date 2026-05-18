@@ -105,10 +105,11 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
             combine(
+                feature.isDiscoverable().enabled(),
                 feature.self().enabled(),
                 configProvider.scriptletsSettings,
-            ) { operational, settings ->
-                settings?.takeIf { operational }
+            ) { discoverable, operational, settings ->
+                settings?.takeIf { discoverable && operational }
             }.filterNotNull().collect { settings ->
                 enqueue(settings)
             }

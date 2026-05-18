@@ -16,16 +16,13 @@
 
 package com.duckduckgo.adblocking.impl
 
-import android.annotation.SuppressLint
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.testing.TestLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -43,12 +40,22 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
-@SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
 class ScriptletDownloadWorkerSchedulerTest {
 
     private val workManager: WorkManager = mock()
-    private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
+    private val isDiscoverableEnabledFlow = MutableStateFlow(true)
+    private val selfEnabledFlow = MutableStateFlow(false)
+    private val isDiscoverableToggle: Toggle = mock {
+        on { enabled() } doReturn isDiscoverableEnabledFlow
+    }
+    private val selfToggle: Toggle = mock {
+        on { enabled() } doReturn selfEnabledFlow
+    }
+    private val feature: AdBlockingExtensionFeature = mock {
+        on { isDiscoverable() } doReturn isDiscoverableToggle
+        on { self() } doReturn selfToggle
+    }
     private val scriptletsFlow = MutableStateFlow<ScriptletsSettings?>(null)
     private val configProvider: AdBlockingExtensionConfigProvider = mock {
         on { scriptletsSettings } doReturn scriptletsFlow
@@ -57,7 +64,7 @@ class ScriptletDownloadWorkerSchedulerTest {
         .add(KotlinJsonAdapterFactory())
         .build()
         .adapter(ScriptletsSettings::class.java)
-    private val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.INITIALIZED)
+    private val lifecycleOwner: LifecycleOwner = mock()
 
     private val scriptletsSettings = ScriptletsSettings(version = "2026.5.14", scriptlets = emptyMap())
 
@@ -71,7 +78,7 @@ class ScriptletDownloadWorkerSchedulerTest {
 
     @Test
     fun whenFeatureIsOperationalAndSettingsAreEmittedThenWorkIsEnqueued() = runTest {
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        selfEnabledFlow.value = true
         val scheduler = newScheduler(backgroundScope)
         scheduler.onCreate(lifecycleOwner)
 
@@ -87,7 +94,7 @@ class ScriptletDownloadWorkerSchedulerTest {
 
     @Test
     fun whenFeatureIsNotOperationalAndSettingsAreEmittedThenWorkIsNotEnqueued() = runTest {
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = false))
+        selfEnabledFlow.value = false
         val scheduler = newScheduler(backgroundScope)
         scheduler.onCreate(lifecycleOwner)
 
@@ -99,7 +106,7 @@ class ScriptletDownloadWorkerSchedulerTest {
 
     @Test
     fun whenFeatureIsOperationalAndSettingsAreNullThenWorkIsNotEnqueued() = runTest {
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        selfEnabledFlow.value = true
         val scheduler = newScheduler(backgroundScope)
         scheduler.onCreate(lifecycleOwner)
 
@@ -110,14 +117,47 @@ class ScriptletDownloadWorkerSchedulerTest {
 
     @Test
     fun whenFeatureFlipsFromNotOperationalToOperationalThenWorkIsEnqueued() = runTest {
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = false))
+        selfEnabledFlow.value = false
         scriptletsFlow.value = scriptletsSettings
         val scheduler = newScheduler(backgroundScope)
         scheduler.onCreate(lifecycleOwner)
         runCurrent()
         verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
 
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        selfEnabledFlow.value = true
+        runCurrent()
+
+        verify(workManager).enqueueUniqueWork(
+            eq(ScriptletDownloadWorkerScheduler.WORK_NAME),
+            any(),
+            any<OneTimeWorkRequest>(),
+        )
+    }
+
+    @Test
+    fun whenKillSwitchIsOffThenWorkIsNotEnqueuedEvenIfOperational() = runTest {
+        isDiscoverableEnabledFlow.value = false
+        selfEnabledFlow.value = true
+        val scheduler = newScheduler(backgroundScope)
+        scheduler.onCreate(lifecycleOwner)
+
+        scriptletsFlow.value = scriptletsSettings
+        runCurrent()
+
+        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+    }
+
+    @Test
+    fun whenKillSwitchFlipsOnAndAllOtherGatesAreReadyThenWorkIsEnqueued() = runTest {
+        isDiscoverableEnabledFlow.value = false
+        selfEnabledFlow.value = true
+        scriptletsFlow.value = scriptletsSettings
+        val scheduler = newScheduler(backgroundScope)
+        scheduler.onCreate(lifecycleOwner)
+        runCurrent()
+        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
+
+        isDiscoverableEnabledFlow.value = true
         runCurrent()
 
         verify(workManager).enqueueUniqueWork(

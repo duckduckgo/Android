@@ -82,13 +82,12 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
     }
 
     private fun refresh() {
-        val settings = computeSettings()
-        scriptletsFlow.value = settings?.let { ScriptletsSettings(it.version, it.scriptlets) }
-        domainsFlow.value = settings?.let { DomainsSettings(it.domains) }
+        val raw = parseSettings()
+        scriptletsFlow.value = raw?.let { ScriptletsSettings(it.version, it.scriptlets) }
+        domainsFlow.value = raw?.let { DomainsSettings(it.domains) }
     }
 
-    private fun computeSettings(): AdBlockingExtensionSettings? {
-        if (!feature.isDiscoverable().isEnabled()) return null
+    private fun parseSettings(): AdBlockingExtensionSettings? {
         val settingsJson = feature.self().getSettings() ?: return null
         return runCatching { settingsAdapter.fromJson(settingsJson) }
             .onFailure { logcat(WARN) { "failed to parse settings: ${it.asLog()}" } }
