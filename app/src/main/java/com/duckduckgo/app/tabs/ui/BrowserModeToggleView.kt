@@ -127,7 +127,7 @@ class BrowserModeToggleView @JvmOverloads constructor(
                     candidate.coerceIn(0f, segmentWidthPx.toFloat())
                 return true
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_UP -> {
                 val finalX = binding.selectionIndicator.translationX
                 val snappedMode =
                     if (finalX < segmentWidthPx / 2f) BrowserMode.FIRE else BrowserMode.REGULAR
@@ -142,6 +142,14 @@ class BrowserModeToggleView @JvmOverloads constructor(
                     // No mode change — snap the indicator back to the current segment.
                     animateIndicatorTo(snappedMode, animated = true)
                 }
+                return true
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                // Gesture was interrupted (focus loss, multi-touch, parent intercept) —
+                // not a user-completed selection. Revert to the current mode without
+                // firing the listener.
+                dragging = false
+                currentMode?.let { animateIndicatorTo(it, animated = true) }
                 return true
             }
         }
