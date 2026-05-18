@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboardingquicksetup.ui
 
 import android.content.Context
-import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -38,8 +37,9 @@ class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
     private val binding: ViewBrandDesignAddressBarPositionPickerBinding =
         ViewBrandDesignAddressBarPositionPickerBinding.inflate(LayoutInflater.from(context), this)
 
+    private var lightMode: Boolean = false
     private var currentSelection: OmnibarType = OmnibarType.SINGLE_TOP
-    private var selectionListener: ((OmnibarType) -> Unit)? = null
+    private var selectionChangedListener: ((OmnibarType) -> Unit)? = null
 
     init {
         binding.topOmnibarContainer.setOnClickListener { onOptionClicked(OmnibarType.SINGLE_TOP) }
@@ -71,6 +71,10 @@ class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
             binding.spacerBottomSplit.isVisible = value
         }
 
+    fun setLightMode(isLight: Boolean) {
+        lightMode = isLight
+    }
+
     /**
      * Applies [selection] to the option cards' drawables and radio states.
      *
@@ -79,7 +83,11 @@ class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
      */
     fun setSelection(selection: OmnibarType, animate: Boolean = false) {
         currentSelection = selection
-        val light = isLightMode()
+        applySelection(selection, animate)
+    }
+
+    private fun applySelection(selection: OmnibarType, animate: Boolean) {
+        val light = lightMode
         val topRes = drawableRes(OmnibarType.SINGLE_TOP, selection, light)
         val bottomRes = drawableRes(OmnibarType.SINGLE_BOTTOM, selection, light)
         val splitRes = drawableRes(OmnibarType.SPLIT, selection, light)
@@ -100,19 +108,13 @@ class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
     }
 
     fun setOnSelectionChangedListener(listener: (OmnibarType) -> Unit) {
-        selectionListener = listener
+        selectionChangedListener = listener
     }
 
     private fun onOptionClicked(option: OmnibarType) {
         if (currentSelection != option) {
-            setSelection(option, animate = true)
+            selectionChangedListener?.invoke(option)
         }
-        selectionListener?.invoke(option)
-    }
-
-    private fun isLightMode(): Boolean {
-        val nightFlag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightFlag != Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun drawableRes(type: OmnibarType, selected: OmnibarType, isLight: Boolean): Int {

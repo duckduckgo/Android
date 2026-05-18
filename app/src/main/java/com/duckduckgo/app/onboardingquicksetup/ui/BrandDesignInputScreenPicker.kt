@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboardingquicksetup.ui
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
-import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -48,15 +47,20 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
      * - [CROSSFADE_ANIMATE]: crossfade through the selection states; the Lottie keeps playing from
      *   the current progress so the transition feels continuous.
      */
-    enum class Transition { NONE, ANIMATE, CROSSFADE_ANIMATE }
+    enum class Transition {
+        NONE,
+        ANIMATE,
+        CROSSFADE_ANIMATE
+    }
 
     private val binding: ViewBrandDesignInputScreenPickerBinding =
         ViewBrandDesignInputScreenPickerBinding.inflate(LayoutInflater.from(context), this)
 
     private var lottieRepeatJob: Job? = null
 
+    private var lightMode: Boolean = false
     private var currentWithAi: Boolean = true
-    private var selectionListener: ((Boolean) -> Unit)? = null
+    private var selectionChangedListener: ((Boolean) -> Unit)? = null
 
     init {
         orientation = HORIZONTAL
@@ -65,9 +69,23 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         binding.inputScreenWithAiContainer.setOnClickListener { onOptionClicked(withAi = true) }
     }
 
-    fun setSelection(withAi: Boolean, transition: Transition = Transition.NONE) {
+    fun setLightMode(isLight: Boolean) {
+        lightMode = isLight
+    }
+
+    fun setSelection(
+        withAi: Boolean,
+        transition: Transition = Transition.NONE
+    ) {
         currentWithAi = withAi
-        val isLight = isLightMode()
+        applySelection(withAi, transition)
+    }
+
+    private fun applySelection(
+        withAi: Boolean,
+        transition: Transition
+    ) {
+        val isLight = lightMode
         val withoutAiImageRes = withoutAiImageRes(withAi, isLight)
         val withAiAnimationRes = withAiAnimationRes(withAi, isLight)
 
@@ -76,11 +94,13 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
                 binding.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
                 binding.inputScreenWithAiAnimationFront.setAnimation(withAiAnimationRes)
             }
+
             Transition.ANIMATE -> {
                 binding.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
                 binding.inputScreenWithAiAnimationFront.setAnimation(withAiAnimationRes)
                 playWithAiLottie(binding.inputScreenWithAiAnimationFront)
             }
+
             Transition.CROSSFADE_ANIMATE -> {
                 crossfadeStaticImage(
                     front = binding.inputScreenSearchOnlyImageFront,
@@ -100,7 +120,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
     }
 
     fun setOnSelectionChangedListener(listener: (Boolean) -> Unit) {
-        selectionListener = listener
+        selectionChangedListener = listener
     }
 
     fun startWithAiAnimation(delayedStart: Boolean = false) {
@@ -122,9 +142,8 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     private fun onOptionClicked(withAi: Boolean) {
         if (currentWithAi != withAi) {
-            setSelection(withAi, Transition.CROSSFADE_ANIMATE)
+            selectionChangedListener?.invoke(withAi)
         }
-        selectionListener?.invoke(withAi)
     }
 
     private fun playWithAiLottie(
@@ -135,15 +154,17 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         lottieRepeatJob?.cancel()
         view.removeAllAnimatorListeners()
-        view.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                val replayScope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
-                lottieRepeatJob = replayScope.launch {
-                    delay(LOTTIE_REPEAT_DELAY)
-                    view.playAnimation()
+        view.addAnimatorListener(
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    val replayScope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+                    lottieRepeatJob = replayScope.launch {
+                        delay(LOTTIE_REPEAT_DELAY)
+                        view.playAnimation()
+                    }
                 }
-            }
-        })
+            },
+        )
         if (fromProgress != null) {
             view.progress = fromProgress
         }
@@ -155,13 +176,21 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         }
     }
 
-    private fun crossfadeStaticImage(front: ImageView, back: ImageView, newRes: Int) {
+    private fun crossfadeStaticImage(
+        front: ImageView,
+        back: ImageView,
+        newRes: Int
+    ) {
         back.setImageDrawable(front.drawable)
         front.setImageResource(newRes)
         crossfadeAlpha(front, back)
     }
 
-    private fun crossfadeLottie(front: LottieAnimationView, back: LottieAnimationView, newRes: Int) {
+    private fun crossfadeLottie(
+        front: LottieAnimationView,
+        back: LottieAnimationView,
+        newRes: Int
+    ) {
         val currentProgress = front.progress
         front.composition?.let { back.setComposition(it) }
         back.removeAllAnimatorListeners()
@@ -172,7 +201,10 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         crossfadeAlpha(front, back)
     }
 
-    private fun crossfadeAlpha(front: View, back: View) {
+    private fun crossfadeAlpha(
+        front: View,
+        back: View
+    ) {
         front.animate().cancel()
         back.animate().cancel()
         back.alpha = 1f
@@ -181,19 +213,20 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         back.animate().alpha(0f).setDuration(CROSSFADE_DURATION).setListener(null)
     }
 
-    private fun isLightMode(): Boolean {
-        val nightFlag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightFlag != Configuration.UI_MODE_NIGHT_YES
-    }
-
-    private fun withoutAiImageRes(withAi: Boolean, isLight: Boolean): Int = when {
+    private fun withoutAiImageRes(
+        withAi: Boolean,
+        isLight: Boolean
+    ): Int = when {
         withAi && isLight -> R.drawable.searchbox_withoutai_inactive_brand_design_update
         withAi -> R.drawable.searchbox_withoutai_inactive_dark_brand_design_update
         isLight -> R.drawable.searchbox_withoutai_active_brand_design_update
         else -> R.drawable.searchbox_withoutai_active_dark_brand_design_update
     }
 
-    private fun withAiAnimationRes(withAi: Boolean, isLight: Boolean): Int = when {
+    private fun withAiAnimationRes(
+        withAi: Boolean,
+        isLight: Boolean
+    ): Int = when {
         withAi && isLight -> R.raw.searchbox_with_ai_active
         withAi -> R.raw.searchbox_with_ai_active_dark
         isLight -> R.raw.searchbox_with_ai_inactive

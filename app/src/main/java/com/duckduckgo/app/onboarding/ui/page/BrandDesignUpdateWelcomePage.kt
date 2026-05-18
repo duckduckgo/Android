@@ -67,8 +67,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
-import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheetDialog
-import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheetDialog
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -172,6 +172,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun updateAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
         with(binding.daxDialogCta.addressBarContent.addressBarPicker) {
+            setLightMode(appTheme.isLightModeEnabled())
             isSplitOptionVisible = showSplitOption
             setSelection(selectedOption, animate = animate)
             setOnSelectionChangedListener { viewModel.onAddressBarPositionOptionSelected(it) }
@@ -1636,6 +1637,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 viewModel.onQuickSetupSearchOptionsEditClicked()
             }
         }
+
+        registerQuickSetupBottomSheetResultListeners()
         observeQuickSetupSelection()
     }
 
@@ -1685,30 +1688,34 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
     private fun showQuickSetupAddressBarPositionBottomSheet(initialSelection: OmnibarType, showSplitOption: Boolean) {
-        QuickSetupAddressBarPositionBottomSheetDialog(
-            context = requireContext(),
-            initialSelection = initialSelection,
-            showSplitOption = showSplitOption,
-        ).apply {
-            eventListener = object : QuickSetupAddressBarPositionBottomSheetDialog.EventListener {
-                override fun onDoneClicked(selectedPosition: OmnibarType) {
-                    viewModel.onAddressBarPositionOptionSelected(selectedPosition)
-                }
-            }
-        }.show()
+        QuickSetupAddressBarPositionBottomSheet
+            .newInstance(initialSelection = initialSelection, showSplitOption = showSplitOption)
+            .show(childFragmentManager, QuickSetupAddressBarPositionBottomSheet.TAG)
     }
 
     private fun showQuickSetupSearchOptionsBottomSheet(initialWithAi: Boolean) {
-        QuickSetupSearchOptionsBottomSheetDialog(
-            context = requireContext(),
-            initialWithAi = initialWithAi,
-        ).apply {
-            eventListener = object : QuickSetupSearchOptionsBottomSheetDialog.EventListener {
-                override fun onDoneClicked(withAi: Boolean) {
-                    viewModel.onInputScreenOptionSelected(withAi = withAi)
-                }
-            }
-        }.show()
+        QuickSetupSearchOptionsBottomSheet
+            .newInstance(initialWithAi = initialWithAi)
+            .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
+    }
+
+    private fun registerQuickSetupBottomSheetResultListeners() {
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupAddressBarPositionBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val selectedName = bundle.getString(
+                QuickSetupAddressBarPositionBottomSheet.RESULT_KEY_SELECTED_POSITION,
+            ) ?: return@setFragmentResultListener
+            viewModel.onAddressBarPositionOptionSelected(OmnibarType.valueOf(selectedName))
+        }
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupSearchOptionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI)
+            viewModel.onInputScreenOptionSelected(withAi = withAi)
+        }
     }
 
     /**
@@ -2080,6 +2087,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         transition: BrandDesignInputScreenPicker.Transition,
     ) {
         with(binding.daxDialogCta.inputScreenContent.inputScreenPicker) {
+            setLightMode(appTheme.isLightModeEnabled())
             setSelection(withAi, transition)
             setOnSelectionChangedListener { viewModel.onInputScreenOptionSelected(withAi = it) }
         }
