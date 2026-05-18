@@ -28,6 +28,7 @@ import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetQuickSetupSearchOptionsBinding
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -77,6 +78,8 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
                 setSelection(selected, BrandDesignInputScreenPicker.Transition.CROSSFADE_ANIMATE)
             }
         }
+        binding.quickSetupSearchOptionsCaption.text =
+            getString(BrowserR.string.preOnboardingInputScreenDescription).html(requireContext())
         binding.quickSetupSearchOptionsDoneButton.setOnClickListener {
             setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_WITH_AI to withAi))
             dismiss()

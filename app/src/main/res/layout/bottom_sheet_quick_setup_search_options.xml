@@ -69,9 +69,9 @@
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/ducksansproduct_regular"
                 android:gravity="start"
-                android:text="@string/quickSetupSearchOptionsCaption"
                 app:textType="secondary"
-                app:typography="body1" />
+                app:typography="body1"
+                tools:text="@string/preOnboardingInputScreenDescription" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/quickSetupSearchOptionsDoneButton"
