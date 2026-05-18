@@ -24,8 +24,8 @@
     <string name="yes">Да</string>
     <string name="no">Не</string>
     <string name="open">Отваряне</string>
-    <string name="cancel">Отмени</string>
     <string name="search">Търсене</string>
+    <string name="cancel">Отмени</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Чатът е изтрит</string>

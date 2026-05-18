@@ -24,8 +24,8 @@
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>
     <string name="open">Avaa</string>
-    <string name="cancel">Peruuta</string>
     <string name="search">Hae</string>
+    <string name="cancel">Peruuta</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Keskustelu poistettu</string>
@@ -866,7 +866,7 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Yllätä minut!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Tällainen on <b>**DuckDuckGo Search**!</b> Yksityinen. Nopea. Vähemmän mainoksia.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">Tällainen on DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Se on DuckDuckGo Search!</string>
     <string name="onboardingSerpDaxDialogBrandDesignDescription">Yksityinen. Nopea. Vähemmän mainoksia.</string>
     <string name="onboardingSerpDaxDialogButton">Selvä!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Siirry seuraavaksi sivustolle!</string>
