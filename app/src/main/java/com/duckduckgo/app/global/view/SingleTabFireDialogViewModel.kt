@@ -154,6 +154,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 )
                 try {
                     if (selectedChatUrls != null) {
+                        shouldRestartAfterClearing = false
                         dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
                     } else {
                         dataClearing.clearDataUsingManualFireOptions()

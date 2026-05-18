@@ -1099,6 +1099,21 @@ class SingleTabFireDialogViewModelTest {
         }
     }
 
+    @Test
+    fun `when delete all clicked from ChatHistory origin then clearSelectedDuckAiChats is dispatched and process is not restarted`() = runTest {
+        val urls = setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b")
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = urls))
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing).clearSelectedDuckAiChats(urls)
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+        assertFalse(testee.shouldRestartAfterClearing)
+    }
+
     // endregion
 
     // region onDeleteThisTabClicked
