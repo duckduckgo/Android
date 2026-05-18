@@ -15,11 +15,12 @@
         android:id="@+id/chatHistorySelectAllIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:duplicateParentState="true"
         android:importantForAccessibility="no"
+        android:src="@drawable/selector_chat_history_select_all_indicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_chat_history_unchecked_24" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/chatHistorySelectAllLabel"

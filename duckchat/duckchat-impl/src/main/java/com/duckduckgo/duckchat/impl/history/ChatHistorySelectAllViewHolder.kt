@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.impl.history
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
@@ -28,17 +27,13 @@ class ChatHistorySelectAllViewHolder(
     itemView: View,
 ) : RecyclerView.ViewHolder(itemView) {
 
-    private val icon: ImageView = itemView.findViewById(R.id.chatHistorySelectAllIcon)
     private val label: DaxTextView = itemView.findViewById(R.id.chatHistorySelectAllLabel)
 
     fun bind(allSelected: Boolean, onClick: () -> Unit) {
-        if (allSelected) {
-            icon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_blue_round_24)
-            label.setText(R.string.duck_ai_chat_history_unselect_all)
-        } else {
-            icon.setImageResource(R.drawable.ic_chat_history_unchecked_24)
-            label.setText(R.string.duck_ai_chat_history_select_all)
-        }
+        itemView.isSelected = allSelected
+        label.setText(
+            if (allSelected) R.string.duck_ai_chat_history_unselect_all else R.string.duck_ai_chat_history_select_all,
+        )
         itemView.setOnClickListener { onClick() }
     }
 
