@@ -236,7 +236,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val isDuckAiTab = dialogOrigin == DuckAiContextualChat ||
             targetTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
         val tabCount = tabRepository.getOpenTabCount()
-        val isFireAnimationUpdateEnabled = brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+        val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
+            brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+        }
         return ViewState.Loaded(
             stateData = ViewState.Loaded.StateData(
                 isDuckAiChatsSelected = isDuckAiChatsSelected,
