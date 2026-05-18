@@ -1029,7 +1029,7 @@ class BrowserTabFragment :
                 }
 
                 InputScreenActivityResultCodes.AFTER_INACTIVITY_REQUESTED -> {
-                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams)
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams, fadeTransitionConfig())
                 }
 
                 RESULT_CANCELED -> {
@@ -3678,7 +3678,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onAfterInactivityPressed() {
-                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams)
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams, fadeTransitionConfig())
                 }
             },
         )
