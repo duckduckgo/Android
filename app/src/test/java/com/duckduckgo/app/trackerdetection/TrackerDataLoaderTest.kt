@@ -84,12 +84,12 @@ class TrackerDataLoaderTest {
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
             entityLookupRefresher = mockEntityLookupRefresher,
-            coroutineRule.testDispatcherProvider,
-            object : OptimizeTrackerEvaluationRCWrapper {
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
                 override val enabled: Boolean
                     get() = false
             },
-            object : PrecompileTdsRegexRCWrapper {
+            precompileTdsRegexRCWrapper = object : PrecompileTdsRegexRCWrapper {
                 override val enabled: Boolean
                     get() = false
             },

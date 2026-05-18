@@ -70,7 +70,7 @@ import java.io.File
  *
  * Numbers are observation-only — no pass/fail assertion.
  */
-// @Ignore("Performance benchmark — run manually, not in CI. See class kdoc for instructions.")
+@Ignore("Performance benchmark — run manually, not in CI. See class kdoc for instructions.")
 @RunWith(AndroidJUnit4::class)
 class CachedTdsEntityLookupPerfAndroidTest {
 
