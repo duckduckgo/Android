@@ -18,6 +18,9 @@ package com.duckduckgo.app.dispatchers
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -42,8 +45,13 @@ interface ExternalIntentProcessingState {
 @SingleInstanceIn(AppScope::class)
 class ExternalIntentProcessingStateImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
-    tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
 ) : ExternalIntentProcessingState {
+
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
+
     @Volatile
     override var hasPendingTabLaunch: Boolean = false
         private set

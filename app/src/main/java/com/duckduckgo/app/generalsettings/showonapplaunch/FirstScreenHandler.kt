@@ -24,7 +24,10 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -53,12 +56,16 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val duckChat: DuckChat,
-    private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val systemAutofillEngagement: SystemAutofillEngagement,
     private val customTabDetector: CustomTabDetector,
+    private val browserModeStateHolder: BrowserModeStateHolder,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
+
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value)
 
     override fun onOpen(isFreshLaunch: Boolean) {
         // Notify the NtpAfterIdleManager synchronously on a fresh launch when the currently
