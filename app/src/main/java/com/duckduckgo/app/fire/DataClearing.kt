@@ -76,7 +76,7 @@ class DataClearing @Inject constructor(
     private val dataClearingTrigger: DataClearingTrigger,
 ) : ManualDataClearing, AutomaticDataClearing {
 
-    override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
+    override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean): ClearDataResult {
         suspend fun clearContextualChatDataIfNeeded(tabId: String) {
             val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
                 .contains(FireClearOption.DUCKAI_CHATS)
@@ -99,8 +99,12 @@ class DataClearing @Inject constructor(
         clearContextualChatDataIfNeeded(tabId)
         navigationHistory.removeHistoryForTab(tabId)
 
-        val url = getNewTabUrl(tabUrl)
-        tabOperations.replaceTabWithNewTab(tabId, url)
+        if (replaceCurrentTab) {
+            val url = getNewTabUrl(tabUrl)
+            tabOperations.replaceTabWithNewTab(tabId, url)
+        } else {
+            tabRepository.deleteTabs(listOf(tabId))
+        }
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult

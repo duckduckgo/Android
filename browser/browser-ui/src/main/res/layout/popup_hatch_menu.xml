@@ -47,7 +47,7 @@
         app:primaryTextType="destructive" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/hatchMenuAfterTimeoutSettings"
+        android:id="@+id/hatchMenuAfterInactivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_settings_24"

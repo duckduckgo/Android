@@ -498,9 +498,8 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    val browserMode: BrowserMode
-        get() = requireArguments().getString(BROWSER_MODE_ARG)
-            ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
+    val browserMode: BrowserMode get() = requireArguments().getString(BROWSER_MODE_ARG)
+        ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -5938,17 +5937,13 @@ class BrowserTabFragment :
             showCta(cta, instantShow = true)
         }
 
-        private fun showCta(
-            configuration: Cta,
-            instantShow: Boolean = false
-        ) {
+        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
-
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }

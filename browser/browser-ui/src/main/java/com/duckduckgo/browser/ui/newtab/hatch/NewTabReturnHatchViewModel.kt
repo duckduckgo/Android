@@ -74,6 +74,23 @@ class NewTabReturnHatchViewModel @Inject constructor(
     val commands: Flow<Command> = commandChannel.receiveAsFlow()
 
     private val pendingClose = MutableStateFlow(false)
+    private val burnTargetTabId = MutableStateFlow<String?>(null)
+
+    init {
+        // When the user burns the hatch's tab via the FireDialog, hide the hatch as soon as that
+        // tab is gone from the repository. If the FireDialog is cancelled, the tab survives and the
+        // hatch stays visible.
+        viewModelScope.launch(dispatchers.io()) {
+            combine(burnTargetTabId, tabRepository.flowTabs) { targetId, tabs ->
+                targetId != null && tabs.none { it.tabId == targetId }
+            }.collect { targetGone ->
+                if (targetGone) {
+                    pendingClose.value = true
+                    burnTargetTabId.value = null
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val viewState = pendingClose.flatMapLatest { isClosed ->
@@ -121,6 +138,10 @@ class NewTabReturnHatchViewModel @Inject constructor(
         if (tabId.isEmpty()) return
         pendingClose.value = true
         commandChannel.trySend(Command.ShowTabClosedSnackbar(tabId))
+    }
+
+    fun onBurnTabPressed() {
+        burnTargetTabId.value = viewState.value.currentTabId.takeIf { it.isNotEmpty() }
     }
 
     fun onUndoCloseTab(tabId: String) {
