@@ -56,9 +56,6 @@ abstract class TabRepositoryModule {
     abstract fun bindFireTabRepository(@FireMode impl: TabDataRepository): TabRepository
 
     @Binds
-    abstract fun bindUnqualifiedTabRepository(@RegularMode impl: TabRepository): TabRepository
-
-    @Binds
     abstract fun bindTabAtomicOperations(@RegularMode impl: TabDataRepository): TabAtomicOperations
 
     companion object {
