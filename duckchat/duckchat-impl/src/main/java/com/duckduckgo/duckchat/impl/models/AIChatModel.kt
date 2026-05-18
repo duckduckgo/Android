@@ -110,6 +110,16 @@ data class AIChatModel(
 
     fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
 
+    /** The lowest [UserTier] required to access this model, or `null` if no public tier applies. */
+    val requiredTier: UserTier?
+        get() = when {
+            accessTier.isEmpty() -> UserTier.FREE
+            accessTier.contains(UserTier.FREE.rawValue) -> UserTier.FREE
+            accessTier.contains(UserTier.PLUS.rawValue) -> UserTier.PLUS
+            accessTier.contains(UserTier.PRO.rawValue) -> UserTier.PRO
+            else -> null
+        }
+
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
     }
