@@ -1677,7 +1677,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         if (withAi) {
             R.drawable.ic_ai_24
         } else {
-            R.drawable.is_search_24
+            R.drawable.ic_search_24
         }
 
     private fun searchOptionsLabelRes(withAi: Boolean): Int =
