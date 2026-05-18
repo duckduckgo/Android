@@ -17,6 +17,7 @@
 package com.duckduckgo.app.tabs.model
 
 import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,8 +31,13 @@ import javax.inject.Inject
 class RealAggregateTabRepository @Inject constructor(
     @RegularMode regularRepo: TabRepository,
     @FireMode fireRepo: TabRepository,
+    fireModeAvailability: FireModeAvailability,
 ) : AggregateTabRepository {
 
     override val flowTabs: Flow<List<TabEntity>> =
-        combine(regularRepo.flowTabs, fireRepo.flowTabs) { regular, fire -> regular + fire }
+        if (fireModeAvailability.isAvailable()) {
+            combine(regularRepo.flowTabs, fireRepo.flowTabs) { regular, fire -> regular + fire }
+        } else {
+            regularRepo.flowTabs
+        }
 }
