@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.*
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
@@ -35,6 +36,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
@@ -106,6 +108,7 @@ class WelcomePageViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val syncAutoRestore: SyncAutoRestore,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -166,6 +169,10 @@ class WelcomePageViewModel @Inject constructor(
         ) : Command
 
         data object Finish : Command
+
+        data class FinishAndSubmitSearchQuery(val query: String) : Command
+
+        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
 
         data object OnboardingSkipped : Command
 
@@ -295,6 +302,9 @@ class WelcomePageViewModel @Inject constructor(
                     _commands.send(Finish)
                 }
             }
+
+            QUICK_SETUP -> {
+            }
         }
     }
 
@@ -340,6 +350,10 @@ class WelcomePageViewModel @Inject constructor(
             }
 
             INPUT_SCREEN_PREVIEW -> {
+                // no-op
+            }
+
+            QUICK_SETUP -> {
                 // no-op
             }
         }
@@ -400,6 +414,9 @@ class WelcomePageViewModel @Inject constructor(
             INPUT_SCREEN_PREVIEW -> {
                 // no pixel yet
             }
+
+            QUICK_SETUP -> {
+            }
         }
     }
 
@@ -453,6 +470,21 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    /**
+     * @param optionIndex 1, 2 or 3 if the user tapped one of the preset suggestions; null if they submitted a custom query.
+     */
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean, optionIndex: Int?) {
+        viewModelScope.launch {
+            if (isChat) {
+                duckAiOnboardingExperimentMetrics.fireAiChatType(optionIndex)
+                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+            } else {
+                duckAiOnboardingExperimentMetrics.fireSearchType(optionIndex)
+                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
+            }
+        }
+    }
 
     private fun isSplitOmnibarEnabled(): Boolean =
         androidBrowserConfigFeature.splitOmnibar().isEnabled() &&

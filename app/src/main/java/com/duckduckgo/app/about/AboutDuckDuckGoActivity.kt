@@ -43,6 +43,7 @@ import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWi
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -212,7 +213,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchBrowserScreen() {
-        startActivity(BrowserActivity.intent(this, Url.ABOUT, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = Url.ABOUT, interstitialScreen = true))
         finish()
     }
 

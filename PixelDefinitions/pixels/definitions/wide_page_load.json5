@@ -46,7 +46,7 @@
                 "type": "boolean"
             },
             {
-                "key": "feature.data.ext.tracker_optimization_enabled_v2",
+                "key": "feature.data.ext.tracker_optimization_enabled_v3",
                 "description": "Whether tracker evaluation optimization is enabled",
                 "type": "boolean"
             },

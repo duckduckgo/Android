@@ -133,7 +133,7 @@ class DataClearing @Inject constructor(
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
         logcat { "clearDuckAiChatIfNeeded url=$tabUrl" }
         if (tabUrl == null) return
-        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Single(tabUrl)))
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(setOf(tabUrl))))
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {

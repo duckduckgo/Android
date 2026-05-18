@@ -53,6 +53,7 @@ class ModalEvaluatorCompletionStoreImplTest {
         testee = ModalEvaluatorCompletionStoreImpl(
             store = testDataStore,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
         )
     }
 
@@ -83,5 +84,43 @@ class ModalEvaluatorCompletionStoreImplTest {
 
         // Should still be blocked
         assertTrue(testee.isBlockedBy24HourWindow())
+    }
+
+    @Test
+    fun whenCompletionRecordedSyncThenIsBlockedBy24HourWindow() = runTest {
+        testee.recordCompletionSync()
+
+        assertTrue(testee.isBlockedBy24HourWindow())
+    }
+
+    @Test
+    fun whenFreshInstanceReadsAfterPriorPersistedCompletionThenIsBlocked() = runTest {
+        // Persist a completion via the first instance
+        testee.recordCompletion()
+
+        // Simulate process restart — same DataStore, fresh in-memory state
+        val freshInstance = ModalEvaluatorCompletionStoreImpl(
+            store = testDataStore,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
+        )
+
+        assertTrue(freshInstance.isBlockedBy24HourWindow())
+    }
+
+    @Test
+    fun whenCompletionRecordedSyncThenWriteIsPersistedToDataStore() = runTest {
+        testee.recordCompletionSync()
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        // Fresh instance must observe the timestamp from the DataStore alone — its in-memory
+        // shadow starts UNINITIALIZED, so a non-blocked answer would mean the async write was lost.
+        val freshInstance = ModalEvaluatorCompletionStoreImpl(
+            store = testDataStore,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
+        )
+
+        assertTrue(freshInstance.isBlockedBy24HourWindow())
     }
 }

@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.api
 
 import android.content.Context
 import android.net.Uri
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import kotlinx.coroutines.flow.Flow
 
 interface Subscriptions {
@@ -42,6 +43,7 @@ interface Subscriptions {
      * This method returns a [true] if a  given [product] can be found in the entitlements list or [false] otherwise
      * @return [Boolean]
      */
+    @Deprecated("Use getEntitlements() instead.", ReplaceWith("getEntitlements()"))
     fun getEntitlementStatus(): Flow<List<Product>>
 
     /**
@@ -83,6 +85,12 @@ interface Subscriptions {
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
     suspend fun isFreeTrialEligible(): Boolean
+
+    /**
+     * Emits the set of [Entitlement]s granted by the current active subscription, and re-emits when it changes.
+     * Emits an empty set when there is no active subscription.
+     */
+    fun getEntitlements(): Flow<Set<Entitlement>>
 }
 
 enum class Product(val value: String) {

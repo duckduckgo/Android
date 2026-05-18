@@ -101,6 +101,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     ): BrowserMenuViewState.NewTabPage {
         return BrowserMenuViewState.NewTabPage(
             showDuckChatOption = browserViewState.showDuckChatOption,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             vpnMenuState = browserViewState.vpnMenuState,
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             showAutofill = browserViewState.showAutofill,
@@ -137,6 +138,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
             showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
+            showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
             canSharePage = browserViewState.canSharePage,
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,

@@ -43,6 +43,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -108,6 +109,8 @@ class TabDataRepositoryTest {
     private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
 
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
+
+    private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
 
     @After
     fun after() {
@@ -246,6 +249,7 @@ class TabDataRepositoryTest {
         verify(mockWebViewSessionStorage).deleteAllSessions()
         verify(mockDuckChatContextualDataStore).clearAll()
         verify(mockTabVisitedSitesRepository).clearAll()
+        verify(mockNativeInputStatePublisher).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -647,6 +651,7 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
+            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -665,6 +670,7 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
+            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -756,6 +762,7 @@ class TabDataRepositoryTest {
         }
         verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
         verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
+        verify(mockNativeInputStatePublisher).clearTab(TAB_ID)
     }
 
     private fun tabDataRepository(
@@ -771,6 +778,7 @@ class TabDataRepositoryTest {
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
+        nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -796,6 +804,7 @@ class TabDataRepositoryTest {
             tabManagerFeatureFlags,
             contextualDataStore,
             tabVisitedSitesRepository,
+            nativeInputStatePublisher,
         )
     }
 

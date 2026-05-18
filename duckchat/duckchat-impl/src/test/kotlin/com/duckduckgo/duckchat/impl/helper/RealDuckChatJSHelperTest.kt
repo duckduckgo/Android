@@ -1603,7 +1603,7 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
-        val pending = PendingNativePrompt("test prompt", "model")
+        val pending = PendingNativePrompt("test prompt", "model", null)
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(
@@ -1621,11 +1621,12 @@ class RealDuckChatJSHelperTest {
         assertEquals("test prompt", query.getString("prompt"))
         assertTrue(query.getBoolean("autoSubmit"))
         assertEquals("model", query.getString("modelId"))
+        assertFalse(query.has("reasoningEffort"))
     }
 
     @Test
     fun whenGetAIChatNativePromptWithPendingPromptButNoModelIdThenModelIdOmitted() = runTest {
-        val pending = PendingNativePrompt("test prompt", null)
+        val pending = PendingNativePrompt("test prompt", null, null)
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(
@@ -1640,6 +1641,40 @@ class RealDuckChatJSHelperTest {
         val query = result!!.params.getJSONObject("query")
         assertEquals("test prompt", query.getString("prompt"))
         assertFalse(query.has("modelId"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithReasoningEffortThenPayloadIncludesIt() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model", "medium")
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val query = result!!.params.getJSONObject("query")
+        assertEquals("medium", query.getString("reasoningEffort"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithoutReasoningEffortThenPayloadOmitsField() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model", null)
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("reasoningEffort"))
     }
 
     @Test
@@ -1752,7 +1787,12 @@ class RealDuckChatJSHelperTest {
             PendingNativeImage(base64Data = "base64data1", format = "jpeg"),
             PendingNativeImage(base64Data = "base64data2", format = "png"),
         )
-        val pending = PendingNativePrompt("test prompt", "model-id", images)
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            images = images,
+        )
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(
@@ -1775,8 +1815,62 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativePromptWithSelectedToolThenToolChoiceIncluded() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = "WebSearch",
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertTrue(query.has("toolChoice"))
+        val toolChoice = query.getJSONArray("toolChoice")
+        assertEquals(1, toolChoice.length())
+        assertEquals("WebSearch", toolChoice.getString(0))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoSelectedToolThenToolChoiceAbsent() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            selectedTool = null,
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNotNull(result)
+        val query = result!!.params.getJSONObject("query")
+        assertFalse(query.has("toolChoice"))
+    }
+
+    @Test
     fun whenGetAIChatNativePromptWithNoImagesThenImagesKeyAbsent() = runTest {
-        val pending = PendingNativePrompt("test prompt", "model-id", emptyList())
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = "model-id",
+            reasoningEffort = null,
+            images = emptyList(),
+        )
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
 
         val result = testee.processJsCallbackMessage(

@@ -785,7 +785,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=abc-123")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=abc-123"))))
     }
 
     @Test
@@ -795,7 +795,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://example.com")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://example.com"))))
     }
 
     @Test
@@ -806,7 +806,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=abc-123")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=abc-123"))))
     }
 
     @Test
@@ -817,7 +817,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=abc-123")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=abc-123"))))
     }
 
     @Test
@@ -841,7 +841,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=contextual-123")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=contextual-123"))))
         verify(mockContextualDataStore).clearTabChatUrl("tab1")
     }
 
@@ -878,8 +878,8 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=tab-chat")))
-        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=contextual-456")))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=tab-chat"))))
+        verify(mockDataClearingTrigger).clearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai/chat?chatID=contextual-456"))))
     }
 
     // --- getNewTabUrl tests (via clearSingleTabData) ---

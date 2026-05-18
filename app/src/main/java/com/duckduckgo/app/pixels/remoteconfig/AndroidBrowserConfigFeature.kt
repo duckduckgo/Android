@@ -53,12 +53,22 @@ interface AndroidBrowserConfigFeature {
     fun screenLock(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV2" androidBrowserConfig
+     * @return `true` when the remote config has the global "optimizeTrackerEvaluationV3" androidBrowserConfig
+     * sub-feature flag enabled. Controls the HashMap label-walk tracker-domain lookup path.
+     * If the remote feature is not present defaults to `false`. Always-on for internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun optimizeTrackerEvaluationV3(): Toggle
+
+    /**
+     * Pre-compile TDS rule regex patterns once when TdsClient is built rather than recompiling
+     * on every URL match. When disabled, regex compilation happens per-call (legacy behavior).
+     * @return `true` when the remote config has the global "precompileTdsRegex" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun optimizeTrackerEvaluationV2(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun precompileTdsRegex(): Toggle
 
     /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
@@ -328,6 +338,15 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendPageLoadWideEvent(): Toggle
+
+    /**
+     * Controls whether post-idle session wide events are sent.
+     * @return `true` when the remote config has the global "sendPostIdleSessionWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPostIdleSessionWideEvent(): Toggle
 
     /**
      * Controls whether page content is cached in Room for each tab.

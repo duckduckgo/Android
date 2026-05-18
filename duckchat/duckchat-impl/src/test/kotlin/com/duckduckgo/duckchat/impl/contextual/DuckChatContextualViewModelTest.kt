@@ -70,6 +70,7 @@ class DuckChatContextualViewModelTest {
     private val duckChatFeature: DuckChatFeature = mock()
     private val contextualFireButtonToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
+    private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
         parentName = "androidBrowserConfig",
@@ -105,6 +106,7 @@ class DuckChatContextualViewModelTest {
             duckChatPixels = duckChatPixels,
             duckChatFeature = duckChatFeature,
             featureTogglesInventory = featureTogglesInventory,
+            modelManager = modelManager,
         )
     }
 
@@ -210,6 +212,57 @@ class DuckChatContextualViewModelTest {
         testee.onPromptSent("Hello Duck.ai")
 
         verify(duckChatPixels).reportContextualPromptSubmittedWithoutContextNative()
+    }
+
+    @Test
+    fun `when prompt sent and model id available then query contains modelId`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertFalse(query.has("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent and reasoning effort available then query contains reasoningEffort`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertEquals("gpt-5.2", query.getString("modelId"))
+            assertEquals("low", query.getString("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when prompt sent and neither model nor reasoning available then query omits both`() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn(null)
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("hello")
+
+            val event = awaitItem()
+            val query = event.params.getJSONObject("query")
+            assertFalse(query.has("modelId"))
+            assertFalse(query.has("reasoningEffort"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -334,6 +387,7 @@ class DuckChatContextualViewModelTest {
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
                 )
 
             val tabId = "tab-1"
@@ -701,6 +755,7 @@ class DuckChatContextualViewModelTest {
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
                 )
 
             val serializedPageData =
@@ -737,6 +792,7 @@ class DuckChatContextualViewModelTest {
                     duckChatPixels = duckChatPixels,
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
+                    modelManager = modelManager,
                 )
 
             val serializedPageData =
@@ -1402,6 +1458,7 @@ class DuckChatContextualViewModelTest {
         duckChatPixels = duckChatPixels,
         duckChatFeature = duckChatFeature,
         featureTogglesInventory = featureTogglesInventory,
+        modelManager = modelManager,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
@@ -1439,6 +1496,7 @@ class DuckChatContextualViewModelTest {
         override fun isVoiceChatSessionActive(tabId: String): Boolean = false
         override val activeVoiceChatSessions: Flow<Set<String>> = flowOf(emptySet())
         override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+        override suspend fun isChatHistoryAvailable(): Boolean = false
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

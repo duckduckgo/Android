@@ -21,15 +21,16 @@ import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.text.InputType
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.webkit.ValueCallback
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.Space
 import androidx.core.view.doOnAttach
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -49,20 +50,24 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
-import com.duckduckgo.duckchat.impl.nativeinput.Action
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidgetViewModel
-import com.duckduckgo.duckchat.impl.ui.NativeInputState
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -107,11 +112,21 @@ interface NativeInputWidget {
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
+    fun getResolvedReasoningEffort(): String?
+    fun getSelectedTool(): String?
+    fun clearSelectedTool()
+    fun setModelPickerEnabled(enabled: Boolean)
+
+    /**
+     * Binds a reactive source of "should the model picker be enabled?"
+     */
+    fun bindModelPickerEnabledSource(source: Flow<Boolean>)
     fun getImageAttachmentsJson(): JSONArray?
-    fun clearImageAttachments()
+    fun getFileAttachmentsJson(): JSONArray?
+    fun clearAttachments()
     fun storePendingPrompt(query: String)
-    fun configure(isDuckAiMode: Boolean, isBottom: Boolean)
-    fun configureContextual()
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean)
+    fun configureContextual(tabId: String)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
@@ -149,7 +164,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : InputModeWidget(context, attrs, defStyle), NativeInputWidget {
+) : InputModeWidget(context, attrs, defStyle, R.layout.view_native_input_mode_switch_widget), NativeInputWidget, NativeInputHost {
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -167,9 +182,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
 
+    @Inject
+    lateinit var nativeInputStateProvider: NativeInputStateProvider
+
+    private var activeTabId: String? = null
+
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
+    private var floatingButtons: InputScreenButtons? = null
     private var floatingSubmitContainer: ViewGroup? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
@@ -177,15 +198,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var tierJob: Job? = null
     private var nativeInputStateJob: Job? = null
     private var pluginsJob: Job? = null
+    private var modelPickerEnabledJob: Job? = null
+    private var modelPickerEnabledSource: Flow<Boolean>? = null
+    private var modelPickerView: ModelPicker? = null
+    private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var attachmentLimitExceeded: Boolean = false
     private var hasAttachments: Boolean = false
     private var supportsUpload: Boolean = true
-    private var nativeInputState: NativeInputState = NativeInputState(
-        inputMode = NativeInputState.InputMode.SEARCH_ONLY,
-        inputContext = NativeInputState.InputContext.BROWSER,
-    )
+    private var nativeInputState: NativeInputState? = null
     private var chatSuggestionsBinding: NativeInputChatSuggestionsBinder.Binding? = null
     private var onShowSuggestions: ((RecyclerView.Adapter<*>) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
@@ -197,13 +219,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override var onVoiceSearchClick: (() -> Unit)? = null
         set(value) {
             field = value
-            submitButtons?.onVoiceSearchClick = value
+            voiceHostButtons()?.onVoiceSearchClick = value
             onVoiceClick = value
         }
     override var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            submitButtons?.onVoiceChatClick = value
+            voiceHostButtons()?.onVoiceChatClick = value
         }
     override var onPaidTierChanged: ((Boolean) -> Unit)? = null
         set(value) {
@@ -218,15 +240,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
     private var pendingIsDuckAiMode: Boolean = false
 
+    // True when this widget instance hosts the contextual sheet. Set in configureContextual();
+    // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
+    // BROWSER-state mutations from the main widget into the contextual UI: both widgets
+    // observe the same `tabId` slot, so the contextual widget can briefly receive a state
+    // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
+    // toggle row and reset the parent card's corners.
+    private var isContextualWidget: Boolean = false
+
     private var attachmentView: AttachmentView? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setupPlugins()
+        observeModelPickerEnabledSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
-        observeNativeInputState()
+        // observeNativeInputState() is started from configure()/configureContextual() once
+        // the tabId is known — the widget reads its state from NativeInputStateProvider per-tab.
+        if (activeTabId != null) observeNativeInputState()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -238,14 +271,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 viewModel.plugins.collect { plugins ->
                     for (plugin in plugins) {
                         val container = findViewById<FrameLayout?>(plugin.containerId) ?: continue
-                        val pluginView = plugin.createView(context, onPluginAction)
+                        val pluginView = plugin.createView(context, this@NativeInputModeWidget)
                         container.removeAllViews()
                         container.addView(pluginView)
                         if (plugin.containerId != R.id.startChatContainer) {
                             container.isVisible = isChatTabSelected()
                         }
+                        if (pluginView is ModelPicker) {
+                            modelPickerView = pluginView
+                            // Apply the current enabled state. The host may have set it
+                            // before plugins were created.
+                            pluginView.setPickerEnabled(viewModel.modelPickerEnabled.value)
+                        }
+                        if (pluginView is OptionsView) {
+                            optionsView = pluginView
+                        }
                         wirePluginView(pluginView, scope)
                     }
+                    optionsView?.updateCapabilitiesFrom(modelPickerView)
                 }
             }
             launch {
@@ -260,6 +303,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
                                 command.visible && hasAttachments
                         }
                     }
+                }
+            }
+            launch {
+                viewModel.modelPickerEnabled.collect { enabled ->
+                    modelPickerView?.setPickerEnabled(enabled)
                 }
             }
         }
@@ -277,6 +325,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
             picker.onMenuDismissed = { isModelMenuVisible = false }
+            picker.onModelSelected = {
+                optionsView?.updateCapabilitiesFrom(picker)
+            }
         }
     }
 
@@ -302,6 +353,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         nativeInputStateJob = null
         pluginsJob?.cancel()
         pluginsJob = null
+        modelPickerEnabledJob?.cancel()
+        modelPickerEnabledJob = null
+        modelPickerView = null
+        optionsView = null
         widgetRoot = null
         tearDownChatSuggestions()
     }
@@ -348,11 +403,80 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyTrailingButtonMargin()
         prepareSubmitButtons()
         configureMainButtonsVisibility()
+        configureBottomRowFocusVisibility()
         inputField.doOnTextChanged { _, _, _, _ ->
             updateSendButtonVisibility()
             updateVoiceButtonVisibility()
+            updateNewLineButtonVisibility()
         }
     }
+
+    private fun configureBottomRowFocusVisibility() {
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+        inputField.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            // Toggle visibility is intentionally NOT updated here: it's owned by applyState
+            // (state-driven) and by NativeInputManager.setToggleVisible (keyboard-visibility
+            // driven on duck.ai). Re-evaluating it from the focus listener would race with
+            // setToggleVisible — e.g. re-show the toggle after the keyboard has been dismissed.
+            // Only animate on focus-gain — focus-loss pairs with an instant setToggleVisible hide,
+            // and animating the padding shrink afterwards looks like a two-step collapse.
+            if (hasFocus) beginFocusTransition()
+            updateBottomRowVisibility()
+            applyVerticalPaddingForFocus()
+            if (!hasFocus && isDuckAiPageContext()) {
+                hideKeyboard()
+            }
+        }
+    }
+
+    private fun beginFocusTransition() {
+        val root = parent as? ViewGroup ?: return
+        TransitionManager.beginDelayedTransition(
+            root,
+            AutoTransition().apply { duration = FOCUS_TRANSITION_DURATION_MS },
+        )
+    }
+
+    private fun updateBottomRowVisibility() {
+        val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
+        val visible = isChatTabSelected() && (inputField.hasFocus() || isStreaming)
+        bottomRow.visibility = if (visible) VISIBLE else GONE
+    }
+
+    private fun updateToggleVisibilityForState() {
+        if (isDuckAiPageContext()) return
+        applyToggleVisibility(nativeInputState?.toggleVisible ?: false)
+    }
+
+    private fun applyToggleVisibility(visible: Boolean) {
+        // Contextual sheet always hides the toggle row, regardless of what state the per-tab
+        // store emits — the main widget can publish toggleVisible=true for the same tabId.
+        val effective = visible && !isContextualWidget
+        findViewById<View?>(R.id.inputModeSwitchRow)?.visibility = if (effective) VISIBLE else GONE
+    }
+
+    private fun applyVerticalPaddingForFocus() {
+        // 4dp when minimized, 8dp when expanded on focus. The browser omnibar with the toggle
+        // disabled stays minimized regardless of focus; everywhere else (duck.ai omnibar,
+        // duck.ai contextual, browser omnibar with toggle enabled) expands on focus.
+        val isBrowserOmnibarMinimized = nativeInputState?.let {
+            it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
+        } ?: true
+        val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
+        val verticalPadAttr = if (expanded) {
+            com.duckduckgo.mobile.android.R.dimen.keyline_2
+        } else {
+            com.duckduckgo.mobile.android.R.dimen.keyline_1
+        }
+        val verticalPad = resources.getDimensionPixelSize(verticalPadAttr)
+        setPadding(paddingLeft, verticalPad, paddingRight, verticalPad)
+    }
+
+    private fun isDuckAiPageContext(): Boolean = nativeInputState?.let {
+        it.inputContext == NativeInputState.InputContext.DUCK_AI ||
+            it.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL
+    } ?: false
 
     override fun setVoiceSearchAvailable(available: Boolean) {
         voiceSearchAvailable = available
@@ -367,8 +491,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateVoiceButtonVisibility() {
         val isBlank = inputField.text.isNullOrBlank() && !hasAttachments
         setVoiceButtonVisible(voiceSearchAvailable && isBlank)
-        submitButtons?.setVoiceSearchVisible(false)
-        submitButtons?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
+        val host = voiceHostButtons()
+        host?.setVoiceSearchVisible(false)
+        host?.setVoiceChatVisible(voiceChatAvailable && isBlank && !isStreaming)
     }
 
     private fun updateSendButtonVisibility() {
@@ -380,14 +505,28 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    private fun updateNewLineButtonVisibility() {
+        val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
+        val hasText = inputField.text.isNotBlank()
+        val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
+        floatingButtons?.setNewLineButtonVisible(visible)
+    }
+
     private fun applyState(state: NativeInputState) {
+        val contextChanged = nativeInputState?.inputContext != state.inputContext
         nativeInputState = state
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        setToggleMatchParent()
-        updateToggleVisibility(toggle, state)
+        findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
+            setToggleMatchParent()
+            updateToggleVisibility(toggle, state)
+        }
         updateBackButtons(state)
-        if (!state.toggleVisible) {
-            minimize()
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+        updateNewLineButtonVisibility()
+        applyOmnibarShape()
+        if (contextChanged && isChatTabSelected()) {
+            inputField.applyChatInputType()
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
     }
 
@@ -402,7 +541,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!state.toggleVisible) {
             updateSelectedTab(toggle, state)
         }
-        toggle.visibility = if (state.toggleVisible) VISIBLE else GONE
+        updateToggleVisibilityForState()
     }
 
     private fun updateBackButtons(state: NativeInputState) {
@@ -413,14 +552,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
-    }
-
-    private fun minimize() {
-        if (floatingSubmitContainer == null) return
-        findViewById<Space?>(R.id.spacer)?.updateLayoutParams<LayoutParams> { height = 0 }
-        findViewById<Space?>(R.id.bottomSpacer)?.updateLayoutParams<LayoutParams> { height = 0 }
-        findViewById<View?>(R.id.inputModeWidgetLayout)?.updateLayoutParams<MarginLayoutParams> { topMargin = 0 }
-        getActionBarSize()?.let { minimumHeight = it }
     }
 
     private fun removeMargins() {
@@ -458,42 +589,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun getActionBarSize(): Int? {
-        val typedValue = TypedValue()
-        return if (context.theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
-            TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)
-        } else {
-            null
-        }
-    }
-
     private fun setToggleMatchParent() {
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
-            toggle.updateLayoutParams<LayoutParams> {
-                width = 0
-                matchConstraintDefaultWidth = LayoutParams.MATCH_CONSTRAINT_SPREAD
-                constrainedWidth = false
-                startToStart = LayoutParams.UNSET
-                startToEnd = R.id.inputModeWidgetBack
-            }
+            // The toggle now lives inside the card's vertical LinearLayout with match_parent
+            // width and 8dp horizontal margins, so it fills the card width automatically.
             toggle.tabMode = TabLayout.MODE_FIXED
             toggle.tabGravity = TabLayout.GRAVITY_FILL
-            toggle.requestLayout()
         }
     }
 
     private fun configureMainButtonsVisibility() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        updateDuckAiSubmitButton()
+        applyTabUi()
         toggle.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    updateDuckAiSubmitButton()
+                    applyTabUi()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
-                    updateDuckAiSubmitButton()
+                    applyTabUi()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
             },
@@ -502,13 +618,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
-        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+        val isDuckAiChat = isDuckAiPageContext()
+        val actionFlag = if (isDuckAiChat) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
+        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
+        val baseInputType = InputType.TYPE_CLASS_TEXT or
+            InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         setRawInputType(
-            InputType.TYPE_CLASS_TEXT or
-                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+            if (isDuckAiChat) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
         )
         setHorizontallyScrolling(false)
     }
+
+    override fun shouldSubmitOnHardwareEnter(): Boolean =
+        !(isDuckAiPageContext() && isChatTabSelected())
 
     override fun submitMessage(message: String?) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
@@ -548,16 +670,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun applyDefaultTogglePosition() {
-        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
-        findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
-            val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
-            val resolved = if (position == DefaultTogglePosition.LAST_USED) {
-                DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
-            } else {
-                position
-            }
-            if (resolved == DefaultTogglePosition.DUCK_AI) {
-                selectChatTab()
+        doOnAttach {
+            if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
+            findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
+                val resolved = if (position == DefaultTogglePosition.LAST_USED) {
+                    DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
+                } else {
+                    position
+                }
+                if (resolved == DefaultTogglePosition.DUCK_AI) {
+                    selectChatTab()
+                }
             }
         }
     }
@@ -575,10 +699,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun setToggleVisible(visible: Boolean) {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        val isVisible = visible && nativeInputState.toggleVisible
+        val isVisible = visible && (nativeInputState?.toggleVisible ?: false)
         suspendLayoutTransitions {
-            toggle.visibility = if (isVisible) VISIBLE else GONE
+            applyToggleVisibility(isVisible)
         }
     }
 
@@ -594,9 +717,38 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
+    override fun getResolvedReasoningEffort(): String? = viewModel.getResolvedReasoningEffort()
+
+    override fun getSelectedTool(): String? = viewModel.getSelectedTool()
+
+    override fun clearSelectedTool() {
+        optionsView?.clearSelection()
+    }
+
+    override fun setModelPickerEnabled(enabled: Boolean) {
+        viewModel.setModelPickerEnabled(enabled)
+    }
+
+    override fun bindModelPickerEnabledSource(source: Flow<Boolean>) {
+        modelPickerEnabledSource = source
+        if (isAttachedToWindow) observeModelPickerEnabledSource()
+    }
+
+    private fun observeModelPickerEnabledSource() {
+        val source = modelPickerEnabledSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        modelPickerEnabledJob?.cancel()
+        modelPickerEnabledJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setModelPickerEnabled(it) }
+            .launchIn(scope)
+    }
+
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
-    override fun clearImageAttachments() {
+    override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
+
+    override fun clearAttachments() {
         attachmentView?.clearAttachments()
     }
 
@@ -604,31 +756,38 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val images = attachmentView?.getImageAttachments()?.map {
             PendingNativeImage(base64Data = it.base64Data, format = it.format)
         } ?: emptyList()
-        viewModel.storePendingPrompt(query, getSelectedModelId(), images)
+        val files = attachmentView?.getFileAttachments()?.map {
+            PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
+        } ?: emptyList()
+        viewModel.storePendingPrompt(query, getSelectedModelId(), getResolvedReasoningEffort(), getSelectedTool(), images, files)
         attachmentView?.clearAttachmentsForNewChat()
+        optionsView?.clearSelection()
     }
 
-    override fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+        activeTabId = tabId
         pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
-            viewModel.configure(isDuckAiMode, isBottom)
-            viewModel.state.replayCache.lastOrNull()?.let { nativeInputState = it }
+            viewModel.configure(tabId, isDuckAiMode, isBottom)
+            observeNativeInputState()
             if (isDuckAiMode) selectChatTab()
-            applyOmnibarShape(isBottom)
             attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
 
-    override fun configureContextual() {
+    override fun configureContextual(tabId: String) {
+        activeTabId = tabId
         pendingIsDuckAiMode = true
+        isContextualWidget = true
         doOnAttach {
-            viewModel.configureContextual()
+            viewModel.configureContextual(tabId)
+            observeNativeInputState()
             selectChatTab()
             attachmentView?.setDuckAiMode(true)
         }
     }
 
-    override fun isWidgetBottom(): Boolean = nativeInputState.isBottom
+    override fun isWidgetBottom(): Boolean = nativeInputState?.isBottom ?: false
 
     override fun setWidgetPosition(isBottom: Boolean) {
         doOnAttach {
@@ -636,9 +795,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun applyOmnibarShape(isBottom: Boolean) {
-        if (isBottom) return
-        if (nativeInputState.toggleVisible) return
+    private fun applyOmnibarShape() {
+        // The contextual sheet's parent card has a top-only rounded shape applied by
+        // ContextualNativeInputManager.applyCardShape(); never overwrite it from here. The
+        // shared per-tab state store can briefly emit a BROWSER state with toggleVisible=false
+        // (e.g. SEARCH_ONLY users when the main widget publishes first), which would otherwise
+        // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
+        if (isContextualWidget) return
+        val state = nativeInputState ?: return
+        if (state.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
+        if (state.isBottom) return
+        if (state.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
         card.radius = card.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.largeShapeCornerRadius)
         val targetTopMargin = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.omnibarCardMarginTop)
@@ -750,8 +917,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeNativeInputState() {
         nativeInputStateJob?.cancel()
+        val tabId = activeTabId ?: return
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
-        nativeInputStateJob = viewModel.state
+        nativeInputStateJob = nativeInputStateProvider.stateForTab(tabId)
             .onEach(::applyState)
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -797,24 +965,27 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.showStopButton()
         } else {
             submitButtons?.showSendButton()
+            applyTabUi()
             floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
+        updateBottomRowVisibility()
         updateSendButtonVisibility()
         updateVoiceButtonVisibility()
+        updateNewLineButtonVisibility()
     }
 
-    private fun updateDuckAiSubmitButton() {
+    private fun applyTabUi() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
         setImageButtonVisible(isChatTab && supportsUpload)
+        submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_right_24_inverted)
         if (isChatTab) {
-            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
-        } else {
-            submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
         }
         updateSendButtonVisibility()
+        updateNewLineButtonVisibility()
+        updateBottomRowVisibility()
     }
 
     override fun setImageButtonVisible(visible: Boolean) {
@@ -825,48 +996,85 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingSubmitContainer = container
     }
 
-    private val onPluginAction = fun(action: Action) {
-        when (action) {
-            Action.StartChat -> if (!submitAsChat()) viewModel.openNewChat()
-            is Action.ShowAttachmentChooser -> onAttachmentChooserStateChanged?.invoke(action.showing)
-            is Action.AttachmentStateChanged -> {
-                val hadLimitError = attachmentLimitExceeded
-                attachmentLimitExceeded = action.limitExceeded
-                hasAttachments = action.hasAttachments
-                supportsUpload = action.supportsUpload
-                setImageButtonVisible(isChatTabSelected() && supportsUpload)
-                if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
-                    floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
-                }
-                updateSendButtonVisibility()
-                updateVoiceButtonVisibility()
-            }
-        }
+    override fun submit() {
+        // in Duck.ai mode we treat this as submitting prompts.
+        // In non-Duck.ai mode we treat this as starting a chat with or without a prompt.
+        if (!submitAsChat()) viewModel.openNewChat()
     }
 
-    private fun configureSubmitButtons() {
-        if (submitButtons != null) return
-        val floating = floatingSubmitContainer
-        val (container, useTopBar) = if (floating != null) {
-            floating to true
-        } else {
-            (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
+    override fun showAttachmentChooser(showing: Boolean) {
+        onAttachmentChooserStateChanged?.invoke(showing)
+    }
+
+    override fun attachmentChanged(
+        hasAttachments: Boolean,
+        limitExceeded: Boolean,
+        supportsUpload: Boolean,
+    ) {
+        val hadLimitError = attachmentLimitExceeded
+        attachmentLimitExceeded = limitExceeded
+        this.hasAttachments = hasAttachments
+        this.supportsUpload = supportsUpload
+        setImageButtonVisible(isChatTabSelected() && supportsUpload)
+        if (hadLimitError != attachmentLimitExceeded && !isStreaming) {
+            floatingSubmitContainer?.visibility = if (attachmentLimitExceeded) GONE else VISIBLE
         }
-        val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
-            onSendClick = { submitMessage() }
-            onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-            onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
-            onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
-            setSendButtonVisible(false)
-            setNewLineButtonVisible(false)
-        }
-        container.addView(buttons)
-        submitButtons = buttons
+        updateSendButtonVisibility()
         updateVoiceButtonVisibility()
     }
 
+    override fun getInputState(): NativeInputState =
+        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }
+            ?: error("getInputState called before widget was configured")
+    override fun showModelPicker(showing: Boolean) {
+        findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
+    }
+
+    override fun showReasoningPicker(showing: Boolean) {
+        findViewById<FrameLayout?>(R.id.reasoningModePickerContainer)?.isVisible = showing
+    }
+
+    private fun configureSubmitButtons() {
+        if (submitButtons == null) {
+            val bottomContainer = findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return
+            val buttons = InputScreenButtons(
+                context = context,
+                useTopBar = false,
+                layoutResId = R.layout.view_native_input_screen_buttons,
+            ).apply {
+                onSendClick = { submitMessage() }
+                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+                setSendButtonVisible(false)
+                setNewLineButtonVisible(false)
+            }
+            bottomContainer.addView(buttons)
+            submitButtons = buttons
+        }
+
+        val floating = floatingSubmitContainer
+        if (floating != null && floatingButtons == null) {
+            val buttons = InputScreenButtons(
+                context = context,
+                useTopBar = true,
+                layoutResId = R.layout.view_native_input_screen_buttons,
+            ).apply {
+                onNewLineClick = { printNewLine() }
+                onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
+                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
+                setSendButtonVisible(false)
+                setNewLineButtonVisible(false)
+            }
+            floating.addView(buttons)
+            floatingButtons = buttons
+        }
+        updateVoiceButtonVisibility()
+    }
+
+    private fun voiceHostButtons(): InputScreenButtons? = floatingButtons ?: submitButtons
+
     companion object {
         private const val MAX_LINES = 5
+        private const val FOCUS_TRANSITION_DURATION_MS = 100L
     }
 }
 

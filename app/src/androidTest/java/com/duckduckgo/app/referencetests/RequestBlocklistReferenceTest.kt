@@ -65,6 +65,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
+import com.duckduckgo.privacy.config.impl.features.trackerallowlist.OptimizeTrackerAllowListRCWrapper
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistFeature
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
@@ -314,7 +315,13 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
+        val client = TdsClient(
+            name = Client.ClientName.TDS,
+            trackers = trackers,
+            urlToTypeMapper = RealUrlToTypeMapper(),
+            optimizeTrackerEvaluationV3 = false,
+            precompileRegex = false,
+        )
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
@@ -367,7 +374,10 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         } ?: emptyList()
 
         whenever(trackerAllowlistRepository.exceptions).thenReturn(CopyOnWriteArrayList(allowlistEntries))
-        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle)
+        val precompileWrapper = object : OptimizeTrackerAllowListRCWrapper {
+            override val enabled: Boolean = false
+        }
+        trackerAllowlist = RealTrackerAllowlist(trackerAllowlistRepository, fakeToggle, precompileWrapper)
     }
 
     private fun setupUserAllowList() {

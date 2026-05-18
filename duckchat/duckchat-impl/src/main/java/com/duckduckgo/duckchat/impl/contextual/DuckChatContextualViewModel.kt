@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -60,6 +61,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
+    private val modelManager: DuckAiModelManager,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -318,6 +320,8 @@ class DuckChatContextualViewModel @Inject constructor(
             duckChatPixels.reportContextualPromptSubmittedWithContextNative()
         }
 
+        val modelId = modelManager.getSelectedModelId()
+        val reasoningEffort = modelManager.getResolvedReasoningEffort()
         val params =
             JSONObject().apply {
                 put("platform", "android")
@@ -327,6 +331,12 @@ class DuckChatContextualViewModel @Inject constructor(
                     JSONObject().apply {
                         put("prompt", prompt)
                         put("autoSubmit", true)
+                        if (modelId != null) {
+                            put("modelId", modelId)
+                        }
+                        if (reasoningEffort != null) {
+                            put("reasoningEffort", reasoningEffort)
+                        }
                     },
                 )
                 pageContext?.let { put("pageContext", it) }

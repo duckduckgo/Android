@@ -259,7 +259,7 @@ class RealPirActionsRunner @AssistedInject constructor(
             None, CompleteExecution -> {}
             is LoadUrl ->
                 withContext(dispatcherProvider.main()) {
-                    detachedWebView!!.loadUrl(effect.url)
+                    detachedWebView?.loadUrl(effect.url)
                 }
 
             is PushJsAction -> pushJsAction(effect)

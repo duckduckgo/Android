@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScan
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.FailureReason
 import com.squareup.anvil.annotations.ContributesBinding
@@ -79,6 +80,7 @@ class RealPirJobsRunner @Inject constructor(
     private val brokerJsonUpdater: BrokerJsonUpdater,
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val pirScanWideEvent: PirScanWideEvent,
+    private val pirInitialScanCompletionWideEvent: PirInitialScanCompletionWideEvent,
     private val networkProtectionState: NetworkProtectionState,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
@@ -144,17 +146,37 @@ class RealPirJobsRunner @Inject constructor(
             emptyList()
         }
 
+        val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
+        val isVpnConnected = networkProtectionState.safeIsVpnRunning()
+        val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
+        val notificationsPermissionGranted = context.areNotificationsPermissionGranted()
+        val isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled()
+        val webViewCount = minOf(eligibleJobs.size, MAX_DETACHED_WEBVIEW_COUNT)
+
         pirScanWideEvent.onRunStarted(
             executionType = executionType,
             profileQueriesCount = profileQueries.size,
             brokerCount = activeBrokers.size,
             totalScanJobs = eligibleJobs.size,
-            webViewCount = minOf(eligibleJobs.size, MAX_DETACHED_WEBVIEW_COUNT),
-            isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
-            isVpnConnected = networkProtectionState.safeIsVpnRunning(),
-            batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations(),
-            notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
-            isTrackerBlockingEnabled = pirRemoteFeatures.trackerBlocking().isEnabled(),
+            webViewCount = webViewCount,
+            isPowerSavingEnabled = isPowerSavingEnabled,
+            isVpnConnected = isVpnConnected,
+            batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+            notificationsPermissionGranted = notificationsPermissionGranted,
+            isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+        )
+
+        pirInitialScanCompletionWideEvent.onRunStarted(
+            executionType = executionType,
+            profileQueriesCount = profileQueries.size,
+            brokerCount = activeBrokers.size,
+            totalScanJobs = eligibleJobs.size,
+            webViewCount = webViewCount,
+            isPowerSavingEnabled = isPowerSavingEnabled,
+            isVpnConnected = isVpnConnected,
+            batteryOptimizationsEnabled = batteryOptimizationsEnabled,
+            notificationsPermissionGranted = notificationsPermissionGranted,
+            isTrackerBlockingEnabled = isTrackerBlockingEnabled,
         )
 
         if (activeBrokers.isEmpty()) {
@@ -190,6 +212,7 @@ class RealPirJobsRunner @Inject constructor(
             )
 
             pirScanWideEvent.onScanCompleted(executionType)
+            pirInitialScanCompletionWideEvent.onScanCompleted()
 
             if (executionType.isManual) {
                 val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()

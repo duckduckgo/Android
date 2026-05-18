@@ -19,6 +19,9 @@ package com.duckduckgo.pir.impl.dashboard.state
 import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
@@ -38,6 +41,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -51,6 +57,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPirSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockContext: Context = mock()
 
     private val currentTime = 1640995200000L
@@ -62,16 +69,32 @@ class RealPirDashboardInitialScanStateProviderTest {
             currentTimeProvider = mockCurrentTimeProvider,
             pirRepository = mockPirRepository,
             pirSchedulingRepository = mockPirSchedulingRepository,
+            brokerStepsParser = mockBrokerStepsParser,
             context = mockContext,
         )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
     }
 
+    private suspend fun setupBrokersWithScannableSteps(brokers: List<Broker>) {
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(brokers)
+        brokers.forEach { broker ->
+            whenever(mockPirRepository.getBrokerScanSteps(broker.name)).thenReturn("{steps:${broker.name}}")
+            whenever(mockBrokerStepsParser.parseStep(eq(broker), any(), anyOrNull())).thenReturn(
+                listOf(
+                    ScanStep(
+                        broker = broker,
+                        step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                    ),
+                ),
+            )
+        }
+    }
+
     @Test
     fun whenNoActiveBrokersExistThenGetActiveBrokersAndMirrorSitesTotalReturnsZero() = runTest {
         // Given
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        setupBrokersWithScannableSteps(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
 
         // When
@@ -84,8 +107,8 @@ class RealPirDashboardInitialScanStateProviderTest {
     @Test
     fun whenActiveBrokersExistButNoMirrorSitesThenReturnsActiveBrokersCount() = runTest {
         // Given
-        val activeBrokers = listOf("broker1", "broker2", "broker3")
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(activeBrokers)
+        val activeBrokers = listOf(createBroker("broker1"), createBroker("broker2"), createBroker("broker3"))
+        setupBrokersWithScannableSteps(activeBrokers)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
 
         // When
@@ -98,7 +121,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     @Test
     fun whenActiveBrokersAndExtantMirrorSitesExistThenReturnsTotalCount() = runTest {
         // Given
-        val activeBrokers = listOf("broker1", "broker2")
+        val activeBrokers = listOf(createBroker("broker1"), createBroker("broker2"))
         val mirrorSites = listOf(
             createMirrorSite(
                 name = "mirror1",
@@ -126,7 +149,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             ),
         )
 
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(activeBrokers)
+        setupBrokersWithScannableSteps(activeBrokers)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(mirrorSites)
 
         // When
@@ -134,6 +157,77 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // Then
         assertEquals(4, result) // 2 active brokers + 2 extant mirror sites with active parents
+    }
+
+    @Test
+    fun whenActiveBrokerScanStepCannotBeParsedThenBrokerAndItsMirrorSitesAreExcludedFromTotal() = runTest {
+        // Given
+        val parseableBroker = createBroker("broker1")
+        val unparseableBroker = createBroker("broker2")
+        val activeBrokers = listOf(parseableBroker, unparseableBroker)
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getBrokerScanSteps(parseableBroker.name)).thenReturn("{steps:broker1}")
+        whenever(mockPirRepository.getBrokerScanSteps(unparseableBroker.name)).thenReturn("{steps:broker2}")
+        whenever(mockBrokerStepsParser.parseStep(eq(parseableBroker), any(), anyOrNull())).thenReturn(
+            listOf(
+                ScanStep(
+                    broker = parseableBroker,
+                    step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                ),
+            ),
+        )
+        // Parsing failure surfaces as an empty list from the parser
+        whenever(mockBrokerStepsParser.parseStep(eq(unparseableBroker), any(), anyOrNull())).thenReturn(emptyList())
+
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(
+            listOf(
+                createMirrorSite(
+                    name = "mirror1",
+                    parentSite = "broker1",
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+                createMirrorSite(
+                    name = "mirror2",
+                    parentSite = "broker2", // Parent has unparseable scan step
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+            ),
+        )
+
+        // When
+        val result = testee.getActiveBrokersAndMirrorSitesTotal()
+
+        // Then - only broker1 + its mirror site counted, broker2 and its mirror excluded
+        assertEquals(2, result)
+    }
+
+    @Test
+    fun whenActiveBrokerHasNoStoredScanStepsThenBrokerIsExcludedFromTotal() = runTest {
+        // Given
+        val parseableBroker = createBroker("broker1")
+        val brokerWithoutScanSteps = createBroker("broker2")
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parseableBroker, brokerWithoutScanSteps))
+        whenever(mockPirRepository.getBrokerScanSteps(parseableBroker.name)).thenReturn("{steps:broker1}")
+        whenever(mockPirRepository.getBrokerScanSteps(brokerWithoutScanSteps.name)).thenReturn(null)
+        whenever(mockBrokerStepsParser.parseStep(eq(parseableBroker), any(), anyOrNull())).thenReturn(
+            listOf(
+                ScanStep(
+                    broker = parseableBroker,
+                    step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                ),
+            ),
+        )
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+        // When
+        val result = testee.getActiveBrokersAndMirrorSitesTotal()
+
+        // Then
+        assertEquals(1, result)
     }
 
     @Test

@@ -32,10 +32,21 @@ data class RemoteAIChatModel(
     @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
     @field:Json(name = "provider") val provider: String? = null,
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
+    @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
+    @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
+    @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
 )
 
 data class RemoteTierAttachmentLimits(
+    val files: RemoteFileLimits? = null,
     val images: RemoteImageLimits? = null,
+)
+
+data class RemoteFileLimits(
+    val maxPerConversation: Int? = null,
+    val maxFileSizeMB: Int? = null,
+    val maxTotalFileSizeBytes: Long? = null,
+    val maxPagesPerFile: Int? = null,
 )
 
 data class RemoteImageLimits(
@@ -45,8 +56,22 @@ data class RemoteImageLimits(
 )
 
 data class AttachmentLimits(
+    val files: FileLimits = FileLimits(),
     val images: ImageLimits = ImageLimits(),
 )
+
+data class FileLimits(
+    val maxPerConversation: Int = DEFAULT_FILE_MAX_PER_CONVERSATION,
+    val maxFileSizeBytes: Long = DEFAULT_FILE_MAX_SIZE_BYTES,
+    val maxTotalFileSizeBytes: Long = DEFAULT_FILE_MAX_SIZE_BYTES,
+    val maxPagesPerFile: Int = DEFAULT_FILE_MAX_PAGES,
+) {
+    companion object {
+        const val DEFAULT_FILE_MAX_PER_CONVERSATION = 3
+        const val DEFAULT_FILE_MAX_SIZE_BYTES = 5L * 1024 * 1024
+        const val DEFAULT_FILE_MAX_PAGES = 8
+    }
+}
 
 data class ImageLimits(
     val maxPerTurn: Int = DEFAULT_IMAGE_MAX_PER_TURN,
@@ -63,7 +88,7 @@ data class ImageLimits(
 data class AIChatAttachmentUsage(
     val imagesUsed: Int = 0,
     val filesUsed: Int = 0,
-    val fileSizeBytesUsed: Int = 0,
+    val fileSizeBytesUsed: Long = 0L,
 )
 
 data class AIChatModel(
@@ -76,7 +101,15 @@ data class AIChatModel(
     val provider: ModelProvider = ModelProvider.UNKNOWN,
     val supportsImageUpload: Boolean = false,
     val supportedImageFormats: List<String> = emptyList(),
+    val supportedFileTypes: List<String> = emptyList(),
+    val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
+    val supportedTools: List<Tool> = emptyList(),
 ) {
+    val supportsFileUpload: Boolean
+        get() = supportedFileTypes.isNotEmpty()
+
+    fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
+
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
     }
@@ -86,6 +119,11 @@ enum class UserTier(val rawValue: String) {
     FREE("free"),
     PLUS("plus"),
     PRO("pro"),
+    ;
+
+    companion object {
+        fun from(raw: String?): UserTier? = entries.firstOrNull { it.rawValue == raw }
+    }
 }
 
 enum class ModelProvider {

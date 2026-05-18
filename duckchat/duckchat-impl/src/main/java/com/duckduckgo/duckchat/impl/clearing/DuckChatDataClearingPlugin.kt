@@ -44,7 +44,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         types.forEach { type ->
             when (type) {
                 is ClearableData.DuckChats.All -> deleteAllChats()
-                is ClearableData.DuckChats.Single -> deleteChat(type.chatUrl)
+                is ClearableData.DuckChats.Selected -> deleteSelected(type.chatUrls)
                 else -> { /* not handled by this plugin */ }
             }
         }
@@ -69,14 +69,19 @@ class DuckChatDataClearingPlugin @Inject constructor(
         }
     }
 
-    private suspend fun deleteChat(chatUrl: String) {
-        logcat { "DuckChatDataClearingPlugin: deleting chat url=$chatUrl" }
-        val chatId = extractChatId(chatUrl) ?: return
-        val deleted = duckChatDeleter.deleteChat(chatId)
-        if (deleted) {
-            duckChatSyncRepository.recordSingleChatDeletion(chatId)
-            syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    private suspend fun deleteSelected(chatUrls: Set<String>) {
+        logcat { "DuckChatDataClearingPlugin: deleting ${chatUrls.size} selected chat(s)" }
+        if (chatUrls.isEmpty()) return
+        var anyDeleted = false
+        chatUrls.forEach { chatUrl ->
+            val chatId = extractChatId(chatUrl) ?: return@forEach
+            if (duckChatDeleter.deleteChat(chatId)) {
+                duckChatSyncRepository.recordSingleChatDeletion(chatId)
+                anyDeleted = true
+            }
         }
+        // One sync trigger per user-visible delete action, not N.
+        if (anyDeleted) syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
     private fun extractChatId(url: String): String? {

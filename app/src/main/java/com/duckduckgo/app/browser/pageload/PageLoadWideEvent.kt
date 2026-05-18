@@ -330,7 +330,7 @@ class RealPageLoadWideEvent @Inject constructor(
         const val KEY_ERROR_CODE = "error_code"
         const val KEY_WEBVIEW_VERSION = "webview_version"
         const val KEY_CPM_ENABLED = "cpm_enabled"
-        const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v2"
+        const val KEY_TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled_v3"
         const val KEY_IS_TAB_IN_FOREGROUND_ON_FINISH = "is_tab_in_foreground_on_finish"
         const val KEY_ACTIVE_REQUESTS_ON_LOAD_START = "active_requests_on_load_start"
         const val KEY_CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish"

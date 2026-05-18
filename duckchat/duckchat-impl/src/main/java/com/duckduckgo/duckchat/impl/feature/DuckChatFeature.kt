@@ -220,6 +220,21 @@ interface DuckChatFeature {
     fun useNativeStorageChatData(): Toggle
 
     /**
+     * @return `true` when the native chat history screen can be launched.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun historyScreen(): Toggle
+
+    /**
+     * @return `true` when the per-row Fire-icon delete affordance on Duck.ai chat-history
+     * suggestions in the omnibar autocomplete is visible.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun deleteFromAutocomplete(): Toggle
+
+    /**
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
      * @return `true` when the remote config has the "digitalAssistantDuckAi"
      * sub-feature flag enabled
