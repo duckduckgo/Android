@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.view.doOnAttach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
@@ -98,7 +99,9 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
             Transition.ANIMATE -> {
                 binding.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
                 binding.inputScreenWithAiAnimationFront.setAnimation(withAiAnimationRes)
-                playWithAiLottie(binding.inputScreenWithAiAnimationFront)
+                binding.inputScreenWithAiAnimationFront.doOnAttach {
+                    playWithAiLottie(binding.inputScreenWithAiAnimationFront)
+                }
             }
 
             Transition.CROSSFADE_ANIMATE -> {
