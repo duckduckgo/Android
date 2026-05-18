@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.voice
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
@@ -62,7 +62,7 @@ interface VoiceSessionStateManager {
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
 class RealVoiceSessionStateManager @Inject constructor(
     private val context: Context,
-    private val tabRepository: TabRepository,
+    private val tabRepository: AggregateTabRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckChatFeature: DuckChatFeature,
 ) : VoiceSessionStateManager, BrowserLifecycleObserver {

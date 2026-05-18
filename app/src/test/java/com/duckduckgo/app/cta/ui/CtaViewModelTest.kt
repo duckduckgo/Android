@@ -43,8 +43,8 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -116,7 +116,7 @@ class CtaViewModelTest {
 
     private val mockUserStageStore: UserStageStore = mock()
 
-    private val mockTabRepository: TabRepository = mock()
+    private val mockAggregateTabRepository: AggregateTabRepository = mock()
 
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
 
@@ -171,7 +171,7 @@ class CtaViewModelTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
-        whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().liveTabs().asFlow())
+        whenever(mockAggregateTabRepository.flowTabs).thenReturn(db.tabsDao().liveTabs().asFlow())
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(DISABLED)
         whenever(mockDuckPlayer.isDuckPlayerUri(any())).thenReturn(false)
         whenever(mockDuckPlayer.getUserPreferences()).thenReturn(UserPreferences(false, AlwaysAsk))
@@ -192,7 +192,7 @@ class CtaViewModelTest {
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
-            tabRepository = mockTabRepository,
+            aggregateTabRepository = mockAggregateTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
