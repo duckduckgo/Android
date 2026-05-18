@@ -228,6 +228,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var currentBrowserMode: BrowserMode
+
     private val lastActiveTabs = TabList()
 
     private var duckAiFragment: DuckChatWebViewFragment? = null
@@ -292,7 +295,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this, viewModel.currentMode.value)
+        TabPagerAdapter(this, currentBrowserMode)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -600,7 +603,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val mode = if (isExternal) BrowserMode.REGULAR else viewModel.currentMode.value
+        val mode = if (isExternal) BrowserMode.REGULAR else currentBrowserMode
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, mode)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
@@ -684,7 +687,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
         // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
-        if (requiresRegularBrowserMode && viewModel.currentMode.value != BrowserMode.REGULAR) {
+        if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
             pendingFireToRegularIntent = intent
             lifecycleScope.launch {
@@ -1068,7 +1071,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
-        val mode = viewModel.currentMode.value
+        val mode = currentBrowserMode
         val fragment =
             DuckChatWebViewFragment().apply {
                 arguments =
