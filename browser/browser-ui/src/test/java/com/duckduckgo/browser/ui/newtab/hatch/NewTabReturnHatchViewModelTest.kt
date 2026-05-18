@@ -446,4 +446,66 @@ class NewTabReturnHatchViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun whenBurnTabPressedAndTabRemovedFromRepositoryThenHatchHides() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+        tabsFlow.value = listOf(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = emptyList()
+
+            assertFalse(awaitItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedButTabStillInRepositoryThenHatchStaysVisible() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+        tabsFlow.value = listOf(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedAndOnlyAnotherTabRemovedThenHatchStaysVisible() = runTest {
+        val burnTarget = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        val otherTab = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
+        lastAccessedTabFlow.emit(burnTarget)
+        tabsFlow.value = listOf(burnTarget, otherTab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = listOf(burnTarget)
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedWithEmptyCurrentTabIdThenHatchUnaffectedByTabsChanges() = runTest {
+        lastAccessedTabFlow.emit(null)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = emptyList()
+
+            expectNoEvents()
+        }
+    }
 }

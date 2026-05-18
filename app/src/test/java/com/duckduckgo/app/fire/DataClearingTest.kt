@@ -973,6 +973,43 @@ class DataClearingTest {
         verify(mockTabOperations).replaceTabWithNewTab("tab1", freshDuckChatUrl)
     }
 
+    // --- clearSingleTabData with replaceCurrentTab = false (Hatch origin) ---
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplace_thenDeleteTabAndDoNotReplace() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabOperations, never()).replaceTabWithNewTab(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplaceForDuckAiTab_thenDoNotReplaceWithDuckAiUrl() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabOperations, never()).replaceTabWithNewTab(any(), anyOrNull())
+        verify(mockDuckChat, never()).getDuckChatUrl(any(), any())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplace_thenStillClearDataAndRemoveHistory() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com")))
+        verify(mockNavigationHistory).removeHistoryForTab("tab1")
+    }
+
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
         whenever(mockFireDataStore.getManualClearOptions()).thenReturn(options)
     }
