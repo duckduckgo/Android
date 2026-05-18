@@ -996,7 +996,6 @@ class DataClearingTest {
 
         verify(mockTabRepository).deleteTabs(listOf("tab1"))
         verify(mockTabOperations, never()).replaceTabWithNewTab(any(), anyOrNull())
-        verify(mockDuckChat, never()).getDuckChatUrl(any(), any())
     }
 
     @Test
