@@ -28,9 +28,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.runCurrent
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -40,51 +42,124 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ScriptletDownloadWorkerSchedulerTest {
 
     private val workManager: WorkManager = mock()
-    private val isDiscoverableEnabledFlow = MutableStateFlow(true)
-    private val selfEnabledFlow = MutableStateFlow(false)
+
+    private val discoverableFlow = MutableStateFlow(true)
+    private val operationalFlow = MutableStateFlow(true)
+    private val settingsFlow = MutableStateFlow<ScriptletsSettings?>(null)
+
     private val isDiscoverableToggle: Toggle = mock {
-        on { enabled() } doReturn isDiscoverableEnabledFlow
+        on { enabled() } doReturn discoverableFlow
     }
     private val selfToggle: Toggle = mock {
-        on { enabled() } doReturn selfEnabledFlow
+        on { enabled() } doReturn operationalFlow
     }
     private val feature: AdBlockingExtensionFeature = mock {
         on { isDiscoverable() } doReturn isDiscoverableToggle
         on { self() } doReturn selfToggle
     }
-    private val scriptletsFlow = MutableStateFlow<ScriptletsSettings?>(null)
     private val configProvider: AdBlockingExtensionConfigProvider = mock {
-        on { scriptletsSettings } doReturn scriptletsFlow
+        on { scriptletsSettings } doReturn settingsFlow
     }
     private val settingsAdapter: JsonAdapter<ScriptletsSettings> = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
         .adapter(ScriptletsSettings::class.java)
     private val lifecycleOwner: LifecycleOwner = mock()
+    private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val scriptletsSettings = ScriptletsSettings(version = "2026.5.14", scriptlets = emptyMap())
 
-    private fun newScheduler(appScope: CoroutineScope) = ScriptletDownloadWorkerScheduler(
-        workManager = workManager,
-        configProvider = configProvider,
-        feature = feature,
-        settingsAdapter = settingsAdapter,
-        appScope = appScope,
-    )
+    @After
+    fun tearDown() {
+        testScope.cancel()
+    }
+
+    private fun startScheduler() {
+        ScriptletDownloadWorkerScheduler(
+            workManager = workManager,
+            configProvider = configProvider,
+            feature = feature,
+            settingsAdapter = settingsAdapter,
+            appScope = testScope,
+        ).onCreate(lifecycleOwner)
+    }
 
     @Test
-    fun whenFeatureIsOperationalAndSettingsAreEmittedThenWorkIsEnqueued() = runTest {
-        selfEnabledFlow.value = true
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
+    fun whenDiscoverableAndOperationalAndSettingsArePresentThenWorkIsEnqueued() {
+        settingsFlow.value = scriptletsSettings
 
-        scriptletsFlow.value = scriptletsSettings
-        runCurrent()
+        startScheduler()
 
+        verifyEnqueuedOnce()
+    }
+
+    @Test
+    fun whenDiscoverableIsOffThenWorkIsNotEnqueued() {
+        discoverableFlow.value = false
+        settingsFlow.value = scriptletsSettings
+
+        startScheduler()
+
+        verifyNotEnqueued()
+    }
+
+    @Test
+    fun whenOperationalIsOffThenWorkIsNotEnqueued() {
+        operationalFlow.value = false
+        settingsFlow.value = scriptletsSettings
+
+        startScheduler()
+
+        verifyNotEnqueued()
+    }
+
+    @Test
+    fun whenSettingsAreNullThenWorkIsNotEnqueued() {
+        startScheduler()
+
+        verifyNotEnqueued()
+    }
+
+    @Test
+    fun whenDiscoverableFlipsOnThenWorkIsEnqueued() {
+        discoverableFlow.value = false
+        settingsFlow.value = scriptletsSettings
+        startScheduler()
+        verifyNotEnqueued()
+
+        discoverableFlow.value = true
+
+        verifyEnqueuedOnce()
+    }
+
+    @Test
+    fun whenOperationalFlipsOnThenWorkIsEnqueued() {
+        operationalFlow.value = false
+        settingsFlow.value = scriptletsSettings
+        startScheduler()
+        verifyNotEnqueued()
+
+        operationalFlow.value = true
+
+        verifyEnqueuedOnce()
+    }
+
+    @Test
+    fun whenSettingsBecomeNonNullThenWorkIsEnqueued() {
+        startScheduler()
+        verifyNotEnqueued()
+
+        settingsFlow.value = scriptletsSettings
+
+        verifyEnqueuedOnce()
+    }
+
+    private fun verifyEnqueuedOnce() {
         verify(workManager).enqueueUniqueWork(
             eq(ScriptletDownloadWorkerScheduler.WORK_NAME),
             any(),
@@ -92,78 +167,7 @@ class ScriptletDownloadWorkerSchedulerTest {
         )
     }
 
-    @Test
-    fun whenFeatureIsNotOperationalAndSettingsAreEmittedThenWorkIsNotEnqueued() = runTest {
-        selfEnabledFlow.value = false
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
-
-        scriptletsFlow.value = scriptletsSettings
-        runCurrent()
-
+    private fun verifyNotEnqueued() {
         verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-    }
-
-    @Test
-    fun whenFeatureIsOperationalAndSettingsAreNullThenWorkIsNotEnqueued() = runTest {
-        selfEnabledFlow.value = true
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
-
-        runCurrent()
-
-        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-    }
-
-    @Test
-    fun whenFeatureFlipsFromNotOperationalToOperationalThenWorkIsEnqueued() = runTest {
-        selfEnabledFlow.value = false
-        scriptletsFlow.value = scriptletsSettings
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
-        runCurrent()
-        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-
-        selfEnabledFlow.value = true
-        runCurrent()
-
-        verify(workManager).enqueueUniqueWork(
-            eq(ScriptletDownloadWorkerScheduler.WORK_NAME),
-            any(),
-            any<OneTimeWorkRequest>(),
-        )
-    }
-
-    @Test
-    fun whenKillSwitchIsOffThenWorkIsNotEnqueuedEvenIfOperational() = runTest {
-        isDiscoverableEnabledFlow.value = false
-        selfEnabledFlow.value = true
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
-
-        scriptletsFlow.value = scriptletsSettings
-        runCurrent()
-
-        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-    }
-
-    @Test
-    fun whenKillSwitchFlipsOnAndAllOtherGatesAreReadyThenWorkIsEnqueued() = runTest {
-        isDiscoverableEnabledFlow.value = false
-        selfEnabledFlow.value = true
-        scriptletsFlow.value = scriptletsSettings
-        val scheduler = newScheduler(backgroundScope)
-        scheduler.onCreate(lifecycleOwner)
-        runCurrent()
-        verify(workManager, never()).enqueueUniqueWork(any(), any(), any<OneTimeWorkRequest>())
-
-        isDiscoverableEnabledFlow.value = true
-        runCurrent()
-
-        verify(workManager).enqueueUniqueWork(
-            eq(ScriptletDownloadWorkerScheduler.WORK_NAME),
-            any(),
-            any<OneTimeWorkRequest>(),
-        )
     }
 }
