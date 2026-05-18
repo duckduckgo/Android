@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.store
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
@@ -72,6 +73,10 @@ import com.squareup.moshi.Types
         MirrorSiteEntity::class,
         EmailConfirmationJobRecordEntity::class,
         PirEmailConfirmationLog::class,
+    ],
+    autoMigrations = [
+        // v16: adds nullable optOutFormSubmittedDate column to OptOutJobRecordEntity
+        AutoMigration(from = 15, to = 16),
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
