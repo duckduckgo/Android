@@ -104,7 +104,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             val event = bundle.getString(FireDialog.RESULT_KEY_EVENT)
             val confirmation = (viewModel.uiState.value as? ChatHistoryUiState.Loaded)?.confirmation
             when (event) {
-                FireDialog.EVENT_ON_CLEAR_STARTED -> when (confirmation) {
+                FireDialog.EVENT_ON_CLEAR_STARTED,
+                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> when (confirmation) {
                     is ChatHistoryUiState.PendingConfirmation.FireAll -> viewModel.onFireAllConfirmed()
                     is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> viewModel.onDeleteSelectedConfirmed()
                     null -> Unit
