@@ -51,7 +51,7 @@ class QuickSetupAddressBarPositionBottomSheetDialog(
 
         with(binding.addressBarPicker) {
             isSplitOptionVisible = showSplitOption
-            setSelection(currentSelection)
+            setSelection(initialSelection)
             setOnSelectionChangedListener { selected -> currentSelection = selected }
         }
 
@@ -64,7 +64,6 @@ class QuickSetupAddressBarPositionBottomSheetDialog(
         }
 
         setOnShowListener(::setRoundCorners)
-        setOnCancelListener { eventListener?.onCanceled() }
     }
 
     private fun setRoundCorners(dialogInterface: DialogInterface) {
@@ -80,6 +79,5 @@ class QuickSetupAddressBarPositionBottomSheetDialog(
 
     interface EventListener {
         fun onDoneClicked(selectedPosition: OmnibarType)
-        fun onCanceled()
     }
 }

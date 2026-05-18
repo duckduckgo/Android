@@ -20,20 +20,15 @@ import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.use
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBrandDesignAddressBarPositionPickerBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 
-/**
- * Address-bar-position picker: a row of three option cards (top / bottom / split) with their
- * selected/unselected drawables, radio button states, and click → callback wiring.
- *
- * Hosts (the onboarding ADDRESS_BAR_POSITION dialog and the quick-setup bottom sheet) are
- * responsible for everything else — title, visibility, alpha animations, dialog framing.
- */
 class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -50,12 +45,30 @@ class BrandDesignAddressBarPositionPicker @JvmOverloads constructor(
         binding.topOmnibarContainer.setOnClickListener { onOptionClicked(OmnibarType.SINGLE_TOP) }
         binding.bottomOmnibarContainer.setOnClickListener { onOptionClicked(OmnibarType.SINGLE_BOTTOM) }
         binding.splitOmnibarContainer.setOnClickListener { onOptionClicked(OmnibarType.SPLIT) }
+
+        context.theme.obtainStyledAttributes(attrs, R.styleable.BrandDesignAddressBarPositionPicker, 0, 0).use { ta ->
+            val customSpacing = ta.getDimensionPixelSize(
+                R.styleable.BrandDesignAddressBarPositionPicker_itemSpacingMaxWidth,
+                -1,
+            )
+            if (customSpacing >= 0) {
+                applySpacerMaxWidth(binding.spacerTopBottom, customSpacing)
+                applySpacerMaxWidth(binding.spacerBottomSplit, customSpacing)
+            }
+        }
+    }
+
+    private fun applySpacerMaxWidth(spacer: View, maxWidthPx: Int) {
+        val lp = spacer.layoutParams as LayoutParams
+        lp.matchConstraintMaxWidth = maxWidthPx
+        spacer.layoutParams = lp
     }
 
     var isSplitOptionVisible: Boolean
         get() = binding.splitOmnibarContainer.isVisible
         set(value) {
             binding.splitOmnibarContainer.isVisible = value
+            binding.spacerBottomSplit.isVisible = value
         }
 
     /**

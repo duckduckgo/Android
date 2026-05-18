@@ -16,6 +16,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_top_corners_onboarding_bottom_sheet_drawable"
@@ -61,7 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginBottom="@dimen/keyline_2" />
+                android:layout_marginBottom="@dimen/keyline_2"
+                app:itemSpacingMaxWidth="32dp" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/quickSetupAddressBarPositionCaption"
@@ -80,7 +82,8 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:paddingHorizontal="@dimen/keyline_5"
                 android:text="@string/quickSetupBottomSheetDone"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                tools:ignore="InvalidDaxButtonProperty" />
 
         </LinearLayout>
 

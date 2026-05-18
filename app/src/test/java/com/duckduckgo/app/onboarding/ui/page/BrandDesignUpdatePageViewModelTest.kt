@@ -960,4 +960,63 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     // endregion
+
+    // region Quick setup - edit click commands
+
+    @Test
+    fun whenQuickSetupAddressBarPositionEditClickedThenSendShowAddressBarPositionBottomSheetCommandWithDefaults() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupAddressBarPositionEditClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
+            command as Command.ShowQuickSetupAddressBarPositionBottomSheet
+            assertEquals(OmnibarType.SINGLE_TOP, command.initialSelection)
+            assertEquals(false, command.showSplitOption)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupAddressBarPositionEditClickedAfterPickingBottomThenCommandReflectsCurrentSelection() = runTest {
+        val testee = createViewModel()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+        testee.commands.test {
+            testee.onQuickSetupAddressBarPositionEditClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
+            assertEquals(
+                OmnibarType.SINGLE_BOTTOM,
+                (command as Command.ShowQuickSetupAddressBarPositionBottomSheet).initialSelection,
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupSearchOptionsEditClickedThenSendShowSearchOptionsBottomSheetCommandWithDefaultWithAiTrue() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupSearchOptionsEditClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
+            assertEquals(true, (command as Command.ShowQuickSetupSearchOptionsBottomSheet).initialWithAi)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupSearchOptionsEditClickedAfterPickingSearchOnlyThenCommandReflectsCurrentWithAi() = runTest {
+        val testee = createViewModel()
+        testee.onInputScreenOptionSelected(withAi = false)
+        testee.commands.test {
+            testee.onQuickSetupSearchOptionsEditClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
+            assertEquals(false, (command as Command.ShowQuickSetupSearchOptionsBottomSheet).initialWithAi)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
 }

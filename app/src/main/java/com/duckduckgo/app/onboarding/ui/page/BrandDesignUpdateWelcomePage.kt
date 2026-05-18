@@ -452,6 +452,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
                     BrandDesignUpdatePageViewModel.Command.SkipDialogAnimation -> skipCurrentDialogAnimation()
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupAddressBarPositionBottomSheet -> {
+                        showQuickSetupAddressBarPositionBottomSheet(
+                            initialSelection = command.initialSelection,
+                            showSplitOption = command.showSplitOption,
+                        )
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet -> {
+                        showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
+                    }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -1621,10 +1630,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             addWidgetItem.setOnCheckedChangeListener { checked ->
             }
             addressBarPositionItem.setOnEditClickListener {
-                showQuickSetupAddressBarPositionBottomSheet()
+                viewModel.onQuickSetupAddressBarPositionEditClicked()
             }
             addressBarSearchOptionsItem.setOnEditClickListener {
-                showQuickSetupSearchOptionsBottomSheet()
+                viewModel.onQuickSetupSearchOptionsEditClicked()
             }
         }
         observeQuickSetupSelection()
@@ -1662,7 +1671,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun searchOptionsIconRes(withAi: Boolean): Int =
-        if (withAi) R.drawable.ic_ai_24 else R.drawable.is_search_24
+        if (withAi) {
+            R.drawable.ic_ai_24
+        } else {
+            R.drawable.is_search_24
+        }
 
     private fun searchOptionsLabelRes(withAi: Boolean): Int =
         if (withAi) {
@@ -1671,33 +1684,29 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             R.string.preOnboardingInputScreenSearchOnly
         }
 
-    private fun showQuickSetupAddressBarPositionBottomSheet() {
-        val state = viewModel.viewState.value
+    private fun showQuickSetupAddressBarPositionBottomSheet(initialSelection: OmnibarType, showSplitOption: Boolean) {
         QuickSetupAddressBarPositionBottomSheetDialog(
             context = requireContext(),
-            initialSelection = state.selectedAddressBarPosition,
-            showSplitOption = state.showSplitOption,
+            initialSelection = initialSelection,
+            showSplitOption = showSplitOption,
         ).apply {
             eventListener = object : QuickSetupAddressBarPositionBottomSheetDialog.EventListener {
                 override fun onDoneClicked(selectedPosition: OmnibarType) {
                     viewModel.onAddressBarPositionOptionSelected(selectedPosition)
                 }
-                override fun onCanceled() {}
             }
         }.show()
     }
 
-    private fun showQuickSetupSearchOptionsBottomSheet() {
-        val state = viewModel.viewState.value
+    private fun showQuickSetupSearchOptionsBottomSheet(initialWithAi: Boolean) {
         QuickSetupSearchOptionsBottomSheetDialog(
             context = requireContext(),
-            initialWithAi = state.inputScreenSelected,
+            initialWithAi = initialWithAi,
         ).apply {
             eventListener = object : QuickSetupSearchOptionsBottomSheetDialog.EventListener {
                 override fun onDoneClicked(withAi: Boolean) {
                     viewModel.onInputScreenOptionSelected(withAi = withAi)
                 }
-                override fun onCanceled() {}
             }
         }.show()
     }

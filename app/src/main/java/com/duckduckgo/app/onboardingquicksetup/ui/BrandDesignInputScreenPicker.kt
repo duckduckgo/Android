@@ -26,26 +26,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.databinding.ViewBrandDesignInputScreenPickerBinding
 import com.duckduckgo.mobile.android.R
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/**
- * Search-mode picker: two option cards — "Search Only" (static image) and "Search + Duck.ai"
- * (Lottie animation). Shared by the onboarding INPUT_SCREEN dialog and the quick-setup
- * search-options bottom sheet.
- *
- * Owns drawable selection (light/dark × selected/unselected), Lottie playback (single play +
- * delayed loop), crossfade transitions for both image and Lottie cards, radio check states,
- * and click → callback wiring.
- *
- * Title / description / dialog framing are the host's responsibility.
- */
 class BrandDesignInputScreenPicker @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -56,7 +45,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
      * - [NONE]: snap drawables; do not start the Lottie. Used for the initial paint when the host
      *   plans to call [startWithAiAnimation] later (e.g. after a fade-in completes).
      * - [ANIMATE]: snap drawables; start the Lottie loop immediately.
-     * - [CROSSFADE_ANIMATE]: crossfade through the back views; the Lottie keeps playing from
+     * - [CROSSFADE_ANIMATE]: crossfade through the selection states; the Lottie keeps playing from
      *   the current progress so the transition feels continuous.
      */
     enum class Transition { NONE, ANIMATE, CROSSFADE_ANIMATE }
@@ -64,7 +53,6 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
     private val binding: ViewBrandDesignInputScreenPickerBinding =
         ViewBrandDesignInputScreenPickerBinding.inflate(LayoutInflater.from(context), this)
 
-    private val lottieScope = MainScope()
     private var lottieRepeatJob: Job? = null
 
     private var currentWithAi: Boolean = true
@@ -77,9 +65,6 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         binding.inputScreenWithAiContainer.setOnClickListener { onOptionClicked(withAi = true) }
     }
 
-    /**
-     * Applies [withAi] to the option cards' drawables and radio states using the requested [transition].
-     */
     fun setSelection(withAi: Boolean, transition: Transition = Transition.NONE) {
         currentWithAi = withAi
         val isLight = isLightMode()
@@ -118,20 +103,10 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         selectionListener = listener
     }
 
-    /**
-     * Starts (or restarts) the with-AI Lottie loop on the currently-set animation resource.
-     * Used by hosts that want to delay the start until after their own fade-in completes.
-     *
-     * @param delayedStart when true, waits [LOTTIE_INITIAL_DELAY] before starting.
-     */
     fun startWithAiAnimation(delayedStart: Boolean = false) {
         playWithAiLottie(binding.inputScreenWithAiAnimationFront, delayedStart = delayedStart)
     }
 
-    /**
-     * Cancels any pending Lottie repeat and stops the front/back Lottie animations.
-     * Hosts should call this from `onDestroyView` to release Lottie animation listeners.
-     */
     fun cancelLottieAnimations() {
         lottieRepeatJob?.cancel()
         lottieRepeatJob = null
@@ -143,11 +118,6 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
             removeAllAnimatorListeners()
             cancelAnimation()
         }
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        lottieScope.cancel()
     }
 
     private fun onOptionClicked(withAi: Boolean) {
@@ -162,11 +132,13 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         fromProgress: Float? = null,
         delayedStart: Boolean = false,
     ) {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         lottieRepeatJob?.cancel()
         view.removeAllAnimatorListeners()
         view.addAnimatorListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                lottieRepeatJob = lottieScope.launch {
+                val replayScope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+                lottieRepeatJob = replayScope.launch {
                     delay(LOTTIE_REPEAT_DELAY)
                     view.playAnimation()
                 }
@@ -175,7 +147,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
         if (fromProgress != null) {
             view.progress = fromProgress
         }
-        lottieRepeatJob = lottieScope.launch {
+        lottieRepeatJob = scope.launch {
             if (delayedStart) {
                 delay(LOTTIE_INITIAL_DELAY)
             }

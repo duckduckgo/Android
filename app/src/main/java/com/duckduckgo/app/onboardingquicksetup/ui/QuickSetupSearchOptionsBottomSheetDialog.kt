@@ -63,7 +63,6 @@ class QuickSetupSearchOptionsBottomSheetDialog(
         }
 
         setOnShowListener(::setRoundCorners)
-        setOnCancelListener { eventListener?.onCanceled() }
         setOnDismissListener { binding.inputScreenPicker.cancelLottieAnimations() }
     }
 
@@ -79,8 +78,6 @@ class QuickSetupSearchOptionsBottomSheetDialog(
     }
 
     interface EventListener {
-        /** @param withAi true if the user chose "Toggle between Search and Duck.ai", false for "Search Only". */
         fun onDoneClicked(withAi: Boolean)
-        fun onCanceled()
     }
 }

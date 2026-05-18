@@ -30,4 +30,8 @@
         <attr name="quickSetupRowSecondaryText" />
     </declare-styleable>
 
+    <declare-styleable name="BrandDesignAddressBarPositionPicker">
+        <attr name="itemSpacingMaxWidth" format="dimension" />
+    </declare-styleable>
+
 </resources>
