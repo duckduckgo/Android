@@ -64,8 +64,6 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
         private set
 
     init {
-        // AppScope-singleton: re-subscribe on mode change so a fire-mode tab load can still clear
-        // hasPendingTabLaunch. A one-shot subscribe at init would lock onto the startup mode forever.
         browserModeStateHolder.currentMode
             .flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).flowSelectedTab }
             .filterNotNull()
