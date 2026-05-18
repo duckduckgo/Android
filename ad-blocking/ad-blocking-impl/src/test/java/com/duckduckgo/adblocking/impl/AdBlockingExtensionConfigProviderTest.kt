@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -58,6 +59,11 @@ class AdBlockingExtensionConfigProviderTest {
             "domains": ["youtube.com", "m.youtube.com"]
         }
     """.trimIndent()
+
+    @Before
+    fun setup() {
+        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = true))
+    }
 
     @Test
     fun whenSettingsAreMissingThenSettingsAreNull() = runTest {
@@ -183,5 +189,15 @@ class AdBlockingExtensionConfigProviderTest {
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenKillSwitchIsOffThenSettingsAreNull() = runTest {
+        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = false))
+        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
+        val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
+
+        assertNull(freshProvider.scriptletsSettings.value)
+        assertNull(freshProvider.domainsSettings.value)
     }
 }

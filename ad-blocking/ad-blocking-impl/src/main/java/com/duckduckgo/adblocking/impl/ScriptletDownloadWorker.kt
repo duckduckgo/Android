@@ -30,6 +30,7 @@ import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdater
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -40,6 +41,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,13 +90,19 @@ class ScriptletDownloadWorker(
 class ScriptletDownloadWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val configProvider: AdBlockingExtensionConfigProvider,
+    private val feature: AdBlockingExtensionFeature,
     private val settingsAdapter: JsonAdapter<ScriptletsSettings>,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
-            configProvider.scriptletsSettings.filterNotNull().collect { settings ->
+            combine(
+                feature.self().enabled(),
+                configProvider.scriptletsSettings,
+            ) { operational, settings ->
+                settings?.takeIf { operational }
+            }.filterNotNull().collect { settings ->
                 enqueue(settings)
             }
         }
