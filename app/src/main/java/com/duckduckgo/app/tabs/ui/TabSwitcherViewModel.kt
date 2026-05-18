@@ -53,6 +53,10 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -68,6 +72,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
@@ -84,7 +89,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
-    private val tabRepository: TabRepository,
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val browserModeStateHolder: BrowserModeStateHolder,
+    private val fireModeAvailability: FireModeAvailability,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
@@ -97,24 +104,38 @@ class TabSwitcherViewModel @Inject constructor(
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
-    val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
-        context = viewModelScope.coroutineContext,
-    )
+
+    private val currentMode: StateFlow<BrowserMode> =
+        if (fireModeAvailability.isAvailable()) {
+            browserModeStateHolder.currentMode
+        } else {
+            MutableStateFlow(BrowserMode.REGULAR)
+        }
+
+    private val tabRepository: TabRepository
+        get() = tabRepositoryProvider.forMode(currentMode.value)
+
+    val deletableTabs: LiveData<List<TabEntity>> =
+        currentMode.flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).flowDeletableTabs }
+            .asLiveData(context = viewModelScope.coroutineContext)
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val tabSwitcherItemsFlow = tabRepository.flowTabs
-        .debounce(100.milliseconds)
-        .conflate()
-        .flatMapLatest { tabEntities ->
-            combine(
-                tabRepository.flowSelectedTab,
-                _viewState,
-                tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-            ) { activeTab, viewState, isAnimationTileDismissed ->
-                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+    private val tabSwitcherItemsFlow = currentMode.flatMapLatest { mode ->
+        val repo = tabRepositoryProvider.forMode(mode)
+        repo.flowTabs
+            .debounce(100.milliseconds)
+            .conflate()
+            .flatMapLatest { tabEntities ->
+                combine(
+                    repo.flowSelectedTab,
+                    _viewState,
+                    tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
+                ) { activeTab, viewState, isAnimationTileDismissed ->
+                    getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+                }
             }
-        }
+    }
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
 
@@ -126,7 +147,7 @@ class TabSwitcherViewModel @Inject constructor(
     val viewState = combine(
         _viewState,
         tabSwitcherItemsFlow,
-        tabRepository.tabSwitcherData,
+        currentMode.flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).tabSwitcherData },
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
     ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton ->
         viewState.copy(
@@ -142,7 +163,7 @@ class TabSwitcherViewModel @Inject constructor(
         ),
     )
 
-    val layoutType = tabRepository.tabSwitcherData
+    val layoutType = currentMode.flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).tabSwitcherData }
         .map { it.layoutType }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
