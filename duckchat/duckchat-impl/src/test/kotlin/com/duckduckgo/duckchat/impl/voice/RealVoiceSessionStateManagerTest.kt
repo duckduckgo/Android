@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -48,7 +48,7 @@ class RealVoiceSessionStateManagerTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val tabRepository: TabRepository = mock()
+    private val tabRepository: AggregateTabRepository = mock()
     private val tabsFlow = MutableStateFlow<List<TabEntity>>(emptyList())
     private val duckChatFeature: DuckChatFeature = mock()
     private val voiceChatServiceToggle: Toggle = mock()

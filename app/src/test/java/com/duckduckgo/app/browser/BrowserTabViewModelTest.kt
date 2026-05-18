@@ -216,9 +216,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_CTA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
-import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
