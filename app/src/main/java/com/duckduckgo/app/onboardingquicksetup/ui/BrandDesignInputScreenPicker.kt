@@ -50,7 +50,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
     enum class Transition {
         NONE,
         ANIMATE,
-        CROSSFADE_ANIMATE
+        CROSSFADE_ANIMATE,
     }
 
     private val binding: ViewBrandDesignInputScreenPickerBinding =
@@ -75,7 +75,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     fun setSelection(
         withAi: Boolean,
-        transition: Transition = Transition.NONE
+        transition: Transition = Transition.NONE,
     ) {
         currentWithAi = withAi
         applySelection(withAi, transition)
@@ -83,7 +83,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     private fun applySelection(
         withAi: Boolean,
-        transition: Transition
+        transition: Transition,
     ) {
         val isLight = lightMode
         val withoutAiImageRes = withoutAiImageRes(withAi, isLight)
@@ -179,7 +179,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
     private fun crossfadeStaticImage(
         front: ImageView,
         back: ImageView,
-        newRes: Int
+        newRes: Int,
     ) {
         back.setImageDrawable(front.drawable)
         front.setImageResource(newRes)
@@ -189,7 +189,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
     private fun crossfadeLottie(
         front: LottieAnimationView,
         back: LottieAnimationView,
-        newRes: Int
+        newRes: Int,
     ) {
         val currentProgress = front.progress
         front.composition?.let { back.setComposition(it) }
@@ -203,7 +203,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     private fun crossfadeAlpha(
         front: View,
-        back: View
+        back: View,
     ) {
         front.animate().cancel()
         back.animate().cancel()
@@ -215,7 +215,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     private fun withoutAiImageRes(
         withAi: Boolean,
-        isLight: Boolean
+        isLight: Boolean,
     ): Int = when {
         withAi && isLight -> R.drawable.searchbox_withoutai_inactive_brand_design_update
         withAi -> R.drawable.searchbox_withoutai_inactive_dark_brand_design_update
@@ -225,7 +225,7 @@ class BrandDesignInputScreenPicker @JvmOverloads constructor(
 
     private fun withAiAnimationRes(
         withAi: Boolean,
-        isLight: Boolean
+        isLight: Boolean,
     ): Int = when {
         withAi && isLight -> R.raw.searchbox_with_ai_active
         withAi -> R.raw.searchbox_with_ai_active_dark
