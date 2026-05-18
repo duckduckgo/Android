@@ -209,6 +209,7 @@ import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -283,6 +284,7 @@ import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -496,8 +498,9 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    val browserMode: BrowserMode get() = requireArguments().getString(BROWSER_MODE_ARG)
-        ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
+    val browserMode: BrowserMode
+        get() = requireArguments().getString(BROWSER_MODE_ARG)
+            ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -1024,6 +1027,10 @@ class BrowserTabFragment :
 
                 InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
                     onFireButtonPressed()
+                }
+
+                InputScreenActivityResultCodes.AFTER_INACTIVITY_REQUESTED -> {
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams)
                 }
 
                 RESULT_CANCELED -> {
@@ -3670,6 +3677,10 @@ class BrowserTabFragment :
                         dialog.show(parentFragmentManager)
                     }
                 }
+
+                override fun onAfterInactivityPressed() {
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams)
+                }
             },
         )
     }
@@ -5927,13 +5938,17 @@ class BrowserTabFragment :
             showCta(cta, instantShow = true)
         }
 
-        private fun showCta(configuration: Cta, instantShow: Boolean = false) {
+        private fun showCta(
+            configuration: Cta,
+            instantShow: Boolean = false
+        ) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
                 is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta ->
                     showOnboardingDialogCta(configuration, instantShow = instantShow)
+
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
             }
