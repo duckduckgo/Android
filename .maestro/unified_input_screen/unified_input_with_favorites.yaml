@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 name: "UnifiedInput: new tab shows pre-seeded favorites"
 tags:
   - unifiedInputTest
@@ -13,6 +13,7 @@ tags:
             # isMaestro is auto-injected by the Maestro runtime on every launchApp call
             testScenario: "favorites_3"
             nativeInputToggle: "true"
+            omnibarPosition: "bottom"
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: ./shared/enable_unified_input.yaml
       - assertVisible:

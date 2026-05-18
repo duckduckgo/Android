@@ -133,7 +133,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun nativeInputField(): Toggle
 
     /**
