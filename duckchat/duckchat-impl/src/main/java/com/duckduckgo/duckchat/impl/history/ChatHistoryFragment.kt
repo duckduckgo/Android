@@ -164,6 +164,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private fun applyDefaultToolbar() {
         binding.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+        binding.toolbar.navigationContentDescription = null
         binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
         binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
         binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
@@ -214,6 +215,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             val dialog = fireDialogProvider.createFireDialog(
                 FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = selectedChatUrls),
             )
+            if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return@launch
             dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
         }
     }
