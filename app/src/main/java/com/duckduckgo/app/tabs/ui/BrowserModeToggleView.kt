@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewConfiguration
@@ -80,7 +81,19 @@ class BrowserModeToggleView @JvmOverloads constructor(
     }
 
     fun setRegularTabCount(count: Int) {
-        binding.regularTabCount.text = count.toString()
+        val isInfinite = count >= INFINITE_TAB_COUNT_THRESHOLD
+        binding.regularTabCount.apply {
+            text = if (isInfinite) {
+                context.getString(R.string.browserModeToggleTabCountInfinite)
+            } else {
+                count.toString()
+            }
+            setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                if (isInfinite) INFINITE_TEXT_SIZE_SP else DIGIT_TEXT_SIZE_SP,
+            )
+            translationY = if (isInfinite) -INFINITE_VERTICAL_SHIFT_DP.toPx(context).toFloat() else 0f
+        }
     }
 
     fun setOnModeChangedListener(listener: (BrowserMode) -> Unit) {
@@ -156,5 +169,9 @@ class BrowserModeToggleView @JvmOverloads constructor(
     private companion object {
         const val OUTER_ELEVATION_DP = 4
         const val SLIDE_DURATION_MS = 220L
+        const val INFINITE_TAB_COUNT_THRESHOLD = 100
+        const val DIGIT_TEXT_SIZE_SP = 12f
+        const val INFINITE_TEXT_SIZE_SP = 13f
+        const val INFINITE_VERTICAL_SHIFT_DP = 1
     }
 }
