@@ -64,9 +64,16 @@ class ScriptletDownloadWorker(
     lateinit var settingsAdapter: JsonAdapter<ScriptletsSettings>
 
     @Inject
+    lateinit var feature: AdBlockingExtensionFeature
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
+        if (!feature.isDiscoverable().isEnabled()) {
+            logcat { "ScriptletDownloadWorker: kill-switch is off, skipping" }
+            return@withContext Result.success()
+        }
         logcat { "Starting ScriptletDownloadWorker" }
         val settingsJson = inputData.getString(KEY_SETTINGS) ?: return@withContext Result.failure()
         val settings = runCatching { settingsAdapter.fromJson(settingsJson) }

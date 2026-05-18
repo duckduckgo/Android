@@ -16,6 +16,7 @@
 
 package com.duckduckgo.adblocking.impl
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.ListenableWorker.Result
@@ -23,23 +24,29 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdater
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
 class ScriptletDownloadWorkerTest {
 
@@ -48,6 +55,7 @@ class ScriptletDownloadWorkerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val updater: ScriptletUpdater = mock()
+    private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
     private val settingsAdapter: JsonAdapter<ScriptletsSettings> = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
@@ -59,6 +67,11 @@ class ScriptletDownloadWorkerTest {
             "scriptlets/isolated/ublock-filters.js" to ScriptletEntry("https://cdn.example/isolated.js", "iso-sig"),
         ),
     )
+
+    @Before
+    fun setup() {
+        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = true))
+    }
 
     @Test
     fun whenInputDataHasNoSettingsThenDoWorkReturnsFailure() = runTest {
@@ -93,6 +106,16 @@ class ScriptletDownloadWorkerTest {
         assertEquals(Result.retry(), result)
     }
 
+    @Test
+    fun whenKillSwitchIsOffThenDoWorkReturnsSuccessWithoutCallingUpdater() = runTest {
+        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = false))
+
+        val result = newWorker(inputData = settingsAdapter.toJson(settings)).doWork()
+
+        assertEquals(Result.success(), result)
+        verify(updater, never()).update(any())
+    }
+
     private fun newWorker(inputData: String?): ScriptletDownloadWorker {
         val data = if (inputData == null) {
             androidx.work.Data.EMPTY
@@ -102,6 +125,7 @@ class ScriptletDownloadWorkerTest {
         return TestListenableWorkerBuilder<ScriptletDownloadWorker>(context, inputData = data).build().also {
             it.updater = updater
             it.settingsAdapter = settingsAdapter
+            it.feature = feature
             it.dispatchers = coroutineRule.testDispatcherProvider
         }
     }
