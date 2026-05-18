@@ -281,6 +281,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
+    private var skipTabPagerStateSaveOnRecreate = false
+
     private lateinit var renderer: BrowserStateRenderer
 
     private val binding: ActivityBrowserBinding by viewBinding()
@@ -419,7 +421,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (swipingTabsFeature.isEnabled) {
+        if (swipingTabsFeature.isEnabled && !skipTabPagerStateSaveOnRecreate) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
         pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
@@ -1221,10 +1223,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
      * one mode at a time (single adapter, single currentTab, single lastActiveTabs).
+     *
+     * The previous mode's BrowserTabFragments must NOT be restored, otherwise the new mode's
+     * ViewPager renders the old mode's webviews on top. We flag this so onSaveInstanceState
+     * skips the tab pager bundle.
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
             viewModel.currentMode.drop(1).collect {
+                skipTabPagerStateSaveOnRecreate = true
                 recreate()
             }
         }
