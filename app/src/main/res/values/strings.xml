@@ -734,9 +734,6 @@
     <string name="tabSelectedIndicator">Tab selected indicator</string>
     <string name="tabNotSelectedIndicator">Tab not selected indicator</string>
 
-    <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
-    <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
-
     <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links from DuckDuckGo</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">
         <item quantity="one">Share Link</item>
