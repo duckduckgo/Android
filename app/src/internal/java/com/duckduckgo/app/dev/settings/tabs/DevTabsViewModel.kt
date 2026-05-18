@@ -22,6 +22,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForBookmarks
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForFavorites
 import com.duckduckgo.app.tabs.model.TabDataRepository
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -74,12 +76,14 @@ private val randomUrls = listOf(
 @ContributesViewModel(ActivityScope::class)
 class DevTabsViewModel @Inject constructor(
     private val dispatcher: DispatcherProvider,
-    private val tabDataRepository: TabDataRepository,
+    @RegularMode private val tabDataRepository: TabDataRepository,
+    @FireMode private val fireTabDataRepository: TabDataRepository,
     private val savedSitesRepository: SavedSitesRepository,
 ) : ViewModel() {
 
     data class ViewState(
         val tabCount: Int = 0,
+        val fireTabCount: Int = 0,
         val bookmarkCount: Int = 0,
         val favoritesCount: Int = 0,
     )
@@ -94,6 +98,13 @@ class DevTabsViewModel @Inject constructor(
         tabDataRepository.flowTabs
             .onEach { tabs ->
                 _viewState.update { it.copy(tabCount = tabs.count()) }
+            }
+            .flowOn(dispatcher.io())
+            .launchIn(viewModelScope)
+
+        fireTabDataRepository.flowTabs
+            .onEach { tabs ->
+                _viewState.update { it.copy(fireTabCount = tabs.count()) }
             }
             .flowOn(dispatcher.io())
             .launchIn(viewModelScope)
@@ -127,6 +138,30 @@ class DevTabsViewModel @Inject constructor(
     fun clearTabs() {
         viewModelScope.launch(dispatcher.io()) {
             tabDataRepository.deleteAll()
+        }
+    }
+
+    fun addFireTabs(count: Int) {
+        viewModelScope.launch {
+            repeat(count) {
+                val randomIndex = randomUrls.indices.random()
+                fireTabDataRepository.add(
+                    url = randomUrls[randomIndex],
+                )
+            }
+        }
+    }
+
+    fun clearFireTabs() {
+        viewModelScope.launch(dispatcher.io()) {
+            // deleteAll() on the Fire instance fans out to shared singletons that aren't
+            // mode-aware yet (sessions, duck-chat, favicons, ad-click, native-input,
+            // preview persister, visited-sites). Until the Tabs.* clearing plugin lands,
+            // use per-tab deletion so only Fire-keyed entries are cleared.
+            val fireTabIds = fireTabDataRepository.getTabs().map { it.tabId }
+            if (fireTabIds.isNotEmpty()) {
+                fireTabDataRepository.deleteTabs(fireTabIds)
+            }
         }
     }
 

@@ -105,6 +105,79 @@
             android:layout_height="8dp" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/fireTabCountHeader"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="@string/devSettingsFireTabsScreenHeader"
+            app:typography="caption_allCaps" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/generateFireTabsItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/fireTabCount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:primaryText="@string/devSettingsFireTabsScreenTabsToAdd" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/fireTabCount"
+                style="@style/Widget.DuckDuckGo.TextInput"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="100"
+                app:layout_constraintBottom_toBottomOf="@id/generateFireTabsItem"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/generateFireTabsItem"
+                app:layout_constraintTop_toTopOf="@id/generateFireTabsItem"
+                app:type="single_line"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/addFireTabsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsFireTabsScreenAddTabsButtonText"
+                app:daxButtonSize="large" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/clearFireTabsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsFireTabsScreenClearTabsButtonText"
+                app:daxButtonSize="large" />
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/fireTabsFlowView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:constraint_referenced_ids="addFireTabsButton,clearFireTabsButton"
+                app:flow_horizontalStyle="spread"
+                app:flow_wrapMode="chain"
+                app:layout_constraintTop_toBottomOf="@id/generateFireTabsItem" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/bookmarksCountHeader"
             android:layout_width="match_parent"
             android:layout_height="48dp"
