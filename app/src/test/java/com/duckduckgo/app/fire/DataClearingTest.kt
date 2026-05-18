@@ -196,7 +196,7 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenManualClearWithDuckAiChats_thenDispatchDuckChatsAllViaTrigger() = runTest {
+    fun `manual clear with DuckAi chats dispatches DuckChats All via trigger`() = runTest {
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
 
         testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
@@ -1024,7 +1024,7 @@ class DataClearingTest {
     // --- clearSelectedDuckAiChats ---
 
     @Test
-    fun whenClearSelectedDuckAiChatsWithUrls_thenDispatchSelectedViaTrigger() = runTest {
+    fun `clearSelectedDuckAiChats with urls dispatches Selected via trigger`() = runTest {
         val urls = setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b")
 
         testee.clearSelectedDuckAiChats(urls)
@@ -1033,14 +1033,14 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSelectedDuckAiChats_thenDoNotWipeDuckAiWebStorage() = runTest {
+    fun `clearSelectedDuckAiChats does not wipe DuckAi web storage`() = runTest {
         testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
 
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
     }
 
     @Test
-    fun whenClearSelectedDuckAiChats_thenDoNotTouchTabsOrBrowserData() = runTest {
+    fun `clearSelectedDuckAiChats does not touch tabs or browser data`() = runTest {
         testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
 
         verify(mockClearDataAction, never()).clearTabsOnly()
@@ -1049,7 +1049,7 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSelectedDuckAiChats_thenDoNotTouchFireButtonOrchestrationFlags() = runTest {
+    fun `clearSelectedDuckAiChats does not touch fire button orchestration flags`() = runTest {
         testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
 
         verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
@@ -1057,14 +1057,14 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSelectedDuckAiChatsWithEmptySet_thenNoOp() = runTest {
+    fun `clearSelectedDuckAiChats with empty set is a no-op`() = runTest {
         testee.clearSelectedDuckAiChats(emptySet())
 
         verify(mockDataClearingTrigger, never()).clearData(any())
     }
 
     @Test
-    fun whenClearSelectedDuckAiChatsAndFeatureFlagOff_thenNoOp() = runTest {
+    fun `clearSelectedDuckAiChats with feature flag off is a no-op`() = runTest {
         showClearDuckAIChatHistoryFlow.value = false
 
         testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))

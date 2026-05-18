@@ -56,7 +56,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsAllAndDuckAiTabOpen_thenCloseOnlyDuckAiTab() = runTest {
+    fun `DuckChats All closes only DuckAi tabs`() = runTest {
         val duckAiTab = TabEntity(tabId = "duck-ai", url = "https://duck.ai")
         val browserTab = TabEntity(tabId = "browser", url = "https://example.com")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(duckAiTab, browserTab))
@@ -69,7 +69,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsAllAndNoDuckAiTabs_thenDoNotCallDeleteTabs() = runTest {
+    fun `DuckChats All with no DuckAi tabs does not call deleteTabs`() = runTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "browser", url = "https://example.com")))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
@@ -79,14 +79,14 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsAllAndNoOpenTabs_thenNoOp() = runTest {
+    fun `DuckChats All with no open tabs is a no-op`() = runTest {
         testee.onClearData(setOf(ClearableData.DuckChats.All))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
-    fun whenDuckChatsSelectedAndTabUrlMatches_thenCloseMatchingTabOnly() = runTest {
+    fun `DuckChats Selected closes only the matching tab`() = runTest {
         val matchingTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         val unrelatedDuckAiTab = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=zzz")
         val browserTab = TabEntity(tabId = "tab3", url = "https://example.com")
@@ -101,7 +101,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsSelectedAndMultipleUrlsMatch_thenCloseAllMatching() = runTest {
+    fun `DuckChats Selected with multiple matching urls closes all of them`() = runTest {
         val t1 = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=a")
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=b")
         val t3 = TabEntity(tabId = "tab3", url = "https://example.com")
@@ -118,7 +118,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsSelectedAndNoTabMatches_thenDoNotCallDeleteTabs() = runTest {
+    fun `DuckChats Selected with no matching tab does not call deleteTabs`() = runTest {
         val unrelated = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=other")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(unrelated))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
@@ -129,7 +129,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsSelectedAndMultipleTabsShareTheSameChatId_thenCloseAllOfThem() = runTest {
+    fun `DuckChats Selected closes every tab sharing the same chatID`() = runTest {
         val t1 = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=abc")
         val t3 = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc")
@@ -142,7 +142,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenTabUrlDriftedFromCanonicalChatUrl_thenStillCloseTheTabByChatId() = runTest {
+    fun `tab url drifted from canonical chat url still closes the tab by chatID`() = runTest {
         // Tab URLs that share the same chatID but differ in path, extra params, fragments —
         // the kinds of drift that happen as the user interacts with the chat over a session.
         val original = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
@@ -158,7 +158,7 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenSelectedUrlHasNoChatIdQueryParam_thenNoOp() = runTest {
+    fun `Selected url with no chatID query param is a no-op`() = runTest {
         val anyTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(anyTab))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
@@ -169,14 +169,14 @@ class DuckAiTabsCleanupPluginTest {
     }
 
     @Test
-    fun whenDuckChatsSelectedWithEmptyUrlSet_thenNoOp() = runTest {
+    fun `DuckChats Selected with empty url set is a no-op`() = runTest {
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(emptySet())))
 
         verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
-    fun whenUnrelatedClearableData_thenNoOp() = runTest {
+    fun `unrelated ClearableData is a no-op`() = runTest {
         testee.onClearData(setOf(ClearableData.BrowserData.All, ClearableData.Tabs.All))
 
         verify(mockTabRepository, never()).deleteTabs(any())
