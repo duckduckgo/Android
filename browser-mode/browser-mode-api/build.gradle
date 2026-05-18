@@ -29,5 +29,5 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.webkit
 
-    compileOnly 'javax.inject:javax.inject:1'
+    compileOnly "javax.inject:javax.inject:_"
 }
