@@ -37,6 +37,10 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -49,6 +53,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -87,6 +92,20 @@ class AutoCompleteApiTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
+    private lateinit var mockFireTabRepository: TabRepository
+
+    @Mock
+    private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
+
+    @Mock
+    private lateinit var mockBrowserModeStateHolder: BrowserModeStateHolder
+
+    @Mock
+    private lateinit var mockFireModeAvailability: FireModeAvailability
+
+    private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
+
+    @Mock
     private lateinit var mockAutocompleteTabsFeature: AutocompleteTabsFeature
 
     @Mock
@@ -118,6 +137,10 @@ class AutoCompleteApiTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
         whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
+        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
+        whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
         runTest {
             whenever(mockDeviceAppLookup.query(any())).thenReturn(emptyList())
         }
@@ -2063,7 +2086,9 @@ class AutoCompleteApiTest {
             mockSavedSitesRepository,
             mockNavigationHistory,
             RealAutoCompleteScorer(),
-            mockTabRepository,
+            mockTabRepositoryProvider,
+            mockBrowserModeStateHolder,
+            mockFireModeAvailability,
             mockAutocompleteTabsFeature,
             mockDuckChat,
             mockHistory,

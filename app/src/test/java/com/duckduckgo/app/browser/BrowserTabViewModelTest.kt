@@ -250,6 +250,10 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -710,13 +714,23 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao = db.fireproofWebsiteDao()
             locationPermissionsDao = db.locationPermissionsDao()
 
+            val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
+            whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+            whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockTabRepository)
+            val browserModeStateHolder: BrowserModeStateHolder = mock()
+            whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+            val fireModeAvailability: FireModeAvailability = mock()
+            whenever(fireModeAvailability.isAvailable()).thenReturn(true)
+
             mockAutoCompleteApi =
                 AutoCompleteApi(
                     mockAutoCompleteService,
                     mockSavedSitesRepository,
                     mockNavigationHistory,
                     mockAutoCompleteScorer,
-                    mockTabRepository,
+                    tabRepositoryProvider,
+                    browserModeStateHolder,
+                    fireModeAvailability,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,
