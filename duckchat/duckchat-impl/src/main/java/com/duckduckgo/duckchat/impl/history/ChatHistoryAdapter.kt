@@ -58,6 +58,20 @@ class ChatHistoryAdapter(
         }
     }
 
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
+        val selectionChange = payloads.firstOrNull { it is RowChange.SelectionChanged } as? RowChange.SelectionChanged
+        val entry = getItem(position)
+        if (selectionChange != null && holder is ChatHistoryViewHolder && entry is ChatHistoryListEntry.Row) {
+            holder.animateSelectionChange(entry.item, selectionChange.selected)
+        } else {
+            onBindViewHolder(holder, position)
+        }
+    }
+
+    private sealed interface RowChange {
+        data class SelectionChanged(val selected: Boolean) : RowChange
+    }
+
     private object Diff : DiffUtil.ItemCallback<ChatHistoryListEntry>() {
         override fun areItemsTheSame(oldItem: ChatHistoryListEntry, newItem: ChatHistoryListEntry): Boolean = when {
             oldItem is ChatHistoryListEntry.Header && newItem is ChatHistoryListEntry.Header ->
@@ -70,6 +84,15 @@ class ChatHistoryAdapter(
 
         override fun areContentsTheSame(oldItem: ChatHistoryListEntry, newItem: ChatHistoryListEntry): Boolean =
             oldItem == newItem
+
+        override fun getChangePayload(oldItem: ChatHistoryListEntry, newItem: ChatHistoryListEntry): Any? {
+            if (oldItem is ChatHistoryListEntry.Row && newItem is ChatHistoryListEntry.Row &&
+                oldItem.item == newItem.item && oldItem.selected != newItem.selected
+            ) {
+                return RowChange.SelectionChanged(newItem.selected)
+            }
+            return null
+        }
     }
 
     private companion object {

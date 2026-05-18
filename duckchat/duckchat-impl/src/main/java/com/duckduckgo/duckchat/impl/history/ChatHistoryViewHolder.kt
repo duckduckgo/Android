@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.impl.history
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
@@ -41,7 +43,34 @@ class ChatHistoryViewHolder(
         onMoreClick: (ChatHistoryItem, View) -> Unit,
         onLongClick: (ChatHistoryItem) -> Boolean = { false },
     ) {
+        iconContainer.animate().cancel()
+        iconContainer.rotationY = 0f
         title.text = item.displayTitle
+        applySelectionState(item, selected)
+        itemView.setOnClickListener { onClick(item) }
+        itemView.setOnLongClickListener { onLongClick(item) }
+        moreButton.setOnClickListener { anchor -> onMoreClick(item, anchor) }
+    }
+
+    fun animateSelectionChange(item: ChatHistoryItem, selected: Boolean) {
+        iconContainer.animate().cancel()
+        iconContainer.animate()
+            .rotationY(HALF_FLIP_DEGREES)
+            .setDuration(HALF_FLIP_DURATION_MS)
+            .setInterpolator(AccelerateInterpolator())
+            .withEndAction {
+                applySelectionState(item, selected)
+                iconContainer.rotationY = -HALF_FLIP_DEGREES
+                iconContainer.animate()
+                    .rotationY(0f)
+                    .setDuration(HALF_FLIP_DURATION_MS)
+                    .setInterpolator(DecelerateInterpolator())
+                    .start()
+            }
+            .start()
+    }
+
+    private fun applySelectionState(item: ChatHistoryItem, selected: Boolean) {
         if (selected) {
             iconContainer.setBackgroundResource(R.drawable.bg_chat_history_circle_accent)
             typeIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
@@ -53,9 +82,6 @@ class ChatHistoryViewHolder(
             typeIcon.colorFilter = null
             iconContainer.contentDescription = null
         }
-        itemView.setOnClickListener { onClick(item) }
-        itemView.setOnLongClickListener { onLongClick(item) }
-        moreButton.setOnClickListener { anchor -> onMoreClick(item, anchor) }
     }
 
     private fun iconFor(type: ChatType, pinned: Boolean): Int = when (type) {
@@ -65,6 +91,9 @@ class ChatHistoryViewHolder(
     }
 
     companion object {
+        private const val HALF_FLIP_DEGREES = 90f
+        private const val HALF_FLIP_DURATION_MS = 150L
+
         fun create(parent: ViewGroup): ChatHistoryViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.view_chat_history_item, parent, false)
