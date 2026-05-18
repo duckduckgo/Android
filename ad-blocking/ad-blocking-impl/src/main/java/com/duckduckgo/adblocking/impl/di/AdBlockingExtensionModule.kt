@@ -87,12 +87,8 @@ object AdBlockingExtensionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideMoshiBuilder(): Moshi.Builder = Moshi.Builder()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAdBlockingExtensionSettingsAdapter(moshiBuilder: Moshi.Builder): JsonAdapter<AdBlockingExtensionSettings> =
-        moshiBuilder
+    fun provideAdBlockingExtensionSettingsAdapter(): JsonAdapter<AdBlockingExtensionSettings> =
+        Moshi.Builder()
             .add(Domain::class.java, DomainJsonAdapter().nullSafe())
             .add(KotlinJsonAdapterFactory())
             .build()
@@ -100,8 +96,8 @@ object AdBlockingExtensionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideScriptletsSettingsAdapter(moshiBuilder: Moshi.Builder): JsonAdapter<ScriptletsSettings> =
-        moshiBuilder
+    fun provideScriptletsSettingsAdapter(): JsonAdapter<ScriptletsSettings> =
+        Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
             .adapter(ScriptletsSettings::class.java)

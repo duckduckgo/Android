@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.work:work-runtime-ktx:2.11.2'
+    implementation  AndroidX.work.runtimeKtx
     implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler
     ksp project(':anvil-ksp')
