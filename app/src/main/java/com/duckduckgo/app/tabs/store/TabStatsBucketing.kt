@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.store
 
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ACTIVITY_BUCKETS
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.ONE_WEEK_IN_DAYS
 import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.TAB_COUNT_BUCKETS
 import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.THREE_WEEKS_IN_DAYS
@@ -61,7 +62,7 @@ interface TabStatsBucketing {
 
 @ContributesBinding(AppScope::class)
 class DefaultTabStatsBucketing @Inject constructor(
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
 ) : TabStatsBucketing {
     override suspend fun getNumberOfOpenTabs(): String {
         val count = tabRepository.getOpenTabCount()

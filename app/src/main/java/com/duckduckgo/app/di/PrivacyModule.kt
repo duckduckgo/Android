@@ -41,6 +41,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -67,7 +68,7 @@ object PrivacyModule {
         context: Context,
         dataManager: WebDataManager,
         clearingStore: UnsentForgetAllPixelStore,
-        tabRepository: TabRepository,
+        @RegularMode tabRepository: TabRepository,
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
@@ -84,6 +85,8 @@ object PrivacyModule {
         duckAiHostProvider: DuckAiHostProvider,
         siteDataCleaner: SiteDataCleaner,
     ): ClearDataAction {
+        // TODO: Burns currently only clear @RegularMode tabs. Cross-mode tab clearing will be
+        // handled as part of the data-clearing fire-mode work.
         return ClearPersonalDataAction(
             context,
             dataManager,

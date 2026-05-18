@@ -44,6 +44,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -83,7 +84,7 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
