@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetQuickSetupAddressBarPositionBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -83,6 +84,8 @@ class QuickSetupAddressBarPositionBottomSheet : BottomSheetDialogFragment() {
                 setSelection(selected, animate = true)
             }
         }
+        binding.quickSetupAddressBarPositionCaption.text =
+            getString(BrowserR.string.quickSetupAddressBarPositionCaption).html(requireContext())
         binding.quickSetupAddressBarPositionDoneButton.setOnClickListener {
             setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_SELECTED_POSITION to currentSelection.name))
             dismiss()

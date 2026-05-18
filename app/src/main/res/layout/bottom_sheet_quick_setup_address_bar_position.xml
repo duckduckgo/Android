@@ -71,9 +71,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_3"
                 android:fontFamily="@font/ducksansproduct_regular"
-                android:text="@string/quickSetupAddressBarPositionCaption"
                 app:textType="secondary"
-                app:typography="body1" />
+                app:typography="body1"
+                tools:text="@string/quickSetupAddressBarPositionCaption" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/quickSetupAddressBarPositionDoneButton"

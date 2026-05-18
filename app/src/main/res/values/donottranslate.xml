@@ -125,7 +125,7 @@
 
     <!-- Quick setup bottom sheets -->
     <string name="quickSetupAddressBarPositionTitle">Where do you want your address bar?</string>
-    <string name="quickSetupAddressBarPositionCaption">You can make changes in Settings > Appearance.</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[You can make changes in <b>Settings > Appearance</b>.]]></string>
     <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
     <string name="quickSetupBottomSheetDone">Done</string>
 </resources>
