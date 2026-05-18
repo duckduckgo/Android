@@ -1951,7 +1951,7 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        val intent = TabSwitcherActivity.intent(activity, tabId)
+        val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
 

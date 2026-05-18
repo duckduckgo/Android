@@ -172,7 +172,6 @@ class TabSwitcherActivity :
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
 
-    private var selectedTabId: String? = null
     private var skipTabPurge: Boolean = false
 
     private lateinit var tabTouchHelper: TabTouchHelper
@@ -185,6 +184,12 @@ class TabSwitcherActivity :
     private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
     private var isTrackerAnimationPanelVisible = false
     private var browserModeToggle: BrowserModeToggleView? = null
+
+    // Tracks the mode we last rendered for. When the toggle flips, the next viewState emission
+    // will arrive with a different mode's tab list — we want to scroll to that mode's active
+    // tab so the user doesn't land in an arbitrary scroll position.
+    private var lastObservedBrowserMode: com.duckduckgo.browsermode.api.BrowserMode? = null
+    private var scrollToActiveTabOnNextUpdate = false
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
@@ -220,7 +225,6 @@ class TabSwitcherActivity :
             viewModel.onTrackerAnimationInfoPanelClicked()
         }
 
-        extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
         configureBrowserModeToggle()
@@ -260,10 +264,6 @@ class TabSwitcherActivity :
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(KEY_FIRST_TIME_LOADING, firstTimeLoadingTabsList)
-    }
-
-    private fun extractIntentExtras() {
-        selectedTabId = intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)
     }
 
     private fun configureViewReferences() {
@@ -421,12 +421,13 @@ class TabSwitcherActivity :
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
 
-                val shouldScroll = firstTimeLoadingTabsList && it.tabs.isNotEmpty()
+                val shouldScroll = (firstTimeLoadingTabsList || scrollToActiveTabOnNextUpdate) && it.tabs.isNotEmpty()
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
                     if (shouldScroll) {
                         firstTimeLoadingTabsList = false
-                        scrollToActiveTab()
+                        scrollToActiveTabOnNextUpdate = false
+                        scrollToActiveTab(it.tabSwitcherItems)
                     }
                 }
 
@@ -455,6 +456,10 @@ class TabSwitcherActivity :
             lifecycleScope.launch {
                 viewModel.browserMode.flowWithLifecycle(lifecycle).collect { mode ->
                     browserModeToggle?.setMode(mode)
+                    if (lastObservedBrowserMode != null && lastObservedBrowserMode != mode) {
+                        scrollToActiveTabOnNextUpdate = true
+                    }
+                    lastObservedBrowserMode = mode
                 }
             }
             lifecycleScope.launch {
@@ -555,8 +560,10 @@ class TabSwitcherActivity :
         }
     }
 
-    private fun scrollToActiveTab() {
-        val index = tabsAdapter.getAdapterPositionForTab(selectedTabId)
+    private fun scrollToActiveTab(items: List<TabSwitcherItem>) {
+        val index = items.indexOfFirst {
+            (it is NormalTab && it.isActive) || (it is DuckAiTab && it.isActive)
+        }
         if (index != -1) {
             scrollToPosition(index)
         }
@@ -944,16 +951,8 @@ class TabSwitcherActivity :
     }
 
     companion object {
-        fun intent(
-            context: Context,
-            selectedTabId: String? = null,
-        ): Intent {
-            val intent = Intent(context, TabSwitcherActivity::class.java)
-            intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)
-            return intent
-        }
+        fun intent(context: Context): Intent = Intent(context, TabSwitcherActivity::class.java)
 
-        const val EXTRA_KEY_SELECTED_TAB = "selected"
         const val EXTRA_KEY_DELETED_TAB_IDS = "deletedTabIds"
         const val EXTRA_KEY_DUCK_AI_URL = "duckAIUrl"
 
