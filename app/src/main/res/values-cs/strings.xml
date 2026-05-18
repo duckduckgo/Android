@@ -24,8 +24,8 @@
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
     <string name="open">Otevřít</string>
-    <string name="cancel">Zrušit</string>
     <string name="search">Vyhledávání</string>
+    <string name="cancel">Zrušit</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat smazán</string>
@@ -902,7 +902,7 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Překvap mě!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je vyhledávač DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Tohle je vyhledávač DuckDuckGo Search!</string>
     <string name="onboardingSerpDaxDialogBrandDesignDescription">Soukromý. Rychlý. S méně reklamami.</string>
     <string name="onboardingSerpDaxDialogButton">Mám to!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
