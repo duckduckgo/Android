@@ -218,6 +218,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -425,6 +426,8 @@ class BrowserTabViewModelTest {
     private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private val mockTabRepository: TabRepository = mock()
+
+    private val mockAggregateTabRepository: AggregateTabRepository = mock()
 
     private val webViewSessionStorage: WebViewSessionStorage = mock()
 
@@ -802,7 +805,7 @@ class BrowserTabViewModelTest {
                     settingsDataStore = ctaViewModelMockSettingsStore,
                     onboardingStore = mockOnboardingStore,
                     userStageStore = mockUserStageStore,
-                    tabRepository = mockTabRepository,
+                    aggregateTabRepository = mockAggregateTabRepository,
                     dispatchers = coroutineRule.testDispatcherProvider,
                     duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                     extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,

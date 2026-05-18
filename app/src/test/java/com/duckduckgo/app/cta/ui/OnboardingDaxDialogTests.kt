@@ -37,7 +37,7 @@ import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdat
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -81,7 +81,7 @@ class OnboardingDaxDialogTests {
     private val settingsDataStore: SettingsDataStore = mock()
     private val onboardingStore: OnboardingStore = mock()
     private val userStageStore: UserStageStore = mock()
-    private val tabRepository: TabRepository = mock()
+    private val aggregateTabRepository: AggregateTabRepository = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
@@ -114,7 +114,7 @@ class OnboardingDaxDialogTests {
             settingsDataStore,
             onboardingStore,
             userStageStore,
-            tabRepository,
+            aggregateTabRepository,
             coroutineRule.testDispatcherProvider,
             mockDuckChat,
             duckDuckGoUrlDetector,

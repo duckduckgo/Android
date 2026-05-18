@@ -37,7 +37,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -101,7 +101,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockUserStageStore: UserStageStore = mock()
-    private val mockTabRepository: TabRepository = mock()
+    private val mockAggregateTabRepository: AggregateTabRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockSubscriptions: Subscriptions = mock()
@@ -148,7 +148,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
-            tabRepository = mockTabRepository,
+            aggregateTabRepository = mockAggregateTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
