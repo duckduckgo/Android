@@ -459,7 +459,13 @@ class NewTabReturnHatchViewModelTest {
             testee.onBurnTabPressed()
             tabsFlow.value = emptyList()
 
-            assertFalse(awaitItem().shouldShow)
+            // The viewState combine and the burn-target observer both consume flowTabs, so the
+            // order of emissions is non-deterministic. Drain until we observe the hatch hidden.
+            var hidden = !awaitItem().shouldShow
+            while (!hidden) {
+                hidden = !awaitItem().shouldShow
+            }
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -491,7 +497,9 @@ class NewTabReturnHatchViewModelTest {
             testee.onBurnTabPressed()
             tabsFlow.value = listOf(burnTarget)
 
-            expectNoEvents()
+            // tabs count drops from 2 to 1 so viewState re-emits, but shouldShow stays true
+            // because the burn target is still present in the repository.
+            assertTrue(awaitItem().shouldShow)
         }
     }
 
