@@ -1879,6 +1879,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             binding.daxDialogCta.comparisonChartContent.check5,
         ).sortedBy { comparisonTable.indexOfChild(it.parent as View) }
 
+        // Reset trimPathEnd up-front: the alpha fade-in completes ~50ms before the postDelayed AVD start,
+        // so any stale trimPathEnd=1 from a previous run would render the tick fully drawn during the gap.
+        checkViews.forEach { checkView ->
+            (checkView.drawable?.mutate() as? AnimatedVectorDrawable)?.reset()
+        }
+
         val iconAnimators = checkViews.mapIndexed { index, checkView ->
             AnimatorSet().apply {
                 playTogether(
