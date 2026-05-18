@@ -20,6 +20,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -183,6 +184,7 @@ class TabSwitcherActivity :
     private var layoutTypeMenuItem: MenuItem? = null
     private var tabSwitcherAnimationTileRemovalDialog: DaxAlertDialog? = null
     private var isTrackerAnimationPanelVisible = false
+    private var browserModeToggle: BrowserModeToggleView? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
@@ -221,6 +223,7 @@ class TabSwitcherActivity :
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
+        configureBrowserModeToggle()
         configureRecycler()
         configureNavigationBar()
 
@@ -346,19 +349,42 @@ class TabSwitcherActivity :
         )
     }
 
+    private fun configureBrowserModeToggle() {
+        if (!viewModel.isBrowserModeToggleVisible) return
+
+        val toggle = BrowserModeToggleView(this).also { browserModeToggle = it }
+        toolbar.addView(
+            toggle,
+            Toolbar.LayoutParams(
+                Toolbar.LayoutParams.WRAP_CONTENT,
+                Toolbar.LayoutParams.WRAP_CONTENT,
+                Gravity.START or Gravity.CENTER_VERTICAL,
+            ),
+        )
+        toggle.setOnModeChangedListener { mode ->
+            viewModel.onBrowserModeToggled(mode)
+        }
+    }
+
     private fun updateToolbarTitle(
         mode: Mode,
         tabCount: Int,
     ) {
+        val toggle = browserModeToggle
+        val showToggle = toggle != null && mode !is Selection
+
+        toggle?.visibility = if (showToggle) View.VISIBLE else View.GONE
+
         toolbar.title =
-            if (mode is Selection) {
-                if (mode.selectedTabs.isEmpty()) {
-                    getString(R.string.selectTabsMenuItem)
-                } else {
-                    getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
-                }
-            } else {
-                resources.getQuantityString(R.plurals.tabSwitcherTitle, tabCount, tabCount)
+            when {
+                mode is Selection ->
+                    if (mode.selectedTabs.isEmpty()) {
+                        getString(R.string.selectTabsMenuItem)
+                    } else {
+                        getString(R.string.tabSelectionTitle, mode.selectedTabs.size)
+                    }
+                showToggle -> ""
+                else -> resources.getQuantityString(R.plurals.tabSwitcherTitle, tabCount, tabCount)
             }
     }
 
@@ -422,6 +448,19 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             urlDisplayRepository.isFullUrlEnabled.flowWithLifecycle(lifecycle).collect {
                 tabsAdapter.isFullUrlEnabled = it
+            }
+        }
+
+        if (viewModel.isBrowserModeToggleVisible) {
+            lifecycleScope.launch {
+                viewModel.browserMode.flowWithLifecycle(lifecycle).collect { mode ->
+                    browserModeToggle?.setMode(mode)
+                }
+            }
+            lifecycleScope.launch {
+                viewModel.regularTabCount.flowWithLifecycle(lifecycle).collect { count ->
+                    browserModeToggle?.setRegularTabCount(count)
+                }
             }
         }
 

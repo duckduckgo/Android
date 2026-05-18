@@ -56,6 +56,7 @@ import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -90,6 +91,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserModeStateHolder: BrowserModeStateHolder,
+    private val fireModeAvailability: FireModeAvailability,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
@@ -103,7 +105,21 @@ class TabSwitcherViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
 
-    private val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
+    val isBrowserModeToggleVisible: Boolean = fireModeAvailability.isAvailable()
+
+    val browserMode: StateFlow<BrowserMode> =
+        if (isBrowserModeToggleVisible) {
+            browserModeStateHolder.currentMode
+        } else {
+            MutableStateFlow(BrowserMode.REGULAR)
+        }
+
+    private val currentMode: StateFlow<BrowserMode> get() = browserMode
+
+    val regularTabCount: StateFlow<Int> =
+        tabRepositoryProvider.forMode(BrowserMode.REGULAR).flowTabs
+            .map { it.size }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(currentMode.value)
@@ -219,6 +235,12 @@ class TabSwitcherViewModel @Inject constructor(
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
         command.value = Command.ShowFireBottomSheet
+    }
+
+    fun onBrowserModeToggled(mode: BrowserMode) {
+        if (!isBrowserModeToggleVisible) return
+        if (mode == browserMode.value) return
+        browserModeStateHolder.switchTo(mode)
     }
 
     suspend fun onTabSelected(tabId: String) {
