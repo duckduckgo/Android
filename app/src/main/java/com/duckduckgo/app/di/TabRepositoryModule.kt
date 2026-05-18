@@ -97,14 +97,6 @@ abstract class TabRepositoryModule {
             nativeInputStatePublisher = nativeInputStatePublisher,
         )
 
-        /**
-         * Fire-mode [TabDataRepository] singleton backed by the fire-mode [TabsDao].
-         *
-         * WARNING: [TabRepository.deleteAll] on this instance shares fan-out targets with the
-         * regular-mode instance (it clears app-global singletons like sessions / duck-chat /
-         * favicons / ad-click). It is UNSAFE to call until the Tabs.* clearing plugin lands.
-         * Do not invoke deleteAll() from any new code in this plan.
-         */
         @Provides
         @SingleInstanceIn(AppScope::class)
         @FireMode
