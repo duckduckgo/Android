@@ -107,4 +107,7 @@
     <string name="duck_ai_chat_history_rename_confirm_title">Save</string>
     <string name="duck_ai_chat_history_rename_confirm_content_description">Save chat title</string>
     <string name="duck_ai_chat_history_rename_error">Couldn\'t rename chat</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Chat pinned</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chat unpinned</string>
+    <string name="duck_ai_chat_history_undo">Undo</string>
 </resources>

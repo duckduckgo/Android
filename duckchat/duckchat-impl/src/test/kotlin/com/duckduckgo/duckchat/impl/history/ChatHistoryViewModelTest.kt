@@ -858,6 +858,66 @@ class ChatHistoryViewModelTest {
         assertTrue(repository.pinnedChats.isEmpty())
     }
 
+    @Test
+    fun `onTogglePin emits PinToggled message event with previous pinned state false`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = false))
+
+        viewModel.messageEvents.test {
+            // Drain the initial Loaded state so latestItems is primed.
+            viewModel.uiState.test { awaitInitialLoaded() }
+            viewModel.onTogglePin("a")
+
+            val event = awaitItem()
+            assertTrue(event is ChatHistoryViewModel.MessageEvent.PinToggled)
+            event as ChatHistoryViewModel.MessageEvent.PinToggled
+            assertEquals("a", event.chatId)
+            assertEquals(false, event.wasPinned)
+        }
+    }
+
+    @Test
+    fun `onTogglePin emits PinToggled message event with previous pinned state true`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = true))
+
+        viewModel.messageEvents.test {
+            viewModel.uiState.test { awaitInitialLoaded() }
+            viewModel.onTogglePin("a")
+
+            val event = awaitItem()
+            assertTrue(event is ChatHistoryViewModel.MessageEvent.PinToggled)
+            event as ChatHistoryViewModel.MessageEvent.PinToggled
+            assertEquals("a", event.chatId)
+            assertEquals(true, event.wasPinned)
+        }
+    }
+
+    @Test
+    fun `onTogglePin emits no message event when chatId is unknown`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = false))
+
+        viewModel.messageEvents.test {
+            viewModel.uiState.test { awaitInitialLoaded() }
+            viewModel.onTogglePin("missing")
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `onUndoTogglePin restores the requested pinned state via the repository`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a", pinned = true))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onTogglePin("a") // a → unpinned
+            awaitItem() // Loaded after the unpin write
+            viewModel.onUndoTogglePin("a", restorePinned = true)
+            val restored = awaitItem() as Loaded
+            assertEquals(listOf("a"), restored.pinned.map { it.chatId })
+            assertEquals(emptyList<String>(), restored.recent.map { it.chatId })
+        }
+        assertEquals(listOf("a" to false, "a" to true), repository.pinnedChats)
+    }
+
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.

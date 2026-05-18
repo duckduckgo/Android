@@ -125,6 +125,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach(::onNavigationEvent)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.messageEvents
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach(::onMessageEvent)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
@@ -133,11 +138,30 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
     }
 
+    private fun onMessageEvent(event: ChatHistoryViewModel.MessageEvent) {
+        when (event) {
+            is ChatHistoryViewModel.MessageEvent.PinToggled -> showPinToggledSnackbar(event)
+        }
+    }
+
     private fun openRenameScreen(chatId: String, currentTitle: String) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.chatHistoryFragmentContainer, RenameChatFragment.newInstance(chatId, currentTitle))
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun showPinToggledSnackbar(event: ChatHistoryViewModel.MessageEvent.PinToggled) {
+        val messageRes = if (event.wasPinned) {
+            R.string.duck_ai_chat_history_unpin_snackbar
+        } else {
+            R.string.duck_ai_chat_history_pin_snackbar
+        }
+        Snackbar.make(binding.root, messageRes, Snackbar.LENGTH_LONG)
+            .setAction(R.string.duck_ai_chat_history_undo) {
+                viewModel.onUndoTogglePin(event.chatId, restorePinned = event.wasPinned)
+            }
+            .show()
     }
 
     private fun render(state: ChatHistoryUiState) {

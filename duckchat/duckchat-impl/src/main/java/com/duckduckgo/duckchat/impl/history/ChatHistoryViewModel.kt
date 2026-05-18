@@ -57,6 +57,9 @@ class ChatHistoryViewModel @Inject constructor(
     private val navigationChannel = Channel<NavigationEvent>(capacity = Channel.BUFFERED, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val navigationEvents: Flow<NavigationEvent> = navigationChannel.receiveAsFlow()
 
+    private val messageChannel = Channel<MessageEvent>(capacity = Channel.BUFFERED, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val messageEvents: Flow<MessageEvent> = messageChannel.receiveAsFlow()
+
     /** Cached snapshot so non-suspend action methods can read Recent without re-subscribing. */
     private var latestItems: List<ChatHistoryItem> = emptyList()
 
@@ -136,7 +139,13 @@ class ChatHistoryViewModel @Inject constructor(
 
     fun onTogglePin(chatId: String) {
         val current = latestItems.firstOrNull { it.chatId == chatId } ?: return
-        appScope.launch { chatHistoryRepository.setPinned(chatId, !current.pinned) }
+        val wasPinned = current.pinned
+        appScope.launch { chatHistoryRepository.setPinned(chatId, !wasPinned) }
+        messageChannel.trySend(MessageEvent.PinToggled(chatId = chatId, wasPinned = wasPinned))
+    }
+
+    fun onUndoTogglePin(chatId: String, restorePinned: Boolean) {
+        appScope.launch { chatHistoryRepository.setPinned(chatId, restorePinned) }
     }
 
     private fun dispatchSelectedClear(chatIds: Set<String>) {
@@ -265,6 +274,10 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
+    }
+
+    sealed interface MessageEvent {
+        data class PinToggled(val chatId: String, val wasPinned: Boolean) : MessageEvent
     }
 
     private companion object {
