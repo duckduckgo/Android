@@ -169,6 +169,7 @@ import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
+import com.duckduckgo.app.cta.ui.SubscriptionPromoFlow
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -3403,7 +3404,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedSubscriptionPromoModalCtaThenLaunchSubscriptionWithReinstallModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__skippedonboardingupsell")
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING)
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
@@ -3413,7 +3414,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedPromoModalSubscriptionPromoCtaThenLaunchSubscriptionWithPromoModalOrigin() {
-        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge")
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE)
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
