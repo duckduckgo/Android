@@ -24,8 +24,8 @@
     <string name="yes">Da</string>
     <string name="no">Nu</string>
     <string name="open">Deschide</string>
-    <string name="cancel">Anulează</string>
     <string name="search">Căutare</string>
+    <string name="cancel">Anulează</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat șters</string>
@@ -884,8 +884,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[Acesta este <b>DuckDuckGo Search</b>! Privat. Rapid. Mai puține reclame.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">Acesta este DuckDuckGo Search!</string>
-    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Rapid. Mai puține reclame.</string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Așa arată DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Privat. Rapid. Cu mai puține reclame.</string>
     <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
