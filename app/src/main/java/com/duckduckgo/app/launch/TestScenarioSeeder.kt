@@ -33,6 +33,7 @@ interface TestScenarioSeeder {
         scenarioKey: String?,
         omnibarPosition: String?,
         nativeInputToggle: String?,
+        inputScreenWithAI: String?,
     )
 
     companion object {
@@ -40,6 +41,7 @@ interface TestScenarioSeeder {
         const val EXTRA_TEST_SCENARIO = "testScenario"
         const val EXTRA_OMNIBAR_POSITION = "omnibarPosition"
         const val EXTRA_NATIVE_INPUT_TOGGLE = "nativeInputToggle"
+        const val EXTRA_INPUT_WITH_AI_TOGGLE = "inputWithAiToggle"
     }
 }
 
@@ -57,6 +59,7 @@ class RealTestScenarioSeeder @Inject constructor(
         scenarioKey: String?,
         omnibarPosition: String?,
         nativeInputToggle: String?,
+        inputScreenWithAI: String?,
     ) {
         if (isMaestroExtra != "true") return
         withContext(dispatchers.io()) {
@@ -69,7 +72,10 @@ class RealTestScenarioSeeder @Inject constructor(
                 }
             }
             nativeInputToggle?.let {
-                duckChatDataStore.setDuckChatUserEnabled(it == "true")
+                duckChatDataStore.setNativeInputFieldUserSetting(it == "true")
+            }
+            inputScreenWithAI?.let {
+                duckChatDataStore.setInputScreenUserSetting(it == "true")
             }
         }
     }

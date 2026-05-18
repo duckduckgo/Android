@@ -53,11 +53,13 @@ class RealTestScenarioSeederTest {
         scenario: String? = null,
         omnibarPosition: String? = null,
         nativeInputToggle: String? = null,
+        inputScreenWithAI: String? = null,
     ) = seeder.seedIfNeeded(
         isMaestroExtra = isMaestro,
         scenarioKey = scenario,
         omnibarPosition = omnibarPosition,
         nativeInputToggle = nativeInputToggle,
+        inputScreenWithAI = inputScreenWithAI,
     )
 
     @Test
@@ -136,27 +138,49 @@ class RealTestScenarioSeederTest {
     }
 
     @Test
-    fun `when nativeInputToggle is true, duck ai is enabled`() = runTest {
+    fun `when nativeInputToggle is true, native input field setting is enabled`() = runTest {
         seed(nativeInputToggle = "true")
 
-        verify(duckChatDataStore).setDuckChatUserEnabled(true)
+        verify(duckChatDataStore).setNativeInputFieldUserSetting(true)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
     @Test
-    fun `when nativeInputToggle is false, duck ai is disabled`() = runTest {
+    fun `when nativeInputToggle is false, native input field setting is disabled`() = runTest {
         seed(nativeInputToggle = "false")
 
-        verify(duckChatDataStore).setDuckChatUserEnabled(false)
+        verify(duckChatDataStore).setNativeInputFieldUserSetting(false)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
     @Test
-    fun `all three args can be combined independently`() = runTest {
-        seed(scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
+    fun `when inputScreenWithAI is true, input screen setting is enabled`() = runTest {
+        seed(inputScreenWithAI = "true")
+
+        verify(duckChatDataStore).setInputScreenUserSetting(true)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+    }
+
+    @Test
+    fun `when inputScreenWithAI is false, input screen setting is disabled`() = runTest {
+        seed(inputScreenWithAI = "false")
+
+        verify(duckChatDataStore).setInputScreenUserSetting(false)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+    }
+
+    @Test
+    fun `all args can be combined independently`() = runTest {
+        seed(
+            scenario = "favorites_3",
+            omnibarPosition = "bottom",
+            nativeInputToggle = "true",
+            inputScreenWithAI = "true",
+        )
 
         verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verify(duckChatDataStore).setDuckChatUserEnabled(true)
+        verify(duckChatDataStore).setNativeInputFieldUserSetting(true)
+        verify(duckChatDataStore).setInputScreenUserSetting(true)
     }
 }

@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.launch
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
@@ -26,6 +28,8 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority
 import logcat.logcat
@@ -36,6 +40,7 @@ class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val pixel: Pixel,
+    private val testScenarioSeeder: TestScenarioSeeder,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -45,9 +50,29 @@ class LaunchViewModel @Inject constructor(
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
-    suspend fun determineViewToShow() {
-        waitForReferrerData()
-        showOnboardingOrHome()
+    fun initialiseData(intent: Intent) {
+        viewModelScope.launch {
+            try {
+                testScenarioSeeder.seedIfNeeded(
+                    isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
+                    scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+                    omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
+                    nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
+                    inputScreenWithAI = intent.getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE),
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // seed failure must not prevent routing to BrowserActivity
+            }
+        }
+    }
+
+    fun determineViewToShow() {
+        viewModelScope.launch {
+            waitForReferrerData()
+            showOnboardingOrHome()
+        }
     }
 
     suspend fun showOnboardingOrHome() {

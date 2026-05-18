@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.launch
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
@@ -31,6 +32,8 @@ import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -47,6 +50,7 @@ class LaunchViewModelTest {
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
     private val pixel: Pixel = mock()
+    private val testScenarioSeeder: TestScenarioSeeder = mock()
 
     private lateinit var testee: LaunchViewModel
 
@@ -61,11 +65,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
@@ -76,11 +82,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
@@ -91,11 +99,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
     }
@@ -106,10 +116,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
         verify(mockCommandObserver).onChanged(any<Home>())
     }
 
@@ -119,10 +132,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
         verify(mockCommandObserver).onChanged(any<Home>())
     }
 
@@ -132,10 +148,13 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
         verify(mockCommandObserver).onChanged(any<Home>())
     }
 
@@ -145,10 +164,55 @@ class LaunchViewModelTest {
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
             pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
         )
 
         testee.determineViewToShow()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(pixel).fire(AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER)
+    }
+
+    @Test
+    fun whenInitialiseDataThenSeederIsInvokedWithIntentExtras() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+        )
+        val intent = mock<Intent>().apply {
+            whenever(getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO)).thenReturn("true")
+            whenever(getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO)).thenReturn("favorites_3")
+            whenever(getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION)).thenReturn("bottom")
+            whenever(getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE)).thenReturn("true")
+            whenever(getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE)).thenReturn("true")
+        }
+
+        testee.initialiseData(intent)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(testScenarioSeeder).seedIfNeeded(
+            isMaestroExtra = eq("true"),
+            scenarioKey = eq("favorites_3"),
+            omnibarPosition = eq("bottom"),
+            nativeInputToggle = eq("true"),
+            inputScreenWithAI = eq("true"),
+        )
+    }
+
+    @Test
+    fun whenSeederThrowsThenInitialiseDataDoesNotCrash() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+        )
+        whenever(testScenarioSeeder.seedIfNeeded(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+            .thenThrow(RuntimeException("seed failed"))
+
+        testee.initialiseData(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
     }
 }
