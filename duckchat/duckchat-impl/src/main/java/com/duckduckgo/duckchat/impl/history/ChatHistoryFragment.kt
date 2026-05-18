@@ -143,16 +143,23 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 if (selectMode != null) {
                     applySelectModeToolbar(selectMode.selectedChatIds.size)
                     setFireActionVisible(selectMode.selectedChatIds.isNotEmpty())
-                    onBackPressedCallback.isEnabled = true
                 } else {
                     applyDefaultToolbar()
                     // Hide fire when Recent is empty — title is "Delete N chats?" of the Recent count.
                     setFireActionVisible(state.recent.isNotEmpty())
-                    onBackPressedCallback.isEnabled = binding.searchBar.isVisible
                 }
                 renderConfirmation(state.confirmation)
             }
         }
+        // Re-derive every render so a transition out of Loaded (e.g. last chat deleted externally)
+        // can't leave us intercepting back presses with no overlay to dismiss.
+        onBackPressedCallback.isEnabled = shouldInterceptBack(state)
+    }
+
+    private fun shouldInterceptBack(state: ChatHistoryUiState): Boolean {
+        if (binding.searchBar.isVisible) return true
+        val loaded = state as? ChatHistoryUiState.Loaded ?: return false
+        return loaded.mode is ChatHistoryUiState.Mode.Selecting
     }
 
     private fun applyDefaultToolbar() {
