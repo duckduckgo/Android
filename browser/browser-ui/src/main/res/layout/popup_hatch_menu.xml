@@ -28,6 +28,11 @@
         app:leadingIcon="@drawable/ic_return_24"
         app:primaryText="@string/hatchMenuReturnTab" />
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        app:defaultPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuCloseTab"
         android:layout_width="match_parent"
@@ -37,6 +42,11 @@
         app:leadingIconTint="?daxColorDestructive"
         app:primaryTextType="destructive" />
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        app:defaultPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuBurnTab"
         android:layout_width="match_parent"
@@ -45,6 +55,11 @@
         app:leadingIcon="@drawable/ic_fire_24"
         app:leadingIconTint="?daxColorDestructive"
         app:primaryTextType="destructive" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        app:defaultPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/hatchMenuAfterInactivity"
