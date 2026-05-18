@@ -24,8 +24,8 @@
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
     <string name="open">Öppna</string>
-    <string name="cancel">Avbryt</string>
     <string name="search">Sökning</string>
+    <string name="cancel">Avbryt</string>
 
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chatt raderad</string>
