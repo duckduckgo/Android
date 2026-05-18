@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.di
 
+import android.annotation.SuppressLint
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -34,7 +37,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
-//noinspection NoImplImportsInAppModule
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
