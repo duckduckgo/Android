@@ -1,0 +1,8 @@
+appId: com.duckduckgo.mobile.android
+---
+- assertVisible:
+    text: "Example"
+- assertVisible:
+    text: "DuckDuckGo"
+- assertVisible:
+    text: "Privacy Test Pages"
