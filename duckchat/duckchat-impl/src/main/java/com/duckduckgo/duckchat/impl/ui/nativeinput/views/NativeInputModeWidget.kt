@@ -1050,7 +1050,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     override fun toolSelected(tool: String?) {
-        // wired in Task 4
+        viewModel.setSelectedTool(tool)
     }
 
     override fun showModelPicker(showing: Boolean) {

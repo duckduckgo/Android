@@ -21,6 +21,8 @@ import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
@@ -34,6 +36,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -54,6 +57,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -90,7 +94,14 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
-    private val nativeInputStatePublisher: NativeInputStatePublisher = mock()
+
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val tabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
+    }
+    private val realNativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
+    private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
@@ -138,8 +149,14 @@ class NativeInputModeWidgetViewModelTest {
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            nativeInputStateProvider = nativeInputStateProvider,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
+    }
+
+    @After
+    fun tearDownStore() {
+        realNativeInputStateStore.clearAll()
     }
 
     private fun setIsEnabled(enabled: Boolean) {
@@ -754,6 +771,64 @@ class NativeInputModeWidgetViewModelTest {
         testee.fireChatUrlSuggestionPixel(url)
 
         verify(autoComplete).fireAutocompletePixel(eq(emptyList()), eq(url), eq(true))
+    }
+
+    // endregion
+
+    // region publisher.update preserves plugin-owned fields
+
+    @Test
+    fun `when widget VM publishes then plugin-owned selectedTool is preserved`() = runTest {
+        val tabId = "tab-A"
+        // Plugin writes selectedTool first (via the publisher interface of the same store)
+        nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = "WEB_SEARCH") }
+
+        // Widget VM configures and triggers its publish loop
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+
+        // Allow the combine to emit and the publish loop to run
+        advanceUntilIdle()
+
+        // selectedTool must survive the widget VM's update
+        assertEquals("WEB_SEARCH", nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    // endregion
+
+    // region setSelectedTool
+
+    @Test
+    fun `when setSelectedTool then publisher updates selectedTool for active tab`() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        testee.setSelectedTool("WEB_SEARCH")
+
+        assertEquals("WEB_SEARCH", nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    @Test
+    fun `when setSelectedTool with null then publisher clears selectedTool`() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        testee.setSelectedTool("WEB_SEARCH")
+
+        testee.setSelectedTool(null)
+
+        assertNull(nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    @Test
+    fun `when setSelectedTool and no active tab then nothing happens`() = runTest {
+        val freshViewModel = createViewModel()
+
+        freshViewModel.setSelectedTool("WEB_SEARCH")
+
+        // No active tab → no publisher write. Sample an arbitrary tab to confirm.
+        assertNull(nativeInputStateProvider.stateForTab("any-tab").value.selectedTool)
     }
 
     // endregion

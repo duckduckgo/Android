@@ -246,6 +246,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.update { it.copy(toggleSelection = selection) }
     }
 
+    fun setSelectedTool(tool: String?) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
+    }
+
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
