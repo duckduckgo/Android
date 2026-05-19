@@ -217,7 +217,7 @@ class ChatHistoryViewModelTest {
     // --- Fire-all ---
 
     @Test
-    fun `onFireAllRequested with two or more Recent chats sets FireAll confirmation with the Recent count`() = runTest {
+    fun `onFireAllRequested with two or more chats sets FireAll confirmation with every chatId including pinned`() = runTest {
         source.value = listOf(
             item("p", pinned = true),
             item("r1"),
@@ -231,17 +231,17 @@ class ChatHistoryViewModelTest {
             viewModel.onFireAllRequested()
 
             val confirming = awaitItem() as Loaded
-            assertEquals(ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("r1", "r2", "r3")), confirming.confirmation)
+            assertEquals(
+                ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("p", "r1", "r2", "r3")),
+                confirming.confirmation,
+            )
             assertTrue(repository.deletedChatIds.isEmpty())
         }
     }
 
     @Test
-    fun `onFireAllRequested with exactly one Recent chat dispatches DuckChats Selected with that chat url`() = runTest {
-        source.value = listOf(
-            item("p", pinned = true),
-            item("r1"),
-        )
+    fun `onFireAllRequested with exactly one recent chat dispatches DuckChats Selected with that chat url`() = runTest {
+        source.value = listOf(item("r1"))
 
         viewModel.uiState.test {
             awaitInitialLoaded()
@@ -258,19 +258,40 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onFireAllRequested with no Recent chats is a no-op`() = runTest {
+    fun `onFireAllRequested with exactly one pinned chat dispatches DuckChats Selected with that chat url`() = runTest {
+        source.value = listOf(item("p", pinned = true))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+
+            viewModel.onFireAllRequested()
+
+            expectNoEvents()
+        }
+        assertEquals(
+            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=p")))),
+            dataClearingTrigger.calls,
+        )
+        assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
+    @Test
+    fun `onFireAllRequested with only pinned chats and no recent sets FireAll confirmation with the pinned ids`() = runTest {
         source.value = listOf(
             item("p1", pinned = true),
             item("p2", pinned = true),
         )
 
         viewModel.uiState.test {
-            val initial = awaitInitialLoaded()
-            assertEquals(null, initial.confirmation)
+            awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
 
-            expectNoEvents()
+            val confirming = awaitItem() as Loaded
+            assertEquals(
+                ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("p1", "p2")),
+                confirming.confirmation,
+            )
             assertTrue(repository.deletedChatIds.isEmpty())
         }
     }
@@ -289,7 +310,7 @@ class ChatHistoryViewModelTest {
             awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
-            awaitItem() // confirmation = FireAll(3)
+            awaitItem() // confirmation = FireAll(5) — p1, p2, r1, r2, r3
 
             viewModel.onFireAllConfirmed()
 
@@ -337,12 +358,13 @@ class ChatHistoryViewModelTest {
             awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
-            awaitItem() // confirmation = FireAll(2)
+            awaitItem() // confirmation = FireAll(3) — p, r1, r2
             viewModel.onFireAllConfirmed()
             awaitItem() // confirmation cleared
         }
 
-        // ViewModel never touches the repository on the dialog path — production wipes Pinned too.
+        // ViewModel never touches the repository on the dialog path — production wipes every chat
+        // including Pinned via the dialog-driven Selected dispatch.
         assertEquals(false, repository.deleteAllChatsCalled)
         assertTrue(repository.deletedChatIds.isEmpty())
     }
@@ -661,17 +683,17 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `chatUrlsForDialog returns Recent URLs while a FireAll confirmation is pending`() = runTest {
+    fun `chatUrlsForDialog returns every chat URL including pinned while a FireAll confirmation is pending`() = runTest {
         source.value = listOf(item("p", pinned = true), item("r1"), item("r2"))
 
         viewModel.uiState.test {
             awaitInitialLoaded()
 
             viewModel.onFireAllRequested()
-            awaitItem() // FireAll({r1, r2})
+            awaitItem() // FireAll({p, r1, r2})
 
             assertEquals(
-                setOf("https://duck.ai?chatID=r1", "https://duck.ai?chatID=r2"),
+                setOf("https://duck.ai?chatID=p", "https://duck.ai?chatID=r1", "https://duck.ai?chatID=r2"),
                 viewModel.chatUrlsForDialog(),
             )
         }

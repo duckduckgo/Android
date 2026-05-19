@@ -147,8 +147,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                     setFireActionVisible(selectMode.selectedChatIds.isNotEmpty())
                 } else {
                     applyDefaultToolbar()
-                    // Hide fire when Recent is empty — title is "Delete N chats?" of the Recent count.
-                    setFireActionVisible(state.recent.isNotEmpty())
+                    // Fire-all wipes every chat including Pinned — show whenever any chat is present.
+                    setFireActionVisible(state.pinned.isNotEmpty() || state.recent.isNotEmpty())
                 }
                 renderConfirmation(state.confirmation)
             }
