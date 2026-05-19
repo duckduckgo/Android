@@ -33,12 +33,10 @@ private const val KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuqrhn2ztPnPt8QybIGs
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealPublicKeyProvider @Inject constructor(
-    private val keyFactory: KeyFactory,
-    private val decoder: Base64.Decoder,
-) : PublicKeyProvider {
+class RealPublicKeyProvider @Inject constructor() : PublicKeyProvider {
 
     override val publicKey: PublicKey by lazy {
-        keyFactory.generatePublic(X509EncodedKeySpec(decoder.decode(KEY)))
+        KeyFactory.getInstance("EC")
+            .generatePublic(X509EncodedKeySpec(Base64.getDecoder().decode(KEY)))
     }
 }

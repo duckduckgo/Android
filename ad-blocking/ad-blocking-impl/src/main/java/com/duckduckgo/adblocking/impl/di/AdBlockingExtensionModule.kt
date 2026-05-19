@@ -16,7 +16,6 @@
 
 package com.duckduckgo.adblocking.impl.di
 
-import com.duckduckgo.adblocking.impl.domain.PublicKeyProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.DomainJsonAdapter
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
@@ -34,12 +33,6 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import java.nio.charset.CharsetDecoder
-import java.nio.charset.StandardCharsets
-import java.security.KeyFactory
-import java.security.PublicKey
-import java.security.Signature
-import java.util.Base64
 
 @Module
 @ContributesTo(AppScope::class)
@@ -61,29 +54,6 @@ object AdBlockingExtensionModule {
     @Provides
     fun provideAdBlockingExtensionDao(database: AdBlockingExtensionDatabase): AdBlockingExtensionDao =
         database.adBlockingExtensionDao()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideBase64Decoder(): Base64.Decoder =
-        Base64.getDecoder()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideKeyFactory(): KeyFactory =
-        KeyFactory.getInstance("EC")
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideAdBlockingExtensionPublicKey(publicKeyProvider: PublicKeyProvider): PublicKey =
-        publicKeyProvider.publicKey
-
-    @Provides
-    fun provideUTF8CharsetDecoder(): CharsetDecoder =
-        StandardCharsets.UTF_8.newDecoder()
-
-    @Provides
-    fun provideSignature(): Signature =
-        Signature.getInstance("SHA256withECDSA")
 
     @SingleInstanceIn(AppScope::class)
     @Provides

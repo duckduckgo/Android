@@ -17,15 +17,14 @@
 package com.duckduckgo.adblocking.impl.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.Signature
 import java.security.spec.ECGenParameterSpec
 import java.util.Base64
@@ -42,15 +41,14 @@ class ScriptletSignatureValidatorTest {
             initialize(ECGenParameterSpec("secp256r1"))
         }.generateKeyPair()
         validator = RealScriptletSignatureValidator(
-            publicKey = keyPair.public,
-            signature = Signature.getInstance("SHA256withECDSA"),
-            charsetDecoder = StandardCharsets.UTF_8.newDecoder(),
-            base64Decoder = Base64.getDecoder(),
+            publicKeyProvider = object : PublicKeyProvider {
+                override val publicKey: PublicKey = keyPair.public
+            },
         )
     }
 
     @Test
-    fun whenContentAndSignatureMatchThenValidateReturnsValid() = runTest {
+    fun whenContentAndSignatureMatchThenValidateReturnsValid() {
         val content = "console.log('hello')".toByteArray()
         val signature = sign(content, keyPair.private)
 
@@ -58,7 +56,7 @@ class ScriptletSignatureValidatorTest {
     }
 
     @Test
-    fun whenContentIsTamperedThenValidateReturnsSignatureVerificationFailed() = runTest {
+    fun whenContentIsTamperedThenValidateReturnsSignatureVerificationFailed() {
         val original = "original content".toByteArray()
         val signature = sign(original, keyPair.private)
         val tampered = "tampered content".toByteArray()
@@ -70,22 +68,21 @@ class ScriptletSignatureValidatorTest {
     }
 
     @Test
-    fun whenSignatureIsFromDifferentKeyThenValidateReturnsSignatureVerificationFailed() =
-        runTest {
-            val content = "content".toByteArray()
-            val otherKeyPair = KeyPairGenerator.getInstance("EC").apply {
-                initialize(ECGenParameterSpec("secp256r1"))
-            }.generateKeyPair()
-            val signature = sign(content, otherKeyPair.private)
+    fun whenSignatureIsFromDifferentKeyThenValidateReturnsSignatureVerificationFailed() {
+        val content = "content".toByteArray()
+        val otherKeyPair = KeyPairGenerator.getInstance("EC").apply {
+            initialize(ECGenParameterSpec("secp256r1"))
+        }.generateKeyPair()
+        val signature = sign(content, otherKeyPair.private)
 
-            Assert.assertEquals(
-                ScriptletValidationResult.Invalid.SignatureVerificationFailed,
-                validator.validate(content, signature),
-            )
-        }
+        Assert.assertEquals(
+            ScriptletValidationResult.Invalid.SignatureVerificationFailed,
+            validator.validate(content, signature),
+        )
+    }
 
     @Test
-    fun whenSignatureIsMalformedBase64ThenValidateReturnsInvalidSignatureFormat() = runTest {
+    fun whenSignatureIsMalformedBase64ThenValidateReturnsInvalidSignatureFormat() {
         val content = "content".toByteArray()
 
         Assert.assertEquals(
@@ -95,19 +92,18 @@ class ScriptletSignatureValidatorTest {
     }
 
     @Test
-    fun whenSignatureBytesAreNotValidEcdsaSignatureThenValidateReturnsSignatureVerificationFailed() =
-        runTest {
-            val content = "content".toByteArray()
-            val garbage = Base64.getEncoder().encodeToString(ByteArray(64) { 0x42 })
+    fun whenSignatureBytesAreNotValidEcdsaSignatureThenValidateReturnsSignatureVerificationFailed() {
+        val content = "content".toByteArray()
+        val garbage = Base64.getEncoder().encodeToString(ByteArray(64) { 0x42 })
 
-            Assert.assertEquals(
-                ScriptletValidationResult.Invalid.SignatureVerificationFailed,
-                validator.validate(content, garbage),
-            )
-        }
+        Assert.assertEquals(
+            ScriptletValidationResult.Invalid.SignatureVerificationFailed,
+            validator.validate(content, garbage),
+        )
+    }
 
     @Test
-    fun whenContentIsNotValidUtf8ThenValidateReturnsInvalidEncoding() = runTest {
+    fun whenContentIsNotValidUtf8ThenValidateReturnsInvalidEncoding() {
         val invalidUtf8 = byteArrayOf(0xFF.toByte(), 0xFE.toByte(), 0x80.toByte(), 0x81.toByte())
         val signature = sign(invalidUtf8, keyPair.private)
 

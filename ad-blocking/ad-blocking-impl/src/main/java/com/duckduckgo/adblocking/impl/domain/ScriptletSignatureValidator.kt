@@ -19,14 +19,12 @@ package com.duckduckgo.adblocking.impl.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import java.nio.ByteBuffer
 import java.nio.charset.CharacterCodingException
-import java.nio.charset.CharsetDecoder
+import java.nio.charset.StandardCharsets
 import java.security.PublicKey
 import java.security.Signature
 import java.util.Base64
@@ -42,35 +40,32 @@ sealed interface ScriptletValidationResult {
 }
 
 interface ScriptletSignatureValidator {
-    suspend fun validate(content: ByteArray, signatureBase64: String): ScriptletValidationResult
+    fun validate(content: ByteArray, signatureBase64: String): ScriptletValidationResult
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealScriptletSignatureValidator @Inject constructor(
-    private val publicKey: PublicKey,
-    private val signature: Signature,
-    private val charsetDecoder: CharsetDecoder,
-    private val base64Decoder: Base64.Decoder,
+    publicKeyProvider: PublicKeyProvider,
 ) : ScriptletSignatureValidator {
 
-    private val mutex = Mutex()
+    private val publicKey: PublicKey = publicKeyProvider.publicKey
 
-    override suspend fun validate(content: ByteArray, signatureBase64: String): ScriptletValidationResult = mutex.withLock {
+    override fun validate(content: ByteArray, signatureBase64: String): ScriptletValidationResult {
         try {
-            charsetDecoder.decode(ByteBuffer.wrap(content))
+            StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(content))
         } catch (e: CharacterCodingException) {
             logcat(WARN) { "Validating scriptlet failed with invalid encoding: ${e.message}" }
-            return@withLock ScriptletValidationResult.Invalid.Encoding
+            return ScriptletValidationResult.Invalid.Encoding
         }
         val signatureBytes = try {
-            base64Decoder.decode(signatureBase64)
+            Base64.getDecoder().decode(signatureBase64)
         } catch (e: IllegalArgumentException) {
             logcat(WARN) { "Validating scriptlet failed with invalid signature format: ${e.message}" }
-            return@withLock ScriptletValidationResult.Invalid.SignatureFormat
+            return ScriptletValidationResult.Invalid.SignatureFormat
         }
-        try {
-            val verified = signature.run {
+        return try {
+            val verified = Signature.getInstance(SIGNATURE_ALGORITHM).run {
                 initVerify(publicKey)
                 update(content)
                 verify(signatureBytes)
@@ -86,5 +81,9 @@ class RealScriptletSignatureValidator @Inject constructor(
             logcat(WARN) { "ScriptletSignatureValidator: verification threw: ${t.asLog()}" }
             ScriptletValidationResult.Invalid.SignatureVerificationFailed
         }
+    }
+
+    companion object {
+        const val SIGNATURE_ALGORITHM = "SHA256withECDSA"
     }
 }
