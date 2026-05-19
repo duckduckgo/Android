@@ -295,7 +295,16 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
         val params = card.layoutParams as FrameLayout.LayoutParams
         val fullWidth = (card.parent as View).width - params.leftMargin - params.rightMargin
+        // MaterialCardView compat padding scales with corner radius, but setRadius doesn't
+        // trigger updatePadding — only setMaxCardElevation does. Measure with the final radius
+        // (re-set maxCardElevation to force the padding update); otherwise fullHeight is short
+        // by the padding delta and lands as a bottom step after restoreLayout's wrap_content.
+        val materialCard = card as? MaterialCardView
+        val savedRadius = materialCard?.radius ?: 0f
+        val savedMaxElevation = materialCard?.maxCardElevation ?: 0f
+        materialCard?.apply { radius = widgetCornerRadius; maxCardElevation = savedMaxElevation }
         val fullHeight = measureUnconstrainedHeight(card, fullWidth)
+        materialCard?.apply { radius = savedRadius; maxCardElevation = savedMaxElevation }
 
         runAnimator(
             cleanup = { omnibarCard.alpha = 1f },

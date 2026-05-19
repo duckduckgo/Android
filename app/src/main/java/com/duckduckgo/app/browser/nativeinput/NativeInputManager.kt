@@ -609,6 +609,9 @@ class RealNativeInputManager @Inject constructor(
         if (omnibarController.isDuckAiMode()) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
+        // Apply focused-state layout so the widget is measured at its final size; otherwise
+        // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
+        widgetFrom(widgetView)?.prepareForEnterAnimation()
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
@@ -619,7 +622,10 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
-            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+            onCancel = {
+                layoutCoordinator.setWidgetAnimating(false)
+                widgetFrom(widgetView)?.endEnterAnimationPreview()
+            },
             onComplete = {
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
@@ -632,7 +638,10 @@ class RealNativeInputManager @Inject constructor(
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
-        widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+        widgetFrom(widgetView)?.apply {
+            focusInput(rootView.context as? Activity)
+            endEnterAnimationPreview()
+        }
     }
 
     private fun bindChatSuggestions(

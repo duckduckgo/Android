@@ -97,6 +97,8 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
+    fun prepareForEnterAnimation()
+    fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
     fun selectChatTab()
@@ -247,6 +249,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
     // toggle row and reset the parent card's corners.
     private var isContextualWidget: Boolean = false
+
+    // Held during the enter animation so padding/bottom-row compute as if focused; without
+    // it they'd flip from 4dp→8dp after focusInput and look like a second step.
+    private var previewEnterFocus = false
 
     private var attachmentView: AttachmentView? = null
 
@@ -440,7 +446,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = isChatTabSelected() && (inputField.hasFocus() || isStreaming)
+        val visible = isChatTabSelected() && (inputField.hasFocus() || previewEnterFocus || isStreaming)
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -463,7 +469,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
+        val expanded = !isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus)
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
@@ -656,6 +662,25 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (!inputField.hasFocus()) {
             inputField.requestFocus()
         }
+    }
+
+    override fun prepareForEnterAnimation() {
+        if (inputField.hasFocus()) return
+        // State observation is async; apply it synchronously so toggle-row visibility etc. are
+        // in their final positions before the enter animation measures the widget.
+        if (nativeInputState == null) {
+            activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }?.let(::applyState)
+        }
+        previewEnterFocus = true
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+    }
+
+    override fun endEnterAnimationPreview() {
+        if (!previewEnterFocus) return
+        previewEnterFocus = false
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
     }
 
     override fun hideKeyboard() {
