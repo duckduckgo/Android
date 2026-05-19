@@ -21,6 +21,7 @@ data class NativeInputState(
     val inputContext: InputContext,
     val inputPosition: InputPosition = InputPosition.TOP,
     val toggleSelection: ToggleSelection = defaultToggleFor(inputContext),
+    val selectedTool: String? = null,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,
