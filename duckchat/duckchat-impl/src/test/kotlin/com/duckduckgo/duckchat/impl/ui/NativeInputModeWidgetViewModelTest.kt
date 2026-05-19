@@ -544,24 +544,31 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenNoPluginsThenGetSelectedToolReturnsNull() = runTest {
-        val viewModel = createViewModel(plugins = emptyList())
+    fun whenNoTabIsActiveThenGetSelectedToolReturnsNull() = runTest {
+        val freshViewModel = createViewModel()
 
-        assertNull(viewModel.getSelectedTool())
+        assertNull(freshViewModel.getSelectedTool())
     }
 
     @Test
-    fun whenPluginReturnsToolSelectionThenGetSelectedToolReturnsIt() = runTest {
-        val plugin = fakeToolPlugin(containerId = 3, tool = "WebSearch")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenSelectedToolWasPublishedThenGetSelectedToolReturnsIt() = runTest {
+        val tabId = "tab-A"
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool("WEB_SEARCH")
 
-        assertEquals("WebSearch", viewModel.getSelectedTool())
+        assertEquals("WEB_SEARCH", viewModel.getSelectedTool())
     }
 
     @Test
-    fun whenNoPluginContributesToolSelectionThenGetSelectedToolReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenSelectedToolClearedThenGetSelectedToolReturnsNull() = runTest {
+        val tabId = "tab-A"
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool("WEB_SEARCH")
+        viewModel.setSelectedTool(null)
 
         assertNull(viewModel.getSelectedTool())
     }
@@ -581,15 +588,6 @@ class NativeInputModeWidgetViewModelTest {
             override fun createView(context: Context, host: NativeInputHost): View = View(context)
             override fun getPromptContribution(): PromptContribution? =
                 effort?.let { PromptContribution.ReasoningEffortSelection(it) }
-        }
-    }
-
-    private fun fakeToolPlugin(containerId: Int, tool: String?): NativeInputPlugin {
-        return object : NativeInputPlugin {
-            override val containerId: Int = containerId
-            override fun createView(context: Context, host: NativeInputHost): View = View(context)
-            override fun getPromptContribution(): PromptContribution? =
-                tool?.let { PromptContribution.ToolSelection(it) }
         }
     }
 

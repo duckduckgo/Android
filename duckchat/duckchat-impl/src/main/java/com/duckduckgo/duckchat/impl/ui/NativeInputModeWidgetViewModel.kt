@@ -37,6 +37,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
@@ -96,6 +97,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
+    private val nativeInputStateProvider: NativeInputStateProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -152,9 +154,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun getSelectedTool(): String? {
-        return _plugins.value.firstNotNullOfOrNull { plugin ->
-            (plugin.getPromptContribution() as? PromptContribution.ToolSelection)?.tool
-        }
+        val tabId = activeTabId.value ?: return null
+        return nativeInputStateProvider.stateForTab(tabId).value.selectedTool
     }
 
     private data class WidgetConfig(
