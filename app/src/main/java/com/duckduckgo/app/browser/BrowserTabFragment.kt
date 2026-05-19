@@ -209,6 +209,7 @@ import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchScreenNoParams
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -283,6 +284,7 @@ import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.PromoBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -1024,6 +1026,10 @@ class BrowserTabFragment :
 
                 InputScreenActivityResultCodes.FIRE_BUTTON_REQUESTED -> {
                     onFireButtonPressed()
+                }
+
+                InputScreenActivityResultCodes.AFTER_INACTIVITY_REQUESTED -> {
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams, requireContext().fadeTransitionConfig())
                 }
 
                 RESULT_CANCELED -> {
@@ -3676,6 +3682,10 @@ class BrowserTabFragment :
                         val dialog = fireDialogProvider.createFireDialog(FireDialogOrigin.Hatch(newTabReturnHatchView.tabId))
                         dialog.show(parentFragmentManager)
                     }
+                }
+
+                override fun onAfterInactivityPressed() {
+                    globalActivityStarter.start(requireContext(), ShowOnAppLaunchScreenNoParams, requireContext().fadeTransitionConfig())
                 }
             },
         )
