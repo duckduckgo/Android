@@ -72,7 +72,10 @@ fun DaxText(
  * with [buildAnnotatedString] or compose it from string resources.
  *
  * @param color The default text color applied to spans that do not override it via [SpanStyle].
- */
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211634956773768
+ * Figma reference: https://www.figma.com/design/jHLwh4erLbNc2YeobQpGFt/Design-System-Guidelines?node-id=1313-19967
+ * */
 @Composable
 fun DaxText(
     text: AnnotatedString,
