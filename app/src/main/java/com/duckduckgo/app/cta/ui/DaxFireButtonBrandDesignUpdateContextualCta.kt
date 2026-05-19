@@ -46,7 +46,7 @@ data class DaxFireButtonBrandDesignUpdateContextualCta(
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
-    override val showArrow: Boolean = false
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
