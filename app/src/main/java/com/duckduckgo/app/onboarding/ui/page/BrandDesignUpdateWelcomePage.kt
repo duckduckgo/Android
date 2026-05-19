@@ -1481,6 +1481,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             QUICK_SETUP -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+
+                // Quick setup already visible — observeQuickSetupSelection keeps the row state in sync, nothing else needs re-running.
+                if (binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible) {
+                    return
+                }
+
                 binding.welcomeScreenWalkingDax.isVisible = false
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.QuickSetup)
 
