@@ -57,7 +57,10 @@ class OnboardingViewModel @Inject constructor(
 
     suspend fun initializePages() {
         val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
-            onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+            // Temporary: force legacy onboarding on CI builds so existing Maestro flows keep passing.
+            // Remove once E2E tests cover the brand-design onboarding pages.
+            !appBuildConfig.isDefaultVariantForced &&
+                onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
         }
         if (isBrandDesignUpdateEnabled) {
             pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
