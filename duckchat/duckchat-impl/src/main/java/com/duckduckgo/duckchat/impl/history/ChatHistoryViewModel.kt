@@ -23,6 +23,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
@@ -44,6 +45,7 @@ class ChatHistoryViewModel @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val duckChat: DuckChatInternal,
     private val dataClearingTrigger: DataClearingTrigger,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -123,6 +125,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     private fun dispatchSelectedClear(chatIds: Set<String>) {
         if (chatIds.isEmpty()) return
+        if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
         val urls = chatIds.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
         appScope.launch {
             dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(urls)))

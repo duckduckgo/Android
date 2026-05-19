@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class ChatHistoryViewModelTest {
 
@@ -40,7 +43,11 @@ class ChatHistoryViewModelTest {
     private val repository = FakeChatHistoryRepository(source)
     private val duckChat = FakeDuckChatInternal()
     private val dataClearingTrigger = RecordingDataClearingTrigger()
-    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat, dataClearingTrigger)
+    private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
+    private val duckAiFeatureState: DuckAiFeatureState = mock {
+        whenever(it.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
+    }
+    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat, dataClearingTrigger, duckAiFeatureState)
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -762,6 +769,40 @@ class ChatHistoryViewModelTest {
             dataClearingTrigger.calls,
         )
         assertTrue(repository.deletedChatIds.isEmpty())
+    }
+
+    @Test
+    fun `onDeleteSingleChat is a no-op when showClearDuckAIChatHistory is off`() = runTest {
+        source.value = listOf(item("a"))
+        showClearDuckAIChatHistoryFlow.value = false
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+
+            viewModel.onDeleteSingleChat("a")
+
+            expectNoEvents()
+        }
+        assertTrue(dataClearingTrigger.calls.isEmpty())
+    }
+
+    @Test
+    fun `onDeleteSelectedRequested with one selection is a no-op when showClearDuckAIChatHistory is off`() = runTest {
+        source.value = listOf(item("a"))
+        showClearDuckAIChatHistoryFlow.value = false
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+            viewModel.onSelectionToggled("a")
+            awaitItem() // Selecting({a})
+
+            viewModel.onDeleteSelectedRequested()
+
+            awaitItem() // mode reset to Default before dispatch (which is gated off)
+        }
+        assertTrue(dataClearingTrigger.calls.isEmpty())
     }
 
     /**
