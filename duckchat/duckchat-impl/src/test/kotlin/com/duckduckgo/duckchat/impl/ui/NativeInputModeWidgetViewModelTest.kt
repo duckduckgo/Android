@@ -776,7 +776,7 @@ class NativeInputModeWidgetViewModelTest {
     // region publisher.update preserves plugin-owned fields
 
     @Test
-    fun `when widget VM publishes then plugin-owned selectedTool is preserved`() = runTest {
+    fun whenWidgetVmPublishesThenPluginOwnedSelectedToolIsPreserved() = runTest {
         val tabId = "tab-A"
         // Plugin writes selectedTool first (via the publisher interface of the same store)
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = "WEB_SEARCH") }
@@ -797,7 +797,7 @@ class NativeInputModeWidgetViewModelTest {
     // region setSelectedTool
 
     @Test
-    fun `when setSelectedTool then publisher updates selectedTool for active tab`() = runTest {
+    fun whenSetSelectedToolThenPublisherUpdatesSelectedToolForActiveTab() = runTest {
         val tabId = "tab-A"
         testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
         advanceUntilIdle()
@@ -808,7 +808,7 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun `when setSelectedTool with null then publisher clears selectedTool`() = runTest {
+    fun whenSetSelectedToolWithNullThenPublisherClearsSelectedTool() = runTest {
         val tabId = "tab-A"
         testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
         advanceUntilIdle()
@@ -820,7 +820,7 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun `when setSelectedTool and no active tab then nothing happens`() = runTest {
+    fun whenSetSelectedToolAndNoActiveTabThenNothingHappens() = runTest {
         val freshViewModel = createViewModel()
 
         freshViewModel.setSelectedTool("WEB_SEARCH")
