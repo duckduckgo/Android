@@ -586,6 +586,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Fire Button Animation</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
     <string name="settingsHeroWaterAnimation">Whirlpool</string>
     <string name="settingsHeroAbstractAnimation">Airstream</string>
     <string name="settingsNoneAnimation">None</string>
