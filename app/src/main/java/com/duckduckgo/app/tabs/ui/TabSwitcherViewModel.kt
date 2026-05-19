@@ -29,6 +29,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -67,6 +68,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -105,6 +107,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
+    @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
     val isBrowserModeToggleVisible: Boolean = fireModeAvailability.isAvailable()
@@ -538,8 +541,11 @@ class TabSwitcherViewModel @Inject constructor(
         fromIndex: Int,
         toIndex: Int,
     ) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            tabRepository.updateTabPosition(fromIndex, toIndex)
+        // Capture the repo for the current mode and run on appCoroutineScope
+        // so the DB write isn't canceled when the user immediately taps a tab to leave
+        val repo = tabRepository
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            repo.updateTabPosition(fromIndex, toIndex)
         }
     }
 
@@ -667,7 +673,7 @@ class TabSwitcherViewModel @Inject constructor(
         val isDuckAIButtonVisible: Boolean = false,
         val isSplitOmnibarEnabled: Boolean = false,
         val browserMode: BrowserMode = BrowserMode.REGULAR,
-        val regularTabCount: Int = 0,
+        val regularTabCount: Int? = null,
     ) {
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0

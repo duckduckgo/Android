@@ -222,6 +222,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            coroutinesTestRule.testScope,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -2005,6 +2006,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            coroutinesTestRule.testScope,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             isolatedViewModel.viewState.collect()
@@ -2046,6 +2048,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            coroutinesTestRule.testScope,
         )
 
         assertFalse(isolatedViewModel.isBrowserModeToggleVisible)
@@ -2090,6 +2093,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            coroutinesTestRule.testScope,
         )
 
         isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE)
