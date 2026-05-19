@@ -44,9 +44,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:hint="@string/duck_ai_chat_history_rename_chat_title_hint"
-        android:inputType="text|textCapWords"
+        app:capitalizeKeyboard="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:type="single_line" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

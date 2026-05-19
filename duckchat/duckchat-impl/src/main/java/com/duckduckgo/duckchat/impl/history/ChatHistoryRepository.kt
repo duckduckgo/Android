@@ -61,7 +61,9 @@ class RealChatHistoryRepository @Inject constructor(
     }
 
     override suspend fun renameChat(chatId: String, newTitle: String) {
-        withContext(dispatchers.io()) { chatStore.renameChat(chatId, newTitle) }
+        withContext(dispatchers.io()) {
+            check(chatStore.renameChat(chatId, newTitle)) { "Chat $chatId not found or unreadable" }
+        }
     }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(

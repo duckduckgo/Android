@@ -165,6 +165,22 @@ class ChatHistoryRepositoryTest {
         verify(chatStore).deleteAllChats()
     }
 
+    @Test
+    fun `renameChat delegates to store on success`() = runTest {
+        whenever(chatStore.renameChat("abc", "New")).thenReturn(true)
+
+        repository.renameChat("abc", "New")
+
+        verify(chatStore).renameChat("abc", "New")
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `renameChat throws when store reports the chat could not be updated`() = runTest {
+        whenever(chatStore.renameChat("missing", "New")).thenReturn(false)
+
+        repository.renameChat("missing", "New")
+    }
+
     private fun chat(
         chatId: String,
         title: String = "Title",
