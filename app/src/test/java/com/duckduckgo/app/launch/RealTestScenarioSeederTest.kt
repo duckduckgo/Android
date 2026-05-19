@@ -16,11 +16,10 @@
 
 package com.duckduckgo.app.launch
 
-import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.testseeder.api.OmnibarPositionWriter
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -39,13 +38,13 @@ class RealTestScenarioSeederTest {
     val coroutineRule = CoroutineTestRule()
 
     private val savedSitesRepository: SavedSitesRepository = mock()
-    private val settingsDataStore: SettingsDataStore = mock()
+    private val omnibarPositionWriter: OmnibarPositionWriter = mock()
     private val duckChat: DuckChat = mock()
     private lateinit var seeder: RealTestScenarioSeeder
 
     @Before
     fun setup() {
-        seeder = RealTestScenarioSeeder(savedSitesRepository, settingsDataStore, duckChat, coroutineRule.testDispatcherProvider)
+        seeder = RealTestScenarioSeeder(savedSitesRepository, omnibarPositionWriter, duckChat, coroutineRule.testDispatcherProvider)
     }
 
     private suspend fun seed(
@@ -66,28 +65,28 @@ class RealTestScenarioSeederTest {
     fun `when isMaestro extra is absent, nothing is seeded`() = runTest {
         seed(isMaestro = null, scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
     }
 
     @Test
     fun `when isMaestro is not true, nothing is seeded`() = runTest {
         seed(isMaestro = "false", scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
     }
 
     @Test
     fun `when isMaestro is true but all args absent, nothing is seeded`() = runTest {
         seed()
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
     }
 
     @Test
     fun `when scenario key is unknown, no data is seeded`() = runTest {
         seed(scenario = "unknown_scenario_key")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
     }
 
     @Test
@@ -107,34 +106,35 @@ class RealTestScenarioSeederTest {
     }
 
     @Test
-    fun `when omnibarPosition is top, omnibar type is set to top`() = runTest {
+    fun `when omnibarPosition is top, writer is called with top`() = runTest {
         seed(omnibarPosition = "top")
 
-        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
+        verify(omnibarPositionWriter).setFromKey("top")
         verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
-    fun `when omnibarPosition is bottom, omnibar type is set to bottom`() = runTest {
+    fun `when omnibarPosition is bottom, writer is called with bottom`() = runTest {
         seed(omnibarPosition = "bottom")
 
-        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        verify(omnibarPositionWriter).setFromKey("bottom")
         verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
-    fun `when omnibarPosition is split, omnibar type is set to split`() = runTest {
+    fun `when omnibarPosition is split, writer is called with split`() = runTest {
         seed(omnibarPosition = "split")
 
-        verify(settingsDataStore).omnibarType = OmnibarType.SPLIT
+        verify(omnibarPositionWriter).setFromKey("split")
         verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
-    fun `when omnibarPosition is unknown, omnibar type is not set`() = runTest {
+    fun `when omnibarPosition is unknown, writer is still invoked and other deps untouched`() = runTest {
         seed(omnibarPosition = "unknown")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
+        verify(omnibarPositionWriter).setFromKey("unknown")
+        verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
@@ -142,7 +142,7 @@ class RealTestScenarioSeederTest {
         seed(nativeInputToggle = "true")
 
         verify(duckChat).setNativeInputFieldUserSetting(true)
-        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
     }
 
     @Test
@@ -150,7 +150,7 @@ class RealTestScenarioSeederTest {
         seed(nativeInputToggle = "false")
 
         verify(duckChat).setNativeInputFieldUserSetting(false)
-        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
     }
 
     @Test
@@ -158,7 +158,7 @@ class RealTestScenarioSeederTest {
         seed(inputScreenWithAI = "true")
 
         verify(duckChat).setInputScreenUserSetting(true)
-        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
     }
 
     @Test
@@ -166,7 +166,7 @@ class RealTestScenarioSeederTest {
         seed(inputScreenWithAI = "false")
 
         verify(duckChat).setInputScreenUserSetting(false)
-        verifyNoInteractions(savedSitesRepository, settingsDataStore)
+        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
     }
 
     @Test
@@ -179,7 +179,7 @@ class RealTestScenarioSeederTest {
         )
 
         verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+        verify(omnibarPositionWriter).setFromKey("bottom")
         verify(duckChat).setNativeInputFieldUserSetting(true)
         verify(duckChat).setInputScreenUserSetting(true)
     }

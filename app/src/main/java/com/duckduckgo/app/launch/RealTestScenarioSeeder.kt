@@ -16,12 +16,11 @@
 
 package com.duckduckgo.app.launch
 
-import com.duckduckgo.app.browser.omnibar.OmnibarType
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.testseeder.api.OmnibarPositionWriter
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -32,7 +31,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealTestScenarioSeeder @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
-    private val settingsDataStore: SettingsDataStore,
+    private val omnibarPositionWriter: OmnibarPositionWriter,
     private val duckChat: DuckChat,
     private val dispatchers: DispatcherProvider,
 ) : TestScenarioSeeder {
@@ -47,13 +46,7 @@ class RealTestScenarioSeeder @Inject constructor(
         if (isMaestroExtra != "true") return
         withContext(dispatchers.io()) {
             scenarioKey?.let { TestScenario.fromKey(it)?.seed(savedSitesRepository) }
-            omnibarPosition?.let {
-                when (it.lowercase()) {
-                    "top" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                    "bottom" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-                    "split" -> settingsDataStore.omnibarType = OmnibarType.SPLIT
-                }
-            }
+            omnibarPosition?.let { omnibarPositionWriter.setFromKey(it) }
             nativeInputToggle?.let {
                 duckChat.setNativeInputFieldUserSetting(it == "true")
             }
