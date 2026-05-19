@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation AndroidX.core.ktx
     implementation  AndroidX.work.runtimeKtx
     implementation AndroidX.room.runtime
     ksp AndroidX.room.compiler

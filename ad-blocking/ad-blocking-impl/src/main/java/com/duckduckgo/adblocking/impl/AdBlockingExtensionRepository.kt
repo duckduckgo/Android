@@ -21,11 +21,14 @@ import com.duckduckgo.adblocking.impl.store.ScriptletEntity
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface AdBlockingExtensionRepository {
     suspend fun getStoredVersion(): String?
     suspend fun storeScriptlets(version: String, scriptlets: Map<String, ByteArray>)
+    fun scriptletsFlow(): Flow<AdBlockingScriptletData?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -44,4 +47,17 @@ class RealAdBlockingExtensionRepository @Inject constructor(
             },
         )
     }
+
+    override fun scriptletsFlow(): Flow<AdBlockingScriptletData?> =
+        dao.scriptletsFlow().map { rows ->
+            if (rows.isEmpty()) {
+                null
+            } else {
+                AdBlockingScriptletData(
+                    scriptlets = rows.map { row ->
+                        AdBlockingScriptletData.Scriptlet(name = row.name, content = String(row.content))
+                    },
+                )
+            }
+        }
 }
