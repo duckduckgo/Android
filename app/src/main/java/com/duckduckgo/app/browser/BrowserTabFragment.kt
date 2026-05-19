@@ -3013,7 +3013,10 @@ class BrowserTabFragment :
             }
         } else {
             newBrowserTab.rebrandBrowserBackground.gone()
-            newBrowserTab.browserBackground.setImageResource(backgroundRes)
+            newBrowserTab.browserBackground.apply {
+                setImageResource(backgroundRes)
+                isVisible = true
+            }
         }
     }
 
