@@ -42,6 +42,13 @@ interface NativeInputHost {
     fun showReasoningPicker(showing: Boolean)
 
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+
+    /**
+     * Plugins call this whenever the user's tool selection changes. The widget routes this into
+     * `NativeInputStatePublisher.update` for the active tab; observers read [NativeInputState.selectedTool]
+     * via [NativeInputStateProvider].
+     */
+    fun toolSelected(tool: String?)
 }
 
 interface NativeInputPlugin : ActivePlugin {
