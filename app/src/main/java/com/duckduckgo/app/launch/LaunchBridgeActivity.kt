@@ -40,8 +40,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        viewModel.initialiseData(intent)
-        viewModel.determineViewToShow()
+        viewModel.start(intent)
     }
 
     private fun configureObservers() {

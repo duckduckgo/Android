@@ -34,6 +34,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -70,7 +71,7 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
@@ -87,7 +88,7 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
@@ -104,7 +105,7 @@ class LaunchViewModelTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Onboarding>())
@@ -120,7 +121,7 @@ class LaunchViewModelTest {
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Home>())
@@ -136,7 +137,7 @@ class LaunchViewModelTest {
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Home>())
@@ -152,7 +153,7 @@ class LaunchViewModelTest {
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(mockCommandObserver).onChanged(any<Home>())
@@ -167,14 +168,14 @@ class LaunchViewModelTest {
             testScenarioSeeder = testScenarioSeeder,
         )
 
-        testee.determineViewToShow()
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(pixel).fire(AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER)
     }
 
     @Test
-    fun whenInitialiseDataThenSeederIsInvokedWithIntentExtras() = runTest {
+    fun whenStartThenSeederIsInvokedWithIntentExtras() = runTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
@@ -189,7 +190,7 @@ class LaunchViewModelTest {
             whenever(getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE)).thenReturn("true")
         }
 
-        testee.initialiseData(intent)
+        testee.start(intent)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(testScenarioSeeder).seedIfNeeded(
@@ -202,17 +203,41 @@ class LaunchViewModelTest {
     }
 
     @Test
-    fun whenSeederThrowsThenInitialiseDataDoesNotCrash() = runTest {
+    fun whenSeederThrowsThenStartStillRoutesToHome() = runTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
         )
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(testScenarioSeeder.seedIfNeeded(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
             .thenThrow(RuntimeException("seed failed"))
+        testee.command.observeForever(mockCommandObserver)
 
-        testee.initialiseData(mock<Intent>())
+        testee.start(mock<Intent>())
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
+    fun whenStartThenSeedingCompletesBeforeNavigationCommandIsEmitted() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx"),
+            pixel = pixel,
+            testScenarioSeeder = testScenarioSeeder,
+        )
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        testee.command.observeForever(mockCommandObserver)
+
+        testee.start(mock<Intent>())
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        inOrder(testScenarioSeeder, mockCommandObserver).apply {
+            verify(testScenarioSeeder).seedIfNeeded(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+            verify(mockCommandObserver).onChanged(any<Home>())
+        }
     }
 }

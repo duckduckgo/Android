@@ -28,7 +28,8 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.LogPriority
@@ -50,29 +51,27 @@ class LaunchViewModel @Inject constructor(
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
-    fun initialiseData(intent: Intent) {
+    fun start(intent: Intent) {
         viewModelScope.launch {
-            try {
-                testScenarioSeeder.seedIfNeeded(
-                    isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
-                    scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
-                    omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
-                    nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
-                    inputScreenWithAI = intent.getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE),
-                )
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                // seed failure must not prevent routing to BrowserActivity
-            }
-        }
-    }
-
-    fun determineViewToShow() {
-        viewModelScope.launch {
+            seedTestScenario(intent)
             waitForReferrerData()
             showOnboardingOrHome()
         }
+    }
+
+    private suspend fun seedTestScenario(intent: Intent) {
+        runCatching {
+            testScenarioSeeder.seedIfNeeded(
+                isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
+                scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
+                omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
+                nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
+                inputScreenWithAI = intent.getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE),
+            )
+        }
+        // runCatching swallows CancellationException; re-check so a cancelled viewModelScope
+        // (activity finished mid-launch) stops the rest of start() instead of routing into a dead UI.
+        currentCoroutineContext().ensureActive()
     }
 
     suspend fun showOnboardingOrHome() {
