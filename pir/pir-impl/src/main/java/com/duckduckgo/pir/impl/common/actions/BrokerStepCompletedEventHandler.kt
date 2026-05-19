@@ -90,6 +90,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 actionRetryCount = 0,
                 generatedEmailData = null,
+                emailExtractedData = emptyMap(),
                 stageStatus = PirStageStatus(
                     currentStage = PirStage.VALIDATE,
                     stageStartMs = currentTimeProvider.currentTimeMillis(),
