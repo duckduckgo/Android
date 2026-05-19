@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animación del botón Fuego</string>
     <string name="settingsHeroFireAnimation">Infierno</string>
+    <string name="settingsHeroFireAnimationClassic">Infierno Clásico</string>
     <string name="settingsHeroWaterAnimation">Remolino</string>
     <string name="settingsHeroAbstractAnimation">Corriente de aire</string>
     <string name="settingsNoneAnimation">Ninguna</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
     <string name="preOnboardingAddressBarTitle">¿Dónde debo poner tu barra de direcciones?</string>
     <string name="preOnboardingAddressBarOkButton">Siguiente</string>
+    <string name="preOnboardingAddressBarPositionTop">Arriba</string>
+    <string name="preOnboardingAddressBarPositionBottom">Inferior</string>
+    <string name="preOnboardingAddressBarPositionSplit">Dividir</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Arriba (predeterminado)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Inferior</string>
@@ -866,7 +870,7 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">¡Sorpréndeme!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[¡Eso es <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anuncios.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">¡Eso es DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">¡Así es DuckDuckGo Search!</string>
     <string name="onboardingSerpDaxDialogBrandDesignDescription">Privado. Rápido. Menos anuncios.</string>
     <string name="onboardingSerpDaxDialogButton">Entendido</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">¡A continuación, intenta visitar un sitio!</string>
@@ -993,4 +997,11 @@
     <string name="copyLinkText">Copiar texto del enlace</string>
     <string name="linkTextCopied">Texto del enlace copiado</string>
     <string name="linkTextCopyFailed">No se pudo copiar el texto del enlace</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Hola.</string>
+    <string name="preOnboardingWelcomeDialogBody1">¿Todo listo para un navegador más rápido que\nte da el control?</string>
+    <string name="preOnboardingWelcomeDialogBody2">La IA es siempre opcional y la protección de privacidad está siempre activada.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d de %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">cómo se dice «duck» en inglés</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cómo se dice «duck» en español</string>
 </resources>

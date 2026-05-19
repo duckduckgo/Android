@@ -587,6 +587,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tűz gomb animáció</string>
     <string name="settingsHeroFireAnimation">Lángnyelvek</string>
+    <string name="settingsHeroFireAnimationClassic">Klasszikus lángnyelvek</string>
     <string name="settingsHeroWaterAnimation">Örvény</string>
     <string name="settingsHeroAbstractAnimation">Levegő</string>
     <string name="settingsNoneAnimation">Nincs</string>
@@ -844,6 +845,9 @@
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
+    <string name="preOnboardingAddressBarPositionTop">Fent</string>
+    <string name="preOnboardingAddressBarPositionBottom">Lent</string>
+    <string name="preOnboardingAddressBarPositionSplit">Felosztás</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Felül (alapértelmezett)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Könnyen látható</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Alul</string>
@@ -993,4 +997,11 @@
     <string name="copyLinkText">Link szövegének másolása</string>
     <string name="linkTextCopied">Link szövege másolva</string>
     <string name="linkTextCopyFailed">Nem sikerült másolni a link szövegét</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Szia!</string>
+    <string name="preOnboardingWelcomeDialogBody1">Felkészültél egy gyorsabb böngészőre, amely\nsaját kezedbe adja az irányítást?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Az AI mindig opcionális, az adatvédelem\npedig állandóan be van kapcsolva.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d/%2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
 </resources>
