@@ -16,17 +16,37 @@
 
 package com.duckduckgo.duckchat.impl.nativeinput
 
+import app.cash.turbine.test
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertSame
+import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealNativeInputStateStoreTest {
 
-    private val testee = RealNativeInputStateStore()
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val tabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
+    }
+    private val lazyTabRepository: dagger.Lazy<TabRepository> = dagger.Lazy { tabRepository }
+
+    private val testee = RealNativeInputStateStore(lazyTabRepository)
 
     @Test
     fun whenStateForTabCalledTwiceForSameTabThenSameFlowReturned() {
@@ -158,4 +178,78 @@ class RealNativeInputStateStoreTest {
         assertEquals(NativeInputState.zero("tab-a"), testee.stateForTab("tab-a").value)
         assertEquals(NativeInputState.zero("tab-b"), testee.stateForTab("tab-b").value)
     }
+
+    @Test
+    fun whenSelectedTabPublishedThenStateEmitsItsValue() = runTest {
+        val published = NativeInputState(
+            inputMode = InputMode.SEARCH_ONLY,
+            inputContext = InputContext.DUCK_AI,
+            tabId = "tab-a",
+        )
+        testee.publish("tab-a", published)
+        selectedTabFlow.value = tabEntity("tab-a")
+
+        testee.state.test {
+            assertEquals(published, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSelectedTabChangesThenStateReEmitsForNewTab() = runTest {
+        val stateA = NativeInputState(
+            inputMode = InputMode.SEARCH_AND_DUCK_AI,
+            inputContext = InputContext.BROWSER,
+            tabId = "tab-a",
+        )
+        val stateB = NativeInputState(
+            inputMode = InputMode.SEARCH_ONLY,
+            inputContext = InputContext.DUCK_AI,
+            tabId = "tab-b",
+        )
+        testee.publish("tab-a", stateA)
+        testee.publish("tab-b", stateB)
+        selectedTabFlow.value = tabEntity("tab-a")
+
+        testee.state.test {
+            assertEquals(stateA, awaitItem())
+
+            selectedTabFlow.value = tabEntity("tab-b")
+
+            assertEquals(stateB, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSelectedTabsStateUpdatedThenStateReEmits() = runTest {
+        val initial = NativeInputState(
+            inputMode = InputMode.SEARCH_AND_DUCK_AI,
+            inputContext = InputContext.BROWSER,
+            tabId = "tab-a",
+        )
+        testee.publish("tab-a", initial)
+        selectedTabFlow.value = tabEntity("tab-a")
+
+        testee.state.test {
+            assertEquals(initial, awaitItem())
+
+            testee.update("tab-a") { it.copy(inputMode = InputMode.SEARCH_ONLY) }
+
+            assertEquals(initial.copy(inputMode = InputMode.SEARCH_ONLY), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSelectedTabIsNullThenStateDoesNotEmit() = runTest {
+        selectedTabFlow.value = null
+
+        testee.state.test {
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)
 }
