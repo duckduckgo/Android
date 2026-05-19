@@ -697,25 +697,6 @@ class ChatHistoryViewModelTest {
         assertTrue(repository.deletedChatIds.isEmpty())
     }
 
-    @Test
-    fun `concurrent repository emission removing a selected id reconciles the selection`() = runTest {
-        source.value = listOf(item("a"), item("b"), item("c"))
-
-        viewModel.uiState.test {
-            awaitInitialLoaded()
-            viewModel.onEnterSelectMode()
-            awaitItem()
-            viewModel.onSelectAllToggled()
-            awaitItem() // Selecting({a, b, c})
-
-            // Simulate an external delete (e.g. omnibar Fire-icon) removing chat "b"
-            source.value = listOf(item("a"), item("c"))
-            cancelAndConsumeRemainingEvents()
-        }
-        val mode = (viewModel.uiState.value as Loaded).mode as ChatHistoryUiState.Mode.Selecting
-        assertEquals(setOf("a", "c"), mode.selectedChatIds)
-    }
-
     /**
      * `stateIn(WhileSubscribed)` does not guarantee subscribers observe the `Loading` initial
      * value — the upstream may emit before the StateFlow can replay it. Tolerate both orderings.

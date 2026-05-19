@@ -353,7 +353,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val isFirePictogramVisible: Boolean = true,
                 val isFireAnimationUpdateEnabled: Boolean = false,
                 val titleSource: TitleSource = TitleSource.Static(R.string.singleTabFireDialogTitle),
-                val fireOptionsOverride: Set<FireClearOption>? = null,
             )
         }
     }
