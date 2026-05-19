@@ -52,6 +52,7 @@ import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUT
 import com.duckduckgo.lint.ui.NoRawM3SurfaceUsageDetector.Companion.NO_RAW_M3_SURFACE_USAGE
 import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.DaxSecureTextFieldTrailingIconDetector.Companion.INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE
+import com.duckduckgo.lint.ui.NoMaterial3CheckboxUsageDetector.Companion.NO_MATERIAL3_CHECKBOX_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3RadioButtonUsageDetector.Companion.NO_MATERIAL3_RADIO_BUTTON_USAGE
 import com.duckduckgo.lint.ui.NoMaterial3SwitchUsageDetector.Companion.NO_MATERIAL3_SWITCH_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
@@ -115,6 +116,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
             NO_MATERIAL3_SWITCH_USAGE,
             NO_MATERIAL3_RADIO_BUTTON_USAGE,
+            NO_MATERIAL3_CHECKBOX_USAGE,
             NO_RAW_M3_BUTTON_USAGE,
             NO_RAW_M3_ALERT_DIALOG_USAGE,
             NO_RAW_M3_SURFACE_USAGE,
