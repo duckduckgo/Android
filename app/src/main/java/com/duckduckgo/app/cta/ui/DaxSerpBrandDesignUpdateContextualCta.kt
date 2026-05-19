@@ -25,6 +25,7 @@ import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxSerpBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -47,10 +48,11 @@ data class DaxSerpBrandDesignUpdateContextualCta(
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
     override fun configureContentViews(view: View) {
+        val context = view.context
         view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             ?.setText(R.string.onboardingSerpDaxDialogBrandDesignTitle)
-        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
-            ?.setText(R.string.onboardingSerpDaxDialogBrandDesignDescription)
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
+            context.getString(R.string.onboardingSerpDaxDialogBrandDesignDescription).preventWidows()
     }
 
     override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {

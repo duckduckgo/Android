@@ -41,6 +41,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -202,14 +203,14 @@ class BrandDesignUpdateDefaultBrowserPage :
 
     private fun setUiForDialog() {
         // Brand-design variant uses a single placeholder illustration for both states; only copy varies.
-        subtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        subtitle.text = getString(R.string.defaultBrowserDescriptionNoDefault).preventWidows()
         title.setText(R.string.onboardingDefaultBrowserTitle)
         primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
     }
 
     private fun setUiForSettings() {
-        subtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        subtitle.text = getString(R.string.onboardingDefaultBrowserDescription).preventWidows()
         title.setText(R.string.onboardingDefaultBrowserTitle)
         primaryButton.setText(R.string.setAsDefaultBrowser)
         setButtonsBehaviour()
