@@ -2798,8 +2798,12 @@ class BrowserTabFragment :
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen(it.privacyProtectionEnabled)
             is Command.EditWithSelectedQuery -> {
-                omnibar.setText(it.query)
-                omnibar.setTextSelection(it.query.length)
+                if (nativeInputManager.isNativeInputEnabled()) {
+                    nativeInputManager.setText(it.query)
+                } else {
+                    omnibar.setText(it.query)
+                    omnibar.setTextSelection(it.query.length)
+                }
             }
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
