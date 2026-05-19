@@ -89,19 +89,13 @@ class ModelPickerViewModel @Inject constructor(
     }
 
     fun buildSections(state: ModelState): List<ModelSection> {
+        val byTier = state.models.groupBy { it.requiredTier }
         // Models with a null requiredTier (non-public access tiers only, e.g. "internal") have no
         // section to land in and are intentionally hidden from the picker.
-        state.models.filter { it.requiredTier == null }.forEach {
-            logcat { "Duck.ai picker: hiding model with no public required tier (id=${it.id}, accessTier=${it.accessTier})." }
-        }
-        val freeModels = state.models.filter { it.requiredTier == UserTier.FREE }
-        val plusModels = state.models.filter { it.requiredTier == UserTier.PLUS }
-        val proModels = state.models.filter { it.requiredTier == UserTier.PRO }
-
         return listOfNotNull(
-            freeModels.toSectionOrNull(headerRes = null),
-            plusModels.toSectionOrNull(R.string.duckAiModelPickerPlusModels),
-            proModels.toSectionOrNull(R.string.duckAiModelPickerProModels),
+            byTier[UserTier.FREE].orEmpty().toSectionOrNull(headerRes = null),
+            byTier[UserTier.PLUS].orEmpty().toSectionOrNull(R.string.duckAiModelPickerPlusModels),
+            byTier[UserTier.PRO].orEmpty().toSectionOrNull(R.string.duckAiModelPickerProModels),
         )
     }
 
