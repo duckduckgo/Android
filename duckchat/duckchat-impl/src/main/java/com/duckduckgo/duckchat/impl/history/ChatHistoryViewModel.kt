@@ -52,10 +52,7 @@ class ChatHistoryViewModel @Inject constructor(
     private var latestItems: List<ChatHistoryItem> = emptyList()
 
     val uiState: StateFlow<ChatHistoryUiState> = combine(
-        chatHistoryRepository.observeChats().onEach { items ->
-            latestItems = items
-            reconcileSelection(items)
-        },
+        chatHistoryRepository.observeChats().onEach { latestItems = it },
         controls,
         ::reduce,
     ).stateIn(
@@ -63,18 +60,6 @@ class ChatHistoryViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         initialValue = ChatHistoryUiState.Loading,
     )
-
-    /** Intersect any selection with the current item IDs so concurrent deletes don't desync it. */
-    private fun reconcileSelection(items: List<ChatHistoryItem>) {
-        val current = controls.value.mode
-        if (current is Mode.Selecting && current.selectedChatIds.isNotEmpty()) {
-            val knownIds = items.mapTo(mutableSetOf()) { it.chatId }
-            val intersected = current.selectedChatIds.intersect(knownIds)
-            if (intersected.size != current.selectedChatIds.size) {
-                controls.update { it.copy(mode = Mode.Selecting(intersected)) }
-            }
-        }
-    }
 
     fun isSelectMode(): Boolean = controls.value.mode is Mode.Selecting
 
@@ -168,7 +153,9 @@ class ChatHistoryViewModel @Inject constructor(
         controls.update { c ->
             val mode = c.mode as? Mode.Selecting ?: return@update c
             val visibleIds = visibleChatIds(c.search)
-            val next = if (mode.selectedChatIds == visibleIds) emptySet() else visibleIds
+            // Filter to live ids — selection can lag deletes and skew the comparison.
+            val effectiveSelected = mode.selectedChatIds intersect latestItems.mapTo(mutableSetOf()) { it.chatId }
+            val next = if (effectiveSelected == visibleIds) emptySet() else visibleIds
             c.copy(mode = Mode.Selecting(next))
         }
     }
@@ -219,12 +206,16 @@ class ChatHistoryViewModel @Inject constructor(
     ): ChatHistoryUiState {
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
+        val effectiveMode = when (val mode = controls.mode) {
+            is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
+            Mode.Default -> Mode.Default
+        }
         return Loaded(
             pinned = pinned.sortedByDate().filterBy(controls.search),
             recent = recent.sortedByDate().filterBy(controls.search),
             searchQuery = controls.search.query,
             searchActive = controls.search.active,
-            mode = controls.mode,
+            mode = effectiveMode,
             confirmation = controls.confirmation,
         )
     }

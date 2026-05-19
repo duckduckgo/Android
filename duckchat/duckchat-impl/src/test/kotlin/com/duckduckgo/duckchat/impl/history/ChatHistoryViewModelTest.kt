@@ -546,6 +546,49 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `when an item disappears from the source the selection drops the stale id in the next state`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+            viewModel.onSelectionToggled("a")
+            awaitItem() // Selecting({a})
+            viewModel.onSelectionToggled("b")
+            awaitItem() // Selecting({a, b})
+
+            source.value = listOf(item("a"), item("c"))
+
+            val updated = awaitItem() as Loaded
+            val mode = updated.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(setOf("a"), mode.selectedChatIds)
+        }
+    }
+
+    @Test
+    fun `onSelectAllToggled with a stale selection equal to visible still toggles off`() = runTest {
+        source.value = listOf(item("a"), item("b"), item("c"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onEnterSelectMode()
+            awaitItem() // Selecting({})
+            viewModel.onSelectAllToggled()
+            awaitItem() // Selecting({a, b, c})
+
+            source.value = listOf(item("a"), item("b"))
+            awaitItem() // mode reconciled to Selecting({a, b}) by reduce
+
+            viewModel.onSelectAllToggled()
+
+            val cleared = awaitItem() as Loaded
+            val mode = cleared.mode as ChatHistoryUiState.Mode.Selecting
+            assertEquals(emptySet<String>(), mode.selectedChatIds)
+        }
+    }
+
+    @Test
     fun `onSelectModeCancelled returns to Default mode with no deletion`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
