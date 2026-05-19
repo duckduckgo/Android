@@ -260,9 +260,7 @@ class RealNativeInputManager @Inject constructor(
         val widget = widgetFrom(rootView) ?: return
         val widgetRoot = widgetRoot
 
-        if (omnibarController.isDuckAiMode()) {
-            widget.setToggleVisible(isVisible)
-        }
+        widget.setToggleVisible(isVisible)
 
         if (isVisible) {
             isPickingImage = false
@@ -283,6 +281,8 @@ class RealNativeInputManager @Inject constructor(
         if (isPickingImage) return
         if (omnibarController.isDuckAiMode()) {
             updateWidgetFocus(widget)
+        } else {
+            hideNativeInput()
         }
     }
 
