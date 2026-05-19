@@ -65,7 +65,9 @@ class RealChatHistoryRepository @Inject constructor(
         withContext(dispatchers.io()) { chatStore.renameChat(chatId, newTitle) }
 
     override suspend fun setPinned(chatId: String, pinned: Boolean) {
-        withContext(dispatchers.io()) { chatStore.setPinned(chatId, pinned) }
+        withContext(dispatchers.io()) {
+            if (pinned) chatStore.pinChat(chatId) else chatStore.unpinChat(chatId)
+        }
     }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(

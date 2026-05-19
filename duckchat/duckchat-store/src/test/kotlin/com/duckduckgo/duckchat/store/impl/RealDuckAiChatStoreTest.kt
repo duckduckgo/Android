@@ -337,24 +337,25 @@ class RealDuckAiChatStoreTest {
         verify(chatsDao).deleteAll()
     }
 
-    // --- setPinned ---
+    // --- pinChat / unpinChat ---
 
     @Test
-    fun `setPinned returns false when chat not found`() = runTest {
+    fun `pinChat is a no-op when chat not found`() = runTest {
         whenever(chatsDao.getById("missing")).thenReturn(null)
 
-        assertFalse(store.setPinned("missing", true))
+        store.pinChat("missing")
+
         verify(chatsDao, never()).upsert(any())
     }
 
     @Test
-    fun `setPinned updates only the pinned flag and preserves other JSON fields`() = runTest {
+    fun `pinChat sets pinned to true and preserves other JSON fields`() = runTest {
         val originalJson = """
             {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false,"fileRefs":["uuid1"],"messages":[{"role":"user","text":"hi"}]}
         """.trimIndent()
         whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
 
-        assertTrue(store.setPinned("abc", true))
+        store.pinChat("abc")
 
         val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
         verify(chatsDao).upsert(entityCaptor.capture())
@@ -369,10 +370,26 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
-    fun `setPinned returns false when stored JSON is malformed`() = runTest {
+    fun `unpinChat sets pinned to false`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        store.unpinChat("abc")
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val json = JSONObject(entityCaptor.firstValue.data)
+        assertFalse(json.getBoolean("pinned"))
+    }
+
+    @Test
+    fun `pinChat is a no-op when stored JSON is malformed`() = runTest {
         whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not a json"))
 
-        assertFalse(store.setPinned("abc", true))
+        store.pinChat("abc")
+
         verify(chatsDao, never()).upsert(any())
     }
 }
