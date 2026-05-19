@@ -133,22 +133,6 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenEmptyAccessTierAndNoEntityAccessThenModelNotAccessible() = runTest {
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any())).thenReturn(
-            AIChatModelsResponse(
-                listOf(remoteModel("id", accessTier = emptyList(), entityHasAccess = false)),
-            ),
-        )
-
-        testee = createManager()
-        testee.fetchModels()
-
-        assertFalse(testee.modelState.value.models[0].isAccessible)
-    }
-
-    @Test
     fun whenNonEmptyAccessTierAndTierMatchesThenAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
@@ -369,6 +353,26 @@ class RealDuckAiModelManagerTest {
         testee.fetchModels()
 
         assertEquals(UserTier.PRO, testee.modelState.value.userTier)
+    }
+
+    @Test
+    fun whenModelHasEmptyAccessTierAndEntityHasNoAccessThenModelIsFilteredOut() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("visible", accessTier = listOf("free"), entityHasAccess = true),
+                    remoteModel("ghost", accessTier = emptyList(), entityHasAccess = false),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val ids = testee.modelState.value.models.map { it.id }
+        assertEquals(listOf("visible"), ids)
     }
 
     @Test

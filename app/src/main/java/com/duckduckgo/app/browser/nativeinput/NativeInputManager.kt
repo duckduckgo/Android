@@ -482,7 +482,7 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchUpgrade() }
+                omnibarController.updateTierTitle(tier) { launchPurchase() }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -714,7 +714,7 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun launchUpgrade() {
+    private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
     }
 

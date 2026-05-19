@@ -110,6 +110,16 @@ data class AIChatModel(
 
     fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
 
+    /** The lowest [UserTier] required to access this model, or `null` if no public tier applies. */
+    val requiredTier: UserTier?
+        get() = when {
+            accessTier.isEmpty() -> UserTier.FREE
+            accessTier.contains(UserTier.FREE.rawValue) -> UserTier.FREE
+            accessTier.contains(UserTier.PLUS.rawValue) -> UserTier.PLUS
+            accessTier.contains(UserTier.PRO.rawValue) -> UserTier.PRO
+            else -> null
+        }
+
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
     }
@@ -139,7 +149,7 @@ enum class ModelProvider {
         fun from(id: String, providerString: String?): ModelProvider {
             return when {
                 id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
-                id.startsWith("mistralai/") || id.startsWith("mistralai_") -> MISTRAL
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") || providerString == "mistral" -> MISTRAL
                 id.contains("gpt-oss") -> OSS
                 providerString == "anthropic" -> ANTHROPIC
                 providerString == "openai" -> OPENAI

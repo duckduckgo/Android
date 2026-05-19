@@ -23,9 +23,8 @@
     <string name="native_input_chat_hint">Ask anything privately…</string>
 
     <!-- Model Picker -->
-    <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
-    <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
-    <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
+    <string name="duckAiModelPickerPlusModels" translatable="false">Plus</string>
+    <string name="duckAiModelPickerProModels" translatable="false">Pro</string>
 
     <!-- Reasoning Mode Picker -->
     <string name="duckChatReasoningModeContentDescription" translatable="false">Reasoning mode</string>
