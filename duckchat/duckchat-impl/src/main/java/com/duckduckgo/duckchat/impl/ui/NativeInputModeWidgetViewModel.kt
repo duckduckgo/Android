@@ -186,8 +186,21 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     )
 
     init {
+        // Publish only the widget-owned fields via update, leaving plugin-owned contributions (added
+        // later by typed host methods) untouched across widget emissions. This keeps the widget VM
+        // the single writer for its fields without clobbering anything the publisher.update path
+        // wrote on behalf of a plugin.
         viewModelScope.launch {
-            state.collect { nativeInputStatePublisher.publish(it.tabId, it) }
+            state.collect { snapshot ->
+                nativeInputStatePublisher.update(snapshot.tabId) { current ->
+                    current.copy(
+                        inputMode = snapshot.inputMode,
+                        inputContext = snapshot.inputContext,
+                        inputPosition = snapshot.inputPosition,
+                        tabId = snapshot.tabId,
+                    )
+                }
+            }
         }
     }
 
