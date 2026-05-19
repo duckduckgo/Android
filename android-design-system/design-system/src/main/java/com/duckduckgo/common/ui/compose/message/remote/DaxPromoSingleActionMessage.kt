@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -31,6 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
@@ -50,8 +53,10 @@ import com.duckduckgo.mobile.android.R
  * Marketing-style card with the dismiss button at the top, then title, full-width
  * illustration, body, and a primary action button with a leading share icon.
  *
- * @param title The message title.
- * @param body The message body text.
+ * @param title The message title. Supports HTML markup (`<b>`, `<i>`, `<a>`, etc.) —
+ *   parsed via `AnnotatedString.fromHtml(...)`.
+ * @param body The message body text. Supports HTML markup (`<b>`, `<i>`, `<a>`, etc.) —
+ *   parsed via `AnnotatedString.fromHtml(...)`.
  * @param illustration The illustration shown between title and body. Drawn with
  *   [ContentScale.Fit] inside a 256dp × 144dp max box so remote images can't break
  *   the card layout. Use [painterResource] for a local drawable, or
@@ -91,7 +96,7 @@ fun DaxPromoSingleActionMessage(
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             DaxText(
-                text = title,
+                text = remember(title) { AnnotatedString.fromHtml(title) },
                 style = DuckDuckGoTheme.typography.h2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -109,7 +114,7 @@ fun DaxPromoSingleActionMessage(
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             DaxText(
-                text = body,
+                text = remember(body) { AnnotatedString.fromHtml(body) },
                 style = DuckDuckGoTheme.typography.body1,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
