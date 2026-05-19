@@ -89,8 +89,8 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives ImageGeneration when model is image-generation`() = runTest {
-        source.value = listOf(chat(chatId = "abc", title = "Image", model = "image-generation"))
+    fun `observeChats derives ImageGeneration when isImageGeneration flag is true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Image", isImageGeneration = true))
 
         repository.observeChats().test {
             assertEquals(ChatType.ImageGeneration, awaitItem().single().type)
@@ -98,8 +98,8 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Voice when model is voice-mode`() = runTest {
-        source.value = listOf(chat(chatId = "abc", title = "Voice", model = "voice-mode"))
+    fun `observeChats derives Voice when isVoice flag is true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Voice", isVoice = true))
 
         repository.observeChats().test {
             assertEquals(ChatType.Voice, awaitItem().single().type)
@@ -107,7 +107,16 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Discussion fallback when model is unknown`() = runTest {
+    fun `observeChats prefers ImageGeneration over Voice when both flags are true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Mixed", isImageGeneration = true, isVoice = true))
+
+        repository.observeChats().test {
+            assertEquals(ChatType.ImageGeneration, awaitItem().single().type)
+        }
+    }
+
+    @Test
+    fun `observeChats derives Discussion fallback when no classification flag is set`() = runTest {
         source.value = listOf(chat(chatId = "abc", title = "Just text", model = "gpt-5-mini"))
 
         repository.observeChats().test {
@@ -116,7 +125,7 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Discussion fallback when model is empty`() = runTest {
+    fun `observeChats derives Discussion fallback when model is empty and no flags set`() = runTest {
         source.value = listOf(chat(chatId = "abc", title = "Just text", model = ""))
 
         repository.observeChats().test {
@@ -192,6 +201,8 @@ class ChatHistoryRepositoryTest {
         lastEdit: String = "2026-04-01T00:00:00.000Z",
         pinned: Boolean = false,
         fileRefs: List<String> = emptyList(),
+        isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
     ): DuckAiChat = DuckAiChat(
         chatId = chatId,
         title = title,
@@ -199,6 +210,8 @@ class ChatHistoryRepositoryTest {
         lastEdit = lastEdit,
         pinned = pinned,
         fileRefs = fileRefs,
+        isImageGeneration = isImageGeneration,
+        isVoice = isVoice,
     )
 
     private companion object {

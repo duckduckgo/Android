@@ -78,17 +78,15 @@ class RealChatHistoryRepository @Inject constructor(
         lastEditMillis = chat.lastEdit.parseIsoMillis(),
     )
 
-    private fun DuckAiChat.toChatType(): ChatType = model.toChatType()
+    private fun DuckAiChat.toChatType(): ChatType = when {
+        isImageGeneration -> ChatType.ImageGeneration
+        isVoice -> ChatType.Voice
+        else -> ChatType.Discussion
+    }
 
     private fun String.parseIsoMillis(): Long = runCatching { Instant.parse(this).toEpochMilli() }.getOrDefault(0L)
 
     private companion object {
         const val UPSTREAM_UNTITLED = "Untitled Chat"
     }
-}
-
-internal fun String.toChatType(): ChatType = when (this) {
-    "image-generation" -> ChatType.ImageGeneration
-    "voice-mode" -> ChatType.Voice
-    else -> ChatType.Discussion
 }
