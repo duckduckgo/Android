@@ -107,11 +107,6 @@ interface DuckChatInternal : DuckChat {
     suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
 
     /**
-     * Set user setting to determine whether the native input field should be used.
-     */
-    suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
-
-    /**
      * Sets the user's preferred default toggle position.
      */
     suspend fun setDefaultTogglePosition(position: DefaultTogglePosition)
@@ -485,9 +480,9 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
+    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
         withContext(dispatchers.io()) {
-            duckChatFeatureRepository.setNativeInputFieldUserSetting(isEnabled)
+            duckChatFeatureRepository.setNativeInputFieldUserSetting(enabled)
             cacheUserSettings()
         }
     }

@@ -78,6 +78,11 @@ interface DuckChat {
     suspend fun setInputScreenUserSetting(enabled: Boolean)
 
     /**
+     * Set user setting to determine whether the native input field should be used.
+     */
+    suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
+
+    /**
      * Cosmetically sets the input screen user setting.
      */
     suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)

@@ -19,7 +19,7 @@ package com.duckduckgo.app.launch
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -40,12 +40,12 @@ class RealTestScenarioSeederTest {
 
     private val savedSitesRepository: SavedSitesRepository = mock()
     private val settingsDataStore: SettingsDataStore = mock()
-    private val duckChatDataStore: DuckChatDataStore = mock()
+    private val duckChat: DuckChat = mock()
     private lateinit var seeder: RealTestScenarioSeeder
 
     @Before
     fun setup() {
-        seeder = RealTestScenarioSeeder(savedSitesRepository, settingsDataStore, duckChatDataStore, coroutineRule.testDispatcherProvider)
+        seeder = RealTestScenarioSeeder(savedSitesRepository, settingsDataStore, duckChat, coroutineRule.testDispatcherProvider)
     }
 
     private suspend fun seed(
@@ -66,28 +66,28 @@ class RealTestScenarioSeederTest {
     fun `when isMaestro extra is absent, nothing is seeded`() = runTest {
         seed(isMaestro = null, scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
     }
 
     @Test
     fun `when isMaestro is not true, nothing is seeded`() = runTest {
         seed(isMaestro = "false", scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
     }
 
     @Test
     fun `when isMaestro is true but all args absent, nothing is seeded`() = runTest {
         seed()
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
     }
 
     @Test
     fun `when scenario key is unknown, no data is seeded`() = runTest {
         seed(scenario = "unknown_scenario_key")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
     }
 
     @Test
@@ -111,7 +111,7 @@ class RealTestScenarioSeederTest {
         seed(omnibarPosition = "top")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
-        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
@@ -119,7 +119,7 @@ class RealTestScenarioSeederTest {
         seed(omnibarPosition = "bottom")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
@@ -127,21 +127,21 @@ class RealTestScenarioSeederTest {
         seed(omnibarPosition = "split")
 
         verify(settingsDataStore).omnibarType = OmnibarType.SPLIT
-        verifyNoInteractions(savedSitesRepository, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, duckChat)
     }
 
     @Test
     fun `when omnibarPosition is unknown, omnibar type is not set`() = runTest {
         seed(omnibarPosition = "unknown")
 
-        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChatDataStore)
+        verifyNoInteractions(savedSitesRepository, settingsDataStore, duckChat)
     }
 
     @Test
     fun `when nativeInputToggle is true, native input field setting is enabled`() = runTest {
         seed(nativeInputToggle = "true")
 
-        verify(duckChatDataStore).setNativeInputFieldUserSetting(true)
+        verify(duckChat).setNativeInputFieldUserSetting(true)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
@@ -149,7 +149,7 @@ class RealTestScenarioSeederTest {
     fun `when nativeInputToggle is false, native input field setting is disabled`() = runTest {
         seed(nativeInputToggle = "false")
 
-        verify(duckChatDataStore).setNativeInputFieldUserSetting(false)
+        verify(duckChat).setNativeInputFieldUserSetting(false)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
@@ -157,7 +157,7 @@ class RealTestScenarioSeederTest {
     fun `when inputScreenWithAI is true, input screen setting is enabled`() = runTest {
         seed(inputScreenWithAI = "true")
 
-        verify(duckChatDataStore).setInputScreenUserSetting(true)
+        verify(duckChat).setInputScreenUserSetting(true)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
@@ -165,7 +165,7 @@ class RealTestScenarioSeederTest {
     fun `when inputScreenWithAI is false, input screen setting is disabled`() = runTest {
         seed(inputScreenWithAI = "false")
 
-        verify(duckChatDataStore).setInputScreenUserSetting(false)
+        verify(duckChat).setInputScreenUserSetting(false)
         verifyNoInteractions(savedSitesRepository, settingsDataStore)
     }
 
@@ -180,7 +180,7 @@ class RealTestScenarioSeederTest {
 
         verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
         verify(settingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
-        verify(duckChatDataStore).setNativeInputFieldUserSetting(true)
-        verify(duckChatDataStore).setInputScreenUserSetting(true)
+        verify(duckChat).setNativeInputFieldUserSetting(true)
+        verify(duckChat).setInputScreenUserSetting(true)
     }
 }

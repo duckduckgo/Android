@@ -20,7 +20,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -50,7 +50,7 @@ interface TestScenarioSeeder {
 class RealTestScenarioSeeder @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val settingsDataStore: SettingsDataStore,
-    private val duckChatDataStore: DuckChatDataStore,
+    private val duckChat: DuckChat,
     private val dispatchers: DispatcherProvider,
 ) : TestScenarioSeeder {
 
@@ -72,10 +72,10 @@ class RealTestScenarioSeeder @Inject constructor(
                 }
             }
             nativeInputToggle?.let {
-                duckChatDataStore.setNativeInputFieldUserSetting(it == "true")
+                duckChat.setNativeInputFieldUserSetting(it == "true")
             }
             inputScreenWithAI?.let {
-                duckChatDataStore.setInputScreenUserSetting(it == "true")
+                duckChat.setInputScreenUserSetting(it == "true")
             }
         }
     }
