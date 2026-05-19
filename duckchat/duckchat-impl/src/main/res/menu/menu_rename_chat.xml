@@ -18,8 +18,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_rename_confirm"
+        android:contentDescription="@string/duck_ai_chat_history_rename_confirm_content_description"
         android:enabled="false"
         android:icon="@drawable/ic_check_24"
-        android:title="@string/duck_ai_chat_history_rename_confirm_content_description"
+        android:title="@string/duck_ai_chat_history_rename_confirm_title"
         app:showAsAction="always" />
 </menu>
