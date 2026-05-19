@@ -164,10 +164,10 @@ class ModelPickerView @JvmOverloads constructor(
         }
     }
 
-    private fun currentSurface(): PickerSurface =
+    private fun currentSurface(): ModelPickerViewModel.PickerSurface =
         when (host.getInputState().inputContext) {
-            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.DUCK_AI_TAB
-            InputContext.BROWSER -> PickerSurface.ADDRESS_BAR
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> ModelPickerViewModel.PickerSurface.DUCK_AI_TAB
+            InputContext.BROWSER -> ModelPickerViewModel.PickerSurface.ADDRESS_BAR
         }
 
     private fun showMenu() {

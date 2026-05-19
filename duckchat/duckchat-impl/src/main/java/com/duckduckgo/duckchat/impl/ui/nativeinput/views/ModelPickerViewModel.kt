@@ -114,11 +114,11 @@ class ModelPickerViewModel @Inject constructor(
         data class LaunchUpgrade(val origin: String) : Command()
     }
 
+    enum class PickerSurface(val origin: String) {
+        ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
+        DUCK_AI_TAB("funnel_duckai_androidapp__modelpicker"),
+    }
+
     private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =
         takeIf { it.isNotEmpty() }?.let { ModelSection(headerRes, it) }
-}
-
-enum class PickerSurface(val origin: String) {
-    ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
-    DUCK_AI_TAB("funnel_duckai_androidapp__modelpicker"),
 }

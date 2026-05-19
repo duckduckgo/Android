@@ -26,7 +26,7 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel.PickerSurface
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runCurrent
