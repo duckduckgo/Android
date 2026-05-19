@@ -597,6 +597,7 @@
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animace tlačítka pro mazání</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroFireAnimationClassic">Pekelná klasika</string>
     <string name="settingsHeroWaterAnimation">Vodní vír</string>
     <string name="settingsHeroAbstractAnimation">Vzdušný proud</string>
     <string name="settingsNoneAnimation">Žádný</string>
@@ -880,6 +881,9 @@
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
     <string name="preOnboardingAddressBarOkButton">Další</string>
+    <string name="preOnboardingAddressBarPositionTop">Nahoru</string>
+    <string name="preOnboardingAddressBarPositionBottom">Dole</string>
+    <string name="preOnboardingAddressBarPositionSplit">Rozdělení</string>
     <string name="highlightsPreOnboardingAddressBarOption1Title">Nahoře (výchozí)</string>
     <string name="highlightsPreOnboardingAddressBarOption1Description">Snadno viditelné</string>
     <string name="highlightsPreOnboardingAddressBarOption2Title">Dole</string>
@@ -902,7 +906,7 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Překvap mě!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[To je vyhledávač <b>DuckDuckGo Search</b>! Soukromý. Rychlý. S méně reklamami.]]></string>
-    <string name="onboardingSerpDaxDialogBrandDesignTitle">To je vyhledávač DuckDuckGo Search!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">Tohle je vyhledávač DuckDuckGo Search!</string>
     <string name="onboardingSerpDaxDialogBrandDesignDescription">Soukromý. Rychlý. S méně reklamami.</string>
     <string name="onboardingSerpDaxDialogButton">Mám to!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
@@ -1033,4 +1037,11 @@
     <string name="copyLinkText">Kopírovat text odkazu</string>
     <string name="linkTextCopied">Text odkazu zkopírován</string>
     <string name="linkTextCopyFailed">Nepodařilo se zkopírovat text odkazu</string>
+
+    <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
+    <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 </resources>
