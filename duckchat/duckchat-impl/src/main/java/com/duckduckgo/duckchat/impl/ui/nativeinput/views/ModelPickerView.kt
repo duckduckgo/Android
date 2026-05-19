@@ -54,7 +54,6 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 import javax.inject.Inject
 
 interface ModelPicker {
@@ -87,7 +86,7 @@ class ModelPickerView @JvmOverloads constructor(
     private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastObservedModelId: String? = null
-    private var host: NativeInputHost? = null
+    private lateinit var host: NativeInputHost
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
     override var onModelSelected: (() -> Unit)? = null
@@ -165,16 +164,11 @@ class ModelPickerView @JvmOverloads constructor(
         }
     }
 
-    private fun currentSurface(): PickerSurface {
-        val inputContext = host?.getInputState()?.inputContext
-        if (inputContext == null) {
-            logcat { "Duck.ai picker: host not set, defaulting upsell surface to ADDRESS_BAR. Funnel attribution may be wrong." }
-        }
-        return when (inputContext) {
+    private fun currentSurface(): PickerSurface =
+        when (host.getInputState().inputContext) {
             InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.DUCK_AI_TAB
-            InputContext.BROWSER, null -> PickerSurface.ADDRESS_BAR
+            InputContext.BROWSER -> PickerSurface.ADDRESS_BAR
         }
-    }
 
     private fun showMenu() {
         val state = viewModel.state.value
