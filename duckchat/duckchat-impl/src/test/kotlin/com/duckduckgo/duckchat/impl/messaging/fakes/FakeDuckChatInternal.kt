@@ -183,7 +183,13 @@ class FakeDuckChatInternal(
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
     override fun openVoiceDuckChat() { }
-    override fun isVoiceSessionActive(): Boolean = false
+    override fun isVoiceChatSessionActive(tabId: String): Boolean = false
+    override val activeVoiceChatSessions: Flow<Set<String>> = MutableStateFlow(emptySet())
+    override fun observeTriggerVoiceChatSessionEnd(): Flow<String> = kotlinx.coroutines.flow.emptyFlow()
+
+    override suspend fun isChatHistoryAvailable(): Boolean = false
+
+    override fun openWithChatId(chatId: String) { }
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

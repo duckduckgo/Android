@@ -9,12 +9,24 @@ on:
         description: 'Ref to build APK from (branch, tag, commit)'
         type: string
         required: true
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        type: string
+        required: false
+        default: 'Metro'
   workflow_dispatch:
+    inputs:
+      ddg_di:
+        description: 'DI framework to build with (AnvilDagger or Metro)'
+        type: string
+        required: false
+        default: 'Metro'
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  DDG_DI: ${{ inputs.ddg_di || 'Metro' }}
 
 jobs:
   create-tag:
@@ -119,13 +131,13 @@ jobs:
           DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time -Pddg.di=${{ env.DDG_DI }}
 
       - name: Generate internal version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
-          output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-internal -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-internal -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pddg.di=${{ env.DDG_DI }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path

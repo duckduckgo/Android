@@ -42,6 +42,7 @@ data class OptOutJobRecordEntity(
     val attemptCount: Int = 0,
     val lastOptOutAttemptDate: Long? = null,
     val optOutRequestedDate: Long = 0L,
+    val optOutFormSubmittedDate: Long? = null,
     val optOutRemovedDate: Long = 0L,
     val deprecated: Boolean = false,
     val dateCreatedInMillis: Long,

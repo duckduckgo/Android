@@ -32,7 +32,7 @@
             {
                 "key": "feature.data.ext.is_purchase_attempt",
                 "description": "true if the restore was triggered during a purchase attempt, false otherwise",
-                "enum": ["true", "false"]
+                "type": "boolean"
             },
             {
                 "key": "feature.data.ext.restore_latency_ms_bucketed",

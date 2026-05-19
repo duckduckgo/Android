@@ -1,0 +1,134 @@
+// Wide event pixel for subscription purchase flow monitoring
+{
+    "wide_subscription-purchase": {
+        "description": "Monitors the subscription purchase flow from initiation through confirmation",
+        "owners": ["lmac012", "cmonfortep"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["subscription-purchase"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. FE-controlled — new funnel names can be introduced without a schema change as long as they match the pattern. Empty string is allowed (sent when the URL carries `?origin=` with no value).",
+                "type": "string",
+                "pattern": "^(funnel_[a-z0-9_]+_android)?$",
+                "examples": ["funnel_appsettings_android", "funnel_purchase_offer_page_android"]
+            },
+            {
+                "key": "feature.data.ext.subscription_identifier",
+                "description": "Identifier of the subscription the user is purchasing (offer ID when present, otherwise plan ID)",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.free_trial_eligible",
+                "description": "Whether the user is eligible for a free trial at purchase start",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.creation_latency_ms_bucketed",
+                "description": "Duration of the account-creation step in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.activation_latency_ms_bucketed",
+                "description": "Duration from billing flow purchase to subscription activation in milliseconds, bucketed using the lower bucket boundary",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000", "1800000", "3600000", "14400000"]
+            },
+            {
+                "key": "feature.data.ext.step.refresh_subscription",
+                "description": "True if the refresh-subscription step succeeded, false if it failed",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.create_account",
+                "description": "True if the create-account step succeeded, false if it failed",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.billing_flow_init",
+                "description": "True if the billing-flow-init step succeeded, false if it failed",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.billing_flow_purchase",
+                "description": "True if the Play billing purchase step succeeded, false if it failed",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.confirm_purchase",
+                "description": "True if the BE purchase-confirmation step succeeded, false if it failed",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Free-form failure reason. Only present on FAILURE events.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.missing_product_failure_reason",
+                "description": "Sub-classification of a missing-product-details failure. Only present when billing_flow_init fails for that reason.",
+                "enum": ["no_products_loaded", "product_id_not_found", "offer_not_found"]
+            },
+            {
+                "key": "feature.data.ext.requested_product_id",
+                "description": "Play product ID requested at billing_flow_init time. Diagnostic context for missing-product failures.",
+                "enum": ["ddg_privacy_pro", "ddg_subscription_pro"]
+            },
+            {
+                "key": "feature.data.ext.requested_plan_id",
+                "description": "Play basePlan ID requested at billing_flow_init time. Diagnostic context for missing-product failures.",
+                "enum": [
+                    "ddg-privacy-pro-monthly-renews-us",
+                    "ddg-privacy-pro-monthly-renews-row",
+                    "ddg-privacy-pro-yearly-renews-us",
+                    "ddg-privacy-pro-yearly-renews-row",
+                    "ddg-subscription-pro-yearly-renews-us",
+                    "ddg-subscription-pro-monthly-renews-us",
+                    "ddg-subscription-pro-yearly-renews-row",
+                    "ddg-subscription-pro-monthly-renews-row"
+                ]
+            },
+            {
+                "key": "feature.data.ext.requested_offer_id",
+                "description": "Play offer ID requested at billing_flow_init time, or 'none' when no offer was requested. Diagnostic context for missing-product failures.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.loaded_products_count",
+                "description": "Number of products loaded from Play at the time of a missing-product-details failure.",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.billing_client_ready",
+                "description": "Whether the Play billing client was ready at the time of a missing-product-details failure.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.last_load_products_outcome",
+                "description": "Outcome of the most recent loadProducts() call before the missing-product-details failure. Distinguishes 'Play returned empty for this user' from 'loadProducts() failed with a Play BillingError we swallowed'. Format: 'never_attempted' (we never called Play, likely lifecycle issue), 'success_n=<count>' (Play replied success with this many products), 'failure_<BillingError>' (Play replied with this billing error enum).",
+                "type": "string",
+                "pattern": "^(never_attempted|success_n=\\d+|failure_[A-Z_]+)$",
+                "examples": [
+                    "never_attempted",
+                    "success_n=0",
+                    "success_n=2",
+                    "failure_BILLING_UNAVAILABLE",
+                    "failure_DEVELOPER_ERROR",
+                    "failure_NETWORK_ERROR"
+                ]
+            }
+        ]
+    }
+}

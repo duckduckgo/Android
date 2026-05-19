@@ -23,6 +23,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.FireRestart
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.noAnimationConfig
 import com.duckduckgo.di.scopes.ActivityScope
@@ -84,6 +85,7 @@ class FireActivity : AppCompatActivity() {
         ): Intent {
             val intent = BrowserActivity.intent(
                 context,
+                launchSource = FireRestart,
                 notifyDataCleared = notifyDataCleared,
                 isLaunchFromClearDataAction = true,
                 deletedTabCount = deletedTabCount,

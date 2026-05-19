@@ -36,6 +36,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -100,6 +101,21 @@ class InlinePdfHandlerTest {
         val file = File((result as PdfDownloadResult.Success).uri.path!!)
         assertTrue(file.exists())
         assertEquals(pdfBytes.size.toLong(), file.length())
+    }
+
+    @Test
+    fun whenDownloadOverPlainHttpThenCertificateIsNull() = runTest {
+        val pdfBytes = "%PDF-1.4 test content".toByteArray()
+        server.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(Buffer().write(pdfBytes)),
+        )
+
+        val result = inlinePdfHandler.downloadToCache(server.url("/test.pdf").toString())
+
+        assertTrue(result is PdfDownloadResult.Success)
+        assertNull((result as PdfDownloadResult.Success).certificate)
     }
 
     @Test
@@ -200,6 +216,30 @@ class InlinePdfHandlerTest {
         assertEquals(
             PdfRenderDecision.NotApplicable,
             inlinePdfHandler.classifyPdfRequest("https://example.com/doc.pdf", "  attachment; filename=doc.pdf", "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenUrlIsDataUriThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("data:application/pdf;base64,JVBERi0xLjQK", null, "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("file:///sdcard/doc.pdf", null, "application/pdf"),
+        )
+    }
+
+    @Test
+    fun whenUrlIsContentSchemeThenDecisionIsNotApplicable() {
+        assertEquals(
+            PdfRenderDecision.NotApplicable,
+            inlinePdfHandler.classifyPdfRequest("content://media/external/file/doc.pdf", null, "application/pdf"),
         )
     }
 
@@ -523,4 +563,78 @@ class InlinePdfHandlerTest {
     }
 
     // endregion
+
+    @Test
+    fun whenPdfFileEvictedThenItsCertSidecarIsAlsoDeleted() {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val oldPdf = File(cacheDir, "1-old.pdf").apply {
+            writeBytes(ByteArray(10))
+            setLastModified(1_000L)
+        }
+        val oldSidecar = File(cacheDir, "1-old.pdf.cert").apply {
+            writeBytes(ByteArray(100))
+            setLastModified(1_000L)
+        }
+        val keep = File(cacheDir, "2-keep.pdf").apply {
+            writeBytes(ByteArray(10))
+            setLastModified(2_000L)
+        }
+
+        // only keep should remain. Old PDF is evicted, and so is its sidecar.
+        inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxFiles = 1)
+
+        assertFalse("Evicted PDF should be gone", oldPdf.exists())
+        assertFalse("Evicted PDF's cert sidecar should be gone too", oldSidecar.exists())
+        assertTrue(keep.exists())
+    }
+
+    @Test
+    fun whenSidecarsPresentThenTheyDoNotCountTowardCacheCap() {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val pdfs = (1..3).map { i ->
+            File(cacheDir, "$i-file.pdf").apply {
+                writeBytes(ByteArray(10))
+                setLastModified(i.toLong() * 1_000L)
+            }
+        }
+        val sidecars = pdfs.map { File(cacheDir, "${it.name}.cert").apply { writeBytes(ByteArray(100)) } }
+        val keep = pdfs.last()
+
+        // 3 PDFs + 3 sidecars = 6 files on disk, but only 3 PDFs count. Cap at 3 → no eviction.
+        inlinePdfHandler.enforceCacheBudget(keepFile = keep, maxFiles = 3)
+
+        pdfs.forEach { assertTrue("PDF ${it.name} should survive a cap that ignores sidecars", it.exists()) }
+        sidecars.forEach { assertTrue("Sidecar ${it.name} should survive when its PDF survives", it.exists()) }
+    }
+
+    @Test
+    fun whenCertSidecarMalformedThenCacheHitReturnsNullCertWithoutCrashing() = runTest {
+        val cacheDir = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "pdf_cache").apply { mkdirs() }
+        val url = "https://example.com/malformed.pdf"
+        val targetFile = File(cacheDir, "${url.hashCode()}-malformed.pdf").apply {
+            writeBytes("%PDF-1.4 cached content".toByteArray())
+        }
+        // Sidecar contains arbitrary bytes that aren't a valid marshaled Bundle.
+        File(cacheDir, "${targetFile.name}.cert").writeBytes("not a valid bundle".toByteArray())
+
+        val result = inlinePdfHandler.downloadToCache(url)
+
+        assertTrue(result is PdfDownloadResult.Success)
+        assertNull((result as PdfDownloadResult.Success).certificate)
+    }
+
+    @Test
+    fun whenCacheHitWithoutSidecarThenCertificateIsNull() = runTest {
+        val pdfBytes = "%PDF-1.4 cached".toByteArray()
+        server.enqueue(MockResponse().setResponseCode(200).setBody(Buffer().write(pdfBytes)))
+        val url = server.url("/no-sidecar.pdf").toString()
+
+        val first = inlinePdfHandler.downloadToCache(url)
+        assertTrue(first is PdfDownloadResult.Success)
+        assertNull((first as PdfDownloadResult.Success).certificate)
+
+        val second = inlinePdfHandler.downloadToCache(url)
+        assertTrue(second is PdfDownloadResult.Success)
+        assertNull((second as PdfDownloadResult.Success).certificate)
+    }
 }

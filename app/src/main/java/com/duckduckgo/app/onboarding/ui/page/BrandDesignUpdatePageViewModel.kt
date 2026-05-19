@@ -39,6 +39,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REI
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager
+import com.duckduckgo.app.onboardingquicksetup.OnboardingQuickSetupExperimentManager.QuickSetupExperimentVariant
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -93,6 +95,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
+    private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -176,6 +179,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             INPUT_SCREEN_PREVIEW -> {
+            }
+            QUICK_SETUP -> {
+                // TODO Quick setup: add pixel for dialog shown
             }
         }
     }
@@ -308,6 +314,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     _commands.send(Command.Finish)
                 }
             }
+
+            QUICK_SETUP -> {
+                viewModelScope.launch {
+                    _commands.send(Command.OnboardingSkipped)
+                }
+            }
         }
     }
 
@@ -326,8 +338,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 _viewState.update { it.copy(isReinstallUser = true) }
-                setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                viewModelScope.launch {
+                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        setCurrentDialog(QUICK_SETUP)
+                    } else {
+                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+                    }
+                }
             }
 
             SKIP_ONBOARDING_OPTION -> {
@@ -335,7 +353,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW -> {
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
                 // no-op
             }
         }

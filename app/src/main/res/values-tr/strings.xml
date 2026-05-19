@@ -866,6 +866,8 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSerpDaxDialogDescription"><![CDATA[<b>DuckDuckGo Search</b> işte bu! Özel. Hızlı. Daha az reklam.]]></string>
+    <string name="onboardingSerpDaxDialogBrandDesignTitle">DuckDuckGo Search işte bu!</string>
+    <string name="onboardingSerpDaxDialogBrandDesignDescription">Özel. Hızlı. Daha az reklam.</string>
     <string name="onboardingSerpDaxDialogButton">Anladım!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">

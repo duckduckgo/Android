@@ -31,12 +31,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDataClearingSettingsBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.DataClearingSettingsViewModel.Command
-import com.duckduckgo.app.global.view.FireDialogProvider
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
+import com.duckduckgo.app.settings.clear.displayLabelResId
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -89,7 +90,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutomaticClearingStatus(it.automaticallyClearingEnabled)
-                    updateSelectedFireAnimation(it.selectedFireAnimation)
+                    updateSelectedFireAnimation(it.selectedFireAnimation, it.isFireAnimationUpdateEnabled)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                     updateFireproofWebsitesCount(it.fireproofWebsitesCount)
                 }
@@ -110,9 +111,11 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
         binding.automaticDataClearingSetting.setSecondaryText(statusText)
     }
 
-    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        val subtitle = getString(fireAnimation.nameResId)
-        binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
+    private fun updateSelectedFireAnimation(
+        fireAnimation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        binding.selectedFireAnimationSetting.setSecondaryText(getString(fireAnimation.displayLabelResId(isFireAnimationUpdateEnabled)))
     }
 
     private fun updateClearDuckAiDataSetting(
@@ -131,7 +134,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
+            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation, it.isFireAnimationUpdateEnabled)
             is Command.LaunchFireDialog -> launchFireDialog()
             is Command.LaunchAutomaticDataClearingSettings -> launchAutomaticDataClearingSettings()
         }
@@ -142,7 +145,18 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
         startActivity(FireproofWebsitesActivity.intent(this), options)
     }
 
-    private fun launchFireAnimationSelector(animation: FireAnimation) {
+    private fun launchFireAnimationSelector(
+        animation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        if (isFireAnimationUpdateEnabled) {
+            launchBrandDesignFireAnimationSelector(animation, viewModel::onFireAnimationSelected)
+        } else {
+            launchLegacyFireAnimationSelector(animation)
+        }
+    }
+
+    private fun launchLegacyFireAnimationSelector(animation: FireAnimation) {
         val currentAnimationOption = animation.getOptionIndex()
 
         com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder(this)
@@ -178,7 +192,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
+            val dialog = fireDialogProvider.createFireDialog(Settings)
             dialog.show(supportFragmentManager)
         }
     }

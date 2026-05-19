@@ -43,4 +43,12 @@ interface OnboardingBrandDesignUpdateToggles {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun brandDesignUpdate(): Toggle
+
+    /**
+     * Kill switch for the new fire animation work (new Inferno default in
+     * Data Clearing settings + bottom-sheet Lottie swap). Default FALSE; flip
+     * ON to enable the new fire animation surfaces.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun fireAnimationUpdate(): Toggle
 }

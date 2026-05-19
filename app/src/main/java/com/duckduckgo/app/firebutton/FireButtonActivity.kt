@@ -32,14 +32,13 @@ import com.duckduckgo.app.browser.databinding.ActivityDataClearingBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
-import com.duckduckgo.app.global.view.FireDialogProvider
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.SETTINGS
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
+import com.duckduckgo.app.settings.clear.displayLabelResId
 import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -47,6 +46,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin.Settings
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -102,7 +103,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutomaticClearDataOptions(it.automaticallyClearData, it.clearDuckAiData)
-                    updateSelectedFireAnimation(it.selectedFireAnimation)
+                    updateSelectedFireAnimation(it.selectedFireAnimation, it.isFireAnimationUpdateEnabled)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                     updateClearDataAction(it.clearDuckAiData)
                 }
@@ -128,9 +129,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
         binding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        val subtitle = getString(fireAnimation.nameResId)
-        binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
+    private fun updateSelectedFireAnimation(
+        fireAnimation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        binding.selectedFireAnimationSetting.setSecondaryText(getString(fireAnimation.displayLabelResId(isFireAnimationUpdateEnabled)))
     }
 
     private fun updateClearDuckAiDataSetting(
@@ -156,7 +159,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option, it.clearDuckAi)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
+            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation, it.isFireAnimationUpdateEnabled)
             is Command.LaunchFireDialog -> launchFireDialog()
         }
     }
@@ -254,7 +257,18 @@ class FireButtonActivity : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
-    private fun launchFireAnimationSelector(animation: FireAnimation) {
+    private fun launchFireAnimationSelector(
+        animation: FireAnimation,
+        isFireAnimationUpdateEnabled: Boolean,
+    ) {
+        if (isFireAnimationUpdateEnabled) {
+            launchBrandDesignFireAnimationSelector(animation, viewModel::onFireAnimationSelected)
+        } else {
+            launchLegacyFireAnimationSelector(animation)
+        }
+    }
+
+    private fun launchLegacyFireAnimationSelector(animation: FireAnimation) {
         val currentAnimationOption = animation.getOptionIndex()
 
         RadioListAlertDialogBuilder(this)
@@ -274,7 +288,6 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val selectedAnimation = selectedItem.getAnimationForIndex()
-
                         viewModel.onFireAnimationSelected(selectedAnimation)
                     }
 
@@ -291,7 +304,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
     private fun launchFireDialog() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(SETTINGS)
+            val dialog = fireDialogProvider.createFireDialog(Settings)
             dialog.show(supportFragmentManager)
         }
     }

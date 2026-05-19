@@ -28,5 +28,5 @@ interface OptimizeTrackerEvaluationRCWrapper {
 class RealOptimizeTrackerEvaluationRCWrapper @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : OptimizeTrackerEvaluationRCWrapper {
-    override val enabled by lazy { androidBrowserConfigFeature.optimizeTrackerEvaluationV2().isEnabled() }
+    override val enabled by lazy { androidBrowserConfigFeature.optimizeTrackerEvaluationV3().isEnabled() }
 }

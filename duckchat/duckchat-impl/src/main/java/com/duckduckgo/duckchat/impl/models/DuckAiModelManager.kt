@@ -31,7 +31,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -41,6 +44,9 @@ data class ModelState(
     val selectedModelId: String? = null,
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
+    val attachmentLimits: AttachmentLimits = AttachmentLimits(),
+    val selectedReasoningMode: ReasoningMode? = null,
+    val availableReasoningModes: List<AvailableReasoningMode> = emptyList(),
 )
 
 interface DuckAiModelManager {
@@ -50,7 +56,11 @@ interface DuckAiModelManager {
 
     suspend fun selectModel(model: AIChatModel)
 
+    suspend fun selectReasoningMode(mode: ReasoningMode)
+
     fun getSelectedModelId(): String?
+
+    fun getResolvedReasoningEffort(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -67,10 +77,21 @@ class RealDuckAiModelManager @Inject constructor(
     private val _modelState = MutableStateFlow(ModelState())
     override val modelState: StateFlow<ModelState> = _modelState.asStateFlow()
 
+    // Each public model mutator (fetchModels, selectModel, selectReasoningMode) does a read-write
+    // on _modelState and may also write to dataStore. Without a lock, two of them running on
+    // Dispatchers.IO at the same time can overlap and leave selectedReasoningMode out of sync
+    // with availableReasoningModes. This mutex serializes those operations so each one sees a
+    // consistent view of the previous state.
+    private val stateMutex = Mutex()
+
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            restoreCachedSelection()
-            subscriptions.getEntitlementStatus()
+            try {
+                stateMutex.withLock { restoreCachedSelection() }
+            } catch (e: Exception) {
+                logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
+            }
+            subscriptions.getEntitlements()
                 .distinctUntilChanged()
                 .collect {
                     logcat { "Duck.ai Model Manager: entitlements changed, re-fetching models" }
@@ -80,10 +101,22 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun restoreCachedSelection() {
-        val cached = dataStore.getSelectedModel() ?: return
+        val cachedModel = dataStore.getSelectedModel()
+        val cachedReasoningRaw = dataStore.getSelectedReasoningMode()
+        if (cachedModel == null) {
+            // Reasoning is only meaningful when a model is selected; drop any orphan from prefs.
+            if (cachedReasoningRaw != null) dataStore.setSelectedReasoningMode(null)
+            return
+        }
+        val parsedReasoning = ReasoningMode.from(cachedReasoningRaw)
+        if (cachedReasoningRaw != null && parsedReasoning == null) {
+            // Unparseable raw (e.g. mode removed in this version) -> clear it so it does not rot in prefs.
+            dataStore.setSelectedReasoningMode(null)
+        }
         _modelState.value = _modelState.value.copy(
-            selectedModelId = cached.id,
-            selectedModelShortName = cached.shortName,
+            selectedModelId = cachedModel.id,
+            selectedModelShortName = cachedModel.shortName,
+            selectedReasoningMode = parsedReasoning,
         )
     }
 
@@ -91,25 +124,35 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
-                val models = fetchRemoteModels(userTier)
-                val selectedModelId = validateAndPersistSelection(models)
+                val response = fetchModelsResponse()
+                val models = response.models.map { resolveModel(it, userTier) }
+                val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
+                stateMutex.withLock {
+                    val selectedModelId = validateAndPersistSelection(models)
+                    val selectedModel = models.find { it.id == selectedModelId }
+                    val available = ReasoningResolver.availableModes(selectedModel?.supportedReasoningEfforts.orEmpty())
+                    val nextReasoningMode = clearStaleReasoningModeIfNeeded(_modelState.value.selectedReasoningMode, available)
 
-                _modelState.value = ModelState(
-                    models = models,
-                    selectedModelId = selectedModelId,
-                    selectedModelShortName = models.find { it.id == selectedModelId }?.shortName,
-                    userTier = userTier,
-                )
-                logcat { "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=$selectedModelId" }
+                    _modelState.value = ModelState(
+                        models = models,
+                        selectedModelId = selectedModelId,
+                        selectedModelShortName = selectedModel?.shortName,
+                        userTier = userTier,
+                        attachmentLimits = attachmentLimits,
+                        selectedReasoningMode = nextReasoningMode,
+                        availableReasoningModes = available,
+                    )
+                    logcat { "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=$selectedModelId" }
+                }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
             }
         }
     }
 
-    private suspend fun fetchRemoteModels(userTier: UserTier): List<AIChatModel> {
+    private suspend fun fetchModelsResponse(): AIChatModelsResponse {
         val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
-        return modelsService.getModels(url).models.map { resolveModel(it, userTier) }
+        return modelsService.getModels(url)
     }
 
     private suspend fun validateAndPersistSelection(models: List<AIChatModel>): String? {
@@ -129,31 +172,89 @@ class RealDuckAiModelManager @Inject constructor(
 
     override suspend fun selectModel(model: AIChatModel) {
         withContext(dispatcherProvider.io()) {
-            dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
-            _modelState.value = _modelState.value.copy(
-                selectedModelId = model.id,
-                selectedModelShortName = model.shortName,
-            )
-            logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+            stateMutex.withLock {
+                dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
+                val available = ReasoningResolver.availableModes(model.supportedReasoningEfforts)
+                val nextReasoningMode = clearStaleReasoningModeIfNeeded(_modelState.value.selectedReasoningMode, available)
+                _modelState.value = _modelState.value.copy(
+                    selectedModelId = model.id,
+                    selectedModelShortName = model.shortName,
+                    selectedReasoningMode = nextReasoningMode,
+                    availableReasoningModes = available,
+                )
+                logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+            }
+        }
+    }
+
+    override suspend fun selectReasoningMode(mode: ReasoningMode) {
+        withContext(dispatcherProvider.io()) {
+            stateMutex.withLock {
+                val available = _modelState.value.availableReasoningModes
+                if (available.none { it.mode == mode }) return@withLock
+                dataStore.setSelectedReasoningMode(mode.rawValue)
+                _modelState.value = _modelState.value.copy(selectedReasoningMode = mode)
+                logcat { "Duck.ai Model Manager: selected reasoning mode ${mode.rawValue}" }
+            }
         }
     }
 
     override fun getSelectedModelId(): String? = _modelState.value.selectedModelId
 
+    override fun getResolvedReasoningEffort(): String? {
+        val state = _modelState.value
+        return ReasoningResolver.effortFor(state.selectedReasoningMode, state.availableReasoningModes)?.rawValue
+    }
+
+    private suspend fun clearStaleReasoningModeIfNeeded(
+        persisted: ReasoningMode?,
+        available: List<AvailableReasoningMode>,
+    ): ReasoningMode? {
+        if (persisted == null) return null
+        if (available.any { it.mode == persisted }) return persisted
+        dataStore.setSelectedReasoningMode(null)
+        return null
+    }
+
     private suspend fun resolveUserTier(): UserTier {
         return try {
-            val status = subscriptions.getSubscriptionStatus()
-            if (!status.isActiveOrWaiting()) return UserTier.FREE
-
-            val products = subscriptions.getAvailableProducts()
-            when {
-                products.contains(Product.DuckAiPlus) -> UserTier.PLUS
-                else -> UserTier.FREE
-            }
+            if (!subscriptions.getSubscriptionStatus().isActiveOrWaiting()) return UserTier.FREE
+            val entitlements = subscriptions.getEntitlements().firstOrNull().orEmpty()
+            val duckAiTier = entitlements.firstOrNull { it.product == Product.DuckAiPlus.value }?.name
+            UserTier.from(duckAiTier) ?: UserTier.FREE
         } catch (e: Exception) {
             logcat { "Duck.ai Model Manager: failed to resolve user tier, defaulting to FREE: ${e.message}" }
             UserTier.FREE
         }
+    }
+
+    private fun resolveAttachmentLimits(
+        remoteLimits: Map<String, RemoteTierAttachmentLimits>?,
+        userTier: UserTier,
+    ): AttachmentLimits {
+        if (remoteLimits.isNullOrEmpty()) return AttachmentLimits()
+        val tierLimits = remoteLimits[userTier.rawValue] ?: return AttachmentLimits()
+        return AttachmentLimits(
+            files = tierLimits.files?.let { remote ->
+                FileLimits(
+                    maxPerConversation = remote.maxPerConversation ?: FileLimits.DEFAULT_FILE_MAX_PER_CONVERSATION,
+                    maxFileSizeBytes = remote.maxFileSizeMB?.let { it.toLong() * 1024 * 1024 }
+                        ?: FileLimits.DEFAULT_FILE_MAX_SIZE_BYTES,
+                    maxTotalFileSizeBytes = remote.maxTotalFileSizeBytes
+                        ?: remote.maxFileSizeMB?.let { it.toLong() * 1024 * 1024 }
+                        ?: FileLimits.DEFAULT_FILE_MAX_SIZE_BYTES,
+                    maxPagesPerFile = remote.maxPagesPerFile ?: FileLimits.DEFAULT_FILE_MAX_PAGES,
+                )
+            } ?: FileLimits(),
+            images = tierLimits.images?.let { remote ->
+                ImageLimits(
+                    maxPerTurn = remote.maxPerTurn ?: ImageLimits.DEFAULT_IMAGE_MAX_PER_TURN,
+                    maxPerConversation = remote.maxPerConversation ?: ImageLimits.DEFAULT_IMAGE_MAX_PER_CONVERSATION,
+                    maxInputCharsWithAttachments = remote.maxInputCharsWithAttachments
+                        ?: ImageLimits.DEFAULT_MAX_INPUT_CHARS_WITH_ATTACHMENTS,
+                )
+            } ?: ImageLimits(),
+        )
     }
 
     private fun resolveModel(remote: RemoteAIChatModel, userTier: UserTier): AIChatModel {
@@ -171,6 +272,11 @@ class RealDuckAiModelManager @Inject constructor(
             accessTier = accessTier,
             isAccessible = isAccessible,
             provider = ModelProvider.from(id = remote.id, providerString = remote.provider),
+            supportsImageUpload = remote.supportsImageUpload,
+            supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
+            supportedFileTypes = remote.supportedFileTypes.orEmpty(),
+            supportedReasoningEfforts = remote.supportedReasoningEffort.orEmpty().mapNotNull(ReasoningEffort::from),
+            supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
         )
     }
 

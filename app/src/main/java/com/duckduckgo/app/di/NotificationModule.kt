@@ -34,11 +34,13 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
+@ContributesTo(AppScope::class)
 object NotificationModule {
 
     @Provides
@@ -114,7 +116,8 @@ object NotificationModule {
         factory: NotificationFactory,
         notificationDao: NotificationDao,
         pluginPoint: PluginPoint<SchedulableNotificationPlugin>,
+        launchIntentBuilder: NotificationLaunchIntentBuilder,
     ): NotificationSender {
-        return AppNotificationSender(context, manager, factory, notificationDao, pluginPoint)
+        return AppNotificationSender(context, manager, factory, notificationDao, pluginPoint, launchIntentBuilder)
     }
 }

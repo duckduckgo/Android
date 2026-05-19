@@ -28,6 +28,7 @@ import com.duckduckgo.app.cta.model.CtaId.DAX_FIRE_BUTTON
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_VISIT_SITE
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -97,6 +98,7 @@ class OnboardingDaxDialogTests {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCtaExistingUsers()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
         whenever(mockOnboardingBrandDesignUpdateToggles.self()).thenReturn(mockDisabledToggle)
         whenever(mockOnboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(mockDisabledToggle)
@@ -123,6 +125,7 @@ class OnboardingDaxDialogTests {
             },
             mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
+            mock(DuckAiOnboardingExperimentMetrics::class.java),
         )
     }
 
@@ -268,7 +271,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenRefreshCtaReturnsSubscriptionCta() = runTest {
+    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenGetPromoCtaOnForegroundReturnsSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -279,12 +282,7 @@ class OnboardingDaxDialogTests {
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
 
-        val result = testee.refreshCta(
-            coroutineRule.testDispatcherProvider.io(),
-            isBrowserShowing = false,
-            site = null,
-            detectedRefreshPatterns = emptySet(),
-        )
+        val result = testee.getPromoCtaOnForeground()
 
         assertNotNull(result)
         assertTrue(result is SubscriptionPromoModalCta)

@@ -19,6 +19,9 @@ package com.duckduckgo.pir.impl.dashboard.state
 import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.BrokerStepsParser
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
@@ -34,10 +37,14 @@ import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -51,6 +58,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPirSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockContext: Context = mock()
 
     private val currentTime = 1640995200000L
@@ -62,16 +70,32 @@ class RealPirDashboardInitialScanStateProviderTest {
             currentTimeProvider = mockCurrentTimeProvider,
             pirRepository = mockPirRepository,
             pirSchedulingRepository = mockPirSchedulingRepository,
+            brokerStepsParser = mockBrokerStepsParser,
             context = mockContext,
         )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
     }
 
+    private suspend fun setupBrokersWithScannableSteps(brokers: List<Broker>) {
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(brokers)
+        brokers.forEach { broker ->
+            whenever(mockPirRepository.getBrokerScanSteps(broker.name)).thenReturn("{steps:${broker.name}}")
+            whenever(mockBrokerStepsParser.parseStep(eq(broker), any(), anyOrNull())).thenReturn(
+                listOf(
+                    ScanStep(
+                        broker = broker,
+                        step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                    ),
+                ),
+            )
+        }
+    }
+
     @Test
     fun whenNoActiveBrokersExistThenGetActiveBrokersAndMirrorSitesTotalReturnsZero() = runTest {
         // Given
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(emptyList())
+        setupBrokersWithScannableSteps(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
 
         // When
@@ -84,8 +108,8 @@ class RealPirDashboardInitialScanStateProviderTest {
     @Test
     fun whenActiveBrokersExistButNoMirrorSitesThenReturnsActiveBrokersCount() = runTest {
         // Given
-        val activeBrokers = listOf("broker1", "broker2", "broker3")
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(activeBrokers)
+        val activeBrokers = listOf(createBroker("broker1"), createBroker("broker2"), createBroker("broker3"))
+        setupBrokersWithScannableSteps(activeBrokers)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
 
         // When
@@ -98,7 +122,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     @Test
     fun whenActiveBrokersAndExtantMirrorSitesExistThenReturnsTotalCount() = runTest {
         // Given
-        val activeBrokers = listOf("broker1", "broker2")
+        val activeBrokers = listOf(createBroker("broker1"), createBroker("broker2"))
         val mirrorSites = listOf(
             createMirrorSite(
                 name = "mirror1",
@@ -126,7 +150,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             ),
         )
 
-        whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(activeBrokers)
+        setupBrokersWithScannableSteps(activeBrokers)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(mirrorSites)
 
         // When
@@ -134,6 +158,77 @@ class RealPirDashboardInitialScanStateProviderTest {
 
         // Then
         assertEquals(4, result) // 2 active brokers + 2 extant mirror sites with active parents
+    }
+
+    @Test
+    fun whenActiveBrokerScanStepCannotBeParsedThenBrokerAndItsMirrorSitesAreExcludedFromTotal() = runTest {
+        // Given
+        val parseableBroker = createBroker("broker1")
+        val unparseableBroker = createBroker("broker2")
+        val activeBrokers = listOf(parseableBroker, unparseableBroker)
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getBrokerScanSteps(parseableBroker.name)).thenReturn("{steps:broker1}")
+        whenever(mockPirRepository.getBrokerScanSteps(unparseableBroker.name)).thenReturn("{steps:broker2}")
+        whenever(mockBrokerStepsParser.parseStep(eq(parseableBroker), any(), anyOrNull())).thenReturn(
+            listOf(
+                ScanStep(
+                    broker = parseableBroker,
+                    step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                ),
+            ),
+        )
+        // Parsing failure surfaces as an empty list from the parser
+        whenever(mockBrokerStepsParser.parseStep(eq(unparseableBroker), any(), anyOrNull())).thenReturn(emptyList())
+
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(
+            listOf(
+                createMirrorSite(
+                    name = "mirror1",
+                    parentSite = "broker1",
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+                createMirrorSite(
+                    name = "mirror2",
+                    parentSite = "broker2", // Parent has unparseable scan step
+                    addedAt = currentTime - 10000,
+                    removedAt = 0L,
+                ),
+            ),
+        )
+
+        // When
+        val result = testee.getActiveBrokersAndMirrorSitesTotal()
+
+        // Then - only broker1 + its mirror site counted, broker2 and its mirror excluded
+        assertEquals(2, result)
+    }
+
+    @Test
+    fun whenActiveBrokerHasNoStoredScanStepsThenBrokerIsExcludedFromTotal() = runTest {
+        // Given
+        val parseableBroker = createBroker("broker1")
+        val brokerWithoutScanSteps = createBroker("broker2")
+
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(listOf(parseableBroker, brokerWithoutScanSteps))
+        whenever(mockPirRepository.getBrokerScanSteps(parseableBroker.name)).thenReturn("{steps:broker1}")
+        whenever(mockPirRepository.getBrokerScanSteps(brokerWithoutScanSteps.name)).thenReturn(null)
+        whenever(mockBrokerStepsParser.parseStep(eq(parseableBroker), any(), anyOrNull())).thenReturn(
+            listOf(
+                ScanStep(
+                    broker = parseableBroker,
+                    step = ScanStepActions(stepType = "scan", actions = emptyList(), scanType = "data"),
+                ),
+            ),
+        )
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+        // When
+        val result = testee.getActiveBrokersAndMirrorSitesTotal()
+
+        // Then
+        assertEquals(1, result)
     }
 
     @Test
@@ -422,9 +517,111 @@ class RealPirDashboardInitialScanStateProviderTest {
         assertEquals("https://broker1.com", dashboardResult.broker.url)
         assertEquals("https://broker1.com/optout", dashboardResult.broker.optOutUrl)
         assertEquals(1641254400000L, dashboardResult.optOutSubmittedDateInMillis)
+        assertNull(dashboardResult.optOutFormSubmittedDateInMillis)
         assertEquals(0L, dashboardResult.optOutRemovedDateInMillis) // Should be 0L, not null
         assertEquals(1642464000000L, dashboardResult.estimatedRemovalDateInMillis!!) // Should be calculated
         assertFalse(dashboardResult.hasMatchingRecordOnParentBroker)
+    }
+
+    @Test
+    fun whenBrokerIsNotChildThenGetScanResultsUsesOwnOptOutFormSubmittedDate() = runTest {
+        // Given - a parent (non-child) broker with its own form submission timestamp
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe"),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                brokerName = "broker1",
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = 1641254400000L,
+                optOutFormSubmittedDateInMillis = 1641000000000L,
+            ),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals(1641000000000L, result[0].optOutFormSubmittedDateInMillis)
+    }
+
+    @Test
+    fun whenBrokerIsChildThenGetScanResultsPropagatesParentFormSubmittedDate() = runTest {
+        // Given - a child broker with no form submission of its own and a parent broker
+        // that has two opt-out records with different form-submitted timestamps. The child
+        // should inherit the most recent parent timestamp regardless of profile match.
+        // Broker.parent stores the parent's URL (matching production broker JSON), so
+        // the propagation path must resolve URL → broker → opt-out records.
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "parent", name = "Adam Joseph Smith"),
+            createExtractedProfile(dbId = 2L, brokerName = "parent", name = "Emily Smith"),
+            createExtractedProfile(dbId = 3L, brokerName = "child", name = "Adam P Smith"),
+        )
+        val activeBrokers = listOf(
+            createBroker("parent", url = "parent.com"),
+            createBroker("child", url = "child.com", parent = "parent.com"),
+        )
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                extractedProfileId = 1L,
+                brokerName = "parent",
+                status = OptOutJobStatus.REQUESTED,
+                optOutFormSubmittedDateInMillis = 1641000000000L,
+            ),
+            createOptOutJobRecord(
+                extractedProfileId = 2L,
+                brokerName = "parent",
+                status = OptOutJobStatus.REQUESTED,
+                optOutFormSubmittedDateInMillis = 1641500000000L, // most recent
+            ),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then - all child results inherit the most recent parent form-submitted date
+        val childResult = result.single { it.broker.name == "child" }
+        assertEquals(1641500000000L, childResult.optOutFormSubmittedDateInMillis)
+    }
+
+    @Test
+    fun whenChildBrokerHasNoParentSubmissionsThenOptOutFormSubmittedDateIsNull() = runTest {
+        // Given - a child broker with no opt-out records on its parent
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "child", name = "John Doe"),
+        )
+        val activeBrokers = listOf(
+            createBroker("parent", url = "parent.com"),
+            createBroker("child", url = "child.com", parent = "parent.com"),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(createProfileQuery(id = 1L)))
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then
+        assertEquals(1, result.size)
+        assertNull(result[0].optOutFormSubmittedDateInMillis)
     }
 
     @Test
@@ -761,6 +958,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         userProfileId: Long = 1L,
         status: OptOutJobStatus = OptOutJobStatus.REQUESTED,
         optOutRequestedDateInMillis: Long = 0L,
+        optOutFormSubmittedDateInMillis: Long? = null,
         optOutRemovedDateInMillis: Long = 0L,
     ): OptOutJobRecord {
         return OptOutJobRecord(
@@ -771,6 +969,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             attemptCount = 0,
             lastOptOutAttemptDateInMillis = 0L,
             optOutRequestedDateInMillis = optOutRequestedDateInMillis,
+            optOutFormSubmittedDateInMillis = optOutFormSubmittedDateInMillis,
             optOutRemovedDateInMillis = optOutRemovedDateInMillis,
         )
     }

@@ -117,16 +117,18 @@
         android:layout_marginTop="-4dp"
         android:layout_marginEnd="-4dp"
         android:alpha="0"
-        android:contentDescription="@null"
+        android:background="@drawable/bg_brand_design_dismiss_button"
+        android:contentDescription="@string/closeContentDescription"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:outlineProvider="none"
         android:padding="8dp"
+        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        app:tint="?attr/onboardingIconsPrimary"
         android:translationZ="8dp"
         app:layout_constraintEnd_toEndOf="@id/brandDesignCardView"
         app:layout_constraintTop_toTopOf="@id/brandDesignCardView"
         app:srcCompat="@drawable/ic_close_16"
-        tools:alpha="1"
-        tools:ignore="ContentDescription" />
+        tools:alpha="1" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

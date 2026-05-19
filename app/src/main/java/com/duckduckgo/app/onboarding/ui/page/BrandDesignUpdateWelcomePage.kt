@@ -65,6 +65,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -78,6 +79,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
@@ -124,6 +126,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
+    private var quickSetupFadeInAnimatorSet: AnimatorSet? = null
     private var stepIndicatorFadeOutAnimator: ObjectAnimator? = null
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
     private var inputToggleLottieJob: Job? = null
@@ -541,6 +544,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
         binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
+        binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
         inputScreenFadeInAnimatorSet?.removeAllListeners()
@@ -549,6 +553,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenPreviewFadeInAnimatorSet?.removeAllListeners()
         inputScreenPreviewFadeInAnimatorSet?.cancel()
         inputScreenPreviewFadeInAnimatorSet = null
+        quickSetupFadeInAnimatorSet?.removeAllListeners()
+        quickSetupFadeInAnimatorSet?.cancel()
+        quickSetupFadeInAnimatorSet = null
         stepIndicatorFadeOutAnimator?.removeAllListeners()
         stepIndicatorFadeOutAnimator?.cancel()
         stepIndicatorFadeOutAnimator = null
@@ -651,7 +658,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     getString(R.string.preOnboardingWelcomeDialogTitle),
                                 ) {
                                     val animators = mutableListOf<Animator>(
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -678,6 +687,105 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             }
                         },
                     )
+                }
+
+                QUICK_SETUP -> {
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    backgroundAnimator?.transitionTo(step = OnboardingBackgroundStep.QuickSetup)
+
+                    // Swap content before measuring so the next layout pass reflects the quick-setup size,
+                    // and ChangeBounds animates the card expanding into it. The include root stays fully
+                    // opaque so the title is visible while it types; only the options container and primary
+                    // CTA are alpha-hidden until typing completes.
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+
+                    binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                    binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
+                        getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
+
+                    val showBottomWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = binding.bottomWingAnimation,
+                    )
+                    if (!showBottomWingAnimation) {
+                        binding.bottomWingAnimation.isVisible = false
+                    }
+
+                    val transition = ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            // Transition callbacks can still arrive after removeListener() if the
+                            // end event was already in flight; unlike Animator.cancel(), this is
+                            // not a synchronous stop.
+                            if (view == null) return
+                            binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.startOnboardingTypingAnimation(
+                                getString(R.string.preOnboardingReinstallQuickSetupTitle),
+                            ) {
+                                quickSetupFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(
+                                            binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupOptionsContainer,
+                                            View.ALPHA,
+                                            1f,
+                                        ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(
+                                        object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                binding.daxDialogCta.primaryCta.setOnClickListener {
+                                                    viewModel.onPrimaryCtaClicked()
+                                                }
+                                                setQuickSetupListeners()
+
+                                                isAnimating = false
+                                            }
+                                        },
+                                    )
+                                    start()
+                                }
+                            }
+                        }
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    val cardView = binding.daxDialogCta.cardView
+                    cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                    arrowSlideAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                        interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator()
+                        addUpdateListener {
+                            cardView.setArrowAnimationFraction(it.animatedValue as Float)
+                        }
+                        start()
+                    }
+
+                    if (showBottomWingAnimation) {
+                        playBottomWingAnimation()
+                    }
+
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        if (showBottomWingAnimation) {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = binding.bottomWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingReinstallStartBrowsing)
+                    binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
                 SYNC_RESTORE -> {
@@ -784,7 +892,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
-                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 0f)
+                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 0f)
+                            .setDuration(OUTRO_FADE_DURATION),
+                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
@@ -798,8 +908,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             override fun onAnimationEnd(animation: Animator) {
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
-                                binding.daxDialogCta.welcomeContent.bodyText.text =
-                                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
+                                binding.daxDialogCta.welcomeContent.bodyText1.text =
+                                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
 
                                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                                 binding.daxDialogCta.welcomeContent.titleText.text = ""
@@ -813,7 +924,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 ) {
                                     skipOnboardingFadeInAnimatorSet = AnimatorSet().apply {
                                         playTogether(
-                                            ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
+                                            ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
                                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                             ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -984,7 +1095,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = false
 
-                    val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                    val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                     binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
                     binding.daxDialogCta.inputScreenContent.root.isVisible = true
@@ -1135,6 +1246,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
+                binding.daxDialogCta.secondaryCta.visibility =
+                    if (onboardingDialogType == INITIAL_REINSTALL_USER) View.INVISIBLE else View.GONE
+
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
                     with(binding.welcomeScreenWalkingDax) {
@@ -1150,7 +1264,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
-                binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                 if (onboardingDialogType == INITIAL_REINSTALL_USER) {
@@ -1235,6 +1350,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.welcomeTitle.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = true
+                binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
+                binding.daxDialogCta.welcomeContent.bodyText1.text =
+                    getString(R.string.preOnboardingDaxDialog3Text).preventWidows().html(requireContext())
+                binding.daxDialogCta.welcomeContent.bodyText2.isGone = true
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
+                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
                     with(binding.welcomeScreenWalkingDax) {
@@ -1245,23 +1370,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.welcomeContent.root.isVisible = true
-                binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingDaxDialog3Title)
                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
-                binding.daxDialogCta.welcomeContent.bodyText.text =
-                    getString(R.string.preOnboardingDaxDialog3Text).html(requireContext())
-                binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
+                binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.secondaryCta.isVisible = true
                 binding.daxDialogCta.secondaryCta.alpha = 1f
-                binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
@@ -1382,7 +1500,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                 binding.daxDialogCta.addressBarContent.root.isVisible = false
 
-                val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
                 binding.daxDialogCta.inputScreenContent.root.isVisible = true
@@ -1406,6 +1524,62 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 // when view is opened without animations, do not crossfade state but start lottie animations
                 updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.ANIMATE)
+            }
+
+            QUICK_SETUP -> {
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+                binding.welcomeScreenWalkingDax.isVisible = false
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.QuickSetup)
+
+                // Apply the final visibility of every include + cta BEFORE measuring, so the dialog's
+                // measured height reflects what will actually be on screen.
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+
+                binding.daxDialogCta.reinstallerQuickSetupContent.root.alpha = 1f
+                binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupOptionsContainer.alpha = 1f
+                binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
+                    getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
+                binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.cancelAnimation()
+                binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitle.text =
+                    getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
+
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingReinstallStartBrowsing)
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                setQuickSetupListeners()
+
+                val showWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = binding.bottomWingAnimation,
+                )
+                binding.bottomWingAnimation.apply {
+                    cancelAnimation()
+                    isVisible = showWing
+                    alpha = 1f
+                    progress = WING_STOP_PROGRESS
+                }
+                binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    if (showWing) {
+                        verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                        bottomToTop = binding.bottomWingAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = if (deviceInfo.isTablet()) 0.5f else 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
+
+                val cardView = binding.daxDialogCta.cardView
+                cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                cardView.setArrowAnimationFraction(1f)
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
 
             INPUT_SCREEN_PREVIEW -> {
@@ -1508,6 +1682,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
             }
+        }
+    }
+
+    private fun setQuickSetupListeners() {
+        binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
+        }
+
+        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem.setOnCheckedChangeListener { checked ->
         }
     }
 
@@ -1656,6 +1838,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 addressBarContent.addressBarTitle,
                 inputScreenContent.inputScreenTitle,
                 inputScreenPreviewContent.inputScreenPreviewTitle,
+                reinstallerQuickSetupContent.quickSetupTitle,
             ).filter { it.hasAnimationStarted() }.forEach { it.performClick() }
         }
 
@@ -1667,6 +1850,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         addressBarFadeInAnimatorSet?.end()
         inputScreenFadeInAnimatorSet?.end()
         inputScreenPreviewFadeInAnimatorSet?.end()
+        quickSetupFadeInAnimatorSet?.end()
         suggestionButtonsAnimatorSet?.end()
 
         // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one

@@ -31,6 +31,11 @@
         <item name="tabInlineLabel">true</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.TabLayout.Rounded.Native" parent="Widget.DuckDuckGo.TabLayout.Rounded">
+        <item name="android:background">@drawable/native_tab_layout_background</item>
+        <item name="tabIndicatorColor">?attr/daxColorControlRaisedFillPrimary</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.SettingsPictogram">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/extraLargeShapeCornerRadius</item>

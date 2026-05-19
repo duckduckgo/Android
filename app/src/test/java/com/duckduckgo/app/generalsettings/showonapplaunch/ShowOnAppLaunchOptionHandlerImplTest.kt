@@ -31,8 +31,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -64,6 +66,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val systemAutofillEngagement: SystemAutofillEngagement = mock()
+    private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private lateinit var testee: ShowOnAppLaunchOptionHandler
 
     @Before
@@ -78,6 +81,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             ntpAfterIdleManager,
             settingsDataStore,
             systemAutofillEngagement,
+            browserInteractionsPlugins,
         )
     }
 
@@ -852,16 +856,18 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     }
 
     @Test
-    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnIsNotified() = runTest {
-        // Even when no new tab is added because the user is already on an NTP, the handler should
-        // still notify — the currently-shown NTP counts as an after-idle shown event.
+    fun whenInactivityWasIdleTrueAndOptionNewTabPageAndSelectedTabIsAlreadyNtpThenIdleReturnNotNotified() = runTest {
+        // When the user is already on an NTP, no new tab is added — and we deliberately don't
+        // call onIdleReturnTriggered(): NtpAfterIdleManager has preserved the prior session's
+        // classification across the background, and a stale pending flag here would leak onto
+        // the next NTP shown (e.g. a manually-opened new tab).
         fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
         (fakeTabRepository as FakeTabRepository).selectedTab =
             TabEntity(tabId = "1", url = null, position = 0)
 
         testee.handleAfterInactivityOption(wasIdle = true)
 
-        verify(ntpAfterIdleManager).onIdleReturnTriggered()
+        verify(ntpAfterIdleManager, never()).onIdleReturnTriggered()
     }
 
     @Test

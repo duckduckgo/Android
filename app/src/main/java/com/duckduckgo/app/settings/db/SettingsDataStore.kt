@@ -24,6 +24,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -31,6 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -106,7 +108,6 @@ interface SettingsDataStore {
      */
     var urlPreferenceSetByUser: Boolean
     var clearDuckAiData: Boolean
-    var useBottomSheetMenu: Boolean
     var showTrackersCountInAddressBar: Boolean
     var hasNewDownload: Boolean
     var singleTabFireDialogShownCount: Int
@@ -143,6 +144,7 @@ interface SettingsDataStore {
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val brandDesignUpdateToggles: Lazy<OnboardingBrandDesignUpdateToggles>,
 ) : SettingsDataStore,
     AutoCompleteSettings {
     private val fireAnimationMapper = FireAnimationPrefsMapper()
@@ -293,10 +295,6 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_CLEAR_DUCK_AI_DATA, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CLEAR_DUCK_AI_DATA, enabled) }
 
-    override var useBottomSheetMenu: Boolean
-        get() = preferences.getBoolean(KEY_USE_BOTTOM_SHEET_MENU, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_USE_BOTTOM_SHEET_MENU, enabled) }
-
     override var showTrackersCountInAddressBar: Boolean
         get() = preferences.getBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR, enabled) }
@@ -356,8 +354,16 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
-        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
+        val flagOn = isFireAnimationUpdateEnabled()
+        val savedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+        val implicitDefault = if (flagOn) FireAnimation.Inferno else FireAnimation.HeroFire
+        val resolved = fireAnimationMapper.fireAnimationFrom(savedValue, implicitDefault)
+        // mask saved INFERNO to HeroFire when the flag is off so the kill switch fully rolls back the new animation
+        return if (!flagOn && resolved == FireAnimation.Inferno) FireAnimation.HeroFire else resolved
+    }
+
+    private fun isFireAnimationUpdateEnabled(): Boolean {
+        return brandDesignUpdateToggles.get().fireAnimationUpdate().isEnabled()
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -405,7 +411,6 @@ class SettingsSharedPreferences @Inject constructor(
         const val URL_PREFERENCE_MIGRATED = "URL_PREFERENCE_MIGRATED"
         const val URL_PREFERENCE_SET_BY_USER = "URL_PREFERENCE_SET_BY_USER"
         const val KEY_CLEAR_DUCK_AI_DATA = "KEY_CLEAR_DUCK_AI_DATA"
-        const val KEY_USE_BOTTOM_SHEET_MENU = "USE_BOTTOM_SHEET_MENU"
         const val KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR = "KEY_SHOW_TRACKERS_COUNT_IN_ADDRESS_BAR"
         const val KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT = "KEY_SINGLE_TAB_FIRE_DIALOG_SHOWN_COUNT"
         const val KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED = "KEY_GET_DESKTOP_BROWSER_SETTING_DISMISSED"
@@ -420,11 +425,13 @@ class SettingsSharedPreferences @Inject constructor(
             private const val HERO_FIRE_PREFS_VALUE = "HERO_FIRE"
             private const val HERO_WATER_PREFS_VALUE = "HERO_WATER"
             private const val HERO_ABSTRACT_PREFS_VALUE = "HERO_ABSTRACT"
+            private const val INFERNO_PREFS_VALUE = "INFERNO"
             private const val NONE_PREFS_VALUE = "NONE"
         }
 
         fun prefValue(fireAnimation: FireAnimation) =
             when (fireAnimation) {
+                FireAnimation.Inferno -> INFERNO_PREFS_VALUE
                 FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
                 FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
                 FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
@@ -435,6 +442,7 @@ class SettingsSharedPreferences @Inject constructor(
             value: String?,
             defValue: FireAnimation,
         ) = when (value) {
+            INFERNO_PREFS_VALUE -> FireAnimation.Inferno
             HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
             HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
             HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract

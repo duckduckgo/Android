@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.notification.model
 
-import android.app.PendingIntent
+import android.content.Intent
 
 interface SchedulableNotificationPlugin {
+
     fun getSchedulableNotification(): SchedulableNotification
 
     // TODO onNotificationLaunched is not used at the moment.
@@ -26,5 +27,10 @@ interface SchedulableNotificationPlugin {
     fun onNotificationCancelled()
     fun onNotificationShown()
     fun getSpecification(): NotificationSpec
-    fun getLaunchIntent(): PendingIntent?
+
+    /**
+     * Returns the [Intent] that should be launched when the user taps the notification, or `null`
+     * if the notification cannot be launched right now.
+     */
+    suspend fun getLaunchIntent(): Intent?
 }

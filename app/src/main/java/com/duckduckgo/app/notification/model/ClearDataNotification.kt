@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.notification.model
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -25,7 +25,6 @@ import com.duckduckgo.app.fire.AutomaticDataClearing
 import com.duckduckgo.app.firebutton.DataClearingSettingsActivity
 import com.duckduckgo.app.firebutton.FireButtonActivity
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -101,7 +100,6 @@ class ClearDataSpecification(context: Context) : NotificationSpec {
 class ClearDataNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: ClearDataNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -133,8 +131,8 @@ class ClearDataNotificationPlugin @Inject constructor(
         }
     }
 
-    override fun getLaunchIntent(): PendingIntent? {
-        val intent = if (runBlocking { useSingleTabFireDialog.await() }) {
+    override suspend fun getLaunchIntent(): Intent {
+        return if (useSingleTabFireDialog.await()) {
             DataClearingSettingsActivity.intent(context).apply {
                 putExtra(DataClearingSettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
             }
@@ -143,11 +141,6 @@ class ClearDataNotificationPlugin @Inject constructor(
                 putExtra(FireButtonActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
             }
         }
-        val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-        return pendingIntent
     }
 
     private fun pixelName(notificationType: String) = "${notificationType}_${getSpecification().pixelSuffix}"

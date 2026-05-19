@@ -43,6 +43,7 @@ import com.squareup.kotlinpoet.ksp.writeTo
 class ContributesSubComponentProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
+    private val isMetro: Boolean,
 ) : SymbolProcessor {
 
     companion object {
@@ -106,21 +107,10 @@ class ContributesSubComponentProcessor(
         }
         val scopeClassName = scopeType.toClassName()
 
-        val delayGeneration = annotation.getArgumentValue("delayGeneration") as? Boolean ?: false
-
-        if (delayGeneration && getParentScope(scopeClassName) != APP_SCOPE) {
-            logger.error(
-                "${classDeclaration.qualifiedName?.asString()}: " +
-                    "'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
-                classDeclaration,
-            )
-            return
-        }
-
         if (scopeClassName == ACTIVITY_SCOPE) {
             generateActivityInjector(classDeclaration, scopeClassName)
         } else {
-            generateSubComponent(classDeclaration, scopeClassName, delayGeneration)
+            generateSubComponent(classDeclaration, scopeClassName)
             generateSubComponentModule(classDeclaration, scopeClassName, annotation)
         }
     }
@@ -160,7 +150,6 @@ class ContributesSubComponentProcessor(
     private fun generateSubComponent(
         classDeclaration: KSClassDeclaration,
         scopeClassName: ClassName,
-        delayGeneration: Boolean,
     ) {
         val className = classDeclaration.simpleName.asString()
         val packageName = classDeclaration.packageName.asString()
@@ -169,24 +158,16 @@ class ContributesSubComponentProcessor(
         val parentScope = getParentScope(scopeClassName)
         val subComponentClassName = ClassName(packageName, subComponentName)
 
-        // Subcomponent annotation (MergeSubcomponent or ContributesSubcomponent)
-        val subComponentAnnotation = if (delayGeneration) {
-            AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_CLASS)
-                .addMember("scope = %T::class", scopeClassName)
-                .addMember("parentScope = %T::class", parentScope)
-                .build()
-        } else {
-            AnnotationSpec.builder(MERGE_SUBCOMPONENT_CLASS)
-                .addMember("scope = %T::class", scopeClassName)
-                .build()
-        }
+        // Always use @ContributesSubcomponent (with parentScope) instead of @MergeSubcomponent.
+        // Metro's interop recognizes @ContributesSubcomponent and establishes the parent-child
+        // scope relationship. @MergeSubcomponent doesn't carry parentScope and Metro can't
+        // determine the hierarchy.
+        val subComponentAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_CLASS)
+            .addMember("scope = %T::class", scopeClassName)
+            .addMember("parentScope = %T::class", parentScope)
+            .build()
 
-        // Factory annotation (ContributesSubcomponent.Factory or Subcomponent.Factory)
-        val factoryAnnotation = if (delayGeneration) {
-            AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS).build()
-        } else {
-            AnnotationSpec.builder(SUBCOMPONENT_FACTORY_CLASS).build()
-        }
+        val factoryAnnotation = AnnotationSpec.builder(CONTRIBUTES_SUBCOMPONENT_FACTORY_CLASS).build()
 
         // Factory interface
         val factoryType = TypeSpec.interfaceBuilder("Factory")
@@ -223,12 +204,20 @@ class ContributesSubComponentProcessor(
             .build()
 
         // Main SubComponent interface
+        // In Metro mode, @SingleInstanceIn is omitted — Metro derives the scope from
+        // @ContributesSubcomponent(scope = ...) and adding @SingleInstanceIn would cause
+        // a "multiple scope annotations" error. In AnvilDagger mode, Dagger requires the
+        // explicit scope annotation on the generated subcomponent.
         val typeSpec = TypeSpec.interfaceBuilder(subComponentName)
-            .addAnnotation(
-                AnnotationSpec.builder(SINGLE_INSTANCE_IN_CLASS)
-                    .addMember("scope = %T::class", scopeClassName)
-                    .build(),
-            )
+            .apply {
+                if (!isMetro) {
+                    addAnnotation(
+                        AnnotationSpec.builder(SINGLE_INSTANCE_IN_CLASS)
+                            .addMember("scope = %T::class", scopeClassName)
+                            .build(),
+                    )
+                }
+            }
             .addAnnotation(subComponentAnnotation)
             .addSuperinterface(ANDROID_INJECTOR_CLASS.parameterizedBy(classType))
             .addType(factoryType)
@@ -317,9 +306,5 @@ class ContributesSubComponentProcessor(
 
     private fun KSAnnotation.getArgumentType(name: String): KSType? {
         return arguments.firstOrNull { it.name?.asString() == name }?.value as? KSType
-    }
-
-    private fun KSAnnotation.getArgumentValue(name: String): Any? {
-        return arguments.firstOrNull { it.name?.asString() == name }?.value
     }
 }

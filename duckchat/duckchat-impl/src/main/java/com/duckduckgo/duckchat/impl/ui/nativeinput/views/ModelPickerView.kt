@@ -51,7 +51,12 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
+    var onMenuShown: (() -> Unit)?
+    var onMenuDismissed: (() -> Unit)?
+    var onModelSelected: (() -> Unit)?
     fun getSelectedModelId(): String?
+    fun isImageGenerationSupported(): Boolean
+    fun isWebSearchSupported(): Boolean
     fun setPickerEnabled(enabled: Boolean)
 }
 
@@ -70,12 +75,26 @@ class ModelPickerView @JvmOverloads constructor(
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
     private var popupWindow: PopupWindow? = null
+    private var lastObservedModelId: String? = null
+    override var onMenuShown: (() -> Unit)? = null
+    override var onMenuDismissed: (() -> Unit)? = null
+    override var onModelSelected: (() -> Unit)? = null
 
     init {
         inflate(context, R.layout.view_model_picker, this)
     }
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
+
+    override fun isImageGenerationSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isImageGenerationSupported()
+    }
+
+    override fun isWebSearchSupported(): Boolean {
+        if (!isAttachedToWindow) return true
+        return viewModel.isWebSearchSupported()
+    }
 
     private var pickerEnabled = false
 
@@ -102,10 +121,16 @@ class ModelPickerView @JvmOverloads constructor(
     private fun observeState() {
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         stateJob?.cancel()
+        lastObservedModelId = viewModel.state.value.selectedModelId
         stateJob = viewModel.state
             .onEach { state ->
                 state.selectedModelShortName?.let { chip.text = it }
                 updateVisibility()
+                val newId = state.selectedModelId
+                if (newId != null && newId != lastObservedModelId) {
+                    lastObservedModelId = newId
+                    onModelSelected?.invoke()
+                }
             }
             .launchIn(scope)
     }
@@ -115,6 +140,7 @@ class ModelPickerView @JvmOverloads constructor(
         if (state.models.isEmpty()) return
 
         viewModel.menuShowing = true
+        onMenuShown?.invoke()
         showPopupWindow(state)
     }
 
@@ -162,6 +188,7 @@ class ModelPickerView @JvmOverloads constructor(
     private fun onPopupDismissed() {
         viewModel.menuShowing = false
         popupWindow = null
+        onMenuDismissed?.invoke()
     }
 
     override fun onDetachedFromWindow() {

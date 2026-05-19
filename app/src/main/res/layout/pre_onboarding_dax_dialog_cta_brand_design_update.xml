@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         app:arrowOffsetStart="96dp"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0">
@@ -47,22 +48,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="20dp"
                 android:paddingTop="28dp"
-                android:paddingEnd="20dp"
                 android:paddingBottom="20dp">
 
                 <include
                     android:id="@+id/welcomeContent"
                     layout="@layout/include_brand_design_dialog_welcome"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp" />
 
                 <include
                     android:id="@+id/comparisonChartContent"
                     layout="@layout/include_brand_design_comparison_chart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone"
                     tools:visibility="gone" />
 
@@ -71,6 +74,8 @@
                     layout="@layout/include_brand_design_address_bar_position"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
                 <include
@@ -78,11 +83,22 @@
                     layout="@layout/include_brand_design_input_screen"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:visibility="gone" />
 
                 <include
                     android:id="@+id/inputScreenPreviewContent"
                     layout="@layout/include_brand_design_input_screen_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/reinstallerQuickSetupContent"
+                    layout="@layout/include_brand_design_reinstaller_quick_setup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
@@ -91,7 +107,9 @@
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:alpha="0"
                     android:paddingHorizontal="24dp"
                     android:text="@string/preOnboardingDaxDialog1Button"
@@ -103,6 +121,8 @@
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:alpha="0"
                     android:text="@string/preOnboardingDaxDialog1SecondaryButton"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"

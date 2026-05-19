@@ -32,6 +32,7 @@ dependencies {
     implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':browser-mode-api')
     implementation project(':browser-ui')
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
@@ -50,6 +51,7 @@ dependencies {
     implementation project(':cookies-api')
     implementation project(':duckchat-store')
 
+    implementation project(':app-build-config-api')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(':statistics-api')

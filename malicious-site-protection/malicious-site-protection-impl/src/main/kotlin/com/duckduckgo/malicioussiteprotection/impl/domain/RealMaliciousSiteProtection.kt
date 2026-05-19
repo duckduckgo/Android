@@ -51,7 +51,6 @@ import javax.inject.Inject
 
 class WriteInProgressException : Exception("Write in progress")
 
-@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
     suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit>
     suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit>
@@ -59,6 +58,7 @@ interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, InternalMaliciousSiteProtection::class)
+@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

@@ -1,0 +1,63 @@
+{
+  "name": "Vehicle Related Records",
+  "url": "vehiclerelatedrecords.com",
+  "version": "0.4.0",
+  "parent": "spyfly.com",
+  "addedDatetime": 1778777242134,
+  "optOutUrl": "https://www.spyfly.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://vehiclerelatedrecords.com/results.php?sptp=Drivers&sbid=Driving&first=${firstName}&last=${lastName}&city=${city}&state=${state}",
+          "id": "16fb97aa-59d4-4113-b1f7-85aac2fbf8f9"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "table.results-table"
+            }
+          ],
+          "id": "1ed7d7fb-d6a5-44b3-8755-a62cb0021aef"
+        },
+        {
+          "actionType": "extract",
+          "selector": "table.results-table tr.odd",
+          "noResultsSelector": "//span[contains(@class, 'search_title') and contains(., 'Your search was unsuccessful')]",
+          "profile": {
+            "name": {
+              "selector": "div.name"
+            },
+            "age": {
+              "selector": "td.hidden-xs"
+            },
+            "addressCityState": {
+              "selector": ".//td[5]"
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "e6d23772-0b90-4ce3-9381-9d6d39d4a84d"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

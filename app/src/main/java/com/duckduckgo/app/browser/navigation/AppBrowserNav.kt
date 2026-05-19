@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.navigation
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -32,14 +33,14 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         context: Context,
         url: String,
     ): Intent {
-        return BrowserActivity.intent(context = context, queryExtra = url, interstitialScreen = true)
+        return BrowserActivity.intent(context = context, launchSource = InAppNavigation, queryExtra = url, interstitialScreen = true)
     }
 
     override fun openInCurrentTab(
         context: Context,
         url: String,
     ): Intent {
-        return BrowserActivity.intent(context = context, queryExtra = url, openInCurrentTab = true)
+        return BrowserActivity.intent(context = context, launchSource = InAppNavigation, queryExtra = url, openInCurrentTab = true)
     }
 
     override fun openDuckChat(
@@ -47,12 +48,25 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         hasSessionActive: Boolean,
         duckChatUrl: String,
     ): Intent {
-        return BrowserActivity.intent(context = context, openDuckChat = true, duckChatUrl = duckChatUrl, duckChatSessionActive = hasSessionActive)
+        return BrowserActivity.intent(
+            context = context,
+            launchSource = InAppNavigation,
+            openDuckChat = true,
+            duckChatUrl = duckChatUrl,
+            duckChatSessionActive = hasSessionActive,
+        )
     }
 
     override fun closeDuckChat(
         context: Context,
     ): Intent {
-        return BrowserActivity.intent(context = context, closeDuckChat = true)
+        return BrowserActivity.intent(context = context, launchSource = InAppNavigation, closeDuckChat = true)
+    }
+
+    override fun openExistingTab(
+        context: Context,
+        tabId: String,
+    ): Intent {
+        return BrowserActivity.intent(context = context, launchSource = InAppNavigation, openExistingTabId = tabId)
     }
 }

@@ -471,6 +471,7 @@ class SyncActivityViewModelTest {
     fun whenDeleteAccountConfirmedThenDeleteAccount() = runTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
+        whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Success(true))
 
         testee.onDeleteAccountConfirmed()
 

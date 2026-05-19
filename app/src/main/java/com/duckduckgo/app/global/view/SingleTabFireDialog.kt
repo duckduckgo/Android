@@ -50,6 +50,8 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -66,7 +68,14 @@ import com.google.android.material.R as MaterialR
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
 private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
+private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
+private const val ARG_TAB_ID = "tabId"
+internal const val ORIGIN_BROWSER = "Browser"
+internal const val ORIGIN_SETTINGS = "Settings"
+internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
+internal const val ORIGIN_DUCK_AI_CONTEXTUAL_CHAT = "DuckAiContextualChat"
+internal const val ORIGIN_HATCH = "Hatch"
 
 @InjectWith(FragmentScope::class)
 class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
@@ -99,6 +108,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var animationEnabled = false
     private var canFinish = false
     private var pendingFragmentResultEvent: String? = null
+    private var isFireAnimationUpdateEnabled = false
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -121,8 +131,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val originName = arguments?.getString(ARG_ORIGIN, "BROWSER") ?: "BROWSER"
-        viewModel.setOrigin(FireDialogProvider.FireDialogOrigin.valueOf(originName))
+        viewModel.setOrigin(readOriginFromArguments())
 
         setupLayout()
         configureBottomSheet()
@@ -240,7 +249,17 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
-        if (!state.stateData.isFirePictogramVisible) {
+        isFireAnimationUpdateEnabled = state.stateData.isFireAnimationUpdateEnabled
+
+        if (state.stateData.isFirePictogramVisible) {
+            val animationRes = if (isFireAnimationUpdateEnabled) {
+                R.raw.fire_dialog_animation_brand_design
+            } else {
+                R.raw.fire_dialog_animation
+            }
+            binding.fireIcon.setAnimation(animationRes)
+            binding.fireIcon.playAnimation()
+        } else {
             binding.fireIcon.gone()
         }
 
@@ -327,6 +346,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun hideDialog() {
         binding.fireDialogRootView.gone()
+        // lift the 640dp cap so the burn animation fills the screen on tablets
+        (dialog as? BottomSheetDialog)?.behavior?.maxWidth = NO_MAX_WIDTH
     }
 
     private fun playAnimation() {
@@ -396,11 +417,40 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         data object ClearingFinished : ClearAllEvent()
     }
 
+    private fun readOriginFromArguments(): FireDialogProvider.FireDialogOrigin {
+        val tag = arguments?.getString(ARG_ORIGIN) ?: ORIGIN_BROWSER
+        return when (tag) {
+            ORIGIN_SETTINGS -> FireDialogProvider.FireDialogOrigin.Settings
+            ORIGIN_TAB_SWITCHER -> FireDialogProvider.FireDialogOrigin.TabSwitcher
+            ORIGIN_DUCK_AI_CONTEXTUAL_CHAT -> FireDialogProvider.FireDialogOrigin.DuckAiContextualChat
+            ORIGIN_HATCH -> {
+                val tabId = arguments?.getString(ARG_TAB_ID)
+                if (tabId != null) {
+                    FireDialogProvider.FireDialogOrigin.Hatch(tabId)
+                } else {
+                    FireDialogProvider.FireDialogOrigin.Browser
+                }
+            }
+            else -> FireDialogProvider.FireDialogOrigin.Browser
+        }
+    }
+
     companion object {
         fun newInstance(origin: FireDialogProvider.FireDialogOrigin): SingleTabFireDialog {
             return SingleTabFireDialog().apply {
-                arguments = bundleOf(ARG_ORIGIN to origin.name)
+                arguments = bundleOf(
+                    ARG_ORIGIN to origin.tag(),
+                    ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
+                )
             }
+        }
+
+        private fun FireDialogProvider.FireDialogOrigin.tag(): String = when (this) {
+            FireDialogProvider.FireDialogOrigin.Browser -> ORIGIN_BROWSER
+            FireDialogProvider.FireDialogOrigin.Settings -> ORIGIN_SETTINGS
+            FireDialogProvider.FireDialogOrigin.TabSwitcher -> ORIGIN_TAB_SWITCHER
+            FireDialogProvider.FireDialogOrigin.DuckAiContextualChat -> ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
+            is FireDialogProvider.FireDialogOrigin.Hatch -> ORIGIN_HATCH
         }
     }
 }

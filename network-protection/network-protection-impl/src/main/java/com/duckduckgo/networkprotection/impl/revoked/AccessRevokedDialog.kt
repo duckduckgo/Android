@@ -99,11 +99,13 @@ class RealAccessRevokedDialog @Inject constructor(
             .addEventListener(
                 object : EventListener() {
                     override fun onPositiveButtonClicked() {
-                        // Commenting this for now since this is still behind the subs build
-                        globalActivityStarter.start(activity, SubscriptionPurchase())
+                        networkProtectionPixels.reportAccessRevokedDialogSubscribeClicked()
+                        globalActivityStarter.start(activity, SubscriptionPurchase(origin = PURCHASE_ORIGIN))
                     }
 
-                    override fun onNegativeButtonClicked() {}
+                    override fun onNegativeButtonClicked() {
+                        networkProtectionPixels.reportAccessRevokedDialogDismissClicked()
+                    }
 
                     override fun onDialogDismissed() {
                         coroutineScope.launch {
@@ -138,5 +140,6 @@ class RealAccessRevokedDialog @Inject constructor(
     companion object {
         private const val FILENAME = "com.duckduckgo.networkprotection.dialog.access.revoked.store.v1"
         private const val KEY_END_DIALOG_SHOWN = "KEY_END_DIALOG_SHOWN"
+        private const val PURCHASE_ORIGIN = "funnel_alert_android__subscriptionvpnrevoked"
     }
 }

@@ -63,7 +63,7 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
 ) : ModalEvaluator, ReEngagementPromptEvaluator {
 
-    override val priority: Int = 2
+    override val priority: Int = 3
 
     override val evaluatorId: String = "re_engagement_prompt"
 
@@ -111,7 +111,7 @@ class ReEngagementPromptEvaluatorImpl @Inject constructor(
     }
 
     companion object {
-        private const val MODAL_DISPLAY_DELAY = 1500L
+        private const val MODAL_DISPLAY_DELAY = 250L
         private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
         private const val EXISTING_USER_DAYS_INACTIVE_MILLIS = 7 * 24 * 60 * 60 * 1000L
         private const val MAX_DAYS_USED_IN_INACTIVE_WINDOW = 1L

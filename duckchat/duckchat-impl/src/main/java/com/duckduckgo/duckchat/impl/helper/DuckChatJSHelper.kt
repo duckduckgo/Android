@@ -29,8 +29,10 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatAttachmentUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -82,6 +84,7 @@ enum class NativeAction {
     NEW_CHAT,
     SIDEBAR,
     DUCK_AI_SETTINGS,
+    END_VOICE_SESSION,
 }
 
 @ContributesBinding(AppScope::class)
@@ -96,6 +99,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val faviconManager: FaviconManager,
     private val duckChatFeature: DuckChatFeature,
     private val voiceSessionStateManager: VoiceSessionStateManager,
+    private val limitsHandler: LimitsHandler,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -122,7 +126,13 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA ->
                 id?.let {
                     getAIChatNativeHandoffData(featureName, method, it)
-                }.also { registerDuckChatIsOpenDebounced() }
+                }.also {
+                    if (voiceSessionStateManager.isVoiceSessionActive(tabId)) {
+                        // NOTE: Force end native chat state if duck ai chat has been refreshed with an active voice session
+                        voiceSessionStateManager.onVoiceSessionEnded(tabId)
+                    }
+                    registerDuckChatIsOpenDebounced()
+                }
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
@@ -155,6 +165,15 @@ class RealDuckChatJSHelper @Inject constructor(
                 ChatState
                     .fromValue(data?.optString("status"))
                     ?.let { status -> duckChat.updateChatState(status) }
+                data?.optJSONObject("attachments")?.let { attachments ->
+                    val usage = AIChatAttachmentUsage(
+                        imagesUsed = attachments.optInt("imagesUsed", 0),
+                        filesUsed = attachments.optInt("filesUsed", 0),
+                        fileSizeBytesUsed = attachments.optLong("fileSizeBytesUsed", 0L),
+                    )
+                    limitsHandler.setConversationImagesUsed(usage.imagesUsed)
+                    limitsHandler.setConversationFilesUsed(usage.filesUsed, usage.fileSizeBytesUsed)
+                }
                 null
             }
 
@@ -231,7 +250,7 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_VOICE_SESSION_ENDED -> {
-                voiceSessionStateManager.onVoiceSessionEnded()
+                voiceSessionStateManager.onVoiceSessionEnded(tabId)
                 null
             }
 
@@ -247,6 +266,7 @@ class RealDuckChatJSHelper @Inject constructor(
             NativeAction.NEW_CHAT -> SUBSCRIPTION_NEW_CHAT
             NativeAction.SIDEBAR -> SUBSCRIPTION_TOGGLE_SIDEBAR
             NativeAction.DUCK_AI_SETTINGS -> SUBSCRIPTION_DUCK_AI_SETTINGS
+            NativeAction.END_VOICE_SESSION -> SUBSCRIPTION_END_VOICE_SESSION
         }
 
         return SubscriptionEventData(
@@ -388,6 +408,43 @@ class RealDuckChatJSHelper @Inject constructor(
                         if (pending.modelId != null) {
                             put("modelId", pending.modelId)
                         }
+                        if (pending.reasoningEffort != null) {
+                            put("reasoningEffort", pending.reasoningEffort)
+                        }
+                        if (pending.selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(pending.selectedTool) })
+                        }
+                        if (pending.images.isNotEmpty()) {
+                            put(
+                                "images",
+                                JSONArray().apply {
+                                    pending.images.forEach { image ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", image.base64Data)
+                                                put("format", image.format)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
+                        if (pending.files.isNotEmpty()) {
+                            put(
+                                "files",
+                                JSONArray().apply {
+                                    pending.files.forEach { file ->
+                                        put(
+                                            JSONObject().apply {
+                                                put("data", file.base64Data)
+                                                put("fileName", file.fileName)
+                                                put("mimeType", file.mimeType)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                        }
                     },
                 )
             }
@@ -500,5 +557,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
         private const val SUBSCRIPTION_SUBMIT_NATIVE_PROMPT = "submitAIChatNativePrompt"
+        private const val SUBSCRIPTION_END_VOICE_SESSION = "endVoiceSession"
     }
 }

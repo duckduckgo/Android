@@ -34,6 +34,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -54,7 +55,6 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
-import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -213,6 +213,12 @@ interface SubscriptionsManager {
     val entitlements: Flow<List<Product>>
 
     /**
+     * Flow returning the live entitlement set with both [Entitlement.name] and [Entitlement.product].
+     * Same trigger points as [entitlements].
+     */
+    val entitlementSet: Flow<Set<Entitlement>>
+
+    /**
      * Flow to know the state of the current purchase
      */
     val currentPurchaseState: Flow<CurrentPurchase>
@@ -315,6 +321,12 @@ class RealSubscriptionsManager @Inject constructor(
     )
     override val entitlements = _entitlements.onSubscription { emitEntitlementsValues() }
 
+    private val _entitlementSet: MutableSharedFlow<Set<Entitlement>> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = DROP_OLDEST,
+    )
+    override val entitlementSet = _entitlementSet.onSubscription { emitEntitlementsValues() }
+
     private var purchaseStateJob: Job? = null
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
@@ -340,12 +352,10 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun emitEntitlementsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            val entitlements = if (authRepository.getSubscription()?.status?.isActiveOrWaiting() == true) {
-                authRepository.getEntitlements().toProductList()
-            } else {
-                emptyList()
-            }
-            _entitlements.emit(entitlements)
+            val active = authRepository.getSubscription()?.status?.isActiveOrWaiting() == true
+            val rawEntitlements = if (active) authRepository.getEntitlements() else emptyList()
+            _entitlements.emit(rawEntitlements.toProductList())
+            _entitlementSet.emit(rawEntitlements.toSet())
         }
     }
 
@@ -552,6 +562,7 @@ class RealSubscriptionsManager @Inject constructor(
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
+        _entitlementSet.emit(emptySet())
     }
 
     private suspend fun checkPurchase(

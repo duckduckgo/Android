@@ -649,6 +649,51 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenNativeInputEnabledAndOpenDuckChatThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?native-input=true&duckai=5",
+        )
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndOpenDuckChatWithQueryThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openDuckChatWithPrefill(query = "example")
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?q=example&native-input=true&duckai=5",
+        )
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndOpenVoiceDuckChatThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&native-input=true&duckai=5",
+        )
+    }
+
+    @Test
     fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLinkThenIsDuckChatUrl() {
         assertTrue(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
     }
@@ -1388,6 +1433,39 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when native input enabled and get duck chat url with query then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?q=query&native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and get duck chat url with autoprompt then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and get duck chat url with empty query then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?native-input=true&duckai=5")
+    }
+
+    @Test
     fun `when url can be handled by webview return true`() {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
@@ -1727,4 +1805,75 @@ class RealDuckChatTest {
     }
 
     // endregion
+
+    @Test
+    fun whenAllChatHistoryFlagsOnThenIsChatHistoryAvailableTrue() = runTest {
+        enableChatHistoryFlags()
+
+        assertTrue(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenDuckChatDisabledThenIsChatHistoryAvailableFalse() = runTest {
+        enableChatHistoryFlags()
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenNativeStorageOffThenIsChatHistoryAvailableFalse() = runTest {
+        enableChatHistoryFlags()
+        duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenHistoryScreenOffThenIsChatHistoryAvailableFalse() = runTest {
+        enableChatHistoryFlags()
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
+
+        assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenAllChatHistoryFlagsOffThenIsChatHistoryAvailableFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = false))
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertFalse(testee.isChatHistoryAvailable())
+    }
+
+    @Test
+    fun whenOpenWithChatIdThenDuckChatOpenedWithChatIdUrlParameterAndForcedFreshSession() = runTest {
+        // Stub an active session so the test fails if forceNewSession is not propagated.
+        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
+        val urlCaptor = argumentCaptor<String>()
+        val sessionCaptor = argumentCaptor<Boolean>()
+
+        testee.openWithChatId("chat-123")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockBrowserNav).openDuckChat(any(), sessionCaptor.capture(), urlCaptor.capture())
+        assertTrue(urlCaptor.firstValue.contains("chatID=chat-123"))
+        assertFalse(sessionCaptor.firstValue)
+    }
+
+    private suspend fun enableChatHistoryFlags() {
+        duckChatFeature.self().setRawStoredState(State(enable = true))
+        duckChatFeature.useNativeStorageChatData().setRawStoredState(State(enable = true))
+        duckChatFeature.historyScreen().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+    }
 }

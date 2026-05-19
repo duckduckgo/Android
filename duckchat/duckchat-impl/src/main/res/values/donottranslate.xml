@@ -27,11 +27,74 @@
     <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
     <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
 
+    <!-- Reasoning Mode Picker -->
+    <string name="duckChatReasoningModeContentDescription" translatable="false">Reasoning mode</string>
+    <string name="duckChatReasoningModeFastTitle" translatable="false">Fast</string>
+    <string name="duckChatReasoningModeFastSubtitle" translatable="false">Answers quickly</string>
+    <string name="duckChatReasoningModeReasoningTitle" translatable="false">Reasoning</string>
+    <string name="duckChatReasoningModeReasoningSubtitle" translatable="false">For complex tasks</string>
+    <string name="duckChatReasoningModeExtendedTitle" translatable="false">Extended Reasoning</string>
+    <string name="duckChatReasoningModeExtendedSubtitle" translatable="false">For analytical tasks</string>
+
     <!-- Duck.ai voice microphone foreground service notification -->
     <string name="duckAiVoiceNotificationTitle">Duck.ai Voice Chat Active</string>
     <string name="duckAiVoiceNotificationMessage">Microphone is in use by Duck.ai</string>
     <string name="duckAiVoiceNotificationChannelName">Duck.ai Voice Chat</string>
+    <string name="duckAiVoiceNotificationActionOpenChat">Open chat</string>
+    <string name="duckAiVoiceNotificationActionEndSession">End session</string>
 
     <!-- Start chat icon content description -->
     <string name="duckChatStartChatContentDescription">Start chat</string>
+
+    <!-- Image attachment -->
+    <string name="duckChatImageAttachmentRemoveContentDescription">Remove image</string>
+
+    <!-- Image attachment limits -->
+    <string name="duckChatImageAttachmentLimitPerMessage" instruction="%1$d is the maximum number of images allowed per message.">You can only attach %1$d images at a time.</string>
+    <string name="duckChatImageAttachmentLimitPerConversation" instruction="%1$d is the maximum number of images allowed in a single conversation.">You can only attach %1$d images per conversation.</string>
+
+    <!-- duck.ai onboarding end CTA -->
+    <string name="duckAiEndCtaTitle">You\'ve got this!</string>
+    <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="duckAiEndCtaButton">High five!</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Take Photo</string>
+    <string name="attachmentAttachPhoto">Attach Photo</string>
+    <string name="attachmentAttachFile">Attach File</string>
+
+    <!-- File attachment -->
+    <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
+    <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
+    <string name="duckChatFileAttachmentTooLarge" instruction="%1$d is the maximum file size in MB.">File exceeds the maximum size of %1$d MB.</string>
+    <string name="duckChatFileAttachmentTooManyPages" instruction="%1$d is the maximum number of pages per file.">One of the files attached has more pages than we support. Please upload files with %1$d pages or fewer.</string>
+    <string name="duckChatFileAttachmentTotalSizeLimitExceeded" instruction="%1$d is the total size limit in MB.">The attached files exceed the total size limit of %1$dMB.</string>
+    <string name="fileCaptureBrowseDisambiguationTitle">Upload a file</string>
+
+    <!-- Options button -->
+    <string name="duckChatOptionsButtonContentDescription">Duck.ai options</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Remove %1$s</string>
+    <string name="duckChatOptionsMenuCreateImage">Create Image</string>
+    <string name="duckChatOptionsMenuCreateImageSubtitle">Turn text into images</string>
+    <string name="duckChatOptionsMenuWebSearch">Web Search</string>
+    <string name="duckChatOptionsMenuWebSearchSubtitle">Source answers from the web</string>
+
+    <!-- Chat history -->
+    <string name="duck_ai_chat_history_title">Chats</string>
+    <string name="duck_ai_chat_history_section_pinned">Pinned</string>
+    <string name="duck_ai_chat_history_section_recent">Recent</string>
+    <string name="duck_ai_chat_history_untitled">Untitled chat</string>
+    <string name="duck_ai_chat_history_empty_title">No Chats yet</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Open Duck.ai</string>
+    <string name="duck_ai_chat_history_coming_soon">Coming soon</string>
+    <string name="duck_ai_chat_history_more_options">More options</string>
+    <string name="duck_ai_chat_history_action_select">Select</string>
+    <string name="duck_ai_chat_history_action_pin">Pin</string>
+    <string name="duck_ai_chat_history_action_unpin">Unpin</string>
+    <string name="duck_ai_chat_history_action_rename">Rename</string>
+    <string name="duck_ai_chat_history_action_download">Download</string>
+    <string name="duck_ai_chat_history_action_delete">Delete</string>
+    <string name="duck_ai_chat_history_search_hint">Search chats</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Close search</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
 </resources>

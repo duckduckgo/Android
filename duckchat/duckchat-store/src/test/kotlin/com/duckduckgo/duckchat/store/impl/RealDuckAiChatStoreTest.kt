@@ -24,6 +24,8 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import dagger.Lazy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -135,6 +137,57 @@ class RealDuckAiChatStoreTest {
     fun `getChats returns empty list when store is empty`() = runTest {
         whenever(chatsDao.getAll()).thenReturn(emptyList())
         assertTrue(store.getChats().isEmpty())
+    }
+
+    @Test
+    fun `getChatsFlow emits mapped business model on each DAO emission`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}"""
+        val source = MutableStateFlow(listOf(DuckAiBridgeChatEntity("abc", json)))
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val first = store.getChatsFlow().firstOrNull().orEmpty()
+
+        assertEquals(1, first.size)
+        assertEquals("abc", first[0].chatId)
+        assertEquals("Test", first[0].title)
+        assertTrue(first[0].pinned)
+    }
+
+    @Test
+    fun `getChatsFlow re-emits after deletions`() = runTest {
+        val json1 = """{"chatId":"abc","title":"A","model":"m","lastEdit":"2026-04-01T00:00:00.000Z","pinned":false}"""
+        val json2 = """{"chatId":"def","title":"B","model":"m","lastEdit":"2026-04-02T00:00:00.000Z","pinned":false}"""
+        val source = MutableStateFlow(listOf(DuckAiBridgeChatEntity("abc", json1), DuckAiBridgeChatEntity("def", json2)))
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val flow = store.getChatsFlow()
+        assertEquals(2, flow.firstOrNull().orEmpty().size)
+
+        source.value = listOf(DuckAiBridgeChatEntity("abc", json1))
+        assertEquals(listOf("abc"), flow.firstOrNull().orEmpty().map { it.chatId })
+    }
+
+    @Test
+    fun `getChatsFlow emits empty list after deleteAll`() = runTest {
+        val source = MutableStateFlow<List<DuckAiBridgeChatEntity>>(emptyList())
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        assertTrue(store.getChatsFlow().firstOrNull().orEmpty().isEmpty())
+    }
+
+    @Test
+    fun `getChatsFlow drops malformed entries on every emission`() = runTest {
+        val good = """{"chatId":"abc","title":"Test","model":"m","lastEdit":"2026-04-01T00:00:00.000Z","pinned":false}"""
+        val source = MutableStateFlow(
+            listOf(
+                DuckAiBridgeChatEntity("abc", good),
+                DuckAiBridgeChatEntity("bad", "not json"),
+            ),
+        )
+        whenever(chatsDao.getAllAsFlow()).thenReturn(source)
+
+        val emitted = store.getChatsFlow().firstOrNull().orEmpty()
+        assertEquals(listOf("abc"), emitted.map { it.chatId })
     }
 
     // --- deleteChat ---

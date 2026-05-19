@@ -448,7 +448,7 @@ class DuckDuckGoWebView :
 
     internal fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
-        if (!allowed || browserUiLockFeature.self().isEnabled()) {
+        if (!allowed || (::browserUiLockFeature.isInitialized && browserUiLockFeature.self().isEnabled())) {
             enableSwipeRefresh(allowed)
         }
     }

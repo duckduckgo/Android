@@ -61,7 +61,7 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
     private val onboardingFlowChecker: OnboardingFlowChecker,
 ) : ModalEvaluator, WinBackPromptEvaluator {
 
-    override val priority: Int = 1
+    override val priority: Int = 2
 
     override val evaluatorId: String = "win_back_prompt"
 
@@ -91,6 +91,6 @@ class WinBackPromptEvaluatorImpl @Inject constructor(
         !defaultBrowserDetector.isDefaultBrowser()
 
     companion object {
-        private const val MODAL_DISPLAY_DELAY = 1500L
+        private const val MODAL_DISPLAY_DELAY = 250L
     }
 }

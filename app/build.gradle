@@ -49,6 +49,8 @@ android {
             }
         }
 
+        buildConfigField "String", "DI_FRAMEWORK", "\"${findProperty('ddg.di') ?: 'AnvilDagger'}\""
+
         if (project.hasProperty('perf-test')) {
             buildConfigField "boolean", "IS_PERFORMANCE_TEST", "true"
         } else {
@@ -418,7 +420,8 @@ dependencies {
     implementation project(':fingerprint-protection-impl')
     implementation project(':fingerprint-protection-store')
 
-    implementation project(':fire-mode-impl')
+    implementation project(':browser-mode-api')
+    implementation project(':browser-mode-impl')
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')

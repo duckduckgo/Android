@@ -84,6 +84,8 @@ class Omnibar(
         fun onBackButtonPressed()
 
         fun onDuckAISidebarButtonPressed()
+
+        fun onDuckAIBackButtonPressed()
     }
 
     interface FindInPageListener {
@@ -393,6 +395,7 @@ class Omnibar(
                 privacyShield = viewState.showPrivacyShield.isHighlighted(),
             ),
         )
+        omnibarView.decorate(Decoration.LockForOnboarding(viewState.isOmnibarLockedForOnboarding))
     }
 
     fun createCookiesAnimation(isCosmetic: Boolean) {

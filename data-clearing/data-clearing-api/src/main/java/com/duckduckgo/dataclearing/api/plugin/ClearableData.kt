@@ -39,6 +39,11 @@ sealed class ClearableData {
     /** Duck AI chats. */
     sealed class DuckChats : ClearableData() {
         data object All : DuckChats()
-        data class Single(val chatUrl: String) : DuckChats()
+
+        /**
+         * A known set of Duck.ai chats, identified by their full chat URLs.
+         * `setOf(oneUrl)` is the single-chat case; `emptySet()` is a valid no-op.
+         */
+        data class Selected(val chatUrls: Set<String>) : DuckChats()
     }
 }

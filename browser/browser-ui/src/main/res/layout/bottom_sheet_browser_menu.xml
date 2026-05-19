@@ -223,6 +223,14 @@
                 app:fullWidth="false" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/duckChatHistoryMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_chats_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuChats" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/bookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -246,14 +254,6 @@
                 app:iconDrawable="@drawable/ic_downloads_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuDownloads" />
-
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/duckChatHistoryMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_dot_list_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuDuckChatHistory" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/privacyToolsSectionDivider"
