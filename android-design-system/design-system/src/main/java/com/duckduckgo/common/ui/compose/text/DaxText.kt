@@ -20,8 +20,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -42,6 +48,34 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBoxInverted
 @Composable
 fun DaxText(
     text: String,
+    modifier: Modifier = Modifier,
+    style: DuckDuckGoTextStyle = DuckDuckGoTheme.typography.body1,
+    color: Color = DuckDuckGoTheme.textColors.primary,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    maxLines: Int = Int.MAX_VALUE,
+) {
+    Text(
+        text = text,
+        color = color,
+        style = style.asTextStyle,
+        textAlign = textAlign,
+        overflow = overflow,
+        maxLines = maxLines,
+        modifier = modifier,
+    )
+}
+
+/**
+ * [AnnotatedString] variant of [DaxText]. Use this when the text needs inline
+ * styling (bold spans, color spans, links, etc.). Build the [AnnotatedString]
+ * with [buildAnnotatedString] or compose it from string resources.
+ *
+ * @param color The default text color applied to spans that do not override it via [SpanStyle].
+ */
+@Composable
+fun DaxText(
+    text: AnnotatedString,
     modifier: Modifier = Modifier,
     style: DuckDuckGoTextStyle = DuckDuckGoTheme.typography.body1,
     color: Color = DuckDuckGoTheme.textColors.primary,
@@ -226,6 +260,24 @@ private fun DaxTextColorDisabledPreview() {
         DaxText(
             text = "Disabled Color",
             color = DuckDuckGoTheme.textColors.disabled,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun DaxTextAnnotatedStringPreview() {
+    PreviewBox {
+        DaxText(
+            text = buildAnnotatedString {
+                append("Normal, ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("bold") }
+                append(", ")
+                withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) { append("underlined") }
+                append(", and ")
+                withStyle(SpanStyle(color = DuckDuckGoTheme.textColors.secondary)) { append("colored") }
+                append(" spans.")
+            },
         )
     }
 }
