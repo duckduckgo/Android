@@ -21,10 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
-import com.duckduckgo.adblocking.impl.remoteconfig.DomainJsonAdapter
 import com.duckduckgo.adblocking.impl.remoteconfig.RealAdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
@@ -42,7 +40,6 @@ class AdBlockingExtensionConfigProviderTest {
 
     private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
     private val settingsAdapter = Moshi.Builder()
-        .add(Domain::class.java, DomainJsonAdapter().nullSafe())
         .add(KotlinJsonAdapterFactory())
         .build()
         .adapter(AdBlockingExtensionSettings::class.java)
@@ -54,8 +51,7 @@ class AdBlockingExtensionConfigProviderTest {
             "scriptlets": {
                 "scriptlets/isolated/ublock-filters.js": { "url": "https://cdn.example/isolated.js", "signature": "iso-sig" },
                 "scriptlets/main/ublock-filters.js": { "url": "https://cdn.example/main.js", "signature": "main-sig" }
-            },
-            "domains": ["youtube.com", "m.youtube.com"]
+            }
         }
     """.trimIndent()
 
@@ -65,7 +61,6 @@ class AdBlockingExtensionConfigProviderTest {
         provider.onPrivacyConfigDownloaded()
 
         assertNull(provider.scriptletsSettings.value)
-        assertNull(provider.domainsSettings.value)
     }
 
     @Test
@@ -74,29 +69,26 @@ class AdBlockingExtensionConfigProviderTest {
         provider.onPrivacyConfigDownloaded()
 
         assertNull(provider.scriptletsSettings.value)
-        assertNull(provider.domainsSettings.value)
     }
 
     @Test
     fun whenVersionIsMissingThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(
-            Toggle.State(remoteEnableState = true, settings = """{"scriptlets": {}, "domains": []}"""),
+            Toggle.State(remoteEnableState = true, settings = """{"scriptlets": {}}"""),
         )
         provider.onPrivacyConfigDownloaded()
 
         assertNull(provider.scriptletsSettings.value)
-        assertNull(provider.domainsSettings.value)
     }
 
     @Test
     fun whenScriptletsIsMissingThenSettingsAreNull() = runTest {
         feature.self().setRawStoredState(
-            Toggle.State(remoteEnableState = true, settings = """{"version": "1.0", "domains": []}"""),
+            Toggle.State(remoteEnableState = true, settings = """{"version": "1.0"}"""),
         )
         provider.onPrivacyConfigDownloaded()
 
         assertNull(provider.scriptletsSettings.value)
-        assertNull(provider.domainsSettings.value)
     }
 
     @Test
@@ -115,30 +107,6 @@ class AdBlockingExtensionConfigProviderTest {
             ScriptletEntry(url = "https://cdn.example/isolated.js", signature = "iso-sig"),
             scriptlets?.scriptlets?.get("scriptlets/isolated/ublock-filters.js"),
         )
-    }
-
-    @Test
-    fun whenSettingsAreValidThenDomainsSettingsReflectsParsedConfig() = runTest {
-        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
-        provider.onPrivacyConfigDownloaded()
-
-        assertEquals(
-            listOf(Domain("youtube.com"), Domain("m.youtube.com")),
-            provider.domainsSettings.value?.domains,
-        )
-    }
-
-    @Test
-    fun whenDomainsFieldIsAbsentThenDomainsSettingsHasEmptyDomains() = runTest {
-        feature.self().setRawStoredState(
-            Toggle.State(
-                remoteEnableState = true,
-                settings = """{"version": "1.0", "scriptlets": {}}""",
-            ),
-        )
-        provider.onPrivacyConfigDownloaded()
-
-        assertEquals(emptyList<Domain>(), provider.domainsSettings.value?.domains)
     }
 
     @Test

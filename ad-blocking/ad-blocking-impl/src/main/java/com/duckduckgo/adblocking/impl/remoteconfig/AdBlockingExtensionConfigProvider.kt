@@ -16,14 +16,11 @@
 
 package com.duckduckgo.adblocking.impl.remoteconfig
 
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +33,6 @@ import javax.inject.Inject
 data class AdBlockingExtensionSettings(
     val version: String,
     val scriptlets: Map<String, ScriptletEntry>,
-    val domains: List<Domain> = emptyList(),
 )
 
 data class ScriptletEntry(
@@ -49,13 +45,8 @@ data class ScriptletsSettings(
     val scriptlets: Map<String, ScriptletEntry>,
 )
 
-data class DomainsSettings(
-    val domains: List<Domain>,
-)
-
 interface AdBlockingExtensionConfigProvider {
     val scriptletsSettings: StateFlow<ScriptletsSettings?>
-    val domainsSettings: StateFlow<DomainsSettings?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -67,14 +58,12 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
 ) : AdBlockingExtensionConfigProvider, PrivacyConfigCallbackPlugin {
 
     private val scriptletsFlow = MutableStateFlow<ScriptletsSettings?>(null)
-    private val domainsFlow = MutableStateFlow<DomainsSettings?>(null)
 
     init {
         refresh()
     }
 
     override val scriptletsSettings: StateFlow<ScriptletsSettings?> = scriptletsFlow.asStateFlow()
-    override val domainsSettings: StateFlow<DomainsSettings?> = domainsFlow.asStateFlow()
 
     override fun onPrivacyConfigDownloaded() {
         logcat { "onPrivacyConfigDownloaded" }
@@ -84,7 +73,6 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
     private fun refresh() {
         val raw = parseSettings()
         scriptletsFlow.value = raw?.let { ScriptletsSettings(it.version, it.scriptlets) }
-        domainsFlow.value = raw?.let { DomainsSettings(it.domains) }
     }
 
     private fun parseSettings(): AdBlockingExtensionSettings? {
@@ -93,12 +81,5 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
             .onFailure { logcat(WARN) { "failed to parse settings: ${it.asLog()}" } }
             .getOrNull()
             ?.takeIf { it.version.isNotEmpty() }
-    }
-}
-
-internal class DomainJsonAdapter : JsonAdapter<Domain>() {
-    override fun fromJson(reader: JsonReader): Domain = Domain(reader.nextString())
-    override fun toJson(writer: JsonWriter, value: Domain?) {
-        writer.value(value?.value)
     }
 }
