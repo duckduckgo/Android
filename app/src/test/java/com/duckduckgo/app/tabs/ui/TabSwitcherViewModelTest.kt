@@ -2016,6 +2016,98 @@ class TabSwitcherViewModelTest {
         verify(isolatedProvider, never()).forMode(BrowserMode.FIRE)
     }
 
+    @Test
+    fun `when fire mode available then isBrowserModeToggleVisible is true`() = runTest {
+        // @Before sets isAvailable() = true
+        assertTrue(testee.isBrowserModeToggleVisible)
+    }
+
+    @Test
+    fun `when fire mode unavailable then isBrowserModeToggleVisible is false`() = runTest {
+        val isolatedAvailability: FireModeAvailability = mock()
+        whenever(isolatedAvailability.isAvailable()).thenReturn(false)
+        val isolatedStateHolder: BrowserModeStateHolder = mock()
+        whenever(isolatedStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+        val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
+        whenever(isolatedProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+
+        val isolatedViewModel = TabSwitcherViewModel(
+            isolatedProvider,
+            isolatedStateHolder,
+            isolatedAvailability,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            swipingTabsFeatureProvider,
+            duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
+            mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
+            faviconManager,
+            savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
+        )
+
+        assertFalse(isolatedViewModel.isBrowserModeToggleVisible)
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to fire then switches mode on state holder`() = runTest {
+        testee.onBrowserModeToggled(BrowserMode.FIRE)
+
+        verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to current mode then does not call switchTo`() = runTest {
+        // currentModeFlow starts at REGULAR
+        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+
+        verify(mockBrowserModeStateHolder, never()).switchTo(any())
+    }
+
+    @Test
+    fun `when fire mode unavailable then onBrowserModeToggled is no-op`() = runTest {
+        val isolatedAvailability: FireModeAvailability = mock()
+        whenever(isolatedAvailability.isAvailable()).thenReturn(false)
+        val isolatedStateHolder: BrowserModeStateHolder = mock()
+        whenever(isolatedStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+        val isolatedProvider = mock<BrowserModeDataProvider<TabRepository>>()
+        whenever(isolatedProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+
+        val isolatedViewModel = TabSwitcherViewModel(
+            isolatedProvider,
+            isolatedStateHolder,
+            isolatedAvailability,
+            coroutinesTestRule.testDispatcherProvider,
+            mockPixel,
+            swipingTabsFeatureProvider,
+            duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
+            mockWebTrackersBlockedAppRepository,
+            mockTabSwitcherPrefsDataStore,
+            faviconManager,
+            savedSitesRepository,
+            mockTrackersAnimationInfoPanelPixels,
+            mockOmnibarFeatureRepository,
+        )
+
+        isolatedViewModel.onBrowserModeToggled(BrowserMode.FIRE)
+
+        verify(isolatedStateHolder, never()).switchTo(any())
+    }
+
+    @Test
+    fun `regularTabCount reflects regular repo tab count`() = runTest {
+        // @Before wires mockTabRepository.flowTabs to flowOf(tabList) and forMode(REGULAR) -> mockTabRepository
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            testee.viewState.collect()
+        }
+        advanceUntilIdle()
+
+        assertEquals(tabList.size, testee.viewState.value.regularTabCount)
+    }
+
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
 
         private val animationTileDismissedFlow = MutableStateFlow(false)

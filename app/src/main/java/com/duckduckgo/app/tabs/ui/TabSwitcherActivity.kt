@@ -364,6 +364,16 @@ class TabSwitcherActivity :
         toggle.setOnModeChangedListener { mode ->
             viewModel.onBrowserModeToggled(mode)
         }
+
+        // Seed from the current viewState so the first frame matches the final state — otherwise
+        // the toolbar flashes its default title and the indicator sits on FIRE for one frame.
+        applyViewState(viewModel.viewState.value)
+    }
+
+    private fun applyViewState(state: TabSwitcherViewModel.ViewState) {
+        browserModeToggle?.setMode(state.browserMode)
+        browserModeToggle?.setRegularTabCount(state.regularTabCount)
+        updateToolbarTitle(state.mode, state.tabs.size)
     }
 
     private fun updateToolbarTitle(
@@ -421,6 +431,11 @@ class TabSwitcherActivity :
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
 
+                if (lastObservedBrowserMode != null && lastObservedBrowserMode != it.browserMode) {
+                    scrollToActiveTabOnNextUpdate = true
+                }
+                lastObservedBrowserMode = it.browserMode
+
                 val shouldScroll = (firstTimeLoadingTabsList || scrollToActiveTabOnNextUpdate) && it.tabs.isNotEmpty()
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
@@ -431,7 +446,7 @@ class TabSwitcherActivity :
                     }
                 }
 
-                updateToolbarTitle(it.mode, it.tabs.size)
+                applyViewState(it)
                 updateTabGridItemDecorator()
 
                 tabTouchHelper.mode = it.mode
@@ -449,23 +464,6 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             urlDisplayRepository.isFullUrlEnabled.flowWithLifecycle(lifecycle).collect {
                 tabsAdapter.isFullUrlEnabled = it
-            }
-        }
-
-        if (viewModel.isBrowserModeToggleVisible) {
-            lifecycleScope.launch {
-                viewModel.browserMode.flowWithLifecycle(lifecycle).collect { mode ->
-                    browserModeToggle?.setMode(mode)
-                    if (lastObservedBrowserMode != null && lastObservedBrowserMode != mode) {
-                        scrollToActiveTabOnNextUpdate = true
-                    }
-                    lastObservedBrowserMode = mode
-                }
-            }
-            lifecycleScope.launch {
-                viewModel.regularTabCount.flowWithLifecycle(lifecycle).collect { count ->
-                    browserModeToggle?.setRegularTabCount(count)
-                }
             }
         }
 

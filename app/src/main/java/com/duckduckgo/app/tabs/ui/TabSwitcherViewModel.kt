@@ -60,6 +60,7 @@ import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
+import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -70,6 +71,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -107,19 +109,15 @@ class TabSwitcherViewModel @Inject constructor(
 
     val isBrowserModeToggleVisible: Boolean = fireModeAvailability.isAvailable()
 
-    val browserMode: StateFlow<BrowserMode> =
+    private val currentMode: StateFlow<BrowserMode> =
         if (isBrowserModeToggleVisible) {
             browserModeStateHolder.currentMode
         } else {
             MutableStateFlow(BrowserMode.REGULAR)
         }
 
-    private val currentMode: StateFlow<BrowserMode> get() = browserMode
-
-    val regularTabCount: StateFlow<Int> =
-        tabRepositoryProvider.forMode(BrowserMode.REGULAR).flowTabs
-            .map { it.size }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+    private val regularTabCount: Flow<Int> =
+        tabRepositoryProvider.forMode(BrowserMode.REGULAR).flowTabs.map { it.size }
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(currentMode.value)
@@ -154,17 +152,22 @@ class TabSwitcherViewModel @Inject constructor(
         tabSwitcherItemsFlow,
         currentMode.flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).tabSwitcherData },
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton ->
+        currentMode,
+        regularTabCount,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton, browserMode, regularTabCount ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
             isDuckAIButtonVisible = showDuckAiButton,
+            browserMode = browserMode,
+            regularTabCount = regularTabCount,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = ViewState(
             isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
+            browserMode = currentMode.value,
         ),
     )
 
@@ -239,7 +242,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onBrowserModeToggled(mode: BrowserMode) {
         if (!isBrowserModeToggleVisible) return
-        if (mode == browserMode.value) return
+        if (mode == currentMode.value) return
         browserModeStateHolder.switchTo(mode)
     }
 
@@ -663,6 +666,8 @@ class TabSwitcherViewModel @Inject constructor(
         val layoutType: LayoutType? = null,
         val isDuckAIButtonVisible: Boolean = false,
         val isSplitOmnibarEnabled: Boolean = false,
+        val browserMode: BrowserMode = BrowserMode.REGULAR,
+        val regularTabCount: Int = 0,
     ) {
         val tabs: List<Tab> = tabSwitcherItems.filterIsInstance<Tab>()
         val numSelectedTabs: Int = (mode as? Selection)?.selectedTabs?.size ?: 0
