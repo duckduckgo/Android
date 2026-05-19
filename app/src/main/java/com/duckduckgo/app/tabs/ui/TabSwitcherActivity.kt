@@ -26,12 +26,15 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.core.view.drawToBitmap
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -73,6 +76,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShowUndoDeleteTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
@@ -185,11 +189,19 @@ class TabSwitcherActivity :
     private var isTrackerAnimationPanelVisible = false
     private var browserModeToggle: BrowserModeToggleView? = null
 
-    // Tracks the mode we last rendered for. When the toggle flips, the next viewState emission
-    // will arrive with a different mode's tab list — we want to scroll to that mode's active
-    // tab so the user doesn't land in an arbitrary scroll position.
-    private var lastObservedBrowserMode: com.duckduckgo.browsermode.api.BrowserMode? = null
-    private var scrollToActiveTabOnNextUpdate = false
+    // Non-null while a mode switch is in flight
+    private var modeSwitch: ModeSwitch? = null
+
+    /**
+     * Holds the bitmap overlay covering the recycler
+     * and a reference to the items list visible at fade-out time; the observer compares against
+     * [staleItems] to detect when the new mode's tabs have arrived.
+     */
+    private data class ModeSwitch(
+        val overlay: ImageView?,
+        val staleItems: List<TabSwitcherItem>,
+    )
+
     private var lastSnackbar: DefaultSnackbar? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
@@ -363,18 +375,65 @@ class TabSwitcherActivity :
             ),
         )
         toggle.setOnModeChangedListener { mode ->
-            viewModel.onBrowserModeToggled(mode)
+            fadeOutAndSwitchMode(mode)
         }
 
-        // Seed from the current viewState so the first frame matches the final state — otherwise
-        // the toolbar flashes its default title and the indicator sits on FIRE for one frame.
         applyViewState(viewModel.viewState.value)
     }
 
     private fun applyViewState(state: TabSwitcherViewModel.ViewState) {
         browserModeToggle?.setMode(state.browserMode)
-        browserModeToggle?.setRegularTabCount(state.regularTabCount)
+        state.regularTabCount?.let { browserModeToggle?.setRegularTabCount(it) }
         updateToolbarTitle(state.mode, state.tabs.size)
+    }
+
+    // Snapshot the recycler and overlay it; the recycler updates underneath (mode switch, diff
+    // dispatch, scroll, Glide loads — none of it visible behind the static bitmap). When the
+    // observer sees a fresh tabSwitcherItems reference it calls revealNewMode, which crossfades
+    // the overlay out and the live recycler in.
+    private fun fadeOutAndSwitchMode(newMode: BrowserMode) {
+        if (modeSwitch != null) return
+
+        val overlay = runCatching { tabsRecycler.drawToBitmap() }.getOrNull()?.let { bitmap ->
+            ImageView(this).apply {
+                setImageBitmap(bitmap)
+                scaleType = ImageView.ScaleType.FIT_XY
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                )
+            }.also(tabsContainer::addView)
+        }
+        if (overlay != null) {
+            tabsRecycler.alpha = 0f
+        }
+
+        modeSwitch = ModeSwitch(overlay, viewModel.viewState.value.tabSwitcherItems)
+
+        // Suppress diff animations across the swap so items don't keep shuffling
+        tabsRecycler.itemAnimator = null
+
+        browserModeToggle?.setMode(newMode)
+        viewModel.onBrowserModeToggled(newMode)
+
+        // Fallback for the degenerate case where both modes have an empty list
+        tabsRecycler.postDelayed(::revealNewMode, FADE_IN_FALLBACK_MS)
+    }
+
+    private fun revealNewMode() {
+        val state = modeSwitch ?: return
+        modeSwitch = null
+        tabsRecycler.itemAnimator = DefaultItemAnimator()
+
+        tabsRecycler.animate()
+            .alpha(1f)
+            .setDuration(FADE_DURATION_MS)
+            .start()
+        state.overlay?.animate()
+            ?.alpha(0f)
+            ?.setDuration(FADE_DURATION_MS)
+            ?.withEndAction { tabsContainer.removeView(state.overlay) }
+            ?.start()
     }
 
     private fun updateToolbarTitle(
@@ -432,18 +491,17 @@ class TabSwitcherActivity :
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
 
-                if (lastObservedBrowserMode != null && lastObservedBrowserMode != it.browserMode) {
-                    scrollToActiveTabOnNextUpdate = true
-                }
-                lastObservedBrowserMode = it.browserMode
-
-                val shouldScroll = (firstTimeLoadingTabsList || scrollToActiveTabOnNextUpdate) && it.tabs.isNotEmpty()
+                val staleItems = modeSwitch?.staleItems
+                val freshAfterModeSwitch = staleItems != null && it.tabSwitcherItems !== staleItems
+                val shouldScroll = it.tabs.isNotEmpty() && (firstTimeLoadingTabsList || freshAfterModeSwitch)
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
                     if (shouldScroll) {
                         firstTimeLoadingTabsList = false
-                        scrollToActiveTabOnNextUpdate = false
                         scrollToActiveTab(it.tabSwitcherItems)
+                    }
+                    if (freshAfterModeSwitch) {
+                        tabsRecycler.post(::revealNewMode)
                     }
                 }
 
@@ -961,5 +1019,7 @@ class TabSwitcherActivity :
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
+        private const val FADE_DURATION_MS = 180L
+        private const val FADE_IN_FALLBACK_MS = 1200L
     }
 }
