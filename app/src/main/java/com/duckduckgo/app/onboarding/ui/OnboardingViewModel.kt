@@ -133,6 +133,6 @@ class OnboardingViewModel @Inject constructor(
     enum class ExtendedOnboardingFlow {
         DEFAULT,
         DUCK_AI_FOCUSED,
-        DEFAULT_WITHOUT_INTRO_CTA
+        DEFAULT_WITHOUT_INTRO_CTA,
     }
 }
