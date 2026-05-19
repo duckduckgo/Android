@@ -223,7 +223,7 @@ class ModelPickerViewModelTest {
             testee.onModelTapped(model, PickerSurface.ADDRESS_BAR)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchPurchase("funnel_nativeinput_androidapp__modelpicker"),
+                ModelPickerViewModel.Command.LaunchPurchase(PickerSurface.ADDRESS_BAR.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -239,7 +239,7 @@ class ModelPickerViewModelTest {
             testee.onModelTapped(model, PickerSurface.DUCK_AI_TAB)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchPurchase("funnel_duckai_androidapp__modelpicker"),
+                ModelPickerViewModel.Command.LaunchPurchase(PickerSurface.DUCK_AI_TAB.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -255,7 +255,7 @@ class ModelPickerViewModelTest {
             testee.onModelTapped(model, PickerSurface.ADDRESS_BAR)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchUpgrade("funnel_nativeinput_androidapp__modelpicker"),
+                ModelPickerViewModel.Command.LaunchUpgrade(PickerSurface.ADDRESS_BAR.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -271,7 +271,7 @@ class ModelPickerViewModelTest {
             testee.onModelTapped(model, PickerSurface.DUCK_AI_TAB)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchUpgrade("funnel_duckai_androidapp__modelpicker"),
+                ModelPickerViewModel.Command.LaunchUpgrade(PickerSurface.DUCK_AI_TAB.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
