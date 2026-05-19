@@ -69,8 +69,8 @@ class BrowserModeToggleView @JvmOverloads constructor(
         clipToPadding = false
         elevation = OUTER_ELEVATION_DP.toPx(context).toFloat()
 
-        binding.fireSegment.setOnClickListener { dispatchUserSelection(BrowserMode.FIRE) }
-        binding.regularSegment.setOnClickListener { dispatchUserSelection(BrowserMode.REGULAR) }
+        binding.fireSegment.setOnClickListener { dispatchToggle() }
+        binding.regularSegment.setOnClickListener { dispatchToggle() }
     }
 
     fun setMode(mode: BrowserMode) {
@@ -169,9 +169,12 @@ class BrowserModeToggleView @JvmOverloads constructor(
         }
     }
 
-    private fun dispatchUserSelection(mode: BrowserMode) {
-        if (mode == currentMode) return
-        listener?.invoke(mode)
+    private fun dispatchToggle() {
+        val target = when (currentMode) {
+            BrowserMode.FIRE -> BrowserMode.REGULAR
+            BrowserMode.REGULAR, null -> BrowserMode.FIRE
+        }
+        listener?.invoke(target)
     }
 
     private companion object {
