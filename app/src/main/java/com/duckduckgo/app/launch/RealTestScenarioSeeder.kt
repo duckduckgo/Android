@@ -22,28 +22,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-interface TestScenarioSeeder {
-    suspend fun seedIfNeeded(
-        isMaestroExtra: String?,
-        scenarioKey: String?,
-        omnibarPosition: String?,
-        nativeInputToggle: String?,
-        inputScreenWithAI: String?,
-    )
-
-    companion object {
-        const val EXTRA_IS_MAESTRO = "isMaestro"
-        const val EXTRA_TEST_SCENARIO = "testScenario"
-        const val EXTRA_OMNIBAR_POSITION = "omnibarPosition"
-        const val EXTRA_NATIVE_INPUT_TOGGLE = "nativeInputToggle"
-        const val EXTRA_INPUT_WITH_AI_TOGGLE = "inputWithAiToggle"
-    }
-}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

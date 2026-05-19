@@ -27,6 +27,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule

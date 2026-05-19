@@ -28,6 +28,7 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companio
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.testseeder.api.TestScenarioSeeder
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
