@@ -25,10 +25,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -67,7 +69,8 @@ import com.duckduckgo.mobile.android.R
  * @param onDismiss Optional dismiss callback. When non-null, a close button is rendered in
  *   the top-end corner and invokes this callback on tap.
  *
- * Asana Task: https://app.asana.com/1/137249556945/project/1211724162604201/task/1211659112661253
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214491893546827?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=17708-27286&m=dev
  */
 @Composable
 internal fun DaxMessage(
@@ -151,6 +154,7 @@ internal fun DaxMessage(
     }
 }
 
+@Stable
 enum class DaxMessageContentAlignment {
     Start,
     Center,
@@ -179,13 +183,14 @@ sealed interface DaxMessageActions {
 }
 
 /** A single button entry used by [DaxMessageActions]. */
+@Immutable
 data class DaxAction(
     val text: String,
     val onClick: () -> Unit,
 )
 
 private object DaxMessageDefaults {
-    val shape: Shape = RoundedCornerShape(0.dp)
+    val shape: Shape = RectangleShape
     val elevation: Dp = 0.dp
 }
 

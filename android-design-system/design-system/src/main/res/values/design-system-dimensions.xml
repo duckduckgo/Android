@@ -147,6 +147,8 @@
 
     <!-- Dax Remote Message -->
     <dimen name="remoteMessageCardImageSize">48dp</dimen>
+    <dimen name="promoMessageCardIllustrationMaxWidth">256dp</dimen>
+    <dimen name="promoMessageCardIllustrationMaxHeight">144dp</dimen>
 
     <!-- Slider -->
     <dimen name="sliderTrackHeight">6dp</dimen>

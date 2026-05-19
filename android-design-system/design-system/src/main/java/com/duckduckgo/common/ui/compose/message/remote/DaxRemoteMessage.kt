@@ -145,9 +145,9 @@ internal fun DaxRemoteMessage(
         title = title,
         body = body,
         elevation = dimensionResource(R.dimen.keyline_1),
-        topContent = topIllustration?.let { { it() } },
+        topContent = topIllustration,
         onDismiss = onDismissClicked,
-        modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
+        modifier = modifier,
         actions = actions,
         shape = DuckDuckGoTheme.shapes.large,
     )
@@ -161,6 +161,7 @@ private fun DaxRemoteMessagePreview() {
             title = "Remote Message",
             body = "Body text goes here.",
             onDismissClicked = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }
@@ -174,6 +175,7 @@ private fun DaxRemoteMessageWithIllustrationPreview() {
             body = "Body text goes here.",
             topIllustration = painterResource(R.drawable.ic_critical_update),
             onDismissClicked = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }

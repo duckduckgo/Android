@@ -16,9 +16,11 @@
 
 package com.duckduckgo.common.ui.compose.message.remote
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -62,6 +64,7 @@ private fun DaxMediumMessagePreview() {
             body = "Body text goes here. This component doesn't have buttons",
             topIllustration = painterResource(R.drawable.ic_critical_update),
             onDismissed = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }

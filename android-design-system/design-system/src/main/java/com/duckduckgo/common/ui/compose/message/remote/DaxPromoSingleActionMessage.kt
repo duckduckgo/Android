@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxCardElevation
+import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -50,12 +52,14 @@ import com.duckduckgo.mobile.android.R
  *
  * @param title The message title.
  * @param body The message body text.
- * @param illustration The illustration shown between title and body. Drawn at its
- *   intrinsic size with [ContentScale.Fit]. Use
- *   [painterResource] for a local drawable, or
+ * @param illustration The illustration shown between title and body. Drawn with
+ *   [ContentScale.Fit] inside a 256dp × 144dp max box so remote images can't break
+ *   the card layout. Use [painterResource] for a local drawable, or
  *   `coil3.compose.rememberAsyncImagePainter` for a remote URL.
- * @param actionText The label of the primary action button.
- * @param onActionClick Called when the user taps the primary action.
+ * @param illustrationContentDescription Accessibility description for [illustration].
+ *   Pass `null` only if the illustration is purely decorative and adds no information
+ *   beyond [title] and [body].
+ * @param action The primary call-to-action.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  */
@@ -64,17 +68,13 @@ fun DaxPromoSingleActionMessage(
     title: String,
     body: String,
     illustration: Painter,
-    actionText: String,
-    onActionClick: () -> Unit,
+    illustrationContentDescription: String?,
+    action: DaxAction,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DaxCard(
-        modifier = modifier.padding(
-            start = dimensionResource(R.dimen.keyline_4),
-            end = dimensionResource(R.dimen.keyline_4),
-            bottom = dimensionResource(R.dimen.keyline_4),
-        ),
+        modifier = modifier,
         elevation = DaxCardElevation(dimensionResource(R.dimen.keyline_1)),
         shape = DuckDuckGoTheme.shapes.large,
     ) {
@@ -100,8 +100,12 @@ fun DaxPromoSingleActionMessage(
             )
             Image(
                 painter = illustration,
-                contentDescription = null,
+                contentDescription = illustrationContentDescription,
                 contentScale = ContentScale.Fit,
+                modifier = Modifier.sizeIn(
+                    maxWidth = dimensionResource(R.dimen.promoMessageCardIllustrationMaxWidth),
+                    maxHeight = dimensionResource(R.dimen.promoMessageCardIllustrationMaxHeight),
+                ),
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_2)))
             DaxText(
@@ -114,8 +118,8 @@ fun DaxPromoSingleActionMessage(
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.keyline_4)))
             DaxPrimaryButton(
-                text = actionText,
-                onClick = onActionClick,
+                text = action.text,
+                onClick = action.onClick,
                 size = DaxButtonSize.Small,
                 leadingIconPainter = painterResource(R.drawable.ic_share_android_16),
                 modifier = Modifier
@@ -132,11 +136,16 @@ private fun DaxPromoSingleActionMessagePreview() {
     PreviewBox {
         DaxPromoSingleActionMessage(
             title = "Promo Single Action Message",
-            body = "Body text goes here. This component has two buttons and showcases and app update",
+            body = "Body text goes here. This component has two buttons and showcases an app update",
             illustration = painterResource(R.drawable.promo_mac_and_windows),
-            actionText = "Promo Link",
-            onActionClick = {},
+            illustrationContentDescription = null,
+            action = DaxAction(text = "Promo Link", onClick = {}),
             onDismissed = {},
+            modifier = Modifier.padding(
+                start = dimensionResource(R.dimen.keyline_4),
+                end = dimensionResource(R.dimen.keyline_4),
+                bottom = dimensionResource(R.dimen.keyline_4),
+            ),
         )
     }
 }

@@ -33,6 +33,9 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * @param primaryAction The primary call-to-action.
  * @param secondaryAction The secondary ghost action.
  * @param modifier Modifier for this message card.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/task/1214931438529739
+ * Figma Reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=14379-111153&m=dev
  */
 @Composable
 fun DaxBannerMessage(

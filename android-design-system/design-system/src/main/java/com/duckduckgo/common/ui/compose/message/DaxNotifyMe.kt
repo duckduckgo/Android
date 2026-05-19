@@ -36,9 +36,12 @@ import com.duckduckgo.mobile.android.R
  * @param primaryAction The primary call-to-action (e.g. "Notify me").
  * @param secondaryAction The secondary ghost action (e.g. "Not now").
  * @param modifier Modifier for this message card.
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/task/1214931438529738
+ * Figma Reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=17708-27293&m=dev
  */
 @Composable
-fun NotifyMe(
+fun DaxNotifyMe(
     title: String,
     body: String,
     primaryAction: DaxAction,
@@ -51,7 +54,7 @@ fun NotifyMe(
         elevation = dimensionResource(R.dimen.keyline_1),
         shape = DuckDuckGoTheme.shapes.large,
         contentAlignment = DaxMessageContentAlignment.Start,
-        modifier = modifier.padding(dimensionResource(R.dimen.keyline_4)),
+        modifier = modifier,
         actions = DaxMessageActions.RightAligned(
             primary = primaryAction,
             secondary = secondaryAction,
@@ -61,9 +64,9 @@ fun NotifyMe(
 
 @PreviewLightDark
 @Composable
-private fun DaxBannerMessagePreview() {
+private fun DaxNotifyMePreview() {
     PreviewBox {
-        NotifyMe(
+        DaxNotifyMe(
             title = "Keep an eye on blocked trackers",
             body = "Get updates about blocked tracking attempts in your notification drawer.",
             primaryAction = DaxAction(
@@ -74,6 +77,7 @@ private fun DaxBannerMessagePreview() {
                 text = "Not now",
                 onClick = {},
             ),
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }

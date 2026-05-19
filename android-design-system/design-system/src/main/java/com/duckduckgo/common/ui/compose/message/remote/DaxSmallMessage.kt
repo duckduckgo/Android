@@ -16,10 +16,13 @@
 
 package com.duckduckgo.common.ui.compose.message.remote
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
+import com.duckduckgo.mobile.android.R
 
 /**
  * DuckDuckGo small remote message card.
@@ -54,6 +57,7 @@ private fun DaxSmallMessagePreview() {
             title = "Small Message",
             body = "Body text goes here. This component doesn't have buttons",
             onDismissed = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }

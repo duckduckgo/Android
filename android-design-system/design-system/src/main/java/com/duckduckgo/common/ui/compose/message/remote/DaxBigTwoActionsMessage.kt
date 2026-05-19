@@ -16,9 +16,11 @@
 
 package com.duckduckgo.common.ui.compose.message.remote
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.message.DaxAction
@@ -36,10 +38,8 @@ import com.duckduckgo.mobile.android.R
  * @param body The message body text.
  * @param topIllustration The illustration shown above the title. Use [painterResource]
  *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
- * @param primaryActionText The label of the primary action button.
- * @param onPrimaryActionClick Called when the user taps the primary action.
- * @param secondaryActionText The label of the secondary (ghost) action button.
- * @param onSecondaryActionClick Called when the user taps the secondary action.
+ * @param primaryAction The primary call-to-action.
+ * @param secondaryAction The secondary ghost action.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  */
@@ -48,10 +48,8 @@ fun DaxBigTwoActionsMessage(
     title: String,
     body: String,
     topIllustration: Painter,
-    primaryActionText: String,
-    onPrimaryActionClick: () -> Unit,
-    secondaryActionText: String,
-    onSecondaryActionClick: () -> Unit,
+    primaryAction: DaxAction,
+    secondaryAction: DaxAction,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,14 +60,8 @@ fun DaxBigTwoActionsMessage(
         modifier = modifier,
         onDismissClicked = onDismissed,
         actions = DaxMessageActions.CenterAligned(
-            primary = DaxAction(
-                text = primaryActionText,
-                onClick = onPrimaryActionClick,
-            ),
-            secondary = DaxAction(
-                text = secondaryActionText,
-                onClick = onSecondaryActionClick,
-            ),
+            primary = primaryAction,
+            secondary = secondaryAction,
         ),
     )
 }
@@ -80,13 +72,12 @@ private fun DaxBigTwoActionsMessagePreview() {
     PreviewBox {
         DaxBigTwoActionsMessage(
             title = "Big Two Actions Message",
-            body = "Body text goes here. This component has two buttons and showcases and app update",
+            body = "Body text goes here. This component has two buttons and showcases an app update",
             topIllustration = painterResource(R.drawable.ic_app_update),
-            primaryActionText = "Action",
-            secondaryActionText = "Secondary",
-            onPrimaryActionClick = {},
-            onSecondaryActionClick = {},
+            primaryAction = DaxAction(text = "Action", onClick = {}),
+            secondaryAction = DaxAction(text = "Secondary", onClick = {}),
             onDismissed = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }

@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +45,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxMediumMessage
@@ -149,7 +151,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             val bigTwoActionsUpdateMessage = Message(
                 topIllustration = CommonR.drawable.ic_app_update,
                 title = "Big Two Actions Message",
-                subtitle = "Body text goes here. This component has two buttons and showcases and app update",
+                subtitle = "Body text goes here. This component has two buttons an showcases and app update",
                 action = "Primary",
                 action2 = "Secondary",
             )
@@ -197,11 +199,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     title = "Promo Single Action Message",
                     body = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                     illustration = painterResource(CommonR.drawable.promo_mac_and_windows),
-                    actionText = "Promo Link",
-                    onActionClick = {},
+                    illustrationContentDescription = null,
+                    action = DaxAction(text = "Promo Link", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.promo_single_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(
+                        start = dimensionResource(CommonR.dimen.keyline_4),
+                        end = dimensionResource(CommonR.dimen.keyline_4),
+                        bottom = dimensionResource(CommonR.dimen.keyline_4),
+                    ),
                 )
             }
 
@@ -212,6 +219,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.small_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -223,6 +231,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.medium_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -231,11 +240,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     topIllustration = painterResource(CommonR.drawable.ic_announce),
                     title = "Compose Big Single Message",
                     body = "Body text goes here. This component has one button",
-                    actionText = "Primary",
-                    onActionClick = {},
+                    action = DaxAction(text = "Primary", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_single_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -256,11 +265,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     },
                     title = "Bring your passwords from Google to DuckDuckGo",
                     body = "Quickly and securely import your passwords to DuckDuckGo. Google may ask you to enter your password.",
-                    actionText = "Import From Google",
-                    onActionClick = {},
+                    action = DaxAction(text = "Import From Google", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_single_lottie_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -269,13 +278,12 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     topIllustration = painterResource(CommonR.drawable.ic_ddg_announce),
                     title = "Compose Big Two Actions",
                     body = "Body text goes here. This component has two buttons",
-                    primaryActionText = "Primary",
-                    secondaryActionText = "Secondary",
-                    onPrimaryActionClick = {},
-                    onSecondaryActionClick = {},
+                    primaryAction = DaxAction(text = "Primary", onClick = {}),
+                    secondaryAction = DaxAction(text = "Secondary", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_two_actions_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -283,14 +291,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 DaxBigTwoActionsMessage(
                     topIllustration = painterResource(CommonR.drawable.ic_app_update),
                     title = "Compose Big Two Actions",
-                    body = "Body text goes here. This component has two buttons and showcases and app update",
-                    primaryActionText = "Primary",
-                    secondaryActionText = "Secondary",
-                    onPrimaryActionClick = {},
-                    onSecondaryActionClick = {},
+                    body = "Body text goes here. This component has two buttons an showcases and app update",
+                    primaryAction = DaxAction(text = "Primary", onClick = {}),
+                    secondaryAction = DaxAction(text = "Secondary", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_two_actions_update_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
 
@@ -302,14 +309,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                         fallback = painterResource(CommonR.drawable.ic_app_update),
                     ),
                     title = "Compose Remote Image",
-                    body = "Body text goes here. This component has two buttons and showcases and app update",
-                    primaryActionText = "Primary",
-                    secondaryActionText = "Secondary",
-                    onPrimaryActionClick = {},
-                    onSecondaryActionClick = {},
+                    body = "Body text goes here. This component has two buttons an showcases and app update",
+                    primaryAction = DaxAction(text = "Primary", onClick = {}),
+                    secondaryAction = DaxAction(text = "Secondary", onClick = {}),
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_two_actions_server_image_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }
         }

@@ -17,9 +17,11 @@
 package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.message.DaxAction
@@ -40,8 +42,7 @@ import com.duckduckgo.mobile.android.R
  * @param body The message body text.
  * @param topIllustration Composable slot rendered above the title. Receives a [ColumnScope]
  *   so the content can use `Modifier.align(...)` if needed.
- * @param actionText The label of the primary action button.
- * @param onActionClick Called when the user taps the primary action.
+ * @param action The primary action button.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  */
@@ -50,8 +51,7 @@ fun DaxBigSingleActionMessage(
     title: String,
     body: String,
     topIllustration: @Composable ColumnScope.() -> Unit,
-    actionText: String,
-    onActionClick: () -> Unit,
+    action: DaxAction,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,12 +61,7 @@ fun DaxBigSingleActionMessage(
         onDismissClicked = onDismissed,
         modifier = modifier,
         topIllustration = topIllustration,
-        actions = DaxMessageActions.SmallSingle(
-            primary = DaxAction(
-                text = actionText,
-                onClick = onActionClick,
-            ),
-        ),
+        actions = DaxMessageActions.SmallSingle(primary = action),
     )
 }
 
@@ -76,12 +71,14 @@ fun DaxBigSingleActionMessage(
  * Variant with a top illustration, title, body, one primary action button, and a dismiss
  * button.
  *
+ * Callers are responsible for any outer spacing — pass the desired padding through
+ * [modifier] (e.g. `Modifier.padding(...)`).
+ *
  * @param title The message title.
  * @param body The message body text.
  * @param topIllustration The illustration shown above the title. Use [painterResource]
  *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
- * @param actionText The label of the primary action button.
- * @param onActionClick Called when the user taps the primary action.
+ * @param action The primary action button.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
  */
@@ -90,8 +87,7 @@ fun DaxBigSingleActionMessage(
     title: String,
     body: String,
     topIllustration: Painter,
-    actionText: String,
-    onActionClick: () -> Unit,
+    action: DaxAction,
     onDismissed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -101,12 +97,7 @@ fun DaxBigSingleActionMessage(
         modifier = modifier,
         topIllustration = topIllustration,
         onDismissClicked = onDismissed,
-        actions = DaxMessageActions.SmallSingle(
-            primary = DaxAction(
-                text = actionText,
-                onClick = onActionClick,
-            ),
-        ),
+        actions = DaxMessageActions.SmallSingle(primary = action),
     )
 }
 
@@ -118,9 +109,9 @@ private fun DaxBigSingleActionMessagePreview() {
             title = "Big Single Message",
             body = "Body text goes here. This component has one button",
             topIllustration = painterResource(R.drawable.ic_ddg_announce),
-            actionText = "Action",
-            onActionClick = {},
+            action = DaxAction(text = "Action", onClick = {}),
             onDismissed = {},
+            modifier = Modifier.padding(dimensionResource(R.dimen.keyline_4)),
         )
     }
 }
