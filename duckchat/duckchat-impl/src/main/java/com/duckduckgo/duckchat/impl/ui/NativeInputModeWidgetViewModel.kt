@@ -160,6 +160,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
+        // null = follow the context-derived default; non-null = user (or widget) has set it explicitly
+        // via setToggleSelection. Reset to null on every configure(), then driven by the widget's
+        // TabLayout listener.
+        val toggleSelection: NativeInputState.ToggleSelection? = null,
     )
 
     private val widgetConfig = MutableStateFlow(WidgetConfig())
@@ -172,12 +176,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         duckChatInternal.observeInputScreenUserSettingEnabled(),
         widgetConfig,
         activeTabId.filterNotNull(),
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, tabId ->
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, _ ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
-            tabId = tabId,
+            toggleSelection = config.toggleSelection ?: NativeInputState.defaultToggleFor(config.inputContext),
         )
     }.shareIn(
         scope = viewModelScope,
@@ -190,17 +194,22 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         // later by typed host methods) untouched across widget emissions. This keeps the widget VM
         // the single writer for its fields without clobbering anything the publisher.update path
         // wrote on behalf of a plugin.
+        //
+        // Pair each state with the active tabId via combine so the publish target is captured at
+        // emission time rather than read separately from activeTabId.value (which could shift
+        // between emission and read on a fast tab switch).
         viewModelScope.launch {
-            state.collect { snapshot ->
-                nativeInputStatePublisher.update(snapshot.tabId) { current ->
-                    current.copy(
-                        inputMode = snapshot.inputMode,
-                        inputContext = snapshot.inputContext,
-                        inputPosition = snapshot.inputPosition,
-                        tabId = snapshot.tabId,
-                    )
+            combine(state, activeTabId.filterNotNull()) { snapshot, tabId -> tabId to snapshot }
+                .collect { (tabId, snapshot) ->
+                    nativeInputStatePublisher.update(tabId) { current ->
+                        current.copy(
+                            inputMode = snapshot.inputMode,
+                            inputContext = snapshot.inputContext,
+                            inputPosition = snapshot.inputPosition,
+                            toggleSelection = snapshot.toggleSelection,
+                        )
+                    }
                 }
-            }
         }
     }
 
@@ -231,6 +240,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun setWidgetPosition(isBottom: Boolean) {
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.update { it.copy(inputPosition = position) }
+    }
+
+    fun setToggleSelection(selection: NativeInputState.ToggleSelection) {
+        widgetConfig.update { it.copy(toggleSelection = selection) }
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {

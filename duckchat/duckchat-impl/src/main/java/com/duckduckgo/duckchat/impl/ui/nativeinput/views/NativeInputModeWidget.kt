@@ -531,7 +531,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
-        val targetIndex = if (state.defaultToggleSelection == NativeInputState.ToggleSelection.DUCK_AI) 1 else 0
+        val targetIndex = if (state.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI) 1 else 0
         if (toggle.selectedTabPosition != targetIndex) {
             toggle.getTabAt(targetIndex)?.select()
         }

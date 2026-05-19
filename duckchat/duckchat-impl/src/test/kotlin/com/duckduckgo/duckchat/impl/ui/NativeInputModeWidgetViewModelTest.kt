@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
@@ -235,12 +236,12 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiThenDefaultToggleSelectionIsDuckAi() = runTest {
         testee.setDuckAiMode(true)
 
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
     fun whenContextIsBrowserThenDefaultToggleSelectionIsSearch() = runTest {
-        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
@@ -272,7 +273,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
         testee.configureContextual(tabId = "test-tab")
 
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
@@ -777,6 +778,30 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+    }
+
+    // endregion
+
+    // region setToggleSelection
+
+    @Test
+    fun whenSetToggleSelectionThenStateReflectsTheSelection() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+
+        val emitted = testee.state.first()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, emitted.toggleSelection)
+    }
+
+    @Test
+    fun whenConfigureCalledThenToggleSelectionFallsBackToContextDefault() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+        testee.state.first { it.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI }
+
+        testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
+
+        val emitted = testee.state.first()
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, emitted.toggleSelection)
     }
 
     // endregion

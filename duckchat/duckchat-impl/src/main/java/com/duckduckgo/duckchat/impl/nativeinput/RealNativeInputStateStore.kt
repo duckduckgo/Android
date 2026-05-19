@@ -82,5 +82,5 @@ class RealNativeInputStateStore @Inject constructor(
     // value. The native input widget overwrites it on configure, so observers should never see this
     // placeholder in practice.
     private fun flowFor(tabId: String): MutableStateFlow<NativeInputState> =
-        flows.computeIfAbsent(tabId) { MutableStateFlow(NativeInputState.zero(tabId)) }
+        flows.computeIfAbsent(tabId) { MutableStateFlow(NativeInputState.zero()) }
 }

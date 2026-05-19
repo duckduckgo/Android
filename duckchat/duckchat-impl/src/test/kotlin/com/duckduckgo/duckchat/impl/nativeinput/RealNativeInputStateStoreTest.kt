@@ -68,7 +68,7 @@ class RealNativeInputStateStoreTest {
     fun whenStateForTabCalledWithoutPriorPublishThenZeroStateReturned() {
         val state = testee.stateForTab("tab-a").value
 
-        assertEquals(NativeInputState.zero("tab-a"), state)
+        assertEquals(NativeInputState.zero(), state)
     }
 
     @Test
@@ -76,7 +76,6 @@ class RealNativeInputStateStoreTest {
         val published = NativeInputState(
             inputMode = InputMode.SEARCH_ONLY,
             inputContext = InputContext.DUCK_AI,
-            tabId = "tab-a",
         )
 
         testee.publish("tab-a", published)
@@ -93,7 +92,6 @@ class RealNativeInputStateStoreTest {
             NativeInputState(
                 inputMode = InputMode.SEARCH_ONLY,
                 inputContext = InputContext.DUCK_AI,
-                tabId = "tab-a",
             ),
         )
 
@@ -107,7 +105,6 @@ class RealNativeInputStateStoreTest {
             NativeInputState(
                 inputMode = InputMode.SEARCH_ONLY,
                 inputContext = InputContext.BROWSER,
-                tabId = "tab-a",
             ),
         )
 
@@ -131,13 +128,12 @@ class RealNativeInputStateStoreTest {
             NativeInputState(
                 inputMode = InputMode.SEARCH_ONLY,
                 inputContext = InputContext.DUCK_AI,
-                tabId = "tab-a",
             ),
         )
 
         testee.clearTab("tab-a")
 
-        assertEquals(NativeInputState.zero("tab-a"), testee.stateForTab("tab-a").value)
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-a").value)
     }
 
     @Test
@@ -145,7 +141,6 @@ class RealNativeInputStateStoreTest {
         val stateB = NativeInputState(
             inputMode = InputMode.SEARCH_ONLY,
             inputContext = InputContext.DUCK_AI,
-            tabId = "tab-b",
         )
         testee.publish("tab-b", stateB)
 
@@ -161,7 +156,6 @@ class RealNativeInputStateStoreTest {
             NativeInputState(
                 inputMode = InputMode.SEARCH_ONLY,
                 inputContext = InputContext.DUCK_AI,
-                tabId = "tab-a",
             ),
         )
         testee.publish(
@@ -169,14 +163,13 @@ class RealNativeInputStateStoreTest {
             NativeInputState(
                 inputMode = InputMode.SEARCH_ONLY,
                 inputContext = InputContext.DUCK_AI,
-                tabId = "tab-b",
             ),
         )
 
         testee.clearAll()
 
-        assertEquals(NativeInputState.zero("tab-a"), testee.stateForTab("tab-a").value)
-        assertEquals(NativeInputState.zero("tab-b"), testee.stateForTab("tab-b").value)
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-a").value)
+        assertEquals(NativeInputState.zero(), testee.stateForTab("tab-b").value)
     }
 
     @Test
@@ -184,7 +177,6 @@ class RealNativeInputStateStoreTest {
         val published = NativeInputState(
             inputMode = InputMode.SEARCH_ONLY,
             inputContext = InputContext.DUCK_AI,
-            tabId = "tab-a",
         )
         testee.publish("tab-a", published)
         selectedTabFlow.value = tabEntity("tab-a")
@@ -200,12 +192,10 @@ class RealNativeInputStateStoreTest {
         val stateA = NativeInputState(
             inputMode = InputMode.SEARCH_AND_DUCK_AI,
             inputContext = InputContext.BROWSER,
-            tabId = "tab-a",
         )
         val stateB = NativeInputState(
             inputMode = InputMode.SEARCH_ONLY,
             inputContext = InputContext.DUCK_AI,
-            tabId = "tab-b",
         )
         testee.publish("tab-a", stateA)
         testee.publish("tab-b", stateB)
@@ -226,7 +216,6 @@ class RealNativeInputStateStoreTest {
         val initial = NativeInputState(
             inputMode = InputMode.SEARCH_AND_DUCK_AI,
             inputContext = InputContext.BROWSER,
-            tabId = "tab-a",
         )
         testee.publish("tab-a", initial)
         selectedTabFlow.value = tabEntity("tab-a")
