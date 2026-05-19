@@ -293,6 +293,7 @@ dependencies {
 	implementation project(":duckchat-impl")
 	implementation project(":duckchat-store")
 	implementation project(":test-seeder-api")
+	internalImplementation project(":test-seeder-internal")
 	implementation project(":data-clearing-api")
 	implementation project(":data-clearing-impl")
 	internalImplementation project(":duckchat-internal")

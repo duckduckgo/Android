@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.launch
+package com.duckduckgo.testseeder.internal
 
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 
