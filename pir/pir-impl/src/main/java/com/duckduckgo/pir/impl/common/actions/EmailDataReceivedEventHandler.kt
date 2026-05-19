@@ -42,6 +42,7 @@ class EmailDataReceivedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
+                actionRetryCount = 0,
                 emailExtractedData = actualEvent.emailExtractedData,
             ),
             nextEvent = ExecuteBrokerStepAction(
