@@ -22,7 +22,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -41,24 +40,18 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class, boundType = NativeInputStateProvider::class)
 @ContributesBinding(AppScope::class, boundType = NativeInputStatePublisher::class)
 class RealNativeInputStateStore @Inject constructor(
-    // Lazy avoids a Dagger cycle: TabRepository's impl (TabDataRepository) injects
-    // NativeInputStatePublisher to clearTab on tab eviction. Resolving TabRepository
-    // lazily lets Dagger construct both without circularity. The lazy is only
-    // dereferenced when `state` is collected for the first time.
-    private val tabRepository: Lazy<TabRepository>,
+    private val tabRepository: TabRepository,
 ) :
     NativeInputStateProvider,
     NativeInputStatePublisher {
 
     private val flows = ConcurrentHashMap<String, MutableStateFlow<NativeInputState>>()
 
-    override val state: Flow<NativeInputState> by lazy {
-        tabRepository.get().flowSelectedTab
-            .filterNotNull()
-            .map { it.tabId }
-            .distinctUntilChanged()
-            .flatMapLatest { flowFor(it) }
-    }
+    override val state: Flow<NativeInputState> = tabRepository.flowSelectedTab
+        .filterNotNull()
+        .map { it.tabId }
+        .distinctUntilChanged()
+        .flatMapLatest { flowFor(it) }
 
     override fun stateForTab(tabId: String): StateFlow<NativeInputState> = flowFor(tabId)
 

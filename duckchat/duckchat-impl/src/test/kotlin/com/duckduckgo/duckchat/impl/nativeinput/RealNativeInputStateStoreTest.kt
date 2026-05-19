@@ -44,9 +44,8 @@ class RealNativeInputStateStoreTest {
     private val tabRepository: TabRepository = mock<TabRepository>().also {
         whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
     }
-    private val lazyTabRepository: dagger.Lazy<TabRepository> = dagger.Lazy { tabRepository }
 
-    private val testee = RealNativeInputStateStore(lazyTabRepository)
+    private val testee = RealNativeInputStateStore(tabRepository)
 
     @Test
     fun whenStateForTabCalledTwiceForSameTabThenSameFlowReturned() {
