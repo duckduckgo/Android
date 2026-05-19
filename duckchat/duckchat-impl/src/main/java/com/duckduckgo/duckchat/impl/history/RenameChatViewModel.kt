@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.FragmentScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -39,9 +40,14 @@ class RenameChatViewModel @Inject constructor(
 
     fun onSaveClicked(chatId: String, newTitle: String) {
         appScope.launch {
-            runCatching { chatHistoryRepository.renameChat(chatId, newTitle.trim()) }
-                .onSuccess { resultChannel.trySend(RenameResult.Success) }
-                .onFailure { error -> resultChannel.trySend(RenameResult.Error(error)) }
+            try {
+                chatHistoryRepository.renameChat(chatId, newTitle.trim())
+                resultChannel.trySend(RenameResult.Success)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                resultChannel.trySend(RenameResult.Error(e))
+            }
         }
     }
 
