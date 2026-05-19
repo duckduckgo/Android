@@ -100,6 +100,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun setText(text: String)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -151,6 +152,12 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setPickingImage(picking: Boolean) {
         isPickingImage = picking
+    }
+
+    override fun setText(text: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.text = text
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
