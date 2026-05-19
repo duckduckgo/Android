@@ -38,7 +38,6 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
@@ -46,6 +45,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -73,7 +73,6 @@ class TabDataRepository @Inject constructor(
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
-    private val nativeInputStatePublisher: NativeInputStatePublisher,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -83,6 +82,12 @@ class TabDataRepository @Inject constructor(
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
     override val childClosedTabs = childTabClosedSharedFlow.asSharedFlow()
+
+    private val deletedTabsSharedFlow = MutableSharedFlow<String>()
+    override val deletedTabs: SharedFlow<String> = deletedTabsSharedFlow.asSharedFlow()
+
+    private val allTabsDeletedSharedFlow = MutableSharedFlow<Unit>()
+    override val allTabsDeleted: SharedFlow<Unit> = allTabsDeletedSharedFlow.asSharedFlow()
 
     // We only want the new emissions when subscribing, however Room does not honour that contract so we
     // need to drop the first emission always (this is equivalent to the Observable semantics)
@@ -340,7 +345,7 @@ class TabDataRepository @Inject constructor(
         }
         siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
-        nativeInputStatePublisher.clearTab(tab.tabId)
+        deletedTabsSharedFlow.emit(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -350,7 +355,7 @@ class TabDataRepository @Inject constructor(
         }
         tabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
-            nativeInputStatePublisher.clearTab(it)
+            deletedTabsSharedFlow.emit(it)
         }
     }
 
@@ -361,7 +366,7 @@ class TabDataRepository @Inject constructor(
             clearAllSiteData(listOf(tabId))
         }
         tabVisitedSitesRepository.clearTab(tabId)
-        nativeInputStatePublisher.clearTab(tabId)
+        deletedTabsSharedFlow.emit(tabId)
     }
 
     private fun clearAllSiteData(tabIds: List<String>) {
@@ -407,7 +412,7 @@ class TabDataRepository @Inject constructor(
         clearAllSiteData(deletableTabIds)
         deletableTabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
-            nativeInputStatePublisher.clearTab(it)
+            deletedTabsSharedFlow.emit(it)
         }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
@@ -440,7 +445,7 @@ class TabDataRepository @Inject constructor(
             }
         }
         tabVisitedSitesRepository.clearTab(tabId)
-        nativeInputStatePublisher.clearTab(tabId)
+        deletedTabsSharedFlow.emit(tabId)
     }
 
     override suspend fun deleteAll() {
@@ -453,7 +458,7 @@ class TabDataRepository @Inject constructor(
         siteData.clear()
         duckChatContextualDataStore.clearAll()
         tabVisitedSitesRepository.clearAll()
-        nativeInputStatePublisher.clearAll()
+        allTabsDeletedSharedFlow.emit(Unit)
     }
 
     override suspend fun getSelectedTab(): TabEntity? =

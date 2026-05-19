@@ -1074,6 +1074,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             get() = TODO("Not yet implemented")
         override val childClosedTabs: SharedFlow<String>
             get() = TODO("Not yet implemented")
+        override val deletedTabs: SharedFlow<String>
+            get() = TODO("Not yet implemented")
+        override val allTabsDeleted: SharedFlow<Unit>
+            get() = TODO("Not yet implemented")
         override val flowDeletableTabs: Flow<List<TabEntity>>
             get() = TODO("Not yet implemented")
         override val liveSelectedTab: LiveData<TabEntity>

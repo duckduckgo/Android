@@ -43,12 +43,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import app.cash.turbine.test
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
@@ -109,8 +109,6 @@ class TabDataRepositoryTest {
     private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
 
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
-
-    private val mockNativeInputStatePublisher: NativeInputStatePublisher = mock()
 
     @After
     fun after() {
@@ -249,7 +247,6 @@ class TabDataRepositoryTest {
         verify(mockWebViewSessionStorage).deleteAllSessions()
         verify(mockDuckChatContextualDataStore).clearAll()
         verify(mockTabVisitedSitesRepository).clearAll()
-        verify(mockNativeInputStatePublisher).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
 
@@ -651,7 +648,6 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
-            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -670,7 +666,6 @@ class TabDataRepositoryTest {
             verify(mockAdClickManager).clearTabId(tabId)
             verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
-            verify(mockNativeInputStatePublisher).clearTab(tabId)
         }
     }
 
@@ -762,7 +757,6 @@ class TabDataRepositoryTest {
         }
         verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
         verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
-        verify(mockNativeInputStatePublisher).clearTab(TAB_ID)
     }
 
     private fun tabDataRepository(
@@ -778,7 +772,6 @@ class TabDataRepositoryTest {
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
         contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
-        nativeInputStatePublisher: NativeInputStatePublisher = mockNativeInputStatePublisher,
     ): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -804,7 +797,6 @@ class TabDataRepositoryTest {
             tabManagerFeatureFlags,
             contextualDataStore,
             tabVisitedSitesRepository,
-            nativeInputStatePublisher,
         )
     }
 
@@ -827,6 +819,78 @@ class TabDataRepositoryTest {
 
     private fun now(): LocalDateTime {
         return FakeTimeProvider().localDateTimeNow()
+    }
+
+    @Test
+    fun whenDeleteThenDeletedTabsEmits() = runTest {
+        val testee = tabDataRepository()
+        val tab = TabEntity(tabId = TAB_ID, position = 0)
+
+        testee.deletedTabs.test {
+            testee.delete(tab)
+            assertEquals(TAB_ID, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteTabsThenDeletedTabsEmitsForEach() = runTest {
+        val testee = tabDataRepository()
+        val tabIds = listOf("tab-a", "tab-b")
+
+        testee.deletedTabs.test {
+            testee.deleteTabs(tabIds)
+            assertEquals("tab-a", awaitItem())
+            assertEquals("tab-b", awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenReplaceTabWithNewTabThenDeletedTabsEmits() = runTest {
+        val testee = tabDataRepository()
+
+        testee.deletedTabs.test {
+            testee.replaceTabWithNewTab(TAB_ID, url = null)
+            assertEquals(TAB_ID, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurgeDeletableTabsThenDeletedTabsEmitsForEach() = runTest {
+        val testee = tabDataRepository()
+        whenever(mockDao.getDeletableTabIds()).thenReturn(listOf("tab-a", "tab-b"))
+
+        testee.deletedTabs.test {
+            testee.purgeDeletableTabs()
+            assertEquals("tab-a", awaitItem())
+            assertEquals("tab-b", awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceThenDeletedTabsEmits() = runTest {
+        val testee = tabDataRepository()
+        whenever(mockDao.tab(TAB_ID)).thenReturn(TabEntity(tabId = TAB_ID, position = 0))
+
+        testee.deletedTabs.test {
+            testee.deleteTabAndSelectSource(TAB_ID)
+            assertEquals(TAB_ID, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAllThenAllTabsDeletedEmits() = runTest {
+        val testee = tabDataRepository()
+
+        testee.allTabsDeleted.test {
+            testee.deleteAll()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     companion object {

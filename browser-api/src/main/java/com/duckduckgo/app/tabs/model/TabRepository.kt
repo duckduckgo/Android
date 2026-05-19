@@ -35,6 +35,21 @@ interface TabRepository {
     val childClosedTabs: SharedFlow<String>
 
     /**
+     * Emits a tabId each time a tab is removed from the repository. Covers every removal site:
+     * single delete, batched delete, source-tab delete, replacement, and purge of tabs previously
+     * marked deletable. Subsystems that hold per-tab state (e.g. the native input state store) can
+     * subscribe to evict their entries without coupling [TabRepository] to those consumers.
+     */
+    val deletedTabs: SharedFlow<String>
+
+    /**
+     * Emits once each time every tab is deleted at once (fire-button path). Equivalent to receiving
+     * a [deletedTabs] event for each currently open tab, but emitted as a single signal so consumers
+     * can drop all per-tab state without iterating.
+     */
+    val allTabsDeleted: SharedFlow<Unit>
+
+    /**
      * @return the tabs that are marked as "deletable" in the DB
      */
     val flowDeletableTabs: Flow<List<TabEntity>>
