@@ -16,11 +16,7 @@
 
 package com.duckduckgo.adblocking.impl
 
-data class AdBlockingScriptletData(
-    val scriptlets: List<Scriptlet>,
-) {
-    data class Scriptlet(
-        val name: String,
-        val content: String,
-    )
-}
+data class Scriptlet(
+    val name: String,
+    val content: String,
+)

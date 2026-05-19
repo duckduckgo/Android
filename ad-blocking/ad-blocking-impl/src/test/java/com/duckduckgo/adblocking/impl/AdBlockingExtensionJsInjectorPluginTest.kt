@@ -43,7 +43,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
 
     private var discoverableEnabled = true
     private var operationalEnabled = true
-    private val scriptletsFlow = MutableStateFlow<AdBlockingScriptletData?>(null)
+    private val scriptletsFlow = MutableStateFlow<List<Scriptlet>>(emptyList())
 
     private val isDiscoverableToggle: Toggle = mock {
         on { isEnabled() } doAnswer { discoverableEnabled }
@@ -61,14 +61,10 @@ class AdBlockingExtensionJsInjectorPluginTest {
     private val webView: WebView = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
-    private val singleScriptlet = AdBlockingScriptletData(
-        scriptlets = listOf(AdBlockingScriptletData.Scriptlet(name = "a.js", content = "console.log('a')")),
-    )
-    private val twoScriptlets = AdBlockingScriptletData(
-        scriptlets = listOf(
-            AdBlockingScriptletData.Scriptlet(name = "b.js", content = "console.log('b')"),
-            AdBlockingScriptletData.Scriptlet(name = "a.js", content = "console.log('a')"),
-        ),
+    private val singleScriptlet = listOf(Scriptlet(name = "a.js", content = "console.log('a')"))
+    private val twoScriptlets = listOf(
+        Scriptlet(name = "b.js", content = "console.log('b')"),
+        Scriptlet(name = "a.js", content = "console.log('a')"),
     )
 
     private val plugin by lazy {
@@ -174,15 +170,8 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
-    fun whenScriptletDataIsNullThenScriptIsNotInjected() {
-        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
-
-        verify(webView, never()).evaluateJavascript(any(), isNull())
-    }
-
-    @Test
     fun whenScriptletsListIsEmptyThenScriptIsNotInjected() {
-        scriptletsFlow.value = AdBlockingScriptletData(scriptlets = emptyList())
+        scriptletsFlow.value = emptyList()
 
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
@@ -203,9 +192,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
         scriptletsFlow.value = singleScriptlet
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
-        scriptletsFlow.value = AdBlockingScriptletData(
-            scriptlets = listOf(AdBlockingScriptletData.Scriptlet(name = "a.js", content = "console.log('updated')")),
-        )
+        scriptletsFlow.value = listOf(Scriptlet(name = "a.js", content = "console.log('updated')"))
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
         verify(webView).evaluateJavascript(

@@ -28,7 +28,7 @@ import javax.inject.Inject
 interface AdBlockingExtensionRepository {
     suspend fun getStoredVersion(): String?
     suspend fun storeScriptlets(version: String, scriptlets: Map<String, ByteArray>)
-    fun scriptletsFlow(): Flow<AdBlockingScriptletData?>
+    fun scriptletsFlow(): Flow<List<Scriptlet>>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -48,16 +48,8 @@ class RealAdBlockingExtensionRepository @Inject constructor(
         )
     }
 
-    override fun scriptletsFlow(): Flow<AdBlockingScriptletData?> =
+    override fun scriptletsFlow(): Flow<List<Scriptlet>> =
         dao.scriptletsFlow().map { rows ->
-            if (rows.isEmpty()) {
-                null
-            } else {
-                AdBlockingScriptletData(
-                    scriptlets = rows.map { row ->
-                        AdBlockingScriptletData.Scriptlet(name = row.name, content = String(row.content))
-                    },
-                )
-            }
+            rows.map { row -> Scriptlet(name = row.name, content = String(row.content)) }
         }
 }

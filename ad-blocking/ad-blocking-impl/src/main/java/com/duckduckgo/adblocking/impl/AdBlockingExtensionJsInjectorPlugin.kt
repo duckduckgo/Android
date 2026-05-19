@@ -47,7 +47,7 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
 
     private val payload: StateFlow<String?> = repository
         .scriptletsFlow()
-        .map { data -> data?.let(::buildScript) }
+        .map(::buildScript)
         .stateIn(appScope, SharingStarted.Eagerly, initialValue = null)
 
     @UiThread
@@ -81,8 +81,8 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
 
     override fun onPageFinished(webView: WebView, url: String?, site: Site?) = Unit
 
-    private fun buildScript(data: AdBlockingScriptletData): String? =
-        data.scriptlets
+    private fun buildScript(scriptlets: List<Scriptlet>): String? =
+        scriptlets
             .takeUnless { it.isEmpty() }
             ?.sortedBy { it.name }
             ?.joinToString(separator = "\n") { it.content }
