@@ -240,7 +240,7 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
-    fun `onFireAllRequested with exactly one recent chat dispatches DuckChats Selected with that chat url`() = runTest {
+    fun `onFireAllRequested with exactly one recent chat sets FireAll confirmation`() = runTest {
         source.value = listOf(item("r1"))
 
         viewModel.uiState.test {
@@ -248,17 +248,18 @@ class ChatHistoryViewModelTest {
 
             viewModel.onFireAllRequested()
 
-            expectNoEvents()
+            val confirming = awaitItem() as Loaded
+            assertEquals(
+                ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("r1")),
+                confirming.confirmation,
+            )
         }
-        assertEquals(
-            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=r1")))),
-            dataClearingTrigger.calls,
-        )
+        assertTrue(dataClearingTrigger.calls.isEmpty())
         assertTrue(repository.deletedChatIds.isEmpty())
     }
 
     @Test
-    fun `onFireAllRequested with exactly one pinned chat dispatches DuckChats Selected with that chat url`() = runTest {
+    fun `onFireAllRequested with exactly one pinned chat sets FireAll confirmation`() = runTest {
         source.value = listOf(item("p", pinned = true))
 
         viewModel.uiState.test {
@@ -266,12 +267,13 @@ class ChatHistoryViewModelTest {
 
             viewModel.onFireAllRequested()
 
-            expectNoEvents()
+            val confirming = awaitItem() as Loaded
+            assertEquals(
+                ChatHistoryUiState.PendingConfirmation.FireAll(chatIds = setOf("p")),
+                confirming.confirmation,
+            )
         }
-        assertEquals(
-            listOf(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=p")))),
-            dataClearingTrigger.calls,
-        )
+        assertTrue(dataClearingTrigger.calls.isEmpty())
         assertTrue(repository.deletedChatIds.isEmpty())
     }
 

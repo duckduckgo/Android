@@ -122,15 +122,12 @@ class ChatHistoryViewModel @Inject constructor(
         controls.update { it.copy(search = SearchState()) }
     }
 
-    /** Fire-all wipes every Duck.ai chat including Pinned. N=1 fires directly; N≥2 confirms via dialog. */
+    /** Fire-all wipes every Duck.ai chat including Pinned — always confirms via dialog before deleting. */
     fun onFireAllRequested() {
         val all = latestItems
-        when {
-            all.isEmpty() -> Unit
-            all.size == 1 -> dispatchSelectedClear(setOf(all.single().chatId))
-            else -> controls.update {
-                it.copy(confirmation = PendingConfirmation.FireAll(chatIds = all.mapTo(mutableSetOf()) { i -> i.chatId }))
-            }
+        if (all.isEmpty()) return
+        controls.update {
+            it.copy(confirmation = PendingConfirmation.FireAll(chatIds = all.mapTo(mutableSetOf()) { i -> i.chatId }))
         }
     }
 
