@@ -23,6 +23,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.ContextThemeWrapper
@@ -753,7 +754,7 @@ sealed class OnboardingDaxDialogCta(
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
             val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
-            val targetDepth = if (showArrow) 1f else 0f
+            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
             this.cardContainer = cardContainer
             isAnimating = true
 
@@ -944,9 +945,18 @@ sealed class OnboardingDaxDialogCta(
             applyOptionsContentHeight(container)
         }
 
-        private fun applyWingBottomState(container: View) {
+        private fun stripWingForPhoneLandscape(wing: LottieAnimationView) {
+            if (wing.isAnimating) wing.cancelAnimation()
+            wing.isVisible = false
+        }
+
+        internal fun applyWingBottomState(container: View) {
             wingPlayInGeneration++
             val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
             val showsWing = this is ShowsWingBottom
             when {
                 showsWing && !wing.isVisible -> {
@@ -983,6 +993,10 @@ sealed class OnboardingDaxDialogCta(
         private fun startWingBottomPlayIn(container: View) {
             if (this !is ShowsWingBottom) return
             val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
             if (!wing.isVisible || wing.isAnimating || wing.progress >= WING_STOP_PROGRESS) return
             val generation = wingPlayInGeneration
             wing.postDelayed(
@@ -997,8 +1011,12 @@ sealed class OnboardingDaxDialogCta(
         }
 
         private fun snapWingBottomToResting(container: View) {
-            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
             if (this !is ShowsWingBottom) return
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
             if (wing.isAnimating) wing.cancelAnimation()
             wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
             wing.progress = WING_STOP_PROGRESS
@@ -1058,7 +1076,7 @@ sealed class OnboardingDaxDialogCta(
             bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
             container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
-                ?.setArrowDepthFraction(if (showArrow) 1f else 0f)
+                ?.setArrowDepthFraction(if (showArrow && !container.isPhoneLandscape()) 1f else 0f)
             snapWingBottomToResting(container)
             if (!alreadySettled) {
                 onSettled()
@@ -1615,6 +1633,27 @@ sealed class DaxBubbleCta(
             view.findViewById<View>(R.id.primaryCta),
         )
 
+        /**
+         * Show or hide the [R.id.wavingDax] Lottie based on whether the receiver CTA opts into
+         * [ShowsWavingDax] AND the device is not in phone landscape. Extracted from `showCta` so
+         * the gate logic can be exercised in unit tests without driving the full show flow.
+         */
+        internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
+            container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                if (showsWavingDax != null && !container.isPhoneLandscape()) {
+                    showsWavingDax.configureWavingDax(dax)
+                    if (!dax.isVisible || dax.alpha == 0f) {
+                        dax.progress = 0f
+                        dax.alpha = 1f
+                        dax.isVisible = true
+                        dax.post { dax.playAnimation() }
+                    }
+                } else {
+                    dax.isVisible = false
+                }
+            }
+        }
+
         private fun resetAllIncludesExcept(view: View, active: View) {
             getAllContentIncludes(view).forEach { include ->
                 if (include == active) {
@@ -1636,7 +1675,7 @@ sealed class DaxBubbleCta(
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
-            val targetDepth = if (showArrow) 1f else 0f
+            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
@@ -1667,21 +1706,6 @@ sealed class DaxBubbleCta(
             }
 
             val wavingDax = this as? ShowsWavingDax
-            val applyWavingDaxState = {
-                container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
-                    if (wavingDax != null) {
-                        wavingDax.configureWavingDax(dax)
-                        if (!dax.isVisible || dax.alpha == 0f) {
-                            dax.progress = 0f
-                            dax.alpha = 1f
-                            dax.isVisible = true
-                            dax.post { dax.playAnimation() }
-                        }
-                    } else {
-                        dax.isVisible = false
-                    }
-                }
-            }
 
             // Helper: type title then fade in content
             val typeAndFadeIn = {
@@ -1796,7 +1820,7 @@ sealed class DaxBubbleCta(
                             resetHeaderState()
                             resetTextAlignment()
                             configureContentViews(container)
-                            applyWavingDaxState()
+                            applyWavingDaxState(container, wavingDax)
                             // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
                             if (!isAnimating) {
@@ -1816,7 +1840,7 @@ sealed class DaxBubbleCta(
                 resetHeaderState()
                 resetTextAlignment()
                 configureContentViews(container)
-                applyWavingDaxState()
+                applyWavingDaxState(container, wavingDax)
                 cardView.setArrowDepthFraction(targetDepth)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
@@ -2127,3 +2151,10 @@ fun String.getStringForOmnibarPosition(position: OmnibarType): String =
     }
 
 private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator = animate().alpha(1f).setDuration(duration.inWholeMilliseconds)
+
+internal fun View.isPhoneLandscape(): Boolean {
+    val config = context.resources.configuration
+    val isPhone = config.smallestScreenWidthDp < 600
+    val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
+    return isPhone && isLandscape
+}

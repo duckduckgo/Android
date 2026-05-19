@@ -74,7 +74,7 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
             }
         }
 
-        view.findViewById<LottieAnimationView>(R.id.wavingDax).apply {
+        view.findViewById<LottieAnimationView>(R.id.wavingDax)?.apply {
             isVisible = true
             // Container is still GONE here; Lottie.playAnimation() no-ops unless isShown() is true.
             post { playAnimation() }
