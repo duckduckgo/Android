@@ -37,6 +37,7 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -66,6 +67,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -93,6 +95,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val pixel: Pixel,
+    private val nativeInputStatePublisher: NativeInputStatePublisher,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -148,6 +151,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
+    fun getSelectedTool(): String? {
+        return _plugins.value.firstNotNullOfOrNull { plugin ->
+            (plugin.getPromptContribution() as? PromptContribution.ToolSelection)?.tool
+        }
+    }
+
     private data class WidgetConfig(
         val inputContext: NativeInputState.InputContext = NativeInputState.InputContext.BROWSER,
         val inputPosition: NativeInputState.InputPosition = NativeInputState.InputPosition.TOP,
@@ -155,22 +164,32 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val widgetConfig = MutableStateFlow(WidgetConfig())
 
+    private val activeTabId = MutableStateFlow<String?>(null)
+
     val state: SharedFlow<NativeInputState> = combine(
         duckAiFeatureState.showSettings,
         duckChatInternal.observeEnableDuckChatUserSetting(),
         duckChatInternal.observeInputScreenUserSettingEnabled(),
         widgetConfig,
-    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config ->
+        activeTabId.filterNotNull(),
+    ) { isFeatureEnabled, isUserEnabled, isInputScreenUserSettingEnabled, config, tabId ->
         NativeInputState(
             inputMode = getInputMode(isFeatureEnabled && isUserEnabled, isInputScreenUserSettingEnabled),
             inputContext = config.inputContext,
             inputPosition = config.inputPosition,
+            tabId = tabId,
         )
     }.shareIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         replay = 1,
     )
+
+    init {
+        viewModelScope.launch {
+            state.collect { nativeInputStatePublisher.publish(it.tabId, it) }
+        }
+    }
 
     val chatState: Flow<ChatState> = duckChatInternal.chatState
 
@@ -201,7 +220,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         widgetConfig.update { it.copy(inputPosition = position) }
     }
 
-    fun configure(isDuckAiMode: Boolean, isBottom: Boolean) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
+        activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
@@ -211,13 +231,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         query: String,
         modelId: String?,
         reasoningEffort: String?,
+        selectedTool: String? = null,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
     ) {
-        pendingNativePromptStore.store(query, modelId, reasoningEffort, images, files)
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files)
     }
 
-    fun configureContextual() {
+    fun configureContextual(tabId: String) {
+        activeTabId.value = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
     }
 

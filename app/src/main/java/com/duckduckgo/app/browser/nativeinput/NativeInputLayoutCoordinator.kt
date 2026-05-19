@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.google.android.material.card.MaterialCardView
 
@@ -85,6 +86,16 @@ class NativeInputLayoutCoordinator(
     fun configureAutocompleteLayout(widgetView: View, isBottom: Boolean) {
         val autoCompleteList = rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
+
+        // In duck.ai mode the legacy AppBar stays visible; float overlays over it so AppBar
+        // behavior/elevation doesn't push or cover them. Restored on widget detach.
+        val restoreFloats: List<() -> Unit> = if (omnibarState.isDuckAiMode()) {
+            listOfNotNull(autoCompleteList, focusedView).map { it.floatOverLegacyOmnibar() }
+        } else {
+            emptyList()
+        }
+
+        // Keep widget above the (possibly raised) overlay views.
         val baseElevation = maxOf(autoCompleteList.elevation, focusedView?.elevation ?: 0f)
         val targetElevation = baseElevation + widgetView.resources.displayMetrics.density
         widgetView.elevation = maxOf(widgetView.elevation, targetElevation)
@@ -128,6 +139,7 @@ class NativeInputLayoutCoordinator(
 
                 override fun onViewDetachedFromWindow(v: View) {
                     applyPadding(deltaTop = 0, deltaBottom = 0)
+                    restoreFloats.forEach { it() }
                     v.removeOnLayoutChangeListener(layoutListener)
                     autoCompleteList.removeOnLayoutChangeListener(layoutListener)
                     focusedView?.removeOnLayoutChangeListener(layoutListener)
@@ -135,6 +147,20 @@ class NativeInputLayoutCoordinator(
                 }
             },
         )
+    }
+
+    // Clears the CoordinatorLayout behavior and raises elevation so the view floats over
+    // the legacy AppBar. Returns a lambda that restores the previous state.
+    private fun View.floatOverLegacyOmnibar(): () -> Unit {
+        val previousBehavior = (layoutParams as? CoordinatorLayout.LayoutParams)?.behavior
+        val previousElevation = elevation
+        val raisedElevation = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.omnibarFloatElevation)
+        updateLayoutParams<CoordinatorLayout.LayoutParams> { behavior = null }
+        elevation = maxOf(elevation, raisedElevation)
+        return {
+            updateLayoutParams<CoordinatorLayout.LayoutParams> { behavior = previousBehavior }
+            elevation = previousElevation
+        }
     }
 
     fun configureContentOffset(widgetView: View, isBottom: Boolean) {
@@ -149,8 +175,6 @@ class NativeInputLayoutCoordinator(
             ).map { Target(it, it.snapshotPadding()) }
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
-
-        val overlap = widgetView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
 
         // Animate child reflows when the widget toggles Search ↔ DuckAI changes our padding.
         // The transition is staged here but only assigned to the parent once the enter animation
@@ -198,11 +222,7 @@ class NativeInputLayoutCoordinator(
 
         fun computeDeltaBottom(): Int {
             if (!isBottom) return 0
-            return if (omnibarState.isOmnibarBottom()) {
-                maxOf(0, overlap)
-            } else {
-                maxOf(0, anchor.height - overlap)
-            }
+            return maxOf(0, widgetView.height)
         }
 
         fun applyOffsetWithBottom(anchorBottomInWindow: Int) {

@@ -411,6 +411,9 @@ class RealDuckChatJSHelper @Inject constructor(
                         if (pending.reasoningEffort != null) {
                             put("reasoningEffort", pending.reasoningEffort)
                         }
+                        if (pending.selectedTool != null) {
+                            put("toolChoice", JSONArray().apply { put(pending.selectedTool) })
+                        }
                         if (pending.images.isNotEmpty()) {
                             put(
                                 "images",

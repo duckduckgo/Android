@@ -16,7 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.auth2
 
-import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import java.time.Instant
 
 /**

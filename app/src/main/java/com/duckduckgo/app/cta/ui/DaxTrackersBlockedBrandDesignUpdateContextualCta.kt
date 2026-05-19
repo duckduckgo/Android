@@ -30,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -56,7 +57,7 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            getTrackersDescription(context, trackers).html(context)
+            getTrackersDescription(context, trackers).preventWidows().html(context)
     }
 
     override fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {

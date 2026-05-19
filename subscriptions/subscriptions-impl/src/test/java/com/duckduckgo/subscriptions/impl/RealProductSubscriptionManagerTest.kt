@@ -25,6 +25,7 @@ import com.duckduckgo.subscriptions.api.Product.*
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.ACTIVE
 import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.ProductSubscriptionManager.ProductStatus.INELIGIBLE
@@ -281,4 +282,6 @@ private class FakeSubscriptions(
     override fun isSubscriptionUrl(uri: Uri): Boolean = false
 
     override suspend fun isFreeTrialEligible(): Boolean = false
+
+    override fun getEntitlements(): Flow<Set<Entitlement>> = flowOf(emptySet())
 }

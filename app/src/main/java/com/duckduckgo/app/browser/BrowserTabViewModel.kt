@@ -3486,7 +3486,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.origin}".toUri())
+                        command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=${cta.flow.origin}".toUri())
                     }
                     null
                 }
@@ -4973,10 +4973,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is OnboardingDaxDialogCta.DaxFireButtonCta,
             is DaxFireButtonBrandDesignUpdateContextualCta,
-            -> {
-                // TODO: replace in stage 2 (DaxFireButtonCta brand-design migration).
-                LaunchFireDialogFromOnboardingDialog(onboardingCta)
-            }
+            -> LaunchFireDialogFromOnboardingDialog(onboardingCta)
 
             else -> HideOnboardingDaxDialog(onboardingCta)
         }
@@ -5026,7 +5023,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta || cta is DaxFireButtonBrandDesignUpdateContextualCta) {
-            // TODO: replace in stage 2 (DaxFireButtonCta brand-design migration).
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }

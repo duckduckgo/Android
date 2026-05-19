@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.model.Entitlement
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
@@ -163,6 +164,10 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun isFreeTrialEligible(): Boolean {
         return subscriptionsManager.isFreeTrialEligible()
+    }
+
+    override fun getEntitlements(): Flow<Set<Entitlement>> {
+        return subscriptionsManager.entitlementSet
     }
 
     private fun buildSubscriptionUrl(uri: Uri?): String {

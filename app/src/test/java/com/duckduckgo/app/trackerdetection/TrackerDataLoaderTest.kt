@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.app.pixels.remoteconfig.PrecompileTdsRegexRCWrapper
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
 import com.duckduckgo.app.trackerdetection.api.TdsJsonTracker
@@ -83,6 +84,10 @@ class TrackerDataLoaderTest {
             urlToTypeMapper = mockUrlToTypeMapper,
             coroutineRule.testDispatcherProvider,
             object : OptimizeTrackerEvaluationRCWrapper {
+                override val enabled: Boolean
+                    get() = false
+            },
+            object : PrecompileTdsRegexRCWrapper {
                 override val enabled: Boolean
                     get() = false
             },

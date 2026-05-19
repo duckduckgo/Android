@@ -29,6 +29,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxMainNetworkBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -55,7 +56,7 @@ data class DaxMainNetworkBrandDesignUpdateContextualCta(
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
-            text = getTrackersDescription(context).html(context)
+            text = getTrackersDescription(context).preventWidows().html(context)
         }
     }
 

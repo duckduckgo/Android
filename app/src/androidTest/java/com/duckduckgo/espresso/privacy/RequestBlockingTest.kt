@@ -30,6 +30,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.clickMenuItem
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -47,6 +48,7 @@ class RequestBlockingTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
+            launchSource = InAppNavigation,
             queryExtra = "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
         ),
     )

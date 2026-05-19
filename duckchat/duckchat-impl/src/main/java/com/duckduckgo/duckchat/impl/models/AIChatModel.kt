@@ -34,6 +34,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
     @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
     @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
+    @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
 )
 
 data class RemoteTierAttachmentLimits(
@@ -102,9 +103,12 @@ data class AIChatModel(
     val supportedImageFormats: List<String> = emptyList(),
     val supportedFileTypes: List<String> = emptyList(),
     val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
+    val supportedTools: List<Tool> = emptyList(),
 ) {
     val supportsFileUpload: Boolean
         get() = supportedFileTypes.isNotEmpty()
+
+    fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
 
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
@@ -115,6 +119,11 @@ enum class UserTier(val rawValue: String) {
     FREE("free"),
     PLUS("plus"),
     PRO("pro"),
+    ;
+
+    companion object {
+        fun from(raw: String?): UserTier? = entries.firstOrNull { it.rawValue == raw }
+    }
 }
 
 enum class ModelProvider {

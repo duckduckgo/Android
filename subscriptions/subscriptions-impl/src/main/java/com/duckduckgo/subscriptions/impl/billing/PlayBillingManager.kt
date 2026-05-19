@@ -43,6 +43,8 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseA
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContext
+import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
@@ -127,6 +129,8 @@ class RealPlayBillingManager @Inject constructor(
 
     // New Subscription ProductDetails
     private var _products = MutableStateFlow(emptyList<ProductDetails>())
+
+    private var lastLoadProductsOutcome: LastLoadProductsOutcome = LastLoadProductsOutcome.NeverAttempted
 
     override val products: List<ProductDetails>
         get() = _products.value
@@ -228,7 +232,23 @@ class RealPlayBillingManager @Inject constructor(
 
         if (productDetails == null || offerToken == null) {
             val error = "Missing product details"
-            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(error = error)
+            val reason = when {
+                products.isEmpty() -> BillingFlowInitFailureContext.Reason.NO_PRODUCTS_LOADED
+                productDetails == null -> BillingFlowInitFailureContext.Reason.PRODUCT_ID_NOT_FOUND
+                else -> BillingFlowInitFailureContext.Reason.OFFER_NOT_FOUND
+            }
+            subscriptionPurchaseWideEvent.onBillingFlowInitFailure(
+                error = error,
+                failureContext = BillingFlowInitFailureContext(
+                    reason = reason,
+                    requestedProductId = subscriptionProduct,
+                    requestedPlanId = planId,
+                    requestedOfferId = offerId,
+                    loadedProductIds = products.map { it.productId },
+                    billingClientReady = billingClient.ready,
+                    lastLoadProductsOutcome = lastLoadProductsOutcome,
+                ),
+            )
             _purchaseState.emit(PurchaseState.Failure(error))
             return@withContext
         }
@@ -354,6 +374,7 @@ class RealPlayBillingManager @Inject constructor(
     private suspend fun loadProducts() {
         when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
             is SubscriptionsResult.Success -> {
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Success(result.products.size)
                 if (result.products.isEmpty()) {
                     logcat { "No products found" }
                 }
@@ -361,6 +382,7 @@ class RealPlayBillingManager @Inject constructor(
             }
 
             is SubscriptionsResult.Failure -> {
+                lastLoadProductsOutcome = LastLoadProductsOutcome.Failure(result.billingError.toString())
                 logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
             }
         }

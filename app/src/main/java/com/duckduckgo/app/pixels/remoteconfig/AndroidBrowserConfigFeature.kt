@@ -61,6 +61,16 @@ interface AndroidBrowserConfigFeature {
     fun optimizeTrackerEvaluationV3(): Toggle
 
     /**
+     * Pre-compile TDS rule regex patterns once when TdsClient is built rather than recompiling
+     * on every URL match. When disabled, regex compilation happens per-call (legacy behavior).
+     * @return `true` when the remote config has the global "precompileTdsRegex" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun precompileTdsRegex(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`

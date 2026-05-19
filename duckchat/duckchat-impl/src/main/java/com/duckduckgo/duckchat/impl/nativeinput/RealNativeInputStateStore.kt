@@ -56,9 +56,8 @@ class RealNativeInputStateStore @Inject constructor() :
     }
 
     // Seed unpublished tabs with [NativeInputState.zero] only because StateFlow requires an initial
-    // value. The native input widget overwrites it on configure; see the TODO on zero() — once the
-    // widget is wired to publish first, this seed becomes unreachable and can be replaced with a
-    // first-publish gate.
+    // value. The native input widget overwrites it on configure, so observers should never see this
+    // placeholder in practice.
     private fun flowFor(tabId: String): MutableStateFlow<NativeInputState> =
         flows.computeIfAbsent(tabId) { MutableStateFlow(NativeInputState.zero(tabId)) }
 }

@@ -93,8 +93,9 @@
     </string>
 
     <!--Onboarding Rebrand Design Update-->
-    <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
-    <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that protects you and lets you decide when and how to use AI?</string>
+    <string name="preOnboardingWelcomeDialogTitle">Hi there.</string>
+    <string name="preOnboardingWelcomeDialogBody1">Ready for a faster browser that\nputs you in control?</string>
+    <string name="preOnboardingWelcomeDialogBody2">AI is always optional, and\nprivacy protection is always on.</string>
     <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
     <!-- Input Mode Demo Onboarding step -->
@@ -128,4 +129,8 @@
     <string name="quickSetupAddressBarPositionCaption"><![CDATA[You can make changes in <b>Settings > Appearance</b>.]]></string>
     <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
     <string name="quickSetupBottomSheetDone">Done</string>
+
+    <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
+    <string name="settingsInfernoAnimation">Inferno</string>
 </resources>

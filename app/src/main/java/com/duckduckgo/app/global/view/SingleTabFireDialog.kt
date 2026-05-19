@@ -108,6 +108,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private var animationEnabled = false
     private var canFinish = false
     private var pendingFragmentResultEvent: String? = null
+    private var isFireAnimationUpdateEnabled = false
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -248,7 +249,17 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
-        if (!state.stateData.isFirePictogramVisible) {
+        isFireAnimationUpdateEnabled = state.stateData.isFireAnimationUpdateEnabled
+
+        if (state.stateData.isFirePictogramVisible) {
+            val animationRes = if (isFireAnimationUpdateEnabled) {
+                R.raw.fire_dialog_animation_brand_design
+            } else {
+                R.raw.fire_dialog_animation
+            }
+            binding.fireIcon.setAnimation(animationRes)
+            binding.fireIcon.playAnimation()
+        } else {
             binding.fireIcon.gone()
         }
 

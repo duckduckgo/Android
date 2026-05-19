@@ -68,6 +68,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
@@ -1495,7 +1496,7 @@ sealed class DaxBubbleCta(
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
 
             val daxTitle = container.context.getString(title)
-            val daxDescription = container.context.getString(description)
+            val daxDescription = container.context.getString(description).preventWidows()
 
             val titleView = container.findViewById<DaxTypeAnimationTextView>(R.id.brandDesignTitle)
             val hiddenTitle = container.findViewById<DaxTextView>(R.id.brandDesignHiddenTitle)
@@ -1852,9 +1853,26 @@ class BrokenSitePromptDialogCta : Cta {
     }
 }
 
+enum class SubscriptionPromoFlow(
+    val origin: String,
+    val shownPixel: Pixel.PixelName,
+    val subscribeClickPixel: Pixel.PixelName,
+) {
+    SKIPPED_ONBOARDING(
+        "funnel_modal_android__skippedonboardingupsell",
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SHOWN,
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SUBSCRIBE_CLICKED,
+    ),
+    NUDGE(
+        "funnel_modal_android__subscriptionnudge",
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_NUDGE_SHOWN,
+        AppPixelName.SUBSCRIPTION_PROMO_MODAL_NUDGE_SUBSCRIBE_CLICKED,
+    ),
+}
+
 class SubscriptionPromoModalCta(
     val isFreeTrialCopy: Boolean,
-    val origin: String,
+    val flow: SubscriptionPromoFlow,
 ) : Cta {
     override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
     override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN

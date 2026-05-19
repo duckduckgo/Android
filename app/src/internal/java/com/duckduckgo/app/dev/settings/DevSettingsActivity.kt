@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
+import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
@@ -139,7 +140,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun goToUrl(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
+        startActivity(BrowserActivity.intent(this, launchSource = InAppNavigation, queryExtra = url))
         finish()
     }
 

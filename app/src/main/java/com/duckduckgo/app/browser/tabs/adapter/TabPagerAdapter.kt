@@ -25,12 +25,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.browsermode.api.BrowserMode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
+    private val browserMode: BrowserMode,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
 
@@ -73,11 +75,11 @@ class TabPagerAdapter(
         pendingMessage?.cleanupJob?.cancel()
 
         return if (pendingMessage != null) {
-            BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal).apply {
+            BrowserTabFragment.newInstance(tab.tabId, null, false, isExternal, browserMode).apply {
                 this.messageFromPreviousTab = pendingMessage.message
             }
         } else {
-            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
+            BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal, browserMode)
         }
     }
 

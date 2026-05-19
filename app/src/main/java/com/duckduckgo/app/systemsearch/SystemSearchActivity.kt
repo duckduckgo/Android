@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.mode.SystemSearchExternal
 import com.duckduckgo.app.browser.nativeinput.applyDuckAiIconStyling
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
@@ -688,7 +689,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        startActivity(BrowserActivity.intent(this, interstitialScreen = true))
+        startActivity(BrowserActivity.intent(this, launchSource = SystemSearchExternal, interstitialScreen = true))
         finish()
     }
 
@@ -699,6 +700,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         startActivity(
             BrowserActivity.intent(
                 context = this,
+                launchSource = SystemSearchExternal,
                 queryExtra = query,
                 interstitialScreen = true,
                 openExistingTabId = openExistingTabId,

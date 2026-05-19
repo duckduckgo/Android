@@ -174,6 +174,7 @@ class CtaViewModel @Inject constructor(
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
             if (cta is SubscriptionPromoModalCta) {
+                pixel.fire(cta.flow.shownPixel, cta.pixelShownParameters())
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
@@ -215,6 +216,7 @@ class CtaViewModel @Inject constructor(
             brokenSitePrompt.userAcceptedPrompt()
         }
         if (cta is SubscriptionPromoModalCta) {
+            pixel.fire(cta.flow.subscribeClickPixel, cta.pixelOkParameters())
             withContext(dispatchers.io()) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -274,11 +276,11 @@ class CtaViewModel @Inject constructor(
             when {
                 canShowSubscriptionCtaForSkippedOnboarding() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_modal_android__skippedonboardingupsell",
+                    flow = SubscriptionPromoFlow.SKIPPED_ONBOARDING,
                 )
                 canShowSubscriptionPromoCta() -> SubscriptionPromoModalCta(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
-                    origin = "funnel_modal_android__subscriptionnudge",
+                    flow = SubscriptionPromoFlow.NUDGE,
                 )
                 else -> null
             }
@@ -289,8 +291,11 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || daxDialogFireEducationShown()) return@withContext null
             if (isBrandDesignUpdateEnabled()) {
-                // TODO: replace in stage 2 (DaxFireButtonCta brand-design migration).
-                return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+                return@withContext DaxFireButtonBrandDesignUpdateContextualCta(
+                    onboardingStore = onboardingStore,
+                    appInstallStore = appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                )
             }
             OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
         }

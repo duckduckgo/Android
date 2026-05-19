@@ -57,6 +57,12 @@
     <string name="duckAiEndCtaTitle">You\'ve got this!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
     <string name="duckAiEndCtaButton">High five!</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Take Photo</string>
+    <string name="attachmentAttachPhoto">Attach Photo</string>
+    <string name="attachmentAttachFile">Attach File</string>
+
     <!-- File attachment -->
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
     <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
@@ -67,6 +73,7 @@
 
     <!-- Options button -->
     <string name="duckChatOptionsButtonContentDescription">Duck.ai options</string>
+    <string name="duckChatOptionsChipDismissContentDescription" instruction="%1$s is the name of the option being removed (e.g. Create Image).">Remove %1$s</string>
     <string name="duckChatOptionsMenuCreateImage">Create Image</string>
     <string name="duckChatOptionsMenuCreateImageSubtitle">Turn text into images</string>
     <string name="duckChatOptionsMenuWebSearch">Web Search</string>

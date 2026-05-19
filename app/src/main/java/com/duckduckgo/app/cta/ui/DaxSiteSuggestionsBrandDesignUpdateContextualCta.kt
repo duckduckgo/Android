@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -54,7 +55,7 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
         view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             .text = context.getString(R.string.onboardingSitesSuggestionsDaxDialogTitle).html(context)
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
-            .text = context.getString(R.string.onboardingSitesDaxDialogDescription).html(context)
+            .text = context.getString(R.string.onboardingSitesDaxDialogDescription).preventWidows().html(context)
 
         val options = onboardingStore.getSitesOptions()
         val optionsViews = listOf(

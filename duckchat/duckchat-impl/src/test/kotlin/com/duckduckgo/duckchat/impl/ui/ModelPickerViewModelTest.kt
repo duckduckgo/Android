@@ -22,6 +22,7 @@ import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -255,7 +256,81 @@ class ModelPickerViewModelTest {
         assertNull(testee.getIconResForModel(model))
     }
 
-    private fun freeModel(id: String, shortName: String, provider: ModelProvider = ModelProvider.UNKNOWN) = AIChatModel(
+    @Test
+    fun whenNoModelSelectedThenGetSelectedModelReturnsNull() {
+        stateFlow.value = ModelState(models = listOf(freeModel("id1", "model1")), selectedModelId = null)
+
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelSelectedThenGetSelectedModelReturnsIt() {
+        val model = freeModel("id1", "model1")
+        stateFlow.value = ModelState(models = listOf(model), selectedModelId = "id1")
+
+        assertEquals(model, testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenSelectedModelSupportsImageGenerationThenIsImageGenerationSupportedIsTrue() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.IMAGE_GENERATION))),
+            selectedModelId = "id1",
+        )
+
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportImageGenerationThenIsImageGenerationSupportedIsFalse() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
+            selectedModelId = "id1",
+        )
+
+        assertFalse(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenNoModelSelectedThenIsImageGenerationSupportedDefaultsToTrue() {
+        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
+
+        assertTrue(testee.isImageGenerationSupported())
+    }
+
+    @Test
+    fun whenSelectedModelSupportsWebSearchThenIsWebSearchSupportedIsTrue() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = listOf(Tool.WEB_SEARCH))),
+            selectedModelId = "id1",
+        )
+
+        assertTrue(testee.isWebSearchSupported())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportWebSearchThenIsWebSearchSupportedIsFalse() {
+        stateFlow.value = ModelState(
+            models = listOf(freeModel("id1", "model1", supportedTools = emptyList())),
+            selectedModelId = "id1",
+        )
+
+        assertFalse(testee.isWebSearchSupported())
+    }
+
+    @Test
+    fun whenNoModelSelectedThenIsWebSearchSupportedDefaultsToTrue() {
+        stateFlow.value = ModelState(models = emptyList(), selectedModelId = null)
+
+        assertTrue(testee.isWebSearchSupported())
+    }
+
+    private fun freeModel(
+        id: String,
+        shortName: String,
+        provider: ModelProvider = ModelProvider.UNKNOWN,
+        supportedTools: List<Tool> = emptyList(),
+    ) = AIChatModel(
         id = id,
         name = id,
         displayName = id,
@@ -263,6 +338,7 @@ class ModelPickerViewModelTest {
         accessTier = listOf("free"),
         isAccessible = true,
         provider = provider,
+        supportedTools = supportedTools,
     )
 
     private fun premiumModel(id: String, shortName: String) = AIChatModel(
