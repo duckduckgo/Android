@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -77,12 +78,6 @@ class RealChatHistoryRepository @Inject constructor(
         pinned = chat.pinned,
         lastEditMillis = chat.lastEdit.parseIsoMillis(),
     )
-
-    private fun DuckAiChat.toChatType(): ChatType = when {
-        isImageGeneration -> ChatType.ImageGeneration
-        isVoice -> ChatType.Voice
-        else -> ChatType.Discussion
-    }
 
     private fun String.parseIsoMillis(): Long = runCatching { Instant.parse(this).toEpochMilli() }.getOrDefault(0L)
 

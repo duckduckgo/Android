@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxHistoryCount
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import java.time.Instant
@@ -52,6 +53,7 @@ class ChatSuggestionsNativeReader @Inject constructor(
                     title = chat.title,
                     lastEdit = parseLastEdit(chat.lastEdit),
                     pinned = chat.pinned,
+                    type = chat.toChatType(),
                 )
             }
     }

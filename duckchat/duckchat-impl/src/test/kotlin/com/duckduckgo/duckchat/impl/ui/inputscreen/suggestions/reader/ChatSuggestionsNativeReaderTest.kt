@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen.suggestions.reader
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
+import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -123,16 +124,44 @@ class ChatSuggestionsNativeReaderTest {
         reader.tearDown() // should not throw
     }
 
+    @Test
+    fun `fetchSuggestions maps isImageGeneration flag to ChatType_ImageGeneration`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), isImageGeneration = true)
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.ImageGeneration, reader.fetchSuggestions(query = "").single().type)
+    }
+
+    @Test
+    fun `fetchSuggestions maps isVoice flag to ChatType_Voice`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString(), isVoice = true)
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.Voice, reader.fetchSuggestions(query = "").single().type)
+    }
+
+    @Test
+    fun `fetchSuggestions defaults to ChatType_Discussion when no flag is set`() = runTest {
+        val chat = chatWithLastEdit(Instant.now().minus(1, ChronoUnit.DAYS).toString())
+        whenever(store.getChats()).thenReturn(listOf(chat))
+
+        assertEquals(ChatType.Discussion, reader.fetchSuggestions(query = "").single().type)
+    }
+
     private fun chatWithLastEdit(
         lastEdit: String,
         chatId: String = "chat-1",
         title: String = "Test",
         pinned: Boolean = false,
+        isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
     ) = DuckAiChat(
         chatId = chatId,
         title = title,
         model = "gpt-5-mini",
         lastEdit = lastEdit,
         pinned = pinned,
+        isImageGeneration = isImageGeneration,
+        isVoice = isVoice,
     )
 }
