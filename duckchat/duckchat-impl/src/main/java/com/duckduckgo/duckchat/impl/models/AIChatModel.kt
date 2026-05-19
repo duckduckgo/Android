@@ -149,7 +149,7 @@ enum class ModelProvider {
         fun from(id: String, providerString: String?): ModelProvider {
             return when {
                 id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
-                id.startsWith("mistralai/") || id.startsWith("mistralai_") -> MISTRAL
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") || providerString == "mistral" -> MISTRAL
                 id.contains("gpt-oss") -> OSS
                 providerString == "anthropic" -> ANTHROPIC
                 providerString == "openai" -> OPENAI
