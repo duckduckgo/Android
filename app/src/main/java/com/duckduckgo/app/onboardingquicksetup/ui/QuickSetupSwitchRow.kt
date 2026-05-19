@@ -46,6 +46,8 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
         }
     }
 
+    private var checkedChangeListener: ((Boolean) -> Unit)? = null
+
     var isChecked: Boolean
         get() = binding.quickSetupSwitchRowSwitch.isChecked
         set(value) {
@@ -61,6 +63,15 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
     }
 
     fun setOnCheckedChangeListener(listener: (Boolean) -> Unit) {
+        checkedChangeListener = listener
         binding.quickSetupSwitchRowSwitch.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+    }
+
+    fun setCheckedSilently(checked: Boolean) {
+        binding.quickSetupSwitchRowSwitch.setOnCheckedChangeListener(null)
+        binding.quickSetupSwitchRowSwitch.isChecked = checked
+        checkedChangeListener?.let { listener ->
+            binding.quickSetupSwitchRowSwitch.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+        }
     }
 }

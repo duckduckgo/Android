@@ -68,6 +68,7 @@
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallSetDefaultLabel" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/setDefaultBrowserDivider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:defaultPadding="false"
@@ -81,6 +82,7 @@
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddHomeScreenWidgetLabel" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:id="@+id/addWidgetDivider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:defaultPadding="false"
