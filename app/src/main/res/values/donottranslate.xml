@@ -124,4 +124,8 @@
     <string name="preOnboardingReinstallAddressBarSearchOptionsValue">Search and Duck.ai</string>
     <string name="preOnboardingReinstallEditAction">Edit</string>
     <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
+
+    <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
+    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
+    <string name="settingsInfernoAnimation">Inferno</string>
 </resources>

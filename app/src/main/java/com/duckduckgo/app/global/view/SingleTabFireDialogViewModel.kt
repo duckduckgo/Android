@@ -28,6 +28,7 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -84,6 +85,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val downloadsRepository: DownloadsRepository,
     private val duckChat: DuckChat,
+    private val brandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     var shouldRestartAfterClearing: Boolean = true
@@ -234,6 +236,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val isDuckAiTab = dialogOrigin == DuckAiContextualChat ||
             targetTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
         val tabCount = tabRepository.getOpenTabCount()
+        val isFireAnimationUpdateEnabled = withContext(dispatcherProvider.io()) {
+            brandDesignUpdateToggles.fireAnimationUpdate().isEnabled()
+        }
         return ViewState.Loaded(
             stateData = ViewState.Loaded.StateData(
                 isDuckAiChatsSelected = isDuckAiChatsSelected,
@@ -243,6 +248,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 isSiteDataSubtitleEligible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                 isDownloadsSubtitleEligible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
                 isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
+                isFireAnimationUpdateEnabled = isFireAnimationUpdateEnabled,
             ),
             origin = dialogOrigin,
         )
@@ -312,6 +318,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 val isSiteDataSubtitleEligible: Boolean = false,
                 val isDownloadsSubtitleEligible: Boolean = false,
                 val isFirePictogramVisible: Boolean = true,
+                val isFireAnimationUpdateEnabled: Boolean = false,
             )
         }
     }

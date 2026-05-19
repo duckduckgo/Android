@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -29,15 +30,20 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -69,6 +75,10 @@ internal class FireButtonViewModelTest {
     @Mock
     private lateinit var mockDuckAiFeatureState: DuckAiFeatureState
 
+    private val mockBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     private val duckAishowClearDuckAIChatHistoryFlow = MutableStateFlow(false)
 
     @Before
@@ -79,6 +89,7 @@ internal class FireButtonViewModelTest {
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(duckAishowClearDuckAIChatHistoryFlow)
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(disabledToggle)
 
         runBlocking {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
@@ -90,6 +101,8 @@ internal class FireButtonViewModelTest {
             mockPixel,
             mockDuckChat,
             mockDuckAiFeatureState,
+            mockBrandDesignUpdateToggles,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -268,7 +281,42 @@ internal class FireButtonViewModelTest {
         testee.commands().test {
             testee.userRequestedToChangeFireAnimation()
 
-            assertEquals(Command.LaunchFireAnimationSettings(FireAnimation.HeroFire), awaitItem())
+            assertEquals(
+                Command.LaunchFireAnimationSettings(
+                    animation = FireAnimation.HeroFire,
+                    isFireAnimationUpdateEnabled = false,
+                ),
+                awaitItem(),
+            )
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFireAnimationSettingClickedWithFireAnimationUpdateToggleOnThenCommandFlagsItEnabled() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+
+        testee = FireButtonViewModel(
+            mockAppSettingsDataStore,
+            mockFireAnimationLoader,
+            mockPixel,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            mockBrandDesignUpdateToggles,
+            coroutineTestRule.testDispatcherProvider,
+        )
+
+        testee.commands().test {
+            testee.userRequestedToChangeFireAnimation()
+
+            assertEquals(
+                Command.LaunchFireAnimationSettings(
+                    animation = FireAnimation.HeroFire,
+                    isFireAnimationUpdateEnabled = true,
+                ),
+                awaitItem(),
+            )
 
             cancelAndConsumeRemainingEvents()
         }
@@ -321,6 +369,16 @@ internal class FireButtonViewModelTest {
     }
 
     @Test
+    fun whenInfernoSelectedThenPixelSent() {
+        testee.onFireAnimationSelected(FireAnimation.Inferno)
+
+        verify(mockPixel).fire(
+            AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
+        )
+    }
+
+    @Test
     fun whenSameFireAnimationSelectedThenDoNotSendPixel() {
         givenSelectedFireAnimation(FireAnimation.HeroFire)
 
@@ -338,6 +396,36 @@ internal class FireButtonViewModelTest {
             testee.onClearDataActionClicked()
 
             assertEquals(Command.LaunchFireDialog, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleOffThenViewStateMarksFireAnimationUpdateDisabled() = runTest {
+        testee.viewState().test {
+            assertFalse(awaitItem().isFireAnimationUpdateEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleOnThenViewStateMarksFireAnimationUpdateEnabled() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+
+        testee = FireButtonViewModel(
+            mockAppSettingsDataStore,
+            mockFireAnimationLoader,
+            mockPixel,
+            mockDuckChat,
+            mockDuckAiFeatureState,
+            mockBrandDesignUpdateToggles,
+            coroutineTestRule.testDispatcherProvider,
+        )
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isFireAnimationUpdateEnabled)
 
             cancelAndConsumeRemainingEvents()
         }

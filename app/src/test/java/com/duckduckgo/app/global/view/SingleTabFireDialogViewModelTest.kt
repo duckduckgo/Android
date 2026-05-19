@@ -27,6 +27,7 @@ import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY
@@ -51,6 +52,7 @@ import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
@@ -62,6 +64,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -88,7 +91,11 @@ class SingleTabFireDialogViewModelTest {
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockDuckChat: DuckChat = mock()
+    private val mockBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     @Before
     fun setup() {
@@ -99,6 +106,8 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockDateProvider.getUtcIsoLocalDate()).thenReturn("2025-12-15")
 
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(disabledToggle)
 
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
@@ -124,6 +133,7 @@ class SingleTabFireDialogViewModelTest {
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         downloadsRepository = mockDownloadsRepository,
         duckChat = mockDuckChat,
+        brandDesignUpdateToggles = mockBrandDesignUpdateToggles,
     )
 
     // region Initialization
@@ -506,6 +516,39 @@ class SingleTabFireDialogViewModelTest {
             val state = awaitItem()
 
             assertFalse(state.stateData.isFirePictogramVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation update toggle is disabled then isFireAnimationUpdateEnabled is false`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.stateData.isFireAnimationUpdateEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation update toggle is enabled then isFireAnimationUpdateEnabled is true`() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.stateData.isFireAnimationUpdateEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -895,6 +938,21 @@ class SingleTabFireDialogViewModelTest {
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
+        )
+    }
+
+    @Test
+    fun `when delete all clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
         )
     }
 
