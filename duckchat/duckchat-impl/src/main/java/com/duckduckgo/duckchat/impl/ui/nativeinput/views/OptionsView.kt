@@ -27,7 +27,9 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -37,6 +39,9 @@ import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
 @SuppressLint("ViewConstructor")
@@ -72,6 +77,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     private var popupWindow: PopupWindow? = null
     private var optionsButton: ImageView
+    private var selectedToolJob: Job? = null
 
     init {
         orientation = HORIZONTAL
@@ -83,14 +89,31 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        restoreChip()
+        observeSelectedTool()
     }
 
-    private fun restoreChip() {
-        val tool = viewModel.selectedTool.value ?: return
-        val item = menuItems.firstOrNull { it.tool == tool } ?: return
-        addView(buildChip(item), 1)
-        applyPickerVisibility()
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        selectedToolJob?.cancel()
+        selectedToolJob = null
+        dismissPopup()
+    }
+
+    private fun observeSelectedTool() {
+        selectedToolJob?.cancel()
+        val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
+        selectedToolJob = viewModel.selectedTool
+            .onEach { tool -> renderSelection(tool) }
+            .launchIn(lifecycleOwner.lifecycleScope)
+    }
+
+    private fun renderSelection(tool: Tool?) {
+        val matchingItem = tool?.let { selected -> menuItems.firstOrNull { it.tool == selected } }
+        removeChip()
+        if (matchingItem != null) addView(buildChip(matchingItem), 1)
+        val show = viewModel.shouldShowPickers
+        host.showModelPicker(show)
+        host.showReasoningPicker(show)
     }
 
     fun getSelectedTool(): Tool? {
@@ -100,10 +123,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     fun clearSelection() {
         if (!isAttachedToWindow) return
-        // TODO Task 7: full View migration — push via host.toolSelected(null)
         host.toolSelected(null)
-        removeChip()
-        applyPickerVisibility()
     }
 
     override fun onVisibilityChanged(changedView: View, visibility: Int) {
@@ -125,18 +145,10 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
         if (isAttachedToWindow) {
             val selectionCleared = viewModel.updateVisibleTools(visibleTools)
-            if (selectionCleared) {
-                removeChip()
-                applyPickerVisibility()
-            }
+            if (selectionCleared) host.toolSelected(null)
         }
 
         optionsButton.isVisible = visibleTools.isNotEmpty()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        dismissPopup()
     }
 
     private fun buildOptionsButton(): ImageView {
@@ -188,9 +200,9 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             trailingIcon.visibility = if (item.tool == selectedTool) VISIBLE else GONE
 
             row.setOnClickListener {
-                val nowSelected = item.tool != viewModel.selectedTool.value
+                val willBeSelected = item.tool != viewModel.selectedTool.value
                 trailingIcons.values.forEach { it.visibility = GONE }
-                if (nowSelected) trailingIcon.visibility = VISIBLE
+                if (willBeSelected) trailingIcon.visibility = VISIBLE
                 onOptionTapped(item)
                 row.postDelayed({ popup.dismiss() }, MENU_DISMISS_DELAY_MS)
             }
@@ -199,19 +211,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun onOptionTapped(item: MenuItem) {
-        // TODO Task 7: full View migration — derive toggle from host.toolSelected
         val nowSelected = item.tool != viewModel.selectedTool.value
-        val hadChip = viewModel.selectedTool.value != null
         host.toolSelected(if (nowSelected) item.tool.rawValue else null)
-        if (hadChip) removeChip()
-        if (nowSelected) addView(buildChip(item), 1)
-        applyPickerVisibility()
-    }
-
-    private fun applyPickerVisibility() {
-        val show = viewModel.shouldShowPickers
-        host.showModelPicker(show)
-        host.showReasoningPicker(show)
     }
 
     private fun removeChip() {
@@ -223,10 +224,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            // TODO Task 7: full View migration — push via host.toolSelected(null)
             host.toolSelected(null)
-            removeView(view)
-            applyPickerVisibility()
         }
         return view
     }
