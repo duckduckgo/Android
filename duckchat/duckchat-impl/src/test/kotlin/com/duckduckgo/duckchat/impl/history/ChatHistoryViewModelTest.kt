@@ -866,8 +866,9 @@ private class FakeChatHistoryRepository(
         source.value = emptyList()
     }
 
-    override suspend fun renameChat(chatId: String, newTitle: String) {
+    override suspend fun renameChat(chatId: String, newTitle: String): Boolean {
         renamedChats += chatId to newTitle
+        return true
     }
 }
 

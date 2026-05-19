@@ -35,7 +35,7 @@ interface ChatHistoryRepository {
 
     suspend fun deleteChat(chatId: String)
     suspend fun deleteAllChats()
-    suspend fun renameChat(chatId: String, newTitle: String)
+    suspend fun renameChat(chatId: String, newTitle: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -60,11 +60,8 @@ class RealChatHistoryRepository @Inject constructor(
         withContext(dispatchers.io()) { chatStore.deleteAllChats() }
     }
 
-    override suspend fun renameChat(chatId: String, newTitle: String) {
-        withContext(dispatchers.io()) {
-            check(chatStore.renameChat(chatId, newTitle)) { "Chat $chatId not found or unreadable" }
-        }
-    }
+    override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
+        withContext(dispatchers.io()) { chatStore.renameChat(chatId, newTitle) }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
         chatId = chat.chatId,

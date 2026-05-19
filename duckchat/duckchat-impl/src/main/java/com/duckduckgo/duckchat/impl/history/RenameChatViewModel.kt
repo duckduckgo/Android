@@ -40,19 +40,19 @@ class RenameChatViewModel @Inject constructor(
 
     fun onSaveClicked(chatId: String, newTitle: String) {
         appScope.launch {
-            try {
-                chatHistoryRepository.renameChat(chatId, newTitle.trim())
-                resultChannel.trySend(RenameResult.Success)
+            val outcome = try {
+                if (chatHistoryRepository.renameChat(chatId, newTitle.trim())) RenameResult.Success else RenameResult.Error
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                resultChannel.trySend(RenameResult.Error(e))
+                RenameResult.Error
             }
+            resultChannel.trySend(outcome)
         }
     }
 
     sealed interface RenameResult {
         data object Success : RenameResult
-        data class Error(val throwable: Throwable) : RenameResult
+        data object Error : RenameResult
     }
 }

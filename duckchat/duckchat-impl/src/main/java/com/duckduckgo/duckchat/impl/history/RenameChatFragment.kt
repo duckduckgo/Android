@@ -85,7 +85,7 @@ class RenameChatFragment : DuckDuckGoFragment(R.layout.fragment_rename_chat) {
     private fun onRenameResult(result: RenameChatViewModel.RenameResult) {
         when (result) {
             RenameChatViewModel.RenameResult.Success -> dismiss()
-            is RenameChatViewModel.RenameResult.Error ->
+            RenameChatViewModel.RenameResult.Error ->
                 Snackbar.make(binding.root, R.string.duck_ai_chat_history_rename_error, Snackbar.LENGTH_SHORT).show()
         }
     }

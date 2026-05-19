@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -166,19 +167,22 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `renameChat delegates to store on success`() = runTest {
+    fun `renameChat delegates to store and returns true on success`() = runTest {
         whenever(chatStore.renameChat("abc", "New")).thenReturn(true)
 
-        repository.renameChat("abc", "New")
+        val result = repository.renameChat("abc", "New")
 
+        assertTrue(result)
         verify(chatStore).renameChat("abc", "New")
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `renameChat throws when store reports the chat could not be updated`() = runTest {
+    @Test
+    fun `renameChat returns false when store reports the chat could not be updated`() = runTest {
         whenever(chatStore.renameChat("missing", "New")).thenReturn(false)
 
-        repository.renameChat("missing", "New")
+        val result = repository.renameChat("missing", "New")
+
+        assertFalse(result)
     }
 
     private fun chat(

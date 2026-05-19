@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -45,16 +44,24 @@ class RenameChatViewModelTest {
     }
 
     @Test
-    fun `onSaveClicked emits Error when repository throws`() = coroutineRule.testScope.runTest {
-        val failure = IllegalStateException("boom")
-        repository.errorToThrow = failure
+    fun `onSaveClicked emits Error when repository reports failure`() = coroutineRule.testScope.runTest {
+        repository.nextResult = false
 
         viewModel.results.test {
             viewModel.onSaveClicked("chat-1", "New Title")
 
-            val result = awaitItem()
-            assertTrue(result is RenameChatViewModel.RenameResult.Error)
-            assertEquals(failure, (result as RenameChatViewModel.RenameResult.Error).throwable)
+            assertEquals(RenameChatViewModel.RenameResult.Error, awaitItem())
+        }
+    }
+
+    @Test
+    fun `onSaveClicked emits Error when repository throws`() = coroutineRule.testScope.runTest {
+        repository.errorToThrow = IllegalStateException("boom")
+
+        viewModel.results.test {
+            viewModel.onSaveClicked("chat-1", "New Title")
+
+            assertEquals(RenameChatViewModel.RenameResult.Error, awaitItem())
         }
     }
 }
@@ -62,14 +69,16 @@ class RenameChatViewModelTest {
 private class RecordingRenameRepository : ChatHistoryRepository {
     val renames: MutableList<Pair<String, String>> = mutableListOf()
     var errorToThrow: Throwable? = null
+    var nextResult: Boolean = true
 
     override fun observeChats(): Flow<List<ChatHistoryItem>> = MutableStateFlow(emptyList())
 
     override suspend fun deleteChat(chatId: String) = Unit
     override suspend fun deleteAllChats() = Unit
 
-    override suspend fun renameChat(chatId: String, newTitle: String) {
+    override suspend fun renameChat(chatId: String, newTitle: String): Boolean {
         errorToThrow?.let { throw it }
         renames += chatId to newTitle
+        return nextResult
     }
 }
