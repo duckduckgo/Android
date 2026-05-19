@@ -190,6 +190,7 @@ class TabSwitcherActivity :
     // tab so the user doesn't land in an arbitrary scroll position.
     private var lastObservedBrowserMode: com.duckduckgo.browsermode.api.BrowserMode? = null
     private var scrollToActiveTabOnNextUpdate = false
+    private var lastSnackbar: DefaultSnackbar? = null
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
@@ -600,12 +601,13 @@ class TabSwitcherActivity :
             ShowAnimatedTileDismissalDialog -> showAnimatedTileDismissalDialog()
             DismissAnimatedTileDismissalDialog -> tabSwitcherAnimationTileRemovalDialog!!.dismiss()
             Command.ShowFireBottomSheet -> onFireButtonClicked()
+            Command.DismissSnackbar -> lastSnackbar?.dismiss()
         }
     }
 
     private fun showBookmarkSnackbarWithUndo(numBookmarks: Int) {
         val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
-        DefaultSnackbar(
+        lastSnackbar = DefaultSnackbar(
             parentView = binding.root,
             message = message,
             anchor = snackbarAnchorView,
@@ -613,7 +615,8 @@ class TabSwitcherActivity :
             showAction = numBookmarks > 0,
             onAction = viewModel::undoBookmarkAction,
             onDismiss = viewModel::finishBookmarkAction,
-        ).show()
+        )
+        lastSnackbar?.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -754,7 +757,7 @@ class TabSwitcherActivity :
     }
 
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {
-        DefaultSnackbar(
+        lastSnackbar = DefaultSnackbar(
             parentView = binding.root,
             message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
             anchor = snackbarAnchorView,
@@ -762,7 +765,8 @@ class TabSwitcherActivity :
             showAction = true,
             onAction = { launch { viewModel.onUndoDeleteTabs(tabIds) } },
             onDismiss = { launch { viewModel.onUndoDeleteSnackbarDismissed(tabIds) } },
-        ).show()
+        )
+        lastSnackbar?.show()
     }
 
     private fun launchShareLinkChooser(

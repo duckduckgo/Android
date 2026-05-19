@@ -213,6 +213,7 @@ class TabSwitcherViewModel @Inject constructor(
         data class ShowUndoBookmarkMessage(val numBookmarks: Int) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
         data object ShowFireBottomSheet : Command()
+        data object DismissSnackbar : Command()
     }
 
     fun onNewTabRequested(fromOverflowMenu: Boolean = false) = viewModelScope.launch {
@@ -246,6 +247,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onBrowserModeToggled(mode: BrowserMode) {
         if (!isBrowserModeToggleVisible) return
         if (mode == currentMode.value) return
+        command.value = Command.DismissSnackbar
         browserModeStateHolder.switchTo(mode)
     }
 
