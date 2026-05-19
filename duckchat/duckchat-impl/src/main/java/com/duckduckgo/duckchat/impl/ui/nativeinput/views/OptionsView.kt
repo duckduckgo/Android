@@ -100,7 +100,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     fun clearSelection() {
         if (!isAttachedToWindow) return
-        viewModel.clearTool()
+        // TODO Task 7: full View migration — push via host.toolSelected(null)
+        host.toolSelected(null)
         removeChip()
         applyPickerVisibility()
     }
@@ -198,10 +199,12 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun onOptionTapped(item: MenuItem) {
+        // TODO Task 7: full View migration — derive toggle from host.toolSelected
+        val nowSelected = item.tool != viewModel.selectedTool.value
         val hadChip = viewModel.selectedTool.value != null
-        viewModel.toggleTool(item.tool)
+        host.toolSelected(if (nowSelected) item.tool.rawValue else null)
         if (hadChip) removeChip()
-        if (viewModel.selectedTool.value != null) addView(buildChip(item), 1)
+        if (nowSelected) addView(buildChip(item), 1)
         applyPickerVisibility()
     }
 
@@ -220,7 +223,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            viewModel.clearTool()
+            // TODO Task 7: full View migration — push via host.toolSelected(null)
+            host.toolSelected(null)
             removeView(view)
             applyPickerVisibility()
         }
