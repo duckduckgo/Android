@@ -1023,9 +1023,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    override fun getInputState(): NativeInputState =
-        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }
-            ?: error("getInputState called before widget was configured")
     override fun showModelPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
     }
