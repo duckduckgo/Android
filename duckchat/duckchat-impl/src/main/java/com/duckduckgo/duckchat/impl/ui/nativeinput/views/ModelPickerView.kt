@@ -41,6 +41,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -78,14 +79,21 @@ class ModelPickerView @JvmOverloads constructor(
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ModelPickerViewModel::class.java]
     }
     private val chip: Chip by lazy { findViewById(R.id.modelPickerChip) }
     private var stateJob: Job? = null
+    private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
     private var lastObservedModelId: String? = null
+
+    // Mirrors the input context from the per-tab native input state so currentSurface() can be
+    // read synchronously from popup callbacks. Updated by observeInputContext().
+    private var lastInputContext: InputContext = InputContext.BROWSER
     private lateinit var host: NativeInputHost
     override var onMenuShown: (() -> Unit)? = null
     override var onMenuDismissed: (() -> Unit)? = null
@@ -131,6 +139,15 @@ class ModelPickerView @JvmOverloads constructor(
 
         viewModel.fetchModels()
         observeState()
+        observeInputContext()
+    }
+
+    private fun observeInputContext() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        inputContextJob?.cancel()
+        inputContextJob = nativeInputStateProvider.state
+            .onEach { lastInputContext = it.inputContext }
+            .launchIn(scope)
     }
 
     private fun observeState() {
@@ -165,7 +182,7 @@ class ModelPickerView @JvmOverloads constructor(
     }
 
     private fun currentSurface(): ModelPickerViewModel.PickerSurface =
-        when (host.getInputState().inputContext) {
+        when (lastInputContext) {
             InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> ModelPickerViewModel.PickerSurface.DUCK_AI_TAB
             InputContext.BROWSER -> ModelPickerViewModel.PickerSurface.ADDRESS_BAR
         }
@@ -230,6 +247,8 @@ class ModelPickerView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        inputContextJob?.cancel()
+        inputContextJob = null
         commandJob?.cancel()
         commandJob = null
         dismissPopup()
