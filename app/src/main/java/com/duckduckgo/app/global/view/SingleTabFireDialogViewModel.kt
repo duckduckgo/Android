@@ -146,24 +146,39 @@ class SingleTabFireDialogViewModel @Inject constructor(
             withContext(dispatcherProvider.io()) {
                 fireButtonStore.incrementFireButtonUseCount()
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-                val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls
                 val clearOptions = fireDataStore.getManualClearOptions()
                 dataClearingWideEvent.start(
                     entryPoint = DataClearingWideEvent.EntryPoint.SINGLE_TAB_FIRE_DIALOG,
                     clearOptions = clearOptions,
                 )
                 try {
-                    if (selectedChatUrls != null) {
-                        shouldRestartAfterClearing = false
-                        dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
-                    } else {
-                        dataClearing.clearDataUsingManualFireOptions()
-                    }
+                    dataClearing.clearDataUsingManualFireOptions()
                     dataClearingWideEvent.finishSuccess()
                 } catch (e: Exception) {
                     dataClearingWideEvent.finishFailure(e)
                     throw e
                 }
+            }
+
+            command.send(Command.ClearingComplete)
+        }
+    }
+
+    fun onDeleteSelectedChatsClicked() {
+        val selectedChatUrls = (origin.value as? FireDialogOrigin.ChatHistory)?.selectedChatUrls ?: return
+        viewModelScope.launch {
+            shouldRestartAfterClearing = false
+            command.send(Command.OnClearStarted)
+
+            val fireAnimationEnabled = withContext(dispatcherProvider.io()) {
+                settingsDataStore.fireAnimationEnabled
+            }
+            if (fireAnimationEnabled) {
+                command.send(Command.PlayAnimation)
+            }
+
+            withContext(dispatcherProvider.io()) {
+                dataClearing.clearSelectedDuckAiChats(selectedChatUrls)
             }
 
             command.send(Command.ClearingComplete)

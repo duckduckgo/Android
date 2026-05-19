@@ -176,15 +176,23 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun setupLayout() {
         binding.deleteAllPrimaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteAllSecondaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteThisTabButton.setOnClickListener {
             hideDialog()
             viewModel.onDeleteThisTabClicked()
+        }
+    }
+
+    private fun dispatchDeleteAll() {
+        if (arguments?.getString(ARG_ORIGIN) == ORIGIN_CHAT_HISTORY) {
+            viewModel.onDeleteSelectedChatsClicked()
+        } else {
+            viewModel.onDeleteAllClicked()
         }
     }
 

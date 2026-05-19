@@ -1099,19 +1099,124 @@ class SingleTabFireDialogViewModelTest {
         }
     }
 
+    // endregion
+
+    // region onDeleteSelectedChatsClicked
+
     @Test
-    fun `when delete all clicked from ChatHistory origin then clearSelectedDuckAiChats is dispatched and process is not restarted`() = runTest {
+    fun `when delete selected chats clicked then clearSelectedDuckAiChats is dispatched with the origin urls`() = runTest {
         val urls = setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b")
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = urls))
 
-        testee.onDeleteAllClicked()
+        testee.onDeleteSelectedChatsClicked()
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockDataClearing).clearSelectedDuckAiChats(urls)
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+    }
+
+    @Test
+    fun `when delete selected chats clicked then process is not restarted`() = runTest {
+        val urls = setOf("https://duck.ai?chatID=a")
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = urls))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
         assertFalse(testee.shouldRestartAfterClearing)
+    }
+
+    @Test
+    fun `when delete selected chats clicked then no fire-dialog pixels are fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED_DAILY), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_ANIMATION), any(), any(), any())
+    }
+
+    @Test
+    fun `when delete selected chats clicked then fire button counters are not touched`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockFireButtonStore, never()).incrementFireButtonUseCount()
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+    }
+
+    @Test
+    fun `when delete selected chats clicked then data clearing wide event is not started`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+    }
+
+    @Test
+    fun `when delete selected chats clicked with animation enabled then play animation command is sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.commands().test {
+            testee.onDeleteSelectedChatsClicked()
+
+            awaitItem() // OnShow from init
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.PlayAnimation, awaitItem())
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete selected chats clicked with animation disabled then play animation command is not sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.commands().test {
+            testee.onDeleteSelectedChatsClicked()
+
+            awaitItem() // OnShow from init
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete selected chats clicked without ChatHistory origin then nothing happens`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearSelectedDuckAiChats(any())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
     }
 
     // endregion
