@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
@@ -96,6 +97,7 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
+    private val modelManager: DuckAiModelManager = mock()
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
@@ -152,6 +154,7 @@ class NativeInputModeWidgetViewModelTest {
             pixel = pixel,
             nativeInputStatePublisher = nativeInputStatePublisher,
             nativeInputStateProvider = nativeInputStateProvider,
+            modelManager = modelManager,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -530,17 +533,17 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenPluginReturnsReasoningEffortSelectionThenGetResolvedReasoningEffortReturnsIt() = runTest {
-        val plugin = fakeReasoningPlugin(containerId = 7, effort = "low")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenModelManagerResolvesReasoningEffortThenGetResolvedReasoningEffortReturnsIt() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+        val viewModel = createViewModel()
 
         assertEquals("low", viewModel.getResolvedReasoningEffort())
     }
 
     @Test
-    fun whenNoPluginContributesReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenModelManagerReturnsNoReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+        val viewModel = createViewModel()
 
         assertNull(viewModel.getResolvedReasoningEffort())
     }
@@ -582,15 +585,6 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.storePendingPrompt("hello", "model-1", null, selectedTool = "GenerateImage")
 
         verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
-    }
-
-    private fun fakeReasoningPlugin(containerId: Int, effort: String?): NativeInputPlugin {
-        return object : NativeInputPlugin {
-            override val containerId: Int = containerId
-            override fun createView(context: Context, host: NativeInputHost): View = View(context)
-            override fun getPromptContribution(): PromptContribution? =
-                effort?.let { PromptContribution.ReasoningEffortSelection(it) }
-        }
     }
 
     @Test

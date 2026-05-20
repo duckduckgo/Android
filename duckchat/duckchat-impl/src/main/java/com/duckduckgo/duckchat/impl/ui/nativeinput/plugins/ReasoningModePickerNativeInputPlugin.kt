@@ -21,7 +21,6 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
@@ -34,15 +33,11 @@ import javax.inject.Inject
     featureName = "pluginReasoningModePickerNativeInput",
     parentFeatureName = "pluginPointNativeInput",
 )
-class ReasoningModePickerNativeInputPlugin @Inject constructor(
-    private val modelManager: DuckAiModelManager,
-) : NativeInputPlugin {
+class ReasoningModePickerNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.reasoningModePickerContainer
 
     override fun createView(context: Context, host: NativeInputHost): View = ReasoningModePickerView(context)
 
-    override fun getPromptContribution(): PromptContribution? =
-        modelManager.getResolvedReasoningEffort()
-            ?.let { PromptContribution.ReasoningEffortSelection(it) }
+    override fun getPromptContribution(): PromptContribution? = null
 }

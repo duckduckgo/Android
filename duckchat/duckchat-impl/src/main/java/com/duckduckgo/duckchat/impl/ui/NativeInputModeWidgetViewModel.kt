@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -98,6 +99,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val pixel: Pixel,
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val nativeInputStateProvider: NativeInputStateProvider,
+    private val modelManager: DuckAiModelManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -147,11 +149,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun getResolvedReasoningEffort(): String? {
-        return _plugins.value.firstNotNullOfOrNull { plugin ->
-            (plugin.getPromptContribution() as? PromptContribution.ReasoningEffortSelection)?.effort
-        }
-    }
+    fun getResolvedReasoningEffort(): String? = modelManager.getResolvedReasoningEffort()
 
     fun getSelectedTool(): String? {
         val tabId = activeTabId.value ?: return null
