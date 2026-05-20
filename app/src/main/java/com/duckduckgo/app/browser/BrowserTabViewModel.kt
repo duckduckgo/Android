@@ -655,8 +655,12 @@ class BrowserTabViewModel @Inject constructor(
     private var hasCompletedPageLoad = false
 
     private var allowlistRefreshTriggerJob: Job? = null
-    private var isCustomTabScreen: Boolean = false
-    private var customTabClientPackage: String? = null
+
+    /** Non-null while this tab is displayed inside a Custom Tab. Captures the verified calling
+     *  package (when known) used by [handleAppLink]'s trusted-caller carve-out. */
+    private data class CustomTabContext(val clientPackage: String?)
+    private var customTab: CustomTabContext? = null
+
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
@@ -911,8 +915,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null) {
-        this.isCustomTabScreen = isCustomTab
-        this.customTabClientPackage = clientPackage
+        this.customTab = if (isCustomTab) CustomTabContext(clientPackage) else null
     }
 
     fun onViewReady() {
@@ -1564,7 +1567,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     override fun closeCurrentTab() {
-        if (isCustomTabScreen) {
+        if (customTab != null) {
             command.value = Command.NavigateBackInCustomTab
         } else {
             viewModelScope.launch {
@@ -3495,9 +3498,7 @@ class BrowserTabViewModel @Inject constructor(
         // the "trusted-caller" carve-out applies - if an app opens a Custom Tab, App Links that
         // point back to that same app should be allowed even without user interaction.
         val targetPackage = appLink.appIntent?.component?.packageName ?: appLink.appIntent?.`package`
-        val isTrustedCaller = isCustomTabScreen &&
-            customTabClientPackage != null &&
-            customTabClientPackage == targetPackage
+        val isTrustedCaller = targetPackage != null && customTab?.clientPackage == targetPackage
         return (hasGesture || appLinksHandler.isUserQuery() || isTrustedCaller) &&
             appLinksHandler.handleAppLink(
                 isForMainFrame,
@@ -3534,7 +3535,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun appLinkClicked(appLink: AppLink) {
         command.value = when {
             // When in custom tab, always open the app link directly, without prompting.
-            isCustomTabScreen -> OpenAppLink(appLink)
+            customTab != null -> OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> ShowAppLinkPrompt(appLink)
             else -> OpenAppLink(appLink)
         }
@@ -3772,7 +3773,7 @@ class BrowserTabViewModel @Inject constructor(
                         currentPdfFileName = pdfTitle,
                     )
                     command.value = ShowPdfInTab(url, result.uri)
-                    if (!isCustomTabScreen && pdfDownloadTooltipDataStore.canShow()) {
+                    if (customTab == null && pdfDownloadTooltipDataStore.canShow()) {
                         pdfDownloadTooltipDataStore.incrementShownCount()
                         command.value = Command.ShowPdfDownloadTooltip
                     }
@@ -4375,7 +4376,7 @@ class BrowserTabViewModel @Inject constructor(
     fun handleNewTabIfEmptyUrl() {
         val shouldDisplayAboutBlank = webNavigationState == null
         if (shouldDisplayAboutBlank) {
-            if (isCustomTabScreen) {
+            if (customTab != null) {
                 handleNewTabForEmptyUrlOnCustomTab()
             }
             omnibarViewState.value = currentOmnibarViewState().copy(
