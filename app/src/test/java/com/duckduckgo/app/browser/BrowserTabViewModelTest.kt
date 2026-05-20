@@ -76,6 +76,7 @@ import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideDaxBubbleCtaOnSubmit
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
+import com.duckduckgo.app.browser.commands.Command.HideNativeInputOnOnboardingSubmit
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -165,6 +166,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.DaxTryASearchBrandDesignUpdateBubbleCta
+import com.duckduckgo.app.cta.ui.DaxVisitSiteOptionsBrandDesignUpdateBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
@@ -7047,6 +7049,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideDaxBubbleCtaOnSubmit> {
             assertEquals(cta, this.daxBubbleCta)
         }
+        assertCommandIssued<HideNativeInputOnOnboardingSubmit>()
         assertNull(testee.ctaViewState.value?.cta)
     }
 
@@ -7060,6 +7063,37 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         assertCommandNotIssued<HideDaxBubbleCtaOnSubmit>()
+        assertCommandNotIssued<HideNativeInputOnOnboardingSubmit>()
+        assertEquals(cta, testee.ctaViewState.value?.cta)
+    }
+
+    @Test
+    fun givenVisitSiteOptionsBubbleShownAndNativeInputEnabledWhenUserSubmittedQueryThenBubbleIsDismissed() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+        nativeInputFieldUserSettingEnabledFlow.value = true
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandIssued<HideDaxBubbleCtaOnSubmit> {
+            assertEquals(cta, this.daxBubbleCta)
+        }
+        assertCommandIssued<HideNativeInputOnOnboardingSubmit>()
+        assertNull(testee.ctaViewState.value?.cta)
+    }
+
+    @Test
+    fun givenVisitSiteOptionsBubbleShownAndNativeInputDisabledWhenUserSubmittedQueryThenBubbleIsNotDismissed() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+        nativeInputFieldUserSettingEnabledFlow.value = false
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandNotIssued<HideDaxBubbleCtaOnSubmit>()
+        assertCommandNotIssued<HideNativeInputOnOnboardingSubmit>()
         assertEquals(cta, testee.ctaViewState.value?.cta)
     }
 
