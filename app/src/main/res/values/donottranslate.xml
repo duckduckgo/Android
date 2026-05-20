@@ -134,6 +134,10 @@
     <string name="quickSetupRemoveHomeScreenWidgetStep2">Touch and hold the widget</string>
     <string name="quickSetupRemoveHomeScreenWidgetStep3">Tap or drag to remove it</string>
 
+    <string name="quickSetupRemoveHomeScreenWidgetStep1Number" translatable="false">1</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep2Number" translatable="false">2</string>
+    <string name="quickSetupRemoveHomeScreenWidgetStep3Number" translatable="false">3</string>
+
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
     <string name="settingsInfernoAnimation">Inferno</string>

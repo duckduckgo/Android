@@ -28,4 +28,6 @@
     <dimen name="onboardingContextualBackgroundOverlapNegative">-56dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
     <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
+    <dimen name="quickSetupBottomSheetHorizontalPadding">40dp</dimen>
+    <dimen name="quickSetupRemoveWidgetStepNumberSize">28dp</dimen>
 </resources>
