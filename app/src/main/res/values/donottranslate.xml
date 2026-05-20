@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- We won't have a translation for this, to be used later. -->
     <string name="trackersOverviewEmpty">No tracking requests were blocked from loading on this page. If a company\'s requests are loaded, it can allow them to profile you.</string>
@@ -54,15 +54,6 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
-    <!-- Pre-onboarding Address Bar Position -->
-    <string name="preOnboardingAddressBarPositionTop">Top</string>
-    <string name="preOnboardingAddressBarPositionBottom">Bottom</string>
-    <string name="preOnboardingAddressBarPositionSplit">Split</string>
-
-    <!-- Pre-onboarding Input Screen (AI Chat Toggle) -->
-    <string name="preOnboardingInputScreenSearchOnly">Search Only</string>
-    <string name="preOnboardingInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
-
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 
@@ -73,10 +64,6 @@
     <string name="duckAiHeaderFreePlan">Free Plan</string>
     <string name="duckAiHeaderUpgrade">Upgrade</string>
     <string name="duckAiHeaderPaidTitle">Duck.ai</string>
-
-    <!-- Onboarding search options (need escaped quotes for "duck") -->
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate 'duck' too.">how to say \"duck\" in english</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate 'duck' too. Don't add question mark">how to say \"duck\" in spanish</string>
 
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
@@ -91,12 +78,6 @@
         }
       }]
     </string>
-
-    <!--Onboarding Rebrand Design Update-->
-    <string name="preOnboardingWelcomeDialogTitle">Hi there.</string>
-    <string name="preOnboardingWelcomeDialogBody1">Ready for a faster browser that\nputs you in control?</string>
-    <string name="preOnboardingWelcomeDialogBody2">AI is always optional, and\nprivacy protection is always on.</string>
-    <string name="onboardingStepIndicatorText" tools:ignore="MissingInstruction">%1$d of %2$d</string>
 
     <!-- Input Mode Demo Onboarding step -->
     <string name="preOnboardingInputModeDemoTitle">Ready to get started?&lt;br/&gt;Try a search or AI chat!</string>
@@ -125,10 +106,6 @@
     <string name="preOnboardingReinstallAddressBarSearchOptionsValue">Search and Duck.ai</string>
     <string name="preOnboardingReinstallEditAction">Edit</string>
     <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
-
-    <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
-    <string name="settingsHeroFireAnimationClassic">Inferno Classic</string>
-    <string name="settingsInfernoAnimation">Inferno</string>
 
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>

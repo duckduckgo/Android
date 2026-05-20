@@ -118,12 +118,12 @@ class FireAnimationTest {
 
     @Test
     fun whenDisplayLabelInfernoAndIncludesInfernoThenInfernoStringResource() {
-        assertEquals(R.string.settingsInfernoAnimation, Inferno.displayLabelResId(includesInferno = true))
+        assertEquals(R.string.settingsHeroFireAnimation, Inferno.displayLabelResId(includesInferno = true))
     }
 
     @Test
     fun whenDisplayLabelInfernoAndExcludesInfernoThenInfernoStringResource() {
-        assertEquals(R.string.settingsInfernoAnimation, Inferno.displayLabelResId(includesInferno = false))
+        assertEquals(R.string.settingsHeroFireAnimation, Inferno.displayLabelResId(includesInferno = false))
     }
 
     @Test
