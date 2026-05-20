@@ -1089,7 +1089,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
 
                     binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        if (deviceInfo.isTablet()) {
+                        if (showLeftWingAnimation && deviceInfo.isTablet()) {
                             verticalBias = 0.5f
                             bottomToTop = binding.leftWingAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1099,6 +1099,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showLeftWingAnimation) 1f else 0f)
 
                     binding.welcomeScreenWalkingDax.isVisible = false
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
@@ -1491,7 +1492,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    if (deviceInfo.isTablet()) {
+                    if (showLeftWing && deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.leftWingAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1505,6 +1506,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
+                cardView.setArrowDepthFraction(if (showLeftWing) 1f else 0f)
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
                 binding.daxDialogCta.secondaryCta.isVisible = false
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
