@@ -72,11 +72,13 @@ private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
 private const val NO_MAX_WIDTH = -1
 private const val ARG_ORIGIN = "origin"
 private const val ARG_TAB_ID = "tabId"
+private const val ARG_SELECTED_CHAT_URLS = "selectedChatUrls"
 internal const val ORIGIN_BROWSER = "Browser"
 internal const val ORIGIN_SETTINGS = "Settings"
 internal const val ORIGIN_TAB_SWITCHER = "TabSwitcher"
 internal const val ORIGIN_DUCK_AI_CONTEXTUAL_CHAT = "DuckAiContextualChat"
 internal const val ORIGIN_HATCH = "Hatch"
+internal const val ORIGIN_CHAT_HISTORY = "ChatHistory"
 
 @InjectWith(FragmentScope::class)
 class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
@@ -174,15 +176,23 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun setupLayout() {
         binding.deleteAllPrimaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteAllSecondaryButton.setOnClickListener {
             hideDialog()
-            viewModel.onDeleteAllClicked()
+            dispatchDeleteAll()
         }
         binding.deleteThisTabButton.setOnClickListener {
             hideDialog()
             viewModel.onDeleteThisTabClicked()
+        }
+    }
+
+    private fun dispatchDeleteAll() {
+        if (arguments?.getString(ARG_ORIGIN) == ORIGIN_CHAT_HISTORY) {
+            viewModel.onDeleteSelectedChatsClicked()
+        } else {
+            viewModel.onDeleteAllClicked()
         }
     }
 
@@ -271,14 +281,11 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             binding.fireIcon.gone()
         }
 
-        val titleRes = if (state.stateData.isDuckAiTab && state.isDeleteThisTabButtonVisible) {
-            R.string.singleTabFireDialogTitleDuckAi
-        } else if (state.stateData.isDuckAiChatsSelected) {
-            R.string.singleTabFireDialogTitleWithChats
-        } else {
-            R.string.singleTabFireDialogTitle
+        binding.dialogTitle.text = when (val source = state.stateData.titleSource) {
+            is SingleTabFireDialogViewModel.TitleSource.Static -> requireContext().getString(source.resId)
+            is SingleTabFireDialogViewModel.TitleSource.Plural ->
+                resources.getQuantityString(source.pluralsId, source.count, source.count)
         }
-        binding.dialogTitle.text = requireContext().getString(titleRes)
 
         if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
@@ -439,6 +446,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                     FireDialogProvider.FireDialogOrigin.Browser
                 }
             }
+            ORIGIN_CHAT_HISTORY -> {
+                val urls = arguments?.getStringArrayList(ARG_SELECTED_CHAT_URLS)?.toSet().orEmpty()
+                FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = urls)
+            }
             else -> FireDialogProvider.FireDialogOrigin.Browser
         }
     }
@@ -449,6 +460,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 arguments = bundleOf(
                     ARG_ORIGIN to origin.tag(),
                     ARG_TAB_ID to (origin as? FireDialogProvider.FireDialogOrigin.Hatch)?.tabId,
+                    ARG_SELECTED_CHAT_URLS to (origin as? FireDialogProvider.FireDialogOrigin.ChatHistory)
+                        ?.selectedChatUrls?.let { ArrayList(it) },
                 )
             }
         }
@@ -459,6 +472,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             FireDialogProvider.FireDialogOrigin.TabSwitcher -> ORIGIN_TAB_SWITCHER
             FireDialogProvider.FireDialogOrigin.DuckAiContextualChat -> ORIGIN_DUCK_AI_CONTEXTUAL_CHAT
             is FireDialogProvider.FireDialogOrigin.Hatch -> ORIGIN_HATCH
+            is FireDialogProvider.FireDialogOrigin.ChatHistory -> ORIGIN_CHAT_HISTORY
         }
     }
 }

@@ -29,6 +29,9 @@ interface ManualDataClearing {
      */
     suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
 
+    /** Deletes only the chats addressed by [chatUrls] and closes any browser tabs pointing at them. */
+    suspend fun clearSelectedDuckAiChats(chatUrls: Set<String>)
+
     /**
      * Clears all data associated with tab:
      * site browsing data (via WebStorageCompat), tab-specific history,

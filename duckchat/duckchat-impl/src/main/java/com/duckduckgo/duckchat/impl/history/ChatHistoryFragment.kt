@@ -20,13 +20,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.SearchBar
@@ -35,13 +35,15 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
+import com.duckduckgo.dataclearing.api.fire.FireDialog
+import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentChatHistoryBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
@@ -52,10 +54,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
-    lateinit var duckChat: DuckChatInternal
-
-    @Inject
-    lateinit var pixel: Pixel
+    lateinit var fireDialogProvider: FireDialogProvider
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
@@ -63,13 +62,18 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     private val adapter = ChatHistoryAdapter(
-        onChatClicked = { item -> duckChat.openWithChatId(item.chatId) },
-        onChatMoreClicked = { _, anchor -> showRowPopup(anchor) },
+        onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
+        onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
+        onChatLongClicked = { item -> viewModel.onChatRowLongClicked(item.chatId) },
+        onSelectAllClicked = { viewModel.onSelectAllToggled() },
     )
 
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
         override fun handleOnBackPressed() {
-            hideSearchBar()
+            when {
+                binding.searchBar.isVisible -> hideSearchBar()
+                viewModel.isSelectMode() -> viewModel.onSelectModeCancelled()
+            }
         }
     }
 
@@ -85,7 +89,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         binding.chatHistoryList.layoutManager = LinearLayoutManager(requireContext())
         binding.chatHistoryList.adapter = adapter
 
-        binding.chatHistoryEmptyState.setOnPrimaryCtaClickListener { duckChat.openDuckChat() }
+        binding.chatHistoryEmptyState.setOnPrimaryCtaClickListener { viewModel.onOpenDuckAiClicked() }
 
         binding.searchBar.onAction { action ->
             when (action) {
@@ -95,6 +99,21 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
+
+        childFragmentManager.setFragmentResultListener(FireDialog.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            val event = bundle.getString(FireDialog.RESULT_KEY_EVENT)
+            val confirmation = (viewModel.uiState.value as? ChatHistoryUiState.Loaded)?.confirmation
+            when (event) {
+                FireDialog.EVENT_ON_CLEAR_STARTED,
+                FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED,
+                -> when (confirmation) {
+                    is ChatHistoryUiState.PendingConfirmation.FireAll -> viewModel.onFireAllConfirmed()
+                    is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> viewModel.onDeleteSelectedConfirmed()
+                    null -> Unit
+                }
+                FireDialog.EVENT_ON_CANCEL -> viewModel.onConfirmationCancelled()
+            }
+        }
 
         viewModel.uiState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -108,29 +127,103 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             ChatHistoryUiState.Loading -> {
                 binding.chatHistoryList.visibility = View.GONE
                 binding.chatHistoryEmptyState.visibility = View.GONE
+                applyDefaultToolbar()
+                setFireActionVisible(false)
             }
             ChatHistoryUiState.Empty -> {
                 binding.chatHistoryList.visibility = View.GONE
                 binding.chatHistoryEmptyState.visibility = View.VISIBLE
                 adapter.submitList(emptyList())
+                applyDefaultToolbar()
+                setFireActionVisible(false)
             }
             is ChatHistoryUiState.Loaded -> {
                 binding.chatHistoryList.visibility = View.VISIBLE
                 binding.chatHistoryEmptyState.visibility = View.GONE
-                adapter.submitList(buildEntries(state))
+                val selectMode = state.mode as? ChatHistoryUiState.Mode.Selecting
+                adapter.submitList(buildEntries(state, selectMode))
+                if (selectMode != null) {
+                    applySelectModeToolbar(selectMode.selectedChatIds.size)
+                    setFireActionVisible(selectMode.selectedChatIds.isNotEmpty())
+                } else {
+                    applyDefaultToolbar()
+                    // Fire-all wipes every chat including Pinned — show whenever any chat is present.
+                    setFireActionVisible(state.pinned.isNotEmpty() || state.recent.isNotEmpty())
+                }
+                renderConfirmation(state.confirmation)
+            }
+        }
+        // Re-derive every render so a transition out of Loaded (e.g. last chat deleted externally)
+        // can't leave us intercepting back presses with no overlay to dismiss.
+        onBackPressedCallback.isEnabled = shouldInterceptBack(state)
+    }
+
+    private fun shouldInterceptBack(state: ChatHistoryUiState): Boolean {
+        if (binding.searchBar.isVisible) return true
+        val loaded = state as? ChatHistoryUiState.Loaded ?: return false
+        return loaded.mode is ChatHistoryUiState.Mode.Selecting
+    }
+
+    private fun applyDefaultToolbar() {
+        binding.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+        binding.toolbar.navigationContentDescription = null
+        binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
+        binding.toolbar.setTitle(R.string.duck_ai_chat_history_title)
+        binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = true
+        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = true
+    }
+
+    private fun applySelectModeToolbar(count: Int) {
+        binding.toolbar.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+        binding.toolbar.navigationContentDescription =
+            getString(R.string.duck_ai_chat_history_exit_select_mode_content_description)
+        binding.toolbar.setNavigationOnClickListener { viewModel.onSelectModeCancelled() }
+        binding.toolbar.title = count.toString()
+        binding.toolbar.menu.findItem(R.id.chat_history_action_search)?.isVisible = false
+        binding.toolbar.menu.findItem(R.id.chat_history_action_overflow)?.isVisible = false
+    }
+
+    private fun buildEntries(
+        state: ChatHistoryUiState.Loaded,
+        selectMode: ChatHistoryUiState.Mode.Selecting?,
+    ): List<ChatHistoryListEntry> = buildList {
+        if (selectMode != null) {
+            val visibleIds = (state.pinned + state.recent).map { it.chatId }.toSet()
+            val allSelected = visibleIds.isNotEmpty() && selectMode.selectedChatIds == visibleIds
+            add(ChatHistoryListEntry.SelectAllHeader(allSelected = allSelected))
+        }
+        if (state.pinned.isNotEmpty()) {
+            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
+            state.pinned.forEach { item ->
+                val selected = selectMode != null && item.chatId in selectMode.selectedChatIds
+                add(ChatHistoryListEntry.Row(item = item, selected = selected))
+            }
+        }
+        if (state.recent.isNotEmpty()) {
+            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_recent))
+            state.recent.forEach { item ->
+                val selected = selectMode != null && item.chatId in selectMode.selectedChatIds
+                add(ChatHistoryListEntry.Row(item = item, selected = selected))
             }
         }
     }
 
-    private fun buildEntries(state: ChatHistoryUiState.Loaded): List<ChatHistoryListEntry> = buildList {
-        if (state.pinned.isNotEmpty()) {
-            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
-            state.pinned.forEach { add(ChatHistoryListEntry.Row(it)) }
+    private fun renderConfirmation(confirmation: ChatHistoryUiState.PendingConfirmation?) {
+        if (confirmation == null) return
+        if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return
+
+        val selectedChatUrls = viewModel.chatUrlsForDialog().orEmpty()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val dialog = fireDialogProvider.createFireDialog(
+                FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = selectedChatUrls),
+            )
+            if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return@launch
+            dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
         }
-        if (state.recent.isNotEmpty()) {
-            if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_recent))
-            state.recent.forEach { add(ChatHistoryListEntry.Row(it)) }
-        }
+    }
+
+    private fun setFireActionVisible(visible: Boolean) {
+        binding.toolbar.menu.findItem(R.id.chat_history_action_fire)?.isVisible = visible
     }
 
     private fun onMenuItemClicked(item: MenuItem): Boolean = when (item.itemId) {
@@ -143,7 +236,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             true
         }
         R.id.chat_history_action_fire -> {
-            showComingSoonSnackbar()
+            viewModel.onFireIconClicked()
             true
         }
         else -> false
@@ -157,28 +250,28 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     private fun hideSearchBar() {
-        onBackPressedCallback.isEnabled = false
         binding.searchBar.handle(SearchBar.Event.DismissSearchBar)
         requireActivity().hideKeyboard()
         binding.toolbar.show()
         viewModel.onSearchClosed()
+        // onBackPressedCallback.isEnabled is reset by render() — select mode may still be active.
     }
 
     private fun showToolbarOverflowPopup() {
         val anchor = binding.toolbar.findViewById<View>(R.id.chat_history_action_overflow) ?: return
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_overflow)
         val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.select)) { showComingSoonSnackbar() }
+        popup.onMenuItemClicked(view.findViewById(R.id.select)) { viewModel.onEnterSelectMode() }
         popup.show(binding.root, anchor)
     }
 
-    private fun showRowPopup(anchor: View) {
+    private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
         val view = popup.contentView
         popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.rename)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
-        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { showComingSoonSnackbar() }
+        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
         popup.show(binding.root, anchor)
     }
 
@@ -187,6 +280,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     companion object {
+        private const val FIRE_DIALOG_TAG = "chat_history_fire_dialog"
+
         fun newInstance(): ChatHistoryFragment = ChatHistoryFragment()
     }
 }

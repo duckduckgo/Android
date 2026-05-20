@@ -183,6 +183,9 @@ interface DuckChatInternal : DuckChat {
      */
     fun openWithChatId(chatId: String)
 
+    /** Single source of truth for the Duck.ai chat URL shape. */
+    fun buildChatUrl(chatId: String): String
+
     /**
      * Calls onClose when a close event is emitted.
      */
@@ -827,6 +830,10 @@ class RealDuckChat @Inject constructor(
 
     override fun openWithChatId(chatId: String) {
         openDuckChat(parameters = mapOf(CHAT_ID_QUERY_NAME to chatId), forceNewSession = true)
+    }
+
+    override fun buildChatUrl(chatId: String): String {
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

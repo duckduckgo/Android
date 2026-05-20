@@ -19,28 +19,43 @@ package com.duckduckgo.duckchat.impl.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
+import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import logcat.logcat
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class ChatHistoryViewModel @Inject constructor(
     private val chatHistoryRepository: ChatHistoryRepository,
+    @AppCoroutineScope private val appScope: CoroutineScope,
+    private val duckChat: DuckChatInternal,
+    private val dataClearingTrigger: DataClearingTrigger,
+    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
-    private val searchState = MutableStateFlow(SearchState())
+    private val controls = MutableStateFlow(UiControls())
+
+    /** Cached snapshot so non-suspend action methods can read Recent without re-subscribing. */
+    private var latestItems: List<ChatHistoryItem> = emptyList()
 
     val uiState: StateFlow<ChatHistoryUiState> = combine(
-        chatHistoryRepository.observeChats(),
-        searchState,
+        chatHistoryRepository.observeChats().onEach { latestItems = it },
+        controls,
         ::reduce,
     ).stateIn(
         scope = viewModelScope,
@@ -48,30 +63,168 @@ class ChatHistoryViewModel @Inject constructor(
         initialValue = ChatHistoryUiState.Loading,
     )
 
+    fun isSelectMode(): Boolean = controls.value.mode is Mode.Selecting
+
+    fun onChatRowClicked(chatId: String) {
+        if (controls.value.mode is Mode.Selecting) {
+            onSelectionToggled(chatId)
+        } else {
+            duckChat.openWithChatId(chatId)
+        }
+    }
+
+    /** Long-press enters select mode with the row pre-selected; returns true to consume the event. */
+    fun onChatRowLongClicked(chatId: String): Boolean {
+        controls.update { c ->
+            val nextMode = when (val mode = c.mode) {
+                is Mode.Selecting -> Mode.Selecting(toggle(mode.selectedChatIds, chatId))
+                Mode.Default -> Mode.Selecting(setOf(chatId))
+            }
+            c.copy(mode = nextMode)
+        }
+        return true
+    }
+
+    fun onOpenDuckAiClicked() {
+        duckChat.openDuckChat()
+    }
+
+    fun onFireIconClicked() {
+        if (controls.value.mode is Mode.Selecting) {
+            onDeleteSelectedRequested()
+        } else {
+            onFireAllRequested()
+        }
+    }
+
     fun onSearchActivated() {
-        searchState.update { it.copy(active = true) }
+        controls.update { it.copy(search = it.search.copy(active = true)) }
     }
 
     fun onSearchQueryChanged(query: String) {
-        searchState.update { it.copy(query = query) }
+        controls.update { it.copy(search = it.search.copy(query = query)) }
     }
 
     fun onSearchClosed() {
-        searchState.value = SearchState()
+        controls.update { it.copy(search = SearchState()) }
     }
 
-    private fun reduce(items: List<ChatHistoryItem>, search: SearchState): ChatHistoryUiState {
-        logcat { "ChatHistory: reduce ${items.size} item(s), searchActive=${search.active}" }
+    /** Fire-all wipes every Duck.ai chat including Pinned — always confirms via dialog before deleting. */
+    fun onFireAllRequested() {
+        val all = latestItems
+        if (all.isEmpty()) return
+        controls.update {
+            it.copy(confirmation = PendingConfirmation.FireAll(chatIds = all.mapTo(mutableSetOf()) { i -> i.chatId }))
+        }
+    }
+
+    /** Per-row overflow Delete — fires immediately, no confirmation. */
+    fun onDeleteSingleChat(chatId: String) {
+        dispatchSelectedClear(setOf(chatId))
+    }
+
+    private fun dispatchSelectedClear(chatIds: Set<String>) {
+        if (chatIds.isEmpty()) return
+        if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
+        val urls = chatIds.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
+        appScope.launch {
+            dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(urls)))
+        }
+    }
+
+    /** The dialog drives the actual deletion via the URL set surfaced by [chatUrlsForDialog]. */
+    fun onFireAllConfirmed() {
+        controls.update { it.copy(confirmation = null) }
+    }
+
+    fun onConfirmationCancelled() {
+        controls.update { it.copy(confirmation = null) }
+    }
+
+    fun onEnterSelectMode() {
+        controls.update { it.copy(mode = Mode.Selecting(emptySet())) }
+    }
+
+    fun onSelectionToggled(chatId: String) {
+        controls.update { c ->
+            val mode = c.mode as? Mode.Selecting ?: return@update c
+            c.copy(mode = Mode.Selecting(toggle(mode.selectedChatIds, chatId)))
+        }
+    }
+
+    fun onSelectAllToggled() {
+        controls.update { c ->
+            val mode = c.mode as? Mode.Selecting ?: return@update c
+            val visibleIds = visibleChatIds(c.search)
+            // Filter to live ids — selection can lag deletes and skew the comparison.
+            val effectiveSelected = mode.selectedChatIds intersect latestItems.mapTo(mutableSetOf()) { it.chatId }
+            val next = if (effectiveSelected == visibleIds) emptySet() else visibleIds
+            c.copy(mode = Mode.Selecting(next))
+        }
+    }
+
+    fun onSelectModeCancelled() {
+        controls.update { it.copy(mode = Mode.Default) }
+    }
+
+    fun onDeleteSelectedRequested() {
+        val current = controls.value.mode as? Mode.Selecting ?: return
+        val ids = current.selectedChatIds
+        when {
+            ids.isEmpty() -> Unit
+            ids.size == 1 -> {
+                controls.update { it.copy(mode = Mode.Default) }
+                dispatchSelectedClear(ids)
+            }
+            else -> controls.update {
+                it.copy(confirmation = PendingConfirmation.DeleteSelected(chatIds = ids))
+            }
+        }
+    }
+
+    /**
+     * The dialog drives the actual deletion via the URL set surfaced by [chatUrlsForDialog].
+     * Both fields update atomically (one frame, not two) — keeps the test contract simple.
+     */
+    fun onDeleteSelectedConfirmed() {
+        controls.update { it.copy(confirmation = null, mode = Mode.Default) }
+    }
+
+    /** Snapshot of the captured chat IDs (resolved to URLs) for the pending confirmation. */
+    fun chatUrlsForDialog(): Set<String>? {
+        val ids = controls.value.confirmation?.chatIds ?: return null
+        if (ids.isEmpty()) return null
+        return ids.mapTo(mutableSetOf()) { duckChat.buildChatUrl(it) }
+    }
+
+    private fun visibleChatIds(search: SearchState): Set<String> =
+        latestItems
+            .asSequence()
+            .filter { item -> !search.active || search.query.isEmpty() || item.displayTitle.contains(search.query, ignoreCase = true) }
+            .mapTo(mutableSetOf()) { it.chatId }
+
+    private fun reduce(
+        items: List<ChatHistoryItem>,
+        controls: UiControls,
+    ): ChatHistoryUiState {
         if (items.isEmpty()) return ChatHistoryUiState.Empty
         val (pinned, recent) = items.partition { it.pinned }
+        val effectiveMode = when (val mode = controls.mode) {
+            is Mode.Selecting -> Mode.Selecting(mode.selectedChatIds intersect items.mapTo(mutableSetOf()) { it.chatId })
+            Mode.Default -> Mode.Default
+        }
         return Loaded(
-            pinned = pinned.sortedByDate().filterBy(search),
-            recent = recent.sortedByDate().filterBy(search),
-            searchQuery = search.query,
-            searchActive = search.active,
-            mode = Mode.Default,
+            pinned = pinned.sortedByDate().filterBy(controls.search),
+            recent = recent.sortedByDate().filterBy(controls.search),
+            searchQuery = controls.search.query,
+            searchActive = controls.search.active,
+            mode = effectiveMode,
+            confirmation = controls.confirmation,
         )
     }
+
+    private fun toggle(current: Set<String>, chatId: String): Set<String> =
+        if (chatId in current) current - chatId else current + chatId
 
     private fun List<ChatHistoryItem>.filterBy(search: SearchState): List<ChatHistoryItem> =
         if (!search.active || search.query.isEmpty()) {
@@ -82,6 +235,12 @@ class ChatHistoryViewModel @Inject constructor(
 
     private fun List<ChatHistoryItem>.sortedByDate(): List<ChatHistoryItem> =
         sortedByDescending { it.lastEditMillis }
+
+    private data class UiControls(
+        val search: SearchState = SearchState(),
+        val confirmation: PendingConfirmation? = null,
+        val mode: Mode = Mode.Default,
+    )
 
     private data class SearchState(
         val active: Boolean = false,

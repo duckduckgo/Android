@@ -59,5 +59,17 @@ interface FireDialogProvider {
          * @property tabId The id of the tab the Hatch is offering to burn.
          */
         data class Hatch(val tabId: String) : FireDialogOrigin()
+
+        /**
+         * Chat history screen — bulk-delete confirmation. Scopes the clear to [selectedChatUrls].
+         * An empty set is a valid no-op shape; the dialog still renders but the destructive
+         * action does nothing.
+         *
+         * @property selectedChatUrls The chat URLs to clear on confirm. Title count
+         *  ("Delete N chats?") is derived from this set's size.
+         */
+        data class ChatHistory(val selectedChatUrls: Set<String>) : FireDialogOrigin() {
+            val count: Int get() = selectedChatUrls.size
+        }
     }
 }
