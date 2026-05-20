@@ -823,6 +823,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBottomWingAnimation) 1f else 0f)
 
                     val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -1325,6 +1326,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                     }
                 }
+                binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
                     getString(R.string.preOnboardingDaxDialog2Title).preventWidows()
