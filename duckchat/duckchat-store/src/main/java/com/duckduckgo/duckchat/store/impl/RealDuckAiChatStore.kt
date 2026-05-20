@@ -66,6 +66,12 @@ interface DuckAiChatStore {
 
     /** Renames [chatId] in the FE-owned JSON blob. Returns true if the chat existed and was updated, false otherwise. */
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
+
+    /** Pins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
+    suspend fun pinChat(chatId: String)
+
+    /** Unpins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
+    suspend fun unpinChat(chatId: String)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -142,6 +148,21 @@ class RealDuckAiChatStore @Inject constructor(
             chatsDao.upsert(entity.copy(data = updatedJson))
             true
         }
+
+    override suspend fun pinChat(chatId: String) = setPinned(chatId, pinned = true)
+
+    override suspend fun unpinChat(chatId: String) = setPinned(chatId, pinned = false)
+
+    private suspend fun setPinned(chatId: String, pinned: Boolean) {
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.setPinned($chatId, $pinned)" }
+            val entity = chatsDao.getById(chatId) ?: return@withContext
+            val updatedJson = runCatching {
+                JSONObject(entity.data).put("pinned", pinned).toString()
+            }.getOrNull() ?: return@withContext
+            chatsDao.upsert(entity.copy(data = updatedJson))
+        }
+    }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -124,6 +125,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach(::onNavigationEvent)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.messageEvents
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach(::onMessageEvent)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
@@ -132,11 +138,30 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
     }
 
+    private fun onMessageEvent(event: ChatHistoryViewModel.MessageEvent) {
+        when (event) {
+            is ChatHistoryViewModel.MessageEvent.PinToggled -> showPinToggledSnackbar(event)
+        }
+    }
+
     private fun openRenameScreen(chatId: String, currentTitle: String) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.chatHistoryFragmentContainer, RenameChatFragment.newInstance(chatId, currentTitle))
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun showPinToggledSnackbar(event: ChatHistoryViewModel.MessageEvent.PinToggled) {
+        val messageRes = if (event.wasPinned) {
+            R.string.duck_ai_chat_history_unpin_snackbar
+        } else {
+            R.string.duck_ai_chat_history_pin_snackbar
+        }
+        Snackbar.make(binding.root, messageRes, Snackbar.LENGTH_LONG)
+            .setAction(R.string.duck_ai_chat_history_undo) {
+                viewModel.onUndoTogglePin(event.chatId, restorePinned = event.wasPinned)
+            }
+            .show()
     }
 
     private fun render(state: ChatHistoryUiState) {
@@ -286,7 +311,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
         val view = popup.contentView
-        popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
+        val pinAction = view.findViewById<PopupMenuItemView>(R.id.pin)
+        val pinLabel = if (item.pinned) R.string.duck_ai_chat_history_action_unpin else R.string.duck_ai_chat_history_action_pin
+        pinAction.setPrimaryText(getString(pinLabel))
+        popup.onMenuItemClicked(pinAction) { viewModel.onTogglePin(item.chatId) }
         popup.onMenuItemClicked(view.findViewById(R.id.rename)) {
             viewModel.onRenameRequested(item.chatId, item.displayTitle)
         }

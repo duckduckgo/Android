@@ -81,4 +81,6 @@ private class RecordingRenameRepository : ChatHistoryRepository {
         renames += chatId to newTitle
         return nextResult
     }
+
+    override suspend fun setPinned(chatId: String, pinned: Boolean) = Unit
 }

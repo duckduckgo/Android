@@ -336,4 +336,60 @@ class RealDuckAiChatStoreTest {
         // traversal file should not be deleted — it's outside filesDir
         verify(chatsDao).deleteAll()
     }
+
+    // --- pinChat / unpinChat ---
+
+    @Test
+    fun `pinChat is a no-op when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        store.pinChat("missing")
+
+        verify(chatsDao, never()).upsert(any())
+    }
+
+    @Test
+    fun `pinChat sets pinned to true and preserves other JSON fields`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false,"fileRefs":["uuid1"],"messages":[{"role":"user","text":"hi"}]}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        store.pinChat("abc")
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val json = JSONObject(entityCaptor.firstValue.data)
+        assertTrue(json.getBoolean("pinned"))
+        assertEquals("Old", json.getString("title"))
+        assertEquals("abc", json.getString("chatId"))
+        assertEquals("gpt-5-mini", json.getString("model"))
+        assertEquals("2026-04-01T21:31:54.260Z", json.getString("lastEdit"))
+        assertEquals("uuid1", json.getJSONArray("fileRefs").getString(0))
+        assertEquals("hi", json.getJSONArray("messages").getJSONObject(0).getString("text"))
+    }
+
+    @Test
+    fun `unpinChat sets pinned to false`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        store.unpinChat("abc")
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val json = JSONObject(entityCaptor.firstValue.data)
+        assertFalse(json.getBoolean("pinned"))
+    }
+
+    @Test
+    fun `pinChat is a no-op when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not a json"))
+
+        store.pinChat("abc")
+
+        verify(chatsDao, never()).upsert(any())
+    }
 }
