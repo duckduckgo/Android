@@ -33,7 +33,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="@dimen/keyline_6"
         android:layout_height="@dimen/keyline_6"
-        app:cardCornerRadius="6dp"
+        app:cardCornerRadius="@dimen/chipImageCornerRadius"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">
 
