@@ -278,6 +278,12 @@ class RealDuckAiModelManager @Inject constructor(
             supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
             supportedFileTypes = remote.supportedFileTypes.orEmpty(),
             supportedReasoningEfforts = remote.supportedReasoningEffort.orEmpty().mapNotNull(ReasoningEffort::from),
+            reasoningEffortAccess = remote.reasoningEffortAccess.orEmpty().mapNotNull { entry ->
+                val effort = ReasoningEffort.from(entry.id) ?: return@mapNotNull null
+                val tiers = entry.accessTier.orEmpty()
+                val accessible = if (tiers.isEmpty()) entry.entityHasAccess else tiers.contains(userTier.rawValue)
+                ReasoningEffortAccess(effort = effort, accessTier = tiers, isAccessible = accessible)
+            },
             supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
         )
     }

@@ -689,6 +689,7 @@ class RealDuckAiModelManagerTest {
         supportsImageUpload: Boolean = false,
         supportedFileTypes: List<String>? = null,
         supportedReasoningEffort: List<String>? = null,
+        reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
     ) = RemoteAIChatModel(
         id = id,
         name = id,
@@ -700,6 +701,7 @@ class RealDuckAiModelManagerTest {
         supportsImageUpload = supportsImageUpload,
         supportedFileTypes = supportedFileTypes,
         supportedReasoningEffort = supportedReasoningEffort,
+        reasoningEffortAccess = reasoningEffortAccess,
     )
 
     @Test
@@ -724,6 +726,110 @@ class RealDuckAiModelManagerTest {
 
         val resolved = testee.modelState.value.models.single()
         assertEquals(listOf(ReasoningEffort.LOW, ReasoningEffort.HIGH), resolved.supportedReasoningEfforts)
+    }
+
+    @Test
+    fun whenRemoteReasoningEffortAccessMissingThenDomainListIsEmpty() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("id", reasoningEffortAccess = null)),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals(emptyList<ReasoningEffortAccess>(), testee.modelState.value.models.single().reasoningEffortAccess)
+    }
+
+    @Test
+    fun whenRemoteReasoningEffortAccessHasUnknownIdThenUnknownDropped() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "id",
+                        reasoningEffortAccess = listOf(
+                            RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                            RemoteReasoningEffortAccess(id = "very_high", accessTier = listOf("pro"), entityHasAccess = false),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val efforts = testee.modelState.value.models.single().reasoningEffortAccess.map { it.effort }
+        assertEquals(listOf(ReasoningEffort.LOW), efforts)
+    }
+
+    @Test
+    fun whenRemoteReasoningEffortAccessResolvedAgainstPlusUserThenAccessibilityFollowsAccessTier() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "id",
+                        accessTier = listOf("free", "plus", "pro"),
+                        entityHasAccess = true,
+                        reasoningEffortAccess = listOf(
+                            RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                            RemoteReasoningEffortAccess(id = "medium", accessTier = listOf("pro"), entityHasAccess = false),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val access = testee.modelState.value.models.single().reasoningEffortAccess
+        assertEquals(
+            listOf(
+                ReasoningEffortAccess(effort = ReasoningEffort.LOW, accessTier = listOf("free", "plus", "pro"), isAccessible = true),
+                ReasoningEffortAccess(effort = ReasoningEffort.MEDIUM, accessTier = listOf("pro"), isAccessible = false),
+            ),
+            access,
+        )
+    }
+
+    @Test
+    fun whenModelInaccessibleButEffortAccessTierIncludesUserThenEffortIsAccessibleNotClampedByModel() = runTest {
+        // Locks in Option A: per-effort isAccessible is resolved independently of model.isAccessible.
+        // The "model takes precedence" rule lives at tap-handling time, not in the data layer.
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "id",
+                        accessTier = listOf("plus", "pro"),
+                        entityHasAccess = false,
+                        reasoningEffortAccess = listOf(
+                            RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val resolved = testee.modelState.value.models.single()
+        assertEquals(false, resolved.isAccessible)
+        assertEquals(true, resolved.reasoningEffortAccess.single().isAccessible)
     }
 
     @Test

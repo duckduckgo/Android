@@ -48,6 +48,15 @@ data class AvailableReasoningMode(
     val effort: ReasoningEffort,
 )
 
+data class ReasoningEffortAccess(
+    val effort: ReasoningEffort,
+    val accessTier: List<String>,
+    val isAccessible: Boolean,
+) {
+    val requiredTier: UserTier?
+        get() = lowestRequiredTier(accessTier, isAccessible)
+}
+
 object ReasoningResolver {
 
     fun availableModes(supported: List<ReasoningEffort>): List<AvailableReasoningMode> =
