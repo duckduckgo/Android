@@ -425,6 +425,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        with(binding.daxDialogCta.comparisonChartContent) {
+            comparisonChartItem1.text = getString(R.string.preOnboardingComparisonChartItem1).preventWidows()
+            comparisonChartDuckAi.text = getString(R.string.preOnboardingComparisonChartDuckAi).preventWidows()
+            comparisonChartItem2.text = getString(R.string.preOnboardingComparisonChartItem2).preventWidows()
+            comparisonChartItem3.text = getString(R.string.preOnboardingComparisonChartItem3).preventWidows()
+            comparisonChartItem4.text = getString(R.string.preOnboardingComparisonChartItem4).preventWidows()
+        }
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
@@ -827,7 +835,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             // not a synchronous stop.
                             if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
-                                getString(R.string.preOnboardingDaxDialog2Title),
+                                getString(R.string.preOnboardingDaxDialog2Title).preventWidows(),
                             ) {
                                 comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -1319,7 +1327,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
-                    getString(R.string.preOnboardingDaxDialog2Title)
+                    getString(R.string.preOnboardingDaxDialog2Title).preventWidows()
                 binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
                 listOf(
                     binding.daxDialogCta.comparisonChartContent.check1,
