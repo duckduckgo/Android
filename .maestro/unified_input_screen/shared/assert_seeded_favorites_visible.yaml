@@ -1,8 +1,8 @@
 appId: com.duckduckgo.mobile.android.debug
 ---
 - assertVisible:
-    text: "Example"
+    text: "Favorite 1"
 - assertVisible:
-    text: "DuckDuckGo"
+    text: "Favorite 2"
 - assertVisible:
-    text: "Privacy Test Pages"
+    text: "Favorite 3"
