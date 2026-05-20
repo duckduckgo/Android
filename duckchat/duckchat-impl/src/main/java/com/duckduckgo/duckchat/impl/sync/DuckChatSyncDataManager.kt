@@ -218,8 +218,10 @@ class DuckChatSyncDataManager @Inject constructor(
                     org.json.JSONObject().apply {
                         put("id", chat.chatId)
                         put("client_last_modified", now)
+                        put("edit_timestamp", now)
                         put("title", syncCrypto.encrypt(chat.title))
-                        put("pinned", chat.pinned)
+                        // FE wire format: "pinned" when set, JSON null when unset (not boolean).
+                        put("pinned", if (chat.pinned) "pinned" else org.json.JSONObject.NULL)
                     },
                 )
             }

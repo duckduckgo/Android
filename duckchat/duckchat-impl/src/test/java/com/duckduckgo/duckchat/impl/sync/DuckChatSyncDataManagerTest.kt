@@ -279,7 +279,36 @@ class DuckChatSyncDataManagerTest {
         assertEquals(SyncableType.DUCK_AI_CHATS, result.type)
         assertTrue(result.jsonString.contains("chat1"))
         assertTrue(result.jsonString.contains("ENC:Hello"))
-        assertTrue(result.jsonString.contains("\"pinned\":true"))
+        assertTrue(result.jsonString.contains("\"pinned\":\"pinned\""))
+    }
+
+    @Test
+    fun whenGetChangesAndUpdatedChatIsUnpinnedThenPinnedFieldIsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("chat1"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "chat1", title = "Hello", pinned = false)),
+        )
+
+        val result = testee.getChanges()
+
+        assertTrue(result.jsonString.contains("\"pinned\":null"))
+    }
+
+    @Test
+    fun whenGetChangesProducesUpdateEntryThenIncludesEditTimestampMatchingClientLastModified() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
+        whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(setOf("chat1"))
+        whenever(duckAiChatStore.getChats()).thenReturn(
+            listOf(stubChat(chatId = "chat1", title = "Hello")),
+        )
+
+        val result = testee.getChanges()
+
+        val entry = org.json.JSONArray(result.jsonString).getJSONObject(0)
+        assertEquals(entry.getString("client_last_modified"), entry.getString("edit_timestamp"))
     }
 
     @Test
