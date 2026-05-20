@@ -20,6 +20,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -74,6 +75,10 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         dax.rotation = SUBSCRIPTION_DAX_ROTATION_DEGREES
         dax.translationX = SUBSCRIPTION_DAX_TRANSLATION_X_DP * density
         dax.translationY = SUBSCRIPTION_DAX_TRANSLATION_Y_DP * density
+        (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+            lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+            dax.layoutParams = lp
+        }
     }
 
     private companion object {

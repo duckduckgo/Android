@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.ui
 
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -75,10 +76,22 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
         }
 
         view.findViewById<LottieAnimationView>(R.id.wavingDax)?.apply {
+            (layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                layoutParams = lp
+            }
+            if (isTablet()) {
+                translationX = TABLET_WAVING_DAX_TRANSLATION_X_DP * resources.displayMetrics.density
+            }
             isVisible = true
             // Container is still GONE here; Lottie.playAnimation() no-ops unless isShown() is true.
             post { playAnimation() }
         }
+    }
+
+    private companion object {
+        private const val TABLET_WAVING_DAX_TRANSLATION_X_DP = -70f
     }
 
     override fun setOnOptionClicked(onOptionClicked: ((DaxDialogIntroOption) -> Unit)?) {

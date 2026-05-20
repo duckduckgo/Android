@@ -36,6 +36,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -957,6 +958,11 @@ sealed class OnboardingDaxDialogCta(
                 stripWingForPhoneLandscape(wing)
                 return
             }
+            (wing.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (wing.isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                wing.layoutParams = lp
+            }
             val showsWing = this is ShowsWingBottom
             when {
                 showsWing && !wing.isVisible -> {
@@ -1544,6 +1550,11 @@ sealed class DaxBubbleCta(
             dax.rotation = 0f
             dax.translationX = DEFAULT_WAVING_DAX_TRANSLATION_X_DP * density
             dax.translationY = DEFAULT_WAVING_DAX_TRANSLATION_Y_DP * density
+            (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (dax.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                dax.layoutParams = lp
+            }
         }
 
         companion object {
@@ -2158,3 +2169,6 @@ internal fun View.isPhoneLandscape(): Boolean {
     val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
     return isPhone && isLandscape
 }
+
+internal fun View.isTablet(): Boolean =
+    context.resources.configuration.smallestScreenWidthDp >= 600

@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.View
 import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
@@ -284,6 +285,49 @@ class BrandDesignContextualDaxDialogCtaTest {
         orientation = Configuration.ORIENTATION_PORTRAIT,
         smallestScreenWidthDp = 360,
     )
+
+    private fun configureContainerForTabletPortrait() = configureContainer(
+        orientation = Configuration.ORIENTATION_PORTRAIT,
+        smallestScreenWidthDp = 800,
+    )
+
+    private fun stubWingLayoutParams(wing: LottieAnimationView): ConstraintLayout.LayoutParams {
+        val containerContext = container.context
+        whenever(wing.context).thenReturn(containerContext)
+        val lp = ConstraintLayout.LayoutParams(0, 0)
+        whenever(wing.layoutParams).thenReturn(lp)
+        return lp
+    }
+
+    @Test
+    fun applyWingBottomState_tabletPortrait_anchorsWingStartToCard() {
+        configureContainerForTabletPortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom))
+            .thenReturn(wing)
+        whenever(wing.isAnimating).thenReturn(false)
+        val lp = stubWingLayoutParams(wing)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+
+        cta.invokeApplyWingBottomState()
+
+        assertEquals(R.id.contextualBrandDesignCardView, lp.startToStart)
+    }
+
+    @Test
+    fun applyWingBottomState_phonePortrait_anchorsWingStartToParent() {
+        configureContainerForPhonePortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom))
+            .thenReturn(wing)
+        whenever(wing.isAnimating).thenReturn(false)
+        val lp = stubWingLayoutParams(wing)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+
+        cta.invokeApplyWingBottomState()
+
+        assertEquals(ConstraintLayout.LayoutParams.PARENT_ID, lp.startToStart)
+    }
 
     /** Concrete subclass that exposes the base-class `internal` helpers for direct test driving. */
     private inner class TestableBrandDesignContextualDaxDialogCta(

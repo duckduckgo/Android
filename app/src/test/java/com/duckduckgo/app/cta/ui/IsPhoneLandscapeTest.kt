@@ -64,6 +64,42 @@ class IsPhoneLandscapeTest {
         assertFalse(view.isPhoneLandscape())
     }
 
+    @Test
+    fun whenSmallestScreenWidthIs600ThenIsTabletReturnsTrue() {
+        val view = viewFor(
+            orientation = Configuration.ORIENTATION_PORTRAIT,
+            smallestScreenWidthDp = 600,
+        )
+        assertTrue(view.isTablet())
+    }
+
+    @Test
+    fun whenSmallestScreenWidthIs599ThenIsTabletReturnsFalse() {
+        val view = viewFor(
+            orientation = Configuration.ORIENTATION_PORTRAIT,
+            smallestScreenWidthDp = 599,
+        )
+        assertFalse(view.isTablet())
+    }
+
+    @Test
+    fun whenSmallestScreenWidthIsLargeTabletThenIsTabletReturnsTrue() {
+        val view = viewFor(
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            smallestScreenWidthDp = 800,
+        )
+        assertTrue(view.isTablet())
+    }
+
+    @Test
+    fun whenSmallestScreenWidthIsTypicalPhoneThenIsTabletReturnsFalse() {
+        val view = viewFor(
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            smallestScreenWidthDp = 360,
+        )
+        assertFalse(view.isTablet())
+    }
+
     private fun viewFor(
         orientation: Int,
         smallestScreenWidthDp: Int,
