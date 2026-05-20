@@ -961,6 +961,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
+                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
                     val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                         rootView = binding.root,
@@ -1435,6 +1436,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
+                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
                 val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                     rootView = binding.root,
                     dialogView = binding.daxDialogCta.root,
