@@ -1701,9 +1701,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun searchOptionsLabelRes(withAi: Boolean): Int =
         if (withAi) {
-            R.string.preOnboardingInputScreenSearchAndDuckAi
+            R.string.quickSetupInputScreenSearchAndDuckAi
         } else {
-            R.string.preOnboardingInputScreenSearchOnly
+            R.string.quickSetupInputScreenSearchOnly
         }
 
     private fun showQuickSetupAddressBarPositionBottomSheet(initialSelection: OmnibarType, showSplitOption: Boolean) {

@@ -110,6 +110,8 @@
     <string name="quickSetupAddressBarPositionCaption"><![CDATA[You can make changes in <b>Settings > Appearance</b>.]]></string>
     <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
     <string name="quickSetupBottomSheetDone">Done</string>
+    <string name="quickSetupInputScreenSearchOnly">Search Only</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
 
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
