@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android.debug
-name: "UnifiedInput: seeded favorites visible across omnibar × AI combos"
+name: "UnifiedInput: open new duck.ai chat and move back to search mode × AI combos"
 tags:
   - unifiedInputTest
 ---
@@ -16,7 +16,7 @@ tags:
             omnibarPosition: "top"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
 
 # 2/6 — AI on, omnibar bottom
 - retry:
@@ -31,7 +31,7 @@ tags:
             omnibarPosition: "bottom"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
 
 # 3/6 — AI on, omnibar split
 - retry:
@@ -46,7 +46,7 @@ tags:
             omnibarPosition: "split"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
 
 # 4/6 — AI off, omnibar top
 - retry:
@@ -61,7 +61,7 @@ tags:
             omnibarPosition: "top"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
 
 # 5/6 — AI off, omnibar bottom
 - retry:
@@ -76,7 +76,7 @@ tags:
             omnibarPosition: "bottom"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
 
 # 6/6 — AI off, omnibar split
 - retry:
@@ -91,4 +91,4 @@ tags:
             omnibarPosition: "split"
             testScenario: "favorites_3"
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: shared/assert_seeded_favorites_visible.yaml
+      - runFlow: shared/open_new_chat.yaml
