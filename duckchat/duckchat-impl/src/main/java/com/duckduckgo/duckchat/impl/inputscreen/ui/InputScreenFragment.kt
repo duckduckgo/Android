@@ -614,6 +614,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         dialog.show(parentFragmentManager)
                     }
                 }
+
+                override fun onAfterInactivityPressed() {
+                    requireActivity().setResult(InputScreenActivityResultCodes.AFTER_INACTIVITY_REQUESTED)
+                    exitInputScreen()
+                }
             },
         )
     }

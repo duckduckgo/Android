@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             app:quickSetupRowIcon="@drawable/ic_ai_24"
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
-            app:quickSetupRowSecondaryText="@string/preOnboardingInputScreenSearchAndDuckAi" />
+            app:quickSetupRowSecondaryText="@string/quickSetupInputScreenSearchAndDuckAi" />
 
     </LinearLayout>
 

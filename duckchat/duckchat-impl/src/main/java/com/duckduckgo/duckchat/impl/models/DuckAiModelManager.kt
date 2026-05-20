@@ -125,7 +125,9 @@ class RealDuckAiModelManager @Inject constructor(
             try {
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
-                val models = response.models.map { resolveModel(it, userTier) }
+                val models = response.models
+                    .map { resolveModel(it, userTier) }
+                    .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 stateMutex.withLock {
                     val selectedModelId = validateAndPersistSelection(models)

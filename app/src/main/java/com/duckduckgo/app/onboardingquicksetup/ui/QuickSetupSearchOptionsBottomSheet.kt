@@ -76,12 +76,12 @@ class QuickSetupSearchOptionsBottomSheet : BottomSheetDialogFragment() {
             setOnSelectionChangedListener { selected ->
                 this@QuickSetupSearchOptionsBottomSheet.withAi = selected
                 setSelection(selected, BrandDesignInputScreenPicker.Transition.CROSSFADE_ANIMATE)
+                setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_WITH_AI to selected))
             }
         }
         binding.quickSetupSearchOptionsCaption.text =
             getString(BrowserR.string.preOnboardingInputScreenDescription).html(requireContext())
         binding.quickSetupSearchOptionsDoneButton.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_WITH_AI to withAi))
             dismiss()
         }
         binding.quickSetupSearchOptionsCloseButton.setOnClickListener {

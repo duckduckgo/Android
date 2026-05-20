@@ -709,7 +709,12 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities, command.isCustomTab, command.isAddressBarTrackersAnimationEnabled)
+                startTrackersAnimation(
+                    command.entities,
+                    command.isCustomTab,
+                    command.isAddressBarTrackersAnimationEnabled,
+                    command.useSoftwareRenderingMode,
+                )
             }
 
             is LaunchInputScreen -> {
@@ -1093,6 +1098,7 @@ class OmnibarLayout @JvmOverloads constructor(
         events: List<Entity>?,
         isCustomTab: Boolean,
         isAddressBarTrackersAnimationEnabled: Boolean,
+        useSoftwareRenderingMode: Boolean,
     ) {
         if (!isCustomTab) {
             if (isAddressBarTrackersAnimationEnabled) {
@@ -1104,6 +1110,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     omnibarViews = omnibarViews(),
                     shieldViews = shieldViews(),
                     entities = events,
+                    useSoftwareRenderingMode = useSoftwareRenderingMode,
                 )
             } else {
                 animatorHelper.startTrackersAnimation(
@@ -1126,6 +1133,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     shieldViews = customTabShieldViews(),
                     entities = events,
                     customBackgroundColor = animationBackgroundColor,
+                    useSoftwareRenderingMode = useSoftwareRenderingMode,
                 )
             } else {
                 animatorHelper.startTrackersAnimation(

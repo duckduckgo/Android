@@ -82,12 +82,12 @@ class QuickSetupAddressBarPositionBottomSheet : BottomSheetDialogFragment() {
             setOnSelectionChangedListener { selected ->
                 currentSelection = selected
                 setSelection(selected, animate = true)
+                setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_SELECTED_POSITION to selected.name))
             }
         }
         binding.quickSetupAddressBarPositionCaption.text =
             getString(BrowserR.string.quickSetupAddressBarPositionCaption).html(requireContext())
         binding.quickSetupAddressBarPositionDoneButton.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_KEY_SELECTED_POSITION to currentSelection.name))
             dismiss()
         }
         binding.quickSetupAddressBarPositionCloseButton.setOnClickListener {

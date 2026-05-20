@@ -16,15 +16,22 @@
 
 package com.duckduckgo.duckchat.api.nativeinput
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Read-only access to the per-tab native input state. Components that need to react to input state
- * changes (toggle visibility, model selection, etc.) observe the flow for their tab.
+ * changes (toggle visibility, model selection, etc.) observe [state], which follows the currently
+ * selected browser tab and re-emits both when the tab changes and when the active tab's state is
+ * republished.
+ *
+ * [stateForTab] is for callers that already know a specific tabId and need synchronous keyed access
+ * — primarily the native input widget itself; plugins should observe [state].
  *
  * The writer-side counterpart is [NativeInputStatePublisher], which is reserved for the native input
  * widget; plugins must not depend on it.
  */
 interface NativeInputStateProvider {
+    val state: Flow<NativeInputState>
     fun stateForTab(tabId: String): StateFlow<NativeInputState>
 }

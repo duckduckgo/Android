@@ -446,4 +446,74 @@ class NewTabReturnHatchViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun whenBurnTabPressedAndTabRemovedFromRepositoryThenHatchHides() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+        tabsFlow.value = listOf(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = emptyList()
+
+            // The viewState combine and the burn-target observer both consume flowTabs, so the
+            // order of emissions is non-deterministic. Drain until we observe the hatch hidden.
+            var hidden = !awaitItem().shouldShow
+            while (!hidden) {
+                hidden = !awaitItem().shouldShow
+            }
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedButTabStillInRepositoryThenHatchStaysVisible() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        lastAccessedTabFlow.emit(tab)
+        tabsFlow.value = listOf(tab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedAndOnlyAnotherTabRemovedThenHatchStaysVisible() = runTest {
+        val burnTarget = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        val otherTab = TabEntity(tabId = "tab2", url = "https://other.com", title = "Other")
+        lastAccessedTabFlow.emit(burnTarget)
+        tabsFlow.value = listOf(burnTarget, otherTab)
+
+        testee.viewState.test {
+            assertTrue(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = listOf(burnTarget)
+
+            // tabs count drops from 2 to 1 so viewState re-emits, but shouldShow stays true
+            // because the burn target is still present in the repository.
+            assertTrue(awaitItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenBurnTabPressedWithEmptyCurrentTabIdThenHatchUnaffectedByTabsChanges() = runTest {
+        lastAccessedTabFlow.emit(null)
+
+        testee.viewState.test {
+            assertFalse(awaitItem().shouldShow)
+
+            testee.onBurnTabPressed()
+            tabsFlow.value = emptyList()
+
+            expectNoEvents()
+        }
+    }
 }

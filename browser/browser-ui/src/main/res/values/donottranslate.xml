@@ -24,6 +24,7 @@
     <string name="duck_ai_tab_label">Duck.ai</string>
     <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
     <string name="hatchMenuReturnTab">Return to Tab</string>
+    <string name="hatchMenuAfterInactivitySettings">After Inactivity</string>
     <string name="hatchMenuCloseTab">Close Tab</string>
     <string name="hatchMenuBurnTab">Delete Tab</string>
     <string name="newTabReturnHatchTabClosed">Tab closed</string>

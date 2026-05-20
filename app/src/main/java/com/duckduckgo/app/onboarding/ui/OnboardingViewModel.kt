@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -48,13 +49,24 @@ class OnboardingViewModel @Inject constructor(
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
     private val onboardingStore: OnboardingStore,
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
+    suspend fun initializePages() {
+        val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
+            // Temporary: force legacy onboarding on CI builds so existing Maestro flows keep passing.
+            // Remove once E2E tests cover the brand-design onboarding pages.
+            !appBuildConfig.isDefaultVariantForced &&
+                onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
+        }
+        if (isBrandDesignUpdateEnabled) {
+            pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
+        } else {
+            pageLayoutManager.buildPageBlueprints()
+        }
     }
 
     fun pageCount(): Int {
@@ -73,6 +85,7 @@ class OnboardingViewModel @Inject constructor(
                 DEFAULT -> {
                     // no-op
                 }
+
                 DUCK_AI_FOCUSED -> {
                     // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
                     onboardingStore.setDuckAiOnboardingFlow()
@@ -86,6 +99,7 @@ class OnboardingViewModel @Inject constructor(
                         CtaId.DAX_END,
                     ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
                 }
+
                 DEFAULT_WITHOUT_INTRO_CTA -> {
                     dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
                 }
@@ -120,6 +134,8 @@ class OnboardingViewModel @Inject constructor(
     }
 
     enum class ExtendedOnboardingFlow {
-        DEFAULT, DUCK_AI_FOCUSED, DEFAULT_WITHOUT_INTRO_CTA
+        DEFAULT,
+        DUCK_AI_FOCUSED,
+        DEFAULT_WITHOUT_INTRO_CTA,
     }
 }

@@ -33,6 +33,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -95,6 +96,13 @@ class NonGranularFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private var canRestart = false
+
+    override fun show(fragmentManager: FragmentManager, tag: String?) {
+        // FragmentManager.commit() inside DialogFragment.show() throws after onSaveInstanceState.
+        // Callers may invoke show() across a coroutine suspension; skip silently if state is saved.
+        if (fragmentManager.isStateSaved) return
+        super.show(fragmentManager, tag)
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
