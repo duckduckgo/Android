@@ -452,16 +452,18 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     fun checkQuickSetupSwitchesState() {
-        viewModelScope.launch {
-            val (isDefault, hasWidget) = withContext(dispatchers.io()) {
-                defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+        if (_viewState.value.currentDialog == QUICK_SETUP) {
+            viewModelScope.launch {
+                val (isDefault, hasWidget) = withContext(dispatchers.io()) {
+                    defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+                }
+                _commands.send(
+                    Command.SyncQuickSetupSwitches(
+                        defaultBrowserChecked = isDefault,
+                        widgetChecked = hasWidget,
+                    ),
+                )
             }
-            _commands.send(
-                Command.SyncQuickSetupSwitches(
-                    defaultBrowserChecked = isDefault,
-                    widgetChecked = hasWidget,
-                ),
-            )
         }
     }
 

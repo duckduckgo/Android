@@ -2185,7 +2185,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         try {
             startActivity(DefaultBrowserSystemSettings.intent())
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "{${getString(R.string.cannotLaunchDefaultAppSettings)}: ${e.asLog()}" }
+            logcat(WARN) { "${getString(R.string.cannotLaunchDefaultAppSettings)}: ${e.asLog()}" }
         }
     }
 

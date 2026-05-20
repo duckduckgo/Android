@@ -70,6 +70,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -1130,10 +1131,14 @@ class BrandDesignUpdatePageViewModelTest {
     // region checkQuickSetupSwitchesState
 
     @Test
-    fun whenCheckQuickSetupSwitchesStateThenSendCombinedSyncWithBothStates() = runTest {
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupThenSendCombinedSyncWithBothStates() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
         testee.commands.test {
             testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
@@ -1146,10 +1151,14 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenCheckQuickSetupSwitchesStateWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
         testee.commands.test {
             testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
@@ -1159,6 +1168,18 @@ class BrandDesignUpdatePageViewModelTest {
             assertTrue(command.widgetChecked)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateNotInQuickSetupThenNoCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(mockDefaultBrowserDetector)
+        verifyNoInteractions(mockWidgetCapabilities)
     }
 
     // endregion
