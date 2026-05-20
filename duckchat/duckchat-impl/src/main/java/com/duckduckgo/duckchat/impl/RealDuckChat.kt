@@ -836,6 +836,11 @@ class RealDuckChat @Inject constructor(
         return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId), getDuckChatLink())
     }
 
+    override fun chatIdOrNull(uri: Uri): String? {
+        if (!isDuckChatUrl(uri)) return null
+        return uri.getQueryParameter(CHAT_ID_QUERY_NAME)?.takeIf { it.isNotBlank() }
+    }
+
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
         duckChatFeatureRepository.setDefaultTogglePosition(position.name)
     }

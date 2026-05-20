@@ -787,8 +787,7 @@ class RealNativeInputManager @Inject constructor(
     internal fun extractDuckAiChatId(rawUrl: String?): String? {
         if (rawUrl.isNullOrBlank()) return null
         val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
-        if (!duckChat.isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
+        return duckChat.chatIdOrNull(uri)
     }
 
     companion object {

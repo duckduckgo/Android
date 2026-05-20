@@ -22,7 +22,6 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -75,7 +74,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         if (chatUrls.isEmpty()) return
         var anyDeleted = false
         chatUrls.forEach { chatUrl ->
-            val chatId = extractChatId(chatUrl) ?: return@forEach
+            val chatId = duckChat.chatIdOrNull(chatUrl.toUri()) ?: return@forEach
             if (duckChatDeleter.deleteChat(chatId)) {
                 duckChatSyncRepository.recordSingleChatDeletion(chatId)
                 anyDeleted = true
@@ -83,11 +82,5 @@ class DuckChatDataClearingPlugin @Inject constructor(
         }
         // One sync trigger per user-visible delete action, not N.
         if (anyDeleted) syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-    }
-
-    private fun extractChatId(url: String): String? {
-        val uri = url.toUri()
-        if (!duckChat.isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
     }
 }

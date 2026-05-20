@@ -63,6 +63,12 @@ interface DuckChat {
     fun isDuckChatUrl(uri: Uri): Boolean
 
     /**
+     * Returns the chatID query parameter from [uri] when it is a Duck.ai chat URL with a
+     * non-blank chatID; null otherwise (including for non-Duck.ai URLs).
+     */
+    fun chatIdOrNull(uri: Uri): String?
+
+    /**
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean

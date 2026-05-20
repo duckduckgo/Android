@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire
 
-import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -61,19 +60,14 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
      */
     private suspend fun closeTabsMatching(chatUrls: Set<String>) {
         if (chatUrls.isEmpty()) return
-        val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { it.toUri().chatIdOrNull() }
+        val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { duckChat.chatIdOrNull(it.toUri()) }
         if (targetChatIds.isEmpty()) return
         val ids = tabRepository.getTabs()
-            .filter { tab -> tab.url?.toUri()?.chatIdOrNull() in targetChatIds }
+            .filter { tab -> tab.url?.toUri()?.let(duckChat::chatIdOrNull) in targetChatIds }
             .map { it.tabId }
         if (ids.isNotEmpty()) {
             logcat { "Closing ${ids.size} Duck.ai tab(s) matching the cleared subset" }
             tabRepository.deleteTabs(ids)
         }
-    }
-
-    private fun Uri.chatIdOrNull(): String? {
-        if (!duckChat.isDuckChatUrl(this)) return null
-        return getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
     }
 }
