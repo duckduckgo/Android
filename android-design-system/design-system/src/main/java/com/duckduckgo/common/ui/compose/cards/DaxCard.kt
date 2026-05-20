@@ -25,11 +25,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -40,6 +40,8 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  *
  * @param modifier The [Modifier] to be applied to this card.
  * @param border Optional border to draw around this card.
+ * @param shape The [Shape] of this card.
+ * @param elevation The resting elevation of this card.
  * @param content The content to be displayed inside this card.
  *
  * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1211670215000539
@@ -49,13 +51,15 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 fun DaxCard(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
+    shape: Shape = DaxCardDefaults.shape,
+    elevation: DaxCardElevation = DaxCardDefaults.elevation,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
         modifier = modifier,
-        shape = DaxCardDefaults.shape,
+        shape = shape,
         colors = DaxCardDefaults.colors,
-        elevation = DaxCardDefaults.elevation,
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation.elevation),
         border = border,
         content = content,
     )
@@ -68,6 +72,8 @@ fun DaxCard(
  * @param modifier The [Modifier] to be applied to this card.
  * @param enabled Controls the enabled state of this card.
  * @param border Optional border to draw around this card.
+ * @param shape The [Shape] of this card.
+ * @param elevation The resting elevation of this card.
  * @param interactionSource The [MutableInteractionSource] representing the stream of interactions for this card.
  * @param content The content to be displayed inside this card.
  *
@@ -80,15 +86,17 @@ fun DaxCard(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     border: BorderStroke? = null,
+    shape: Shape = DaxCardDefaults.shape,
+    elevation: DaxCardElevation = DaxCardDefaults.elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
         onClick = onClick,
         modifier = modifier,
-        shape = DaxCardDefaults.shape,
+        shape = shape,
         colors = DaxCardDefaults.colors,
-        elevation = DaxCardDefaults.elevation,
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation.elevation),
         border = border,
         content = content,
         enabled = enabled,
@@ -96,17 +104,18 @@ fun DaxCard(
     )
 }
 
+/**
+ * Elevation for [DaxCard]. Wraps a single resting elevation value to simplify the API and enforce consistency across Dax cards.
+ */
+data class DaxCardElevation(val elevation: Dp)
+
 private object DaxCardDefaults {
-    /**
-     * The default shape for Dax cards is the medium shape from the DuckDuckGo theme.
-     */
     val shape: Shape
         @Composable
         get() = DuckDuckGoTheme.shapes.medium
 
-    /**
-     * The default colors for Dax cards are derived from the DuckDuckGo theme, with specific colors for the container, content, and disabled states.
-     */
+    val elevation: DaxCardElevation = DaxCardElevation(1.dp)
+
     val colors: CardColors
         @Composable
         get() = CardDefaults.cardColors(
@@ -115,13 +124,6 @@ private object DaxCardDefaults {
             disabledContainerColor = DuckDuckGoTheme.colors.backgrounds.containerDisabled,
             disabledContentColor = DuckDuckGoTheme.colors.text.disabled,
         )
-
-    /**
-     * The default elevation for Dax cards is the card elevation from Material3, which can be customized as needed.
-     */
-    val elevation: CardElevation
-        @Composable
-        get() = CardDefaults.cardElevation(defaultElevation = 1.dp)
 }
 
 @Composable

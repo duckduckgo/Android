@@ -120,7 +120,10 @@ internal fun DaxAlertDialogContent(
     content: (@Composable () -> Unit)? = null,
     buttons: @Composable () -> Unit,
 ) {
-    DaxSurface(modifier = modifier) {
+    DaxSurface(
+        modifier = modifier,
+        shape = DuckDuckGoTheme.shapes.medium,
+    ) {
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.keyline_5)),
         ) {
