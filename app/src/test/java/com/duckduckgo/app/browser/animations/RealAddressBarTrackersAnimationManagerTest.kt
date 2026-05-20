@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.animations
 
 import android.annotation.SuppressLint
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -107,45 +108,37 @@ class RealAddressBarTrackersAnimationManagerTest {
     }
 
     @Test
-    fun whenSoftwareRenderingModeEnabledThenIsSoftwareRenderingModeEnabledReturnsTrue() = runTest {
+    fun whenSoftwareRenderingModeEnabledThenFlowEmitsTrue() = runTest {
         fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
 
-        val result = testee.isSoftwareRenderingModeEnabled()
-
-        assertTrue(result)
+        testee.softwareRenderingModeEnabled.test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun whenSoftwareRenderingModeDisabledThenIsSoftwareRenderingModeEnabledReturnsFalse() = runTest {
+    fun whenSoftwareRenderingModeDisabledThenFlowEmitsFalse() = runTest {
         fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
 
-        val result = testee.isSoftwareRenderingModeEnabled()
-
-        assertFalse(result)
+        testee.softwareRenderingModeEnabled.test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun whenFetchFeatureStateCalledThenCachesSoftwareRenderingModeState() = runTest {
+    fun whenSoftwareRenderingModeChangesThenFlowEmitsNewValue() = runTest {
         fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
 
-        testee.fetchFeatureState()
+        testee.softwareRenderingModeEnabled.test {
+            assertTrue(awaitItem())
 
-        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+            fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+            assertFalse(awaitItem())
 
-        val result = testee.isSoftwareRenderingModeEnabled()
-        assertTrue(result)
-    }
-
-    @Test
-    fun whenIsSoftwareRenderingModeEnabledCalledMultipleTimesThenUseCachedValue() = runTest {
-        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
-
-        assertTrue(testee.isSoftwareRenderingModeEnabled())
-
-        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
-
-        assertTrue(testee.isSoftwareRenderingModeEnabled())
-        assertTrue(testee.isSoftwareRenderingModeEnabled())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test

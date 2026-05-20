@@ -116,7 +116,10 @@ class OmnibarLayoutViewModelTest {
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteFeatureEnabledFlow = MutableStateFlow(false)
 
-    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
+    private val softwareRenderingModeEnabledFlow = MutableStateFlow(false)
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock {
+        on { softwareRenderingModeEnabled } doReturn softwareRenderingModeEnabledFlow
+    }
     private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
@@ -147,7 +150,6 @@ class OmnibarLayoutViewModelTest {
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
         runBlocking {
             whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
-            whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(false)
         }
 
         fakeStandardizedLeadingIconToggle = FeatureToggles.Builder(
@@ -1188,7 +1190,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenSoftwareRenderingModeEnabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
-        whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(true)
+        softwareRenderingModeEnabledFlow.value = true
         initializeViewModel()
 
         testee.viewState.test {
@@ -1209,7 +1211,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenSoftwareRenderingModeDisabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
-        whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(false)
+        softwareRenderingModeEnabledFlow.value = false
         initializeViewModel()
 
         testee.viewState.test {
