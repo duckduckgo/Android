@@ -38,10 +38,22 @@ import com.duckduckgo.mobile.android.R
  * @param body The message body text.
  * @param topIllustration The illustration shown above the title. Use [painterResource]
  *   for a local drawable, or `coil3.compose.rememberAsyncImagePainter` for a remote URL.
+ *   For remote URLs, always supply `error` and `fallback` painters so the card degrades
+ *   gracefully when the request fails or the model is null:
+ *
+ *   ```
+ *   topIllustration = rememberAsyncImagePainter(
+ *       model = "https://...",
+ *       error = painterResource(...),
+ *       fallback = painterResource(...),
+ *   )
+ *   ```
  * @param primaryAction The primary call-to-action.
  * @param secondaryAction The secondary ghost action.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214531387269892
  */
 @Composable
 fun DaxBigTwoActionsMessage(

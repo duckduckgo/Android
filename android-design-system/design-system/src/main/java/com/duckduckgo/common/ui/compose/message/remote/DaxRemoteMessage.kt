@@ -17,9 +17,7 @@
 package com.duckduckgo.common.ui.compose.message.remote
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -35,39 +33,6 @@ import com.duckduckgo.common.ui.compose.message.DaxMessageActions
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
-
-/**
- * Internal base for remote message cards that include a top illustration.
- *
- * This is *not* part of the design system and should *only* be used when creating a *new*
- * design system compliant remote message variant. See [DaxMediumMessage], [DaxBigSingleActionMessage],
- * [DaxBigTwoActionsMessage] for example usage.
- *
- * @param title The message title.
- * @param body The message body text.
- * @param topIllustration Composable slot rendered above the title.
- * @param onDismissClicked Called when the user taps the dismiss button.
- * @param modifier Modifier for this message card.
- * @param actions Optional action row.
- */
-@Composable
-internal fun DaxRemoteMessageWithIllustration(
-    title: String,
-    body: String,
-    onDismissClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-    topIllustration: @Composable ColumnScope.() -> Unit = {},
-    actions: DaxMessageActions? = null,
-) {
-    DaxRemoteMessage(
-        title = title,
-        body = body,
-        onDismissClicked = onDismissClicked,
-        modifier = modifier,
-        topIllustration = topIllustration,
-        actions = actions,
-    )
-}
 
 /**
  * Internal base for remote message cards with a [Painter] illustration.
@@ -98,20 +63,18 @@ internal fun DaxRemoteMessageWithIllustration(
         onDismissClicked = onDismissClicked,
         modifier = modifier,
         topIllustration = {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = topIllustration,
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .padding(
-                            top = dimensionResource(R.dimen.keyline_3),
-                            bottom = dimensionResource(R.dimen.keyline_2),
-                        )
-                        .align(Alignment.Center)
-                        .size(dimensionResource(R.dimen.remoteMessageCardImageSize)),
-                )
-            }
+            Image(
+                painter = topIllustration,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(
+                        top = dimensionResource(R.dimen.keyline_3),
+                        bottom = dimensionResource(R.dimen.keyline_2),
+                    )
+                    .align(Alignment.CenterHorizontally)
+                    .size(dimensionResource(R.dimen.remoteMessageCardImageSize)),
+            )
         },
         actions = actions,
     )

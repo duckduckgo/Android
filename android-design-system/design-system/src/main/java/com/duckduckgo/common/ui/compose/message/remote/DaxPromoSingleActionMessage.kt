@@ -60,13 +60,25 @@ import com.duckduckgo.mobile.android.R
  * @param illustration The illustration shown between title and body. Drawn with
  *   [ContentScale.Fit] inside a 256dp × 144dp max box so remote images can't break
  *   the card layout. Use [painterResource] for a local drawable, or
- *   `coil3.compose.rememberAsyncImagePainter` for a remote URL.
+ *   `coil3.compose.rememberAsyncImagePainter` for a remote URL. For remote URLs,
+ *   always supply `error` and `fallback` painters so the card degrades gracefully
+ *   when the request fails or the model is null:
+ *
+ *   ```
+ *   illustration = rememberAsyncImagePainter(
+ *       model = "https://...",
+ *       error = painterResource(...),
+ *       fallback = painterResource(...),
+ *   )
+ *   ```
  * @param illustrationContentDescription Accessibility description for [illustration].
  *   Pass `null` only if the illustration is purely decorative and adds no information
  *   beyond [title] and [body].
  * @param action The primary call-to-action.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214531801884492
  */
 @Composable
 fun DaxPromoSingleActionMessage(

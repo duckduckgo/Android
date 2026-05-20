@@ -33,6 +33,8 @@ import com.duckduckgo.mobile.android.R
  * @param body The message body text.
  * @param onDismissed Called when the user taps the dismiss button.
  * @param modifier Modifier for this message card.
+ *
+ * Asana task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1214531801886932
  */
 @Composable
 fun DaxSmallMessage(
