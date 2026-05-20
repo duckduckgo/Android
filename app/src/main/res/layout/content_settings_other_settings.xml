@@ -81,6 +81,13 @@
         app:leadingIcon="@drawable/ic_fire_color_24"/>
 
     <LinearLayout
+        android:id="@+id/settingsSectionAdBlocking"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/settingsSectionDuckPlayer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

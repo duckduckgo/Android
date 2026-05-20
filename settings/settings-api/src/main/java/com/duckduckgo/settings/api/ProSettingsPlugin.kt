@@ -41,3 +41,8 @@ interface ProSettingsPlugin : SettingsPlugin
 interface DuckPlayerSettingsPlugin : SettingsPlugin
 
 interface ThreatProtectionSettingsPlugin : SettingsPlugin
+
+/**
+ * This is the plugin for YouTube Ad Blocking settings
+ */
+interface AdBlockingSettingsPlugin : SettingsPlugin
