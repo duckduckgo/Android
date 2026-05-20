@@ -1425,8 +1425,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+
+                binding.daxDialogCta.addressBarContent.root.isVisible = true
+                val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = binding.bobbingDaxAnimation,
+                )
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    if (deviceInfo.isTablet()) {
+                    if (showBobbingDax && deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.bobbingDaxAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1439,11 +1449,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.secondaryCta.isVisible = false
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-
-                binding.daxDialogCta.addressBarContent.root.isVisible = true
+                cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
                 binding.daxDialogCta.addressBarContent.root.alpha = 1f
                 binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
                 binding.daxDialogCta.addressBarContent.addressBarTitle.text =
@@ -1461,11 +1467,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
-                binding.bobbingDaxAnimation.apply {
-                    isVisible = true
-                    alpha = 1f
-                    translationX = 0f
-                    if (!this.isAnimating) playAnimation()
+                if (showBobbingDax) {
+                    binding.bobbingDaxAnimation.apply {
+                        isVisible = true
+                        alpha = 1f
+                        translationX = 0f
+                        if (!this.isAnimating) playAnimation()
+                    }
+                } else {
+                    binding.bobbingDaxAnimation.apply {
+                        if (this.isAnimating) cancelAnimation()
+                        isVisible = false
+                    }
                 }
 
                 setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
