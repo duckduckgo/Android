@@ -75,7 +75,16 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
             }
         }
 
+        applyWavingDaxState(view)
+    }
+
+    internal fun applyWavingDaxState(view: View) {
         view.findViewById<LottieAnimationView>(R.id.wavingDax)?.apply {
+            if (isPhoneLandscape()) {
+                if (isAnimating) cancelAnimation()
+                isVisible = false
+                return@apply
+            }
             (layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
                 lp.startToStart =
                     if (isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID

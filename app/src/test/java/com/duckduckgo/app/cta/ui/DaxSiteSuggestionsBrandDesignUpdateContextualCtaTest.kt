@@ -17,12 +17,20 @@
 package com.duckduckgo.app.cta.ui
 
 import android.content.Context
+import android.content.res.Configuration
+import android.content.res.Resources
+import android.util.DisplayMetrics
+import android.view.View
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.db.AppDatabase
@@ -32,6 +40,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.view.DaxTypeAnimationTextView
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
@@ -48,6 +57,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -59,6 +69,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -68,6 +79,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -240,6 +252,97 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
             any(),
             eq(Count),
         )
+    }
+
+    @Test
+    fun applyWavingDaxState_phoneLandscape_hidesDax() {
+        val dax: LottieAnimationView = mock()
+        val container = stubContainerAndDax(dax, smallestScreenWidthDp = 360, orientation = Configuration.ORIENTATION_LANDSCAPE)
+        whenever(dax.isAnimating).thenReturn(false)
+
+        newBrandDesignCta().applyWavingDaxState(container)
+
+        verify(dax).isVisible = false
+        verify(dax, never()).isVisible = true
+    }
+
+    @Test
+    fun applyWavingDaxState_tabletLandscape_anchorsDaxToCard() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 800, orientation = Configuration.ORIENTATION_LANDSCAPE)
+
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(R.id.contextualBrandDesignCardView, lp.startToStart)
+        verify(dax).isVisible = true
+        verify(dax).translationX = -70f
+    }
+
+    @Test
+    fun applyWavingDaxState_tabletPortrait_anchorsDaxToCard() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 800, orientation = Configuration.ORIENTATION_PORTRAIT)
+
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(R.id.contextualBrandDesignCardView, lp.startToStart)
+        verify(dax).isVisible = true
+    }
+
+    @Test
+    fun applyWavingDaxState_phonePortrait_anchorsDaxToParent() {
+        val dax: LottieAnimationView = mock()
+        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 360, orientation = Configuration.ORIENTATION_PORTRAIT)
+
+        newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
+
+        assertEquals(ConstraintLayout.LayoutParams.PARENT_ID, lp.startToStart)
+        verify(dax).isVisible = true
+    }
+
+    private fun stubContainerWithDax(dax: LottieAnimationView): View {
+        val container: View = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wavingDax)).thenReturn(dax)
+        return container
+    }
+
+    private fun stubContainerAndDax(
+        dax: LottieAnimationView,
+        smallestScreenWidthDp: Int,
+        orientation: Int,
+    ): View {
+        val configuration = Configuration().apply {
+            this.smallestScreenWidthDp = smallestScreenWidthDp
+            this.orientation = orientation
+        }
+        val resources: Resources = mock()
+        val daxContext: Context = mock()
+        whenever(dax.context).thenReturn(daxContext)
+        whenever(daxContext.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        return stubContainerWithDax(dax)
+    }
+
+    private fun stubContainerAndDaxWithLayoutParams(
+        dax: LottieAnimationView,
+        smallestScreenWidthDp: Int,
+        orientation: Int,
+    ): ConstraintLayout.LayoutParams {
+        val lp = ConstraintLayout.LayoutParams(0, 0)
+        val configuration = Configuration().apply {
+            this.smallestScreenWidthDp = smallestScreenWidthDp
+            this.orientation = orientation
+        }
+        val displayMetrics = DisplayMetrics().apply { density = 1f }
+        val resources: Resources = mock()
+        val daxContext: Context = mock()
+        whenever(dax.layoutParams).thenReturn(lp)
+        whenever(dax.context).thenReturn(daxContext)
+        whenever(dax.resources).thenReturn(resources)
+        whenever(daxContext.resources).thenReturn(resources)
+        whenever(resources.configuration).thenReturn(configuration)
+        whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        return lp
     }
 
     private fun newBrandDesignCta(): DaxSiteSuggestionsBrandDesignUpdateContextualCta =
