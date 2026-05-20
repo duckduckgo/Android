@@ -79,6 +79,8 @@ class RealChatHistoryRepository @Inject constructor(
     override suspend fun setPinned(chatId: String, pinned: Boolean) {
         withContext(dispatchers.io()) {
             if (pinned) chatStore.pinChat(chatId) else chatStore.unpinChat(chatId)
+            duckChatSyncRepository.recordSingleChatUpdate(chatId)
+            syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
         }
     }
 

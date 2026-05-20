@@ -226,6 +226,24 @@ class ChatHistoryRepositoryTest {
         verify(syncEngine, never()).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
+    @Test
+    fun `setPinned true delegates to pinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = true)
+
+        verify(chatStore).pinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `setPinned false delegates to unpinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = false)
+
+        verify(chatStore).unpinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
     private fun chat(
         chatId: String,
         title: String = "Title",
