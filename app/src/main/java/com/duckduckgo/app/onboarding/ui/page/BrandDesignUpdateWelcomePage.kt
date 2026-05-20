@@ -985,7 +985,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     if (showBobbingDax) {
                         animateBobbingDaxIn()
                     } else {
-                        binding.bobbingDaxAnimation.isVisible = false
+                        bobbingDaxAnimator?.cancel()
+                        bobbingDaxAnimator = null
+                        binding.bobbingDaxAnimation.apply {
+                            if (this.isAnimating) cancelAnimation()
+                            isVisible = false
+                        }
                     }
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
 
@@ -1475,6 +1480,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         if (!this.isAnimating) playAnimation()
                     }
                 } else {
+                    bobbingDaxAnimator?.cancel()
+                    bobbingDaxAnimator = null
                     binding.bobbingDaxAnimation.apply {
                         if (this.isAnimating) cancelAnimation()
                         isVisible = false
