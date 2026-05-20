@@ -36,10 +36,10 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
@@ -60,19 +60,21 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ReasoningModePickerViewModel::class.java]
     }
 
     private val button: ImageView by lazy { findViewById(R.id.reasoningModePickerButton) }
     private var stateJob: Job? = null
+    private var inputContextJob: Job? = null
     private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
-    private lateinit var host: NativeInputHost
 
-    fun setHost(host: NativeInputHost) {
-        this.host = host
-    }
+    // Mirrors the input context from the per-tab native input state so currentSurface() can be
+    // read synchronously from popup callbacks. Updated by observeInputContext().
+    private var lastInputContext: InputContext = InputContext.BROWSER
 
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
@@ -83,15 +85,26 @@ class ReasoningModePickerView @JvmOverloads constructor(
         super.onAttachedToWindow()
         button.setOnClickListener { showMenu() }
         observeState()
+        observeInputContext()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        inputContextJob?.cancel()
+        inputContextJob = null
         commandJob?.cancel()
         commandJob = null
         dismissPopup()
+    }
+
+    private fun observeInputContext() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        inputContextJob?.cancel()
+        inputContextJob = nativeInputStateProvider.state
+            .onEach { lastInputContext = it.inputContext }
+            .launchIn(scope)
     }
 
     private fun observeState() {
@@ -123,7 +136,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     }
 
     private fun currentSurface(): PickerSurface =
-        when (host.getInputState().inputContext) {
+        when (lastInputContext) {
             InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.REASONING_PICKER_DUCK_AI_TAB
             InputContext.BROWSER -> PickerSurface.REASONING_PICKER_ADDRESS_BAR
         }
