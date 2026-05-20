@@ -69,7 +69,7 @@
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep1Number"
-                    android:textColor="?attr/onboardingAccentTextPrimary"
+                    android:textColor="?attr/quickSetupStepNumberText"
                     android:textSize="18sp" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -98,7 +98,7 @@
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep2Number"
-                    android:textColor="?attr/onboardingAccentTextPrimary"
+                    android:textColor="?attr/quickSetupStepNumberText"
                     android:textSize="18sp" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -126,7 +126,7 @@
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep3Number"
-                    android:textColor="?attr/onboardingAccentTextPrimary"
+                    android:textColor="?attr/quickSetupStepNumberText"
                     android:textSize="18sp" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView

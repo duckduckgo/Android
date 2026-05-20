@@ -18,5 +18,5 @@
     <corners
         android:topLeftRadius="@dimen/onboardingBottomSheetCornerRadius"
         android:topRightRadius="@dimen/onboardingBottomSheetCornerRadius" />
-    <solid android:color="?attr/daxColorSurface" />
+    <solid android:color="?attr/daxColorWindow" />
 </shape>
