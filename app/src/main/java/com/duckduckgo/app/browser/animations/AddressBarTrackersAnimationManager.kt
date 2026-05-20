@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import javax.inject.Inject
@@ -39,10 +40,10 @@ interface AddressBarTrackersAnimationManager {
     suspend fun isFeatureEnabled(): Boolean
 
     /**
-     * Returns the cached software rendering mode state if available, otherwise fetches and caches it.
-     * @return true if the shield animation should use Lottie's SOFTWARE render mode, false otherwise
+     * Observes the software rendering mode kill-switch.
+     * If the emitted value is true, the shield animation should use Lottie's SOFTWARE render mode; otherwise the default.
      */
-    suspend fun isSoftwareRenderingModeEnabled(): Boolean
+    val softwareRenderingModeEnabled: Flow<Boolean>
 
     /**
      * Determines if the tracker animation should be shown based on the current URL
@@ -66,24 +67,19 @@ class RealAddressBarTrackersAnimationManager @Inject constructor(
 ) : AddressBarTrackersAnimationManager {
 
     private var cachedFeatureState: Boolean? = null
-    private var cachedSoftwareRenderingMode: Boolean? = null
+
+    override val softwareRenderingModeEnabled: Flow<Boolean> =
+        addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().enabled()
 
     override suspend fun fetchFeatureState() {
         withContext(dispatcherProvider.io()) {
             cachedFeatureState = addressBarTrackersAnimationFeatureToggle.feature().isEnabled()
-            cachedSoftwareRenderingMode = addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().isEnabled()
         }
     }
 
     override suspend fun isFeatureEnabled(): Boolean = withContext(dispatcherProvider.io()) {
         cachedFeatureState ?: addressBarTrackersAnimationFeatureToggle.feature().isEnabled().also {
             cachedFeatureState = it
-        }
-    }
-
-    override suspend fun isSoftwareRenderingModeEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        cachedSoftwareRenderingMode ?: addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().isEnabled().also {
-            cachedSoftwareRenderingMode = it
         }
     }
 

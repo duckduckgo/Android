@@ -141,7 +141,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState,
             tabRepository.flowTabs,
             flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
-            flow { emit(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()) },
+            addressBarTrackersAnimationManager.softwareRenderingModeEnabled,
             browserMenuHighlight.shouldShowHighlightForMode(mode),
         ) { state, tabs, isAddressBarTrackersAnimationEnabled, useSoftwareRenderingMode, showHighlight ->
             state.copy(

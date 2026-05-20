@@ -82,8 +82,10 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
-        if (useSoftwareRenderingMode) {
-            addressBarTrackersBlockedAnimationShieldIcon.renderMode = RenderMode.SOFTWARE
+        addressBarTrackersBlockedAnimationShieldIcon.renderMode = if (useSoftwareRenderingMode) {
+            RenderMode.SOFTWARE
+        } else {
+            RenderMode.AUTOMATIC
         }
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
