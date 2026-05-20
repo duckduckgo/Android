@@ -22,6 +22,7 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
@@ -49,6 +50,13 @@ class AdBlockingExtensionJsInjectorPluginTest {
     private val repository: AdBlockingExtensionRepository = mock {
         on { scriptletsFlow() } doReturn scriptletsFlow
     }
+    private val userEnabledFlow = MutableStateFlow(true)
+    private val settingsRepository: AdBlockingSettingsRepository = object : AdBlockingSettingsRepository {
+        override fun isEnabledFlow(): Flow<Boolean> = userEnabledFlow
+        override suspend fun setEnabled(enabled: Boolean) {
+            userEnabledFlow.value = enabled
+        }
+    }
     private val webView: WebView = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -61,6 +69,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
     private val plugin by lazy {
         AdBlockingExtensionJsInjectorPlugin(
             statusChecker = statusChecker,
+            settingsRepository = settingsRepository,
             repository = repository,
             appScope = testScope,
         )
@@ -134,6 +143,16 @@ class AdBlockingExtensionJsInjectorPluginTest {
     @Test
     fun whenStatusCheckerRejectsThenScriptIsNotInjected() {
         canInject = false
+        scriptletsFlow.value = singleScriptlet
+
+        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenUserHasDisabledThenScriptIsNotInjected() {
+        userEnabledFlow.value = false
         scriptletsFlow.value = singleScriptlet
 
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
