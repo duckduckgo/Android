@@ -193,6 +193,10 @@ enum class PirPixel(
         baseName = "m_dbp_scan_stage",
         type = Count,
     ),
+    PIR_SCAN_STAGE_EMAIL_GET_DATA(
+        baseName = "m_dbp_scan_stage_email-get-data",
+        type = Count,
+    ),
     PIR_SCAN_STAGE_RESULT_MATCHES(
         baseName = "m_dbp_search_stage_main_status_success",
         type = Count,

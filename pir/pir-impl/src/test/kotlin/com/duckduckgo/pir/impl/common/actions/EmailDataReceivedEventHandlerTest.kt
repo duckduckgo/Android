@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanSt
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageEmailGetDataReceived
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStageEmailGetDataReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailDataReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
@@ -223,7 +224,7 @@ class EmailDataReceivedEventHandlerTest {
     }
 
     @Test
-    fun whenEmailDataReceivedWithScanStepThenDoesNotEmitPixel() = runTest {
+    fun whenEmailDataReceivedWithScanStepThenEmitsPixel() = runTest {
         val scanStep = ScanStep(
             broker = testBroker,
             step = ScanStepActions(
@@ -232,12 +233,17 @@ class EmailDataReceivedEventHandlerTest {
                 scanType = "initial",
             ),
         )
-        val state = stateWithStep(scanStep, runType = RunType.MANUAL)
+        val state = stateWithStep(scanStep, runType = RunType.MANUAL).copy(actionRetryCount = 1)
         val event = EmailDataReceived(emailExtractedData = mapOf("verificationCode" to "abc"))
 
         testee.invoke(state, event)
 
-        verifyNoInteractions(mockPirRunStateHandler)
+        val capturedState = argumentCaptor<BrokerScanStageEmailGetDataReceived>()
+        verify(mockPirRunStateHandler).handleState(capturedState.capture())
+        assertEquals(testBroker, capturedState.firstValue.broker)
+        assertEquals("get-email-data-action-1", capturedState.firstValue.actionID)
+        assertEquals(testCurrentTimeInMillis - testStageStartMs, capturedState.firstValue.durationMs)
+        assertEquals(2, capturedState.firstValue.currentActionAttemptCount)
     }
 
     @Test

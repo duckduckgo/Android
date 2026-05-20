@@ -77,6 +77,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_EMAIL_GET_DATA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_ERROR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_SCAN_STAGE_RESULT_NO_MATCH
@@ -457,6 +458,15 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
+    )
+
+    fun reportScanStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
     )
 
     suspend fun reportScanMatches(
@@ -1077,6 +1087,27 @@ class RealPirPixelSender @Inject constructor(
         )
 
         fire(PIR_SCAN_STAGE, params)
+    }
+
+    override fun reportScanStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_SCAN_STAGE_EMAIL_GET_DATA,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
     }
 
     override suspend fun reportScanMatches(
