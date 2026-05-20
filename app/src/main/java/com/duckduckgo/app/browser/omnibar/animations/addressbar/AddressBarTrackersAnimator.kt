@@ -64,6 +64,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         shieldViews: List<View>,
         entities: List<Entity>?,
         customBackgroundColor: Int?,
+        useSoftwareRenderingMode: Boolean,
         onAnimationComplete: () -> Unit,
     ) {
         if (isAnimationRunning) return
@@ -81,7 +82,9 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
-        addressBarTrackersBlockedAnimationShieldIcon.renderMode = RenderMode.SOFTWARE
+        if (useSoftwareRenderingMode) {
+            addressBarTrackersBlockedAnimationShieldIcon.renderMode = RenderMode.SOFTWARE
+        }
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
 

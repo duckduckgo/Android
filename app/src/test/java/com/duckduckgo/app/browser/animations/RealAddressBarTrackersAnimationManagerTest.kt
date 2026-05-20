@@ -107,6 +107,48 @@ class RealAddressBarTrackersAnimationManagerTest {
     }
 
     @Test
+    fun whenSoftwareRenderingModeEnabledThenIsSoftwareRenderingModeEnabledReturnsTrue() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
+
+        val result = testee.isSoftwareRenderingModeEnabled()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeDisabledThenIsSoftwareRenderingModeEnabledReturnsFalse() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+
+        val result = testee.isSoftwareRenderingModeEnabled()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenFetchFeatureStateCalledThenCachesSoftwareRenderingModeState() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
+
+        testee.fetchFeatureState()
+
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+
+        val result = testee.isSoftwareRenderingModeEnabled()
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenIsSoftwareRenderingModeEnabledCalledMultipleTimesThenUseCachedValue() = runTest {
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = true))
+
+        assertTrue(testee.isSoftwareRenderingModeEnabled())
+
+        fakeFeatureToggle.softwareRenderingMode().setRawStoredState(State(enable = false))
+
+        assertTrue(testee.isSoftwareRenderingModeEnabled())
+        assertTrue(testee.isSoftwareRenderingModeEnabled())
+    }
+
+    @Test
     fun whenCurrentUrlIsNullThenShouldShowAnimationReturnsFalse() {
         val result = testee.shouldShowAnimation(currentUrl = null, lastAnimatedUrl = null)
 
