@@ -119,6 +119,24 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach(::render)
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.navigationEvents
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach(::onNavigationEvent)
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
+        when (event) {
+            is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
+        }
+    }
+
+    private fun openRenameScreen(chatId: String, currentTitle: String) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.chatHistoryFragmentContainer, RenameChatFragment.newInstance(chatId, currentTitle))
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun render(state: ChatHistoryUiState) {
@@ -269,7 +287,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
         val view = popup.contentView
         popup.onMenuItemClicked(view.findViewById(R.id.pin)) { showComingSoonSnackbar() }
-        popup.onMenuItemClicked(view.findViewById(R.id.rename)) { showComingSoonSnackbar() }
+        popup.onMenuItemClicked(view.findViewById(R.id.rename)) {
+            viewModel.onRenameRequested(item.chatId, item.displayTitle)
+        }
         popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
         popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
         popup.show(binding.root, anchor)

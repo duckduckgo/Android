@@ -27,6 +27,7 @@ import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -34,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -275,6 +277,47 @@ class RealDuckAiChatStoreTest {
         assertFalse(file.exists())
         verify(fileMetaDao).deleteAll()
         verify(chatsDao).deleteAll()
+    }
+
+    // --- renameChat ---
+
+    @Test
+    fun `renameChat returns false when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+
+        assertFalse(store.renameChat("missing", "New title"))
+        verify(chatsDao, never()).upsert(any())
+    }
+
+    @Test
+    fun `renameChat updates only the title and preserves other JSON fields`() = runTest {
+        val originalJson = """
+            {"chatId":"abc","title":"Old","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":true,"fileRefs":["uuid1"],"messages":[{"role":"user","text":"hi"}]}
+        """.trimIndent()
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", originalJson))
+
+        assertTrue(store.renameChat("abc", "Brand new title"))
+
+        val entityCaptor = argumentCaptor<DuckAiBridgeChatEntity>()
+        verify(chatsDao).upsert(entityCaptor.capture())
+        val captured = entityCaptor.firstValue
+        assertEquals("abc", captured.chatId)
+        val json = JSONObject(captured.data)
+        assertEquals("Brand new title", json.getString("title"))
+        assertEquals("abc", json.getString("chatId"))
+        assertEquals("gpt-5-mini", json.getString("model"))
+        assertEquals("2026-04-01T21:31:54.260Z", json.getString("lastEdit"))
+        assertTrue(json.getBoolean("pinned"))
+        assertEquals("uuid1", json.getJSONArray("fileRefs").getString(0))
+        assertEquals("hi", json.getJSONArray("messages").getJSONObject(0).getString("text"))
+    }
+
+    @Test
+    fun `renameChat returns false when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not a json"))
+
+        assertFalse(store.renameChat("abc", "New title"))
+        verify(chatsDao, never()).upsert(any())
     }
 
     @Test

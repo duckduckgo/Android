@@ -63,6 +63,9 @@ interface DuckAiChatStore {
 
     /** Deletes all chats and their associated files. */
     suspend fun deleteAllChats()
+
+    /** Renames [chatId] in the FE-owned JSON blob. Returns true if the chat existed and was updated, false otherwise. */
+    suspend fun renameChat(chatId: String, newTitle: String): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -128,6 +131,17 @@ class RealDuckAiChatStore @Inject constructor(
             fileMetaDao.deleteAll()
         }
     }
+
+    override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
+        withContext(dispatchers.io()) {
+            logcat { "DuckAI: RealDuckAiChatStore.renameChat($chatId)" }
+            val entity = chatsDao.getById(chatId) ?: return@withContext false
+            val updatedJson = runCatching {
+                JSONObject(entity.data).put("title", newTitle).toString()
+            }.getOrNull() ?: return@withContext false
+            chatsDao.upsert(entity.copy(data = updatedJson))
+            true
+        }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)
