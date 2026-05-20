@@ -151,10 +151,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
         data class ShowQuickSetupDefaultBrowserDialog(val intent: Intent) : Command
         data object OpenDefaultBrowserSystemSettings : Command
-        data class SyncDefaultBrowserSwitch(val isChecked: Boolean) : Command
         data object LaunchAddWidgetPrompt : Command
         data object ShowRemoveWidgetBottomSheet : Command
         data class SyncAddWidgetSwitch(val isChecked: Boolean) : Command
+        data class SyncQuickSetupSwitches(
+            val defaultBrowserChecked: Boolean,
+            val widgetChecked: Boolean,
+        ) : Command
     }
 
     fun onDialogTapped() {
@@ -448,10 +451,17 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    fun checkDefaultBrowserState() {
+    fun checkQuickSetupSwitchesState() {
         viewModelScope.launch {
-            val isDefault = withContext(dispatchers.io()) { defaultBrowserDetector.isDefaultBrowser() }
-            _commands.send(Command.SyncDefaultBrowserSwitch(isChecked = isDefault))
+            val (isDefault, hasWidget) = withContext(dispatchers.io()) {
+                defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+            }
+            _commands.send(
+                Command.SyncQuickSetupSwitches(
+                    defaultBrowserChecked = isDefault,
+                    widgetChecked = hasWidget,
+                ),
+            )
         }
     }
 

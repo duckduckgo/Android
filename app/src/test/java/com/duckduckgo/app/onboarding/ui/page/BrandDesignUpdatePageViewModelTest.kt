@@ -1127,30 +1127,36 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
-    // region checkDefaultBrowserState
+    // region checkQuickSetupSwitchesState
 
     @Test
-    fun whenCheckDefaultBrowserStateAndIsDefaultThenSendSyncSwitchChecked() = runTest {
+    fun whenCheckQuickSetupSwitchesStateThenSendCombinedSyncWithBothStates() = runTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         val testee = createViewModel()
         testee.commands.test {
-            testee.checkDefaultBrowserState()
+            testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
-            assertTrue(command is Command.SyncDefaultBrowserSwitch)
-            assertTrue((command as Command.SyncDefaultBrowserSwitch).isChecked)
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertTrue(command.defaultBrowserChecked)
+            assertFalse(command.widgetChecked)
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenCheckDefaultBrowserStateAndNotDefaultThenSendSyncSwitchUnchecked() = runTest {
+    fun whenCheckQuickSetupSwitchesStateWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val testee = createViewModel()
         testee.commands.test {
-            testee.checkDefaultBrowserState()
+            testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
-            assertTrue(command is Command.SyncDefaultBrowserSwitch)
-            assertFalse((command as Command.SyncDefaultBrowserSwitch).isChecked)
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertFalse(command.defaultBrowserChecked)
+            assertTrue(command.widgetChecked)
             cancelAndConsumeRemainingEvents()
         }
     }

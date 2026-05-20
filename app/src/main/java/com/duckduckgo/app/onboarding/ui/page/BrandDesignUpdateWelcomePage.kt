@@ -479,10 +479,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     BrandDesignUpdatePageViewModel.Command.OpenDefaultBrowserSystemSettings -> {
                         openDefaultBrowserSystemSettings()
                     }
-                    is BrandDesignUpdatePageViewModel.Command.SyncDefaultBrowserSwitch -> {
-                        binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem
-                            .setCheckedSilently(command.isChecked)
-                    }
                     BrandDesignUpdatePageViewModel.Command.LaunchAddWidgetPrompt -> {
                         addWidgetLauncher.launchAddWidget(activity)
                     }
@@ -492,6 +488,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     is BrandDesignUpdatePageViewModel.Command.SyncAddWidgetSwitch -> {
                         binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem
                             .setCheckedSilently(command.isChecked)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.SyncQuickSetupSwitches -> {
+                        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+                            setDefaultBrowserItem.setCheckedSilently(command.defaultBrowserChecked)
+                            addWidgetItem.setCheckedSilently(command.widgetChecked)
+                        }
                     }
                 }
             }
@@ -576,8 +578,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     override fun onResume() {
         super.onResume()
-        viewModel.checkWidgetAddedState()
-        viewModel.checkDefaultBrowserState()
+        viewModel.checkQuickSetupSwitchesState()
     }
 
     override fun onActivityResult(
