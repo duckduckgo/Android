@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.mode.ExternalUrl
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -44,6 +45,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Sanitize before super.onCreate so lifecycle callbacks dispatched from there don't trip over
+        // Parcelable extras whose classes are absent from our classpath.
+        intent?.sanitize()
         super.onCreate(savedInstanceState)
 
         logcat { "onCreate called with intent $intent" }
