@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.internal.testseeder
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class NativeInputToggleSeederPlugin @Inject constructor(
-    private val duckChat: DuckChat,
+    private val duckChat: DuckChatInternal,
 ) : TestSeederPlugin {
 
     override val handledKeys = setOf(TestSeederKey.NATIVE_INPUT_TOGGLE.key)
