@@ -97,7 +97,7 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
-    fun prepareForEnterAnimation()
+    fun beginEnterAnimationPreview()
     fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
@@ -665,7 +665,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun prepareForEnterAnimation() {
+    override fun beginEnterAnimationPreview() {
         if (inputField.hasFocus()) return
         // State observation is async; apply it synchronously so toggle-row visibility etc. are
         // in their final positions before the enter animation measures the widget.
@@ -675,11 +675,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
         previewEnterFocus = true
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
-        // Bottom omnibar: trigger the IME slide-up now so it overlaps the enter animation,
-        // letting the activity shrink (and the widget's bottom-anchored FrameLayout slide up)
-        // alongside the widget's expansion instead of pushing it up afterwards as a second step.
-        // Top omnibar: keyboard's vertical position is independent of the widget, so its show
-        // stays deferred to focusInput in onEnterComplete.
+        // Bottom omnibar only: trigger the IME slide-up now so it overlaps the enter animation —
+        // the activity shrinks (and the widget's bottom-anchored FrameLayout slides up) alongside
+        // the widget's expansion instead of pushing it up afterwards as a second step. Top omnibar
+        // keyboard position is independent of the widget, so its show stays deferred to focusInput
+        // in onEnterComplete.
+        //
+        // Side effect to be aware of: Activity.showKeyboard() calls inputField.requestFocus()
+        // under the hood, so the input field gains focus here — ~200ms earlier than in top mode
+        // (where focus is set in onEnterComplete via focusInput). The onFocusChangeListener will
+        // therefore fire synchronously inside showKeyboard(). The asymmetry is intentional, but
+        // it does mean any cancel path has to undo focus + IME for bottom mode (see the manager's
+        // animateEnter.onCancel).
         if (isWidgetBottom()) {
             showKeyboard()
         }
