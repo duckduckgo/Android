@@ -916,7 +916,7 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenFetchAndSelectedModelDoesNotSupportPersistedModeThenStaleClearedFromStateAndStore() = runTest {
+    fun whenFetchAndSelectedModelDoesNotSupportPersistedModeThenStaleReplacedWithFirstAccessible() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.EXTENDED_REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -936,12 +936,44 @@ class RealDuckAiModelManagerTest {
         testee = createManager()
         testee.fetchModels()
 
-        assertNull(testee.modelState.value.selectedReasoningMode)
-        verify(dataStore).setSelectedReasoningMode(null)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(ReasoningMode.FAST.rawValue)
     }
 
     @Test
-    fun whenSelectModelClearsStaleReasoningWhenNewModelLacksSupport() = runTest {
+    fun whenAccessibleModelHasAllReasoningEffortsGatedThenSelectedModeClearedAndNoEffortResolved() = runTest {
+        // Edge case: model accessible to FREE user, but every supported reasoning effort is gated to PRO.
+        // Expected: selectedReasoningMode is cleared, getResolvedReasoningEffort returns null (no effort submitted).
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free", "plus", "pro"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("none", "low"),
+                        reasoningEffortAccess = listOf(
+                            RemoteReasoningEffortAccess(id = "none", accessTier = listOf("pro"), entityHasAccess = false),
+                            RemoteReasoningEffortAccess(id = "low", accessTier = listOf("pro"), entityHasAccess = false),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(null)
+        assertNull(testee.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenSelectModelReplacesStaleReasoningWithFirstAccessibleOnNewModel() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.FAST.rawValue)
         testee = createManager()
@@ -958,8 +990,8 @@ class RealDuckAiModelManagerTest {
 
         testee.selectModel(newModel)
 
-        assertNull(testee.modelState.value.selectedReasoningMode)
-        verify(dataStore).setSelectedReasoningMode(null)
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore).setSelectedReasoningMode(ReasoningMode.REASONING.rawValue)
     }
 
     @Test
@@ -987,6 +1019,7 @@ class RealDuckAiModelManagerTest {
     @Test
     fun whenSelectReasoningModeAndSupportedThenPersistedAndStateUpdated() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.REASONING.rawValue)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
         whenever(modelsService.getModels(any())).thenReturn(
             AIChatModelsResponse(
@@ -1027,11 +1060,46 @@ class RealDuckAiModelManagerTest {
         )
         testee = createManager()
         testee.fetchModels()
+        // fetchModels auto-promotes the persisted-null state to REASONING (only accessible mode).
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
 
         testee.selectReasoningMode(ReasoningMode.FAST)
 
-        assertNull(testee.modelState.value.selectedReasoningMode)
+        // FAST isn't in available → refused, state stays REASONING.
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
         verify(dataStore, never()).setSelectedReasoningMode(ReasoningMode.FAST.rawValue)
+    }
+
+    @Test
+    fun whenSelectReasoningModeAndModeIsGatedThenIgnoredAndNotPersisted() = runTest {
+        // Defends against direct calls bypassing the picker's tap handler: gated modes must not be persistable.
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn(ReasoningMode.FAST.rawValue)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel(
+                        "m",
+                        accessTier = listOf("free", "plus", "pro"),
+                        entityHasAccess = true,
+                        supportedReasoningEffort = listOf("none", "low"),
+                        reasoningEffortAccess = listOf(
+                            RemoteReasoningEffortAccess(id = "none", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                            RemoteReasoningEffortAccess(id = "low", accessTier = listOf("pro"), entityHasAccess = false),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+
+        testee.selectReasoningMode(ReasoningMode.REASONING)
+
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(ReasoningMode.REASONING.rawValue)
     }
 
     @Test
@@ -1058,7 +1126,9 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenGetResolvedReasoningEffortAndNoPersistedThenReturnsNull() = runTest {
+    fun whenGetResolvedReasoningEffortAndNoPersistedThenReturnsAutoPromotedEffort() = runTest {
+        // Mirrors validateSelection's first-launch behavior for models: with nothing persisted,
+        // we auto-select the first accessible mode and submit its effort.
         whenever(dataStore.getSelectedReasoningMode()).thenReturn(null)
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -1077,6 +1147,6 @@ class RealDuckAiModelManagerTest {
         testee = createManager()
         testee.fetchModels()
 
-        assertNull(testee.getResolvedReasoningEffort())
+        assertEquals("low", testee.getResolvedReasoningEffort())
     }
 }

@@ -35,8 +35,14 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -52,13 +58,21 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ReasoningModePickerViewModel::class.java]
     }
 
     private val button: ImageView by lazy { findViewById(R.id.reasoningModePickerButton) }
     private var stateJob: Job? = null
+    private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
+    private lateinit var host: NativeInputHost
+
+    fun setHost(host: NativeInputHost) {
+        this.host = host
+    }
 
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
@@ -75,6 +89,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        commandJob?.cancel()
+        commandJob = null
         dismissPopup()
     }
 
@@ -83,17 +99,39 @@ class ReasoningModePickerView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.state
             .onEach { state ->
-                isVisible = state.availableReasoningModes.size > 1
+                isVisible = state.availableReasoningModes.size > 1 &&
+                    state.availableReasoningModes.any { it.isAccessible }
                 viewModel.resolvedMode(state)?.let { mode ->
                     button.setImageResource(viewModel.iconResFor(mode))
                 }
             }
             .launchIn(scope)
+
+        commandJob?.cancel()
+        commandJob = viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(scope)
     }
+
+    private fun processCommand(command: UpsellCommand) {
+        when (command) {
+            is UpsellCommand.LaunchPurchase ->
+                globalActivityStarter.start(context, SubscriptionPurchase(origin = command.origin, featurePage = DUCK_AI_FEATURE_PAGE))
+            is UpsellCommand.LaunchUpgrade ->
+                globalActivityStarter.start(context, SubscriptionUpgrade(origin = command.origin))
+        }
+    }
+
+    private fun currentSurface(): PickerSurface =
+        when (host.getInputState().inputContext) {
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.REASONING_PICKER_DUCK_AI_TAB
+            InputContext.BROWSER -> PickerSurface.REASONING_PICKER_ADDRESS_BAR
+        }
 
     private fun showMenu() {
         val state = viewModel.state.value
         if (state.availableReasoningModes.size <= 1) return
+        if (state.availableReasoningModes.none { it.isAccessible }) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -129,7 +167,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
             trailingIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
             trailingIcon.visibility = if (row.selected) VISIBLE else INVISIBLE
             item.setOnClickListener {
-                viewModel.selectMode(row.mode)
+                viewModel.onModeTapped(row.mode, currentSurface())
                 popup.dismiss()
             }
             container.addView(item)
