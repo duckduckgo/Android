@@ -27,6 +27,7 @@ import javax.inject.Inject
 interface DuckChatSyncMetadataStore {
     var deletionTimestamp: String?
     var pendingChatDeletions: Set<String>
+    var pendingChatUpdates: Set<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,6 +52,12 @@ class RealDuckChatSyncMetadataStore @Inject constructor(
             putStringSet(KEY_PENDING_CHAT_DELETIONS, value)
         }
 
+    override var pendingChatUpdates: Set<String>
+        get() = preferences.getStringSet(KEY_PENDING_CHAT_UPDATES, emptySet()) ?: emptySet()
+        set(value) = preferences.edit(true) {
+            putStringSet(KEY_PENDING_CHAT_UPDATES, value)
+        }
+
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(
             FILENAME,
@@ -63,5 +70,6 @@ class RealDuckChatSyncMetadataStore @Inject constructor(
         const val FILENAME = "com.duckduckgo.duckchat.sync.store"
         private const val KEY_DELETION_TIMESTAMP = "KEY_DELETION_TIMESTAMP"
         private const val KEY_PENDING_CHAT_DELETIONS = "KEY_PENDING_CHAT_DELETIONS"
+        private const val KEY_PENDING_CHAT_UPDATES = "KEY_PENDING_CHAT_UPDATES"
     }
 }

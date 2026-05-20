@@ -50,6 +50,11 @@ interface DuckChatSyncRepository {
     suspend fun getPendingChatDeletions(): Set<String>
     suspend fun removePendingChatDeletions(ids: Set<String>)
     suspend fun clearPendingChatDeletions()
+
+    suspend fun recordSingleChatUpdate(chatId: String)
+    suspend fun getPendingChatUpdates(): Set<String>
+    suspend fun removePendingChatUpdates(ids: Set<String>)
+    suspend fun clearPendingChatUpdates()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -110,6 +115,35 @@ class RealDuckChatSyncRepository @Inject constructor(
         withContext(dispatchers.io()) {
             duckChatSyncMetadataStore.pendingChatDeletions = emptySet()
             logcat { "DuckChat-Sync: cleared all pending chat deletions" }
+        }
+    }
+
+    override suspend fun recordSingleChatUpdate(chatId: String) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatUpdates
+            duckChatSyncMetadataStore.pendingChatUpdates = current + chatId
+            logcat { "DuckChat-Sync: recorded pending chat update for $chatId, queue size: ${current.size + 1}" }
+        }
+    }
+
+    override suspend fun getPendingChatUpdates(): Set<String> {
+        return withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatUpdates
+        }
+    }
+
+    override suspend fun removePendingChatUpdates(ids: Set<String>) {
+        withContext(dispatchers.io()) {
+            val current = duckChatSyncMetadataStore.pendingChatUpdates
+            duckChatSyncMetadataStore.pendingChatUpdates = current - ids
+            logcat { "DuckChat-Sync: removed ${ids.size} pending chat updates, remaining: ${(current - ids).size}" }
+        }
+    }
+
+    override suspend fun clearPendingChatUpdates() {
+        withContext(dispatchers.io()) {
+            duckChatSyncMetadataStore.pendingChatUpdates = emptySet()
+            logcat { "DuckChat-Sync: cleared all pending chat updates" }
         }
     }
 }
