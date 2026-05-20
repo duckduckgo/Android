@@ -5508,8 +5508,8 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            if (clientPackage != null) {
-                args.putString(CLIENT_PACKAGE_ARG, clientPackage)
+            clientPackage?.let {
+                args.putString(CLIENT_PACKAGE_ARG, it)
             }
             query.let {
                 args.putString(URL_EXTRA_ARG, query)

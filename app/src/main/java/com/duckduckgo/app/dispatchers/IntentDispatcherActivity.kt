@@ -18,6 +18,7 @@ package com.duckduckgo.app.dispatchers
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.browser.customtabs.CustomTabsSessionToken
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +27,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.customtabs.api.CustomTabsSessionRegistry
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.collectLatest
@@ -40,6 +42,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var customTabsSessionRegistry: CustomTabsSessionRegistry
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,13 +64,19 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         if (viewState.activityParams != null) {
             globalActivityStarter.start(this, viewState.activityParams)
         } else if (viewState.customTabRequested) {
-            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal, viewState.clientPackage)
+            showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)
         }
     }
 
-    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean, clientPackage: String?) {
+    private fun showCustomTab(intentText: String?, toolbarColor: Int?, isExternal: Boolean) {
+        // The verified calling package (non-null only when the launcher bound the
+        // CustomTabsService). Carried forward as an intent extra so BrowserTabViewModel can
+        // apply the trusted-caller carve-out in handleAppLink.
+        val clientPackage = CustomTabsSessionToken.getSessionTokenFromIntent(intent)
+            ?.let { customTabsSessionRegistry.lookupClientPackage(it) }
+
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
