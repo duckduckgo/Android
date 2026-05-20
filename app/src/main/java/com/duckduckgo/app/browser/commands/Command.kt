@@ -450,8 +450,6 @@ sealed class Command {
         val daxBubbleCta: DaxBubbleCta,
     ) : Command()
 
-    data object HideNativeInputOnOnboardingSubmit : Command()
-
     data class ShowRemoveSearchSuggestionDialog(
         val suggestion: AutoCompleteSuggestion,
     ) : Command()

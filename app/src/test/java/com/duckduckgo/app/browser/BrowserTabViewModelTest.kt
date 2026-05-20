@@ -76,7 +76,6 @@ import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideDaxBubbleCtaOnSubmit
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
-import com.duckduckgo.app.browser.commands.Command.HideNativeInputOnOnboardingSubmit
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
@@ -7049,7 +7048,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideDaxBubbleCtaOnSubmit> {
             assertEquals(cta, this.daxBubbleCta)
         }
-        assertCommandIssued<HideNativeInputOnOnboardingSubmit>()
         assertNull(testee.ctaViewState.value?.cta)
     }
 
@@ -7063,7 +7061,6 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         assertCommandNotIssued<HideDaxBubbleCtaOnSubmit>()
-        assertCommandNotIssued<HideNativeInputOnOnboardingSubmit>()
         assertEquals(cta, testee.ctaViewState.value?.cta)
     }
 
@@ -7079,7 +7076,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideDaxBubbleCtaOnSubmit> {
             assertEquals(cta, this.daxBubbleCta)
         }
-        assertCommandIssued<HideNativeInputOnOnboardingSubmit>()
         assertNull(testee.ctaViewState.value?.cta)
     }
 
@@ -7093,7 +7089,6 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         assertCommandNotIssued<HideDaxBubbleCtaOnSubmit>()
-        assertCommandNotIssued<HideNativeInputOnOnboardingSubmit>()
         assertEquals(cta, testee.ctaViewState.value?.cta)
     }
 

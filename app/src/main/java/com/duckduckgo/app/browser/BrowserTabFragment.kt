@@ -2695,6 +2695,9 @@ class BrowserTabFragment :
             }
 
             is Command.HideKeyboard -> {
+                if (nativeInputManager.isNativeInputEnabled()) {
+                    nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+                }
                 hideKeyboard()
             }
 
@@ -2865,7 +2868,6 @@ class BrowserTabFragment :
             is Command.HideBrokenSitePromptCta -> hideBrokenSitePromptCta(it.brokenSitePromptDialogCta)
             is Command.HideOnboardingDaxBubbleCta -> hideOnboardingDaxBubbleCta(it.daxBubbleCta)
             is Command.HideDaxBubbleCtaOnSubmit -> hideDaxBubbleCta(it.daxBubbleCta)
-            is Command.HideNativeInputOnOnboardingSubmit -> nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
             is Command.ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(it.suggestion)
             is Command.AutocompleteItemRemoved -> autocompleteItemRemoved()
             is Command.OpenDuckPlayerSettings -> globalActivityStarter.start(binding.root.context, DuckPlayerSettingsNoParams)

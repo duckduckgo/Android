@@ -100,7 +100,6 @@ import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideDaxBubbleCtaOnSubmit
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
 import com.duckduckgo.app.browser.commands.Command.HideKeyboardForChat
-import com.duckduckgo.app.browser.commands.Command.HideNativeInputOnOnboardingSubmit
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
@@ -5027,7 +5026,6 @@ class BrowserTabViewModel @Inject constructor(
         if (!nativeInputFieldEnabled) return
         ctaViewState.value = currentCtaViewState().copy(cta = null)
         command.value = HideDaxBubbleCtaOnSubmit(cta)
-        command.value = HideNativeInputOnOnboardingSubmit
     }
 
     fun onFireMenuSelected(viewMode: Omnibar.ViewMode) {
