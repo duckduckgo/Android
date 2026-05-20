@@ -218,7 +218,7 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
         isRedirect: Boolean,
-        hasGesture: Boolean = false,
+        hasGesture: Boolean,
     ): Boolean {
         try {
             logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
@@ -580,7 +580,7 @@ class BrowserWebViewClient @Inject constructor(
         logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
 
         webView.stopLoading()
-        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false, hasGesture = false)
         return true
     }
 
