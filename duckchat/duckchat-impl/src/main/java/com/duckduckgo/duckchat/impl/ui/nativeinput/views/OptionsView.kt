@@ -116,11 +116,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         host.showReasoningPicker(show)
     }
 
-    fun getSelectedTool(): Tool? {
-        if (!isAttachedToWindow) return null
-        return viewModel.selectedTool.value
-    }
-
     fun clearSelection() {
         if (!isAttachedToWindow) return
         host.toolSelected(null)
