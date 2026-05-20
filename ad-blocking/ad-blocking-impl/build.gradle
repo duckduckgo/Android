@@ -52,6 +52,7 @@ dependencies {
     implementation project(path: ':data-store-api')
     implementation project(path: ':design-system')
     implementation project(path: ':di')
+    implementation project(path: ':duckplayer-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':settings-api')
