@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
     <attr name="onboardingTextPrimary" format="color" />
     <attr name="onboardingTextSecondary" format="color" />
@@ -183,7 +183,8 @@
     <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
         <item name="android:textSize">44sp</item>
         <item name="android:textColor">?attr/onboardingTextPrimary</item>
-        <item name="android:lineSpacingExtra">-10sp</item>
+        <item name="android:lineHeight">44sp</item>
+        <item name="android:lineSpacingExtra">0sp</item>
         <item name="android:fontFamily">@font/ducksansdisplay_medium</item>
     </style>
 
