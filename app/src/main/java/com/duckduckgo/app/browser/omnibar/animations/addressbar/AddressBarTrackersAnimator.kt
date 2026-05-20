@@ -32,6 +32,7 @@ import androidx.core.animation.addListener
 import androidx.core.graphics.ColorUtils
 import androidx.core.transition.addListener
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -63,6 +64,7 @@ class AddressBarTrackersAnimator @Inject constructor(
         shieldViews: List<View>,
         entities: List<Entity>?,
         customBackgroundColor: Int?,
+        useSoftwareRenderingMode: Boolean,
         onAnimationComplete: () -> Unit,
     ) {
         if (isAnimationRunning) return
@@ -80,6 +82,9 @@ class AddressBarTrackersAnimator @Inject constructor(
         this.onAnimationComplete = onAnimationComplete
         this.customBackgroundColor = customBackgroundColor
 
+        if (useSoftwareRenderingMode) {
+            addressBarTrackersBlockedAnimationShieldIcon.renderMode = RenderMode.SOFTWARE
+        }
         addressBarTrackersBlockedAnimationShieldIcon.show()
         addressBarTrackersBlockedAnimationShieldIcon.progress = 0F
 

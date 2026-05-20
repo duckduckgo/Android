@@ -39,6 +39,12 @@ interface AddressBarTrackersAnimationManager {
     suspend fun isFeatureEnabled(): Boolean
 
     /**
+     * Returns the cached software rendering mode state if available, otherwise fetches and caches it.
+     * @return true if the shield animation should use Lottie's SOFTWARE render mode, false otherwise
+     */
+    suspend fun isSoftwareRenderingModeEnabled(): Boolean
+
+    /**
      * Determines if the tracker animation should be shown based on the current URL
      * and the URL where the animation was last shown.
      *
@@ -60,16 +66,24 @@ class RealAddressBarTrackersAnimationManager @Inject constructor(
 ) : AddressBarTrackersAnimationManager {
 
     private var cachedFeatureState: Boolean? = null
+    private var cachedSoftwareRenderingMode: Boolean? = null
 
     override suspend fun fetchFeatureState() {
         withContext(dispatcherProvider.io()) {
             cachedFeatureState = addressBarTrackersAnimationFeatureToggle.feature().isEnabled()
+            cachedSoftwareRenderingMode = addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().isEnabled()
         }
     }
 
     override suspend fun isFeatureEnabled(): Boolean = withContext(dispatcherProvider.io()) {
         cachedFeatureState ?: addressBarTrackersAnimationFeatureToggle.feature().isEnabled().also {
             cachedFeatureState = it
+        }
+    }
+
+    override suspend fun isSoftwareRenderingModeEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        cachedSoftwareRenderingMode ?: addressBarTrackersAnimationFeatureToggle.softwareRenderingMode().isEnabled().also {
+            cachedSoftwareRenderingMode = it
         }
     }
 
