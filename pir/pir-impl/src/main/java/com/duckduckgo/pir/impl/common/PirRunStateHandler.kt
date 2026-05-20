@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaParsed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSent
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSolved
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageEmailGetDataReceived
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageFillForm
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageGenerateEmailReceived
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageSubmit
@@ -183,6 +184,14 @@ interface PirRunStateHandler {
             val currentActionAttemptCount: Int,
         ) : PirRunState(broker)
 
+        data class BrokerOptOutStageEmailGetDataReceived(
+            override val broker: Broker,
+            val actionID: String,
+            val attemptId: String,
+            val durationMs: Long,
+            val currentActionAttemptCount: Int,
+        ) : PirRunState(broker)
+
         data class BrokerOptOutStageCaptchaParsed(
             override val broker: Broker,
             val actionID: String,
@@ -300,6 +309,7 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerOptOutStageCaptchaSolved -> handleBrokerOptOutStageCaptchaSolved(pirRunState)
                 is BrokerOptOutStageFillForm -> handleBrokerOptOutStageFillForm(pirRunState)
                 is BrokerOptOutStageGenerateEmailReceived -> handleBrokerOptOutStageGenerateEmailReceived(pirRunState)
+                is BrokerOptOutStageEmailGetDataReceived -> handleBrokerOptOutStageEmailGetDataReceived(pirRunState)
                 is BrokerOptOutStageSubmit -> handleBrokerOptOutStageSubmit(pirRunState)
                 is BrokerOptOutStageValidate -> handleBrokerOptOutStageValidate(pirRunState)
                 is BrokerStepInvalidEvent -> handleBrokerStepInvalidEvent(pirRunState)
@@ -333,6 +343,17 @@ class RealPirRunStateHandler @Inject constructor(
 
     private fun handleBrokerOptOutStageGenerateEmailReceived(pirRunState: BrokerOptOutStageGenerateEmailReceived) {
         pixelSender.reportOptOutStageEmailGenerate(
+            brokerUrl = pirRunState.broker.url,
+            parentUrl = pirRunState.broker.parent.orEmpty(),
+            brokerVersion = pirRunState.broker.version,
+            durationMs = pirRunState.durationMs,
+            tries = pirRunState.currentActionAttemptCount,
+            actionId = pirRunState.actionID,
+        )
+    }
+
+    private fun handleBrokerOptOutStageEmailGetDataReceived(pirRunState: BrokerOptOutStageEmailGetDataReceived) {
+        pixelSender.reportOptOutStageEmailGetData(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,

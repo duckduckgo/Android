@@ -66,6 +66,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SOLVE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GENERATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_EMAIL_GET_DATA
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FILLFORM
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_FINISH
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION
@@ -494,6 +495,15 @@ interface PirPixelSender {
     )
 
     fun reportOptOutStageEmailGenerate(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    )
+
+    fun reportOptOutStageEmailGetData(
         brokerUrl: String,
         parentUrl: String,
         brokerVersion: String,
@@ -1164,6 +1174,27 @@ class RealPirPixelSender @Inject constructor(
     ) {
         fire(
             PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+            getFullStageParams(
+                brokerUrl = brokerUrl,
+                parentUrl = parentUrl,
+                brokerVersion = brokerVersion,
+                durationMs = durationMs,
+                tries = tries,
+                actionId = actionId,
+            ),
+        )
+    }
+
+    override fun reportOptOutStageEmailGetData(
+        brokerUrl: String,
+        parentUrl: String,
+        brokerVersion: String,
+        durationMs: Long,
+        tries: Int,
+        actionId: String,
+    ) {
+        fire(
+            PIR_OPTOUT_STAGE_EMAIL_GET_DATA,
             getFullStageParams(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
