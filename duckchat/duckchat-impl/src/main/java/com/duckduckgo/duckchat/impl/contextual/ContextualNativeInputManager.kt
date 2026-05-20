@@ -82,16 +82,20 @@ class RealContextualNativeInputManager @Inject constructor(
     }
 
     override fun onWebViewMode() {
-        if (isNativeInputEnabled) card?.show() else card?.gone()
-        // WEBVIEW mode means a chat is in progress.
-        // Hide the picker so the user can't change models mid-chat.
-        widget?.setModelPickerEnabled(false)
+        if (isNativeInputEnabled) {
+            card?.show()
+            // WEBVIEW mode means a chat is in progress.
+            // Hide the picker so the user can't change models mid-chat.
+            widget?.setModelPickerEnabled(false)
+        } else {
+            card?.gone()
+        }
     }
 
     override fun onInputMode() {
         card?.gone()
         // INPUT mode is a new chat: restore the picker
-        widget?.setModelPickerEnabled(true)
+        if (isNativeInputEnabled) widget?.setModelPickerEnabled(true)
     }
 
     private fun applyCardShape(card: MaterialCardView) {

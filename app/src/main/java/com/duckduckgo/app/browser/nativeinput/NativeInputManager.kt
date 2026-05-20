@@ -100,6 +100,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun setText(text: String)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -151,6 +152,12 @@ class RealNativeInputManager @Inject constructor(
 
     override fun setPickingImage(picking: Boolean) {
         isPickingImage = picking
+    }
+
+    override fun setText(text: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.text = text
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -475,7 +482,7 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchUpgrade() }
+                omnibarController.updateTierTitle(tier) { launchPurchase() }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
@@ -707,7 +714,7 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun launchUpgrade() {
+    private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
     }
 

@@ -141,8 +141,9 @@ class OmnibarLayoutViewModel @Inject constructor(
             _viewState,
             tabRepository.flowTabs,
             flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
+            addressBarTrackersAnimationManager.softwareRenderingModeEnabled,
             browserMenuHighlight.shouldShowHighlightForMode(mode),
-        ) { state, tabs, isAddressBarTrackersAnimationEnabled, showHighlight ->
+        ) { state, tabs, isAddressBarTrackersAnimationEnabled, useSoftwareRenderingMode, showHighlight ->
             state.copy(
                 shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
                 tabCount = tabs.size,
@@ -150,6 +151,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenuHighlight = showHighlight,
                 viewMode = getViewMode(state),
                 isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
+                useSoftwareRenderingMode = useSoftwareRenderingMode,
             )
         }
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
@@ -256,6 +258,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isDuckAiBackAvailable: Boolean = false,
         val isNativeInputEnabled: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
+        val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
     ) {
@@ -282,6 +285,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             val entities: List<Entity>?,
             val isCustomTab: Boolean,
             val isAddressBarTrackersAnimationEnabled: Boolean,
+            val useSoftwareRenderingMode: Boolean,
         ) : Command()
 
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
@@ -1054,6 +1058,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     entities = decoration.entities,
                                     isCustomTab = viewState.value.viewMode is CustomTab,
                                     isAddressBarTrackersAnimationEnabled = viewState.value.isAddressBarTrackersAnimationEnabled,
+                                    useSoftwareRenderingMode = viewState.value.useSoftwareRenderingMode,
                                 ),
                             )
                         }

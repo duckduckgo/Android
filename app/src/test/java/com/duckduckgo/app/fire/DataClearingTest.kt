@@ -123,6 +123,7 @@ class DataClearingTest {
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
+            whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
         }
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
@@ -192,6 +193,17 @@ class DataClearingTest {
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
         verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+    }
+
+    @Test
+    fun `manual clear with DuckAi chats dispatches DuckChats All via trigger`() = runTest {
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearDataUsingManualFireOptions(shouldRestartIfRequired = false, wasAppUsedSinceLastClear = true)
+
+        verify(mockClearDataAction).clearDuckAiChatsOnly()
+        verify(mockDataClearingTrigger).clearData(eq(setOf(ClearableData.DuckChats.All)))
+        verify(mockTabRepository, never()).deleteTabs(any())
     }
 
     @Test
@@ -971,6 +983,93 @@ class DataClearingTest {
         testee.clearSingleTabData("tab1")
 
         verify(mockTabOperations).replaceTabWithNewTab("tab1", freshDuckChatUrl)
+    }
+
+    // --- clearSingleTabData with replaceCurrentTab = false (Hatch origin) ---
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplace_thenDeleteTabAndDoNotReplace() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabOperations, never()).replaceTabWithNewTab(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplaceForDuckAiTab_thenDoNotReplaceWithDuckAiUrl() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabOperations, never()).replaceTabWithNewTab(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithoutReplace_thenStillClearDataAndRemoveHistory() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+
+        testee.clearSingleTabData("tab1", replaceCurrentTab = false)
+
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com")))
+        verify(mockNavigationHistory).removeHistoryForTab("tab1")
+    }
+
+    // --- clearSelectedDuckAiChats ---
+
+    @Test
+    fun `clearSelectedDuckAiChats with urls dispatches Selected via trigger`() = runTest {
+        val urls = setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b")
+
+        testee.clearSelectedDuckAiChats(urls)
+
+        verify(mockDataClearingTrigger).clearData(eq(setOf(ClearableData.DuckChats.Selected(urls))))
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats does not wipe DuckAi web storage`() = runTest {
+        testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
+
+        verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats does not touch tabs or browser data`() = runTest {
+        testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
+
+        verify(mockClearDataAction, never()).clearTabsOnly()
+        verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
+        verify(mockTabRepository, never()).deleteTabs(any())
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats does not touch fire button orchestration flags`() = runTest {
+        testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
+
+        verify(mockClearDataAction, never()).setAppUsedSinceLastClearFlag(any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats with empty set is a no-op`() = runTest {
+        testee.clearSelectedDuckAiChats(emptySet())
+
+        verify(mockDataClearingTrigger, never()).clearData(any())
+    }
+
+    @Test
+    fun `clearSelectedDuckAiChats with feature flag off is a no-op`() = runTest {
+        showClearDuckAIChatHistoryFlow.value = false
+
+        testee.clearSelectedDuckAiChats(setOf("https://duck.ai?chatID=a"))
+
+        verify(mockDataClearingTrigger, never()).clearData(any())
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {

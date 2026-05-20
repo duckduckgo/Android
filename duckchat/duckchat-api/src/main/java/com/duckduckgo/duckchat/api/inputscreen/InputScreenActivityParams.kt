@@ -61,6 +61,9 @@ data object InputScreenActivityResultCodes {
 
     /** User requested to launch the Browser Menu */
     const val MENU_REQUESTED = 5
+
+    /** User requested to open After Inactivity Settings screen */
+    const val AFTER_INACTIVITY_REQUESTED = 6
 }
 
 /**

@@ -116,7 +116,10 @@ class OmnibarLayoutViewModelTest {
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteFeatureEnabledFlow = MutableStateFlow(false)
 
-    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock()
+    private val softwareRenderingModeEnabledFlow = MutableStateFlow(false)
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager = mock {
+        on { softwareRenderingModeEnabled } doReturn softwareRenderingModeEnabledFlow
+    }
     private val fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
 
     private lateinit var fakeStandardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle
@@ -1181,6 +1184,48 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommand(Command.StartTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeEnabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        softwareRenderingModeEnabledFlow.value = true
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertTrue((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeDisabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        softwareRenderingModeEnabledFlow.value = false
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertFalse((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
             cancelAndIgnoreRemainingEvents()
         }
     }

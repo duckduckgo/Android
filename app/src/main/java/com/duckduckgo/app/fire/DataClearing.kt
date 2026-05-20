@@ -76,7 +76,7 @@ class DataClearing @Inject constructor(
     private val dataClearingTrigger: DataClearingTrigger,
 ) : ManualDataClearing, AutomaticDataClearing {
 
-    override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
+    override suspend fun clearSingleTabData(tabId: String, replaceCurrentTab: Boolean): ClearDataResult {
         suspend fun clearContextualChatDataIfNeeded(tabId: String) {
             val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
                 .contains(FireClearOption.DUCKAI_CHATS)
@@ -95,12 +95,19 @@ class DataClearing @Inject constructor(
         val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
         val tabUrl = tabRepository.getTab(tabId)?.url
 
+        // Reset this tab's URL before dispatching the chat clear: the tabs-cleanup plugin matches
+        // tabs by chatID, and we don't want this tab caught by that match — it stays open with a
+        // new chat URL. Other tabs at the same chatID (duplicates) do get closed, which is desired.
+        if (replaceCurrentTab) {
+            val url = getNewTabUrl(tabUrl)
+            tabOperations.replaceTabWithNewTab(tabId, url)
+        } else {
+            tabRepository.deleteTabs(listOf(tabId))
+        }
+
         clearDuckAiChatIfNeeded(tabUrl)
         clearContextualChatDataIfNeeded(tabId)
         navigationHistory.removeHistoryForTab(tabId)
-
-        val url = getNewTabUrl(tabUrl)
-        tabOperations.replaceTabWithNewTab(tabId, url)
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
@@ -227,6 +234,12 @@ class DataClearing @Inject constructor(
 
     override suspend fun isAutomaticDataClearingOptionSelected(): Boolean {
         return fireDataStore.getAutomaticClearOptions().isNotEmpty()
+    }
+
+    override suspend fun clearSelectedDuckAiChats(chatUrls: Set<String>) {
+        if (chatUrls.isEmpty()) return
+        if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
+        dataClearingTrigger.clearData(setOf(ClearableData.DuckChats.Selected(chatUrls)))
     }
 
     /**

@@ -30,7 +30,7 @@ sealed class FireAnimation(
     val resId: Int,
     val nameResId: Int,
 ) : Serializable {
-    data object Inferno : FireAnimation(R.raw.inferno, R.string.settingsInfernoAnimation)
+    data object Inferno : FireAnimation(R.raw.inferno, R.string.settingsHeroFireAnimation)
 
     // Displayed as "Inferno Classic" when fireAnimationUpdate toggle is on; storage key,
     // pixel value, and asset filename are intentionally preserved for blast-radius reasons.

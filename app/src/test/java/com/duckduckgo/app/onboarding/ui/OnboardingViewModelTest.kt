@@ -28,12 +28,15 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -66,6 +69,10 @@ class OnboardingViewModelTest {
 
     private val onboardingStore: OnboardingStore = mock()
 
+    private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -76,6 +83,7 @@ class OnboardingViewModelTest {
             newAddressBarOptionManager = newAddressBarOptionManager,
             dismissedCtaDao = dismissedCtaDao,
             onboardingStore = onboardingStore,
+            onboardingBrandDesignUpdateToggles = onboardingBrandDesignUpdateToggles,
         )
     }
 
@@ -150,9 +158,21 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenInitializePagesCalledThenBuildPageBlueprints() {
+    fun whenInitializePagesCalledAndBrandDesignUpdateDisabledThenBuildPageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(disabledToggle)
+
         testee.initializePages()
+
         verify(pageLayout).buildPageBlueprints()
+    }
+
+    @Test
+    fun whenInitializePagesCalledAndBrandDesignUpdateEnabledThenBuildBrandDesignUpdatePageBlueprints() = runTest {
+        whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(enabledToggle)
+
+        testee.initializePages()
+
+        verify(pageLayout).buildBrandDesignUpdatePageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {
