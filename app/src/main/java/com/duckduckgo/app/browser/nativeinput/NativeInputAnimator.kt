@@ -309,9 +309,15 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         val materialCard = card as? MaterialCardView
         val savedRadius = materialCard?.radius ?: 0f
         val savedMaxElevation = materialCard?.maxCardElevation ?: 0f
-        materialCard?.apply { radius = widgetCornerRadius; maxCardElevation = savedMaxElevation }
+        materialCard?.apply {
+            radius = widgetCornerRadius
+            maxCardElevation = savedMaxElevation
+        }
         val fullHeight = measureUnconstrainedHeight(card, fullWidth)
-        materialCard?.apply { radius = savedRadius; maxCardElevation = savedMaxElevation }
+        materialCard?.apply {
+            radius = savedRadius
+            maxCardElevation = savedMaxElevation
+        }
 
         runAnimator(
             cleanup = { omnibarCard.alpha = 1f },
