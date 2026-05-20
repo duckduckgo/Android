@@ -124,7 +124,7 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
-                val response = fetchModelsResponse()
+                val response = fetchModelsResponse().withHardcodedReasoningGates()
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
@@ -310,6 +310,21 @@ class RealDuckAiModelManager @Inject constructor(
         return currentSelectedId
     }
 }
+
+// TODO: Remove this hardcoded gate once the backend ships per-effort `reasoningEffortAccess` for gpt-5.2.
+//  EXTENDED_REASONING on gpt-5.2 is PRO-only. We gate every candidate effort of EXTENDED_REASONING.
+//  To remove: delete this function and the `.withHardcodedReasoningGates()` call in fetchModels.
+//  Follow up task: https://app.asana.com/1/137249556945/project/1212810093780571/task/1214980387692321?focus=true
+private fun AIChatModelsResponse.withHardcodedReasoningGates(): AIChatModelsResponse = copy(
+    models = models.map { model ->
+        if (model.id != "gpt-5.2") return@map model
+        model.copy(
+            reasoningEffortAccess = ReasoningMode.EXTENDED_REASONING.candidateEfforts.map { effort ->
+                RemoteReasoningEffortAccess(id = effort.rawValue, accessTier = listOf("pro"), entityHasAccess = false)
+            },
+        )
+    },
+)
 
 private fun com.duckduckgo.subscriptions.api.SubscriptionStatus.isActiveOrWaiting(): Boolean {
     return this == com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE ||
