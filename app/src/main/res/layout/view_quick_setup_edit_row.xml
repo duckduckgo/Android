@@ -34,9 +34,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
+        app:layout_constraintBottom_toTopOf="@id/quickSetupEditRowSecondaryText"
         app:layout_constraintEnd_toStartOf="@id/quickSetupEditRowEditButton"
         app:layout_constraintStart_toEndOf="@id/quickSetupEditRowIcon"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="Primary text" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -44,6 +46,7 @@
         style="@style/Typography.DuckDuckGo.Onboarding.Label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/quickSetupEditRowPrimaryText"
         app:layout_constraintStart_toStartOf="@id/quickSetupEditRowPrimaryText"
         app:layout_constraintTop_toBottomOf="@id/quickSetupEditRowPrimaryText"

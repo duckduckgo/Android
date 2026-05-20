@@ -65,7 +65,6 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="@dimen/quickSetupRemoveWidgetStepNumberSize"
                     android:layout_height="@dimen/quickSetupRemoveWidgetStepNumberSize"
-                    android:layout_marginEnd="@dimen/keyline_4"
                     android:background="@drawable/background_remove_widget_step_number"
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
@@ -76,6 +75,7 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_3"
                     android:gravity="center_vertical"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep1"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body"
@@ -94,7 +94,6 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="@dimen/quickSetupRemoveWidgetStepNumberSize"
                     android:layout_height="@dimen/quickSetupRemoveWidgetStepNumberSize"
-                    android:layout_marginEnd="@dimen/keyline_4"
                     android:background="@drawable/background_remove_widget_step_number"
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
@@ -105,6 +104,7 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_3"
                     android:gravity="center_vertical"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep2"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body"
@@ -122,7 +122,6 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="@dimen/quickSetupRemoveWidgetStepNumberSize"
                     android:layout_height="@dimen/quickSetupRemoveWidgetStepNumberSize"
-                    android:layout_marginEnd="@dimen/keyline_4"
                     android:background="@drawable/background_remove_widget_step_number"
                     android:fontFamily="@font/ducksansproduct_bold"
                     android:gravity="center"
@@ -133,6 +132,7 @@
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_3"
                     android:gravity="center_vertical"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep3"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body"

@@ -36,7 +36,6 @@ class QuickSetupSwitchRow @JvmOverloads constructor(
         ViewQuickSetupSwitchRowBinding.inflate(LayoutInflater.from(context), this)
 
     init {
-        minHeight = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.twoLineItemHeight)
         context.theme.obtainStyledAttributes(attrs, R.styleable.QuickSetupSwitchRow, 0, 0).use { attrs ->
             attrs.getResourceId(R.styleable.QuickSetupSwitchRow_quickSetupRowIcon, 0)
                 .takeIf { it != 0 }
