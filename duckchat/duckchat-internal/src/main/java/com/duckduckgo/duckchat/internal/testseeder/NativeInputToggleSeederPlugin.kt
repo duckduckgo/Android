@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.launch.seeder
+package com.duckduckgo.duckchat.internal.testseeder
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.testseeder.api.TestScenarioSeeder
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.testseeder.api.TestSeederKey
+import com.duckduckgo.testseeder.api.TestSeederPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-class NoOpTestScenarioSeeder @Inject constructor() : TestScenarioSeeder {
-    override suspend fun seedIfNeeded(extras: Map<String, String>) = Unit
+@ContributesMultibinding(AppScope::class)
+class NativeInputToggleSeederPlugin @Inject constructor(
+    private val duckChat: DuckChat,
+) : TestSeederPlugin {
+
+    override val handledKeys = setOf(TestSeederKey.NATIVE_INPUT_TOGGLE.key)
+
+    override suspend fun apply(key: String, value: String) {
+        duckChat.setNativeInputFieldUserSetting(value == "true")
+    }
 }

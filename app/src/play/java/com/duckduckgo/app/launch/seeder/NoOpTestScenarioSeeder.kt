@@ -23,11 +23,5 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class NoOpTestScenarioSeeder @Inject constructor() : TestScenarioSeeder {
-    override suspend fun seedIfNeeded(
-        isMaestroExtra: String?,
-        scenarioKey: String?,
-        omnibarPosition: String?,
-        nativeInputToggle: String?,
-        inputScreenWithAI: String?,
-    ) = Unit
+    override suspend fun seedIfNeeded(extras: Map<String, String>) = Unit
 }

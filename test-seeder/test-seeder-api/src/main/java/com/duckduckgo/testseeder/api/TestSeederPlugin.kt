@@ -16,13 +16,7 @@
 
 package com.duckduckgo.testseeder.api
 
-/**
- * Writes the omnibar position from a Maestro intent extra value.
- *
- * Implementations are only contributed in internal builds. The seeder calls this
- * exclusively from `seedIfNeeded`, which is itself a no-op in non-internal flavours,
- * so no fallback binding is required in release builds.
- */
-interface OmnibarPositionWriter {
-    fun setFromKey(positionKey: String)
+interface TestSeederPlugin {
+    val handledKeys: Set<String>
+    suspend fun apply(key: String, value: String)
 }

@@ -17,11 +17,11 @@
 package com.duckduckgo.testseeder.internal
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.testseeder.api.OmnibarPositionWriter
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
+import com.duckduckgo.testseeder.api.TestSeederKey
+import com.duckduckgo.testseeder.api.TestSeederPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
@@ -30,29 +30,37 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTestScenarioSeeder @Inject constructor(
-    private val savedSitesRepository: SavedSitesRepository,
-    private val omnibarPositionWriter: OmnibarPositionWriter,
-    private val duckChat: DuckChat,
+    plugins: DaggerSet<TestSeederPlugin>,
     private val dispatchers: DispatcherProvider,
 ) : TestScenarioSeeder {
 
-    override suspend fun seedIfNeeded(
-        isMaestroExtra: String?,
-        scenarioKey: String?,
-        omnibarPosition: String?,
-        nativeInputToggle: String?,
-        inputScreenWithAI: String?,
-    ) {
-        if (isMaestroExtra != "true") return
+    private val pluginsByKey: Map<String, TestSeederPlugin> = buildMap {
+        val declaredKeys = TestSeederKey.entries.map { it.key }.toSet()
+        plugins.forEach { plugin ->
+            plugin.handledKeys.forEach { key ->
+                check(key in declaredKeys) {
+                    "${plugin::class.simpleName} claims undeclared key '$key'. Add it to TestSeederKey."
+                }
+                val previous = put(key, plugin)
+                check(previous == null) {
+                    "Key collision on '$key': ${previous!!::class.simpleName} and ${plugin::class.simpleName}"
+                }
+            }
+        }
+    }
+
+    override suspend fun seedIfNeeded(extras: Map<String, String>) {
+        if (extras[TestSeederKey.IS_MAESTRO.key] != "true") return
+
         withContext(dispatchers.io()) {
-            scenarioKey?.let { TestScenario.fromKey(it)?.seed(savedSitesRepository) }
-            omnibarPosition?.let { omnibarPositionWriter.setFromKey(it) }
-            nativeInputToggle?.let {
-                duckChat.setNativeInputFieldUserSetting(it == "true")
-            }
-            inputScreenWithAI?.let {
-                duckChat.setInputScreenUserSetting(it == "true")
-            }
+            extras
+                .filterKeys { it != TestSeederKey.IS_MAESTRO.key }
+                .toSortedMap()
+                .forEach { (key, value) ->
+                    val plugin = pluginsByKey[key]
+                        ?: error("No TestSeederPlugin handles key '$key'. Maestro typo or missing plugin?")
+                    plugin.apply(key, value)
+                }
         }
     }
 }

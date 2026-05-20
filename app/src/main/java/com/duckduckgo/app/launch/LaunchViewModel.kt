@@ -17,6 +17,7 @@
 package com.duckduckgo.app.launch
 
 import android.content.Intent
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -62,17 +63,16 @@ class LaunchViewModel @Inject constructor(
 
     private suspend fun seedTestScenario(intent: Intent) {
         runCatching {
-            testScenarioSeeder.seedIfNeeded(
-                isMaestroExtra = intent.getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO),
-                scenarioKey = intent.getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO),
-                omnibarPosition = intent.getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION),
-                nativeInputToggle = intent.getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE),
-                inputScreenWithAI = intent.getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE),
-            )
+            testScenarioSeeder.seedIfNeeded(intent.extras.toStringMap())
         }
         // runCatching swallows CancellationException; re-check so a cancelled viewModelScope
         // (activity finished mid-launch) stops the rest of start() instead of routing into a dead UI.
         currentCoroutineContext().ensureActive()
+    }
+
+    private fun Bundle?.toStringMap(): Map<String, String> {
+        if (this == null) return emptyMap()
+        return keySet().mapNotNull { key -> getString(key)?.let { key to it } }.toMap()
     }
 
     suspend fun showOnboardingOrHome() {

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.launch
 
 import android.content.Intent
+import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
@@ -183,23 +184,27 @@ class LaunchViewModelTest {
             pixel = pixel,
             testScenarioSeeder = testScenarioSeeder,
         )
-        val intent = mock<Intent>().apply {
-            whenever(getStringExtra(TestScenarioSeeder.EXTRA_IS_MAESTRO)).thenReturn("true")
-            whenever(getStringExtra(TestScenarioSeeder.EXTRA_TEST_SCENARIO)).thenReturn("favorites_3")
-            whenever(getStringExtra(TestScenarioSeeder.EXTRA_OMNIBAR_POSITION)).thenReturn("bottom")
-            whenever(getStringExtra(TestScenarioSeeder.EXTRA_NATIVE_INPUT_TOGGLE)).thenReturn("true")
-            whenever(getStringExtra(TestScenarioSeeder.EXTRA_INPUT_WITH_AI_TOGGLE)).thenReturn("true")
-        }
+        val intent = intentWithExtras(
+            "isMaestro" to "true",
+            "omnibarPosition" to "bottom",
+            "nativeInputToggle" to "true",
+            "inputWithAiToggle" to "true",
+            "addFavorites" to "3",
+        )
 
         testee.start(intent)
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         verify(testScenarioSeeder).seedIfNeeded(
-            isMaestroExtra = eq("true"),
-            scenarioKey = eq("favorites_3"),
-            omnibarPosition = eq("bottom"),
-            nativeInputToggle = eq("true"),
-            inputScreenWithAI = eq("true"),
+            eq(
+                mapOf(
+                    "isMaestro" to "true",
+                    "omnibarPosition" to "bottom",
+                    "nativeInputToggle" to "true",
+                    "inputWithAiToggle" to "true",
+                    "addFavorites" to "3",
+                ),
+            ),
         )
     }
 
@@ -212,8 +217,7 @@ class LaunchViewModelTest {
             testScenarioSeeder = testScenarioSeeder,
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(testScenarioSeeder.seedIfNeeded(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
-            .thenThrow(RuntimeException("seed failed"))
+        whenever(testScenarioSeeder.seedIfNeeded(anyOrNull())).thenThrow(RuntimeException("seed failed"))
         testee.command.observeForever(mockCommandObserver)
 
         testee.start(mock<Intent>())
@@ -237,8 +241,16 @@ class LaunchViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         inOrder(testScenarioSeeder, mockCommandObserver).apply {
-            verify(testScenarioSeeder).seedIfNeeded(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+            verify(testScenarioSeeder).seedIfNeeded(anyOrNull())
             verify(mockCommandObserver).onChanged(any<Home>())
         }
+    }
+
+    private fun intentWithExtras(vararg pairs: Pair<String, String>): Intent {
+        val bundle = mock<Bundle>().apply {
+            whenever(keySet()).thenReturn(pairs.map { it.first }.toSet())
+            pairs.forEach { (key, value) -> whenever(getString(key)).thenReturn(value) }
+        }
+        return mock<Intent>().apply { whenever(extras).thenReturn(bundle) }
     }
 }

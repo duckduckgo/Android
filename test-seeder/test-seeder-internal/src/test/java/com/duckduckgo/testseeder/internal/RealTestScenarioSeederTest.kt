@@ -17,170 +17,143 @@
 package com.duckduckgo.testseeder.internal
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.testseeder.api.OmnibarPositionWriter
+import com.duckduckgo.testseeder.api.TestSeederKey
+import com.duckduckgo.testseeder.api.TestSeederPlugin
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 
 class RealTestScenarioSeederTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val savedSitesRepository: SavedSitesRepository = mock()
-    private val omnibarPositionWriter: OmnibarPositionWriter = mock()
-    private val duckChat: DuckChat = mock()
-    private lateinit var seeder: RealTestScenarioSeeder
-
-    @Before
-    fun setup() {
-        seeder = RealTestScenarioSeeder(savedSitesRepository, omnibarPositionWriter, duckChat, coroutineRule.testDispatcherProvider)
-    }
-
-    private suspend fun seed(
-        isMaestro: String? = "true",
-        scenario: String? = null,
-        omnibarPosition: String? = null,
-        nativeInputToggle: String? = null,
-        inputScreenWithAI: String? = null,
-    ) = seeder.seedIfNeeded(
-        isMaestroExtra = isMaestro,
-        scenarioKey = scenario,
-        omnibarPosition = omnibarPosition,
-        nativeInputToggle = nativeInputToggle,
-        inputScreenWithAI = inputScreenWithAI,
-    )
-
     @Test
-    fun `when isMaestro extra is absent, nothing is seeded`() = runTest {
-        seed(isMaestro = null, scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
+    fun whenIsMaestroIsAbsentThenNoPluginIsCalled() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
 
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
+        seeder.seedIfNeeded(mapOf(TestSeederKey.OMNIBAR_POSITION.key to "bottom"))
+
+        assertEquals(emptyList<Pair<String, String>>(), plugin.calls)
     }
 
     @Test
-    fun `when isMaestro is not true, nothing is seeded`() = runTest {
-        seed(isMaestro = "false", scenario = "favorites_3", omnibarPosition = "bottom", nativeInputToggle = "true")
+    fun whenIsMaestroIsFalseThenNoPluginIsCalled() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
 
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
-    }
-
-    @Test
-    fun `when isMaestro is true but all args absent, nothing is seeded`() = runTest {
-        seed()
-
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
-    }
-
-    @Test
-    fun `when scenario key is unknown, no data is seeded`() = runTest {
-        seed(scenario = "unknown_scenario_key")
-
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter, duckChat)
-    }
-
-    @Test
-    fun `when scenario is favorites_3, three favorites are inserted`() = runTest {
-        seed(scenario = "favorites_3")
-
-        verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(savedSitesRepository, never()).insertBookmark(any(), any())
-    }
-
-    @Test
-    fun `when scenario is bookmarks_2, two bookmarks are inserted`() = runTest {
-        seed(scenario = "bookmarks_2")
-
-        verify(savedSitesRepository, times(2)).insertBookmark(any(), any())
-        verify(savedSitesRepository, never()).insertFavorite(any(), any(), any(), anyOrNull())
-    }
-
-    @Test
-    fun `when omnibarPosition is top, writer is called with top`() = runTest {
-        seed(omnibarPosition = "top")
-
-        verify(omnibarPositionWriter).setFromKey("top")
-        verifyNoInteractions(savedSitesRepository, duckChat)
-    }
-
-    @Test
-    fun `when omnibarPosition is bottom, writer is called with bottom`() = runTest {
-        seed(omnibarPosition = "bottom")
-
-        verify(omnibarPositionWriter).setFromKey("bottom")
-        verifyNoInteractions(savedSitesRepository, duckChat)
-    }
-
-    @Test
-    fun `when omnibarPosition is split, writer is called with split`() = runTest {
-        seed(omnibarPosition = "split")
-
-        verify(omnibarPositionWriter).setFromKey("split")
-        verifyNoInteractions(savedSitesRepository, duckChat)
-    }
-
-    @Test
-    fun `when omnibarPosition is unknown, writer is still invoked and other deps untouched`() = runTest {
-        seed(omnibarPosition = "unknown")
-
-        verify(omnibarPositionWriter).setFromKey("unknown")
-        verifyNoInteractions(savedSitesRepository, duckChat)
-    }
-
-    @Test
-    fun `when nativeInputToggle is true, native input field setting is enabled`() = runTest {
-        seed(nativeInputToggle = "true")
-
-        verify(duckChat).setNativeInputFieldUserSetting(true)
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
-    }
-
-    @Test
-    fun `when nativeInputToggle is false, native input field setting is disabled`() = runTest {
-        seed(nativeInputToggle = "false")
-
-        verify(duckChat).setNativeInputFieldUserSetting(false)
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
-    }
-
-    @Test
-    fun `when inputScreenWithAI is true, input screen setting is enabled`() = runTest {
-        seed(inputScreenWithAI = "true")
-
-        verify(duckChat).setInputScreenUserSetting(true)
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
-    }
-
-    @Test
-    fun `when inputScreenWithAI is false, input screen setting is disabled`() = runTest {
-        seed(inputScreenWithAI = "false")
-
-        verify(duckChat).setInputScreenUserSetting(false)
-        verifyNoInteractions(savedSitesRepository, omnibarPositionWriter)
-    }
-
-    @Test
-    fun `all args can be combined independently`() = runTest {
-        seed(
-            scenario = "favorites_3",
-            omnibarPosition = "bottom",
-            nativeInputToggle = "true",
-            inputScreenWithAI = "true",
+        seeder.seedIfNeeded(
+            mapOf(
+                TestSeederKey.IS_MAESTRO.key to "false",
+                TestSeederKey.OMNIBAR_POSITION.key to "bottom",
+            ),
         )
 
-        verify(savedSitesRepository, times(3)).insertFavorite(any(), any(), any(), anyOrNull())
-        verify(omnibarPositionWriter).setFromKey("bottom")
-        verify(duckChat).setNativeInputFieldUserSetting(true)
-        verify(duckChat).setInputScreenUserSetting(true)
+        assertEquals(emptyList<Pair<String, String>>(), plugin.calls)
+    }
+
+    @Test
+    fun whenIsMaestroIsTrueAndNoOtherKeysThenNoPluginIsCalled() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
+
+        seeder.seedIfNeeded(mapOf(TestSeederKey.IS_MAESTRO.key to "true"))
+
+        assertEquals(emptyList<Pair<String, String>>(), plugin.calls)
+    }
+
+    @Test
+    fun whenKeyHasPluginThenPluginIsAppliedWithKeyAndValue() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
+
+        seeder.seedIfNeeded(
+            mapOf(
+                TestSeederKey.IS_MAESTRO.key to "true",
+                TestSeederKey.OMNIBAR_POSITION.key to "bottom",
+            ),
+        )
+
+        assertEquals(listOf(TestSeederKey.OMNIBAR_POSITION.key to "bottom"), plugin.calls)
+    }
+
+    @Test
+    fun whenMultipleKeysAreSetThenEachPluginIsAppliedInSortedKeyOrder() = runTest {
+        val omnibar = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val nativeInput = RecordingPlugin(TestSeederKey.NATIVE_INPUT_TOGGLE.key)
+        val favorites = RecordingPlugin(TestSeederKey.ADD_FAVORITES.key)
+        val recordedOrder = mutableListOf<String>()
+        omnibar.onApply = { key, _ -> recordedOrder += key }
+        nativeInput.onApply = { key, _ -> recordedOrder += key }
+        favorites.onApply = { key, _ -> recordedOrder += key }
+        val seeder = newSeeder(omnibar, nativeInput, favorites)
+
+        seeder.seedIfNeeded(
+            mapOf(
+                TestSeederKey.IS_MAESTRO.key to "true",
+                TestSeederKey.OMNIBAR_POSITION.key to "top",
+                TestSeederKey.NATIVE_INPUT_TOGGLE.key to "true",
+                TestSeederKey.ADD_FAVORITES.key to "3",
+            ),
+        )
+
+        val expectedSortedOrder = listOf(
+            TestSeederKey.ADD_FAVORITES.key,
+            TestSeederKey.NATIVE_INPUT_TOGGLE.key,
+            TestSeederKey.OMNIBAR_POSITION.key,
+        )
+        assertEquals(expectedSortedOrder, recordedOrder)
+    }
+
+    @Test
+    fun whenAnUnknownKeyIsPassedAtRuntimeThenSeederThrows() = runTest {
+        val plugin = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val seeder = newSeeder(plugin)
+
+        val thrown = assertThrows(IllegalStateException::class.java) {
+            kotlinx.coroutines.runBlocking {
+                seeder.seedIfNeeded(
+                    mapOf(
+                        TestSeederKey.IS_MAESTRO.key to "true",
+                        "definitelyNotAKey" to "x",
+                    ),
+                )
+            }
+        }
+        assertEquals(true, thrown.message!!.contains("definitelyNotAKey"))
+    }
+
+    @Test
+    fun whenPluginClaimsAnUndeclaredKeyThenConstructionThrows() {
+        val rogue = RecordingPlugin("notInTheRegistry")
+
+        assertThrows(IllegalStateException::class.java) { newSeeder(rogue) }
+    }
+
+    @Test
+    fun whenTwoPluginsClaimTheSameKeyThenConstructionThrows() {
+        val a = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+        val b = RecordingPlugin(TestSeederKey.OMNIBAR_POSITION.key)
+
+        assertThrows(IllegalStateException::class.java) { newSeeder(a, b) }
+    }
+
+    private fun newSeeder(vararg plugins: TestSeederPlugin): RealTestScenarioSeeder =
+        RealTestScenarioSeeder(plugins.toSet(), coroutineRule.testDispatcherProvider)
+
+    private class RecordingPlugin(
+        vararg keys: String,
+    ) : TestSeederPlugin {
+        override val handledKeys: Set<String> = keys.toSet()
+        val calls = mutableListOf<Pair<String, String>>()
+        var onApply: ((String, String) -> Unit)? = null
+
+        override suspend fun apply(key: String, value: String) {
+            calls += key to value
+            onApply?.invoke(key, value)
+        }
     }
 }

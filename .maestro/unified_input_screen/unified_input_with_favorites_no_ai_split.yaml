@@ -14,11 +14,11 @@ tags:
             nativeInputToggle: "true"
             inputWithAiToggle: "false"
             omnibarPosition: "split"
-            testScenario: "favorites_3"
+            addFavorites: "3"
       - runFlow: ../shared/skip_all_onboarding.yaml
       - assertVisible:
-          text: "Example"
+          text: "Favorite 1"
       - assertVisible:
-          text: "DuckDuckGo"
+          text: "Favorite 2"
       - assertVisible:
-          text: "Privacy Test Pages"
+          text: "Favorite 3"

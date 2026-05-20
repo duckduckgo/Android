@@ -19,20 +19,24 @@ package com.duckduckgo.app.launch.seeder
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.testseeder.api.OmnibarPositionWriter
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.testseeder.api.TestSeederKey
+import com.duckduckgo.testseeder.api.TestSeederPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-class RealOmnibarPositionWriter @Inject constructor(
+@ContributesMultibinding(AppScope::class)
+class OmnibarPositionSeederPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
-) : OmnibarPositionWriter {
+) : TestSeederPlugin {
 
-    override fun setFromKey(positionKey: String) {
-        when (positionKey.lowercase()) {
-            "top" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-            "bottom" -> settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-            "split" -> settingsDataStore.omnibarType = OmnibarType.SPLIT
+    override val handledKeys = setOf(TestSeederKey.OMNIBAR_POSITION.key)
+
+    override suspend fun apply(key: String, value: String) {
+        settingsDataStore.omnibarType = when (value.lowercase()) {
+            "top" -> OmnibarType.SINGLE_TOP
+            "bottom" -> OmnibarType.SINGLE_BOTTOM
+            "split" -> OmnibarType.SPLIT
+            else -> error("OmnibarPositionSeederPlugin: unknown value '$value' for key '$key'")
         }
     }
 }

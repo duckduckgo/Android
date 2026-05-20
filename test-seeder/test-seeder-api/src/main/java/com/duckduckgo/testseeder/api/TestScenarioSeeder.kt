@@ -17,19 +17,5 @@
 package com.duckduckgo.testseeder.api
 
 interface TestScenarioSeeder {
-    suspend fun seedIfNeeded(
-        isMaestroExtra: String?,
-        scenarioKey: String?,
-        omnibarPosition: String?,
-        nativeInputToggle: String?,
-        inputScreenWithAI: String?,
-    )
-
-    companion object {
-        const val EXTRA_IS_MAESTRO = "isMaestro"
-        const val EXTRA_TEST_SCENARIO = "testScenario"
-        const val EXTRA_OMNIBAR_POSITION = "omnibarPosition"
-        const val EXTRA_NATIVE_INPUT_TOGGLE = "nativeInputToggle"
-        const val EXTRA_INPUT_WITH_AI_TOGGLE = "inputWithAiToggle"
-    }
+    suspend fun seedIfNeeded(extras: Map<String, String>)
 }
