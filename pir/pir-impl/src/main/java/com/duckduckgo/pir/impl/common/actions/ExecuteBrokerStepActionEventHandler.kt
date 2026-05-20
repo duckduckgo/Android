@@ -50,8 +50,11 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetEmailData
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
+import com.duckduckgo.pir.impl.scripts.models.DataSource.EMAIL_DATA
 import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
+import com.duckduckgo.pir.impl.scripts.models.DataSource.FETCHED_EMAIL
 import com.duckduckgo.pir.impl.scripts.models.ExtractedProfileParams
+import com.duckduckgo.pir.impl.scripts.models.FetchedEmail
 import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
@@ -296,33 +299,32 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
         state: State,
         requestData: PirScriptRequestData,
     ): PirScriptRequestData {
-        if (requestData !is UserProfile || requestData.extractedProfile != null) {
+        if (requestData !is UserProfile) {
             return requestData
         }
-        if (actionToExecute.dataSource != EXTRACTED_PROFILE) {
-            return requestData
+        return when (actionToExecute.dataSource) {
+            FETCHED_EMAIL -> {
+                val email = state.generatedEmailData?.emailAddress ?: return requestData
+                requestData.copy(fetchedEmail = FetchedEmail(email = email))
+            }
+            EMAIL_DATA -> {
+                if (state.emailExtractedData.isEmpty()) return requestData
+                requestData.copy(emailData = state.emailExtractedData)
+            }
+            EXTRACTED_PROFILE -> {
+                if (requestData.extractedProfile != null) return requestData
+                val baseParams: ExtractedProfileParams = when (brokerStep) {
+                    is OptOutStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+                    is EmailConfirmationStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
+                    is ScanStep -> if (state.generatedEmailData != null) ExtractedProfileParams() else return requestData
+                }
+                val withEmail = state.generatedEmailData?.let {
+                    baseParams.copy(email = it.emailAddress)
+                } ?: baseParams
+                requestData.copy(extractedProfile = withEmail)
+            }
+            else -> requestData
         }
-
-        val baseParams: ExtractedProfileParams = when (brokerStep) {
-            is OptOutStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
-            is EmailConfirmationStep -> brokerStep.profileToOptOut.toParams(state.profileQuery.fullName)
-            is ScanStep -> if (state.generatedEmailData != null) ExtractedProfileParams() else return requestData
-        }
-
-        val withEmail = state.generatedEmailData?.let {
-            baseParams.copy(email = it.emailAddress)
-        } ?: baseParams
-
-        val withEmailExtractedData = if (state.emailExtractedData.isNotEmpty()) {
-            withEmail.copy(emailExtractedData = state.emailExtractedData)
-        } else {
-            withEmail
-        }
-
-        return UserProfile(
-            userProfile = requestData.userProfile,
-            extractedProfile = withEmailExtractedData,
-        )
     }
 
     companion object {

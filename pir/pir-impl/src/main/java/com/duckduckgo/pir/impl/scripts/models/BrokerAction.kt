@@ -179,6 +179,14 @@ enum class DataSource {
     // Uses the profile scraped via the extract action
     @Json(name = "extractedProfile")
     EXTRACTED_PROFILE,
+
+    // Uses the email address generated via the generateEmail action
+    @Json(name = "fetchedEmail")
+    FETCHED_EMAIL,
+
+    // Uses the data extracted from an email (e.g. verification code) via the getEmailData action
+    @Json(name = "emailData")
+    EMAIL_DATA,
 }
 
 fun BrokerAction.asActionType(): String {
