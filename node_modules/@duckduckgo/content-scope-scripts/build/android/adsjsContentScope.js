@@ -5196,17 +5196,48 @@
       }
     }
     /**
+     * Defines a no-op `getCapabilities` shim on the given target (either an InputDeviceInfo
+     * instance or a synthetic intermediate prototype). The shim is `wrapToString`-masked so
+     * `Function.prototype.toString` looks native, and the descriptor matches native methods.
+     * No-ops when `getCapabilities` is not exposed on InputDeviceInfo.prototype in this browser.
+     * @param {object} target
+     */
+    defineSyntheticGetCapabilities(target) {
+      if (typeof /** @type {any} */
+      target.getCapabilities !== "function") return;
+      const getCapabilities = function getCapabilities2() {
+        return {};
+      };
+      this.defineProperty(target, "getCapabilities", {
+        value: wrapToString(getCapabilities, getCapabilities, "function getCapabilities() { [native code] }"),
+        writable: true,
+        configurable: true,
+        enumerable: true
+      });
+    }
+    /**
      * Creates a valid MediaDeviceInfo or InputDeviceInfo object that passes instanceof checks
      * @param {'videoinput' | 'audioinput' | 'audiooutput'} kind - The device kind
+     * @param {'syntheticPrototype' | 'instanceOwn'} [shimMode] - Where the synthetic shim
+     *   for brand-checked InputDeviceInfo methods lives:
+     *   - 'syntheticPrototype' (default): intermediate prototype between the instance and
+     *     `InputDeviceInfo.prototype`. Hides shims from `hasOwnProperty` on the instance, at
+     *     the cost of a one-level prototype-chain depth difference.
+     *   - 'instanceOwn': preserve `InputDeviceInfo.prototype` as the direct prototype; place
+     *     own masked shims on the instance.
      * @returns {MediaDeviceInfo | InputDeviceInfo}
      */
-    createMediaDeviceInfo(kind) {
+    createMediaDeviceInfo(kind, shimMode = "syntheticPrototype") {
+      const isInputDevice = kind === "videoinput" || kind === "audioinput";
       let deviceInfo;
-      if (kind === "videoinput" || kind === "audioinput") {
-        if (typeof InputDeviceInfo !== "undefined" && InputDeviceInfo.prototype) {
+      if (isInputDevice && typeof InputDeviceInfo !== "undefined" && InputDeviceInfo.prototype) {
+        if (shimMode === "instanceOwn") {
           deviceInfo = Object.create(InputDeviceInfo.prototype);
+          this.defineSyntheticGetCapabilities(deviceInfo);
         } else {
-          deviceInfo = Object.create(MediaDeviceInfo.prototype);
+          const syntheticInputDeviceInfoPrototype = Object.create(InputDeviceInfo.prototype);
+          this.defineSyntheticGetCapabilities(syntheticInputDeviceInfoPrototype);
+          deviceInfo = Object.create(syntheticInputDeviceInfoPrototype);
         }
       } else {
         deviceInfo = Object.create(MediaDeviceInfo.prototype);
@@ -5280,19 +5311,20 @@
           const settings = this.getFeatureSetting("enumerateDevices") || {};
           const timeoutEnabled = settings.timeoutEnabled !== false;
           const timeoutMs = settings.timeoutMs ?? 2e3;
+          const shimMode = settings.shimMode === "instanceOwn" ? "instanceOwn" : "syntheticPrototype";
           try {
             const messagingPromise = this.messaging.request(MSG_DEVICE_ENUMERATION, {});
             const response = timeoutEnabled ? await this.withTimeout(messagingPromise, timeoutMs) : await messagingPromise;
             if (response.willPrompt) {
               const devices = [];
               if (response.videoInput) {
-                devices.push(this.createMediaDeviceInfo("videoinput"));
+                devices.push(this.createMediaDeviceInfo("videoinput", shimMode));
               }
               if (response.audioInput) {
-                devices.push(this.createMediaDeviceInfo("audioinput"));
+                devices.push(this.createMediaDeviceInfo("audioinput", shimMode));
               }
               if (response.audioOutput) {
-                devices.push(this.createMediaDeviceInfo("audiooutput"));
+                devices.push(this.createMediaDeviceInfo("audiooutput", shimMode));
               }
               return Promise.resolve(devices);
             } else {
