@@ -23,6 +23,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.modalcoordinator.api.ModalShownReporter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -38,7 +41,19 @@ class NotificationLaunchModalReporter @Inject constructor(
         activity: Activity,
         savedInstanceState: Bundle?,
     ) {
-        if (activity.intent?.getBooleanExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, false) == true && savedInstanceState == null) {
+        if (savedInstanceState != null) return
+
+        // This callback runs for every activity in the process, including ones launched from external apps
+        // (e.g. IntentDispatcherActivity receiving a share intent). Reading any extra triggers full Bundle
+        // unparcelling, which throws when the foreign intent carries a Parcelable whose class is absent
+        // from our classpath, so we guard the read here even though our own notification intents are safe.
+        val launchedFromNotification = try {
+            activity.intent?.getBooleanExtra(EXTRA_LAUNCHED_FROM_NOTIFICATION, false) == true
+        } catch (e: RuntimeException) {
+            logcat(ERROR) { "Failed to read launched-from-notification extra: ${e.asLog()}" }
+            false
+        }
+        if (launchedFromNotification) {
             modalShownReporter.reportModalShown()
         }
     }
