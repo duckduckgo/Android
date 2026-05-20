@@ -58,6 +58,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -132,6 +134,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
@@ -181,6 +184,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
+            deviceInfo = mockDeviceInfo,
         )
     }
 
@@ -257,7 +261,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     @Test
     fun applyWavingDaxState_phoneLandscape_hidesDax() {
         val dax: LottieAnimationView = mock()
-        val container = stubContainerAndDax(dax, smallestScreenWidthDp = 360, orientation = Configuration.ORIENTATION_LANDSCAPE)
+        val container = stubContainerAndDax(dax, formFactor = FormFactor.PHONE, orientation = Configuration.ORIENTATION_LANDSCAPE)
         whenever(dax.isAnimating).thenReturn(false)
 
         newBrandDesignCta().applyWavingDaxState(container)
@@ -269,7 +273,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     @Test
     fun applyWavingDaxState_tabletLandscape_anchorsDaxToCard() {
         val dax: LottieAnimationView = mock()
-        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 800, orientation = Configuration.ORIENTATION_LANDSCAPE)
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.TABLET, orientation = Configuration.ORIENTATION_LANDSCAPE)
 
         newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
 
@@ -281,7 +285,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     @Test
     fun applyWavingDaxState_tabletPortrait_anchorsDaxToCard() {
         val dax: LottieAnimationView = mock()
-        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 800, orientation = Configuration.ORIENTATION_PORTRAIT)
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.TABLET, orientation = Configuration.ORIENTATION_PORTRAIT)
 
         newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
 
@@ -292,7 +296,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
     @Test
     fun applyWavingDaxState_phonePortrait_anchorsDaxToParent() {
         val dax: LottieAnimationView = mock()
-        val lp = stubContainerAndDaxWithLayoutParams(dax, smallestScreenWidthDp = 360, orientation = Configuration.ORIENTATION_PORTRAIT)
+        val lp = stubContainerAndDaxWithLayoutParams(dax, formFactor = FormFactor.PHONE, orientation = Configuration.ORIENTATION_PORTRAIT)
 
         newBrandDesignCta().applyWavingDaxState(stubContainerWithDax(dax))
 
@@ -308,31 +312,26 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
 
     private fun stubContainerAndDax(
         dax: LottieAnimationView,
-        smallestScreenWidthDp: Int,
+        formFactor: FormFactor,
         orientation: Int,
     ): View {
-        val configuration = Configuration().apply {
-            this.smallestScreenWidthDp = smallestScreenWidthDp
-            this.orientation = orientation
-        }
+        val configuration = Configuration().apply { this.orientation = orientation }
         val resources: Resources = mock()
         val daxContext: Context = mock()
         whenever(dax.context).thenReturn(daxContext)
         whenever(daxContext.resources).thenReturn(resources)
         whenever(resources.configuration).thenReturn(configuration)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
         return stubContainerWithDax(dax)
     }
 
     private fun stubContainerAndDaxWithLayoutParams(
         dax: LottieAnimationView,
-        smallestScreenWidthDp: Int,
+        formFactor: FormFactor,
         orientation: Int,
     ): ConstraintLayout.LayoutParams {
         val lp = ConstraintLayout.LayoutParams(0, 0)
-        val configuration = Configuration().apply {
-            this.smallestScreenWidthDp = smallestScreenWidthDp
-            this.orientation = orientation
-        }
+        val configuration = Configuration().apply { this.orientation = orientation }
         val displayMetrics = DisplayMetrics().apply { density = 1f }
         val resources: Resources = mock()
         val daxContext: Context = mock()
@@ -342,6 +341,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
         whenever(daxContext.resources).thenReturn(resources)
         whenever(resources.configuration).thenReturn(configuration)
         whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
         return lp
     }
 
@@ -350,6 +350,7 @@ class DaxSiteSuggestionsBrandDesignUpdateContextualCtaTest {
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
 
     private suspend fun givenSiteSuggestionsCtaPreconditions() {

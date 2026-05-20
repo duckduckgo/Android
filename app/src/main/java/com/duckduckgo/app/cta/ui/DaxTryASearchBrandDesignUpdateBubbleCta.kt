@@ -21,11 +21,13 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
 
 data class DaxTryASearchBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OptionsBubbleCta(
     ctaId = CtaId.DAX_INTRO,
     title = R.string.onboardingSearchDaxDialogTitle,
@@ -36,5 +38,6 @@ data class DaxTryASearchBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     showArrow = false,
 )

@@ -74,6 +74,8 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.button.MaterialButton
@@ -604,11 +606,6 @@ sealed class OnboardingDaxDialogCta(
      *    for the buttons the subclass actually renders.
      */
 
-    /**
-     * Marker interface for [BrandDesignContextualDaxDialogCta] subclasses that render the
-     * bottom-wing Lottie alongside their contextual dialog. Opting in via this supertype
-     * keeps the wing hooks out of CTAs that don't use them.
-     */
     interface ShowsWingBottom
 
     abstract class BrandDesignContextualDaxDialogCta(
@@ -623,6 +620,7 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore: OnboardingStore,
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
+        open val deviceInfo: DeviceInfo,
         @DrawableRes open val backgroundRes: Int = 0,
     ) : OnboardingDaxDialogCta(
         ctaId = ctaId,
@@ -996,7 +994,7 @@ sealed class OnboardingDaxDialogCta(
             }
         }
 
-        private fun startWingBottomPlayIn(container: View) {
+        internal fun startWingBottomPlayIn(container: View) {
             if (this !is ShowsWingBottom) return
             val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
             if (container.isPhoneLandscape()) {
@@ -1252,6 +1250,12 @@ sealed class OnboardingDaxDialogCta(
                 onButtonClicked.invoke()
             }
         }
+
+        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+        protected fun View.isPhoneLandscape(): Boolean =
+            !deviceInfo.isTablet() &&
+                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
@@ -1529,30 +1533,16 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
-    /**
-     * Marker interface for [BrandDesignUpdateBubbleCta] subclasses that render the waving Dax
-     * Lottie alongside their dialog. Opting in via this supertype keeps the animation hooks
-     * out of CTAs that don't use them.
-     *
-     * When [restartWavingDax] is TRUE, a content transition landing on this CTA fades out the
-     * existing wavingDax before re-playing it at the new position. Override on CTAs that
-     * render the Dax at a visibly different orientation from the previous CTA — without it,
-     * the Dax would jump-cut between positions.
-     *
-     * Override [configureWavingDax] to position the Dax differently. The default matches the
-     * XML defaults; reapplying it every play prevents earlier CTAs' transforms (e.g.
-     * subscription's rotation) from leaking onto the shared view after a reset.
-     */
     interface ShowsWavingDax {
         val restartWavingDax: Boolean get() = false
-        fun configureWavingDax(dax: LottieAnimationView) {
+        fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
             val density = dax.resources.displayMetrics.density
             dax.rotation = 0f
             dax.translationX = DEFAULT_WAVING_DAX_TRANSLATION_X_DP * density
             dax.translationY = DEFAULT_WAVING_DAX_TRANSLATION_Y_DP * density
             (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
                 lp.startToStart =
-                    if (dax.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                    if (deviceInfo.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
                 dax.layoutParams = lp
             }
         }
@@ -1575,6 +1565,7 @@ sealed class DaxBubbleCta(
         onboardingStore: OnboardingStore,
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
+        open val deviceInfo: DeviceInfo,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1587,6 +1578,12 @@ sealed class DaxBubbleCta(
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
     ) {
+
+        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+        protected fun View.isPhoneLandscape(): Boolean =
+            !deviceInfo.isTablet() &&
+                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
@@ -1644,15 +1641,10 @@ sealed class DaxBubbleCta(
             view.findViewById<View>(R.id.primaryCta),
         )
 
-        /**
-         * Show or hide the [R.id.wavingDax] Lottie based on whether the receiver CTA opts into
-         * [ShowsWavingDax] AND the device is not in phone landscape. Extracted from `showCta` so
-         * the gate logic can be exercised in unit tests without driving the full show flow.
-         */
         internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
             container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
                 if (showsWavingDax != null && !container.isPhoneLandscape()) {
-                    showsWavingDax.configureWavingDax(dax)
+                    showsWavingDax.configureWavingDax(dax, deviceInfo)
                     if (!dax.isVisible || dax.alpha == 0f) {
                         dax.progress = 0f
                         dax.alpha = 1f
@@ -1812,8 +1804,6 @@ sealed class DaxBubbleCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
-                // Fade out the wavingDax when the new CTA either doesn't show it or needs a
-                // fresh restart (e.g. a different position). Persisted-Dax transitions skip this.
                 container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
                     if (dax.isVisible && dax.alpha > 0f && (wavingDax == null || wavingDax.restartWavingDax)) {
                         fadeOutAnimators += ObjectAnimator.ofFloat(dax, View.ALPHA, 0f)
@@ -2162,13 +2152,3 @@ fun String.getStringForOmnibarPosition(position: OmnibarType): String =
     }
 
 private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator = animate().alpha(1f).setDuration(duration.inWholeMilliseconds)
-
-internal fun View.isPhoneLandscape(): Boolean {
-    val config = context.resources.configuration
-    val isPhone = config.smallestScreenWidthDp < 600
-    val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
-    return isPhone && isLandscape
-}
-
-internal fun View.isTablet(): Boolean =
-    context.resources.configuration.smallestScreenWidthDp >= 600

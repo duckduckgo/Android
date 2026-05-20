@@ -29,12 +29,14 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 
 data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
     val isFreeTrialCopy: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
@@ -47,6 +49,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
@@ -70,7 +73,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(buttonTextRes)
     }
 
-    override fun configureWavingDax(dax: LottieAnimationView) {
+    override fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
         val density = dax.resources.displayMetrics.density
         dax.rotation = SUBSCRIPTION_DAX_ROTATION_DEGREES
         dax.translationX = SUBSCRIPTION_DAX_TRANSLATION_X_DP * density

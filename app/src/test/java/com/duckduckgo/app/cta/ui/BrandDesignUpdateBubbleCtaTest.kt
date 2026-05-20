@@ -19,7 +19,6 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.util.DisplayMetrics
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -30,6 +29,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -44,6 +45,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
     private val onboardingStore: OnboardingStore = mock()
     private val appInstallStore: AppInstallStore = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     @Before
     fun before() {
@@ -70,7 +72,7 @@ class BrandDesignUpdateBubbleCtaTest {
 
         cta.applyWavingDaxState(container, showsWavingDax)
 
-        verify(showsWavingDax).configureWavingDax(dax)
+        verify(showsWavingDax).configureWavingDax(dax, mockDeviceInfo)
         verify(dax).isVisible = true
     }
 
@@ -83,35 +85,33 @@ class BrandDesignUpdateBubbleCtaTest {
         verify(dax).isVisible = false
     }
 
-    private fun configureContainer(orientation: Int, smallestScreenWidthDp: Int) {
-        val configuration = Configuration().apply {
-            this.orientation = orientation
-            this.smallestScreenWidthDp = smallestScreenWidthDp
-        }
+    private fun configureContainer(orientation: Int, formFactor: FormFactor) {
+        val configuration = Configuration().apply { this.orientation = orientation }
         val resources: Resources = mock()
         val context: Context = mock()
         whenever(container.context).thenReturn(context)
         whenever(context.resources).thenReturn(resources)
         whenever(resources.configuration).thenReturn(configuration)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
     }
 
     private fun configureContainerForPhoneLandscape() = configureContainer(
         orientation = Configuration.ORIENTATION_LANDSCAPE,
-        smallestScreenWidthDp = 360,
+        formFactor = FormFactor.PHONE,
     )
 
     private fun configureContainerForPhonePortrait() = configureContainer(
         orientation = Configuration.ORIENTATION_PORTRAIT,
-        smallestScreenWidthDp = 360,
+        formFactor = FormFactor.PHONE,
     )
 
     @Test
     fun configureWavingDax_tablet_anchorsStartToCard() {
         val dax: LottieAnimationView = mock()
-        val lp = stubDaxForFormFactor(dax, smallestScreenWidthDp = 800)
+        val lp = stubDaxForFormFactor(dax, FormFactor.TABLET)
         val cta = WavingDaxBubbleCta()
 
-        cta.configureWavingDax(dax)
+        cta.configureWavingDax(dax, mockDeviceInfo)
 
         assertEquals(R.id.brandDesignCardView, lp.startToStart)
     }
@@ -119,10 +119,10 @@ class BrandDesignUpdateBubbleCtaTest {
     @Test
     fun configureWavingDax_phone_anchorsStartToParent() {
         val dax: LottieAnimationView = mock()
-        val lp = stubDaxForFormFactor(dax, smallestScreenWidthDp = 360)
+        val lp = stubDaxForFormFactor(dax, FormFactor.PHONE)
         val cta = WavingDaxBubbleCta()
 
-        cta.configureWavingDax(dax)
+        cta.configureWavingDax(dax, mockDeviceInfo)
 
         assertEquals(
             ConstraintLayout.LayoutParams.PARENT_ID,
@@ -133,16 +133,17 @@ class BrandDesignUpdateBubbleCtaTest {
     @Test
     fun subscriptionConfigureWavingDax_tablet_anchorsStartToParent() {
         val dax: LottieAnimationView = mock()
-        val lp = stubDaxForFormFactor(dax, smallestScreenWidthDp = 800)
+        val lp = stubDaxForFormFactor(dax, FormFactor.TABLET)
         lp.startToStart = R.id.brandDesignCardView
         val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
         )
 
-        cta.configureWavingDax(dax)
+        cta.configureWavingDax(dax, mockDeviceInfo)
 
         assertEquals(
             ConstraintLayout.LayoutParams.PARENT_ID,
@@ -153,16 +154,17 @@ class BrandDesignUpdateBubbleCtaTest {
     @Test
     fun subscriptionConfigureWavingDax_phone_anchorsStartToParent() {
         val dax: LottieAnimationView = mock()
-        val lp = stubDaxForFormFactor(dax, smallestScreenWidthDp = 360)
+        val lp = stubDaxForFormFactor(dax, FormFactor.PHONE)
         lp.startToStart = R.id.brandDesignCardView
         val cta = DaxSubscriptionBrandDesignUpdateBubbleCta(
             onboardingStore = onboardingStore,
             appInstallStore = appInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
             isFreeTrialCopy = false,
         )
 
-        cta.configureWavingDax(dax)
+        cta.configureWavingDax(dax, mockDeviceInfo)
 
         assertEquals(
             ConstraintLayout.LayoutParams.PARENT_ID,
@@ -172,25 +174,17 @@ class BrandDesignUpdateBubbleCtaTest {
 
     private fun stubDaxForFormFactor(
         dax: LottieAnimationView,
-        smallestScreenWidthDp: Int,
+        formFactor: FormFactor,
     ): ConstraintLayout.LayoutParams {
         val lp = ConstraintLayout.LayoutParams(0, 0)
-        val configuration = Configuration().apply {
-            this.smallestScreenWidthDp = smallestScreenWidthDp
-        }
-        val displayMetrics = DisplayMetrics().apply { density = 1f }
         val resources: Resources = mock()
-        val context: Context = mock()
         whenever(dax.layoutParams).thenReturn(lp)
-        whenever(dax.context).thenReturn(context)
         whenever(dax.resources).thenReturn(resources)
-        whenever(context.resources).thenReturn(resources)
-        whenever(resources.configuration).thenReturn(configuration)
-        whenever(resources.displayMetrics).thenReturn(displayMetrics)
+        whenever(resources.displayMetrics).thenReturn(android.util.DisplayMetrics().apply { density = 1f })
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
         return lp
     }
 
-    /** Concrete subclass that exposes [applyWavingDaxState] for direct test driving. */
     private inner class TestableBubbleCta : DaxBubbleCta.BrandDesignUpdateBubbleCta(
         ctaId = CtaId.DAX_END,
         title = R.string.onboardingEndDaxDialogTitle,
@@ -201,13 +195,12 @@ class BrandDesignUpdateBubbleCtaTest {
         onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
         appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
         isLightTheme = true,
+        deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
     ) {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false
 
-        override fun configureContentViews(view: View) {
-            // No-op for tests.
-        }
+        override fun configureContentViews(view: View) {}
     }
 
     private inner class WavingDaxBubbleCta :
@@ -221,6 +214,7 @@ class BrandDesignUpdateBubbleCtaTest {
             onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
             appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
             isLightTheme = true,
+            deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
         ),
         DaxBubbleCta.ShowsWavingDax {
         override val activeIncludeId: Int = R.id.primaryCta

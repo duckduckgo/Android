@@ -34,6 +34,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -41,6 +43,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -63,6 +66,7 @@ class BrandDesignContextualDaxDialogCtaTest {
 
     private val onboardingStore: OnboardingStore = mock()
     private val appInstallStore: AppInstallStore = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     private lateinit var testee: TestableBrandDesignContextualDaxDialogCta
 
@@ -85,7 +89,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView))
             .thenReturn(cardView)
 
-        testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore)
+        testee = TestableBrandDesignContextualDaxDialogCta(onboardingStore, appInstallStore, mockDeviceInfo)
     }
 
     @Test
@@ -232,7 +236,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         configureContainerForPhoneLandscape()
         whenever(hiddenTitle.text).thenReturn("Title")
         whenever(titleView.hasAnimationStarted()).thenReturn(false)
-        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
 
         cta.invokeSnap(alreadySettled = false)
 
@@ -244,7 +248,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         configureContainerForPhonePortrait()
         whenever(hiddenTitle.text).thenReturn("Title")
         whenever(titleView.hasAnimationStarted()).thenReturn(false)
-        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
 
         cta.invokeSnap(alreadySettled = false)
 
@@ -257,43 +261,39 @@ class BrandDesignContextualDaxDialogCtaTest {
         val wing: LottieAnimationView = mock()
         whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
         whenever(wing.isAnimating).thenReturn(false)
-        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
 
         cta.invokeApplyWingBottomState()
 
         verify(wing).isVisible = false
     }
 
-    private fun configureContainer(orientation: Int, smallestScreenWidthDp: Int) {
-        val configuration = Configuration().apply {
-            this.orientation = orientation
-            this.smallestScreenWidthDp = smallestScreenWidthDp
-        }
+    private fun configureContainer(orientation: Int, formFactor: FormFactor) {
+        val configuration = Configuration().apply { this.orientation = orientation }
         val resources: Resources = mock()
         val context: Context = mock()
         whenever(container.context).thenReturn(context)
         whenever(context.resources).thenReturn(resources)
         whenever(resources.configuration).thenReturn(configuration)
+        whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
     }
 
     private fun configureContainerForPhoneLandscape() = configureContainer(
         orientation = Configuration.ORIENTATION_LANDSCAPE,
-        smallestScreenWidthDp = 360,
+        formFactor = FormFactor.PHONE,
     )
 
     private fun configureContainerForPhonePortrait() = configureContainer(
         orientation = Configuration.ORIENTATION_PORTRAIT,
-        smallestScreenWidthDp = 360,
+        formFactor = FormFactor.PHONE,
     )
 
     private fun configureContainerForTabletPortrait() = configureContainer(
         orientation = Configuration.ORIENTATION_PORTRAIT,
-        smallestScreenWidthDp = 800,
+        formFactor = FormFactor.TABLET,
     )
 
     private fun stubWingLayoutParams(wing: LottieAnimationView): ConstraintLayout.LayoutParams {
-        val containerContext = container.context
-        whenever(wing.context).thenReturn(containerContext)
         val lp = ConstraintLayout.LayoutParams(0, 0)
         whenever(wing.layoutParams).thenReturn(lp)
         return lp
@@ -307,7 +307,7 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(wing)
         whenever(wing.isAnimating).thenReturn(false)
         val lp = stubWingLayoutParams(wing)
-        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
 
         cta.invokeApplyWingBottomState()
 
@@ -322,17 +322,75 @@ class BrandDesignContextualDaxDialogCtaTest {
             .thenReturn(wing)
         whenever(wing.isAnimating).thenReturn(false)
         val lp = stubWingLayoutParams(wing)
-        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
 
         cta.invokeApplyWingBottomState()
 
         assertEquals(ConstraintLayout.LayoutParams.PARENT_ID, lp.startToStart)
     }
 
-    /** Concrete subclass that exposes the base-class `internal` helpers for direct test driving. */
+    @Test
+    fun applyWingBottomState_wingMidExitWhenWingCtaArrives_abortsExitAndSnapsToResting() {
+        configureContainerForPhonePortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
+        stubWingLayoutParams(wing)
+        whenever(wing.visibility).thenReturn(View.VISIBLE)
+        whenever(wing.isAnimating).thenReturn(true)
+        whenever(wing.progress).thenReturn(0.7f)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
+
+        cta.invokeApplyWingBottomState()
+
+        verify(wing).removeAllAnimatorListeners()
+        verify(wing).cancelAnimation()
+        verify(wing).setMinAndMaxProgress(0f, 0.5f)
+        verify(wing).progress = 0.5f
+    }
+
+    @Test
+    fun applyWingBottomState_wingMidPlayInWhenWingCtaArrives_doesNotInterrupt() {
+        configureContainerForPhonePortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
+        stubWingLayoutParams(wing)
+        whenever(wing.visibility).thenReturn(View.VISIBLE)
+        whenever(wing.isAnimating).thenReturn(true)
+        whenever(wing.progress).thenReturn(0.3f)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
+
+        cta.invokeApplyWingBottomState()
+
+        verify(wing, never()).removeAllAnimatorListeners()
+        verify(wing, never()).cancelAnimation()
+    }
+
+    @Test
+    fun startWingBottomPlayIn_runnableSupersededByNextCtaStaging_doesNotPlay() {
+        configureContainerForPhonePortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
+        whenever(wing.isAnimating).thenReturn(false)
+        whenever(wing.progress).thenReturn(0f)
+
+        val ctaA = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
+        ctaA.invokeStartWingBottomPlayIn()
+
+        val captor = argumentCaptor<Runnable>()
+        verify(wing).postDelayed(captor.capture(), any())
+
+        val ctaB = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
+        ctaB.invokeApplyWingBottomState()
+
+        captor.firstValue.run()
+
+        verify(wing, never()).playAnimation()
+    }
+
     private inner class TestableBrandDesignContextualDaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        override val deviceInfo: DeviceInfo,
     ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_SERP,
         description = null,
@@ -345,15 +403,14 @@ class BrandDesignContextualDaxDialogCtaTest {
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
         isLightTheme = true,
+        deviceInfo = deviceInfo,
     ) {
         var settledInvocations: Int = 0
 
         override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
         override val showArrow: Boolean = false
 
-        override fun configureContentViews(view: View) {
-            // No-op for tests.
-        }
+        override fun configureContentViews(view: View) {}
 
         fun invokeSnap(alreadySettled: Boolean) {
             snapToFinished(
@@ -379,10 +436,10 @@ class BrandDesignContextualDaxDialogCtaTest {
         fun invokeIsContentTransition(): Boolean = isContentTransition(container)
     }
 
-    /** Concrete subclass with [showArrow]=true and a [ShowsWingBottom] opt-in, for gating-path tests. */
     private inner class WingAndArrowContextualCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        override val deviceInfo: DeviceInfo,
     ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
         description = null,
@@ -395,6 +452,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
         isLightTheme = true,
+        deviceInfo = deviceInfo,
     ),
         OnboardingDaxDialogCta.ShowsWingBottom {
 
@@ -403,9 +461,7 @@ class BrandDesignContextualDaxDialogCtaTest {
         override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
         override val showArrow: Boolean = true
 
-        override fun configureContentViews(view: View) {
-            // No-op for tests.
-        }
+        override fun configureContentViews(view: View) {}
 
         fun invokeSnap(alreadySettled: Boolean) {
             snapToFinished(
@@ -424,6 +480,10 @@ class BrandDesignContextualDaxDialogCtaTest {
 
         fun invokeApplyWingBottomState() {
             applyWingBottomState(container)
+        }
+
+        fun invokeStartWingBottomPlayIn() {
+            startWingBottomPlayIn(container)
         }
     }
 }

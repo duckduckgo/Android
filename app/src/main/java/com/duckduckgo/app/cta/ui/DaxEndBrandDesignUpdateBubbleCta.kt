@@ -23,12 +23,14 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.google.android.material.button.MaterialButton
 
 data class DaxEndBrandDesignUpdateBubbleCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = CtaId.DAX_END,
     title = R.string.onboardingEndDaxDialogTitle,
@@ -40,6 +42,7 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
 ),
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
