@@ -38,6 +38,21 @@ interface ProSettingsPlugin : SettingsPlugin
 /**
  * This is the plugin for Duck Player settings
  */
-interface DuckPlayerSettingsPlugin : SettingsPlugin
+interface DuckPlayerSettingsPlugin : SettingsPlugin {
+    /**
+     * Whether the settings section should be shown
+     */
+    fun isShownInSettings(): Boolean
+}
 
 interface ThreatProtectionSettingsPlugin : SettingsPlugin
+
+/**
+ * This is the plugin for YouTube Ad Blocking settings
+ */
+interface AdBlockingSettingsPlugin : SettingsPlugin {
+    /**
+     * Whether the settings section should be shown
+     */
+    fun isShownInSettings(): Boolean
+}

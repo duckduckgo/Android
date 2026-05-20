@@ -22,9 +22,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
-import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -83,12 +80,15 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
+import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
@@ -123,7 +123,6 @@ class SettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
-    private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -136,6 +135,8 @@ class SettingsViewModel @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val settingsDataStore: SettingsDataStore,
     private val appInstallStore: AppInstallStore,
+    private val adBlockingSettingsPlugins: PluginPoint<AdBlockingSettingsPlugin>,
+    private val duckPlayerSettingsPlugins: PluginPoint<DuckPlayerSettingsPlugin>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -148,6 +149,7 @@ class SettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isSubscriptionEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isAdBlockingEnabled: Boolean = false,
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
@@ -238,7 +240,8 @@ class SettingsViewModel @Inject constructor(
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isSubscriptionEnabled = subscriptions.isEligible(),
-                    isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                    isDuckPlayerEnabled = duckPlayerSettingsPlugins.getPlugins().any { it.isShownInSettings() },
+                    isAdBlockingEnabled = adBlockingSettingsPlugins.getPlugins().any { it.isShownInSettings() },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                     isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {

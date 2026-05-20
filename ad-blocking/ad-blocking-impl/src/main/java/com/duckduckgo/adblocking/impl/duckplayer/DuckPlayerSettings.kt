@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ package com.duckduckgo.adblocking.impl.duckplayer
 import android.content.Context
 import android.view.View
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
+import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
 import com.duckduckgo.adblocking.impl.R
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerPixelName.DUCK_PLAYER_SETTINGS_PRESSED
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -38,17 +41,19 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
-class DuckPlayerSettingsTitle @Inject constructor(
+class DuckPlayerSettingsEntry @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
-    private val pixel: Pixel,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckPlayer: DuckPlayer,
+    private val pixel: Pixel,
+    private val statusChecker: AdBlockingStatusChecker,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckPlayerSettingsPlugin {
+
     override fun getView(context: Context): View {
         return OneLineListItem(context).apply {
             setLeadingIconResource(CommonR.drawable.ic_video_player_color_24)
 
-            setPrimaryText(context.getString(R.string.duck_player_setting_title))
+            setPrimaryText(context.getString(R.string.ad_blocking_settings_duck_player_header))
             setOnClickListener {
                 globalActivityStarter.start(this.context, DuckPlayerSettingsNoParams, null)
                 appCoroutineScope.launch {
@@ -57,5 +62,9 @@ class DuckPlayerSettingsTitle @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun isShownInSettings(): Boolean {
+        return !statusChecker.isShownInSettings() && duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK }
     }
 }

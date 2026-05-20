@@ -98,6 +98,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
+import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
@@ -146,6 +147,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
     private val duckPlayerSettingsPlugin by lazy {
         _duckPlayerSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _adBlockingSettingsPlugin: PluginPoint<AdBlockingSettingsPlugin>
+    private val adBlockingSettingsPlugin by lazy {
+        _adBlockingSettingsPlugin.getPlugins()
     }
 
     @Inject
@@ -293,6 +300,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        if (adBlockingSettingsPlugin.isEmpty()) {
+            viewsMain.settingsSectionAdBlocking.gone()
+        } else {
+            adBlockingSettingsPlugin.forEach { plugin ->
+                viewsMain.settingsSectionAdBlocking.addView(plugin.getView(this))
+            }
+        }
+
         if (threatProtectionSettingsPlugin.isEmpty()) {
             viewsPrivacy.settingsSectionThreatProtection.gone()
         } else {
@@ -331,6 +346,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updateSubscription(it.isSubscriptionEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateAdBlocking(it.isAdBlockingEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
@@ -362,6 +378,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsMain.settingsSectionDuckPlayer.show()
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
+        }
+    }
+
+    private fun updateAdBlocking(isAdBlockingEnabled: Boolean) {
+        if (isAdBlockingEnabled) {
+            viewsMain.settingsSectionAdBlocking.show()
+        } else {
+            viewsMain.settingsSectionAdBlocking.gone()
         }
     }
 
