@@ -57,7 +57,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/onboardingContextualBackgroundOverlap"
         app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -175,5 +177,34 @@
         app:srcCompat="@drawable/ic_close_16"
         app:tint="?attr/onboardingIconsPrimary"
         tools:alpha="1" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/wavingDax"
+        android:layout_width="wrap_content"
+        android:layout_height="178dp"
+        android:adjustViewBounds="true"
+        android:translationX="-54dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:translationY="-110dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:lottie_rawRes="@raw/onboarding_dax_waving"
+        tools:lottie_progress="1" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/wingBottom"
+        android:layout_width="114dp"
+        android:layout_height="96dp"
+        android:adjustViewBounds="true"
+        android:rotation="8.2"
+        android:translationX="14dp"
+        android:translationY="-60dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_bottom"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
