@@ -959,8 +959,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = true
+
+                    val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = binding.bobbingDaxAnimation,
+                    )
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                        if (deviceInfo.isTablet()) {
+                        if (showBobbingDax && deviceInfo.isTablet()) {
                             verticalBias = 0.5f
                             bottomToTop = binding.bobbingDaxAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -974,7 +982,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         step = OnboardingBackgroundStep.AddressBar,
                     )
 
-                    animateBobbingDaxIn()
+                    if (showBobbingDax) {
+                        animateBobbingDaxIn()
+                    } else {
+                        binding.bobbingDaxAnimation.isVisible = false
+                    }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
 
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
@@ -1014,9 +1027,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.root.translationZ = 1f.toPx()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
-
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addressBarContent.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = 0f
