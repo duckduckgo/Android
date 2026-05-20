@@ -1047,6 +1047,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     animateBobbingDaxOut()
 
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = false
+                    binding.daxDialogCta.inputScreenContent.root.isVisible = true
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+
                     val leftWingView = binding.leftWingAnimation
                     val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                         rootView = binding.root,
@@ -1118,21 +1126,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showLeftWingAnimation) 1f else 0f)
 
-                    binding.welcomeScreenWalkingDax.isVisible = false
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addressBarContent.root.isVisible = false
-
                     val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                     binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
-
-                    binding.daxDialogCta.inputScreenContent.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
-
-                    // set the toggle state without crossfade, and do not start lottie animations yet, we'll start them once the view fully fades in
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
                 }
 
                 INPUT_SCREEN_PREVIEW -> {
@@ -1503,6 +1502,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.bottomWingAnimation.isVisible = false
 
+                binding.welcomeScreenWalkingDax.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.addressBarContent.root.isVisible = false
+                binding.daxDialogCta.inputScreenContent.root.isVisible = true
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+
                 val leftWingView = binding.leftWingAnimation
                 val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                     rootView = binding.root,
@@ -1525,7 +1532,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
-                binding.welcomeScreenWalkingDax.isVisible = false
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                     if (showLeftWing && deviceInfo.isTablet()) {
                         verticalBias = 0.5f
@@ -1542,15 +1548,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
                 cardView.setArrowDepthFraction(if (showLeftWing) 1f else 0f)
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.secondaryCta.isVisible = false
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.addressBarContent.root.isVisible = false
 
                 val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
-                binding.daxDialogCta.inputScreenContent.root.isVisible = true
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.text =
                     getString(R.string.preOnboardingInputScreenTitleUpdated)
