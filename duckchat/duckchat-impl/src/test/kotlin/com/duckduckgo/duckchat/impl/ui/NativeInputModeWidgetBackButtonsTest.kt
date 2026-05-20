@@ -90,5 +90,5 @@ class NativeInputModeWidgetBackButtonsTest {
     }
 
     private fun stateOf(inputMode: InputMode, inputContext: InputContext): NativeInputState =
-        NativeInputState(inputMode = inputMode, inputContext = inputContext, tabId = "test-tab")
+        NativeInputState(inputMode = inputMode, inputContext = inputContext)
 }
