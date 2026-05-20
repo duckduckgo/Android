@@ -57,6 +57,7 @@ interface BrowserTrackersAnimatorHelper {
      * @param shieldViews are the views that should be hidden while the animation is running.
      * @param entities are the tracker entities detected on the current site
      * @param customBackgroundColor if specified, the background color to use for the animation text container.
+     * @param useSoftwareRenderingMode if true, forces Lottie SOFTWARE render mode on the shield icon to avoid hardware compositor issues on some devices.
      */
     fun startAddressBarTrackersAnimation(
         context: Context,
@@ -67,6 +68,7 @@ interface BrowserTrackersAnimatorHelper {
         shieldViews: List<View>,
         entities: List<Entity>?,
         customBackgroundColor: Int? = null,
+        useSoftwareRenderingMode: Boolean = false,
     )
 
     /**

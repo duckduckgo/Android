@@ -147,6 +147,7 @@ class OmnibarLayoutViewModelTest {
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
         runBlocking {
             whenever(addressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+            whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(false)
         }
 
         fakeStandardizedLeadingIconToggle = FeatureToggles.Builder(
@@ -1181,6 +1182,48 @@ class OmnibarLayoutViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommand(Command.StartTrackersAnimation::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeEnabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertTrue((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSoftwareRenderingModeDisabledThenStartTrackersAnimationCommandForwardsFlag() = runTest {
+        whenever(addressBarTrackersAnimationManager.isSoftwareRenderingModeEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        testee.viewState.test {
+            awaitItem()
+        }
+
+        testee.onOmnibarFocusChanged(false, SERP_URL)
+        val trackers = givenSomeTrackers()
+        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.StartTrackersAnimation)
+            assertFalse((command as Command.StartTrackersAnimation).useSoftwareRenderingMode)
             cancelAndIgnoreRemainingEvents()
         }
     }
