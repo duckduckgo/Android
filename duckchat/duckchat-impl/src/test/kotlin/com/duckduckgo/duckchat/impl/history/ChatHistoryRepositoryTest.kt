@@ -21,8 +21,10 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,6 +34,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -42,6 +45,8 @@ class ChatHistoryRepositoryTest {
 
     private val chatStore: DuckAiChatStore = mock()
     private val context: Context = mock()
+    private val duckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val syncEngine: SyncEngine = mock()
     private val source = MutableStateFlow<List<DuckAiChat>>(emptyList())
     private lateinit var repository: RealChatHistoryRepository
 
@@ -49,7 +54,13 @@ class ChatHistoryRepositoryTest {
     fun setup() {
         whenever(context.getString(R.string.duck_ai_chat_history_untitled)).thenReturn(FALLBACK)
         whenever(chatStore.getChatsFlow()).thenReturn(source)
-        repository = RealChatHistoryRepository(chatStore, coroutineRule.testDispatcherProvider, context)
+        repository = RealChatHistoryRepository(
+            chatStore = chatStore,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            context = context,
+            duckChatSyncRepository = duckChatSyncRepository,
+            syncEngine = syncEngine,
+        )
     }
 
     @Test
@@ -193,6 +204,26 @@ class ChatHistoryRepositoryTest {
         val result = repository.renameChat("missing", "New")
 
         assertFalse(result)
+    }
+
+    @Test
+    fun `renameChat records pending update and triggers sync on success`() = runTest {
+        whenever(chatStore.renameChat("abc", "New")).thenReturn(true)
+
+        repository.renameChat("abc", "New")
+
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `renameChat does not record or trigger sync when store reports failure`() = runTest {
+        whenever(chatStore.renameChat("missing", "New")).thenReturn(false)
+
+        repository.renameChat("missing", "New")
+
+        verify(duckChatSyncRepository, never()).recordSingleChatUpdate("missing")
+        verify(syncEngine, never()).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
     private fun chat(

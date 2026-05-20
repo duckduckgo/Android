@@ -21,8 +21,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.toChatType
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +48,8 @@ class RealChatHistoryRepository @Inject constructor(
     private val chatStore: DuckAiChatStore,
     private val dispatchers: DispatcherProvider,
     private val context: Context,
+    private val duckChatSyncRepository: DuckChatSyncRepository,
+    private val syncEngine: SyncEngine,
 ) : ChatHistoryRepository {
 
     private val fallbackTitle: String by lazy { context.getString(R.string.duck_ai_chat_history_untitled) }
@@ -63,7 +67,14 @@ class RealChatHistoryRepository @Inject constructor(
     }
 
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
-        withContext(dispatchers.io()) { chatStore.renameChat(chatId, newTitle) }
+        withContext(dispatchers.io()) {
+            val updated = chatStore.renameChat(chatId, newTitle)
+            if (updated) {
+                duckChatSyncRepository.recordSingleChatUpdate(chatId)
+                syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+            }
+            updated
+        }
 
     override suspend fun setPinned(chatId: String, pinned: Boolean) {
         withContext(dispatchers.io()) {
