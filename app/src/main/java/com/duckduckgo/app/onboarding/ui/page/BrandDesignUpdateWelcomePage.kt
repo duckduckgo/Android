@@ -1803,6 +1803,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             val withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI)
             viewModel.onInputScreenOptionSelected(withAi = withAi)
         }
+        childFragmentManager.setFragmentResultListener(
+            RemoveWidgetInstructionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.checkWidgetAddedState()
+        }
     }
 
     /**

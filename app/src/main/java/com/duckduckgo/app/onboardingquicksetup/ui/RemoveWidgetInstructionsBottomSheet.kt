@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetRemoveWidgetInstructionsBinding
 import com.duckduckgo.di.scopes.FragmentScope
@@ -62,6 +63,13 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
         return dialog
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        if (isAdded) {
+            setFragmentResult(REQUEST_KEY, Bundle.EMPTY)
+        }
+        super.onDismiss(dialog)
+    }
+
     private fun setRoundCorners(dialogInterface: DialogInterface) {
         val bottomSheet = (dialogInterface as BottomSheetDialog).findViewById<FrameLayout>(R.id.design_bottom_sheet)
         val ctx = requireContext()
@@ -76,5 +84,8 @@ class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "RemoveWidgetInstructionsBottomSheetFragment"
+
+        /** Fragment-result request key. The host registers a listener under this key. */
+        const val REQUEST_KEY = "RemoveWidgetInstructionsResult"
     }
 }
