@@ -1094,6 +1094,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
+    override fun toolSelected(tool: String?) {
+        viewModel.setSelectedTool(tool)
+    }
+
     override fun showModelPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
     }
