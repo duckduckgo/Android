@@ -206,6 +206,12 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
+            if (isBottom) {
+                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
+                // (adjustResize), letting the bottom-anchored widgetView descend to its
+                // post-IME-hide layout position before the exit animation captures its snapshot.
+                widgetFrom(widgetView)?.hideKeyboard()
+            }
             layoutCoordinator.setWidgetAnimating(true)
             animator.animateExit(
                 widgetCard = card,
@@ -616,6 +622,9 @@ class RealNativeInputManager @Inject constructor(
         if (omnibarController.isDuckAiMode()) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
+        // Apply focused-state layout so the widget is measured at its final size; otherwise
+        // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
+        widgetFrom(widgetView)?.beginEnterAnimationPreview()
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
@@ -626,7 +635,21 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
-            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+            onCancel = {
+                layoutCoordinator.setWidgetAnimating(false)
+                widgetFrom(widgetView)?.let { widget ->
+                    widget.endEnterAnimationPreview()
+                    // Symmetric teardown for bottom mode: beginEnterAnimationPreview's
+                    // showKeyboard() requested focus + raised the IME. onEnterComplete is what
+                    // "owns" the focused state on success, so on cancel we undo it here —
+                    // otherwise the widget is left half-entered (focused, IME up) without the
+                    // animation having completed.
+                    if (widget.isWidgetBottom()) {
+                        widget.hideKeyboard()
+                        widget.clearInputFocus()
+                    }
+                }
+            },
             onComplete = {
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
@@ -639,7 +662,10 @@ class RealNativeInputManager @Inject constructor(
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
-        widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+        widgetFrom(widgetView)?.apply {
+            focusInput(rootView.context as? Activity)
+            endEnterAnimationPreview()
+        }
     }
 
     private fun bindChatSuggestions(

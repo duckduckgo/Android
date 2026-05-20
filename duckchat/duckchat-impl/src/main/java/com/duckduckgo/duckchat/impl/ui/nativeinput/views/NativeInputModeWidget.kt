@@ -97,8 +97,11 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
+    fun beginEnterAnimationPreview()
+    fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
+    fun showKeyboard()
     fun selectChatTab()
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
@@ -247,6 +250,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
     // toggle row and reset the parent card's corners.
     private var isContextualWidget: Boolean = false
+
+    // Held during the enter animation so padding/bottom-row compute as if focused; without
+    // it they'd flip from 4dp→8dp after focusInput and look like a second step.
+    private var previewEnterFocus = false
 
     private var attachmentView: AttachmentView? = null
 
@@ -438,7 +445,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = isChatTabSelected() && (inputField.hasFocus() || isStreaming)
+        val visible = isChatTabSelected() && (inputField.hasFocus() || previewEnterFocus || isStreaming)
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -461,7 +468,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
+        val expanded = !isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus)
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
@@ -676,8 +683,46 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun beginEnterAnimationPreview() {
+        if (inputField.hasFocus()) return
+        // State observation is async; apply it synchronously so toggle-row visibility etc. are
+        // in their final positions before the enter animation measures the widget.
+        if (nativeInputState == null) {
+            activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }?.let(::applyState)
+        }
+        previewEnterFocus = true
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+        // Bottom omnibar only: trigger the IME slide-up now so it overlaps the enter animation —
+        // the activity shrinks (and the widget's bottom-anchored FrameLayout slides up) alongside
+        // the widget's expansion instead of pushing it up afterwards as a second step. Top omnibar
+        // keyboard position is independent of the widget, so its show stays deferred to focusInput
+        // in onEnterComplete.
+        //
+        // Side effect to be aware of: Activity.showKeyboard() calls inputField.requestFocus()
+        // under the hood, so the input field gains focus here — ~200ms earlier than in top mode
+        // (where focus is set in onEnterComplete via focusInput). The onFocusChangeListener will
+        // therefore fire synchronously inside showKeyboard(). The asymmetry is intentional, but
+        // it does mean any cancel path has to undo focus + IME for bottom mode (see the manager's
+        // animateEnter.onCancel).
+        if (isWidgetBottom()) {
+            showKeyboard()
+        }
+    }
+
+    override fun endEnterAnimationPreview() {
+        if (!previewEnterFocus) return
+        previewEnterFocus = false
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+    }
+
     override fun hideKeyboard() {
         (context as? Activity)?.hideKeyboard(inputField)
+    }
+
+    override fun showKeyboard() {
+        (context as? Activity)?.showKeyboard(inputField)
     }
 
     override fun selectChatTab() {
