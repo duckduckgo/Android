@@ -101,6 +101,7 @@ interface NativeInputWidget {
     fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
+    fun showKeyboard()
     fun selectChatTab()
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
@@ -674,6 +675,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         previewEnterFocus = true
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
+        // Bottom omnibar: trigger the IME slide-up now so it overlaps the enter animation,
+        // letting the activity shrink (and the widget's bottom-anchored FrameLayout slide up)
+        // alongside the widget's expansion instead of pushing it up afterwards as a second step.
+        // Top omnibar: keyboard's vertical position is independent of the widget, so its show
+        // stays deferred to focusInput in onEnterComplete.
+        if (isWidgetBottom()) {
+            showKeyboard()
+        }
     }
 
     override fun endEnterAnimationPreview() {
@@ -685,6 +694,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun hideKeyboard() {
         (context as? Activity)?.hideKeyboard(inputField)
+    }
+
+    override fun showKeyboard() {
+        (context as? Activity)?.showKeyboard(inputField)
     }
 
     override fun selectChatTab() {

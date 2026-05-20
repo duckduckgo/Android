@@ -199,6 +199,12 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
+            if (isBottom) {
+                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
+                // (adjustResize), letting the bottom-anchored widgetView descend to its
+                // post-IME-hide layout position before the exit animation captures its snapshot.
+                widgetFrom(widgetView)?.hideKeyboard()
+            }
             layoutCoordinator.setWidgetAnimating(true)
             animator.animateExit(
                 widgetCard = card,
