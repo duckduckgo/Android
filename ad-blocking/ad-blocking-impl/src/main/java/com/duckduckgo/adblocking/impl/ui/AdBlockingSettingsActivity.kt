@@ -35,6 +35,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AdBlockingSettingsNoParams::class)
