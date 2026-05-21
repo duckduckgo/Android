@@ -27,7 +27,6 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncDataManager.Adapters.Companion.patchResponseAdapter
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.ModifiedSince
@@ -65,7 +64,6 @@ class DuckChatSyncDataManager @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckAiChatStore: DuckAiChatStore,
-    private val syncCrypto: SyncCrypto,
 ) : DeletableDataManager, SyncableDataProvider, SyncableDataPersister {
 
     override fun getDeletableType(): DeletableType = DeletableType.DUCK_AI_CHATS

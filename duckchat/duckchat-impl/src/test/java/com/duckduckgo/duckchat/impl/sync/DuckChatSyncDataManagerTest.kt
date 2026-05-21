@@ -25,7 +25,6 @@ import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
@@ -61,8 +60,6 @@ class DuckChatSyncDataManagerTest {
 
     private val duckAiChatStore: DuckAiChatStore = mock()
 
-    private val syncCrypto: SyncCrypto = mock()
-
     private lateinit var testee: DuckChatSyncDataManager
 
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
@@ -72,7 +69,6 @@ class DuckChatSyncDataManagerTest {
         whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
         whenever(duckChatSyncRepository.getPendingChatUpdates()).thenReturn(emptySet())
-        whenever(syncCrypto.encrypt(any<String>())).thenAnswer { "ENC:${it.arguments[0]}" }
         testee = DuckChatSyncDataManager(
             duckChatSyncRepository = duckChatSyncRepository,
             duckChatFeatureRepository = duckChatFeatureRepository,
@@ -81,7 +77,6 @@ class DuckChatSyncDataManagerTest {
             duckChatFeature = duckChatFeature,
             appCoroutineScope = coroutineTestRule.testScope,
             duckAiChatStore = duckAiChatStore,
-            syncCrypto = syncCrypto,
         )
     }
 
