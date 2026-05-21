@@ -46,7 +46,10 @@ enum class ReasoningMode(
 data class AvailableReasoningMode(
     val mode: ReasoningMode,
     val effort: ReasoningEffort,
-)
+    val access: ReasoningEffortAccess? = null,
+) {
+    val isAccessible: Boolean get() = access == null || access.isAccessible
+}
 
 data class ReasoningEffortAccess(
     val effort: ReasoningEffort,
@@ -59,20 +62,39 @@ data class ReasoningEffortAccess(
 
 object ReasoningResolver {
 
-    fun availableModes(supported: List<ReasoningEffort>): List<AvailableReasoningMode> =
-        ReasoningMode.entries.mapNotNull { mode ->
-            mode.candidateEfforts.firstOrNull { it in supported }?.let { effort ->
-                AvailableReasoningMode(mode, effort)
-            }
+    /**
+     * For each [ReasoningMode], picks the first candidate effort that is supported and accessible.
+     * If no candidate is accessible, falls back to the first supported one so the row still renders
+     * for upsell routing. If no candidate is supported, the mode is omitted.
+     *
+     * When [effortAccess] does not contain an entry for a chosen effort, the mode is treated as accessible.
+     */
+    fun availableModes(
+        supported: List<ReasoningEffort>,
+        effortAccess: List<ReasoningEffortAccess> = emptyList(),
+    ): List<AvailableReasoningMode> {
+        val accessByEffort = effortAccess.associateBy { it.effort }
+        return ReasoningMode.entries.mapNotNull { mode ->
+            val supportedCandidates = mode.candidateEfforts.filter { it in supported }
+            if (supportedCandidates.isEmpty()) return@mapNotNull null
+            val chosen = supportedCandidates.firstOrNull { effort ->
+                val access = accessByEffort[effort]
+                access == null || access.isAccessible
+            } ?: supportedCandidates.first()
+            AvailableReasoningMode(mode, chosen, accessByEffort[chosen])
         }
+    }
 
     fun resolveMode(
         persisted: ReasoningMode?,
         available: List<AvailableReasoningMode>,
-    ): ReasoningMode? = when {
-        available.isEmpty() -> null
-        persisted != null && available.any { it.mode == persisted } -> persisted
-        else -> available.first().mode
+    ): ReasoningMode? {
+        val accessible = available.filter { it.isAccessible }
+        return when {
+            accessible.isEmpty() -> null
+            persisted != null && accessible.any { it.mode == persisted } -> persisted
+            else -> accessible.first().mode
+        }
     }
 
     fun effortFor(

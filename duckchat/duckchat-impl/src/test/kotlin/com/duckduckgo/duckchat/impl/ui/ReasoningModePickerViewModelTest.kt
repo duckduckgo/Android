@@ -16,15 +16,21 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.models.AvailableReasoningMode
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
+import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ReasoningModePickerViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -77,13 +83,6 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
-    fun whenSelectModeThenDelegatesToManager() = runTest {
-        testee.selectMode(ReasoningMode.REASONING)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        verify(modelManager).selectReasoningMode(ReasoningMode.REASONING)
-    }
-
-    @Test
     fun whenIconResForEachModeThenReturnsExpectedDrawable() {
         assertEquals(
             com.duckduckgo.duckchat.impl.R.drawable.ic_reasoning_fast_24,
@@ -115,4 +114,151 @@ class ReasoningModePickerViewModelTest {
         assertEquals(false, rows[0].selected)
         assertEquals(true, rows[1].selected)
     }
+
+    // ---- onModeTapped upsell routing ----
+
+    @Test
+    fun whenAccessibleModeTappedThenSelectModeInvokedAndNoCommandEmitted() = runTest {
+        state.value = ModelState(
+            availableReasoningModes = listOf(AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW)),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            verify(modelManager).selectReasoningMode(ReasoningMode.REASONING)
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeUserTapsGatedModeRequiringPlusFromAddressBarThenLaunchPurchaseEmitted() = runTest {
+        state.value = ModelState(
+            userTier = UserTier.FREE,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("plus", "pro"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+
+            assertEquals(
+                UpsellCommand.LaunchPurchase(PickerSurface.REASONING_PICKER_ADDRESS_BAR.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFreeUserTapsGatedModeRequiringProFromDuckAiTabThenLaunchPurchaseEmittedWithDuckAiOrigin() = runTest {
+        state.value = ModelState(
+            userTier = UserTier.FREE,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("pro"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_DUCK_AI_TAB)
+
+            assertEquals(
+                UpsellCommand.LaunchPurchase(PickerSurface.REASONING_PICKER_DUCK_AI_TAB.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPlusUserTapsGatedModeRequiringProFromAddressBarThenLaunchUpgradeEmitted() = runTest {
+        state.value = ModelState(
+            userTier = UserTier.PLUS,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("pro"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+
+            assertEquals(
+                UpsellCommand.LaunchUpgrade(PickerSurface.REASONING_PICKER_ADDRESS_BAR.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPlusUserTapsGatedModeRequiringProFromDuckAiTabThenLaunchUpgradeEmittedWithDuckAiOrigin() = runTest {
+        state.value = ModelState(
+            userTier = UserTier.PLUS,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("pro"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_DUCK_AI_TAB)
+
+            assertEquals(
+                UpsellCommand.LaunchUpgrade(PickerSurface.REASONING_PICKER_DUCK_AI_TAB.origin),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGatedModeRequiresFreeTierThenNoCommandEmitted() = runTest {
+        // Pathological: a "gated" entry whose access list still includes FREE → no upsell route.
+        state.value = ModelState(
+            userTier = UserTier.FREE,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("free", "plus", "pro"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGatedModeAccessHasNoPublicTierThenNoCommandEmitted() = runTest {
+        // Only non-public tiers in the access list → requiredTier is null → no upsell route.
+        state.value = ModelState(
+            userTier = UserTier.FREE,
+            availableReasoningModes = listOf(gatedExtended(requires = listOf("internal"))),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTappedModeNotInAvailableListThenNoCommandEmittedAndManagerNotCalled() = runTest {
+        state.value = ModelState(
+            availableReasoningModes = listOf(AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE)),
+        )
+
+        testee.commands.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private fun gatedExtended(requires: List<String>) = AvailableReasoningMode(
+        mode = ReasoningMode.EXTENDED_REASONING,
+        effort = ReasoningEffort.MEDIUM,
+        access = ReasoningEffortAccess(
+            effort = ReasoningEffort.MEDIUM,
+            accessTier = requires,
+            isAccessible = false,
+        ),
+    )
 }

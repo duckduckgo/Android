@@ -28,8 +28,13 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 data class ReasoningModeRow(
@@ -50,8 +55,25 @@ class ReasoningModePickerViewModel @Inject constructor(
     fun resolvedMode(state: ModelState): ReasoningMode? =
         ReasoningResolver.resolveMode(state.selectedReasoningMode, state.availableReasoningModes)
 
-    fun selectMode(mode: ReasoningMode) {
-        viewModelScope.launch { modelManager.selectReasoningMode(mode) }
+    private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val commands: Flow<UpsellCommand> = command.receiveAsFlow()
+
+    fun onModeTapped(mode: ReasoningMode, surface: PickerSurface) {
+        val available = modelManager.modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }
+        if (available == null) {
+            logcat { "Duck.ai reasoning picker: tapped mode $mode not in available list, ignoring." }
+            return
+        }
+        if (available.isAccessible) {
+            viewModelScope.launch { modelManager.selectReasoningMode(mode) }
+            return
+        }
+        val userTier = modelManager.modelState.value.userTier
+        val requiredTier = available.access?.requiredTier ?: run {
+            logcat { "Duck.ai reasoning picker: gated mode $mode has no public required tier, ignoring." }
+            return
+        }
+        routeUpsell(userTier, requiredTier, surface.origin)?.let { command.trySend(it) }
     }
 
     fun rows(state: ModelState): List<ReasoningModeRow> {

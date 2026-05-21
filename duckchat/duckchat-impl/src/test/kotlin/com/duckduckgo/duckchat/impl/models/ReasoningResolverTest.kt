@@ -172,4 +172,85 @@ class ReasoningResolverTest {
         assertNull(ReasoningMode.from("EXTENDED"))
         assertNull(ReasoningMode.from(null))
     }
+
+    // ---- per-effort access integration ----
+
+    @Test
+    fun whenEffortAccessMissingForSupportedEffortThenModeIsAccessibleByDefault() {
+        // No per-effort gating data → modes inherit model access, surfaced as `access=null` and `isAccessible=true`.
+        val result = ReasoningResolver.availableModes(supported = listOf(NONE, LOW), effortAccess = emptyList())
+        assertEquals(listOf(AvailableReasoningMode(FAST, NONE), AvailableReasoningMode(REASONING, LOW)), result)
+        assertEquals(true, result.all { it.isAccessible })
+    }
+
+    @Test
+    fun whenAllEffortsAccessibleThenAccessIsCarriedThroughAndModesAccessible() {
+        val access = listOf(
+            ReasoningEffortAccess(NONE, listOf("free", "plus", "pro"), isAccessible = true),
+            ReasoningEffortAccess(LOW, listOf("free", "plus", "pro"), isAccessible = true),
+        )
+        val result = ReasoningResolver.availableModes(listOf(NONE, LOW), access)
+        assertEquals(access[0], result[0].access)
+        assertEquals(true, result[0].isAccessible)
+        assertEquals(access[1], result[1].access)
+        assertEquals(true, result[1].isAccessible)
+    }
+
+    @Test
+    fun whenPreferredCandidateGatedAndFallbackAccessibleThenFallbackUsed() {
+        // EXTENDED_REASONING candidates = [HIGH, MEDIUM]. HIGH gated to PRO, MEDIUM accessible → MEDIUM chosen.
+        val access = listOf(
+            ReasoningEffortAccess(HIGH, listOf("pro"), isAccessible = false),
+            ReasoningEffortAccess(MEDIUM, listOf("free", "plus", "pro"), isAccessible = true),
+        )
+        val result = ReasoningResolver.availableModes(listOf(MEDIUM, HIGH), access)
+        val extended = result.single { it.mode == EXTENDED_REASONING }
+        assertEquals(MEDIUM, extended.effort)
+        assertEquals(true, extended.isAccessible)
+    }
+
+    @Test
+    fun whenAllCandidatesGatedThenFirstSupportedReturnedAsGatedRow() {
+        // Both candidates gated → preferred (HIGH) returned with its gated access entry; row shows for upsell.
+        val highAccess = ReasoningEffortAccess(HIGH, listOf("pro"), isAccessible = false)
+        val mediumAccess = ReasoningEffortAccess(MEDIUM, listOf("pro"), isAccessible = false)
+        val result = ReasoningResolver.availableModes(listOf(MEDIUM, HIGH), listOf(highAccess, mediumAccess))
+        val extended = result.single { it.mode == EXTENDED_REASONING }
+        assertEquals(HIGH, extended.effort)
+        assertEquals(highAccess, extended.access)
+        assertEquals(false, extended.isAccessible)
+    }
+
+    @Test
+    fun whenAllAvailableModesGatedThenResolveReturnsNull() {
+        // Model is accessible but every reasoning effort is gated to a higher tier → no fallback mode to auto-select.
+        val available = listOf(
+            AvailableReasoningMode(FAST, NONE, ReasoningEffortAccess(NONE, listOf("pro"), isAccessible = false)),
+            AvailableReasoningMode(REASONING, LOW, ReasoningEffortAccess(LOW, listOf("pro"), isAccessible = false)),
+        )
+        assertNull(ReasoningResolver.resolveMode(persisted = FAST, available = available))
+        assertNull(ReasoningResolver.resolveMode(persisted = null, available = available))
+    }
+
+    @Test
+    fun whenPersistedModeIsGatedAndOthersAccessibleThenResolveFallsBackToFirstAccessible() {
+        val available = listOf(
+            AvailableReasoningMode(FAST, NONE, ReasoningEffortAccess(NONE, listOf("pro"), isAccessible = false)),
+            AvailableReasoningMode(REASONING, LOW, ReasoningEffortAccess(LOW, listOf("free", "plus", "pro"), isAccessible = true)),
+        )
+        assertEquals(REASONING, ReasoningResolver.resolveMode(persisted = FAST, available = available))
+    }
+
+    @Test
+    fun whenSomeEffortsHaveAccessAndOthersDoNotThenMissingAreTreatedAsAccessible() {
+        // Only MEDIUM has gating data (Pro-only); LOW has none → REASONING accessible (inherits), EXTENDED gated.
+        val access = listOf(ReasoningEffortAccess(MEDIUM, listOf("pro"), isAccessible = false))
+        val result = ReasoningResolver.availableModes(listOf(LOW, MEDIUM), access)
+        val reasoning = result.single { it.mode == REASONING }
+        val extended = result.single { it.mode == EXTENDED_REASONING }
+        assertEquals(true, reasoning.isAccessible)
+        assertNull(reasoning.access)
+        assertEquals(false, extended.isAccessible)
+        assertEquals(access[0], extended.access)
+    }
 }
