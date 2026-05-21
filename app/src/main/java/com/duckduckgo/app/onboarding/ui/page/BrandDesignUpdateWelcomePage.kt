@@ -482,6 +482,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
+                                maxPageCount = state.maxPageCount,
                             )
                         }
                     }
@@ -492,6 +493,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             selectedAddressBarPosition = state.selectedAddressBarPosition,
                             showSplitOption = state.showSplitOption,
                             inputScreenSelected = state.inputScreenSelected,
+                            maxPageCount = state.maxPageCount,
                         )
                     }
                 }
@@ -632,6 +634,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
+        maxPageCount: Int,
     ) {
         context?.let {
             isAnimating = true
@@ -863,7 +866,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
-                    binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                     binding.daxDialogCta.stepIndicator.isVisible = true
                     binding.daxDialogCta.stepIndicator.alpha = 0f
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
@@ -995,6 +998,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
 
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
                     val transition = ChangeBounds().apply {
@@ -1109,6 +1113,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
 
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 2)
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
@@ -1262,6 +1267,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
+        maxPageCount: Int,
     ) {
         snapToIntroEndState()
 
@@ -1364,7 +1370,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1464,7 +1470,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 2)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 2)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1560,7 +1566,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 3)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 3)
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)

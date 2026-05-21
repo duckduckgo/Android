@@ -73,6 +73,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -96,6 +98,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
+    inputScreenOnboardingStateProvider: InputScreenOnboardingStateProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -103,13 +106,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val hasAnimatedCurrentDialog: Boolean = false,
         val currentDialog: PreOnboardingDialogType? = null,
         val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
+        val inputScreenOnboardingEnabled: Boolean = false,
         val inputScreenSelected: Boolean = true,
         val showSplitOption: Boolean = false,
         val isReinstallUser: Boolean = false,
         val inputScreenPreviewSearchSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewIsSearchSelected: Boolean = false,
-    )
+    ) {
+        val maxPageCount = if (inputScreenOnboardingEnabled) 3 else 2
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -117,16 +123,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var inputScreenOnboardingEnabled: Boolean? = null
-
-    private suspend fun resolveInputScreenOnboardingEnabled(): Boolean {
-        val cached = inputScreenOnboardingEnabled
-        if (cached != null) return cached
-        val value = withContext(dispatchers.io()) {
-            androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-        }
-        inputScreenOnboardingEnabled = value
-        return value
+    init {
+        inputScreenOnboardingStateProvider.isEnabled.onEach { isInputScreenOnboardingEnabled ->
+            _viewState.update { it.copy(inputScreenOnboardingEnabled = isInputScreenOnboardingEnabled) }
+        }.launchIn(viewModelScope)
     }
 
     sealed interface Command {
@@ -154,13 +154,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
         _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
         fireDialogShownPixel(dialogType)
-    }
-
-    private fun navigateToComparisonChart() {
-        viewModelScope.launch {
-            resolveInputScreenOnboardingEnabled()
-            setCurrentDialog(COMPARISON_CHART)
-        }
     }
 
     private fun setInputScreenPreviewDialog(isSearchDefault: Boolean) {
@@ -224,7 +217,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             INITIAL_REINSTALL_USER, INITIAL -> {
-                navigateToComparisonChart()
+                setCurrentDialog(COMPARISON_CHART)
             }
 
             COMPARISON_CHART -> {
@@ -279,7 +272,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                         }
                     }
-                    if (resolveInputScreenOnboardingEnabled()) {
+                    if (viewState.value.inputScreenOnboardingEnabled) {
                         setCurrentDialog(INPUT_SCREEN)
                     } else {
                         _commands.send(Command.Finish)
@@ -353,7 +346,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             }
 
             SKIP_ONBOARDING_OPTION -> {
-                navigateToComparisonChart()
+                setCurrentDialog(COMPARISON_CHART)
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
@@ -400,10 +393,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
-    }
-
-    fun getMaxPageCount(): Int {
-        return if (inputScreenOnboardingEnabled == true) 3 else 2
     }
 
     private suspend fun isAppReinstall(): Boolean =
