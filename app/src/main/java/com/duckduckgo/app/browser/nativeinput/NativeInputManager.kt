@@ -72,6 +72,12 @@ class NativeInputCallbacks(
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
     val onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
     val onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
+    /**
+     * Restore the autocomplete view state from the always-on cache the viewmodel keeps for
+     * the omnibar's text. Returns true when the cache matched [forQuery] and was applied;
+     * the caller uses the return value to decide whether to re-show the suggestions list.
+     */
+    val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
 )
 
 interface NativeInputManager {
@@ -120,6 +126,7 @@ class RealNativeInputManager @Inject constructor(
     private var isPickingImage: Boolean = false
     private var floatingSubmitContainer: View? = null
     private var widgetRoot: View? = null
+    private var lastCallbacks: NativeInputCallbacks? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -188,15 +195,25 @@ class RealNativeInputManager @Inject constructor(
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
 
+        // Reveal the browser behind the closing widget so the exit animation plays over the
+        // live page instead of the NTP background that showNtp swapped in.
+        if (omnibarController.isBrowserMode()) {
+            hideNtp()
+        }
+
+        // Roll the autocomplete cache back to the omnibar's text so in-widget typing is
+        // dismissed. Skip on navigation paths: submit/voice-result/etc. leave the cache to
+        // follow the destination, not the pre-submit omnibar state.
+        if (!isNavigation) {
+            lastCallbacks?.restoreOmnibarAutocomplete?.invoke(omnibarController.getText())
+        }
+
         if (!animate) {
             animator.cancelAnimation()
             isExiting = false
             omnibarController.restore()
             omnibarController.show()
             removeWidget()
-            if (omnibarController.isBrowserMode()) {
-                hideNtp()
-            }
             return !omnibarController.isDuckAiMode()
         }
 
@@ -247,16 +264,10 @@ class RealNativeInputManager @Inject constructor(
                 .withEndAction {
                     widgetCard.alpha = 1f
                     removeWidget()
-                    if (omnibarController.isBrowserMode()) {
-                        hideNtp()
-                    }
                 }
                 .start()
         } else {
             removeWidget()
-            if (omnibarController.isBrowserMode()) {
-                hideNtp()
-            }
         }
     }
 
@@ -333,6 +344,9 @@ class RealNativeInputManager @Inject constructor(
             omnibarController.forceToTop()
         }
         removeWidget()
+        // Assign after removeWidget — removeWidget clears lastCallbacks to drop references
+        // to the previous widget's closures.
+        lastCallbacks = callbacks
         if (omnibarController.isDuckAiMode()) {
             omnibarController.show()
             omnibarController.hideBackground()
@@ -342,10 +356,24 @@ class RealNativeInputManager @Inject constructor(
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, currentTabUrl, callbacks, isBottom)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
-            callbacks.onClearAutocomplete()
+            // Restore the cache before setting text — triggerAutocomplete preserves the
+            // current searchResults, so a stale cache (post-submit reset, or overwritten by
+            // a previous in-widget query) would otherwise flash the list empty.
+            val cacheRestored = callbacks.restoreOmnibarAutocomplete(prefillText)
             widgetFrom(widgetView)?.apply {
                 text = prefillText
                 selectAllText()
+            }
+            // hideNativeInput hid the list directly without touching autoCompleteViewState,
+            // so renderIfChanged skips re-showing on reopen. Surface it manually when the
+            // cache is for the current prefill; otherwise leave it hidden so a different
+            // query's stale items don't flash.
+            if (cacheRestored) {
+                rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList)?.let { list ->
+                    if ((list.adapter?.itemCount ?: 0) > 0) {
+                        list.show()
+                    }
+                }
             }
         }
         attachWidget(widgetView, isBottom, tabId)
@@ -456,6 +484,8 @@ class RealNativeInputManager @Inject constructor(
             floatingSubmitContainer = null
         }
         if (removed) widgetRoot = null
+        // Drop Fragment-scoped callback closures so they don't outlive the widget.
+        lastCallbacks = null
         return removed
     }
 

@@ -240,6 +240,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
@@ -605,6 +606,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val voiceSessionEndTriggerFlow = MutableSharedFlow<String>(extraBufferCapacity = 8)
+    private val nativeInputUserSettingFlow = MutableStateFlow(false)
     private val mockDuckChat: DuckChat = mock {
         on { observeTriggerVoiceChatSessionEnd() } doReturn voiceSessionEndTriggerFlow
     }
@@ -831,6 +833,7 @@ class BrowserTabViewModelTest {
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
             whenever(mockDuckChat.isChatHistoryAvailable()).thenReturn(false)
+            whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputUserSettingFlow)
             whenever(mockQueryUrlPredictor.isReady()).thenReturn(true)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
@@ -2091,6 +2094,123 @@ class BrowserTabViewModelTest {
             encodedParameters = any(),
             type = any(),
         )
+    }
+
+    @Test
+    fun whenRestoreOmnibarAutocompleteAndCacheEmptyThenReturnsNull() = runTest {
+        // Default state: native input flag is false, cache initial value is empty.
+        assertNull(testee.restoreOmnibarAutocomplete("foo"))
+    }
+
+    @Test
+    fun whenRestoreOmnibarAutocompleteAndQueryDoesNotMatchCacheThenReturnsNull() = runTest {
+        primeOmnibarAutocompleteCacheForQuery()
+        delay(500)
+        // Cache populated for "query"; ask for a different query.
+        assertNull(testee.restoreOmnibarAutocomplete("different"))
+    }
+
+    @Test
+    fun whenRestoreOmnibarAutocompleteAndCacheMatchesThenRestoresAndUpdatesViewState() = runTest {
+        primeOmnibarAutocompleteCacheForQuery()
+        delay(500)
+
+        // Pretend the in-widget query changed the view state so we can prove the restore overwrote it.
+        testee.autoCompleteViewState.value =
+            autoCompleteViewState().copy(
+                searchResults = AutoCompleteResult("widget-query", emptyList()),
+                showSuggestions = true,
+                showFocusedView = true,
+            )
+
+        val result = testee.restoreOmnibarAutocomplete("query")
+
+        assertNotNull(result)
+        assertEquals("query", result!!.query)
+        assertTrue(result.suggestions.isNotEmpty())
+        assertEquals("query", autoCompleteViewState().searchResults.query)
+        assertFalse(autoCompleteViewState().showSuggestions)
+        assertFalse(autoCompleteViewState().showFocusedView)
+    }
+
+    @Test
+    fun whenRestoreOmnibarAutocompleteThenLastAutoCompleteStateUpdatedSoSubsequentGonePixelReflectsRestoredSuggestions() = runTest {
+        primeOmnibarAutocompleteCacheForQuery()
+        delay(500)
+
+        // Overwrite lastAutoCompleteState with empty suggestions (simulating in-widget typing that
+        // produced no results) so we can prove the restore re-populates it.
+        testee.autoCompleteViewState.value =
+            autoCompleteViewState().copy(searchResults = AutoCompleteResult("widget-query", emptyList()))
+        assertNotNull(testee.restoreOmnibarAutocomplete("query"))
+
+        testee.autoCompleteSuggestionsGone()
+
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+        verify(mockPixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun whenNativeInputDisabledThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
+        nativeInputUserSettingFlow.value = false
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
+        )
+
+        testee.onOmnibarTextRendered("query")
+        delay(500)
+
+        assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenAutoCompleteSettingDisabledThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
+        nativeInputUserSettingFlow.value = true
+        doReturn(false).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+
+        testee.onOmnibarTextRendered("query")
+        delay(500)
+
+        assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenOmnibarTextRenderedWithBlankThenOmnibarAutocompleteCacheStaysEmpty() = runTest {
+        nativeInputUserSettingFlow.value = true
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+
+        testee.onOmnibarTextRendered("   ")
+        delay(500)
+
+        assertTrue(testee.omnibarAutocompleteCache.value.suggestions.isEmpty())
+    }
+
+    /**
+     * Common setup mirroring [wheneverAutoCompleteIsGoneAndSuggestionsIsNotEmptyFireAutocompleteDisplayed]'s
+     * sources so the AutoCompleteApi produces a non-empty result for "query", then triggers the cache pipeline.
+     * Caller still needs to wait for the debounce.
+     */
+    private fun primeOmnibarAutocompleteCacheForQuery() {
+        nativeInputUserSettingFlow.value = true
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(listOf(Bookmark("abc", "query", "https://example.com", lastModified = null))),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(listOf(Favorite("abc", "query", "https://example.com", position = 1, lastModified = null))),
+        )
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(listOf(VisitedPage("https://foo.com".toUri(), "query", listOf(LocalDateTime.now())))),
+        )
+        whenever(mockTabRepository.flowTabs).thenReturn(
+            flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "query"))),
+        )
+        whenever(mockAutoCompleteScorer.score("query", "https://foo.com".toUri(), 1, "query")).thenReturn(1)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+
+        testee.onOmnibarTextRendered("query")
     }
 
     @Test
