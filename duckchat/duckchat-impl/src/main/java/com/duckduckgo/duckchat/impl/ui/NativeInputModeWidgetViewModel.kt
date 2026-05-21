@@ -52,7 +52,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.subscriptions.api.Product
@@ -144,9 +143,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun getSelectedModelId(): String? {
         if (!_modelPickerEnabled.value) return null
-        return _plugins.value.firstNotNullOfOrNull { plugin ->
-            (plugin.getPromptContribution() as? PromptContribution.ModelSelection)?.modelId
-        }
+        return modelManager.getSelectedModelId()
     }
 
     fun getResolvedReasoningEffort(): String? = modelManager.getResolvedReasoningEffort()
