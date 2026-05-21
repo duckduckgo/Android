@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
@@ -48,6 +49,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.duckduckgo.common.ui.compose.cards.DaxCard
 import com.duckduckgo.common.ui.compose.cards.DaxSurface
+import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.message.DaxAction
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigSingleActionMessage
 import com.duckduckgo.common.ui.compose.message.remote.DaxBigTwoActionsMessage
@@ -56,6 +58,7 @@ import com.duckduckgo.common.ui.compose.message.remote.DaxPromoSingleActionMessa
 import com.duckduckgo.common.ui.compose.message.remote.DaxSmallMessage
 import com.duckduckgo.common.ui.compose.radiobutton.DaxRadioButton
 import com.duckduckgo.common.ui.compose.switch.DaxSwitch
+import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.MessageCta
@@ -150,8 +153,60 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
-    class CheckboxComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
+    class CheckboxComponentViewHolder(
+        parent: ViewGroup,
+        private val isDarkTheme: Boolean,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_checkbox)) {
+        override fun bind(component: Component) {
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_one, isDarkTheme = isDarkTheme) {
+                var isChecked by remember { mutableStateOf(false) }
+
+                DaxCheckbox(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_two, isDarkTheme = isDarkTheme) {
+                var isChecked by remember { mutableStateOf(true) }
+
+                DaxCheckbox(
+                    checked = isChecked,
+                    onCheckedChange = { enabled ->
+                        isChecked = enabled
+                    },
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_three, isDarkTheme = isDarkTheme) {
+                DaxCheckbox(
+                    checked = false,
+                    enabled = false,
+                    onCheckedChange = {},
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_four, isDarkTheme = isDarkTheme) {
+                DaxCheckbox(
+                    checked = true,
+                    enabled = false,
+                    onCheckedChange = {},
+                )
+            }
+            view.setupThemedComposeView(id = R.id.compose_dax_checkbox_five, isDarkTheme = isDarkTheme) {
+                var isChecked by remember { mutableStateOf(false) }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    DaxCheckbox(
+                        checked = isChecked,
+                        onCheckedChange = { enabled ->
+                            isChecked = enabled
+                        },
+                    )
+                    DaxText(text = stringResource(CommonR.string.text_dialog_checkbox))
+                }
+            }
+        }
+    }
 
     class SliderComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_slider))
@@ -626,7 +681,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
                 Component.SWITCH -> SwitchComponentViewHolder(parent, isDarkTheme)
                 Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent, isDarkTheme)
-                Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
+                Component.CHECKBOX -> CheckboxComponentViewHolder(parent, isDarkTheme)
                 Component.SLIDER -> SliderComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
