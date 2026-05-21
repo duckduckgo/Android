@@ -68,12 +68,7 @@ class RealChatHistoryRepository @Inject constructor(
 
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
         withContext(dispatchers.io()) {
-            val updated = chatStore.renameChat(chatId, newTitle)
-            if (updated) {
-                duckChatSyncRepository.recordSingleChatUpdate(chatId)
-                syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-            }
-            updated
+            chatStore.renameChat(chatId, newTitle)
         }
 
     override suspend fun setPinned(chatId: String, pinned: Boolean) {

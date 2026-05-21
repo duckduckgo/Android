@@ -264,7 +264,7 @@ class DuckChatSyncDataManagerTest {
     }
 
     @Test
-    fun whenGetChangesAndPendingUpdatesExistThenReturnsRequestWithEncryptedTitle() = runTest {
+    fun whenGetChangesAndPendingUpdatesExistThenReturnsRequestWithoutTitle() = runTest {
         duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
         whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
@@ -278,8 +278,9 @@ class DuckChatSyncDataManagerTest {
         assertFalse(result.isEmpty())
         assertEquals(SyncableType.DUCK_AI_CHATS, result.type)
         assertTrue(result.jsonString.contains("chat1"))
-        assertTrue(result.jsonString.contains("ENC:Hello"))
         assertTrue(result.jsonString.contains("\"pinned\":\"pinned\""))
+        // Title is intentionally omitted until JWE encryption lands on native.
+        assertFalse(result.jsonString.contains("\"title\""))
     }
 
     @Test
@@ -340,7 +341,8 @@ class DuckChatSyncDataManagerTest {
         assertTrue(result.jsonString.contains("delMe"))
         assertTrue(result.jsonString.contains("\"deleted\":\"true\""))
         assertTrue(result.jsonString.contains("renameMe"))
-        assertTrue(result.jsonString.contains("ENC:New name"))
+        // Title is intentionally omitted from update entries until JWE encryption lands on native.
+        assertFalse(result.jsonString.contains("\"title\""))
     }
 
     @Test

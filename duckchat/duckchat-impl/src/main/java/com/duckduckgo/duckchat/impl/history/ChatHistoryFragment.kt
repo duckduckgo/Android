@@ -57,6 +57,9 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var chatHistoryReader: ChatHistoryReader
+
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[ChatHistoryViewModel::class.java]
@@ -76,6 +79,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 viewModel.isSelectMode() -> viewModel.onSelectModeCancelled()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewLifecycleOwner.lifecycleScope.launch { chatHistoryReader.refresh() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

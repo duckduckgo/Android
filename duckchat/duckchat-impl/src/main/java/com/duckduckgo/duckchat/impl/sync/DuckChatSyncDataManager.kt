@@ -219,8 +219,7 @@ class DuckChatSyncDataManager @Inject constructor(
                         put("id", chat.chatId)
                         put("client_last_modified", now)
                         put("edit_timestamp", now)
-                        put("title", syncCrypto.encrypt(chat.title))
-                        // FE wire format: "pinned" when set, JSON null when unset (not boolean).
+                        // Title is omitted until JWE encryption lands on native.
                         put("pinned", if (chat.pinned) "pinned" else org.json.JSONObject.NULL)
                     },
                 )
