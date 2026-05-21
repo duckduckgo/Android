@@ -30,12 +30,14 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
     private val searchMetricPixelsPlugin: SearchMetricPixelsPlugin,
     private val appUseMetricPixelsPlugin: AppUseMetricPixelsPlugin,
     private val duckAiPromptSentMetricPixelsPlugin: DuckAiPromptSentMetricPixelsPlugin,
+    private val onboardingQuickSetupSearchMetricsPixelsPlugin: OnboardingQuickSetupSearchMetricsPixelsPlugin,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AtbLifecyclePlugin {
 
     override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
         appCoroutineScope.launch {
             searchMetricPixelsPlugin.getMetrics().forEach { it.send() }
+            onboardingQuickSetupSearchMetricsPixelsPlugin.getMetrics().forEach { it.send() }
         }
     }
 
