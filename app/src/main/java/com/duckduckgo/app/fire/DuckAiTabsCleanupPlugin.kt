@@ -22,6 +22,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.squareup.anvil.annotations.ContributesMultibinding
 import logcat.logcat
 import javax.inject.Inject
@@ -60,10 +61,10 @@ class DuckAiTabsCleanupPlugin @Inject constructor(
      */
     private suspend fun closeTabsMatching(chatUrls: Set<String>) {
         if (chatUrls.isEmpty()) return
-        val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { duckChat.chatIdOrNull(it.toUri()) }
+        val targetChatIds = chatUrls.mapNotNullTo(mutableSetOf()) { it.toUri().toChatIdOrNull(duckChat) }
         if (targetChatIds.isEmpty()) return
         val ids = tabRepository.getTabs()
-            .filter { tab -> tab.url?.toUri()?.let(duckChat::chatIdOrNull) in targetChatIds }
+            .filter { tab -> tab.url?.toUri()?.toChatIdOrNull(duckChat) in targetChatIds }
             .map { it.tabId }
         if (ids.isNotEmpty()) {
             logcat { "Closing ${ids.size} Duck.ai tab(s) matching the cleared subset" }

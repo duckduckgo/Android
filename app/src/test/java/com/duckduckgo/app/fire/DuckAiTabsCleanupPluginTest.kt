@@ -91,9 +91,9 @@ class DuckAiTabsCleanupPluginTest {
         val unrelatedDuckAiTab = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=zzz")
         val browserTab = TabEntity(tabId = "tab3", url = "https://example.com")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(matchingTab, unrelatedDuckAiTab, browserTab))
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=abc".toUri()))).thenReturn("abc")
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=zzz".toUri()))).thenReturn("zzz")
-        whenever(mockDuckChat.chatIdOrNull(eq("https://example.com".toUri()))).thenReturn(null)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=abc".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=zzz".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
 
@@ -106,9 +106,9 @@ class DuckAiTabsCleanupPluginTest {
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=b")
         val t3 = TabEntity(tabId = "tab3", url = "https://example.com")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=a".toUri()))).thenReturn("a")
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=b".toUri()))).thenReturn("b")
-        whenever(mockDuckChat.chatIdOrNull(eq("https://example.com".toUri()))).thenReturn(null)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=a".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://duck.ai?chatID=b".toUri()))).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(eq("https://example.com".toUri()))).thenReturn(false)
 
         testee.onClearData(
             setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b"))),
@@ -121,8 +121,7 @@ class DuckAiTabsCleanupPluginTest {
     fun `DuckChats Selected with no matching tab does not call deleteTabs`() = runTest {
         val unrelated = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=other")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(unrelated))
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=other".toUri()))).thenReturn("other")
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai?chatID=abc".toUri()))).thenReturn("abc")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
 
@@ -135,7 +134,7 @@ class DuckAiTabsCleanupPluginTest {
         val t2 = TabEntity(tabId = "tab2", url = "https://duck.ai?chatID=abc")
         val t3 = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(t1, t2, t3))
-        whenever(mockDuckChat.chatIdOrNull(any())).thenReturn("abc")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
 
@@ -151,7 +150,7 @@ class DuckAiTabsCleanupPluginTest {
         val withExtraParams = TabEntity(tabId = "tab3", url = "https://duck.ai?chatID=abc&model=gpt&session=xyz")
         val withFragment = TabEntity(tabId = "tab4", url = "https://duck.ai?chatID=abc#message-5")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(original, withPath, withExtraParams, withFragment))
-        whenever(mockDuckChat.chatIdOrNull(any())).thenReturn("abc")
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=abc"))))
 
@@ -162,7 +161,7 @@ class DuckAiTabsCleanupPluginTest {
     fun `Selected url with no chatID query param is a no-op`() = runTest {
         val anyTab = TabEntity(tabId = "tab1", url = "https://duck.ai?chatID=abc")
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(anyTab))
-        whenever(mockDuckChat.chatIdOrNull(eq("https://duck.ai".toUri()))).thenReturn(null)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai"))))
 

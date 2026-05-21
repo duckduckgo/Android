@@ -72,40 +72,40 @@ class RealNativeInputManagerTest {
 
     @Test
     fun whenUrlIsNotDuckAiThenIsExistingDuckAiChatFalse() {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(false)
 
         assertFalse(testee.isExistingDuckAiChat("https://example.com/?chatID=abcd"))
     }
 
     @Test
     fun whenDuckAiUrlWithoutChatIdThenIsExistingDuckAiChatFalse() {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
 
         assertFalse(testee.isExistingDuckAiChat("https://duck.ai/"))
     }
 
     @Test
     fun whenDuckAiUrlWithBlankChatIdThenIsExistingDuckAiChatFalse() {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
 
         assertFalse(testee.isExistingDuckAiChat("https://duck.ai/?chatID="))
     }
 
     @Test
     fun whenDuckAiUrlWithChatIdThenIsExistingDuckAiChatTrue() {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn("abc-123")
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
 
         assertTrue(testee.isExistingDuckAiChat("https://duck.ai/?chatID=abc-123"))
     }
 
     @Test
     fun whenIsDuckChatUrlChecksParsedUriThenCheckedWithSameUri() {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn("xyz")
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         val raw = "https://duck.ai/chat?chatID=xyz"
 
         testee.isExistingDuckAiChat(raw)
 
-        verify(duckChat).chatIdOrNull(Uri.parse(raw))
+        verify(duckChat).isDuckChatUrl(Uri.parse(raw))
     }
 
     @Test

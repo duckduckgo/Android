@@ -22,6 +22,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -74,7 +75,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
         if (chatUrls.isEmpty()) return
         var anyDeleted = false
         chatUrls.forEach { chatUrl ->
-            val chatId = duckChat.chatIdOrNull(chatUrl.toUri()) ?: return@forEach
+            val chatId = chatUrl.toUri().toChatIdOrNull(duckChat) ?: return@forEach
             if (duckChatDeleter.deleteChat(chatId)) {
                 duckChatSyncRepository.recordSingleChatDeletion(chatId)
                 anyDeleted = true

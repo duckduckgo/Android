@@ -66,11 +66,6 @@ class FakeDuckChat(
         return uri.toString().contains("duckchat")
     }
 
-    override fun chatIdOrNull(uri: Uri): String? {
-        if (!isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
-    }
-
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
     }

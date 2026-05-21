@@ -201,11 +201,6 @@ class FakeDuckChatInternal(
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
-    override fun chatIdOrNull(uri: Uri): String? {
-        if (!isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
-    }
-
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

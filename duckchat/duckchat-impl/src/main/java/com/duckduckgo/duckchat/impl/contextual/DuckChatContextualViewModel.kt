@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -667,7 +668,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private fun extractChatId(url: String?): String? {
         val uri = url?.toUri() ?: return null
-        return duckChat.chatIdOrNull(uri)
+        return uri.toChatIdOrNull(duckChat)
     }
 
     // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).

@@ -110,7 +110,7 @@ class DuckChatDataClearingPluginTest {
     @Test
     fun `Selected with one chat extracts chatId and deletes`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=abc-123"
-        whenever(duckChat.chatIdOrNull(Uri.parse(chatUrl))).thenReturn("abc-123")
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(true)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
@@ -123,7 +123,7 @@ class DuckChatDataClearingPluginTest {
     @Test
     fun `Selected with one chat does nothing when url is not a duck chat url`() = runTest {
         val chatUrl = "https://example.com/?chatID=abc-123"
-        whenever(duckChat.chatIdOrNull(Uri.parse(chatUrl))).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(false)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
@@ -134,7 +134,7 @@ class DuckChatDataClearingPluginTest {
     @Test
     fun `Selected with one chat does nothing when chatId is missing`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat"
-        whenever(duckChat.chatIdOrNull(Uri.parse(chatUrl))).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
 
@@ -145,7 +145,7 @@ class DuckChatDataClearingPluginTest {
     @Test
     fun `Selected with one chat does not record sync when deletion fails`() = runTest {
         val chatUrl = "https://duckduckgo.com/?ia=chat&chatID=abc-123"
-        whenever(duckChat.chatIdOrNull(Uri.parse(chatUrl))).thenReturn("abc-123")
+        whenever(duckChat.isDuckChatUrl(Uri.parse(chatUrl))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("abc-123")).thenReturn(false)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf(chatUrl))))
@@ -157,8 +157,8 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn("alpha")
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn("beta")
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
 
@@ -176,7 +176,7 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `Selected does not call deleteAllChats`() = runTest {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn("x")
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
@@ -203,8 +203,8 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `DuckChats Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn("alpha")
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn("beta")
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("beta")).thenReturn(true)
 
@@ -222,7 +222,7 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `DuckChats Selected does not call deleteAllChats`() = runTest {
-        whenever(duckChat.chatIdOrNull(any())).thenReturn("x")
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChatDeleter.deleteChat(any())).thenReturn(true)
 
         plugin.onClearData(setOf(ClearableData.DuckChats.Selected(setOf("https://duck.ai?chatID=x"))))
@@ -241,8 +241,8 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `DuckChats Selected skips urls that are not duck chat urls`() = runTest {
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn("alpha")
-        whenever(duckChat.chatIdOrNull(eq(Uri.parse("https://example.com")))).thenReturn(null)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
+        whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://example.com")))).thenReturn(false)
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)
 
         plugin.onClearData(
