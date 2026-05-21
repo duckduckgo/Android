@@ -50,6 +50,6 @@ class RealAdBlockingExtensionRepository @Inject constructor(
 
     override fun scriptletsFlow(): Flow<List<Scriptlet>> =
         dao.scriptletsFlow().map { rows ->
-            rows.map { row -> Scriptlet(name = row.name, content = String(row.content)) }
+            rows.map { row -> Scriptlet(name = row.name, content = String(row.content, Charsets.UTF_8)) }
         }
 }
