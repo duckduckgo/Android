@@ -90,8 +90,6 @@ class AttachmentView(
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
 
-    fun setDuckAiMode(enabled: Boolean) = viewModel?.setDuckAiMode(enabled)
-
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
         return ImageView(context).apply {

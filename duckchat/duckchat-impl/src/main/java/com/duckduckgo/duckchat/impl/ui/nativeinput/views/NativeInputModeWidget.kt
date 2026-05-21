@@ -241,7 +241,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
-    private var pendingIsDuckAiMode: Boolean = false
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -325,7 +324,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.bind(scope, viewModelFactory)
-            pluginView.setDuckAiMode(pendingIsDuckAiMode)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -837,22 +835,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
         activeTabId = tabId
-        pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom)
             if (isDuckAiMode) selectChatTab()
-            attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
 
     override fun configureContextual(tabId: String) {
         activeTabId = tabId
-        pendingIsDuckAiMode = true
         isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
             selectChatTab()
-            attachmentView?.setDuckAiMode(true)
         }
     }
 
