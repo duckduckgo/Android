@@ -18,8 +18,7 @@ package com.duckduckgo.adblocking.impl
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -41,19 +40,11 @@ import org.mockito.kotlin.verify
 @RunWith(AndroidJUnit4::class)
 class AdBlockingExtensionJsInjectorPluginTest {
 
-    private var discoverableEnabled = true
-    private var operationalEnabled = true
+    private var canInject = true
     private val scriptletsFlow = MutableStateFlow<List<Scriptlet>>(emptyList())
 
-    private val isDiscoverableToggle: Toggle = mock {
-        on { isEnabled() } doAnswer { discoverableEnabled }
-    }
-    private val selfToggle: Toggle = mock {
-        on { isEnabled() } doAnswer { operationalEnabled }
-    }
-    private val feature: AdBlockingExtensionFeature = mock {
-        on { isDiscoverable() } doReturn isDiscoverableToggle
-        on { self() } doReturn selfToggle
+    private val statusChecker: AdBlockingStatusChecker = mock {
+        on { canInject() } doAnswer { canInject }
     }
     private val repository: AdBlockingExtensionRepository = mock {
         on { scriptletsFlow() } doReturn scriptletsFlow
@@ -69,7 +60,7 @@ class AdBlockingExtensionJsInjectorPluginTest {
 
     private val plugin by lazy {
         AdBlockingExtensionJsInjectorPlugin(
-            feature = feature,
+            statusChecker = statusChecker,
             repository = repository,
             appScope = testScope,
         )
@@ -141,18 +132,8 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
-    fun whenKillSwitchIsOffThenScriptIsNotInjected() {
-        discoverableEnabled = false
-        scriptletsFlow.value = singleScriptlet
-
-        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
-
-        verify(webView, never()).evaluateJavascript(any(), isNull())
-    }
-
-    @Test
-    fun whenOperationalIsOffThenScriptIsNotInjected() {
-        operationalEnabled = false
+    fun whenStatusCheckerRejectsThenScriptIsNotInjected() {
+        canInject = false
         scriptletsFlow.value = singleScriptlet
 
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
@@ -202,22 +183,11 @@ class AdBlockingExtensionJsInjectorPluginTest {
     }
 
     @Test
-    fun whenKillSwitchFlipsOffMidSessionThenNextInjectionNoOps() {
+    fun whenStatusCheckerStartsRejectingMidSessionThenNextInjectionNoOps() {
         scriptletsFlow.value = singleScriptlet
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
-        discoverableEnabled = false
-        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
-
-        verify(webView).evaluateJavascript(any(), isNull())
-    }
-
-    @Test
-    fun whenOperationalFlipsOffMidSessionThenNextInjectionNoOps() {
-        scriptletsFlow.value = singleScriptlet
-        plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
-
-        operationalEnabled = false
+        canInject = false
         plugin.onPageStarted(webView, url = "https://youtube.com/page", isDesktopMode = null)
 
         verify(webView).evaluateJavascript(any(), isNull())

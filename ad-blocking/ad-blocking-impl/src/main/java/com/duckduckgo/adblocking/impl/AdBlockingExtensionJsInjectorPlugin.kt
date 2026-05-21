@@ -19,7 +19,7 @@ package com.duckduckgo.adblocking.impl
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.core.net.toUri
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -40,7 +40,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
-    private val feature: AdBlockingExtensionFeature,
+    private val statusChecker: AdBlockingStatusChecker,
     repository: AdBlockingExtensionRepository,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
@@ -57,12 +57,8 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        if (!feature.isDiscoverable().isEnabled()) {
-            logcat { "Feature not discoverable, skipping" }
-            return
-        }
-        if (!feature.self().isEnabled()) {
-            logcat { "Feature not operational, skipping" }
+        if (!statusChecker.canInject()) {
+            logcat { "Status checker rejected injection, skipping" }
             return
         }
         val uri = url?.toUri() ?: return
