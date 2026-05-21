@@ -93,4 +93,16 @@ class RealAdBlockingStatusCheckerTest {
 
         assertFalse(checker.canInject())
     }
+
+    @Test
+    fun whenDiscoverableFlagEnabledThenIsShownInSettings() {
+        assertTrue(checker.isShownInSettings())
+    }
+
+    @Test
+    fun whenDiscoverableFlagDisabledThenIsNotShownInSettings() {
+        discoverableEnabled = false
+
+        assertFalse(checker.isShownInSettings())
+    }
 }

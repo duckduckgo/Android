@@ -31,6 +31,7 @@ import javax.inject.Inject
 
 interface AdBlockingStatusChecker {
     fun canInject(): Boolean
+    fun isShownInSettings(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -59,4 +60,6 @@ class RealAdBlockingStatusChecker @Inject constructor(
         }
         return true
     }
+
+    override fun isShownInSettings(): Boolean = feature.isDiscoverable().isEnabled()
 }

@@ -19,7 +19,7 @@ package com.duckduckgo.adblocking.impl.ui
 import android.content.Context
 import android.view.View
 import com.duckduckgo.adblocking.impl.R
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.di.scopes.ActivityScope
@@ -33,11 +33,11 @@ import com.duckduckgo.mobile.android.R as CommonR
 @PriorityKey(150)
 class AdBlockingSettingsEntry @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
-    private val feature: AdBlockingExtensionFeature,
+    private val statusChecker: AdBlockingStatusChecker,
 ) : AdBlockingSettingsPlugin {
 
     override fun getView(context: Context): View {
-        if (!feature.isDiscoverable().isEnabled()) {
+        if (!statusChecker.isShownInSettings()) {
             return View(context).apply { visibility = View.GONE }
         }
         return OneLineListItem(context).apply {
