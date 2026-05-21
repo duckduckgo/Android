@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import com.duckduckgo.duckchat.impl.models.UserTier
+import logcat.logcat
 
 enum class PickerSurface(val origin: String) {
     MODEL_PICKER_ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
@@ -42,5 +43,12 @@ internal fun routeUpsell(
     requiredTier == UserTier.FREE -> null
     userTier == UserTier.FREE -> UpsellCommand.LaunchPurchase(origin)
     userTier == UserTier.PLUS && requiredTier == UserTier.PRO -> UpsellCommand.LaunchUpgrade(origin)
-    else -> null
+    else -> {
+        // Only reachable on data inconsistency. The user already covers the required tier so the
+        // upsell shouldn't have been requested. Logging a breadcrumb for tracking.
+        logcat(tag = "PickerUpsell") {
+            "Duck.ai upsell: no native subscription flow for tap (userTier=$userTier, requiredTier=$requiredTier, origin=$origin)"
+        }
+        null
+    }
 }
