@@ -110,7 +110,7 @@
     <string name="duck_ai_chat_history_pin_snackbar">Chat pinned</string>
     <string name="duck_ai_chat_history_unpin_snackbar">Chat unpinned</string>
     <string name="duck_ai_chat_history_undo">Undo</string>
-    <string name="duck_ai_chat_history_download_complete">Download complete for %1$s</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \'My Chat.txt\').">Download complete for %1$s</string>
     <string name="duck_ai_chat_history_download_view">Show</string>
     <string name="duck_ai_chat_history_download_error">Couldn\'t export chat</string>
 </resources>
