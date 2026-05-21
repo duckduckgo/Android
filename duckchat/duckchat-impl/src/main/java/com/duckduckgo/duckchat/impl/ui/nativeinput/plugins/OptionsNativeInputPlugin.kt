@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.OptionsView
 import javax.inject.Inject
 
@@ -38,6 +37,4 @@ class OptionsNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override val containerId: Int = R.id.optionsButtonContainer
 
     override fun createView(context: Context, host: NativeInputHost): View = OptionsView(context, host)
-
-    override fun getPromptContribution(): PromptContribution? = null
 }
