@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.duckduckgo.common.ui.compose.checkbox
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,7 +23,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -52,21 +59,25 @@ fun DaxCheckbox(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
 ) {
-    Checkbox(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        modifier = modifier.alpha(if (enabled) 1f else DaxCheckboxDefaults.disabledAlpha),
-        enabled = enabled,
-        interactionSource = interactionSource,
-        colors = CheckboxDefaults.colors(
-            checkedColor = DaxCheckboxDefaults.colors.boxOn,
-            uncheckedColor = DaxCheckboxDefaults.colors.boxOff,
-            checkmarkColor = DaxCheckboxDefaults.colors.mark,
-            disabledCheckedColor = DaxCheckboxDefaults.colors.boxOn,
-            disabledUncheckedColor = DaxCheckboxDefaults.colors.boxOff,
-            disabledIndeterminateColor = DaxCheckboxDefaults.colors.boxOn,
-        ),
-    )
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides DaxCheckboxDefaults.rippleConfiguration(checked),
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = modifier.alpha(if (enabled) 1f else DaxCheckboxDefaults.disabledAlpha),
+            enabled = enabled,
+            interactionSource = interactionSource,
+            colors = CheckboxDefaults.colors(
+                checkedColor = DaxCheckboxDefaults.colors.boxOn,
+                uncheckedColor = DaxCheckboxDefaults.colors.boxOff,
+                checkmarkColor = DaxCheckboxDefaults.colors.mark,
+                disabledCheckedColor = DaxCheckboxDefaults.colors.boxOn,
+                disabledUncheckedColor = DaxCheckboxDefaults.colors.boxOff,
+                disabledIndeterminateColor = DaxCheckboxDefaults.colors.boxOn,
+            ),
+        )
+    }
 }
 
 private object DaxCheckboxDefaults {
@@ -80,6 +91,14 @@ private object DaxCheckboxDefaults {
             boxOff = DuckDuckGoTheme.colors.system.checkboxOff,
             mark = DuckDuckGoTheme.colors.system.checkboxMark,
         )
+
+    @Composable
+    fun rippleConfiguration(checked: Boolean): RippleConfiguration {
+        val accentBlue = DuckDuckGoTheme.colors.brand.accentBlue
+        return remember(checked, accentBlue) {
+            if (checked) RippleConfiguration(color = accentBlue) else RippleConfiguration()
+        }
+    }
 }
 
 private data class DaxCheckboxColors(
