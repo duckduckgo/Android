@@ -493,16 +493,18 @@ class RealNativeInputManager @Inject constructor(
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
+            // Per-tab chatId (null on new chats) published into NativeInputState for
+            // consumers (reasoning picker, submission) to resolve per-chat state.
+            val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
+            // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
+            bindModelPickerEnabledSource(chatIdFlow.map { it == null })
+            bindChatIdSource(chatIdFlow)
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
-        // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
-        widgetFrom(widgetView)?.bindModelPickerEnabledSource(
-            currentTabUrl.map { !isExistingDuckAiChat(it) },
-        )
     }
 
     private fun bindVoiceButtons(
@@ -745,11 +747,14 @@ class RealNativeInputManager @Inject constructor(
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */
-    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean {
-        if (rawUrl.isNullOrBlank()) return false
-        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return false
-        if (!duckChat.isDuckChatUrl(uri)) return false
-        return !uri.getQueryParameter("chatID").isNullOrBlank()
+    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean = extractDuckAiChatId(rawUrl) != null
+
+    /** Returns the `chatID` query param if [rawUrl] is a Duck.ai chat URL, else `null`. */
+    internal fun extractDuckAiChatId(rawUrl: String?): String? {
+        if (rawUrl.isNullOrBlank()) return null
+        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
+        if (!duckChat.isDuckChatUrl(uri)) return null
+        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
     }
 
     companion object {

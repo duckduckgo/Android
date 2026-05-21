@@ -22,6 +22,8 @@ data class NativeInputState(
     val inputPosition: InputPosition = InputPosition.TOP,
     val toggleSelection: ToggleSelection = defaultToggleFor(inputContext),
     val selectedTool: String? = null,
+    /** Set when the active tab is a Duck.ai page already attached to an existing chat. */
+    val chatId: String? = null,
 ) {
     enum class InputMode {
         SEARCH_AND_DUCK_AI,

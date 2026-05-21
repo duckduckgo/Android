@@ -817,6 +817,49 @@ class NativeInputModeWidgetViewModelTest {
 
     // endregion
 
+    // region setActiveChatId
+
+    @Test
+    fun whenSetActiveChatIdThenPublisherUpdatesChatIdForActiveTab() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        assertEquals("chat-123", nativeInputStateProvider.stateForTab(tabId).value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdWithNullThenPublisherClearsChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        testee.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab(tabId).value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdBeforeConfigureThenChatIdIsBufferedAndPublishedOnConfigure() = runTest {
+        // Regression for the attach race: bindChatIdSource can fire setActiveChatId synchronously
+        // during widget attach, before configure() sets activeTabId.value. The buffered value must
+        // be replayed once a tabId becomes available.
+        val freshViewModel = createViewModel()
+
+        freshViewModel.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        freshViewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
+    }
+
+    // endregion
+
     // region fireChatHistorySelectedPixel
 
     @Test
