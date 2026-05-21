@@ -19,6 +19,7 @@ package com.duckduckgo.adblocking.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
+import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,6 +35,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AdBlockingSettingsViewModel @Inject constructor(
+    private val statusChecker: AdBlockingStatusChecker,
     private val repository: AdBlockingSettingsRepository,
 ) : ViewModel() {
 
@@ -44,7 +46,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         data object OpenDuckPlayerSettings : Command()
     }
 
-    val viewState: StateFlow<ViewState> = repository.isEnabledFlow()
+    val viewState: StateFlow<ViewState> = statusChecker.isUserEnabledFlow()
         .map { ViewState(isEnabled = it) }
         .stateIn(
             viewModelScope,

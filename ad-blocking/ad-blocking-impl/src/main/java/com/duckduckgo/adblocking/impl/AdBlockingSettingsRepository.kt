@@ -24,7 +24,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface AdBlockingSettingsRepository {
-    fun isEnabledFlow(): Flow<Boolean>
+
+    fun isEnabledFlow(): Flow<Boolean?>
     suspend fun setEnabled(enabled: Boolean)
 }
 
@@ -34,7 +35,7 @@ class RealAdBlockingSettingsRepository @Inject constructor(
     private val userPreferences: AdBlockingUserPreferences,
 ) : AdBlockingSettingsRepository {
 
-    override fun isEnabledFlow(): Flow<Boolean> = userPreferences.isEnabledFlow()
+    override fun isEnabledFlow(): Flow<Boolean?> = userPreferences.isEnabledFlow()
 
     override suspend fun setEnabled(enabled: Boolean) {
         userPreferences.setEnabled(enabled)

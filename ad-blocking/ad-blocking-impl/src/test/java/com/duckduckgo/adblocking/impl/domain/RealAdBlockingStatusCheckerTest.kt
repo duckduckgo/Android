@@ -24,7 +24,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -38,6 +40,7 @@ class RealAdBlockingStatusCheckerTest {
 
     private var killSwitchEnabled = true
     private var contingencyModeEnabled = false
+    private var enabledByDefault = false
 
     private val selfToggle: Toggle = mock {
         on { isEnabled() } doAnswer { killSwitchEnabled }
@@ -45,14 +48,18 @@ class RealAdBlockingStatusCheckerTest {
     private val contingencyModeToggle: Toggle = mock {
         on { isEnabled() } doAnswer { contingencyModeEnabled }
     }
+    private val enabledByDefaultToggle: Toggle = mock {
+        on { isEnabled() } doAnswer { enabledByDefault }
+    }
     private val feature: AdBlockingExtensionFeature = mock {
         on { self() } doReturn selfToggle
         on { enableContingencyMode() } doReturn contingencyModeToggle
+        on { enabledByDefault() } doReturn enabledByDefaultToggle
     }
 
-    private val userEnabledFlow = MutableStateFlow(true)
+    private val userEnabledFlow = MutableStateFlow<Boolean?>(true)
     private val settingsRepository: AdBlockingSettingsRepository = object : AdBlockingSettingsRepository {
-        override fun isEnabledFlow(): Flow<Boolean> = userEnabledFlow
+        override fun isEnabledFlow(): Flow<Boolean?> = userEnabledFlow
         override suspend fun setEnabled(enabled: Boolean) {
             userEnabledFlow.value = enabled
         }
@@ -95,13 +102,52 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
+    fun whenUserHasNoPreferenceAndEnabledByDefaultIsTrueThenCanInject() {
+        userEnabledFlow.value = null
+        enabledByDefault = true
+
+        assertTrue(checker.canInject())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceAndEnabledByDefaultIsFalseThenCannotInject() {
+        userEnabledFlow.value = null
+        enabledByDefault = false
+
+        assertFalse(checker.canInject())
+    }
+
+    @Test
+    fun whenUserHasSetTrueThenIsUserEnabledFlowEmitsTrue() = runTest {
+        userEnabledFlow.value = true
+
+        assertTrue(checker.isUserEnabledFlow().first())
+    }
+
+    @Test
+    fun whenUserHasSetFalseThenIsUserEnabledFlowEmitsFalseEvenIfDefaultIsTrue() = runTest {
+        userEnabledFlow.value = false
+        enabledByDefault = true
+
+        assertFalse(checker.isUserEnabledFlow().first())
+    }
+
+    @Test
+    fun whenUserHasNoPreferenceThenIsUserEnabledFlowEmitsDefault() = runTest {
+        userEnabledFlow.value = null
+        enabledByDefault = true
+
+        assertTrue(checker.isUserEnabledFlow().first())
+    }
+
+    @Test
     fun whenDiscoverableFlagEnabledThenIsShownInSettings() {
         assertTrue(checker.isShownInSettings())
     }
 
     @Test
-    fun whenDiscoverableFlagDisabledThenIsNotShownInSettings() {
-        discoverableEnabled = false
+    fun whenKillSwitchFlagDisabledThenIsNotShownInSettings() {
+        killSwitchEnabled = false
 
         assertFalse(checker.isShownInSettings())
     }

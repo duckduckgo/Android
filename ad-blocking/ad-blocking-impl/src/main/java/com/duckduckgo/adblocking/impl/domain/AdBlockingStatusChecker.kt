@@ -23,8 +23,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import logcat.logcat
 import javax.inject.Inject
@@ -32,6 +34,8 @@ import javax.inject.Inject
 interface AdBlockingStatusChecker {
     fun canInject(): Boolean
     fun isShownInSettings(): Boolean
+
+    fun isUserEnabledFlow(): Flow<Boolean>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -43,6 +47,7 @@ class RealAdBlockingStatusChecker @Inject constructor(
 ) : AdBlockingStatusChecker {
 
     private val userEnabled: StateFlow<Boolean> = settingsRepository.isEnabledFlow()
+        .map { it ?: feature.enabledByDefault().isEnabled() }
         .stateIn(appScope, SharingStarted.Eagerly, initialValue = false)
 
     override fun canInject(): Boolean {
@@ -62,4 +67,6 @@ class RealAdBlockingStatusChecker @Inject constructor(
     }
 
     override fun isShownInSettings(): Boolean = feature.isDiscoverable().isEnabled()
+
+    override fun isUserEnabledFlow(): Flow<Boolean> = userEnabled
 }

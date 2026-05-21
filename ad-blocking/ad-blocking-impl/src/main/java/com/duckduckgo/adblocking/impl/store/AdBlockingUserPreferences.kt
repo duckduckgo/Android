@@ -21,7 +21,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -31,8 +30,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface AdBlockingUserPreferences {
-    fun isEnabledFlow(): Flow<Boolean>
-    suspend fun isEnabled(): Boolean
+
+    fun isEnabledFlow(): Flow<Boolean?>
+    suspend fun isEnabled(): Boolean?
     suspend fun setEnabled(enabled: Boolean)
 }
 
@@ -40,14 +40,11 @@ interface AdBlockingUserPreferences {
 @ContributesBinding(AppScope::class)
 class RealAdBlockingUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
-    private val feature: AdBlockingExtensionFeature,
 ) : AdBlockingUserPreferences {
 
-    override fun isEnabledFlow(): Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[KEY_ENABLED] ?: feature.enabledByDefault().isEnabled()
-    }
+    override fun isEnabledFlow(): Flow<Boolean?> = dataStore.data.map { prefs -> prefs[KEY_ENABLED] }
 
-    override suspend fun isEnabled(): Boolean = isEnabledFlow().first()
+    override suspend fun isEnabled(): Boolean? = isEnabledFlow().first()
 
     override suspend fun setEnabled(enabled: Boolean) {
         dataStore.edit { prefs -> prefs[KEY_ENABLED] = enabled }
