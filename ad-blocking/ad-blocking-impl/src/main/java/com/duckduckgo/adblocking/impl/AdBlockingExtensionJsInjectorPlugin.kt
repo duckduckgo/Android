@@ -41,7 +41,6 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
-    settingsRepository: AdBlockingSettingsRepository,
     repository: AdBlockingExtensionRepository,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
@@ -50,9 +49,6 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         .scriptletsFlow()
         .map(::buildScript)
         .stateIn(appScope, SharingStarted.Eagerly, initialValue = null)
-
-    private val userEnabled: StateFlow<Boolean> = settingsRepository.isEnabledFlow()
-        .stateIn(appScope, SharingStarted.Eagerly, initialValue = false)
 
     @UiThread
     override fun onPageStarted(
@@ -63,10 +59,6 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     ) {
         if (!statusChecker.canInject()) {
             logcat { "Status checker rejected injection, skipping" }
-            return
-        }
-        if (!userEnabled.value) {
-            logcat { "User disabled ad blocking, skipping" }
             return
         }
         val uri = url?.toUri() ?: return
