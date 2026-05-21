@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -112,6 +113,63 @@ class RealDuckAiChatStoreTest {
         whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
 
         assertEquals(listOf("uuid1", "uuid2"), store.getChats()[0].fileRefs)
+    }
+
+    @Test
+    fun `getChats parses reasoningMode when present`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertEquals("reasoning", store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field missing`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is empty string`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":""}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is JSON null`() = runTest {
+        // JSONObject.optString returns the literal string "null" for explicit JSON null; guard via isNull.
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":null}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns parsed chat when found`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        val chat = store.getChatById("abc")
+
+        assertEquals("abc", chat?.chatId)
+        assertEquals("gpt-5-mini", chat?.model)
+        assertEquals("reasoning", chat?.reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+        assertNull(store.getChatById("missing"))
+    }
+
+    @Test
+    fun `getChatById returns null when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not json"))
+        assertNull(store.getChatById("abc"))
     }
 
     @Test
