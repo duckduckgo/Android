@@ -47,6 +47,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -94,6 +95,7 @@ class CtaViewModel @Inject constructor(
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
     private val appTheme: AppTheme,
     private val duckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics,
+    private val deviceInfo: DeviceInfo,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -295,6 +297,7 @@ class CtaViewModel @Inject constructor(
                     onboardingStore = onboardingStore,
                     appInstallStore = appInstallStore,
                     isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
                 )
             }
             OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
@@ -309,6 +312,7 @@ class CtaViewModel @Inject constructor(
                     onboardingStore,
                     appInstallStore,
                     isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
                 )
             }
             OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
@@ -327,6 +331,7 @@ class CtaViewModel @Inject constructor(
                     onboardingStore,
                     appInstallStore,
                     isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
                 )
             }
             return@withContext OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -351,7 +356,7 @@ class CtaViewModel @Inject constructor(
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                    DaxTryASearchBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
                 } else {
                     DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
                 }
@@ -360,7 +365,7 @@ class CtaViewModel @Inject constructor(
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                    DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
                 } else {
                     DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
                 }
@@ -369,7 +374,7 @@ class CtaViewModel @Inject constructor(
             // End
             canShowDaxCtaEndOfJourney() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
                 if (isBrandDesignUpdateEnabled()) {
-                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled())
+                    DaxEndBrandDesignUpdateBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
                 }
@@ -382,6 +387,7 @@ class CtaViewModel @Inject constructor(
                         onboardingStore,
                         appInstallStore,
                         appTheme.isLightModeEnabled(),
+                        deviceInfo,
                         isFreeTrialCopy = freeTrialCopyAvailable(),
                     )
                 } else {
@@ -502,6 +508,7 @@ class CtaViewModel @Inject constructor(
                         trackers = it.orderedTrackerBlockedEntities(),
                         settingsDataStore = settingsDataStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
                     )
                 }
                 return OnboardingDaxDialogCta.DaxTrackersBlockedCta(
@@ -525,6 +532,7 @@ class CtaViewModel @Inject constructor(
                                 network = entity.displayName,
                                 siteHost = host,
                                 isLightTheme = appTheme.isLightModeEnabled(),
+                                deviceInfo = deviceInfo,
                             )
                         }
                         return OnboardingDaxDialogCta.DaxMainNetworkCta(
@@ -544,6 +552,7 @@ class CtaViewModel @Inject constructor(
                         onboardingStore,
                         appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
                     )
                 }
                 return OnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
@@ -556,6 +565,7 @@ class CtaViewModel @Inject constructor(
                         onboardingStore,
                         appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
                     )
                 }
                 return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
@@ -568,6 +578,7 @@ class CtaViewModel @Inject constructor(
                         onboardingStore,
                         appInstallStore,
                         isLightTheme = appTheme.isLightModeEnabled(),
+                        deviceInfo = deviceInfo,
                     )
                 }
                 return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)

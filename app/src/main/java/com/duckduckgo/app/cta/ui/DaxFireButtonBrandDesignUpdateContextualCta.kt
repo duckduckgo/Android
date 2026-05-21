@@ -24,12 +24,14 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
 
 data class DaxFireButtonBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_FIRE_BUTTON,
     description = R.string.onboardingFireButtonDaxDialogDescription,
@@ -42,9 +44,12 @@ data class DaxFireButtonBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_fire_button,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
+
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context

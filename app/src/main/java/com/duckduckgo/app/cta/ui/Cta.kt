@@ -20,11 +20,14 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
@@ -33,13 +36,16 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -63,10 +69,13 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.google.android.material.button.MaterialButton
@@ -596,6 +605,9 @@ sealed class OnboardingDaxDialogCta(
      *  - [setOnPrimaryCtaClicked] / [setOnSecondaryCtaClicked] / [setOnOptionClicked]: override only
      *    for the buttons the subclass actually renders.
      */
+
+    interface ShowsWingBottom
+
     abstract class BrandDesignContextualDaxDialogCta(
         ctaId: CtaId,
         @StringRes description: Int?,
@@ -608,6 +620,7 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore: OnboardingStore,
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
+        open val deviceInfo: DeviceInfo,
         @DrawableRes open val backgroundRes: Int = 0,
     ) : OnboardingDaxDialogCta(
         ctaId = ctaId,
@@ -626,6 +639,7 @@ sealed class OnboardingDaxDialogCta(
 
         private var runningFadeIn: AnimatorSet? = null
         private var runningFadeOut: AnimatorSet? = null
+        private var arrowDepthAnimator: ValueAnimator? = null
         private var cardContainer: TouchInterceptingLinearLayout? = null
 
         private var isAnimating: Boolean = false
@@ -636,6 +650,8 @@ sealed class OnboardingDaxDialogCta(
 
         /** Id of the content-include slot this CTA renders (e.g. [R.id.contextualBrandDesignPrimaryCtaContent]). */
         abstract val activeIncludeId: Int
+
+        abstract val showArrow: Boolean
 
         /**
          * Populate the card with subclass-specific content: set title/description text, configure
@@ -676,6 +692,10 @@ sealed class OnboardingDaxDialogCta(
             runningFadeOut?.removeAllListeners()
             runningFadeOut?.cancel()
             runningFadeOut = null
+            arrowDepthAnimator?.removeAllUpdateListeners()
+            arrowDepthAnimator?.cancel()
+            arrowDepthAnimator = null
+            wingPlayInGeneration++
             ctaView?.animate()?.cancel()
             ctaView?.let { bannerFor(it)?.cancel() }
             ctaView?.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
@@ -732,6 +752,8 @@ sealed class OnboardingDaxDialogCta(
             val descriptionView = container.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
             val dismissButton = container.findViewById<ImageView>(R.id.contextualBrandDesignDismissButton)
             val cardContainer = container.findViewById<TouchInterceptingLinearLayout>(R.id.contextualBrandDesignCardContainer)
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
             this.cardContainer = cardContainer
             isAnimating = true
 
@@ -746,6 +768,7 @@ sealed class OnboardingDaxDialogCta(
 
             val typeAndFadeIn = {
                 bannerFor(container)?.slideIn()
+                startWingBottomPlayIn(container)
                 val daxTitle = titleView.text?.toString().orEmpty()
                 val startContentFadeIn = {
                     val animators = mutableListOf<Animator>(
@@ -760,6 +783,15 @@ sealed class OnboardingDaxDialogCta(
                     if (dismissButton.alpha < 1f) {
                         animators += ObjectAnimator.ofFloat(dismissButton, View.ALPHA, 1f)
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                    }
+                    val currentDepth = cardView.arrowDepthFraction
+                    if (targetDepth != currentDepth) {
+                        arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                            duration = DIALOG_CONTENT_FADE_IN_DURATION
+                            interpolator = FastOutSlowInInterpolator()
+                            addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                        }
+                        animators.add(arrowDepthAnimator!!)
                     }
                     runningFadeIn = AnimatorSet().apply {
                         playTogether(animators.toList())
@@ -905,10 +937,94 @@ sealed class OnboardingDaxDialogCta(
             resetAllIncludesExcept(container, activeInclude)
             applyPrimaryCtaText(container)
             configureContentViews(container)
+            applyWingBottomState(container)
             hiddenTitle.text = titleView.text
             applyTitleSlotVisibility(container, titleView)
             bannerFor(container)?.show()
             applyOptionsContentHeight(container)
+        }
+
+        private fun stripWingForPhoneLandscape(wing: LottieAnimationView) {
+            if (wing.isAnimating) wing.cancelAnimation()
+            wing.isVisible = false
+        }
+
+        internal fun applyWingBottomState(container: View) {
+            wingPlayInGeneration++
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
+            (wing.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (wing.isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                wing.layoutParams = lp
+            }
+            val showsWing = this is ShowsWingBottom
+            when {
+                showsWing && !wing.isVisible -> {
+                    // Stage only; [startWingBottomPlayIn] kicks off playback after the banner slides in.
+                    wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                    wing.progress = 0f
+                    wing.isVisible = true
+                }
+                showsWing && wing.isVisible -> {
+                    // Persist across same-wing content transitions: leave at resting state, no replay.
+                    // Abort any in-flight exit from a prior non-wing CTA — its end-listener would otherwise hide the wing.
+                    if (wing.isAnimating && wing.progress >= WING_STOP_PROGRESS) {
+                        wing.removeAllAnimatorListeners()
+                        wing.cancelAnimation()
+                        wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                        wing.progress = WING_STOP_PROGRESS
+                    }
+                }
+                !showsWing && wing.isVisible -> {
+                    wing.setMinAndMaxProgress(WING_STOP_PROGRESS, 1f)
+                    wing.progress = WING_STOP_PROGRESS
+                    wing.addAnimatorListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            wing.isVisible = false
+                            wing.removeAnimatorListener(this)
+                        }
+                    })
+                    wing.playAnimation()
+                }
+                else -> wing.isVisible = false
+            }
+        }
+
+        internal fun startWingBottomPlayIn(container: View) {
+            if (this !is ShowsWingBottom) return
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
+            if (!wing.isVisible || wing.isAnimating || wing.progress >= WING_STOP_PROGRESS) return
+            val generation = wingPlayInGeneration
+            wing.postDelayed(
+                {
+                    if (wingPlayInGeneration != generation) return@postDelayed
+                    if (wing.isVisible && !wing.isAnimating && wing.progress < WING_STOP_PROGRESS) {
+                        wing.playAnimation()
+                    }
+                },
+                WING_PLAY_IN_DELAY,
+            )
+        }
+
+        private fun snapWingBottomToResting(container: View) {
+            if (this !is ShowsWingBottom) return
+            val wing = container.findViewById<LottieAnimationView>(R.id.wingBottom) ?: return
+            if (container.isPhoneLandscape()) {
+                stripWingForPhoneLandscape(wing)
+                return
+            }
+            if (wing.isAnimating) wing.cancelAnimation()
+            wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+            wing.progress = WING_STOP_PROGRESS
+            wing.isVisible = true
         }
 
         private fun applyOptionsContentHeight(container: View) {
@@ -963,6 +1079,9 @@ sealed class OnboardingDaxDialogCta(
             container.alpha = 1f
             bannerFor(container)?.snapToFinalPosition()
             contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+            container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+                ?.setArrowDepthFraction(if (showArrow && !container.isPhoneLandscape()) 1f else 0f)
+            snapWingBottomToResting(container)
             if (!alreadySettled) {
                 onSettled()
             }
@@ -1085,7 +1204,10 @@ sealed class OnboardingDaxDialogCta(
             }
             if (!isContentTransition) {
                 container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.alpha = 0f
+                container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.contextualBrandDesignCardView)
+                    ?.setArrowDepthFraction(0f)
             }
+            container.findViewById<View>(R.id.wavingDax)?.visibility = View.GONE
         }
 
         protected open val allContentIncludeIds: List<Int> = listOf(
@@ -1129,12 +1251,25 @@ sealed class OnboardingDaxDialogCta(
             }
         }
 
+        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+        protected fun View.isPhoneLandscape(): Boolean =
+            !deviceInfo.isTablet() &&
+                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_FADE_IN_START_DELAY = 200L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
+            private const val WING_STOP_PROGRESS = 0.5f
+            private const val WING_PLAY_IN_DELAY = 300L
+
+            // Shared across CTA instances because the fragment swaps contextual CTAs without
+            // calling hideOnboardingCta on the previous one — a per-instance ref couldn't
+            // reach the pending runnable posted on the shared wingBottom view.
+            private var wingPlayInGeneration = 0
 
             /**
              * Cancels the title typing animation and hides the brand-design root, without
@@ -1398,6 +1533,26 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
+    interface ShowsWavingDax {
+        val restartWavingDax: Boolean get() = false
+        fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
+            val density = dax.resources.displayMetrics.density
+            dax.rotation = 0f
+            dax.translationX = DEFAULT_WAVING_DAX_TRANSLATION_X_DP * density
+            dax.translationY = DEFAULT_WAVING_DAX_TRANSLATION_Y_DP * density
+            (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (deviceInfo.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                dax.layoutParams = lp
+            }
+        }
+
+        companion object {
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -54f
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -110f
+        }
+    }
+
     abstract class BrandDesignUpdateBubbleCta(
         ctaId: CtaId,
         @StringRes title: Int,
@@ -1410,6 +1565,7 @@ sealed class DaxBubbleCta(
         onboardingStore: OnboardingStore,
         appInstallStore: AppInstallStore,
         open val isLightTheme: Boolean,
+        open val deviceInfo: DeviceInfo,
     ) : DaxBubbleCta(
         ctaId = ctaId,
         title = title,
@@ -1423,16 +1579,25 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     ) {
 
+        protected fun View.isTablet(): Boolean = deviceInfo.isTablet()
+
+        protected fun View.isPhoneLandscape(): Boolean =
+            !deviceInfo.isTablet() &&
+                context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         companion object {
             private const val DIALOG_FADE_IN_DURATION = 400L
             private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
             private const val HEADER_IMAGE_FADE_IN_DURATION = 300L
+            private const val ARROW_DEPTH_ANIMATION_DURATION = 200L
             private const val TYPING_DELAY_MS = 20L
             private const val TYPING_POST_DELAY_MS = 20L
             private const val DISMISS_BORDER_WIDTH_DP = 1.5f
         }
 
         abstract val activeIncludeId: Int
+
+        abstract val showArrow: Boolean
 
         abstract fun configureContentViews(view: View)
 
@@ -1446,6 +1611,7 @@ sealed class DaxBubbleCta(
 
         private var contentFadeInAnimator: AnimatorSet? = null
         private var fadeOutAnimator: AnimatorSet? = null
+        private var arrowDepthAnimator: ValueAnimator? = null
 
         protected fun resolveOnboardingContext(context: Context): Context {
             val themeRes = if (isLightTheme) {
@@ -1475,6 +1641,22 @@ sealed class DaxBubbleCta(
             view.findViewById<View>(R.id.primaryCta),
         )
 
+        internal fun applyWavingDaxState(container: View, showsWavingDax: ShowsWavingDax?) {
+            container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                if (showsWavingDax != null && !container.isPhoneLandscape()) {
+                    showsWavingDax.configureWavingDax(dax, deviceInfo)
+                    if (!dax.isVisible || dax.alpha == 0f) {
+                        dax.progress = 0f
+                        dax.alpha = 1f
+                        dax.isVisible = true
+                        dax.post { dax.playAnimation() }
+                    }
+                } else {
+                    dax.isVisible = false
+                }
+            }
+        }
+
         private fun resetAllIncludesExcept(view: View, active: View) {
             getAllContentIncludes(view).forEach { include ->
                 if (include == active) {
@@ -1494,6 +1676,9 @@ sealed class DaxBubbleCta(
 
             cancelRunningAnimations()
             val isContentTransition = container.alpha > 0f && container.isVisible // card already visible from previous CTA
+
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
+            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
 
             val daxTitle = container.context.getString(title)
             val daxDescription = container.context.getString(description).preventWidows()
@@ -1517,6 +1702,14 @@ sealed class DaxBubbleCta(
                 headerImage?.alpha = 0f
             }
 
+            val resetTextAlignment = {
+                titleView.gravity = Gravity.START
+                hiddenTitle.gravity = Gravity.START
+                descriptionView.gravity = Gravity.START
+            }
+
+            val wavingDax = this as? ShowsWavingDax
+
             // Helper: type title then fade in content
             val typeAndFadeIn = {
                 hiddenTitle.text = daxTitle.html(container.context)
@@ -1537,6 +1730,17 @@ sealed class DaxBubbleCta(
                             ObjectAnimator.ofFloat(activeInclude, View.ALPHA, 1f)
                                 .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                         )
+                        // Read depth live: the first-show arm synchronously sets it before this lambda runs,
+                        // so a value captured at function entry would animate from a stale snapshot.
+                        val currentDepth = cardView.arrowDepthFraction
+                        if (targetDepth != currentDepth) {
+                            arrowDepthAnimator = ValueAnimator.ofFloat(currentDepth, targetDepth).apply {
+                                duration = ARROW_DEPTH_ANIMATION_DURATION
+                                interpolator = FastOutSlowInInterpolator()
+                                addUpdateListener { cardView.setArrowDepthFraction(it.animatedValue as Float) }
+                            }
+                            animators.add(arrowDepthAnimator!!)
+                        }
                         contentFadeInAnimator = AnimatorSet().apply {
                             playTogether(animators.toList())
                             addListener(object : AnimatorListenerAdapter() {
@@ -1581,6 +1785,7 @@ sealed class DaxBubbleCta(
                 if (headerImage?.isVisible == true) {
                     headerImage.alpha = 1f
                 }
+                cardView.setArrowDepthFraction(targetDepth)
             }
 
             if (isContentTransition) {
@@ -1599,6 +1804,12 @@ sealed class DaxBubbleCta(
                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                     }
                 }
+                container.findViewById<LottieAnimationView>(R.id.wavingDax)?.let { dax ->
+                    if (dax.isVisible && dax.alpha > 0f && (wavingDax == null || wavingDax.restartWavingDax)) {
+                        fadeOutAnimators += ObjectAnimator.ofFloat(dax, View.ALPHA, 0f)
+                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                    }
+                }
                 fadeOutAnimator = AnimatorSet().apply {
                     playTogether(fadeOutAnimators.toList())
                     addListener(object : AnimatorListenerAdapter() {
@@ -1608,7 +1819,9 @@ sealed class DaxBubbleCta(
                             // button alpha causing a flicker. Instead, selectively reset content only.
                             resetAllIncludesExcept(container, activeInclude)
                             resetHeaderState()
+                            resetTextAlignment()
                             configureContentViews(container)
+                            applyWavingDaxState(container, wavingDax)
                             // Blank the title so typing (or snapped settled state) shows new text, not stale.
                             titleView.text = ""
                             if (!isAnimating) {
@@ -1626,7 +1839,10 @@ sealed class DaxBubbleCta(
                 hiddenTitle.text = daxTitle.html(container.context)
                 descriptionView.text = daxDescription.html(container.context)
                 resetHeaderState()
+                resetTextAlignment()
                 configureContentViews(container)
+                applyWavingDaxState(container, wavingDax)
+                cardView.setArrowDepthFraction(targetDepth)
                 container.show()
                 container.animate().alpha(1f).setDuration(DIALOG_FADE_IN_DURATION).setStartDelay(200L)
                     .withEndAction {
@@ -1652,6 +1868,7 @@ sealed class DaxBubbleCta(
                     applySettledState()
                 }
                 contentFadeInAnimator?.let { if (it.isRunning) it.end() }
+                cardView.setArrowDepthFraction(targetDepth)
                 if (wasAnimating) {
                     onTypingAnimationFinished()
                 }
@@ -1667,6 +1884,9 @@ sealed class DaxBubbleCta(
             fadeOutAnimator?.removeAllListeners()
             fadeOutAnimator?.cancel()
             fadeOutAnimator = null
+            arrowDepthAnimator?.removeAllUpdateListeners()
+            arrowDepthAnimator?.cancel()
+            arrowDepthAnimator = null
             ctaView?.animate()?.cancel()
         }
 
