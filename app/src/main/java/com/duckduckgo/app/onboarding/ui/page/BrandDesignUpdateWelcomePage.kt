@@ -34,6 +34,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -2185,7 +2186,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         try {
             startActivity(DefaultBrowserSystemSettings.intent())
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "${getString(R.string.cannotLaunchDefaultAppSettings)}: ${e.asLog()}" }
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { "$errorMessage: ${e.asLog()}" }
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            viewModel.checkQuickSetupSwitchesState()
         }
     }
 
