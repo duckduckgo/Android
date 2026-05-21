@@ -14,11 +14,11 @@ tags:
             nativeInputToggle: "true"
             inputWithAiToggle: "true"
             omnibarPosition: "bottom"
-            addFavorites: "3"
+            addFavorites: "reddit.com;eff.org;cnn.com"
       - runFlow: ../shared/skip_all_onboarding.yaml
       - assertVisible:
-          text: "Favorite 1"
+          text: "reddit.com"
       - assertVisible:
-          text: "Favorite 2"
+          text: "eff.org"
       - assertVisible:
-          text: "Favorite 3"
+          text: "cnn.com"

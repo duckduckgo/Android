@@ -41,7 +41,6 @@ dependencies {
     implementation project(path: ':data-store-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':saved-sites-store')
-    implementation project(path: ':test-seeder-api')
 
     implementation project(path: ':anvil-annotations')
 

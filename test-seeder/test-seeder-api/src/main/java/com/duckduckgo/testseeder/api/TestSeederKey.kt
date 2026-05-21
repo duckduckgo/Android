@@ -26,6 +26,14 @@ enum class TestSeederKey(val key: String, val description: String) {
     OMNIBAR_POSITION("omnibarPosition", "Sets omnibar position. Values: top | bottom | split"),
     NATIVE_INPUT_TOGGLE("nativeInputToggle", "Enables unified native input. Values: true | false"),
     INPUT_WITH_AI_TOGGLE("inputWithAiToggle", "Enables AI in input screen. Values: true | false"),
-    ADD_FAVORITES("addFavorites", "Number of favorites to seed. Values: positive integer."),
-    ADD_BOOKMARKS("addBookmarks", "Number of bookmarks to seed. Values: positive integer."),
+    ADD_FAVORITES(
+        "addFavorites",
+        "Semicolon-separated list of URLs to seed as favorites. " +
+            "URLs without a scheme are normalised to https://. Example: \"reddit.com;eff.org;cnn.com\"",
+    ),
+    ADD_BOOKMARKS(
+        "addBookmarks",
+        "Semicolon-separated list of URLs to seed as bookmarks. " +
+            "URLs without a scheme are normalised to https://. Example: \"reddit.com;eff.org;cnn.com\"",
+    ),
 }

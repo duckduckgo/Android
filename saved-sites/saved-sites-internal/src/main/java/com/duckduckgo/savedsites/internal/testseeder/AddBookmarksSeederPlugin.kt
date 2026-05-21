@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.testseeder
+package com.duckduckgo.savedsites.internal.testseeder
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -24,20 +24,29 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class AddFavoritesSeederPlugin @Inject constructor(
+class AddBookmarksSeederPlugin @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
 ) : TestSeederPlugin {
 
-    override val handledKeys = setOf(TestSeederKey.ADD_FAVORITES.key)
+    override val handledKeys = setOf(TestSeederKey.ADD_BOOKMARKS.key)
 
     override suspend fun apply(key: String, value: String) {
-        val count = value.toIntOrNull()
-            ?: error("AddFavoritesSeederPlugin: '$value' is not a valid integer for key '$key'")
-        require(count > 0) { "AddFavoritesSeederPlugin: count must be positive, got $count" }
+        val urls = value.split(";").map { it.trim() }.filter { it.isNotEmpty() }
+        require(urls.isNotEmpty()) {
+            "AddBookmarksSeederPlugin: no URLs provided in value '$value' for key '$key'"
+        }
 
-        repeat(count) { index ->
-            val n = index + 1
-            savedSitesRepository.insertFavorite(url = "https://favorite-$n.example", title = "Favorite $n")
+        urls.forEach { rawUrl ->
+            savedSitesRepository.insertBookmark(
+                url = normaliseUrl(rawUrl),
+                title = titleFromUrl(rawUrl),
+            )
         }
     }
+
+    private fun normaliseUrl(url: String): String =
+        if (url.startsWith("http://") || url.startsWith("https://")) url else "https://$url"
+
+    private fun titleFromUrl(url: String): String =
+        url.removePrefix("https://").removePrefix("http://").substringBefore("/")
 }
