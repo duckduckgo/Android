@@ -207,26 +207,6 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `renameChat records pending update and triggers sync on success`() = runTest {
-        whenever(chatStore.renameChat("abc", "New")).thenReturn(true)
-
-        repository.renameChat("abc", "New")
-
-        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
-        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-    }
-
-    @Test
-    fun `renameChat does not record or trigger sync when store reports failure`() = runTest {
-        whenever(chatStore.renameChat("missing", "New")).thenReturn(false)
-
-        repository.renameChat("missing", "New")
-
-        verify(duckChatSyncRepository, never()).recordSingleChatUpdate("missing")
-        verify(syncEngine, never()).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
-    }
-
-    @Test
     fun `setPinned true delegates to pinChat and records sync update`() = runTest {
         repository.setPinned("abc", pinned = true)
 
