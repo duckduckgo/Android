@@ -581,7 +581,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received without content then state unchanged`() =
+    fun `when page context received without content then state unchanged and invalid no content pixel fired`() =
         runTest {
             val serializedPageData =
                 """
@@ -599,7 +599,47 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
             assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received without title then invalid no title pixel fired`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "url": "https://ctx.com",
+                    "content": "some content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received empty then invalid empty pixel fired`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "")
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received with malformed json then collection empty pixel fired and no crash`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "{not valid json")
+
+            assertEquals("", testee.updatedPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoContent()
         }
 
     @Test

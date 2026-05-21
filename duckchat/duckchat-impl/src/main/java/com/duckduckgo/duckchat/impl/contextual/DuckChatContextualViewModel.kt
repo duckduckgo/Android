@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -458,7 +459,13 @@ class DuckChatContextualViewModel @Inject constructor(
             if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
             return false
         }
-        val json = JSONObject(pageContext)
+        val json = try {
+            JSONObject(pageContext)
+        } catch (_: JSONException) {
+            logcat { "Duck.ai: pageContext is not valid JSON" }
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextCollectionEmpty()
+            return false
+        }
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
         if (reportInvalidPixels) {
@@ -543,7 +550,7 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
 
-        if (isContextValid(pageContext)) {
+        if (isContextValid(pageContext, reportInvalidPixels = true)) {
             updatedPageContext = pageContext
             val json = JSONObject(updatedPageContext)
             val title = json.optString("title")
@@ -588,7 +595,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             updatedPageContext = ""
-            duckChatPixels.reportContextualPageContextCollectionEmpty()
         }
     }
 
