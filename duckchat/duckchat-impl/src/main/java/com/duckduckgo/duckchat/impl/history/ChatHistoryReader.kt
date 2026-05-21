@@ -32,13 +32,10 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
-import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -48,11 +45,6 @@ import javax.inject.Inject
 import javax.inject.Named
 
 interface ChatHistoryReader {
-    /**
-     * Opens Duck.ai in an attached but invisible WebView so the FE SPA fetches /sync/ai_chats,
-     * decrypts JWE titles, and writes each chat into native Room via the duckAiNativeStorage.putChat
-     * bridge. Errors are silent.
-     */
     suspend fun refresh()
 
     fun tearDown()
@@ -67,8 +59,8 @@ class RealChatHistoryReader @Inject constructor(
     @Named("ContentScopeScripts") private val contentScopeScripts: JsMessaging,
     private val duckChatWebViewClient: DuckChatWebViewClient,
     private val duckChatJSHelper: DuckChatJSHelper,
-    private val subscriptionsJSHelper: SubscriptionsJSHelper,
 ) : ChatHistoryReader {
+    private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var webView: WebView? = null
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
@@ -85,9 +77,7 @@ class RealChatHistoryReader @Inject constructor(
                     logcat { "ChatHistoryReader: page load timed out after ${PAGE_LOAD_TIMEOUT_MS}ms" }
                     return@withContext
                 }
-                logcat { "ChatHistoryReader: page loaded, settling ${SYNC_SETTLE_MS}ms for FE sync" }
-                delay(SYNC_SETTLE_MS)
-                logcat { "ChatHistoryReader: settle done" }
+                logcat { "ChatHistoryReader: page loaded; SPA fan-out continues in the WebView" }
             }
         }.onFailure {
             logcat { "ChatHistoryReader: refresh failed — ${it.message}" }
@@ -128,15 +118,14 @@ class RealChatHistoryReader @Inject constructor(
                 cacheMode = WebSettings.LOAD_DEFAULT
             }
 
-            CookieManager.getInstance().setAcceptCookie(true)
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+            cookieManager.setAcceptCookie(true)
+            cookieManager.setAcceptThirdPartyCookies(this, true)
 
             duckChatWebViewClient.onPageFinishedListener = { url ->
                 logcat { "ChatHistoryReader: onPageFinished $url" }
                 pageLoadDeferred?.complete(Unit)
             }
             webViewClient = duckChatWebViewClient
-
             contentScopeScripts.register(
                 this,
                 object : JsMessageCallback() {
@@ -147,9 +136,8 @@ class RealChatHistoryReader @Inject constructor(
                         data: JSONObject?,
                     ) {
                         logcat { "ChatHistoryReader: bridge $featureName.$method id=$id" }
-                        when (featureName) {
-                            DUCK_CHAT_FEATURE_NAME -> handleDuckChatMessage(featureName, method, id, data)
-                            SUBSCRIPTIONS_FEATURE_NAME -> handleSubscriptionsMessage(featureName, method, id, data)
+                        if (featureName == DUCK_CHAT_FEATURE_NAME) {
+                            handleDuckChatMessage(featureName, method, id, data)
                         }
                     }
                 },
@@ -172,22 +160,11 @@ class RealChatHistoryReader @Inject constructor(
         }
     }
 
-    private fun handleSubscriptionsMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
-        appCoroutineScope.launch(dispatchers.io()) {
-            subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data, context)?.let { response ->
-                withContext(dispatchers.main()) {
-                    contentScopeScripts.onResponse(response)
-                }
-            }
-        }
-    }
-
     companion object {
         private const val DUCK_AI_URL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val PAGE_LOAD_TIMEOUT_MS = 10000L
-        private const val SYNC_SETTLE_MS = 5000L
         private const val DUCK_CHAT_FEATURE_NAME = "aiChat"
     }
 }

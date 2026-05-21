@@ -86,6 +86,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         viewLifecycleOwner.lifecycleScope.launch { chatHistoryReader.refresh() }
     }
 
+    override fun onDestroyView() {
+        chatHistoryReader.tearDown()
+        super.onDestroyView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
