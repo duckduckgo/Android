@@ -14,26 +14,37 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.feature.toggles.impl.metrics
+package com.duckduckgo.app.onboardingquicksetup
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
-import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
+import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class OnboardingQuickSetupSearchMetricsPixelsPlugin @Inject constructor(
-    private val inventory: FeatureTogglesInventory,
-) : MetricsPixelPlugin {
+class OnboardingQuickSetupSearchMetricsAtbLifecyclePlugin @Inject constructor(
+    private val toggles: OnboardingQuickSetupToggles,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : AtbLifecyclePlugin {
 
-    override suspend fun getMetrics(): List<MetricsPixel> {
-        val toggle = inventory.getAll().firstOrNull {
-            it.featureName().name == QUICK_SETUP_TOGGLE_NAME
-        } ?: return emptyList()
+    override fun onSearchRetentionAtbRefreshed(oldAtb: String, newAtb: String) {
+        appCoroutineScope.launch {
+            buildMetrics().forEach { it.send() }
+        }
+    }
+
+    private suspend fun buildMetrics(): List<MetricsPixel> {
+        val toggle = toggles.onboardingQuickSetupExperimentMay26()
+        if (!toggle.isEnabled() || !toggle.isEnrolled()) {
+            return emptyList()
+        }
 
         val d0toD7Daily = (0..7).map { ConversionWindow(lowerWindow = it, upperWindow = it) }
 
@@ -109,9 +120,5 @@ class OnboardingQuickSetupSearchMetricsPixelsPlugin @Inject constructor(
                 conversionWindow = d0toD7Daily,
             ),
         )
-    }
-
-    companion object {
-        private const val QUICK_SETUP_TOGGLE_NAME = "onboardingQuickSetupExperimentMay26"
     }
 }
