@@ -4868,6 +4868,9 @@ class BrowserTabFragment :
         lastOrientation = newConfig.orientation
 
         renderer.renderHomeCta()
+        if (orientationChanged) {
+            renderer.refreshHomeBubbleCtaForOrientation()
+        }
         recreateBrowserMenu()
         viewModel.onConfigurationChanged(orientationChanged)
     }
@@ -6259,6 +6262,14 @@ class BrowserTabFragment :
                     }
                 }
             }
+        }
+
+        fun refreshHomeBubbleCtaForOrientation() {
+            if (!isAdded) return
+            val cta = lastSeenCtaViewState?.cta as? DaxBubbleCta.BrandDesignUpdateBubbleCta ?: return
+            if (!brandDesignDialogScrollView.isVisible) return
+            val container = daxDialogIntroBubbleBrandDesign.daxCtaContainer
+            cta.refreshForOrientation(container)
         }
 
         private fun goFullScreen() {

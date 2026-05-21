@@ -1657,6 +1657,19 @@ sealed class DaxBubbleCta(
             }
         }
 
+        internal fun refreshForOrientation(container: View) {
+            val wavingDax = this as? ShowsWavingDax
+            applyWavingDaxState(container, wavingDax)
+
+            val cardView = container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView)
+                ?: return
+            arrowDepthAnimator?.removeAllUpdateListeners()
+            arrowDepthAnimator?.cancel()
+            arrowDepthAnimator = null
+            val targetDepth = if (showArrow && !container.isPhoneLandscape()) 1f else 0f
+            cardView.setArrowDepthFraction(targetDepth)
+        }
+
         private fun resetAllIncludesExcept(view: View, active: View) {
             getAllContentIncludes(view).forEach { include ->
                 if (include == active) {

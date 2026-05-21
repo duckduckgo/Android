@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import org.junit.Assert.assertEquals
@@ -104,6 +105,61 @@ class BrandDesignUpdateBubbleCtaTest {
         orientation = Configuration.ORIENTATION_PORTRAIT,
         formFactor = FormFactor.PHONE,
     )
+
+    @Test
+    fun refreshForOrientation_phoneLandscape_hidesDaxAndFlattensArrow() {
+        configureContainerForPhoneLandscape()
+        val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView))
+            .thenReturn(cardView)
+        val cta = WavingDaxBubbleCta(showArrow = true)
+
+        cta.refreshForOrientation(container)
+
+        verify(dax).isVisible = false
+        verify(cardView).setArrowDepthFraction(0f)
+    }
+
+    @Test
+    fun refreshForOrientation_phonePortrait_showsDaxAndDeepensArrow() {
+        configureContainerForPhonePortrait()
+        stubDaxForFormFactor(dax, FormFactor.PHONE)
+        whenever(dax.alpha).thenReturn(0f)
+        val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView))
+            .thenReturn(cardView)
+        val cta = WavingDaxBubbleCta(showArrow = true)
+
+        cta.refreshForOrientation(container)
+
+        verify(dax).isVisible = true
+        verify(cardView).setArrowDepthFraction(1f)
+    }
+
+    @Test
+    fun refreshForOrientation_showArrowFalse_keepsArrowFlat() {
+        configureContainerForPhonePortrait()
+        val cardView: DaxOnboardingBubbleBrandDesignUpdateCardView = mock()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView))
+            .thenReturn(cardView)
+        val cta = TestableBubbleCta()
+
+        cta.refreshForOrientation(container)
+
+        verify(cardView).setArrowDepthFraction(0f)
+    }
+
+    @Test
+    fun refreshForOrientation_missingCardView_appliesDaxStateAndReturnsCleanly() {
+        configureContainerForPhoneLandscape()
+        whenever(container.findViewById<DaxOnboardingBubbleBrandDesignUpdateCardView>(R.id.brandDesignCardView))
+            .thenReturn(null)
+        val cta = WavingDaxBubbleCta(showArrow = true)
+
+        cta.refreshForOrientation(container)
+
+        verify(dax).isVisible = false
+    }
 
     @Test
     fun configureWavingDax_tablet_anchorsStartToCard() {
@@ -203,22 +259,22 @@ class BrandDesignUpdateBubbleCtaTest {
         override fun configureContentViews(view: View) {}
     }
 
-    private inner class WavingDaxBubbleCta :
-        DaxBubbleCta.BrandDesignUpdateBubbleCta(
-            ctaId = CtaId.DAX_END,
-            title = R.string.onboardingEndDaxDialogTitle,
-            description = R.string.onboardingEndDaxDialogDescription,
-            shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-            okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-            ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
-            onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
-            appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
-            isLightTheme = true,
-            deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
-        ),
+    private inner class WavingDaxBubbleCta(
+        override val showArrow: Boolean = false,
+    ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
+        ctaId = CtaId.DAX_END,
+        title = R.string.onboardingEndDaxDialogTitle,
+        description = R.string.onboardingEndDaxDialogDescription,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+        onboardingStore = this@BrandDesignUpdateBubbleCtaTest.onboardingStore,
+        appInstallStore = this@BrandDesignUpdateBubbleCtaTest.appInstallStore,
+        isLightTheme = true,
+        deviceInfo = this@BrandDesignUpdateBubbleCtaTest.mockDeviceInfo,
+    ),
         DaxBubbleCta.ShowsWavingDax {
         override val activeIncludeId: Int = R.id.primaryCta
-        override val showArrow: Boolean = false
 
         override fun configureContentViews(view: View) {}
     }
