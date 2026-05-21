@@ -221,7 +221,7 @@ class RealDuckAiModelManager @Inject constructor(
         val match = available.firstOrNull { it.mode == persisted }
         if (match != null && match.isAccessible) return persisted
         val next = available.firstOrNull { it.isAccessible }?.mode
-        if (next?.rawValue != persisted?.rawValue) {
+        if (next != persisted) {
             dataStore.setSelectedReasoningMode(next?.rawValue)
         }
         return next
@@ -318,11 +318,16 @@ class RealDuckAiModelManager @Inject constructor(
 private fun AIChatModelsResponse.withHardcodedReasoningGates(): AIChatModelsResponse = copy(
     models = models.map { model ->
         if (model.id != "gpt-5.2") return@map model
-        model.copy(
-            reasoningEffortAccess = ReasoningMode.EXTENDED_REASONING.candidateEfforts.map { effort ->
+        // Server entries win, hardcode only fills gaps. Lets the gate auto-deactivate as
+        // the backend rolls out, and avoids dropping unrelated server-side data.
+        val existing = model.reasoningEffortAccess.orEmpty()
+        val existingIds = existing.mapTo(mutableSetOf()) { it.id }
+        val hardcoded = ReasoningMode.EXTENDED_REASONING.candidateEfforts
+            .filter { it.rawValue !in existingIds }
+            .map { effort ->
                 RemoteReasoningEffortAccess(id = effort.rawValue, accessTier = listOf("pro"), entityHasAccess = false)
-            },
-        )
+            }
+        model.copy(reasoningEffortAccess = existing + hardcoded)
     },
 )
 
