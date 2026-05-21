@@ -168,7 +168,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 topIllustration = CommonR.drawable.ic_announce,
-                title = "Big Single  Message",
+                title = "Big Single Message",
                 subtitle = "Body text goes here. This component has one button",
                 action = "Primary",
             )
