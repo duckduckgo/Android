@@ -243,6 +243,13 @@ interface DuckChatFeature {
     fun chatSuggestionTypeIcon(): Toggle
 
     /**
+     * @return `true` when the per-row Rename affordance on the Duck.ai chat history screen is visible.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun renameChat(): Toggle
+
+    /**
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
      * @return `true` when the remote config has the "digitalAssistantDuckAi"
      * sub-feature flag enabled
