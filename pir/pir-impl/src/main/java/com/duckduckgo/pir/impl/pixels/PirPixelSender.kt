@@ -1103,7 +1103,7 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                durationMs = durationMs,
+                durationMs = durationMs.roundToNearest10Ms(),
                 tries = tries,
                 actionId = actionId,
             ),
@@ -1230,7 +1230,7 @@ class RealPirPixelSender @Inject constructor(
                 brokerUrl = brokerUrl,
                 parentUrl = parentUrl,
                 brokerVersion = brokerVersion,
-                durationMs = durationMs,
+                durationMs = durationMs.roundToNearest10Ms(),
                 tries = tries,
                 actionId = actionId,
             ),
@@ -1630,6 +1630,8 @@ class RealPirPixelSender @Inject constructor(
         PirExecutionType.MANUAL_EDIT_PROFILE -> "profile_edit"
         PirExecutionType.SCHEDULED -> "scheduled"
     }
+
+    private fun Long.roundToNearest10Ms(): Long = ((this + 5) / 10) * 10
 
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
