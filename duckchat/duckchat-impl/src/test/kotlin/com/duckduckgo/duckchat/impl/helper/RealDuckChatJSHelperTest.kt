@@ -313,7 +313,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAndAutomaticDisabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAndAutomaticDisabledThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
 
         val result =
@@ -326,7 +326,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -354,7 +356,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextWithoutDataThenReturnsNull() = runTest {
+    fun whenGetPageContextWithoutDataThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -367,7 +369,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = "",
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -428,7 +432,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextWithUnknownReasonThenReturnsNull() = runTest {
+    fun whenGetPageContextWithUnknownReasonThenReturnsEmptyPageContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -441,7 +445,9 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -615,7 +621,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context for init without automatic attachment then return null`() = runTest {
+    fun `when get AI chat page context for init without automatic attachment then return empty page context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -630,7 +636,9 @@ class RealDuckChatJSHelperTest {
             pageContext = viewModel.updatedPageContext,
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
@@ -680,7 +688,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context without context then return null`() = runTest {
+    fun `when get AI chat page context without context then return empty page context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -696,7 +704,9 @@ class RealDuckChatJSHelperTest {
             pageContext = "",
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        assertTrue(result!!.params.has("pageContext"))
+        assertTrue(result.params.isNull("pageContext"))
     }
 
     @Test
