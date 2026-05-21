@@ -1907,8 +1907,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         quickSetupFadeInAnimatorSet?.end()
         suggestionButtonsAnimatorSet?.end()
 
-        // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
-        snapCheckIconsToFinalState()
+        // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one.
+        // Only do this on the comparison chart: those runnables are only ever scheduled by playCheckIconAnimation(),
+        // and snapping outside that screen leaves the check views at alpha=1/scale=1 with a static drawable, which
+        // makes them appear pre-rendered when the comparison chart later fades in.
+        if (viewModel.viewState.value.currentDialog == COMPARISON_CHART) {
+            snapCheckIconsToFinalState()
+        }
     }
 
     private fun snapCheckIconsToFinalState() {
