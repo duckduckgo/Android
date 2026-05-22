@@ -45,8 +45,15 @@ data class ModelState(
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
+    /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
     val availableReasoningModes: List<AvailableReasoningMode> = emptyList(),
+    /** Reasoning mode for the current chat. Session only (not persisted)
+     * Note: if we ever want to preserve picks across unsubmitted chats
+     * (User selected a mode but navigated away or switched tab without submission)
+     * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
+     * */
+    val chatScopedReasoningMode: ReasoningMode? = null,
 )
 
 interface DuckAiModelManager {
@@ -57,6 +64,8 @@ interface DuckAiModelManager {
     suspend fun selectModel(model: AIChatModel)
 
     suspend fun selectReasoningMode(mode: ReasoningMode)
+
+    suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
 
     fun getSelectedModelId(): String?
 
@@ -138,7 +147,7 @@ class RealDuckAiModelManager @Inject constructor(
                     )
                     val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
-                    _modelState.value = ModelState(
+                    _modelState.value = _modelState.value.copy(
                         models = models,
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
@@ -204,6 +213,12 @@ class RealDuckAiModelManager @Inject constructor(
                 _modelState.value = _modelState.value.copy(selectedReasoningMode = mode)
                 logcat { "Duck.ai Model Manager: selected reasoning mode ${mode.rawValue}" }
             }
+        }
+    }
+
+    override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) {
+        stateMutex.withLock {
+            _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
         }
     }
 

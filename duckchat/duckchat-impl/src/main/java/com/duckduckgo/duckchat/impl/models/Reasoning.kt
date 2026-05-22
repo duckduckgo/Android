@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.models
 
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+
 enum class ReasoningEffort(val rawValue: String) {
     NONE("none"),
     MINIMAL("minimal"),
@@ -101,4 +103,23 @@ object ReasoningResolver {
         mode: ReasoningMode?,
         available: List<AvailableReasoningMode>,
     ): ReasoningEffort? = available.firstOrNull { it.mode == mode }?.effort
+
+    /** Reasoning data for [chat]; `null` if its model isn't in [modelState] (callers fall back to global). */
+    internal fun forChat(chat: DuckAiChat, modelState: ModelState): ChatReasoningResolution? {
+        val chatModel = modelState.models.firstOrNull { it.id == chat.model } ?: return null
+        val available = availableModes(
+            supported = chatModel.supportedReasoningEfforts,
+            effortAccess = chatModel.reasoningEffortAccess,
+        )
+        val mode = modelState.chatScopedReasoningMode
+            ?: ReasoningMode.from(chat.reasoningMode)
+            ?: modelState.selectedReasoningMode
+        return ChatReasoningResolution(available = available, mode = mode)
+    }
 }
+
+/** Resolved reasoning data for an existing chat: the rows that apply and the mode to use. */
+internal data class ChatReasoningResolution(
+    val available: List<AvailableReasoningMode>,
+    val mode: ReasoningMode?,
+)
