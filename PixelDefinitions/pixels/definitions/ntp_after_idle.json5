@@ -261,14 +261,14 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_ntp_after_escape_hatch_after_inactivity_tapped": {
+    "m_ntp_after_idle_escape_hatch_after_inactivity_tapped": {
         "description": "User tapped After inactivity from the new tab return hatch menu",
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_ntp_after_escape_hatch_after_inactivity_tapped_daily": {
+    "m_ntp_after_idle_escape_hatch_after_inactivity_tapped_daily": {
         "description": "(Daily Pixel) User tapped After inactivity from the new tab return hatch menu",
         "owners": ["malmstein"],
         "triggers": ["other"],

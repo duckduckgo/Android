@@ -25,6 +25,6 @@ enum class NewTabReturnHatchPixelName(override val pixelName: String) : Pixel.Pi
     OPTION_SELECTED_CLOSE_TAB_DAILY("m_ntp_after_idle_escape_hatch_close_tab_tapped_daily"),
     OPTION_SELECTED_RETURN_TAB("m_ntp_after_idle_escape_hatch_return_tapped"),
     OPTION_SELECTED_RETURN_TAB_DAILY("m_ntp_after_idle_escape_hatch_return_tapped_daily"),
-    OPTION_SELECTED_AFTER_INACTIVITY("m_ntp_after_escape_hatch_after_inactivity_tapped"),
-    OPTION_SELECTED_AFTER_INACTIVITY_DAILY("m_ntp_after_escape_hatch_after_inactivity_tapped_daily"),
+    OPTION_SELECTED_AFTER_INACTIVITY("m_ntp_after_idle_escape_hatch_after_inactivity_tapped"),
+    OPTION_SELECTED_AFTER_INACTIVITY_DAILY("m_ntp_after_idle_escape_hatch_after_inactivity_tapped_daily"),
 }
