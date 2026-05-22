@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import com.duckduckgo.duckchat.impl.models.ChatType
 import org.json.JSONObject
 import java.time.Instant
 import java.time.ZoneId

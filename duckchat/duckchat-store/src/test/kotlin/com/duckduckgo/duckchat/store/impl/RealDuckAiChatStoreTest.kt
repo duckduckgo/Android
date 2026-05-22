@@ -611,4 +611,67 @@ class RealDuckAiChatStoreTest {
 
         assertEquals(null, store.getChatContent("missing"))
     }
+
+    @Test
+    fun `readFileRef decodes the base64 data field into raw bytes`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        // FE stores the entire `params` JSON via writeText — "data" carries base64-encoded bytes.
+        val envelope = JSONObject()
+            .put("uuid", uuid)
+            .put("chatId", "abc")
+            .put("fileName", "image-1.jpeg")
+            .put("mimeType", "image/jpeg")
+            .put("data", java.util.Base64.getEncoder().encodeToString("hello".toByteArray()))
+            .toString()
+        File(filesDir, uuid).writeText(envelope)
+
+        val result = store.readFileRef(uuid)
+
+        assertEquals("image-1.jpeg", result?.fileName)
+        assertEquals("image/jpeg", result?.mimeType)
+        assertEquals("hello", result?.bytes?.toString(Charsets.UTF_8))
+    }
+
+    @Test
+    fun `readFileRef strips the data URL prefix before decoding`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        val base64 = java.util.Base64.getEncoder().encodeToString("world".toByteArray())
+        val envelope = JSONObject()
+            .put("uuid", uuid)
+            .put("fileName", "image-1.jpeg")
+            .put("mimeType", "image/jpeg")
+            .put("data", "data:image/jpeg;base64,$base64")
+            .toString()
+        File(filesDir, uuid).writeText(envelope)
+
+        val result = store.readFileRef(uuid)
+
+        assertEquals("world", result?.bytes?.toString(Charsets.UTF_8))
+    }
+
+    @Test
+    fun `readFileRef returns null when the on-disk file is missing`() = runTest {
+        assertNull(store.readFileRef("does-not-exist"))
+    }
+
+    @Test
+    fun `readFileRef returns null when the file is not valid JSON`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        File(filesDir, uuid).writeText("not json")
+
+        assertNull(store.readFileRef(uuid))
+    }
+
+    @Test
+    fun `readFileRef returns null when the data field is missing`() = runTest {
+        val uuid = "82d44a67-0f52-4147-bb51-c0f1cb36f527"
+        File(filesDir, uuid).writeText(JSONObject().put("uuid", uuid).toString())
+
+        assertNull(store.readFileRef(uuid))
+    }
+
+    @Test
+    fun `readFileRef refuses path traversal in the uuid`() = runTest {
+        assertNull(store.readFileRef("../../etc/passwd"))
+    }
 }

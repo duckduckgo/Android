@@ -26,7 +26,6 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.File
-import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -141,6 +140,3 @@ class RealChatExportWriter @Inject constructor(
         val BOM_UTF8: ByteArray = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
     }
 }
-
-/** Reads the bytes from an [InputStream] then closes it. Null-safe convenience used by the repository. */
-internal fun InputStream?.readBytesAndClose(): ByteArray? = this?.use { it.readBytes() }

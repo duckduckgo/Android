@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import com.duckduckgo.duckchat.impl.models.ChatType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

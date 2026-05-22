@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
-import java.io.InputStream
+import java.util.Base64
 import javax.inject.Inject
 
 /**
@@ -52,6 +52,18 @@ data class DuckAiChat(
     val isImageGeneration: Boolean = false,
     /** True when [model] equals `voice-mode`. */
     val isVoice: Boolean = false,
+)
+
+/**
+ * The decoded payload of a chat fileRef. The on-disk file is a JSON envelope written by the FE
+ * containing the base64-encoded image data plus metadata; [DuckAiChatStore.readFileRef] returns
+ * the decoded bytes along with the FE-provided [fileName] and [mimeType] (both may be null when
+ * the FE omitted them).
+ */
+data class FileRefContent(
+    val fileName: String?,
+    val mimeType: String?,
+    val bytes: ByteArray,
 )
 
 interface DuckAiChatStore {
@@ -86,11 +98,13 @@ interface DuckAiChatStore {
     suspend fun getChatContent(chatId: String): String?
 
     /**
-     * Opens an [InputStream] for the file backing [uuid] (a fileRef UUID surfaced on [DuckAiChat]).
-     * Returns null if the file is missing or [uuid] resolves outside the chat-files directory.
-     * Callers MUST close the stream.
+     * Reads the file backing [uuid] (a fileRef UUID surfaced on [DuckAiChat]) and returns its
+     * decoded payload. The on-disk file is a JSON envelope written by the FE bridge; this method
+     * parses it and base64-decodes the `data` field. Returns null if the file is missing, the
+     * JSON is malformed, the `data` field is absent, or [uuid] resolves outside the chat-files
+     * directory.
      */
-    suspend fun openFileRef(uuid: String): InputStream?
+    suspend fun readFileRef(uuid: String): FileRefContent?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -189,17 +203,32 @@ class RealDuckAiChatStore @Inject constructor(
     override suspend fun getChatContent(chatId: String): String? =
         withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
 
-    override suspend fun openFileRef(uuid: String): InputStream? =
+    override suspend fun readFileRef(uuid: String): FileRefContent? =
         withContext(dispatchers.io()) {
             val filesDir = filesDirLazy.get()
             val file = File(filesDir, uuid)
             // Same path-traversal guard as deleteChat — reject anything resolving outside the dir.
             if (!file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
-                logcat { "DuckAI: RealDuckAiChatStore.openFileRef -- invalid uuid=$uuid" }
+                logcat { "DuckAI: RealDuckAiChatStore.readFileRef -- invalid uuid=$uuid" }
                 return@withContext null
             }
             if (!file.exists()) return@withContext null
-            file.inputStream()
+            runCatching {
+                val json = JSONObject(file.readText())
+                val rawData = json.optString("data").takeIf { it.isNotEmpty() } ?: return@runCatching null
+                // Accept both plain base64 and `data:<mime>;base64,<payload>` data URLs.
+                val base64 = if (rawData.startsWith("data:")) {
+                    rawData.substringAfter(',', missingDelimiterValue = "")
+                } else {
+                    rawData
+                }
+                if (base64.isEmpty()) return@runCatching null
+                FileRefContent(
+                    fileName = json.optString("fileName").ifEmpty { null },
+                    mimeType = json.optString("mimeType").ifEmpty { null },
+                    bytes = Base64.getDecoder().decode(base64),
+                )
+            }.getOrNull()
         }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {

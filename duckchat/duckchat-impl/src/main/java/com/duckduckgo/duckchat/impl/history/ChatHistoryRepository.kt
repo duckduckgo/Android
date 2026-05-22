@@ -103,9 +103,9 @@ class RealChatHistoryRepository @Inject constructor(
                 is ExportResult.Zip -> ExportPayload.Zip(
                     content = result.content,
                     images = result.imageFileRefs.mapIndexed { index, uuid ->
-                        val bytes = chatStore.openFileRef(uuid).readBytesAndClose()
+                        val fileRef = chatStore.readFileRef(uuid)
                             ?: throw IllegalStateException("File $uuid missing for chat $chatId")
-                        ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = bytes)
+                        ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = fileRef.bytes)
                     },
                 )
             }
