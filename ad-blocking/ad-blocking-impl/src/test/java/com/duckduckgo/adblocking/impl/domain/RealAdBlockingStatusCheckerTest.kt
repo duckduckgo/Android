@@ -141,12 +141,12 @@ class RealAdBlockingStatusCheckerTest {
     }
 
     @Test
-    fun whenDiscoverableFlagEnabledThenIsShownInSettings() {
+    fun whenKillSwitchIsOnThenIsShownInSettings() {
         assertTrue(checker.isShownInSettings())
     }
 
     @Test
-    fun whenKillSwitchFlagDisabledThenIsNotShownInSettings() {
+    fun whenKillSwitchIsOffThenIsNotShownInSettings() {
         killSwitchEnabled = false
 
         assertFalse(checker.isShownInSettings())

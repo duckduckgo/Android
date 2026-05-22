@@ -66,7 +66,7 @@ class RealAdBlockingStatusChecker @Inject constructor(
         return true
     }
 
-    override fun isShownInSettings(): Boolean = feature.isDiscoverable().isEnabled()
+    override fun isShownInSettings(): Boolean = feature.self().isEnabled()
 
     override fun isUserEnabledFlow(): Flow<Boolean> = userEnabled
 }
