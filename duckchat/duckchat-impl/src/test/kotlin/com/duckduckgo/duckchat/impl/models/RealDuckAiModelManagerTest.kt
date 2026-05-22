@@ -1132,6 +1132,47 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenSetChatScopedReasoningModeThenStateUpdatedAndNotPersisted() = runTest {
+        testee = createManager()
+
+        testee.setChatScopedReasoningMode(ReasoningMode.REASONING)
+
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.chatScopedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(any())
+    }
+
+    @Test
+    fun whenSetChatScopedReasoningModeToNullThenStateClearedAndNotPersisted() = runTest {
+        testee = createManager()
+        testee.setChatScopedReasoningMode(ReasoningMode.REASONING)
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.chatScopedReasoningMode)
+
+        testee.setChatScopedReasoningMode(null)
+
+        assertNull(testee.modelState.value.chatScopedReasoningMode)
+        verify(dataStore, never()).setSelectedReasoningMode(any())
+    }
+
+    @Test
+    fun whenFetchModelsThenChatScopedReasoningModeIsPreserved() = runTest {
+        // fetchModels rebuilds modelState — must not silently drop in-session chat-scoped picks.
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any())).thenReturn(
+            AIChatModelsResponse(
+                listOf(remoteModel("id", accessTier = listOf("free"), entityHasAccess = true)),
+            ),
+        )
+        testee = createManager()
+        testee.setChatScopedReasoningMode(ReasoningMode.REASONING)
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.chatScopedReasoningMode)
+
+        testee.fetchModels()
+
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.chatScopedReasoningMode)
+    }
+
+    @Test
     fun whenSelectReasoningModeAndModeIsGatedThenIgnoredAndNotPersisted() = runTest {
         // Defends against direct calls bypassing the picker's tap handler: gated modes must not be persistable.
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("m", "M"))

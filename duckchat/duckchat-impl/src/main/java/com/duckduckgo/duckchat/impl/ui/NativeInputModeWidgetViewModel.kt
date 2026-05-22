@@ -51,12 +51,16 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -75,7 +79,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 data class ChatTabSuggestions(
@@ -100,6 +103,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val nativeInputStateProvider: NativeInputStateProvider,
     private val modelManager: DuckAiModelManager,
+    private val duckAiChatStore: DuckAiChatStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -122,7 +126,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _modelPickerEnabled = MutableStateFlow(true)
     val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
 
-    private val _chatId = MutableStateFlow<String?>(null)
+    private val currentChat = MutableStateFlow<DuckAiChat?>(null)
+    private var currentChatJob: Job? = null
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -144,12 +149,29 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         _modelPickerEnabled.value = enabled
     }
 
+    // currentChat can briefly hold the previous chat while a getChatById lookup is in flight.
+    // Returns it only when it matches the active tab's published chatId.
+    private fun validChat(): DuckAiChat? {
+        val activeChatId = activeTabId.value?.let { nativeInputStateProvider.stateForTab(it).value.chatId }
+        return currentChat.value?.takeIf { it.chatId == activeChatId }
+    }
+
     fun getSelectedModelId(): String? {
+        // Existing chat: send chat's stored model.
+        validChat()?.model?.let { return it }
+        // New chat with picker off: nothing to send.
         if (!_modelPickerEnabled.value) return null
+        // New chat with picker on: send what the user picked.
         return modelManager.getSelectedModelId()
     }
 
-    fun getResolvedReasoningEffort(): String? = modelManager.getResolvedReasoningEffort()
+    fun getResolvedReasoningEffort(): String? {
+        val chat = validChat() ?: return modelManager.getResolvedReasoningEffort()
+        val resolution = ReasoningResolver.forChat(chat, modelManager.modelState.value)
+            ?: return modelManager.getResolvedReasoningEffort()
+        val mode = ReasoningResolver.resolveMode(persisted = resolution.mode, available = resolution.available)
+        return ReasoningResolver.effortFor(mode, resolution.available)?.rawValue
+    }
 
     fun getSelectedTool(): String? {
         val tabId = activeTabId.value ?: return null
@@ -210,18 +232,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                     }
                 }
         }
-
-        // Publish chatId to per-tab state. setActiveChatId can fire during widget attach before
-        // configure() sets activeTabId — _chatId holds the value until then.
-        viewModelScope.launch {
-            combine(_chatId, activeTabId.filterNotNull()) { chatId, tabId -> tabId to chatId }
-                .collect { (tabId, chatId) ->
-                    nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
-                    // TODO: logs the chatId observers will see for this tab. Added for testing.
-                    //  Remove once consumer logic is implemented.
-                    logcat { "Duck.ai native input: active chatId for tab=$tabId is now $chatId" }
-                }
-        }
     }
 
     val chatState: Flow<ChatState> = duckChatInternal.chatState
@@ -263,7 +273,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun setActiveChatId(chatId: String?) {
-        _chatId.value = chatId
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
+        modelManager.setChatScopedReasoningMode(null)
+        currentChatJob?.cancel()
+        currentChat.value = null
+        if (chatId != null) {
+            currentChatJob = viewModelScope.launch {
+                currentChat.value = duckAiChatStore.getChatById(chatId)
+            }
+        }
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {

@@ -39,7 +39,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
@@ -112,9 +111,11 @@ class ReasoningModePickerView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.state
             .onEach { state ->
-                isVisible = state.availableReasoningModes.size > 1 &&
-                    state.availableReasoningModes.any { it.isAccessible }
-                viewModel.resolvedMode(state)?.let { mode ->
+                isVisible = state.visible
+                // Popup is positioned by screen coordinates, not parented to the button. Dismiss
+                // it explicitly when picker hides or stale rows stay tappable for the new chat.
+                if (!state.visible) dismissPopup()
+                state.displayedMode?.let { mode ->
                     button.setImageResource(viewModel.iconResFor(mode))
                 }
             }
@@ -143,8 +144,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     private fun showMenu() {
         val state = viewModel.state.value
-        if (state.availableReasoningModes.size <= 1) return
-        if (state.availableReasoningModes.none { it.isAccessible }) return
+        if (!state.visible) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -168,8 +168,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
         showAtPosition(popup)
     }
 
-    private fun populate(container: LinearLayout, popup: PopupWindow, state: ModelState) {
-        viewModel.rows(state).forEach { row ->
+    private fun populate(container: LinearLayout, popup: PopupWindow, state: ReasoningModePickerState) {
+        state.rows.forEach { row ->
             val item = LayoutInflater.from(context)
                 .inflate(R.layout.view_reasoning_mode_picker_item, container, false)
             item.findViewById<ImageView>(R.id.reasoningModeItemLeadingIcon)

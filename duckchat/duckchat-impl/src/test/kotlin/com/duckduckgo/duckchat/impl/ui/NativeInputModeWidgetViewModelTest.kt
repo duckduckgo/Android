@@ -45,13 +45,21 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningEffort
+import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -70,9 +78,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -97,6 +108,7 @@ class NativeInputModeWidgetViewModelTest {
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
     private val modelManager: DuckAiModelManager = mock()
+    private val duckAiChatStore: DuckAiChatStore = mock()
 
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
     private val tabRepository: TabRepository = mock<TabRepository>().also {
@@ -154,6 +166,7 @@ class NativeInputModeWidgetViewModelTest {
             nativeInputStatePublisher = nativeInputStatePublisher,
             nativeInputStateProvider = nativeInputStateProvider,
             modelManager = modelManager,
+            duckAiChatStore = duckAiChatStore,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
     }
@@ -540,6 +553,243 @@ class NativeInputModeWidgetViewModelTest {
         assertNull(viewModel.getResolvedReasoningEffort())
     }
 
+    // region chat-aware submission getters
+
+    @Test
+    fun whenChatIdSetThenGetSelectedModelIdReturnsChatsModel() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        assertEquals("chat-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdSetAndPickerDisabledThenGetSelectedModelIdStillReturnsChatsModel() = runTest {
+        // Production binds modelPickerEnabled to `chatId == null`, so existing chats always have the
+        // picker disabled. Submission must still carry the chat's stored model.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertEquals("chat-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdNullAndPickerDisabledThenGetSelectedModelIdReturnsNull() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdFlipsAndNewLookupInFlightThenGetSelectedModelIdFallsBackToGlobalNotPreviousChat() = runTest {
+        // Warm transition: currentChat is still chat-A while _chatId is "chat-B" and the lookup
+        // for chat-B is suspended. Submission must fall back to global rather than return chat-A's
+        // model tagged to chat-B.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
+            DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-A")
+        advanceUntilIdle()
+        assertEquals("chat-A-model", viewModel.getSelectedModelId())
+
+        val pending = CompletableDeferred<DuckAiChat?>()
+        duckAiChatStore.stub {
+            onBlocking { getChatById("chat-B") } doSuspendableAnswer { pending.await() }
+        }
+        viewModel.setActiveChatId("chat-B")
+        advanceUntilIdle()
+
+        // During the transition: currentChat is null, submission falls back to global.
+        assertEquals("global-model", viewModel.getSelectedModelId())
+
+        pending.complete(
+            DuckAiChat(chatId = "chat-B", title = "t", model = "chat-B-model", lastEdit = "now", pinned = false),
+        )
+        advanceUntilIdle()
+        assertEquals("chat-B-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdJustSetAndLookupInFlightThenSubmissionFallsBackToGlobal() = runTest {
+        // setActiveChatId nulls currentChat synchronously and launches the lookup. During the in-
+        // flight window, submission must fall back to global rather than return chat-A's data.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
+            DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-A")
+        advanceUntilIdle()
+        assertEquals("chat-A-model", viewModel.getSelectedModelId())
+
+        // Flip to chat-B without yielding — currentChat is now null, lookup is launched but unfinished.
+        viewModel.setActiveChatId("chat-B")
+        // Intentionally no advanceUntilIdle() here.
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdNullThenGetSelectedModelIdReturnsGlobal() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatHasReasoningModeThenGetResolvedReasoningEffortMatchesChatsMode() = runTest {
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.REASONING.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        assertEquals(ReasoningEffort.LOW.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenChatStoredModeIsGatedForCurrentTierThenGetResolvedReasoningEffortFallsBackToAccessible() = runTest {
+        // Chat was saved with extended_reasoning (PRO-only on this model). Current user is FREE.
+        // Submission must NOT send the gated effort; it must fall back to the first accessible mode's
+        // effort — mirroring what the picker UI shows via resolveMode's accessibility filter.
+        val gatedModel = AIChatModel(
+            id = "chat-model",
+            name = "chat-model",
+            displayName = "chat-model",
+            shortName = "chat-model",
+            accessTier = listOf("free", "plus", "pro"),
+            isAccessible = true,
+            supportedReasoningEfforts = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW, ReasoningEffort.MEDIUM),
+            reasoningEffortAccess = listOf(
+                ReasoningEffortAccess(effort = ReasoningEffort.NONE, accessTier = listOf("free", "plus", "pro"), isAccessible = true),
+                ReasoningEffortAccess(effort = ReasoningEffort.LOW, accessTier = listOf("free", "plus", "pro"), isAccessible = true),
+                ReasoningEffortAccess(effort = ReasoningEffort.MEDIUM, accessTier = listOf("pro"), isAccessible = false),
+            ),
+        )
+        val modelStateFlow = MutableStateFlow(ModelState(models = listOf(gatedModel)))
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.EXTENDED_REASONING.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        // FAST is the first accessible mode (effort NONE). MEDIUM (extended_reasoning) is gated.
+        assertEquals(ReasoningEffort.NONE.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenChatScopedReasoningModeSetThenGetResolvedReasoningEffortOverridesChatStoredMode() = runTest {
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.FAST.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+        modelStateFlow.value = modelStateFlow.value.copy(chatScopedReasoningMode = ReasoningMode.REASONING)
+
+        assertEquals(ReasoningEffort.LOW.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    // endregion
+
+    // region tab-switch chatId clear
+
+    @Test
+    fun whenChatIdChangesThenChatScopedReasoningModeIsClearedOnManager() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // Manager's setter is called every time _chatId emits (including the initial null on configure
+        // and the chat-X value). Reset verification to focus on the chatId-Y transition.
+        clearInvocations(modelManager)
+
+        viewModel.setActiveChatId("chat-Y")
+        advanceUntilIdle()
+
+        verify(modelManager).setChatScopedReasoningMode(null)
+    }
+
+    private fun aiModel(id: String, supported: List<ReasoningEffort>): AIChatModel = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = listOf("free", "plus", "pro"),
+        isAccessible = true,
+        supportedReasoningEfforts = supported,
+    )
+
+    // endregion
+
     @Test
     fun whenNoTabIsActiveThenGetSelectedToolReturnsNull() = runTest {
         val freshViewModel = createViewModel()
@@ -840,22 +1090,6 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertNull(nativeInputStateProvider.stateForTab(tabId).value.chatId)
-    }
-
-    @Test
-    fun whenSetActiveChatIdBeforeConfigureThenChatIdIsBufferedAndPublishedOnConfigure() = runTest {
-        // Regression for the attach race: bindChatIdSource can fire setActiveChatId synchronously
-        // during widget attach, before configure() sets activeTabId.value. The buffered value must
-        // be replayed once a tabId becomes available.
-        val freshViewModel = createViewModel()
-
-        freshViewModel.setActiveChatId("chat-123")
-        advanceUntilIdle()
-
-        freshViewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
-        advanceUntilIdle()
-
-        assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
     }
 
     // endregion
