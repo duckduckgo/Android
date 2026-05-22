@@ -27,37 +27,37 @@ import org.mockito.kotlin.mock
 
 class RealAdBlockingStatusCheckerTest {
 
-    private var discoverableEnabled = true
-    private var operationalEnabled = true
+    private var killSwitchEnabled = true
+    private var contingencyModeEnabled = false
 
-    private val isDiscoverableToggle: Toggle = mock {
-        on { isEnabled() } doAnswer { discoverableEnabled }
-    }
     private val selfToggle: Toggle = mock {
-        on { isEnabled() } doAnswer { operationalEnabled }
+        on { isEnabled() } doAnswer { killSwitchEnabled }
+    }
+    private val contingencyModeToggle: Toggle = mock {
+        on { isEnabled() } doAnswer { contingencyModeEnabled }
     }
     private val feature: AdBlockingExtensionFeature = mock {
-        on { isDiscoverable() } doReturn isDiscoverableToggle
         on { self() } doReturn selfToggle
+        on { enableContingencyMode() } doReturn contingencyModeToggle
     }
 
     private val checker = RealAdBlockingStatusChecker(feature)
 
     @Test
-    fun whenBothRemoteFlagsEnabledThenCanInject() {
+    fun whenKillSwitchIsOnAndContingencyModeIsOffThenCanInject() {
         assertTrue(checker.canInject())
     }
 
     @Test
-    fun whenDiscoverableFlagDisabledThenCannotInject() {
-        discoverableEnabled = false
+    fun whenKillSwitchIsOffThenCannotInject() {
+        killSwitchEnabled = false
 
         assertFalse(checker.canInject())
     }
 
     @Test
-    fun whenOperationalFlagDisabledThenCannotInject() {
-        operationalEnabled = false
+    fun whenContingencyModeIsOnThenCannotInject() {
+        contingencyModeEnabled = true
 
         assertFalse(checker.canInject())
     }

@@ -34,12 +34,12 @@ class RealAdBlockingStatusChecker @Inject constructor(
 ) : AdBlockingStatusChecker {
 
     override fun canInject(): Boolean {
-        if (!feature.isDiscoverable().isEnabled()) {
-            logcat { "Feature not discoverable" }
+        if (!feature.self().isEnabled()) {
+            logcat { "Kill-switch is off" }
             return false
         }
-        if (!feature.self().isEnabled()) {
-            logcat { "Feature not operational" }
+        if (feature.enableContingencyMode().isEnabled()) {
+            logcat { "Contingency mode is on" }
             return false
         }
         return true
