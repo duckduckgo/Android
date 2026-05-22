@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class RealAdBlockingUserPreferences @Inject constructor(
 
     override fun isEnabledFlow(): Flow<Boolean?> = dataStore.data.map { prefs -> prefs[KEY_ENABLED] }
 
-    override suspend fun isEnabled(): Boolean? = isEnabledFlow().first()
+    override suspend fun isEnabled(): Boolean? = isEnabledFlow().firstOrNull()
 
     override suspend fun setEnabled(enabled: Boolean) {
         dataStore.edit { prefs -> prefs[KEY_ENABLED] = enabled }
