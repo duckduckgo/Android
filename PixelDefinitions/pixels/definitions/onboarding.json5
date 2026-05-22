@@ -55,5 +55,54 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_onboarding_quick-setup": {
+        "description": "Fires when the Quick Setup screen is shown to a reinstall user during onboarding and again when the user taps the Start browsing CTA. Sent as Unique once per user per event (shown/clicked).",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "e",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["shown", "clicked"]
+            },
+            {
+                "key": "it",
+                "type": "string",
+                "description": "Install type",
+                "enum": ["new", "reinstall"]
+            },
+            {
+                "key": "d",
+                "type": "integer",
+                "description": "Days since install (0-28). Omitted when more than 28 days have passed since install."
+            },
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Onboarding entry point",
+                "enum": ["default"]
+            },
+            {
+                "key": "flow",
+                "type": "string",
+                "description": "Onboarding flow type",
+                "enum": ["default"]
+            },
+            {
+                "key": "pixelSource",
+                "type": "string",
+                "description": "Device form factor",
+                "enum": ["phone", "tablet"]
+            },
+            {
+                "key": "value",
+                "type": "string",
+                "description": "Only set when e=clicked. Composite encoding of the user's Quick Setup selections, formatted as 'set_as_default:on|off widget:on|off address_bar:top|bottom|split input_type:search|search_and_duckai'."
+            }
+        ]
     }
 }
