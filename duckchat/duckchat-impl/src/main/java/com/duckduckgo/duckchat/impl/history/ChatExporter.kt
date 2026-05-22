@@ -23,28 +23,86 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Formats a Duck.ai chat (FE-owned JSON blob) into the plain-text shape defined by FR-016f.
+ * Formats a Duck.ai chat (FE-owned JSON blob) into the platform-standard plain-text shape.
  * Pure — no I/O, no DI. Inject a [ZoneId] to keep tests deterministic across machine timezones.
+ *
+ * Output shape varies by [ChatType] (see research.md R-16):
+ *  - [ChatType.Discussion]: assistant turns prefixed with `<Model>:`.
+ *  - [ChatType.Voice]: assistant turns prefixed with literal "Voice Chat:" and omitted entirely
+ *    when the model produced no text (matches the macOS/Windows reference voice format where
+ *    user-only turns appear without a response block).
+ *  - [ChatType.ImageGeneration]: assistant text replaced by `[Generated image: image-N.jpeg]`;
+ *    the resulting [ExportResult.Zip] carries the consumed fileRefs in turn order. Positional
+ *    fileRef ↔ assistant-turn association is a known assumption — see R-16 open question (1).
  */
 internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault()) {
 
-    fun export(rawJson: String): String {
+    fun export(
+        rawJson: String,
+        chatType: ChatType = ChatType.Discussion,
+        fileRefs: List<String> = emptyList(),
+    ): ExportResult {
         val json = JSONObject(rawJson)
         val display = ModelDisplay.from(json.optString("model"))
         val turns = extractTurns(json.optJSONArray("messages"))
 
-        return buildString {
-            appendLine(header(display))
+        return when (chatType) {
+            ChatType.Discussion -> ExportResult.Text(renderDiscussion(display, turns))
+            ChatType.Voice -> ExportResult.Text(renderVoice(display, turns))
+            ChatType.ImageGeneration -> renderImage(display, turns, fileRefs)
+        }
+    }
+
+    private fun renderDiscussion(display: ModelDisplay, turns: List<Turn>): String =
+        buildContent(display, turns) { _, turn -> "${display.shortName}:\n${turn.assistantText}" }
+
+    private fun renderVoice(display: ModelDisplay, turns: List<Turn>): String =
+        buildContent(display, turns) { _, turn ->
+            if (turn.assistantText.isBlank()) "" else "Voice Chat:\n${turn.assistantText}"
+        }
+
+    private fun renderImage(
+        display: ModelDisplay,
+        turns: List<Turn>,
+        fileRefs: List<String>,
+    ): ExportResult.Zip {
+        val consumed = mutableListOf<String>()
+        val text = buildContent(display, turns) { index, _ ->
+            val uuid = fileRefs.getOrNull(index)
+            if (uuid != null) {
+                consumed += uuid
+                "${display.shortName}:\n\n[Generated image: image-${consumed.size}.jpeg]"
+            } else {
+                "${display.shortName}:"
+            }
+        }
+        return ExportResult.Zip(text, consumed)
+    }
+
+    private fun buildContent(
+        display: ModelDisplay,
+        turns: List<Turn>,
+        assistantBlock: (Int, Turn) -> String,
+    ): String = buildString {
+        appendLine(header(display))
+        appendLine()
+        append(SEPARATOR)
+        turns.forEachIndexed { index, turn ->
+            if (index > 0) {
+                appendLine()
+                appendLine()
+                appendLine(TURN_SEPARATOR)
+            } else {
+                appendLine()
+            }
             appendLine()
-            append(SEPARATOR)
-            turns.forEachIndexed { index, turn ->
+            appendLine("User prompt ${index + 1} of ${turns.size} - ${formatTimestamp(turn.createdAt)}:")
+            append(turn.userText)
+            val assistant = assistantBlock(index, turn)
+            if (assistant.isNotEmpty()) {
                 appendLine()
                 appendLine()
-                appendLine("User prompt ${index + 1} of ${turns.size} - ${formatTimestamp(turn.createdAt)}:")
-                appendLine(turn.userText)
-                appendLine()
-                appendLine("${display.shortName}:")
-                append(turn.assistantText)
+                append(assistant)
             }
         }
     }
@@ -106,8 +164,16 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
 
     private companion object {
         const val SEPARATOR = "===================="
+        const val TURN_SEPARATOR = "--------------------"
         val TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("M/d/yyyy, h:mm:ss a", Locale.US)
     }
+}
+
+internal sealed interface ExportResult {
+    val content: String
+
+    data class Text(override val content: String) : ExportResult
+    data class Zip(override val content: String, val imageFileRefs: List<String>) : ExportResult
 }
 
 internal data class ModelDisplay(

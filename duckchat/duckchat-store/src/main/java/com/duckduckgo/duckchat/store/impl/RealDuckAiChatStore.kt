@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import java.io.InputStream
 import javax.inject.Inject
 
 /**
@@ -83,6 +84,13 @@ interface DuckAiChatStore {
 
     /** Returns the raw FE-owned JSON blob stored for [chatId], or null if the chat does not exist. */
     suspend fun getChatContent(chatId: String): String?
+
+    /**
+     * Opens an [InputStream] for the file backing [uuid] (a fileRef UUID surfaced on [DuckAiChat]).
+     * Returns null if the file is missing or [uuid] resolves outside the chat-files directory.
+     * Callers MUST close the stream.
+     */
+    suspend fun openFileRef(uuid: String): InputStream?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -180,6 +188,19 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun getChatContent(chatId: String): String? =
         withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
+
+    override suspend fun openFileRef(uuid: String): InputStream? =
+        withContext(dispatchers.io()) {
+            val filesDir = filesDirLazy.get()
+            val file = File(filesDir, uuid)
+            // Same path-traversal guard as deleteChat — reject anything resolving outside the dir.
+            if (!file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
+                logcat { "DuckAI: RealDuckAiChatStore.openFileRef -- invalid uuid=$uuid" }
+                return@withContext null
+            }
+            if (!file.exists()) return@withContext null
+            file.inputStream()
+        }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)

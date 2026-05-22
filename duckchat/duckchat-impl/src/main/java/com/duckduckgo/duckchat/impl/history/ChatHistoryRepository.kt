@@ -43,11 +43,12 @@ interface ChatHistoryRepository {
     suspend fun setPinned(chatId: String, pinned: Boolean)
 
     /**
-     * Formats [chatId] per FR-016f and writes it as a `.txt` file to the public Downloads
+     * Formats [chatId] per the cross-platform reference (research.md R-16) and writes it as a
+     * `.txt` (Discussion/Voice) or `.zip` (ImageGeneration) file to the public Downloads
      * directory, registering it in the in-app Downloads list. Returns the resulting file.
      * Throws if the chat is missing or the write fails.
      */
-    suspend fun exportChat(chatId: String, displayTitle: String): File
+    suspend fun exportChat(chatId: String): File
 }
 
 @ContributesBinding(AppScope::class)
@@ -90,12 +91,25 @@ class RealChatHistoryRepository @Inject constructor(
         }
     }
 
-    override suspend fun exportChat(chatId: String, displayTitle: String): File =
+    override suspend fun exportChat(chatId: String): File =
         withContext(dispatchers.io()) {
-            val rawJson = chatStore.getChatContent(chatId)
+            val chat = chatStore.getChats().firstOrNull { it.chatId == chatId }
                 ?: throw IllegalStateException("Chat $chatId not found")
-            val text = chatExporter.export(rawJson)
-            chatExportWriter.write(text, displayTitle)
+            val rawJson = chatStore.getChatContent(chatId)
+                ?: throw IllegalStateException("Chat $chatId content not found")
+            val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs)
+            val payload = when (result) {
+                is ExportResult.Text -> ExportPayload.Text(result.content)
+                is ExportResult.Zip -> ExportPayload.Zip(
+                    content = result.content,
+                    images = result.imageFileRefs.mapIndexed { index, uuid ->
+                        val bytes = chatStore.openFileRef(uuid).readBytesAndClose()
+                            ?: throw IllegalStateException("File $uuid missing for chat $chatId")
+                        ExportPayload.Zip.Image(name = "image-${index + 1}.jpeg", bytes = bytes)
+                    },
+                )
+            }
+            chatExportWriter.write(payload)
         }
 
     private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(

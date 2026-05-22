@@ -366,7 +366,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 renameAction.gone()
             }
             popup.onMenuItemClicked(view.findViewById(R.id.download)) {
-                viewModel.onDownloadRequested(item.chatId, item.displayTitle)
+                viewModel.onDownloadRequested(item.chatId)
             }
             popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
             popup.show(binding.root, anchor)
