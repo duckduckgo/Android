@@ -27,16 +27,16 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface OnboardingBrandDesignUpdateToggles {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun brandDesignUpdate(): Toggle
 
     /**
      * Gates the new fire animation work: new Inferno default in Data Clearing
      * settings + bottom-sheet Lottie swap.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun fireAnimationUpdate(): Toggle
 }
