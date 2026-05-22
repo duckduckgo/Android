@@ -1,8 +1,12 @@
 appId: com.duckduckgo.mobile.android.debug
 ---
+- extendedWaitUntil:
+    visible:
+      text: "example.com"
+    timeout: 10000
 - assertVisible:
-    text: "Favorite 1"
+    text: "example.com"
 - assertVisible:
-    text: "Favorite 2"
+    text: "duckduckgo.com"
 - assertVisible:
-    text: "Favorite 3"
+    text: "privacytest.com"
