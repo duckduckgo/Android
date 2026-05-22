@@ -1557,8 +1557,8 @@ sealed class DaxBubbleCta(
         }
 
         companion object {
-            private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -54f
-            private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -110f
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -40f
+            private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -150f
         }
     }
 
