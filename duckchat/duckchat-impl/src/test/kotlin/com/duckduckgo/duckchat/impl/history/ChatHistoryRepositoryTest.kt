@@ -21,8 +21,10 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,6 +44,8 @@ class ChatHistoryRepositoryTest {
 
     private val chatStore: DuckAiChatStore = mock()
     private val context: Context = mock()
+    private val duckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val syncEngine: SyncEngine = mock()
     private val source = MutableStateFlow<List<DuckAiChat>>(emptyList())
     private lateinit var repository: RealChatHistoryRepository
 
@@ -49,7 +53,13 @@ class ChatHistoryRepositoryTest {
     fun setup() {
         whenever(context.getString(R.string.duck_ai_chat_history_untitled)).thenReturn(FALLBACK)
         whenever(chatStore.getChatsFlow()).thenReturn(source)
-        repository = RealChatHistoryRepository(chatStore, coroutineRule.testDispatcherProvider, context)
+        repository = RealChatHistoryRepository(
+            chatStore = chatStore,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            context = context,
+            duckChatSyncRepository = duckChatSyncRepository,
+            syncEngine = syncEngine,
+        )
     }
 
     @Test
@@ -193,6 +203,24 @@ class ChatHistoryRepositoryTest {
         val result = repository.renameChat("missing", "New")
 
         assertFalse(result)
+    }
+
+    @Test
+    fun `setPinned true delegates to pinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = true)
+
+        verify(chatStore).pinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `setPinned false delegates to unpinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = false)
+
+        verify(chatStore).unpinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
     private fun chat(
