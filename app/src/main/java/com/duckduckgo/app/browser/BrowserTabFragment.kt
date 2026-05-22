@@ -80,6 +80,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -3024,6 +3025,32 @@ class BrowserTabFragment :
                 isVisible = true
             }
         }
+    }
+
+    /**
+     * Apply a per-CTA crop to the rebrand browser background. When [widthMultiplier] is non-null,
+     * the ImageView is sized to `screenWidth * widthMultiplier` and right-edge-anchored to the
+     * screen (via a derived translation), so the visible portion is the rightmost slice of the
+     * wide drawable. `maxHeight` is lifted so the proportional height (driven by `adjustViewBounds`)
+     * can grow past the XML default of 126dp — otherwise the aspect constraint would shrink the
+     * width back to whatever fits in 126dp. Null restores `MATCH_PARENT`, the XML maxHeight, and
+     * zero translation, so non-cropping bubble CTAs keep the original layout.
+     */
+    private fun applyRebrandBackgroundCrop(widthMultiplier: Float?) {
+        val view = newBrowserTab.rebrandBrowserBackground
+        if (widthMultiplier == null) {
+            view.maxHeight = view.resources.getDimensionPixelSize(R.dimen.onboardingBackgroundMaxHeight)
+            view.updateLayoutParams { width = LayoutParams.MATCH_PARENT }
+            view.translationX = 0f
+            return
+        }
+        val screenWidthPx = view.resources.displayMetrics.widthPixels
+        val targetWidthPx = (screenWidthPx * widthMultiplier).toInt()
+        view.maxHeight = Int.MAX_VALUE
+        view.updateLayoutParams { width = targetWidthPx }
+        // Anchor the image's right edge to the screen's right edge; the rest extends off-screen
+        // to the left and is clipped by the parent / screen bounds.
+        view.translationX = (screenWidthPx - targetWidthPx).toFloat()
     }
 
     private fun setNewTabBackgroundColor(
@@ -5992,6 +6019,7 @@ class BrowserTabFragment :
 
             if (configuration is DaxBubbleCta.BrandDesignUpdateBubbleCta) {
                 setBrowserBackgroundRes(configuration.backgroundRes, useRebrandBackground = true)
+                applyRebrandBackgroundCrop(configuration.backgroundCropWidthMultiplier)
                 setNewTabBackgroundColor(com.duckduckgo.mobile.android.R.attr.onboardingSurfaceBackdrop)
             } else {
                 viewModel.setBrowserBackground(appTheme.isLightModeEnabled())

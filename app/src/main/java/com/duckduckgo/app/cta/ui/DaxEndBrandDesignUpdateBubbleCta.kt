@@ -47,8 +47,15 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
+    override val backgroundCropWidthMultiplier: Float = BACKGROUND_CROP_WIDTH_MULTIPLIER
 
     override fun configureContentViews(view: View) {
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
+    }
+
+    private companion object {
+        // 2x screen width, right-anchored: the drawable's horizontal center lands on the screen's
+        // left edge, exposing the right half of the wide hill illustration behind the card.
+        private const val BACKGROUND_CROP_WIDTH_MULTIPLIER = 2f
     }
 }

@@ -55,6 +55,7 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
     override val restartWavingDax: Boolean = true
+    override val backgroundCropWidthMultiplier: Float = BACKGROUND_CROP_WIDTH_MULTIPLIER
 
     override fun configureContentViews(view: View) {
         view.findViewById<ImageView>(R.id.brandDesignHeaderImage)?.isVisible = true
@@ -92,5 +93,8 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         private const val SUBSCRIPTION_DAX_HEIGHT_DP = 267f
         private const val SUBSCRIPTION_DAX_TRANSLATION_X_DP = -114f
         private const val SUBSCRIPTION_DAX_TRANSLATION_Y_DP = -288f
+        // Same crop ratio as the END CTA: 2x screen width, right-anchored — drawable center
+        // sits on the screen's left edge. Tweak if a different crop is desired.
+        private const val BACKGROUND_CROP_WIDTH_MULTIPLIER = 2f
     }
 }

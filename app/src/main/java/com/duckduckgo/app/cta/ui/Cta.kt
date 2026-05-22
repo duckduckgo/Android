@@ -1612,6 +1612,17 @@ sealed class DaxBubbleCta(
 
         abstract val showArrow: Boolean
 
+        /**
+         * Optional opt-in for an oversize, end-aligned bubble background that exposes only a
+         * portion of the wide drawable. When non-null, the rebrand browser background is sized
+         * to `screenWidth * backgroundCropWidthMultiplier`, anchored so its right edge sits on
+         * the screen's right edge, with the rest extending off-screen to the left. A value of
+         * `2f` puts the drawable's horizontal center exactly on the screen's left edge; values
+         * close to (but less than) 2f shift the visible crop slightly. CTAs that leave this null
+         * get the default `match_parent` width, default maxHeight, and zero translation.
+         */
+        open val backgroundCropWidthMultiplier: Float? = null
+
         abstract fun configureContentViews(view: View)
 
         private var cardContainer: TouchInterceptingLinearLayout? = null
