@@ -159,6 +159,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     private fun initPopupMenu() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuReturnToTab)) {
+            viewModel.onHatchPressed()
             hatchHatchListener?.onHatchPressed()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
@@ -169,6 +170,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             hatchHatchListener?.onBurnTabPressed()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuAfterInactivity)) {
+            viewModel.onAfterInactivityPressed()
             hatchHatchListener?.onAfterInactivityPressed()
         }
     }
