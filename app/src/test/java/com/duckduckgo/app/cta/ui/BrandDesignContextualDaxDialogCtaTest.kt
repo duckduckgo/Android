@@ -349,7 +349,7 @@ class BrandDesignContextualDaxDialogCtaTest {
     }
 
     @Test
-    fun applyWingBottomState_wingMidPlayInWhenWingCtaArrives_doesNotInterrupt() {
+    fun applyWingBottomState_wingMidPlayInWhenWingCtaArrives_snapsToResting() {
         configureContainerForPhonePortrait()
         val wing: LottieAnimationView = mock()
         whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
@@ -361,8 +361,29 @@ class BrandDesignContextualDaxDialogCtaTest {
 
         cta.invokeApplyWingBottomState()
 
+        verify(wing).removeAllAnimatorListeners()
+        verify(wing).cancelAnimation()
+        verify(wing).setMinAndMaxProgress(0f, 0.5f)
+        verify(wing).progress = 0.5f
+    }
+
+    @Test
+    fun applyWingBottomState_wingAtRestingWhenWingCtaArrives_snapsToRestingAndDoesNotCancel() {
+        configureContainerForPhonePortrait()
+        val wing: LottieAnimationView = mock()
+        whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
+        stubWingLayoutParams(wing)
+        whenever(wing.visibility).thenReturn(View.VISIBLE)
+        whenever(wing.isAnimating).thenReturn(false)
+        whenever(wing.progress).thenReturn(0.5f)
+        val cta = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
+
+        cta.invokeApplyWingBottomState()
+
         verify(wing, never()).removeAllAnimatorListeners()
         verify(wing, never()).cancelAnimation()
+        verify(wing).setMinAndMaxProgress(0f, 0.5f)
+        verify(wing).progress = 0.5f
     }
 
     @Test
@@ -370,8 +391,11 @@ class BrandDesignContextualDaxDialogCtaTest {
         configureContainerForPhonePortrait()
         val wing: LottieAnimationView = mock()
         whenever(container.findViewById<LottieAnimationView>(R.id.wingBottom)).thenReturn(wing)
+        whenever(wing.visibility).thenReturn(View.VISIBLE)
         whenever(wing.isAnimating).thenReturn(false)
-        whenever(wing.progress).thenReturn(0f)
+        // Mid-play-in: wing has reached frame 10 of a 45-frame stop window.
+        whenever(wing.frame).thenReturn(10)
+        whenever(wing.maxFrame).thenReturn(45f)
 
         val ctaA = WingAndArrowContextualCta(onboardingStore, appInstallStore, mockDeviceInfo)
         ctaA.invokeStartWingBottomPlayIn()
