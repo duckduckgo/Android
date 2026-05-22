@@ -51,6 +51,7 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -183,6 +184,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
+
+    @Inject
+    lateinit var nativeInputStateProvider: NativeInputStateProvider
 
     private var activeTabId: String? = null
 
@@ -681,8 +685,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         doOnAttach {
             if (inputField.hasFocus()) return@doOnAttach
             if (nativeInputState == null) {
+                // Apply the synchronously-readable per-tab state so toggle-row visibility etc.
+                // are in their final positions before the enter animation measures the widget.
+                // Falling back to NativeInputState.zero() defaults toggle visible, which causes
+                // a measure-then-snap jump on tabs whose real state hides the toggle (e.g.
+                // SEARCH_ONLY or DUCK_AI_CONTEXTUAL). Fall back to a position-only seed only
+                // if the state provider hasn't been injected yet.
+                val publishedState = activeTabId
+                    ?.takeIf { ::nativeInputStateProvider.isInitialized }
+                    ?.let { nativeInputStateProvider.stateForTab(it).value }
                 applyState(
-                    NativeInputState.zero().copy(
+                    publishedState ?: NativeInputState.zero().copy(
                         inputPosition = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP,
                     ),
                 )

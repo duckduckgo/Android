@@ -4844,7 +4844,6 @@ class BrowserTabFragment :
 
     private fun onTabHidden() {
         if (!isAdded) return
-        nativeInputManager.onTabBackgrounded()
         viewModel.onViewHidden()
         downloadMessagesJob.cancel()
         webView?.onPause()
@@ -6371,7 +6370,6 @@ class BrowserTabFragment :
     }
 
     fun onTabSwipedAway() {
-        nativeInputManager.onTabBackgrounded()
         viewModel.onTabSwipedAway()
     }
 

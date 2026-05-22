@@ -661,7 +661,13 @@ class BrowserTabViewModel @Inject constructor(
                         .debounce(300)
                         .distinctUntilChanged()
                         .flatMapLatest { query ->
-                            if (query.isBlank() || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+                            // Skip page URLs — omnibarViewState emits on every navigation, and
+                            // running the fetch against full URLs would be both wasteful and
+                            // wrong (the autocomplete API expects user-typed queries).
+                            val isQueryLike = query.isNotBlank() &&
+                                !UriString.isWebUrl(query) &&
+                                !duckPlayer.isDuckPlayerUri(query)
+                            if (!isQueryLike || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
                                 flowOf(AutoCompleteResult(query, emptyList()))
                             } else {
                                 // Catch inside flatMapLatest so a failed fetch only drops this query's

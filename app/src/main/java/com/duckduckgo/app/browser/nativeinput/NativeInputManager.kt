@@ -107,9 +107,6 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
-
-    /** Dismisses the IME and clears widget focus so the keyboard doesn't leak onto the next tab. */
-    fun onTabBackgrounded()
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -168,13 +165,6 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
-    }
-
-    override fun onTabBackgrounded() {
-        if (!::rootView.isInitialized) return
-        val widget = widgetFrom(rootView) ?: return
-        if (widget.hasInputFocus()) widget.clearInputFocus()
-        widget.hideKeyboard()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -637,18 +627,6 @@ class RealNativeInputManager @Inject constructor(
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
-        // Cancel any in-flight enter animation if the widget detaches before it completes —
-        // otherwise onComplete fires post-detach and focusInput raises the IME on the next tab.
-        widgetView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
-                override fun onViewDetachedFromWindow(v: View) {
-                    animator.cancelAnimation()
-                    v.removeOnAttachStateChangeListener(this)
-                }
-            },
-        )
-
         applyWindowChrome(widgetView, isBottom)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
@@ -713,6 +691,10 @@ class RealNativeInputManager @Inject constructor(
     private fun onEnterComplete(widgetView: View) {
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
+        // Skip the IME-raising work if the widget has been detached before the animation
+        // finished (e.g. fragment-manager transient detach during a tab switch). Otherwise
+        // focusInput would raise the keyboard on whatever tab is now in front.
+        if (!widgetView.isAttachedToWindow) return
         omnibarController.hide()
         widgetFrom(widgetView)?.apply {
             focusInput(rootView.context as? Activity)
