@@ -121,9 +121,10 @@ class ReasoningModePickerViewModel @Inject constructor(
     fun onModeTapped(mode: ReasoningMode, surface: PickerSurface) {
         // Drop taps that race past the picker hiding (loading, mismatch, no accessible rows).
         if (!state.value.visible) return
+        val modelState = modelManager.modelState.value
         val chat = currentChat.value
-        val chatResolution = chat?.let { ReasoningResolver.forChat(it, modelManager.modelState.value) }
-        val available = chatResolution?.available ?: modelManager.modelState.value.availableReasoningModes
+        val chatResolution = chat?.let { ReasoningResolver.forChat(it, modelState) }
+        val available = chatResolution?.available ?: modelState.availableReasoningModes
 
         val match = available.firstOrNull { it.mode == mode }
         if (match == null) {
@@ -138,7 +139,7 @@ class ReasoningModePickerViewModel @Inject constructor(
             }
             return
         }
-        val userTier = modelManager.modelState.value.userTier
+        val userTier = modelState.userTier
         val requiredTier = match.access?.requiredTier ?: run {
             logcat { "Duck.ai reasoning picker: gated mode $mode has no public required tier, ignoring." }
             return

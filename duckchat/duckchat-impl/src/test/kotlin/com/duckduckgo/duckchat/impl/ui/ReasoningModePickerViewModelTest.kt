@@ -263,7 +263,10 @@ class ReasoningModePickerViewModelTest {
         // Pathological: a "gated" entry whose access list still includes FREE → no upsell route.
         modelState.value = ModelState(
             userTier = UserTier.FREE,
-            availableReasoningModes = listOf(gatedExtended(requires = listOf("free", "plus", "pro"))),
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedExtended(requires = listOf("free", "plus", "pro")),
+            ),
         )
         runCurrent()
 
@@ -280,7 +283,10 @@ class ReasoningModePickerViewModelTest {
         // Only non-public tiers in the access list → requiredTier is null → no upsell route.
         modelState.value = ModelState(
             userTier = UserTier.FREE,
-            availableReasoningModes = listOf(gatedExtended(requires = listOf("internal"))),
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                gatedExtended(requires = listOf("internal")),
+            ),
         )
         runCurrent()
 
@@ -295,7 +301,10 @@ class ReasoningModePickerViewModelTest {
     @Test
     fun whenTappedModeNotInAvailableListThenNoCommandEmittedAndManagerNotCalled() = runTest {
         modelState.value = ModelState(
-            availableReasoningModes = listOf(AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE)),
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
         )
         runCurrent()
 
