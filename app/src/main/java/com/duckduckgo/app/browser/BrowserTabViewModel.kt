@@ -649,6 +649,10 @@ class BrowserTabViewModel @Inject constructor(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     internal val omnibarAutocompleteCache: StateFlow<AutoCompleteResult> =
         duckChat.observeNativeInputFieldUserSettingEnabled()
+            .catch { t ->
+                logcat(WARN) { "Native input setting flow failed: ${t.asLog()}" }
+                emit(false)
+            }
             .flatMapLatest { isNativeInputEnabled ->
                 if (!isNativeInputEnabled) {
                     flowOf(AutoCompleteResult("", emptyList()))
@@ -660,13 +664,20 @@ class BrowserTabViewModel @Inject constructor(
                             if (query.isBlank() || !autoCompleteSettings.autoCompleteSuggestionsEnabled) {
                                 flowOf(AutoCompleteResult(query, emptyList()))
                             } else {
+                                // Catch inside flatMapLatest so a failed fetch only drops this query's
+                                // result — without it, .catch + stateIn(Eagerly) would terminate the
+                                // pipeline for the ViewModel's lifetime (no equivalent of the existing
+                                // pipeline's ConflatedJob restart).
                                 autoComplete.autoComplete(query)
+                                    .catch { t ->
+                                        logcat(WARN) { "Failed to get omnibar autocomplete: ${t.asLog()}" }
+                                        emit(AutoCompleteResult(query, emptyList()))
+                                    }
                             }
                         }
                 }
             }
             .flowOn(dispatchers.io())
-            .catch { t: Throwable? -> logcat(WARN) { "Failed to get omnibar autocomplete: ${t?.asLog()}" } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
