@@ -107,6 +107,9 @@ interface NativeInputManager {
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
     fun setText(text: String)
+
+    /** Dismisses the IME and clears widget focus so the keyboard doesn't leak onto the next tab. */
+    fun onTabBackgrounded()
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -165,6 +168,13 @@ class RealNativeInputManager @Inject constructor(
         if (!::rootView.isInitialized) return
         val widget = widgetFrom(rootView) ?: return
         widget.text = text
+    }
+
+    override fun onTabBackgrounded() {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        if (widget.hasInputFocus()) widget.clearInputFocus()
+        widget.hideKeyboard()
     }
 
     override fun handleDuckAiVoiceResult(query: String) {
@@ -627,6 +637,18 @@ class RealNativeInputManager @Inject constructor(
             configure(tabId = tabId, isDuckAiMode = omnibarController.isDuckAiMode(), isBottom = isBottom)
         }
 
+        // Cancel any in-flight enter animation if the widget detaches before it completes —
+        // otherwise onComplete fires post-detach and focusInput raises the IME on the next tab.
+        widgetView.addOnAttachStateChangeListener(
+            object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) = Unit
+                override fun onViewDetachedFromWindow(v: View) {
+                    animator.cancelAnimation()
+                    v.removeOnAttachStateChangeListener(this)
+                }
+            },
+        )
+
         applyWindowChrome(widgetView, isBottom)
 
         if (!startEnterAnimation(widgetView, isBottom)) {
@@ -654,7 +676,7 @@ class RealNativeInputManager @Inject constructor(
         val omnibarCard = omnibarController.getCardView() ?: return false
         // Apply focused-state layout so the widget is measured at its final size; otherwise
         // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
-        widgetFrom(widgetView)?.beginEnterAnimationPreview()
+        widgetFrom(widgetView)?.beginEnterAnimationPreview(isBottom)
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 

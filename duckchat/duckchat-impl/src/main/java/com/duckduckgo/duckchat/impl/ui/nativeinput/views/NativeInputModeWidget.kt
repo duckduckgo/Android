@@ -51,7 +51,6 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -97,7 +96,7 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
-    fun beginEnterAnimationPreview()
+    fun beginEnterAnimationPreview(isBottom: Boolean)
     fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
@@ -184,9 +183,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var chatSuggestionsBinder: NativeInputChatSuggestionsBinder
-
-    @Inject
-    lateinit var nativeInputStateProvider: NativeInputStateProvider
 
     private var activeTabId: String? = null
 
@@ -681,13 +677,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun beginEnterAnimationPreview() {
+    override fun beginEnterAnimationPreview(isBottom: Boolean) {
         doOnAttach {
             if (inputField.hasFocus()) return@doOnAttach
-            // State observation is async; apply it synchronously so toggle-row visibility etc. are
-            // in their final positions before the enter animation measures the widget.
             if (nativeInputState == null) {
-                activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }?.let(::applyState)
+                applyState(
+                    NativeInputState.zero().copy(
+                        inputPosition = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP,
+                    ),
+                )
             }
             previewEnterFocus = true
             updateBottomRowVisibility()
