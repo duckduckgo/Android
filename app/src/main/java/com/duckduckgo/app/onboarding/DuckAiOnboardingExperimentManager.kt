@@ -72,7 +72,6 @@ class DuckAiOnboardingExperimentManagerImpl @Inject constructor(
 
     private fun arePrerequisitesMet(): Boolean =
         !appBuildConfig.isDefaultVariantForced &&
-            browserConfig.showInputScreenOnboarding().isEnabled() &&
             browserConfig.singleTabFireDialog().isEnabled() &&
             !onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled() &&
             !deviceInfo.isTablet()

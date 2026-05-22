@@ -57,9 +57,6 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -93,7 +90,6 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
     private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
-    private val fakeInputScreenOnboardingStateProvider = FakeInputScreenOnboardingStateProvider()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -110,13 +106,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
             mockDuckAiOnboardingExperimentManager,
             mockOnboardingQuickSetupExperimentManager,
-            fakeInputScreenOnboardingStateProvider,
         )
-    }
-
-    private class FakeInputScreenOnboardingStateProvider : InputScreenOnboardingStateProvider {
-        val state = MutableStateFlow(false)
-        override val isEnabled: StateFlow<Boolean> = state.asStateFlow()
     }
 
     // region hasPlayedIntroAnimation
@@ -338,33 +328,26 @@ class BrandDesignUpdatePageViewModelTest {
     // region onPrimaryCtaClicked - address bar position
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithTopThenSaveTopAndSendFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = false
+    fun whenPrimaryCtaFromAddressBarPositionWithTopThenSaveTopAndAdvanceToInputScreen() = runTest {
         val testee = createViewModel()
-        // Navigate to ADDRESS_BAR_POSITION via onDefaultBrowserSet
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.commands.test {
-            testee.onPrimaryCtaClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
         verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
     }
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithBottomThenSaveBottomAndFirePixelAndFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = false
+    fun whenPrimaryCtaFromAddressBarPositionWithBottomThenSaveBottomAndFirePixelAndAdvanceToInputScreen() = runTest {
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-        testee.commands.test {
-            testee.onPrimaryCtaClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
         verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
         verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
     }
 
     @Test
@@ -403,7 +386,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedThenFireAiPixelAndStoreAndFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -422,7 +404,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenFireSearchOnlyPixelAndStoreAndFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -442,7 +423,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithReinstallUserTrueAndAiSelectedThenCallWideEventWithReinstallTrue() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         val testee = createViewModel()
         testee.loadDaxDialog() // sets isReinstallUser = true
@@ -589,42 +569,9 @@ class BrandDesignUpdatePageViewModelTest {
     // region maxPageCount
 
     @Test
-    fun whenInputScreenOnboardingEnabledThenMaxPageCountIs3() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
+    fun whenViewModelCreatedThenMaxPageCountIs3() = runTest {
         val testee = createViewModel()
         advanceUntilIdle()
-        assertEquals(3, testee.viewState.value.maxPageCount)
-    }
-
-    @Test
-    fun whenInputScreenOnboardingDisabledThenMaxPageCountIs2() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = false
-        val testee = createViewModel()
-        advanceUntilIdle()
-        assertEquals(2, testee.viewState.value.maxPageCount)
-    }
-
-    @Test
-    fun whenStateProviderEmitsTrueAfterCreationThenMaxPageCountUpdatesTo3AndAddressBarPositionRoutesToInputScreen() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = false
-        val testee = createViewModel()
-        testee.onDefaultBrowserSet()
-        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        advanceUntilIdle()
-        assertEquals(2, testee.viewState.value.maxPageCount)
-
-        // Privacy config arrives and the provider re-emits with the flag enabled.
-        fakeInputScreenOnboardingStateProvider.state.value = true
-        advanceUntilIdle()
-
-        testee.viewState.test {
-            testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> reads updated ViewState, routes to INPUT_SCREEN
-            var state = awaitItem()
-            while (state.currentDialog != PreOnboardingDialogType.INPUT_SCREEN) {
-                state = awaitItem()
-            }
-            cancelAndConsumeRemainingEvents()
-        }
         assertEquals(3, testee.viewState.value.maxPageCount)
     }
 
@@ -748,7 +695,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenInputScreenDialogShownThenFiresChooseSearchExperiencePixel() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -762,7 +708,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsNullThenFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
@@ -778,7 +723,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsControlThenFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
@@ -794,7 +738,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentDuckAiThenShowInputScreenPreview() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
         val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
         val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
@@ -820,7 +763,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentSearchThenShowInputScreenPreviewWithSearchDefault() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
         val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
         val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
@@ -846,7 +788,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenDoNotEnrollAndFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -866,7 +807,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenPreviewThenFinish() = runTest {
-        fakeInputScreenOnboardingStateProvider.state.value = true
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(emptyList())
