@@ -5,6 +5,7 @@ tags:
 ---
 # 1/3 — omnibar top
 - retry:
+    maxRetries: 3
     commands:
       - launchApp:
           clearState: true
@@ -20,6 +21,7 @@ tags:
 
 # 2/3 — omnibar bottom
 - retry:
+    maxRetries: 3
     commands:
       - launchApp:
           clearState: true
@@ -35,6 +37,7 @@ tags:
 
 # 3/3 — omnibar split
 - retry:
+    maxRetries: 3
     commands:
       - launchApp:
           clearState: true
