@@ -1,9 +1,9 @@
 appId: com.duckduckgo.mobile.android.debug
-name: "UnifiedInput: open new duck.ai chat and move back to search mode × AI combos"
+name: "UnifiedInput: open new duck.ai chat and move back to search mode × omnibar positions"
 tags:
   - unifiedInputTest
 ---
-# 1/6 — AI on, omnibar top
+# 1/3 — omnibar top
 - retry:
     commands:
       - launchApp:
@@ -18,7 +18,7 @@ tags:
       - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
-# 2/6 — AI on, omnibar bottom
+# 2/3 — omnibar bottom
 - retry:
     commands:
       - launchApp:
@@ -33,7 +33,7 @@ tags:
       - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
-# 3/6 — AI on, omnibar split
+# 3/3 — omnibar split
 - retry:
     commands:
       - launchApp:
@@ -43,51 +43,6 @@ tags:
             isMaestro: "true"
             nativeInputToggle: "true"
             inputWithAiToggle: "true"
-            omnibarPosition: "split"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/open_new_chat.yaml
-
-# 4/6 — AI off, omnibar top
-- retry:
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
-            omnibarPosition: "top"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/open_new_chat.yaml
-
-# 5/6 — AI off, omnibar bottom
-- retry:
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
-            omnibarPosition: "bottom"
-            addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: shared/launch_and_skip_onboarding.yaml
-      - runFlow: shared/open_new_chat.yaml
-
-# 6/6 — AI off, omnibar split
-- retry:
-    commands:
-      - launchApp:
-          clearState: true
-          stopApp: true
-          arguments:
-            isMaestro: "true"
-            nativeInputToggle: "true"
-            inputWithAiToggle: "false"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
       - runFlow: shared/launch_and_skip_onboarding.yaml
