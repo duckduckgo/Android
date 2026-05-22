@@ -16,12 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.history
 
-import android.content.Context
-import android.media.MediaScannerConnection
 import android.os.Environment
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -51,7 +51,7 @@ interface ChatExportWriter {
 sealed interface ExportPayload {
     val content: String
 
-    data class Text(override val content: String, val mimeType: String = "text/plain") : ExportPayload
+    data class Text(override val content: String) : ExportPayload
 
     data class Zip(
         override val content: String,
@@ -64,8 +64,8 @@ sealed interface ExportPayload {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealChatExportWriter @Inject constructor(
-    private val context: Context,
     private val downloadsRepository: DownloadsRepository,
+    private val fileDownloadCallbackPlugins: PluginPoint<FileDownloadCallbackPlugin>,
 ) : ChatExportWriter {
 
     private val clock: () -> LocalDateTime = { LocalDateTime.now(ZoneId.systemDefault()) }
@@ -82,7 +82,7 @@ class RealChatExportWriter @Inject constructor(
     private suspend fun writeText(dir: File, payload: ExportPayload.Text): File {
         val file = resolveAvailableFile(dir, baseName(), EXTENSION_TXT)
         file.writeText(payload.content)
-        registerInDownloads(file, payload.mimeType)
+        registerInDownloads(file)
         return file
     }
 
@@ -101,11 +101,11 @@ class RealChatExportWriter @Inject constructor(
                 zip.closeEntry()
             }
         }
-        registerInDownloads(file, "application/zip")
+        registerInDownloads(file)
         return file
     }
 
-    private suspend fun registerInDownloads(file: File, mimeType: String) {
+    private suspend fun registerInDownloads(file: File) {
         downloadsRepository.insert(
             DownloadItem(
                 downloadId = 0L,
@@ -116,7 +116,9 @@ class RealChatExportWriter @Inject constructor(
                 filePath = file.absolutePath,
             ),
         )
-        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), arrayOf(mimeType), null)
+        // Fires the same callback as a regular browser download — surfaces the "new download" dot
+        // on the browser menu via DownloadBadgePlugin (and any other registered plugins).
+        fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
     }
 
     private fun baseName(): String = "duck.ai_${clock().format(FILENAME_FORMATTER)}"
