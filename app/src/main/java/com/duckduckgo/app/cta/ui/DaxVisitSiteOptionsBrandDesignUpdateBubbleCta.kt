@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.cta.ui
 
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -40,5 +42,22 @@ data class DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
     isLightTheme = isLightTheme,
     deviceInfo = deviceInfo,
     showArrow = true,
-),
-    DaxBubbleCta.ShowsWavingDax
+), DaxBubbleCta.ShowsWavingDax {
+
+    override fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
+        val density = dax.resources.displayMetrics.density
+        dax.translationX = WAVING_DAX_TRANSLATION_X_DP * density
+        dax.translationY = WAVING_DAX_TRANSLATION_Y_DP * density
+        (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+            lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+            lp.height = (WAVING_DAX_HEIGHT_DP * density).toInt()
+            dax.layoutParams = lp
+        }
+    }
+
+    private companion object {
+        private const val WAVING_DAX_TRANSLATION_X_DP = -54f
+        private const val WAVING_DAX_TRANSLATION_Y_DP = -110f
+        private const val WAVING_DAX_HEIGHT_DP = 178f
+    }
+}
