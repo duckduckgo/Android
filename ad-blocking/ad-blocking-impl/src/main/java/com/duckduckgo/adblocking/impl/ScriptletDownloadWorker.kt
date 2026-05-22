@@ -71,7 +71,7 @@ class ScriptletDownloadWorker(
     private val settingsAdapter by lazy { buildJsonAdapter() }
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        if (!feature.isDiscoverable().isEnabled()) {
+        if (!feature.self().isEnabled()) {
             logcat { "ScriptletDownloadWorker: kill-switch is off, skipping" }
             return@withContext Result.success()
         }
@@ -112,11 +112,11 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
             combine(
-                feature.isDiscoverable().enabled(),
                 feature.self().enabled(),
+                feature.enableContingencyMode().enabled(),
                 configProvider.scriptletsSettings,
-            ) { discoverable, operational, settings ->
-                settings?.takeIf { discoverable && operational }
+            ) { discoverable, contingencyMode, settings ->
+                settings?.takeIf { discoverable && !contingencyMode }
             }.filterNotNull().collect { settings ->
                 enqueue(settings)
             }

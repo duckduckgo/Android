@@ -70,7 +70,7 @@ class ScriptletDownloadWorkerTest {
 
     @Before
     fun setup() {
-        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
     }
 
     @Test
@@ -108,7 +108,7 @@ class ScriptletDownloadWorkerTest {
 
     @Test
     fun whenKillSwitchIsOffThenDoWorkReturnsSuccessWithoutCallingUpdater() = runTest {
-        feature.isDiscoverable().setRawStoredState(Toggle.State(remoteEnableState = false))
+        feature.self().setRawStoredState(Toggle.State(remoteEnableState = false))
 
         val result = newWorker(inputData = settingsAdapter.toJson(settings)).doWork()
 

@@ -46,18 +46,18 @@ class ScriptletDownloadWorkerSchedulerTest {
     private val workManager: WorkManager = mock()
 
     private val discoverableFlow = MutableStateFlow(true)
-    private val operationalFlow = MutableStateFlow(true)
+    private val contingencyModeFlow = MutableStateFlow(false)
     private val settingsFlow = MutableStateFlow<AdBlockingExtensionSettings?>(null)
 
-    private val isDiscoverableToggle: Toggle = mock {
+    private val selfToggle: Toggle = mock {
         on { enabled() } doReturn discoverableFlow
     }
-    private val selfToggle: Toggle = mock {
-        on { enabled() } doReturn operationalFlow
+    private val contingencyModeToggle: Toggle = mock {
+        on { enabled() } doReturn contingencyModeFlow
     }
     private val feature: AdBlockingExtensionFeature = mock {
-        on { isDiscoverable() } doReturn isDiscoverableToggle
         on { self() } doReturn selfToggle
+        on { enableContingencyMode() } doReturn contingencyModeToggle
     }
     private val configProvider: AdBlockingExtensionConfigProvider = mock {
         on { scriptletsSettings } doReturn settingsFlow
@@ -82,7 +82,7 @@ class ScriptletDownloadWorkerSchedulerTest {
     }
 
     @Test
-    fun whenDiscoverableAndOperationalAndSettingsArePresentThenWorkIsEnqueued() {
+    fun whenDiscoverableAndContingencyModeOffAndSettingsArePresentThenWorkIsEnqueued() {
         settingsFlow.value = scriptletsSettings
 
         startScheduler()
@@ -101,8 +101,8 @@ class ScriptletDownloadWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOperationalIsOffThenWorkIsNotEnqueued() {
-        operationalFlow.value = false
+    fun whenContingencyModeIsOnThenWorkIsNotEnqueued() {
+        contingencyModeFlow.value = true
         settingsFlow.value = scriptletsSettings
 
         startScheduler()
@@ -130,13 +130,13 @@ class ScriptletDownloadWorkerSchedulerTest {
     }
 
     @Test
-    fun whenOperationalFlipsOnThenWorkIsEnqueued() {
-        operationalFlow.value = false
+    fun whenContingencyModeFlipsOffThenWorkIsEnqueued() {
+        contingencyModeFlow.value = true
         settingsFlow.value = scriptletsSettings
         startScheduler()
         verifyNotEnqueued()
 
-        operationalFlow.value = true
+        contingencyModeFlow.value = false
 
         verifyEnqueuedOnce()
     }

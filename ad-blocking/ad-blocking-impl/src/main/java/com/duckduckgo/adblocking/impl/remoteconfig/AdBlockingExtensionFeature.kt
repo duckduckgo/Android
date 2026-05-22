@@ -26,18 +26,18 @@ import com.duckduckgo.feature.toggles.api.Toggle
 )
 interface AdBlockingExtensionFeature {
     /**
-     * @return `true` when the feature is operational.
-     * When false, feature is still accessible, but not working as expected.
+     * Kill-switch. When false, the feature is completely inaccessible.
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    /**
-     * Kill-switch. When false, the feature is completely inaccessible.
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
-    fun isDiscoverable(): Toggle
-
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enabledByDefault(): Toggle
+
+    /**
+     * When enabled, the feature settings will still be accessible, but no scripts
+     * will be injected, and a contingency message will be shown
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun enableContingencyMode(): Toggle
 }
