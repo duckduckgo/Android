@@ -558,6 +558,10 @@ class NativeInputModeWidgetViewModelTest {
     @Test
     fun whenChatIdSetThenGetSelectedModelIdReturnsChatsModel() = runTest {
         whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
             DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
         )
@@ -570,10 +574,38 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenChatModelNotInModelsListThenGetSelectedModelIdFallsBackToGlobal() = runTest {
+        // Chat references "missing-model" no longer offered server-side. Submission must fall back to
+        // global on both halves — chat-model + global-effort would be a mismatched pair.
+        // Picker is disabled here to mirror production (host binds modelPickerEnabled to chatId == null).
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(aiModel(id = "other-model", supported = listOf(ReasoningEffort.NONE))),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "missing-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
     fun whenChatIdSetAndPickerDisabledThenGetSelectedModelIdStillReturnsChatsModel() = runTest {
         // Production binds modelPickerEnabled to `chatId == null`, so existing chats always have the
         // picker disabled. Submission must still carry the chat's stored model.
         whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
             DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
         )
@@ -603,6 +635,15 @@ class NativeInputModeWidgetViewModelTest {
         // for chat-B is suspended. Submission must fall back to global rather than return chat-A's
         // model tagged to chat-B.
         whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-A-model", supported = listOf(ReasoningEffort.NONE)),
+                    aiModel(id = "chat-B-model", supported = listOf(ReasoningEffort.NONE)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
             DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
         )
@@ -634,6 +675,10 @@ class NativeInputModeWidgetViewModelTest {
         // setActiveChatId nulls currentChat synchronously and launches the lookup. During the in-
         // flight window, submission must fall back to global rather than return chat-A's data.
         whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-A-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
         whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
             DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
         )
@@ -1090,6 +1135,21 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertNull(nativeInputStateProvider.stateForTab(tabId).value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdBeforeConfigureThenChatIdIsBufferedAndPublishedOnConfigure() = runTest {
+        // Defensive: setActiveChatId fires before activeTabId is set. The pending value must be
+        // replayed once configure runs.
+        val freshViewModel = createViewModel()
+
+        freshViewModel.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        freshViewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
     }
 
     // endregion

@@ -65,7 +65,7 @@ interface DuckAiModelManager {
 
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
-    fun setChatScopedReasoningMode(mode: ReasoningMode?)
+    suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
 
     fun getSelectedModelId(): String?
 
@@ -216,8 +216,10 @@ class RealDuckAiModelManager @Inject constructor(
         }
     }
 
-    override fun setChatScopedReasoningMode(mode: ReasoningMode?) {
-        _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
+    override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) {
+        stateMutex.withLock {
+            _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
+        }
     }
 
     override fun getSelectedModelId(): String? = _modelState.value.selectedModelId

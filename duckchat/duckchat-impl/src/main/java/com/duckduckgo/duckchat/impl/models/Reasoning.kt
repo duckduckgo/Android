@@ -111,7 +111,9 @@ object ReasoningResolver {
             supported = chatModel.supportedReasoningEfforts,
             effortAccess = chatModel.reasoningEffortAccess,
         )
-        val mode = modelState.chatScopedReasoningMode ?: ReasoningMode.from(chat.reasoningMode)
+        val mode = modelState.chatScopedReasoningMode
+            ?: ReasoningMode.from(chat.reasoningMode)
+            ?: modelState.selectedReasoningMode
         return ChatReasoningResolution(available = available, mode = mode)
     }
 }

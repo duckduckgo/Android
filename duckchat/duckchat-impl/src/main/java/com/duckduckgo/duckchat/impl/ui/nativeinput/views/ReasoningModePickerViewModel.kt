@@ -102,9 +102,9 @@ class ReasoningModePickerViewModel @Inject constructor(
         nativeState: NativeInputState,
         chat: DuckAiChat?,
     ): ReasoningModePickerState {
-        val chatMatches = chat?.chatId == nativeState.chatId
-        val chatResolution = chat?.let { ReasoningResolver.forChat(it, modelState) }
-        if (nativeState.chatId != null && (!chatMatches || chatResolution == null)) {
+        val activeChat = chat?.takeIf { it.chatId == nativeState.chatId }
+        val chatResolution = activeChat?.let { ReasoningResolver.forChat(it, modelState) }
+        if (nativeState.chatId != null && chatResolution == null) {
             return ReasoningModePickerState(visible = false, rows = emptyList(), displayedMode = null)
         }
         val available = chatResolution?.available ?: modelState.availableReasoningModes
@@ -132,7 +132,7 @@ class ReasoningModePickerViewModel @Inject constructor(
         }
         if (match.isAccessible) {
             if (chatResolution != null) {
-                modelManager.setChatScopedReasoningMode(mode)
+                viewModelScope.launch { modelManager.setChatScopedReasoningMode(mode) }
             } else {
                 viewModelScope.launch { modelManager.selectReasoningMode(mode) }
             }

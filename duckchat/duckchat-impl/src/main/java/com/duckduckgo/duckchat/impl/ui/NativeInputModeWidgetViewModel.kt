@@ -129,6 +129,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
 
+    // Defensive buffer for the (rare) case where setActiveChatId fires before configure has set
+    // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
+    private var pendingChatId: String? = null
+    private var hasPendingChatId = false
+
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -157,11 +162,14 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun getSelectedModelId(): String? {
-        // Existing chat: send chat's stored model.
-        validChat()?.model?.let { return it }
-        // New chat with picker off: nothing to send.
-        if (!_modelPickerEnabled.value) return null
-        // New chat with picker on: send what the user picked.
+        // Existing chat with its model still in the list: send the chat's stored model.
+        val chat = validChat()
+        if (chat != null && ReasoningResolver.forChat(chat, modelManager.modelState.value) != null) {
+            return chat.model
+        }
+        // Existing chat whose model is no longer in the list: fall through to global so submission
+        // carries (global model, global effort). New chat with picker off: nothing to send.
+        if (chat == null && !_modelPickerEnabled.value) return null
         return modelManager.getSelectedModelId()
     }
 
@@ -273,15 +281,23 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun setActiveChatId(chatId: String?) {
-        val tabId = activeTabId.value ?: return
+        val tabId = activeTabId.value
+        if (tabId == null) {
+            // configure hasn't run yet — buffer until activeTabId is known, replayed in configure.
+            pendingChatId = chatId
+            hasPendingChatId = true
+            return
+        }
+        applyChatId(tabId, chatId)
+    }
+
+    private fun applyChatId(tabId: String, chatId: String?) {
         nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
-        modelManager.setChatScopedReasoningMode(null)
         currentChatJob?.cancel()
         currentChat.value = null
-        if (chatId != null) {
-            currentChatJob = viewModelScope.launch {
-                currentChat.value = duckAiChatStore.getChatById(chatId)
-            }
+        currentChatJob = viewModelScope.launch {
+            modelManager.setChatScopedReasoningMode(null)
+            if (chatId != null) currentChat.value = duckAiChatStore.getChatById(chatId)
         }
     }
 
@@ -290,6 +306,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
         widgetConfig.value = WidgetConfig(inputContext = context, inputPosition = position)
+        replayPendingChatId(tabId)
+    }
+
+    private fun replayPendingChatId(tabId: String) {
+        if (hasPendingChatId) {
+            val pending = pendingChatId
+            pendingChatId = null
+            hasPendingChatId = false
+            applyChatId(tabId, pending)
+        }
     }
 
     fun storePendingPrompt(
@@ -306,6 +332,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun configureContextual(tabId: String) {
         activeTabId.value = tabId
         widgetConfig.update { it.copy(inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) }
+        replayPendingChatId(tabId)
     }
 
     fun cancelChatSuggestions() {
