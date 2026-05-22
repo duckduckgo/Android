@@ -1,0 +1,57 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+# wait for the unified input widget to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+
+# switch to Duck.ai mode
+- tapOn:
+    text: "Duck.ai"
+    childOf:
+      id: "inputModeWidget"
+
+# wait for the Duck.ai bottom row to settle — options button is the marker
+- extendedWaitUntil:
+    visible:
+      id: "optionsButtonContainer"
+    timeout: 10000
+
+# open the options menu and pick Web Search
+- tapOn:
+    id: "optionsButtonContainer"
+- assertVisible:
+    text: "Web Search"
+- assertVisible:
+    text: "Create Image"
+- tapOn:
+    text: "Web Search"
+
+# the Web Search pill appears in the bottom row — a11y maps to text matcher
+- assertVisible:
+    text: "Remove Web Search"
+
+# tapping the pill removes the tool
+- tapOn:
+    text: "Remove Web Search"
+- assertNotVisible:
+    text: "Remove Web Search"
+
+# open the options menu and pick Create Image
+- tapOn:
+    id: "optionsButtonContainer"
+- assertVisible:
+    text: "Create Image"
+- tapOn:
+    text: "Create Image"
+
+# the Create Image pill appears
+- assertVisible:
+    text: "Remove Create Image"
+
+# tapping the pill removes the tool
+- tapOn:
+    text: "Remove Create Image"
+- assertNotVisible:
+    text: "Remove Create Image"
