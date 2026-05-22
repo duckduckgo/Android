@@ -26,6 +26,7 @@ import org.junit.After
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,5 +87,13 @@ class AdBlockingExtensionRepositoryTest {
         assertEquals("2.0.0", repository.getStoredVersion())
         val stored = database.adBlockingExtensionDao().scriptletsFlow().first()
         assertEquals(setOf("new/path.js"), stored.map { it.name }.toSet())
+    }
+
+    @Test
+    fun whenStoreScriptletsCalledWithEmptyMapThenVersionIsStillPersisted() = runTest {
+        repository.storeScriptlets(version = "2026.3.9", scriptlets = emptyMap())
+
+        assertEquals("2026.3.9", repository.getStoredVersion())
+        assertTrue(database.adBlockingExtensionDao().scriptletsFlow().first().isEmpty())
     }
 }

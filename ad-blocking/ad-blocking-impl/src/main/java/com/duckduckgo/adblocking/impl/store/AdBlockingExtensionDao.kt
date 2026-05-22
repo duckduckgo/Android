@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class AdBlockingExtensionDao {
 
-    @Query("SELECT version FROM ad_blocking_scriptlets LIMIT 1")
+    @Query("SELECT version FROM ad_blocking_scriptlets_metadata WHERE id = ${ScriptletMetadataEntity.SINGLETON_ID}")
     abstract suspend fun getVersion(): String?
 
     @Query("SELECT * FROM ad_blocking_scriptlets")
@@ -38,9 +38,13 @@ abstract class AdBlockingExtensionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertScriptlets(scriptlets: List<ScriptletEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun upsertMetadata(metadata: ScriptletMetadataEntity)
+
     @Transaction
-    open suspend fun replaceAll(scriptlets: List<ScriptletEntity>) {
+    open suspend fun replaceAll(version: String, scriptlets: List<ScriptletEntity>) {
         deleteAllScriptlets()
         insertScriptlets(scriptlets)
+        upsertMetadata(ScriptletMetadataEntity(version = version))
     }
 }

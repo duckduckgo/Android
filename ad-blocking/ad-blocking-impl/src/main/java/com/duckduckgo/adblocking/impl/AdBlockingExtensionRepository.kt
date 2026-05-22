@@ -38,8 +38,9 @@ class RealAdBlockingExtensionRepository @Inject constructor(
 
     override suspend fun storeScriptlets(version: String, scriptlets: Map<String, ByteArray>) {
         dao.replaceAll(
-            scriptlets.map { (name, content) ->
-                ScriptletEntity(name = name, version = version, content = content)
+            version = version,
+            scriptlets = scriptlets.map { (name, content) ->
+                ScriptletEntity(name = name, content = content)
             },
         )
     }

@@ -16,17 +16,15 @@
 
 package com.duckduckgo.adblocking.impl.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Database(
-    exportSchema = true,
-    version = 2,
-    entities = [ScriptletEntity::class, ScriptletMetadataEntity::class],
-)
-abstract class AdBlockingExtensionDatabase : RoomDatabase() {
-    abstract fun adBlockingExtensionDao(): AdBlockingExtensionDao
+@Entity(tableName = "ad_blocking_scriptlets_metadata")
+data class ScriptletMetadataEntity(
+    @PrimaryKey val id: Int = SINGLETON_ID,
+    val version: String,
+) {
+    companion object {
+        const val SINGLETON_ID = 0
+    }
 }
-
-val AD_BLOCKING_EXTENSION_MIGRATIONS = emptyArray<Migration>()

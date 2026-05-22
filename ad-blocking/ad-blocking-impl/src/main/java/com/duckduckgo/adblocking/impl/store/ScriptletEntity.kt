@@ -22,18 +22,16 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "ad_blocking_scriptlets")
 data class ScriptletEntity(
     @PrimaryKey val name: String,
-    val version: String,
     val content: ByteArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScriptletEntity) return false
-        return name == other.name && version == other.version && content.contentEquals(other.content)
+        return name == other.name && content.contentEquals(other.content)
     }
 
     override fun hashCode(): Int {
         var result = name.hashCode()
-        result = 31 * result + version.hashCode()
         result = 31 * result + content.contentHashCode()
         return result
     }
