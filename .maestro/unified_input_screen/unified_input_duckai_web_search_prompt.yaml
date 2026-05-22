@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "UnifiedInput: duck.ai web search prompt sticky-then-clears × omnibar positions"
 tags:
   - unifiedInputTest

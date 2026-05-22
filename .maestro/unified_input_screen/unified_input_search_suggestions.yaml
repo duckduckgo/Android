@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "UnifiedInput: search suggestions visible and dismiss × omnibar positions"
 tags:
   - unifiedInputTest

@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "UnifiedInput: change duck.ai model and reasoning effort × omnibar positions"
 tags:
   - unifiedInputTest

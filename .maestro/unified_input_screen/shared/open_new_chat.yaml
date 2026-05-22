@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 ---
 # move to Duck chat mode
 - tapOn: "Duck.ai"
