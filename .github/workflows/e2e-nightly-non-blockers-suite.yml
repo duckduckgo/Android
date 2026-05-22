@@ -118,7 +118,7 @@ jobs:
           test_suite_name: Android Design System (Nightly)
 
       - name: Unified Input Field
-        id: maestro-ads
+        id: maestro-uif
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
