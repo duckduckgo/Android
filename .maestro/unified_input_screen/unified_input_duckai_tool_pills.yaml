@@ -1,0 +1,49 @@
+appId: com.duckduckgo.mobile.android.debug
+name: "UnifiedInput: duck.ai tool pills select and remove × omnibar positions"
+tags:
+  - unifiedInputTest
+---
+# 1/3 — omnibar top
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "top"
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/flow_duckai_tool_pills.yaml
+
+# 2/3 — omnibar bottom
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "bottom"
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/flow_duckai_tool_pills.yaml
+
+# 3/3 — omnibar split
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "split"
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/flow_duckai_tool_pills.yaml
