@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.view.View
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.WavingDaxSpec
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
@@ -47,6 +48,13 @@ data class DaxEndBrandDesignUpdateBubbleCta(
     DaxBubbleCta.ShowsWavingDax {
     override val activeIncludeId: Int = R.id.primaryCta
     override val showArrow: Boolean = true
+    override val wavingDaxSpec = WavingDaxSpec(
+        rotationDegrees = 0f,
+        translationXDp = -40f,
+        translationYDp = -150f,
+        heightDp = 178f,
+        anchorToCardOnTablet = true,
+    )
 
     override fun configureContentViews(view: View) {
         view.findViewById<MaterialButton>(R.id.primaryCta)?.setText(R.string.onboardingEndDaxDialogButton)
