@@ -93,7 +93,7 @@ class RealChatHistoryRepository @Inject constructor(
 
     override suspend fun exportChat(chatId: String): File =
         withContext(dispatchers.io()) {
-            val chat = chatStore.getChats().firstOrNull { it.chatId == chatId }
+            val chat = chatStore.getChatById(chatId)
                 ?: throw IllegalStateException("Chat $chatId not found")
             val rawJson = chatStore.getChatContent(chatId)
                 ?: throw IllegalStateException("Chat $chatId content not found")
