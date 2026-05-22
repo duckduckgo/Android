@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -78,17 +79,9 @@ class RealChatHistoryRepository @Inject constructor(
         lastEditMillis = chat.lastEdit.parseIsoMillis(),
     )
 
-    private fun DuckAiChat.toChatType(): ChatType = model.toChatType()
-
     private fun String.parseIsoMillis(): Long = runCatching { Instant.parse(this).toEpochMilli() }.getOrDefault(0L)
 
     private companion object {
         const val UPSTREAM_UNTITLED = "Untitled Chat"
     }
-}
-
-internal fun String.toChatType(): ChatType = when (this) {
-    "image-generation" -> ChatType.ImageGeneration
-    "voice-mode" -> ChatType.Voice
-    else -> ChatType.Discussion
 }

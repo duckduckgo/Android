@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.history
+package com.duckduckgo.duckchat.impl.models
 
-import com.duckduckgo.duckchat.impl.models.ChatType
+import androidx.annotation.DrawableRes
+import com.duckduckgo.duckchat.impl.R
 
-data class ChatHistoryItem(
-    val chatId: String,
-    val displayTitle: String,
-    val type: ChatType,
-    val pinned: Boolean,
-    val lastEditMillis: Long,
-)
+@DrawableRes
+internal fun ChatType.iconRes(pinned: Boolean): Int = when (this) {
+    ChatType.Discussion -> if (pinned) R.drawable.ic_chat_pin_24 else R.drawable.ic_chat_24
+    ChatType.ImageGeneration -> if (pinned) R.drawable.ic_images_pin_24 else R.drawable.ic_images_24
+    ChatType.Voice -> if (pinned) R.drawable.ic_voice_pin_24 else R.drawable.ic_voice_24
+}

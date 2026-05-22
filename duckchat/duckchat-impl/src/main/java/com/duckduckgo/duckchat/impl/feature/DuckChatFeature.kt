@@ -235,6 +235,14 @@ interface DuckChatFeature {
     fun deleteFromAutocomplete(): Toggle
 
     /**
+     * @return `true` when chat-suggestion rows in the omnibar autocomplete render a per-type leading icon
+     * (Discussion / ImageGeneration / Voice) instead of the default Discussion icon.
+     * If the remote feature is not present defaults to `true`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun chatSuggestionTypeIcon(): Toggle
+
+    /**
      * Kill switch for opening Duck.ai voice chat when the digital assistant intent is received.
      * @return `true` when the remote config has the "digitalAssistantDuckAi"
      * sub-feature flag enabled

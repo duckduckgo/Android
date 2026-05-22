@@ -26,6 +26,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.iconRes
 
 class ChatHistoryViewHolder(
     itemView: View,
@@ -78,16 +79,10 @@ class ChatHistoryViewHolder(
             iconContainer.contentDescription = itemView.context.getString(R.string.duck_ai_chat_history_row_selected_content_description)
         } else {
             iconContainer.setBackgroundResource(R.drawable.bg_chat_history_circle_solid)
-            typeIcon.setImageResource(iconFor(item.type, item.pinned))
+            typeIcon.setImageResource(item.type.iconRes(item.pinned))
             typeIcon.colorFilter = null
             iconContainer.contentDescription = null
         }
-    }
-
-    private fun iconFor(type: ChatType, pinned: Boolean): Int = when (type) {
-        ChatType.Discussion -> if (pinned) R.drawable.ic_chat_pin_24 else R.drawable.ic_chat_24
-        ChatType.ImageGeneration -> if (pinned) R.drawable.ic_images_pin_24 else R.drawable.ic_images_24
-        ChatType.Voice -> if (pinned) R.drawable.ic_voice_pin_24 else R.drawable.ic_voice_24
     }
 
     companion object {
