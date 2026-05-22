@@ -80,13 +80,17 @@ data class DaxSubscriptionBrandDesignUpdateBubbleCta(
         dax.translationY = SUBSCRIPTION_DAX_TRANSLATION_Y_DP * density
         (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
             lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+            lp.height = (SUBSCRIPTION_DAX_HEIGHT_DP * density).toInt()
             dax.layoutParams = lp
         }
     }
 
     private companion object {
         private const val SUBSCRIPTION_DAX_ROTATION_DEGREES = 22.62f
-        private const val SUBSCRIPTION_DAX_TRANSLATION_X_DP = -76f
-        private const val SUBSCRIPTION_DAX_TRANSLATION_Y_DP = -192f
+        // Baseline 178dp (layout default) scaled 1.5x; translations scaled in proportion to keep the
+        // same relative offset from the bubble's bottom-left.
+        private const val SUBSCRIPTION_DAX_HEIGHT_DP = 267f
+        private const val SUBSCRIPTION_DAX_TRANSLATION_X_DP = -114f
+        private const val SUBSCRIPTION_DAX_TRANSLATION_Y_DP = -288f
     }
 }

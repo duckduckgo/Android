@@ -1552,6 +1552,9 @@ sealed class DaxBubbleCta(
             (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
                 lp.startToStart =
                     if (deviceInfo.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                // Reset height to the layout default in case a previous CTA enlarged it
+                // (e.g. DaxSubscriptionBrandDesignUpdateBubbleCta scales it up by 1.5x).
+                lp.height = (DEFAULT_WAVING_DAX_HEIGHT_DP * density).toInt()
                 dax.layoutParams = lp
             }
         }
@@ -1559,6 +1562,7 @@ sealed class DaxBubbleCta(
         companion object {
             private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -40f
             private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -150f
+            private const val DEFAULT_WAVING_DAX_HEIGHT_DP = 178f
         }
     }
 
