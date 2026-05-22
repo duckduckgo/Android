@@ -1050,7 +1050,7 @@ class BrandDesignUpdatePageViewModelTest {
                 "pixelSource" to "phone",
                 "d" to "0",
                 "e" to "clicked",
-                "value" to "set_as_default:off widget:off address_bar:top input_type:search_and_duckai",
+                "value" to "set_as_default:off,widget:off,address_bar:top,input_type:search_and_duckai",
             ),
             type = Unique(tag = "m_onboarding_quick-setup_clicked"),
         )
@@ -1081,7 +1081,7 @@ class BrandDesignUpdatePageViewModelTest {
                 "pixelSource" to "phone",
                 "d" to "0",
                 "e" to "clicked",
-                "value" to "set_as_default:on widget:off address_bar:bottom input_type:search",
+                "value" to "set_as_default:on,widget:off,address_bar:bottom,input_type:search",
             ),
             type = Unique(tag = "m_onboarding_quick-setup_clicked"),
         )
@@ -1114,7 +1114,7 @@ class BrandDesignUpdatePageViewModelTest {
                 "pixelSource" to "phone",
                 "d" to "0",
                 "e" to "clicked",
-                "value" to "set_as_default:off widget:on address_bar:split input_type:search_and_duckai",
+                "value" to "set_as_default:off,widget:on,address_bar:split,input_type:search_and_duckai",
             ),
             type = Unique(tag = "m_onboarding_quick-setup_clicked"),
         )

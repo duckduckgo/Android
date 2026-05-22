@@ -596,9 +596,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         } else {
             INPUT_TYPE_SEARCH
         }
-        val value = "$PIXEL_SET_AS_DEFAULT_VALUE_PARAM:${onOff(isDefault)} " +
-            "$PIXEL_WIDGET_VALUE_PARAM:${onOff(hasWidget)} " +
-            "$PIXEL_ADDRESS_BAR_VALUE_PARAM:$addressBar " +
+        val value = "$PIXEL_SET_AS_DEFAULT_VALUE_PARAM:${onOff(isDefault)}," +
+            "$PIXEL_WIDGET_VALUE_PARAM:${onOff(hasWidget)}," +
+            "$PIXEL_ADDRESS_BAR_VALUE_PARAM:$addressBar," +
             "$PIXEL_INPUT_TYPE_VALUE_PARAM:$inputType"
         val params = buildQuickSetupStandardParams() + mapOf(
             PIXEL_PARAM_EVENT to PIXEL_EVENT_CLICKED,

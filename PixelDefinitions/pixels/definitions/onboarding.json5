@@ -101,7 +101,7 @@
             {
                 "key": "value",
                 "type": "string",
-                "description": "Only set when e=clicked. Composite encoding of the user's Quick Setup selections, formatted as 'set_as_default:on|off widget:on|off address_bar:top|bottom|split input_type:search|search_and_duckai'."
+                "description": "Only set when e=clicked. Composite encoding of the user's Quick Setup selections, formatted as 'set_as_default:on|off,widget:on|off,address_bar:top|bottom|split,input_type:search|search_and_duckai'."
             }
         ]
     }
