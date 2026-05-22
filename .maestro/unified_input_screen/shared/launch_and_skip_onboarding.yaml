@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+# Robust replacement for ../../shared/skip_all_onboarding.yaml — the upstream version
+# falls back to ../../shared/pre_onboarding.yaml whose asserted welcome copy has drifted
+# from the current onboarding, so it fails on the new build. Skip directly here and
+# wait long enough for the unified input to settle.
+- extendedWaitUntil:
+    visible: "Skip Onboarding"
+    timeout: 30000
+- tapOn: "Skip Onboarding"
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 30000

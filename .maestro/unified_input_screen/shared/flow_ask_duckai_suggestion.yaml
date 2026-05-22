@@ -1,0 +1,43 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+# unified input is open by default with nativeInputToggle="true";
+# wait for it to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+- assertVisible:
+    id: "inputModeWidget"
+
+# type a query that will produce an Ask Duck.ai suggestion
+- inputText: "what is a car"
+- extendedWaitUntil:
+    visible:
+      id: "autoCompleteSuggestionsList"
+    timeout: 10000
+
+# the Ask Duck.ai suggestion uses an "Ask Duck.ai" message and a title matching the typed query
+- assertVisible:
+    text: "Ask Duck.ai"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# tap the suggestion
+- tapOn:
+    text: "Ask Duck.ai"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# accept the duck.ai T&C if it appears (first run only)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
+
+# verify Duck.ai opened with the query submitted — the Duck.ai header replaces the
+# omnibar and the bottom input shows the chat placeholder
+- extendedWaitUntil:
+    visible:
+      id: "duckAIHeader"
+    timeout: 15000
+- assertVisible:
+    id: "duckAIHeader"
+- assertVisible:
+    text: "Ask anything privately…"

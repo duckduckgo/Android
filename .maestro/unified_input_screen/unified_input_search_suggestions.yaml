@@ -16,7 +16,7 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "top"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/flow_search_suggestions.yaml
 
 # 2/3 — omnibar bottom
@@ -32,7 +32,7 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "bottom"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/flow_search_suggestions.yaml
 
 # 3/3 — omnibar split
@@ -48,5 +48,5 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/flow_search_suggestions.yaml

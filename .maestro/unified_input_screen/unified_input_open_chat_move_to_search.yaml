@@ -15,7 +15,7 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "top"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
 # 2/6 — AI on, omnibar bottom
@@ -30,7 +30,7 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "bottom"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
 # 3/6 — AI on, omnibar split
@@ -45,7 +45,7 @@ tags:
             inputWithAiToggle: "true"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
 # 4/6 — AI off, omnibar top
@@ -60,7 +60,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "top"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
 # 5/6 — AI off, omnibar bottom
@@ -75,7 +75,7 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "bottom"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
 
 # 6/6 — AI off, omnibar split
@@ -90,5 +90,5 @@ tags:
             inputWithAiToggle: "false"
             omnibarPosition: "split"
             addFavorites: "example.com;duckduckgo.com;privacytest.com"
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: shared/launch_and_skip_onboarding.yaml
       - runFlow: shared/open_new_chat.yaml
