@@ -73,8 +73,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -98,7 +96,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val duckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager,
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
-    inputScreenOnboardingStateProvider: InputScreenOnboardingStateProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -106,7 +103,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val hasAnimatedCurrentDialog: Boolean = false,
         val currentDialog: PreOnboardingDialogType? = null,
         val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
-        val inputScreenOnboardingEnabled: Boolean = false,
         val inputScreenSelected: Boolean = true,
         val showSplitOption: Boolean = false,
         val isReinstallUser: Boolean = false,
@@ -114,7 +110,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewIsSearchSelected: Boolean = false,
     ) {
-        val maxPageCount = if (inputScreenOnboardingEnabled) 3 else 2
+        val maxPageCount = 3
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -122,12 +118,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
-
-    init {
-        inputScreenOnboardingStateProvider.isEnabled.onEach { isInputScreenOnboardingEnabled ->
-            _viewState.update { it.copy(inputScreenOnboardingEnabled = isInputScreenOnboardingEnabled) }
-        }.launchIn(viewModelScope)
-    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -272,11 +262,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                         }
                     }
-                    if (viewState.value.inputScreenOnboardingEnabled) {
-                        setCurrentDialog(INPUT_SCREEN)
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
+                    setCurrentDialog(INPUT_SCREEN)
                 }
             }
 

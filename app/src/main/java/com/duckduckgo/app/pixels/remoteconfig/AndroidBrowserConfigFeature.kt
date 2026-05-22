@@ -269,14 +269,6 @@ interface AndroidBrowserConfigFeature {
     fun newCustomTab(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "showInputScreenOnboarding" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showInputScreenOnboarding(): Toggle
-
-    /**
      * Controls the duck-ai related copy updates related to browser onboarding
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

@@ -48,7 +48,6 @@ class DuckAiOnboardingExperimentManagerTest {
     private val deviceInfo: DeviceInfo = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val showInputScreenOnboardingToggle: Toggle = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val brandDesignUpdateToggle: Toggle = mock()
     private val experimentToggle: Toggle = mock()
@@ -57,7 +56,6 @@ class DuckAiOnboardingExperimentManagerTest {
 
     @Before
     fun setup() {
-        whenever(browserConfig.showInputScreenOnboarding()).thenReturn(showInputScreenOnboardingToggle)
         whenever(browserConfig.singleTabFireDialog()).thenReturn(singleTabFireDialogToggle)
         whenever(onboardingBrandDesignUpdateToggles.brandDesignUpdate()).thenReturn(brandDesignUpdateToggle)
         whenever(extendedOnboardingFeatureToggles.onboardingDuckAiExperimentMay26()).thenReturn(experimentToggle)
@@ -76,17 +74,6 @@ class DuckAiOnboardingExperimentManagerTest {
     fun whenDefaultVariantForcedThenReturnsNullAndDoesNotEnroll() = runTest {
         givenPrerequisitesMet()
         whenever(appBuildConfig.isDefaultVariantForced).thenReturn(true)
-
-        val result = testee.enroll()
-
-        assertNull(result)
-        verify(experimentToggle, never()).enroll()
-    }
-
-    @Test
-    fun whenShowInputScreenOnboardingDisabledThenReturnsNullAndDoesNotEnroll() = runTest {
-        givenPrerequisitesMet()
-        whenever(showInputScreenOnboardingToggle.isEnabled()).thenReturn(false)
 
         val result = testee.enroll()
 
@@ -196,7 +183,6 @@ class DuckAiOnboardingExperimentManagerTest {
 
     private suspend fun givenPrerequisitesMet() {
         whenever(appBuildConfig.isDefaultVariantForced).thenReturn(false)
-        whenever(showInputScreenOnboardingToggle.isEnabled()).thenReturn(true)
         whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
         whenever(brandDesignUpdateToggle.isEnabled()).thenReturn(false)
         whenever(deviceInfo.formFactor()).thenReturn(FormFactor.PHONE)
