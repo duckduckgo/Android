@@ -1202,6 +1202,67 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `chatId starts null`() {
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `when sheet opened with stored chat url then chatId set before page load`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("abc-123", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in WEBVIEW mode then chatId set from url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val newUrl = "https://duck.ai/chat?chatID=xyz-789"
+        testee.onChatPageLoaded(newUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("xyz-789", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in INPUT mode then chatId not set`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(testee.chatId.value)
+
+        val staleUrl = "https://duck.ai/chat?chatID=stale-123"
+        testee.onChatPageLoaded(staleUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `onNewChatRequested clears chatId`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("abc-123", testee.chatId.value)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
     fun `onNewChatRequested clears stored url for current tab`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"

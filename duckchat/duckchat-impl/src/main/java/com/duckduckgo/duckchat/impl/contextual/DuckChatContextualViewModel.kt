@@ -80,6 +80,11 @@ class DuckChatContextualViewModel @Inject constructor(
     var updatedPageContext: String = ""
     var sheetTabId: String = ""
 
+    // Chat id currently shown in the contextual webview, derived from the URL query param.
+    // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
+    private val _chatId = MutableStateFlow<String?>(null)
+    val chatId: StateFlow<String?> = _chatId.asStateFlow()
+
     @VisibleForTesting
     internal var isPageContextRequested: Boolean = false
 
@@ -172,6 +177,7 @@ class DuckChatContextualViewModel @Inject constructor(
         if (existingChatUrl == null) {
             val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
             withContext(dispatchers.main()) {
+                setSheetUrl(urlToLoad)
                 commandChannel.trySend(Command.LoadUrl(urlToLoad))
                 _viewState.update { state ->
                     state.copy(
@@ -182,6 +188,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             withContext(dispatchers.main()) {
+                setSheetUrl(existingChatUrl)
                 _viewState.update { state ->
                     state.copy(
                         sheetMode = SheetMode.WEBVIEW,
@@ -233,6 +240,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 val hasChatHistory = hasChatId(existingChatUrl)
 
                 withContext(dispatchers.main()) {
+                    setSheetUrl(existingChatUrl)
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
@@ -277,9 +285,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (url == null) {
             return
         } else {
-            fullModeUrl = url
             val sheetMode = _viewState.value.sheetMode
             if (sheetMode == SheetMode.WEBVIEW) {
+                setSheetUrl(url)
                 val hasChatId = hasChatId(url)
 
                 viewModelScope.launch {
@@ -636,6 +644,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextualDataStore.clearTabChatUrl(currentTabId)
 
                 withContext(dispatchers.main()) {
+                    clearSheetUrl()
                     _viewState.update {
                         it.copy(
                             sheetMode = SheetMode.INPUT,
@@ -655,10 +664,20 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun hasChatId(url: String?): Boolean {
-        return url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)
-            .orEmpty()
-            .isNotBlank()
+    private fun hasChatId(url: String?): Boolean = !extractChatId(url).isNullOrBlank()
+
+    private fun extractChatId(url: String?): String? =
+        url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
+
+    // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).
+    private fun setSheetUrl(url: String) {
+        fullModeUrl = url
+        _chatId.value = extractChatId(url)
+    }
+
+    private fun clearSheetUrl() {
+        fullModeUrl = ""
+        _chatId.value = null
     }
 
     private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {

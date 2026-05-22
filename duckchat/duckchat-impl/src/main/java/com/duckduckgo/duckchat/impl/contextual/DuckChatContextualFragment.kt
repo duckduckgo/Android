@@ -433,6 +433,7 @@ class DuckChatContextualFragment :
             widget = binding.contextualNativeInputWidget,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
+            chatIdFlow = viewModel.chatId,
             onSearchSubmitted = { query ->
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
