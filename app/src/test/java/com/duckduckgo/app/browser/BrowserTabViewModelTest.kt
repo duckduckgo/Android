@@ -2191,7 +2191,7 @@ class BrowserTabViewModelTest {
      * sources so the AutoCompleteApi produces a non-empty result for "query", then triggers the cache pipeline.
      * Caller still needs to wait for the debounce.
      */
-    private fun primeOmnibarAutocompleteCacheForQuery() {
+    private suspend fun primeOmnibarAutocompleteCacheForQuery() {
         nativeInputUserSettingFlow.value = true
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
