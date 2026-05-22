@@ -20,7 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,22 +34,21 @@ import logcat.logcat
 import javax.inject.Inject
 
 data class AdBlockingExtensionSettings(
+    @field:Json(name = "version")
     val version: String,
+    @field:Json(name = "scriptlets")
     val scriptlets: Map<String, ScriptletEntry>,
 )
 
 data class ScriptletEntry(
+    @field:Json(name = "url")
     val url: String,
+    @field:Json(name = "signature")
     val signature: String,
 )
 
-data class ScriptletsSettings(
-    val version: String,
-    val scriptlets: Map<String, ScriptletEntry>,
-)
-
 interface AdBlockingExtensionConfigProvider {
-    val scriptletsSettings: StateFlow<ScriptletsSettings?>
+    val scriptletsSettings: StateFlow<AdBlockingExtensionSettings?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -54,16 +56,16 @@ interface AdBlockingExtensionConfigProvider {
 @ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealAdBlockingExtensionConfigProvider @Inject constructor(
     private val feature: AdBlockingExtensionFeature,
-    private val settingsAdapter: JsonAdapter<AdBlockingExtensionSettings>,
 ) : AdBlockingExtensionConfigProvider, PrivacyConfigCallbackPlugin {
 
-    private val scriptletsFlow = MutableStateFlow<ScriptletsSettings?>(null)
+    private val settingsAdapter by lazy { buildJsonAdapter() }
+    private val scriptletsFlow = MutableStateFlow<AdBlockingExtensionSettings?>(null)
 
     init {
         refresh()
     }
 
-    override val scriptletsSettings: StateFlow<ScriptletsSettings?> = scriptletsFlow.asStateFlow()
+    override val scriptletsSettings: StateFlow<AdBlockingExtensionSettings?> = scriptletsFlow.asStateFlow()
 
     override fun onPrivacyConfigDownloaded() {
         logcat { "onPrivacyConfigDownloaded" }
@@ -71,8 +73,7 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
     }
 
     private fun refresh() {
-        val raw = parseSettings()
-        scriptletsFlow.value = raw?.let { ScriptletsSettings(it.version, it.scriptlets) }
+        scriptletsFlow.value = parseSettings()
     }
 
     private fun parseSettings(): AdBlockingExtensionSettings? {
@@ -81,5 +82,10 @@ class RealAdBlockingExtensionConfigProvider @Inject constructor(
             .onFailure { logcat(WARN) { "failed to parse settings: ${it.asLog()}" } }
             .getOrNull()
             ?.takeIf { it.version.isNotEmpty() }
+    }
+
+    private fun buildJsonAdapter(): JsonAdapter<AdBlockingExtensionSettings> {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return moshi.adapter(AdBlockingExtensionSettings::class.java)
     }
 }

@@ -22,11 +22,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -50,7 +47,7 @@ class ScriptletDownloadWorkerSchedulerTest {
 
     private val discoverableFlow = MutableStateFlow(true)
     private val operationalFlow = MutableStateFlow(true)
-    private val settingsFlow = MutableStateFlow<ScriptletsSettings?>(null)
+    private val settingsFlow = MutableStateFlow<AdBlockingExtensionSettings?>(null)
 
     private val isDiscoverableToggle: Toggle = mock {
         on { enabled() } doReturn discoverableFlow
@@ -65,14 +62,10 @@ class ScriptletDownloadWorkerSchedulerTest {
     private val configProvider: AdBlockingExtensionConfigProvider = mock {
         on { scriptletsSettings } doReturn settingsFlow
     }
-    private val settingsAdapter: JsonAdapter<ScriptletsSettings> = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-        .adapter(ScriptletsSettings::class.java)
     private val lifecycleOwner: LifecycleOwner = mock()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
-    private val scriptletsSettings = ScriptletsSettings(version = "2026.5.14", scriptlets = emptyMap())
+    private val scriptletsSettings = AdBlockingExtensionSettings(version = "2026.5.14", scriptlets = emptyMap())
 
     @After
     fun tearDown() {
@@ -84,7 +77,6 @@ class ScriptletDownloadWorkerSchedulerTest {
             workManager = workManager,
             configProvider = configProvider,
             feature = feature,
-            settingsAdapter = settingsAdapter,
             appScope = testScope,
         ).onCreate(lifecycleOwner)
     }

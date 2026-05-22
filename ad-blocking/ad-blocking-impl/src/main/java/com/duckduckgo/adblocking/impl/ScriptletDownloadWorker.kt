@@ -31,7 +31,7 @@ import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdater
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -39,6 +39,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
@@ -61,13 +63,12 @@ class ScriptletDownloadWorker(
     lateinit var updater: ScriptletUpdater
 
     @Inject
-    lateinit var settingsAdapter: JsonAdapter<ScriptletsSettings>
-
-    @Inject
     lateinit var feature: AdBlockingExtensionFeature
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    private val settingsAdapter by lazy { buildJsonAdapter() }
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         if (!feature.isDiscoverable().isEnabled()) {
@@ -87,6 +88,11 @@ class ScriptletDownloadWorker(
         }
     }
 
+    private fun buildJsonAdapter(): JsonAdapter<AdBlockingExtensionSettings> {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return moshi.adapter(AdBlockingExtensionSettings::class.java)
+    }
+
     companion object {
         const val KEY_SETTINGS = "settings"
     }
@@ -98,9 +104,10 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val configProvider: AdBlockingExtensionConfigProvider,
     private val feature: AdBlockingExtensionFeature,
-    private val settingsAdapter: JsonAdapter<ScriptletsSettings>,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
+
+    private val settingsAdapter by lazy { buildJsonAdapter() }
 
     override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
@@ -116,7 +123,7 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
         }
     }
 
-    private fun enqueue(settings: ScriptletsSettings) {
+    private fun enqueue(settings: AdBlockingExtensionSettings) {
         val json = settingsAdapter.toJson(settings)
         val request = OneTimeWorkRequestBuilder<ScriptletDownloadWorker>()
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -124,6 +131,11 @@ class ScriptletDownloadWorkerScheduler @Inject constructor(
             .setInputData(workDataOf(ScriptletDownloadWorker.KEY_SETTINGS to json))
             .build()
         workManager.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
+    private fun buildJsonAdapter(): JsonAdapter<AdBlockingExtensionSettings> {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return moshi.adapter(AdBlockingExtensionSettings::class.java)
     }
 
     companion object {

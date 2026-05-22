@@ -20,13 +20,10 @@ import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.RealAdBlockingExtensionConfigProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,11 +36,7 @@ import org.junit.runner.RunWith
 class AdBlockingExtensionConfigProviderTest {
 
     private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
-    private val settingsAdapter = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-        .adapter(AdBlockingExtensionSettings::class.java)
-    private val provider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
+    private val provider = RealAdBlockingExtensionConfigProvider(feature)
 
     private val validSettingsJson = """
         {
@@ -112,7 +105,7 @@ class AdBlockingExtensionConfigProviderTest {
     @Test
     fun whenSettingsAreValidAtConstructionThenScriptletsSettingsEmitsInitialValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
-        val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
+        val freshProvider = RealAdBlockingExtensionConfigProvider(feature)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
@@ -123,7 +116,7 @@ class AdBlockingExtensionConfigProviderTest {
     @Test
     fun whenOnPrivacyConfigDownloadedFiresAfterSettingsChangeThenScriptletsSettingsEmitsNewValue() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
-        val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
+        val freshProvider = RealAdBlockingExtensionConfigProvider(feature)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)
@@ -140,7 +133,7 @@ class AdBlockingExtensionConfigProviderTest {
     @Test
     fun whenOnPrivacyConfigDownloadedFiresWithUnchangedSettingsThenScriptletsSettingsDoesNotEmitDuplicates() = runTest {
         feature.self().setRawStoredState(Toggle.State(remoteEnableState = true, settings = validSettingsJson))
-        val freshProvider = RealAdBlockingExtensionConfigProvider(feature, settingsAdapter)
+        val freshProvider = RealAdBlockingExtensionConfigProvider(feature)
 
         freshProvider.scriptletsSettings.filterNotNull().test {
             assertEquals("2026.3.9", awaitItem().version)

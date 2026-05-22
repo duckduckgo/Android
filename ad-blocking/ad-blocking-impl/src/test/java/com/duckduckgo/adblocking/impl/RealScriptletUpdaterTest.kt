@@ -20,8 +20,8 @@ import com.duckduckgo.adblocking.impl.domain.RealScriptletUpdater
 import com.duckduckgo.adblocking.impl.domain.ScriptletSignatureValidator
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletValidationResult
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
-import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
@@ -52,7 +52,7 @@ class RealScriptletUpdaterTest {
     private val isolatedBytes = "isolated-bytes".toByteArray()
     private val mainBytes = "main-bytes".toByteArray()
 
-    private val validSettings = ScriptletsSettings(
+    private val validSettings = AdBlockingExtensionSettings(
         version = "2026.3.9",
         scriptlets = mapOf(isolatedPath to isolatedEntry, mainPath to mainEntry),
     )

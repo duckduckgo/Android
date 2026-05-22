@@ -25,8 +25,8 @@ import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdateResult
 import com.duckduckgo.adblocking.impl.domain.ScriptletUpdater
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
-import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -56,12 +56,12 @@ class ScriptletDownloadWorkerTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val updater: ScriptletUpdater = mock()
     private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
-    private val settingsAdapter: JsonAdapter<ScriptletsSettings> = Moshi.Builder()
+    private val settingsAdapter: JsonAdapter<AdBlockingExtensionSettings> = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
-        .adapter(ScriptletsSettings::class.java)
+        .adapter(AdBlockingExtensionSettings::class.java)
 
-    private val settings = ScriptletsSettings(
+    private val settings = AdBlockingExtensionSettings(
         version = "2026.3.9",
         scriptlets = mapOf(
             "scriptlets/isolated/ublock-filters.js" to ScriptletEntry("https://cdn.example/isolated.js", "iso-sig"),
@@ -124,7 +124,6 @@ class ScriptletDownloadWorkerTest {
         }
         return TestListenableWorkerBuilder<ScriptletDownloadWorker>(context, inputData = data).build().also {
             it.updater = updater
-            it.settingsAdapter = settingsAdapter
             it.feature = feature
             it.dispatchers = coroutineRule.testDispatcherProvider
         }

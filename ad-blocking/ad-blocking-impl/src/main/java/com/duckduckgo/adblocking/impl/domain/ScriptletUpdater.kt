@@ -18,7 +18,7 @@ package com.duckduckgo.adblocking.impl.domain
 
 import com.duckduckgo.adblocking.impl.AdBlockingExtensionRepository
 import com.duckduckgo.adblocking.impl.ScriptletDownloader
-import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletsSettings
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -35,7 +35,7 @@ sealed interface ScriptletUpdateResult {
 }
 
 interface ScriptletUpdater {
-    suspend fun update(settings: ScriptletsSettings): ScriptletUpdateResult
+    suspend fun update(settings: AdBlockingExtensionSettings): ScriptletUpdateResult
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -46,7 +46,7 @@ class RealScriptletUpdater @Inject constructor(
     private val validator: ScriptletSignatureValidator,
 ) : ScriptletUpdater {
 
-    override suspend fun update(settings: ScriptletsSettings): ScriptletUpdateResult {
+    override suspend fun update(settings: AdBlockingExtensionSettings): ScriptletUpdateResult {
         if (settings.version == repository.getStoredVersion()) {
             logcat { "Version matches stored. Skipping" }
             return ScriptletUpdateResult.Success
