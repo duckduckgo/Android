@@ -31,6 +31,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ class RealChatHistoryReader @Inject constructor(
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
 
     override suspend fun refresh() {
-        runCatching {
+        try {
             withContext(dispatchers.main()) {
                 val wv = getOrCreateWebView()
                 pageLoadDeferred = CompletableDeferred()
@@ -76,8 +77,10 @@ class RealChatHistoryReader @Inject constructor(
                 }
                 logcat { "ChatHistoryReader: page loaded; SPA fan-out continues in the WebView" }
             }
-        }.onFailure {
-            logcat { "ChatHistoryReader: refresh failed — ${it.message}" }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat { "ChatHistoryReader: refresh failed — ${e.message}" }
         }
     }
 
