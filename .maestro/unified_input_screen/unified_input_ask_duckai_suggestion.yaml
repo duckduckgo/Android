@@ -1,0 +1,52 @@
+appId: com.duckduckgo.mobile.android
+name: "UnifiedInput: ask duck.ai suggestion opens chat × omnibar positions"
+tags:
+  - unifiedInputTest
+---
+# 1/3 — omnibar top
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "top"
+            addFavorites: "example.com;duckduckgo.com;privacytest.com"
+      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/flow_ask_duckai_suggestion.yaml
+
+# 2/3 — omnibar bottom
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "bottom"
+            addFavorites: "example.com;duckduckgo.com;privacytest.com"
+      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/flow_ask_duckai_suggestion.yaml
+
+# 3/3 — omnibar split
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "true"
+            omnibarPosition: "split"
+            addFavorites: "example.com;duckduckgo.com;privacytest.com"
+      - runFlow: shared/launch_and_skip_onboarding.yaml
+      - runFlow: shared/flow_ask_duckai_suggestion.yaml

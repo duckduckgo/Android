@@ -1,0 +1,36 @@
+appId: com.duckduckgo.mobile.android
+---
+# unified input is open by default with nativeInputToggle="true";
+# wait for it to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+- assertVisible:
+    id: "inputModeWidget"
+
+# Search mode is the default — type a query and assert suggestions appear
+- inputText: "reddit"
+- extendedWaitUntil:
+    visible:
+      id: "autoCompleteSuggestionsList"
+    timeout: 10000
+- assertVisible:
+    text: "reddit.com"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# submit and assert search results load + unified input dismisses
+- pressKey: Enter
+- extendedWaitUntil:
+    visible:
+      id: "browserLayout"
+    timeout: 10000
+- assertVisible:
+    id: "browserLayout"
+- assertNotVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "browserLayout"
