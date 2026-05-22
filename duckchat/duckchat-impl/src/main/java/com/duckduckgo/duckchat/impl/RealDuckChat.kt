@@ -833,7 +833,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun buildChatUrl(chatId: String): String {
-        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId), getDuckChatLink())
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeInputParameters(), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
