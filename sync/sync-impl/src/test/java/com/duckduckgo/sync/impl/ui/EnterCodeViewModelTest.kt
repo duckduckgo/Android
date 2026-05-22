@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
@@ -43,6 +44,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
@@ -71,8 +74,19 @@ internal class EnterCodeViewModelTest {
     private val clipboard: Clipboard = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
+        // canUseV2ConnectFlow stays FALSE by default → dispatcher's Legacy path returns the
+        // SyncAuthCode straight from parseSyncAuthCode, byte-identical to pre-dispatcher production.
     }
     private val syncPixels: SyncPixels = mock()
+    private val qrCode: ExchangeV2QrCode = mock()
+    private val runner: ExchangeV2Runner = mock()
+
+    private val codeDispatcher = RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncAccountRepository,
+        qrCode = qrCode,
+        runner = runner,
+    )
 
     private val testee = EnterCodeViewModel(
         syncAccountRepository,
@@ -80,6 +94,7 @@ internal class EnterCodeViewModelTest {
         coroutineTestRule.testDispatcherProvider,
         syncFeature = syncFeature,
         syncPixels = syncPixels,
+        codeDispatcher = codeDispatcher,
     )
 
     @Test

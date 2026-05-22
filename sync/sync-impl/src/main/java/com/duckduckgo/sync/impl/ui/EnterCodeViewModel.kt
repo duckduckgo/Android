@@ -28,14 +28,17 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -52,8 +55,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -63,6 +68,7 @@ class EnterCodeViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val syncPixels: SyncPixels,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -89,6 +95,12 @@ class EnterCodeViewModel @Inject constructor(
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
         data object SwitchAccountSuccess : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?) : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -103,20 +115,63 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-        val codeType = syncAccountRepository.parseSyncAuthCode(pastedCode).also { it.onCodePasted() }
-        when (val result = syncAccountRepository.processCode(codeType)) {
-            is Result.Success -> {
-                if (codeType is SyncAuthCode.Exchange) {
-                    pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
-                } else {
-                    onLoginSuccess(previousPrimaryKey)
+        // Route via SyncCodeDispatcher. FF off → returns Legacy(parseSyncAuthCode(...)) so the
+        // block below runs byte-identical to pre-dispatcher production. FF on → v2 codes are
+        // taken into ownership via V2InProgress and surfaced through DispatchOutcome.
+        when (val decision = codeDispatcher.route(pastedCode)) {
+            is RouteDecision.Legacy -> {
+                logcat { "Sync-CodeDispatch: EnterCodeViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                val codeType = decision.authCode.also { it.onCodePasted() }
+                when (val result = syncAccountRepository.processCode(codeType)) {
+                    is Result.Success -> {
+                        if (codeType is SyncAuthCode.Exchange) {
+                            pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, code = pastedCode)
+                        } else {
+                            onLoginSuccess(previousPrimaryKey)
+                        }
+                    }
+                    is Result.Error -> {
+                        processError(result, pastedCode)
+                    }
                 }
             }
-            is Result.Error -> {
-                processError(result, pastedCode)
+            is RouteDecision.V2InProgress -> {
+                logcat { "Sync-CodeDispatch: EnterCodeViewModel observing V2InProgress" }
+                decision.outcomes.collect { outcome -> handleV2Outcome(outcome, previousPrimaryKey, pastedCode) }
             }
         }
     }
+
+    /**
+     * Translate one [DispatchOutcome] from the v2 dispatcher into the existing command/error
+     * pipeline. Each outcome maps to the same UI hook the v1 path uses for its equivalent
+     * end state — keeps the user-facing behaviour consistent between v1 and v2.
+     */
+    private suspend fun handleV2Outcome(
+        outcome: DispatchOutcome,
+        previousPrimaryKey: String,
+        pastedCode: String,
+    ) {
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> onLoginSuccess(previousPrimaryKey)
+            // Spec §"Same-account case": friendly finish, no account change. Surface as success.
+            is DispatchOutcome.AlreadyConnected -> onLoginSuccess(previousPrimaryKey)
+            is DispatchOutcome.UpgradeRequired -> processError(
+                Error(reason = "Code requires protocol v${outcome.codeMajor}"),
+                pastedCode,
+            )
+            is DispatchOutcome.Failed -> processError(Error(reason = outcome.reason), pastedCode)
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName))
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
 
     private suspend fun onLoginSuccess(previousPrimaryKey: String) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey

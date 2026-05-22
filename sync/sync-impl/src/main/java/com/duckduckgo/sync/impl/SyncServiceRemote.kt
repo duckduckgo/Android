@@ -47,6 +47,7 @@ interface SyncApi {
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        scope: String? = null,
     ): Result<LoginResponse>
 
     fun logout(
@@ -128,6 +129,20 @@ interface SyncApi {
         credentialId: String,
         request: CreateAccessCredentialRequest,
     ): Result<Boolean>
+
+    // ---- Exchange v2 relay (no token — anonymous public relay) ----
+
+    /** Open a relay channel for the v2 pairing flow. Returns Error(code=409) on UUID collision. */
+    fun createExchangeChannel(channelId: String): Result<Unit>
+
+    /** Send a batch of encrypted envelopes to [channelId]. */
+    fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit>
+
+    /** Poll [channelId] for messages with seq > [after]. Returns Error(code=404) if channel is gone. */
+    fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>>
+
+    /** Best-effort DELETE of our own channel — discards relay state. */
+    fun deleteExchangeChannel(channelId: String): Result<Unit>
 }
 
 @ContributesBinding(AppScope::class)
@@ -294,6 +309,7 @@ class SyncServiceRemote @Inject constructor(
         deviceId: String,
         deviceName: String,
         deviceType: String,
+        scope: String?,
     ): Result<LoginResponse> {
         val response = runCatching {
             val call = syncService.login(
@@ -303,6 +319,7 @@ class SyncServiceRemote @Inject constructor(
                     deviceId = deviceId,
                     deviceName = deviceName,
                     deviceType = deviceType,
+                    scope = scope,
                 ),
             )
             call.execute()
@@ -313,8 +330,9 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) {
             val body = response.body() ?: return@onSuccess Result.Error(reason = "Login: empty body")
             val token = body.token.takeUnless { it.isEmpty() } ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
-            val protectedEncryptionKey =
-                body.protected_encryption_key.takeUnless { it.isEmpty() } ?: return@onSuccess Result.Error(reason = "Login: empty PEK in Body")
+            // PEK is absent on 3party logins (server omits the field). Callers downstream are
+            // responsible for null-checking before use on the ddg path.
+            val protectedEncryptionKey = body.protected_encryption_key?.takeUnless { it.isEmpty() }
 
             Result.Success(
                 LoginResponse(
@@ -581,6 +599,37 @@ class SyncServiceRemote @Inject constructor(
         return onSuccess(response) {
             Result.Success(true)
         }
+    }
+
+    override fun createExchangeChannel(channelId: String): Result<Unit> {
+        val response = runCatching {
+            syncService.createExchangeChannel(channelId, ExchangeChannelCreateRequest()).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
+    }
+
+    override fun sendExchangeMessages(channelId: String, envelopes: List<ExchangeEnvelope>): Result<Unit> {
+        val response = runCatching {
+            syncService.postExchangeMessages(channelId, ExchangeMessagesRequest(envelopes)).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
+    }
+
+    override fun pollExchangeMessages(channelId: String, after: Int): Result<List<ExchangeMessageEntry>> {
+        val response = runCatching {
+            syncService.pollExchangeMessages(channelId, after).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) {
+            val messages = response.body()?.messages ?: emptyList()
+            Result.Success(messages)
+        }
+    }
+
+    override fun deleteExchangeChannel(channelId: String): Result<Unit> {
+        val response = runCatching {
+            syncService.deleteExchangeChannel(channelId).execute()
+        }.getOrElse { throwable -> return Result.Error(reason = throwable.message.toString()) }
+        return onSuccess(response) { Result.Success(Unit) }
     }
 
     private fun Result.Error.removeKeysIfInvalid() {

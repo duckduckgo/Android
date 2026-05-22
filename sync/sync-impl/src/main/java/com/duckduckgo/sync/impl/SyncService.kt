@@ -28,6 +28,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -154,6 +155,31 @@ interface SyncService {
         @Body request: CreateAccessCredentialRequest,
     ): Call<Void>
 
+    // ---- Exchange v2 relay (no Authorization — anonymous relay) ----
+
+    @PUT("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
+    fun createExchangeChannel(
+        @Path("channelId") channelId: String,
+        @Body body: ExchangeChannelCreateRequest,
+    ): Call<Void>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
+    fun postExchangeMessages(
+        @Path("channelId") channelId: String,
+        @Body body: ExchangeMessagesRequest,
+    ): Call<Void>
+
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}/messages")
+    fun pollExchangeMessages(
+        @Path("channelId") channelId: String,
+        @Query("after") after: Int,
+    ): Call<ExchangeMessagesResponse>
+
+    @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/v2/exchange/{channelId}")
+    fun deleteExchangeChannel(
+        @Path("channelId") channelId: String,
+    ): Call<Void>
+
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
         const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
@@ -166,6 +192,7 @@ data class Login(
     @field:Json(name = "device_id") val deviceId: String,
     @field:Json(name = "device_name") val deviceName: String,
     @field:Json(name = "device_type") val deviceType: String,
+    @field:Json(name = "scope") val scope: String? = null,
 )
 
 data class Signup(
@@ -203,7 +230,9 @@ data class AccountCreatedResponse(
 
 data class LoginResponse(
     val token: String,
-    val protected_encryption_key: String,
+    // Absent when the matched access credential is 3party-restricted; populated for ddg/legacy
+    // credentials. Callers on the ddg path must null-check before use.
+    val protected_encryption_key: String? = null,
     val devices: List<Device>,
     @field:Json(name = "access_credentials") val accessCredentials: List<AccessCredentialEntry>? = null,
     val keys: List<ProtectedKeyEntry>? = null,
@@ -284,6 +313,38 @@ data class ProtectedKeyEntry(
     @field:Json(name = "encrypted_with") val encryptedWith: String,
     @field:Json(name = "encrypted_private_key") val encryptedPrivateKey: String,
     @field:Json(name = "public_key") val publicKey: RsaJwk? = null,
+)
+
+// ---- Exchange v2 relay envelope models ----
+
+/**
+ * Outer envelope sent on the v2 exchange relay. The [version] field is unencrypted and used
+ * for protocol version negotiation. [payload] is a JWE compact string (RSA-OAEP-256 +
+ * A256GCM) containing the actual message JSON. See Transport TD (Asana 1214486492252757).
+ */
+data class ExchangeEnvelope(
+    val version: String,
+    val payload: String,
+)
+
+/** Body for PUT /sync/v2/exchange/{channelId} — opens the channel. Empty per spec. */
+class ExchangeChannelCreateRequest
+
+/** Body for POST /sync/v2/exchange/{channelId}/messages — batch send. */
+data class ExchangeMessagesRequest(
+    val messages: List<ExchangeEnvelope>,
+)
+
+/** Response from GET /sync/v2/exchange/{channelId}/messages?after={seq}. */
+data class ExchangeMessagesResponse(
+    val messages: List<ExchangeMessageEntry>,
+)
+
+/** Server-assigned [seq] plus the envelope contents. */
+data class ExchangeMessageEntry(
+    val seq: Int,
+    val version: String,
+    val payload: String,
 )
 
 /** RSA-OAEP-256 public key in JWK format (RFC 7517) for sync protected key entries. */

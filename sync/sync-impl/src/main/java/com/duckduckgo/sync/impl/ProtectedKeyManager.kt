@@ -25,6 +25,9 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -100,6 +103,10 @@ class RealProtectedKeyManager @Inject constructor(
         return when (val result = syncApi.setProtectedKeyIfAbsent(token, purpose, key)) {
             is Success -> {
                 logcat { "Sync-ScopedToken: protected key for $purpose created (kid=$kid)" }
+                // Per the Access Credentials TD, the local cache should mirror what's on the
+                // server after every mutation. Append the new entry so callers don't have to
+                // re-hit /sync/keys to find it.
+                cacheLocalProtectedKey(key)
                 Success(true)
             }
             is Error -> {
@@ -107,5 +114,21 @@ class RealProtectedKeyManager @Inject constructor(
                 result
             }
         }
+    }
+
+    private fun cacheLocalProtectedKey(newEntry: ProtectedKeyEntry) {
+        val existing = syncStore.protectedKeysJson
+            ?.let { runCatching { protectedKeysAdapter.fromJson(it) }.getOrNull() }
+            ?: emptyList()
+        // De-dup on kid in case the same key is re-created (shouldn't happen but defensive).
+        val merged = existing.filterNot { it.kid == newEntry.kid } + newEntry
+        syncStore.protectedKeysJson = protectedKeysAdapter.toJson(merged)
+    }
+
+    private companion object {
+        private val protectedKeysAdapter: JsonAdapter<List<ProtectedKeyEntry>> =
+            Moshi.Builder().build().adapter(
+                Types.newParameterizedType(List::class.java, ProtectedKeyEntry::class.java),
+            )
     }
 }

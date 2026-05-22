@@ -139,6 +139,41 @@ class SyncNativeLibTest {
         assertEquals("hola-1213-1231-123", String(decoded))
     }
 
+    /**
+     * Emit v1 (libsodium-BLAKE2b) reference vectors for the Python ref-impl. Inputs are
+     * deterministic (user_id + password). [SyncNativeLib.generateAccountKeys] is documented as
+     * deterministic for primaryKey + passwordHash, and [SyncNativeLib.prepareForLogin] is a
+     * pure function of primaryKey, so these vectors are reproducible cross-run.
+     */
+    @Test
+    fun printV1TestVectorsForRefImpl() {
+        val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
+        val account = syncNativeLib.generateAccountKeys(aUserId, aPassword)
+        val login = syncNativeLib.prepareForLogin(account.primaryKey)
+        val divider = "=".repeat(72)
+        println(divider)
+        println("v1 (libsodium-BLAKE2b) test vectors — for the Python pairing-client")
+        println(divider)
+        println("Input userId (UTF-8 string):    \"$aUserId\"")
+        println("Input password (UTF-8 string):  \"$aPassword\"")
+        println()
+        println("generateAccountKeys() outputs (standard base64):")
+        println("  primaryKey:           ${account.primaryKey}")
+        println("  secretKey:            ${account.secretKey}     # NON-deterministic")
+        println("  protectedSecretKey:   ${account.protectedSecretKey}  # NON-deterministic")
+        println("  passwordHash:         ${account.passwordHash}")
+        println()
+        println("prepareForLogin(primaryKey) outputs (standard base64):")
+        println("  passwordHash:         ${login.passwordHash}")
+        println("  stretchedPrimaryKey:  ${login.stretchedPrimaryKey}")
+        println()
+        println(
+            "Cross-check: generateAccountKeys.passwordHash == prepareForLogin.passwordHash → " +
+                "${account.passwordHash == login.passwordHash}",
+        )
+        println(divider)
+    }
+
     companion object {
         private const val aUserId = "user"
         private const val aPassword = "password"

@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.InvitationCode
 import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.RealSyncCodeDispatcher
 import com.duckduckgo.sync.impl.RecoveryCode
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
@@ -50,6 +51,8 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.encodeB64
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2QrCode
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
@@ -84,7 +87,17 @@ class SyncWithAnotherDeviceViewModelTest {
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java).apply {
         this.seamlessAccountSwitching().setRawStoredState(State(true))
         this.exchangeKeysToSyncWithAnotherDevice().setRawStoredState(State(false))
+        // canUseV2ConnectFlow stays FALSE → dispatcher's Legacy path returns parseSyncAuthCode
+        // unchanged, so the existing test setup mirrors pre-dispatcher production.
     }
+    private val qrCode: ExchangeV2QrCode = mock()
+    private val runner: ExchangeV2Runner = mock()
+    private val codeDispatcher = RealSyncCodeDispatcher(
+        syncFeature = syncFeature,
+        syncAccountRepository = syncRepository,
+        qrCode = qrCode,
+        runner = runner,
+    )
 
     private val testee = SyncWithAnotherActivityViewModel(
         syncRepository,
@@ -93,6 +106,7 @@ class SyncWithAnotherDeviceViewModelTest {
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
         syncFeature,
+        codeDispatcher,
     )
 
     @Test

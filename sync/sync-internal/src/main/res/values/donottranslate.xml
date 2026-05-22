@@ -21,6 +21,7 @@
 
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
+    <string name="sync_v2_pairing_debug_activity_label">V2 Pairing Debug</string>
     <string name="sync_internal_environment_header">Environment Settings</string>
     <string name="sync_internal_environment_title">Use Dev Environment?</string>
     <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>

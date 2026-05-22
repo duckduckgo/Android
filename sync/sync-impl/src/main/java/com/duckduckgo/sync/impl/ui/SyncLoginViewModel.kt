@@ -27,14 +27,17 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -46,8 +49,10 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
@@ -55,6 +60,7 @@ class SyncLoginViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -64,6 +70,12 @@ class SyncLoginViewModel @Inject constructor(
         data object LoginSucess : Command()
         data object Error : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -87,23 +99,65 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
-            when (val result = syncAccountRepository.processCode(codeType)) {
-                is Error -> {
-                    processError(result)
-                }
-
-                is Success -> {
-                    if (codeType is SyncAuthCode.Exchange) {
-                        pollForRecoveryKey()
-                    } else {
-                        syncPixels.fireLoginPixel()
-                        command.send(LoginSucess)
+            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)) so the
+            // existing v1 control flow runs byte-identical to pre-dispatcher production.
+            // FF on → v2-shaped codes are taken into ownership and surfaced via DispatchOutcome.
+            when (val decision = codeDispatcher.route(qrCode)) {
+                is RouteDecision.Legacy -> {
+                    logcat { "Sync-CodeDispatch: SyncLoginViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                    val codeType = decision.authCode
+                    when (val result = syncAccountRepository.processCode(codeType)) {
+                        is Error -> processError(result)
+                        is Success -> {
+                            if (codeType is SyncAuthCode.Exchange) {
+                                pollForRecoveryKey()
+                            } else {
+                                syncPixels.fireLoginPixel()
+                                command.send(LoginSucess)
+                            }
+                        }
                     }
+                }
+                is RouteDecision.V2InProgress -> {
+                    logcat { "Sync-CodeDispatch: SyncLoginViewModel observing V2InProgress" }
+                    decision.outcomes.collect { outcome -> handleV2Outcome(outcome) }
                 }
             }
         }
     }
+
+    /**
+     * Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. Mirrors the
+     * polling-loop terminal handling in [pollForRecoveryKey] so v1 and v2 success/error UX
+     * lands on the same screens.
+     */
+    private suspend fun handleV2Outcome(outcome: DispatchOutcome) {
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> {
+                syncPixels.fireLoginPixel()
+                command.send(LoginSucess)
+            }
+            is DispatchOutcome.AlreadyConnected -> {
+                // Spec §"Same-account case": treat as success. No new login (account is unchanged).
+                command.send(LoginSucess)
+            }
+            is DispatchOutcome.UpgradeRequired -> {
+                processError(Error(reason = "Code requires protocol v${outcome.codeMajor}"))
+            }
+            is DispatchOutcome.Failed -> {
+                processError(Error(reason = outcome.reason))
+            }
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName))
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
 
     private suspend fun processError(result: Error) {
         when (result.code) {

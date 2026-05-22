@@ -110,6 +110,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.launchSyncSettingsButton.setOnClickListener {
             startActivity(Intent(this, SyncActivity::class.java))
         }
+        binding.openV2PairingDebugButton.setOnClickListener {
+            startActivity(Intent(this, SyncV2PairingDebugActivity::class.java))
+        }
+        // this is temporary while testing
         binding.openDuckAiDevScreenButton.setOnClickListener {
             // Launch via class name so sync-internal doesn't need a direct dependency on duckchat-internal.
             val intent = Intent().setClassName(packageName, "com.duckduckgo.duckchat.internal.DuckAiDevActivity")

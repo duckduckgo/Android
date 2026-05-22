@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.ExchangeResult.AccountSwitchingRequired
 import com.duckduckgo.sync.impl.ExchangeResult.LoggedIn
 import com.duckduckgo.sync.impl.ExchangeResult.Pending
@@ -38,10 +39,12 @@ import com.duckduckgo.sync.impl.R.dimen
 import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
@@ -77,6 +80,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
     private val syncFeature: SyncFeature,
+    private val codeDispatcher: SyncCodeDispatcher,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -183,6 +187,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         ) : Command()
 
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Sync your data with [peerName]?". */
+        data class AskJoinerConfirmation(val peerName: String?) : Command()
+
+        /** v2 §"Exchange Confirmations": prompt user "Allow [peerName] to join your sync?". */
+        data class AskHostConfirmation(val peerName: String?) : Command()
     }
 
     fun onReadTextCodeClicked() {
@@ -200,25 +210,82 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
-            when (val result = syncAccountRepository.processCode(codeType)) {
-                is Error -> {
-                    logcat(WARN) { "Sync: error processing code ${result.reason}" }
-                    emitError(result, qrCode)
-                }
+            // Route via SyncCodeDispatcher. FF off → Legacy(parseSyncAuthCode(...)), so the body
+            // below runs byte-identical to pre-dispatcher production. FF on → v2-shaped codes are
+            // taken into ownership and surfaced through DispatchOutcome.
+            when (val decision = codeDispatcher.route(qrCode)) {
+                is RouteDecision.Legacy -> {
+                    logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel handling Legacy(${decision.authCode::class.simpleName})" }
+                    val codeType = decision.authCode.also { it.onCodeScanned() }
+                    when (val result = syncAccountRepository.processCode(codeType)) {
+                        is Error -> {
+                            logcat(WARN) { "Sync: error processing code ${result.reason}" }
+                            emitError(result, qrCode)
+                        }
 
-                is Success -> {
-                    if (codeType is SyncAuthCode.Exchange) {
-                        pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
-                    } else {
-                        // Show recovery screen if QR scanned is Connect and user was not previously logged in (empty PK)
-                        val showRecovery = codeType is SyncAuthCode.Connect && previousPrimaryKey.isEmpty()
-                        onLoginSuccess(previousPrimaryKey, showRecovery)
+                        is Success -> {
+                            if (codeType is SyncAuthCode.Exchange) {
+                                pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
+                            } else {
+                                // Show recovery screen if QR scanned is Connect and user was not previously logged in (empty PK)
+                                val showRecovery = codeType is SyncAuthCode.Connect && previousPrimaryKey.isEmpty()
+                                onLoginSuccess(previousPrimaryKey, showRecovery)
+                            }
+                        }
                     }
+                }
+                is RouteDecision.V2InProgress -> {
+                    logcat { "Sync-CodeDispatch: SyncWithAnotherActivityViewModel observing V2InProgress" }
+                    decision.outcomes.collect { handleV2Outcome(it, previousPrimaryKey, qrCode) }
                 }
             }
         }
     }
+
+    /**
+     * Map one v2 [DispatchOutcome] onto this VM's existing command pipeline. LoggedIn mirrors
+     * v1 Connect post-success semantics: show recovery to fresh devices (no prior primary key),
+     * skip the recovery screen for account-switchers. Errors funnel through [emitError] with a
+     * generic CONNECT_FAILED code so the existing error-dialog mapping picks them up.
+     */
+    private suspend fun handleV2Outcome(
+        outcome: DispatchOutcome,
+        previousPrimaryKey: String,
+        qrCode: String,
+    ) {
+        // Cancel deep-link timeout only on terminal outcomes — keep the timeout running across
+        // confirmation prompts so a stalled session still eventually surfaces an error.
+        when (outcome) {
+            is DispatchOutcome.LoggedIn -> {
+                cancelTimeout()
+                val showRecovery = previousPrimaryKey.isEmpty()
+                onLoginSuccess(previousPrimaryKey, showRecovery)
+            }
+            is DispatchOutcome.AlreadyConnected -> {
+                cancelTimeout()
+                // Spec §"Same-account case": friendly finish, no account change. Skip recovery
+                // screen since nothing actually moved (we were already on this account).
+                onLoginSuccess(previousPrimaryKey, showRecovery = false)
+            }
+            is DispatchOutcome.UpgradeRequired -> {
+                cancelTimeout()
+                emitError(Error(code = CONNECT_FAILED.code, reason = "Code requires protocol v${outcome.codeMajor}"), qrCode)
+            }
+            is DispatchOutcome.Failed -> {
+                cancelTimeout()
+                emitError(Error(code = CONNECT_FAILED.code, reason = outcome.reason), qrCode)
+            }
+            is DispatchOutcome.JoinerConfirmationRequested ->
+                command.send(Command.AskJoinerConfirmation(outcome.peerName))
+            is DispatchOutcome.HostConfirmationRequested ->
+                command.send(Command.AskHostConfirmation(outcome.peerName))
+        }
+    }
+
+    fun onJoinerConfirmed() { codeDispatcher.confirmJoiner() }
+    fun onJoinerDenied() { codeDispatcher.denyJoiner() }
+    fun onHostConfirmed() { codeDispatcher.confirmHost() }
+    fun onHostDenied() { codeDispatcher.denyHost() }
 
     private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
