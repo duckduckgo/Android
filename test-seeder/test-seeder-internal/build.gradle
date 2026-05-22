@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,22 +25,12 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     anvil {
-        generateDaggerFactories = true // default is false
+        generateDaggerFactories = true
     }
-    namespace 'com.duckduckgo.savedsites.internal'
-    lintOptions {
-        baseline file("lint-baseline.xml")
-        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
-    }
+    namespace 'com.duckduckgo.testseeder.internal'
 }
 
 dependencies {
-    implementation project(path: ':autofill-api')
-    implementation project(':internal-features-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':navigation-api')
-    implementation project(':saved-sites-api')
-    implementation project(':saved-sites-impl')
     implementation project(':test-seeder-api')
 
     ksp project(path: ':anvil-ksp')
@@ -48,17 +38,8 @@ dependencies {
     implementation project(':di')
     implementation project(path: ':common-utils')
 
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
+    implementation KotlinX.coroutines.core
     implementation Google.dagger
-    implementation AndroidX.fragment.ktx
-
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "androidx.appcompat:appcompat:_"
-    implementation "com.google.android.material:material:_"
-    implementation "androidx.constraintlayout:constraintlayout:_"
-    implementation project(path: ':design-system')
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

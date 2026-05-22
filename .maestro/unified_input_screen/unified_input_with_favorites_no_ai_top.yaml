@@ -1,0 +1,24 @@
+appId: com.duckduckgo.mobile.android.debug
+name: "UnifiedInput: AI off, omnibar top, seeded favorites visible"
+tags:
+  - unifiedInputTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          arguments:
+            isMaestro: "true"
+            nativeInputToggle: "true"
+            inputWithAiToggle: "false"
+            omnibarPosition: "top"
+            addFavorites: "reddit.com;eff.org;cnn.com"
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - assertVisible:
+          text: "reddit.com"
+      - assertVisible:
+          text: "eff.org"
+      - assertVisible:
+          text: "cnn.com"
