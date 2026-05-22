@@ -17,10 +17,7 @@
 package com.duckduckgo.duckchat.impl.history
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.view.View
-import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -68,7 +65,7 @@ class RealChatHistoryReader @Inject constructor(
     override suspend fun refresh() {
         runCatching {
             withContext(dispatchers.main()) {
-                val wv = getOrCreateWebView() ?: return@withContext
+                val wv = getOrCreateWebView()
                 pageLoadDeferred = CompletableDeferred()
                 logcat { "ChatHistoryReader: loading $DUCK_AI_URL" }
                 wv.loadUrl(DUCK_AI_URL)
@@ -87,25 +84,13 @@ class RealChatHistoryReader @Inject constructor(
     override fun tearDown() {
         pageLoadDeferred?.cancel()
         pageLoadDeferred = null
-        webView?.let { wv ->
-            (wv.parent as? ViewGroup)?.removeView(wv)
-            wv.destroy()
-        }
+        webView?.destroy()
         webView = null
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun getOrCreateWebView(): WebView? {
+    private fun getOrCreateWebView(): WebView {
         webView?.let { return it }
-
-        val activity = context as? Activity ?: run {
-            logcat { "ChatHistoryReader: ActivityContext is not an Activity; cannot create WebView" }
-            return null
-        }
-        val container = activity.findViewById<ViewGroup>(android.R.id.content) ?: run {
-            logcat { "ChatHistoryReader: activity has no android.R.id.content; cannot attach WebView" }
-            return null
-        }
 
         val wv = WebView(context).apply {
             settings.apply {
@@ -144,8 +129,6 @@ class RealChatHistoryReader @Inject constructor(
             )
         }
 
-        container.addView(wv, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        wv.visibility = View.INVISIBLE
         webView = wv
         return wv
     }
