@@ -75,6 +75,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import logcat.logcat
 import javax.inject.Inject
 
 data class ChatTabSuggestions(
@@ -120,6 +121,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     private val _modelPickerEnabled = MutableStateFlow(true)
     val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
+
+    private val _chatId = MutableStateFlow<String?>(null)
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -207,6 +210,18 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                     }
                 }
         }
+
+        // Publish chatId to per-tab state. setActiveChatId can fire during widget attach before
+        // configure() sets activeTabId — _chatId holds the value until then.
+        viewModelScope.launch {
+            combine(_chatId, activeTabId.filterNotNull()) { chatId, tabId -> tabId to chatId }
+                .collect { (tabId, chatId) ->
+                    nativeInputStatePublisher.update(tabId) { it.copy(chatId = chatId) }
+                    // TODO: logs the chatId observers will see for this tab. Added for testing.
+                    //  Remove once consumer logic is implemented.
+                    logcat { "Duck.ai native input: active chatId for tab=$tabId is now $chatId" }
+                }
+        }
     }
 
     val chatState: Flow<ChatState> = duckChatInternal.chatState
@@ -245,6 +260,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun setSelectedTool(tool: String?) {
         val tabId = activeTabId.value ?: return
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
+    }
+
+    fun setActiveChatId(chatId: String?) {
+        _chatId.value = chatId
     }
 
     fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {

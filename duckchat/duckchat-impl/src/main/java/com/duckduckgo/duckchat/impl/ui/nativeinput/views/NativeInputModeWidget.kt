@@ -134,6 +134,12 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
+    /**
+     * Binds a reactive source of the active chat id for this tab.
+     * The widget forwards changes into the [NativeInputState] so observers can react.
+     */
+    fun bindChatIdSource(source: Flow<String?>)
+
     fun bindAttachmentCallbacks(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
@@ -203,6 +209,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pluginsJob: Job? = null
     private var modelPickerEnabledJob: Job? = null
     private var modelPickerEnabledSource: Flow<Boolean>? = null
+    private var chatIdJob: Job? = null
+    private var chatIdSource: Flow<String?>? = null
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
@@ -260,6 +268,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         super.onAttachedToWindow()
         setupPlugins()
         observeModelPickerEnabledSource()
+        observeChatIdSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -358,6 +367,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pluginsJob = null
         modelPickerEnabledJob?.cancel()
         modelPickerEnabledJob = null
+        chatIdJob?.cancel()
+        chatIdJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -810,6 +821,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         modelPickerEnabledJob = source
             .distinctUntilChanged()
             .onEach { viewModel.setModelPickerEnabled(it) }
+            .launchIn(scope)
+    }
+
+    override fun bindChatIdSource(source: Flow<String?>) {
+        chatIdSource = source
+        if (isAttachedToWindow) observeChatIdSource()
+    }
+
+    private fun observeChatIdSource() {
+        val source = chatIdSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        chatIdJob?.cancel()
+        chatIdJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setActiveChatId(it) }
             .launchIn(scope)
     }
 

@@ -23,7 +23,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -104,5 +106,40 @@ class RealNativeInputManagerTest {
         testee.isExistingDuckAiChat(raw)
 
         verify(duckChat).isDuckChatUrl(Uri.parse(raw))
+    }
+
+    @Test
+    fun whenUrlIsNullThenExtractDuckAiChatIdNull() {
+        assertNull(testee.extractDuckAiChatId(null))
+    }
+
+    @Test
+    fun whenUrlIsBlankThenExtractDuckAiChatIdNull() {
+        assertNull(testee.extractDuckAiChatId(""))
+        assertNull(testee.extractDuckAiChatId("   "))
+    }
+
+    @Test
+    fun whenUrlIsNotDuckAiThenExtractDuckAiChatIdNull() {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(false)
+        assertNull(testee.extractDuckAiChatId("https://example.com/?chatID=abcd"))
+    }
+
+    @Test
+    fun whenDuckAiUrlWithoutChatIdThenExtractDuckAiChatIdNull() {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        assertNull(testee.extractDuckAiChatId("https://duck.ai/"))
+    }
+
+    @Test
+    fun whenDuckAiUrlWithBlankChatIdThenExtractDuckAiChatIdNull() {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        assertNull(testee.extractDuckAiChatId("https://duck.ai/?chatID="))
+    }
+
+    @Test
+    fun whenDuckAiUrlWithChatIdThenExtractDuckAiChatIdReturnsValue() {
+        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
+        assertEquals("abc-123", testee.extractDuckAiChatId("https://duck.ai/?chatID=abc-123"))
     }
 }
