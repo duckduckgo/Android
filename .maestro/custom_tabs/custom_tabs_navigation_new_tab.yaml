@@ -10,26 +10,10 @@ tags:
           clearState: true
           stopApp: true
 
-      - assertVisible:
-          text: ".*Ready for a faster browser that protects you and lets you decide when and how to use AI?.*"
-      - tapOn: "let's get started!"
-      - assertVisible:
-          text: "Protections activated!"
-      - tapOn: "choose your browser"
       - runFlow:
-          when:
-            visible: "set as default"
-          commands:
-            - tapOn: "duckduckgo"
-            - tapOn: "set as default"
-      - assertVisible:
-          text: ".*where should I put your address bar?.*"
-      - tapOn: "next"
-      - assertVisible:
-          text: ".*want easy access to private AI chat?.*"
-      - tapOn: "next"
-      - assertVisible:
-          text: ".*Try a search!.*"
+          file: ../shared/pre_onboarding.yaml
+          env:
+            SET_AS_DEFAULT: "true"
       - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:
           text: "settings"
