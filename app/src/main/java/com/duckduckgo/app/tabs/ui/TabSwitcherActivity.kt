@@ -189,7 +189,6 @@ class TabSwitcherActivity :
     private var isTrackerAnimationPanelVisible = false
     private var browserModeToggle: BrowserModeToggleView? = null
 
-    // Non-null while a mode switch is in flight
     private var modeSwitch: ModeSwitch? = null
 
     /**
@@ -387,10 +386,8 @@ class TabSwitcherActivity :
         updateToolbarTitle(state.mode, state.tabs.size)
     }
 
-    // Snapshot the recycler and overlay it; the recycler updates underneath (mode switch, diff
-    // dispatch, scroll, Glide loads — none of it visible behind the static bitmap). When the
-    // observer sees a fresh tabSwitcherItems reference it calls revealNewMode, which crossfades
-    // the overlay out and the live recycler in.
+    // Snapshot the recycler and overlay it; the recycler updates underneath, hidden by the
+    // bitmap. The observer reveals once fresh items arrive.
     private fun fadeOutAndSwitchMode(newMode: BrowserMode) {
         if (modeSwitch != null) return
 
@@ -408,7 +405,8 @@ class TabSwitcherActivity :
             tabsRecycler.alpha = 0f
         }
 
-        modeSwitch = ModeSwitch(overlay, viewModel.viewState.value.tabSwitcherItems)
+        val thisSwitch = ModeSwitch(overlay, viewModel.viewState.value.tabSwitcherItems)
+        modeSwitch = thisSwitch
 
         // Suppress diff animations across the swap so items don't keep shuffling
         tabsRecycler.itemAnimator = null
@@ -416,8 +414,11 @@ class TabSwitcherActivity :
         browserModeToggle?.setMode(newMode)
         viewModel.onBrowserModeToggled(newMode)
 
-        // Fallback for the degenerate case where both modes have an empty list
-        tabsRecycler.postDelayed(::revealNewMode, FADE_IN_FALLBACK_MS)
+        // Fallback for when fresh items never arrive (e.g. both modes empty). Identity-checked so
+        // a stale timer from a previous switch can't reveal the current one.
+        tabsRecycler.postDelayed({
+            if (modeSwitch === thisSwitch) revealNewMode()
+        }, FADE_IN_FALLBACK_MS)
     }
 
     private fun revealNewMode() {
@@ -493,14 +494,14 @@ class TabSwitcherActivity :
 
                 val staleItems = modeSwitch?.staleItems
                 val freshAfterModeSwitch = staleItems != null && it.tabSwitcherItems !== staleItems
-                val shouldScroll = it.tabs.isNotEmpty() && (firstTimeLoadingTabsList || freshAfterModeSwitch)
+                val shouldTryScroll = it.tabs.isNotEmpty() && (firstTimeLoadingTabsList || freshAfterModeSwitch)
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
-                    if (shouldScroll) {
-                        firstTimeLoadingTabsList = false
-                        scrollToActiveTab(it.tabSwitcherItems)
-                    }
-                    if (freshAfterModeSwitch) {
+                    // Scroll inside the commit callback so the new items are committed first.
+                    // If no active tab yet (race with flowSelectedTab), retry on next emission.
+                    val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
+                    if (scrolled) firstTimeLoadingTabsList = false
+                    if (freshAfterModeSwitch && scrolled) {
                         tabsRecycler.post(::revealNewMode)
                     }
                 }
@@ -617,21 +618,21 @@ class TabSwitcherActivity :
         }
     }
 
-    private fun scrollToActiveTab(items: List<TabSwitcherItem>) {
+    private fun scrollToActiveTab(items: List<TabSwitcherItem>): Boolean {
         val index = items.indexOfFirst {
             (it is NormalTab && it.isActive) || (it is DuckAiTab && it.isActive)
         }
-        if (index != -1) {
-            scrollToPosition(index)
-        }
+        if (index == -1) return false
+        scrollToPosition(index)
+        return true
     }
 
     private fun scrollToPosition(index: Int) {
-        tabsRecycler.post {
-            val height = tabsRecycler.height
-            val offset = height / 2 - (tabsRecycler.getChildAt(0)?.height ?: 0) / 2
-            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(index, offset)
-        }
+        val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
+        val height = tabsRecycler.height
+        val firstChildHeight = tabsRecycler.getChildAt(0)?.height ?: 0
+        val offset = (height / 2 - firstChildHeight / 2).coerceAtLeast(0)
+        layoutManager.scrollToPositionWithOffset(index, offset)
     }
 
     private fun processCommand(command: Command) {
