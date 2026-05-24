@@ -1,19 +1,14 @@
 appId: com.duckduckgo.mobile.android
 ---
-# Robust replacement for ../../shared/skip_all_onboarding.yaml — the upstream version
-# falls back to ../../shared/pre_onboarding.yaml whose asserted welcome copy has drifted
-# from the current onboarding, so it fails on the new build.
-#
-# Note: the Skip Onboarding button is anchored under the status bar overlay (the button
-# bounds straddle the status bar height), so tapping by id resolves to a point the
-# system bar intercepts. We tap by point at the bottom of the button instead — this
-# lands inside the button bounds but below the system bar.
+# Robust replacement for ../../shared/skip_all_onboarding.yaml — the upstream
+# version falls back to ../../shared/pre_onboarding.yaml whose asserted welcome
+# copy has drifted from the current onboarding, so it fails on the new build.
 - extendedWaitUntil:
     visible:
       id: "skipOnboardingButton"
     timeout: 30000
 - tapOn:
-    point: "50%, 9%"
+    id: "skipOnboardingButton"
 - extendedWaitUntil:
     visible:
       id: "inputModeWidget"
