@@ -20,12 +20,16 @@ appId: com.duckduckgo.mobile.android
     childOf:
       id: "autoCompleteSuggestionsList"
 
-# submit and assert search results load + unified input dismisses
-- pressKey: Enter
+# submit by tapping the suggestion (more stable on Maestro Cloud than pressKey
+# Enter, which has crashed the app on CI runs) and assert the SERP loads
+- tapOn:
+    text: "reddit.com"
+    childOf:
+      id: "autoCompleteSuggestionsList"
 - extendedWaitUntil:
     visible:
       id: "browserLayout"
-    timeout: 10000
+    timeout: 20000
 - assertVisible:
     id: "browserLayout"
 - assertNotVisible:

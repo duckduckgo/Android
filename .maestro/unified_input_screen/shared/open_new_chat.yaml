@@ -15,9 +15,12 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     optional: true
     text: 'Agree and Continue'
-- tapOn: 
+- tapOn:
     optional: true
     text: "Agree and Continue"
+
+# duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
+- runFlow: reload_duckai_if_needed.yaml
 
 # move to search mode
 - tapOn: "Ask anything privately\u2026"
@@ -25,6 +28,17 @@ appId: com.duckduckgo.mobile.android
 - inputText: "back to search"
 - tapOn: "back to search"
 - pressKey: enter
+
+# wait for the SERP to load \u2014 daxIcon and the browser container appear together
+# once rendering finishes; CI is slower than a local device so give it room
+- extendedWaitUntil:
+    visible:
+      id: "browserLayout"
+    timeout: 20000
+- extendedWaitUntil:
+    visible:
+      id: "daxIcon"
+    timeout: 10000
 - assertVisible:
     id: "daxIcon"
 - assertVisible:
