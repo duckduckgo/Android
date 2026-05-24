@@ -1427,6 +1427,9 @@ class BrowserTabFragment :
                     launchFilePicker(callback, mimeTypes)
                 },
                 restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
+                onContextualSheetRequested = {
+                    viewModel.openDuckAIContextualMode()
+                },
             ),
         )
     }

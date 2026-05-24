@@ -21,6 +21,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputMode
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowCardRowBack
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldShowToggleRowBack
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldSuppressBottomRow
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -87,6 +88,34 @@ class NativeInputModeWidgetBackButtonsTest {
     fun `card row back is hidden in duck ai contextual context`() {
         assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldShowCardRowBack())
         assertFalse(stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL).shouldShowCardRowBack())
+    }
+
+    @Test
+    fun `bottom row is suppressed in search only from browser`() {
+        val state = stateOf(InputMode.SEARCH_ONLY, InputContext.BROWSER)
+
+        assertTrue(state.shouldSuppressBottomRow())
+    }
+
+    @Test
+    fun `bottom row is not suppressed in search only from duck ai`() {
+        val state = stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI)
+
+        assertFalse(state.shouldSuppressBottomRow())
+    }
+
+    @Test
+    fun `bottom row is not suppressed in search and duck ai mode regardless of context`() {
+        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.BROWSER).shouldSuppressBottomRow())
+        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI).shouldSuppressBottomRow())
+        assertFalse(stateOf(InputMode.SEARCH_AND_DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL).shouldSuppressBottomRow())
+    }
+
+    @Test
+    fun `bottom row is not suppressed in search only from duck ai contextual`() {
+        val state = stateOf(InputMode.SEARCH_ONLY, InputContext.DUCK_AI_CONTEXTUAL)
+
+        assertFalse(state.shouldSuppressBottomRow())
     }
 
     private fun stateOf(inputMode: InputMode, inputContext: InputContext): NativeInputState =
