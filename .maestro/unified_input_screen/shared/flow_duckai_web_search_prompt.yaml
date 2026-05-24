@@ -6,9 +6,9 @@ appId: com.duckduckgo.mobile.android
       id: "inputModeWidget"
     timeout: 15000
 
-# switch to Duck.ai mode — target the tab by id
-- tapOn:
-    id: "tabDuckAi"
+# switch to Duck.ai mode — "Duck.ai" only shows as the tab title here, so
+# a text tap is unambiguous
+- tapOn: "Duck.ai"
 - extendedWaitUntil:
     visible:
       id: "optionsButtonContainer"

@@ -6,9 +6,9 @@ appId: com.duckduckgo.mobile.android
       id: "inputModeWidget"
     timeout: 15000
 
-# switch to Duck.ai mode (Search is the default tab) — target the tab by id
-- tapOn:
-    id: "tabDuckAi"
+# switch to Duck.ai mode (Search is the default tab) — "Duck.ai" only shows
+# as the tab title in the input mode switcher, so a text tap is unambiguous
+- tapOn: "Duck.ai"
 
 # wait for the Duck.ai bottom row to settle — model picker is the marker
 - extendedWaitUntil:
