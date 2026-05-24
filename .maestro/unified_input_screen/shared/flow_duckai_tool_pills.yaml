@@ -6,11 +6,9 @@ appId: com.duckduckgo.mobile.android
       id: "inputModeWidget"
     timeout: 15000
 
-# switch to Duck.ai mode
+# switch to Duck.ai mode — target the tab by id
 - tapOn:
-    text: "Duck.ai"
-    childOf:
-      id: "inputModeWidget"
+    id: "tabDuckAi"
 
 # wait for the Duck.ai bottom row to settle — options button is the marker
 - extendedWaitUntil:
