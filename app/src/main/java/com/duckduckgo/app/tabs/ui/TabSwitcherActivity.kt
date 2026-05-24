@@ -30,6 +30,7 @@ import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.children
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -88,6 +89,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
@@ -629,10 +631,21 @@ class TabSwitcherActivity :
 
     private fun scrollToPosition(index: Int) {
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
-        val height = tabsRecycler.height
-        val firstChildHeight = tabsRecycler.getChildAt(0)?.height ?: 0
-        val offset = (height / 2 - firstChildHeight / 2).coerceAtLeast(0)
-        layoutManager.scrollToPositionWithOffset(index, offset)
+        val innerHeight = tabsRecycler.height - tabsRecycler.paddingTop - tabsRecycler.paddingBottom
+        val rowHeight = tabsRecycler.children.firstOrNull {
+            val pos = tabsRecycler.getChildAdapterPosition(it)
+            pos != RecyclerView.NO_POSITION && tabsAdapter.getTabSwitcherItem(pos) !is TrackersAnimationInfoPanel
+        }?.height ?: 0
+        if (innerHeight <= 0 || rowHeight <= 0) {
+            layoutManager.scrollToPosition(index)
+            return
+        }
+        val columns = (layoutManager as? GridLayoutManager)?.spanCount ?: 1
+        val itemCount = tabsRecycler.adapter?.itemCount ?: 0
+        val rowsBelow = ((itemCount + columns - 1) / columns) - (index / columns) - 1
+        val centerOffset = (innerHeight - rowHeight) / 2
+        val pinToBottomOffset = innerHeight - (rowsBelow + 1) * rowHeight - 20.toPx()
+        layoutManager.scrollToPositionWithOffset(index, maxOf(centerOffset, pinToBottomOffset).coerceAtLeast(0))
     }
 
     private fun processCommand(command: Command) {
