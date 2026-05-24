@@ -9,21 +9,25 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "inputModeWidget"
 
-# Search mode is the default — type a query and assert suggestions appear
-- inputText: "reddit"
+# Search mode is the default — type a URL to one of our privacy test pages
+# and assert the autocomplete picks it up. We use privacy-test-pages.site
+# because it's DDG-controlled — sites like reddit.com block Maestro Cloud's
+# datacenter IPs with a "blocked by network security" page.
+- inputText: "privacy-test-pages.site"
 - extendedWaitUntil:
     visible:
       id: "autoCompleteSuggestionsList"
     timeout: 10000
 - assertVisible:
-    text: "reddit.com"
+    text: "privacy-test-pages.site"
     childOf:
       id: "autoCompleteSuggestionsList"
 
 # submit by tapping the suggestion (more stable on Maestro Cloud than pressKey
-# Enter, which has crashed the app on CI runs) and assert the SERP loads
+# Enter, which has crashed the app on CI runs) and assert the page loads + the
+# unified input dismisses
 - tapOn:
-    text: "reddit.com"
+    text: "privacy-test-pages.site"
     childOf:
       id: "autoCompleteSuggestionsList"
 - extendedWaitUntil:
@@ -35,6 +39,6 @@ appId: com.duckduckgo.mobile.android
 - assertNotVisible:
     id: "inputModeWidget"
 - assertVisible:
-    text: "reddit"
+    text: ".*privacy-test-pages.site.*"
     childOf:
-      id: "browserLayout"
+      id: "omnibarTextInput"
