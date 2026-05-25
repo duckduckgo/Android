@@ -448,7 +448,7 @@ class TabSwitcherActivity :
 
         toggle?.visibility = if (showToggle) View.VISIBLE else View.GONE
 
-        toolbar.title =
+        supportActionBar?.title =
             when {
                 mode is Selection ->
                     if (mode.selectedTabs.isEmpty()) {
