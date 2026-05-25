@@ -4,10 +4,11 @@ title Public API surface — `:onboarding-api` types
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 
-' === Entry-point interfaces ===
+' === Entry-point interface ===
 
 interface LinearOnboardingOrchestrator {
     +state : StateFlow<LinearOnboardingState>
+    +startPlan(plan: LinearOnboardingPlan)
     +onEvent(event: LinearOnboardingEvent)
 }
 
@@ -19,9 +20,13 @@ note right of LinearOnboardingOrchestrator::onEvent
   See the event-loop sequence diagram for the full trace.
 end note
 
-interface LinearOnboardingPlanProvider {
-    +buildMainPlan() : LinearOnboardingPlan
-}
+note right of LinearOnboardingOrchestrator::startPlan
+  Idempotent entry point: starts the plan only if
+  `state == NotStarted`. Callers (e.g. an :app-scoped
+  `MainProcessLifecycleObserver`) decide *when* and
+  *whether* to start; the orchestrator stays oblivious
+  to AppStage / UserStageStore.
+end note
 
 ' === State hierarchy (sealed) ===
 
@@ -45,7 +50,18 @@ LinearOnboardingState <|.. State_Skipped
 
 class LinearOnboardingPlan <<data class>> {
     +steps : List<LinearOnboardingStep>
+    +onCompleted : suspend () -> Unit
+    +onSkipped : suspend () -> Unit
 }
+
+note right of LinearOnboardingPlan::onCompleted
+  Awaited by the orchestrator **before** it emits
+  `Completed` / `Skipped`, so any state written in
+  the callback (e.g. AppStage advancement) is visible
+  to listeners that route off the terminal state.
+  Only the main (bottom-of-stack) plan's callbacks
+  ever fire — side plans surface through them.
+end note
 
 interface LinearOnboardingStep {
     +id : LinearOnboardingStepId
@@ -96,8 +112,8 @@ LinearOnboardingTransition <|.. T_Stay
 ' === Cross-group relationships ===
 
 LinearOnboardingOrchestrator ..> LinearOnboardingState : "exposes"
-LinearOnboardingOrchestrator ..> LinearOnboardingEvent : "accepts"
-LinearOnboardingPlanProvider ..> LinearOnboardingPlan : "produces"
+LinearOnboardingOrchestrator ..> LinearOnboardingPlan : "accepts via startPlan"
+LinearOnboardingOrchestrator ..> LinearOnboardingEvent : "accepts via onEvent"
 
 State_InProgress "1" *--> "1" LinearOnboardingPlan : currentPlan
 LinearOnboardingPlan "1" o--> "*" LinearOnboardingStep : steps

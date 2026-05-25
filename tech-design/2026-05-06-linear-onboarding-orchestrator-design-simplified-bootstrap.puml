@@ -1,0 +1,84 @@
+@startuml
+title Bootstrap — from process start to terminal state
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+
+participant "Android\n(ProcessLifecycleOwner)" as Proc
+participant "OnboardingPlanBootstrapper\n(:app, MainProcessLifecycleObserver)" as Boot
+participant "UserStageStore\n(:app)" as USS
+participant "LinearOnboardingPlanProvider\n(:app)" as PP
+participant "LinearOnboardingOrchestrator\n(:onboarding-impl)" as Orch
+participant "Host activity / VM\n(observer)" as Host
+participant "OnboardingSkipper\n(:app)" as Skip
+
+== Process start ==
+
+Proc -> Boot : onCreate(owner)
+note right of Boot
+  Bootstrapper is contributed as a
+  MainProcessLifecycleObserver multibinding
+  in :app, scoped to AppScope.
+end note
+Boot -> Boot : appScope.launch { ... }
+
+== Decide whether to start ==
+
+Boot -> USS : isNewUser()
+USS --> Boot : true / false
+
+alt user is NEW
+  Boot -> PP : buildMainPlan(\n  onCompleted = { userStageStore.stageCompleted(NEW) },\n  onSkipped = { onboardingSkipper.markOnboardingAsCompleted() })
+  PP --> Boot : LinearOnboardingPlan(steps=[...], onCompleted, onSkipped)
+  Boot -> Orch : startPlan(plan)
+  note right of Orch
+    Idempotent — no-op if state != NotStarted.
+    Walks plan from step 0, skipping any
+    whose precondition() returns false.
+  end note
+  Orch -> Orch : push frame, advance to\nfirst eligible step
+  Orch --> Host : state = InProgress(plan, idx)
+
+else user is past NEW
+  Boot -> Boot : no-op (legacy CTA path handles\nthe rest via CtaViewModel)
+end
+
+== Event loop runs (see event-loop diagram) ==
+
+note over Host, Orch
+  Hosts collect orchestrator.state, render dialogs /
+  drive actions, and forward user actions back as
+  events via onEvent(...). See the event-loop and
+  host-coordination diagrams for the inner cycle.
+end note
+
+== Terminal — main plan exhausts or AbortPlan ==
+
+alt main plan exhausts (or side plan exhausts)
+  Orch -> Orch : advanceTopFrame() →\nindex >= steps.size
+
+  Orch -> USS : mainPlan.onCompleted()\n→ stageCompleted(AppStage.NEW)
+  USS --> Orch : DAX_ONBOARDING (written)
+
+  note right of Orch
+    AppStage write is awaited **before** the
+    terminal state is emitted, so any listener
+    that routes off Completed observes the
+    post-write stage value.
+  end note
+
+  Orch -> Orch : _state.value = Completed
+  Orch --> Host : state = Completed
+
+else any step returns AbortPlan
+  Orch -> Orch : frameStack.clear()
+
+  Orch -> Skip : mainPlan.onSkipped()\n→ markOnboardingAsCompleted()
+  Skip -> USS : stageCompleted(DAX_ONBOARDING)\n+ hideTips=true, dismiss ADD_WIDGET
+  Skip --> Orch : done
+
+  Orch -> Orch : _state.value = Skipped
+  Orch --> Host : state = Skipped
+end
+
+@enduml
