@@ -51,7 +51,7 @@
                 android:id="@+id/quickSetupSearchOptionsTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="20dp"
                 android:gravity="center"
                 android:paddingHorizontal="12dp"
                 android:text="@string/quickSetupSearchOptionsTitle"
