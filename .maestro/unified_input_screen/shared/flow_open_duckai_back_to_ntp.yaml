@@ -28,17 +28,13 @@ appId: com.duckduckgo.mobile.android
 # Duck.ai opened — header replaces the omnibar and the back arrow appears
 - extendedWaitUntil:
     visible:
-      id: "duckAIHeader"
+      id: "duckAiBack"
     timeout: 15000
-- assertVisible:
-    id: "duckAIHeader"
-- assertVisible:
-    id: "inputModeUnifiedBack"
 
 # tap the back arrow — only present in this AI-off entry path — and verify
 # we land back on the NTP
 - tapOn:
-    id: "inputModeUnifiedBack"
+    id: "duckAiBack"
 - extendedWaitUntil:
     visible:
       id: "newTabPage"
