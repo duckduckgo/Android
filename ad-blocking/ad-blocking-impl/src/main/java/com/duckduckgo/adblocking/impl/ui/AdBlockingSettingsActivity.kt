@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +48,10 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    private val blockAdsToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onBlockAdsToggled(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,9 +69,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.blockAdsToggle.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onBlockAdsToggled(isChecked)
-        }
+        binding.blockAdsToggle.setOnCheckedChangeListener(blockAdsToggleListener)
 
         val openDuckPlayerSettings = View.OnClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
@@ -78,7 +81,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { state -> binding.blockAdsToggle.setIsChecked(state.isEnabled) }
+            .onEach { state -> binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener) }
             .launchIn(lifecycleScope)
 
         viewModel.commands
