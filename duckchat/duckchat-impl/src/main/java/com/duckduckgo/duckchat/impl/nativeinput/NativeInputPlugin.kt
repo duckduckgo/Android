@@ -22,12 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 
-sealed class PromptContribution {
-    data class ModelSelection(val modelId: String) : PromptContribution()
-    data class ReasoningEffortSelection(val effort: String) : PromptContribution()
-    data class ToolSelection(val tool: String) : PromptContribution()
-}
-
 /**
  * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
  * (e.g. [submit]) without coupling to the widget class directly. State that depends on the active
@@ -42,6 +36,13 @@ interface NativeInputHost {
     fun showReasoningPicker(showing: Boolean)
 
     fun attachmentChanged(hasAttachments: Boolean, limitExceeded: Boolean, supportsUpload: Boolean)
+
+    /**
+     * Plugins call this whenever the user's tool selection changes. The widget routes this into
+     * `NativeInputStatePublisher.update` for the active tab; observers read [NativeInputState.selectedTool]
+     * via [NativeInputStateProvider].
+     */
+    fun toolSelected(tool: String?)
 }
 
 interface NativeInputPlugin : ActivePlugin {
@@ -49,8 +50,6 @@ interface NativeInputPlugin : ActivePlugin {
     val containerId: Int
 
     fun createView(context: Context, host: NativeInputHost): View
-
-    fun getPromptContribution(): PromptContribution?
 }
 
 @ContributesActivePluginPoint(

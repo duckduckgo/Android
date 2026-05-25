@@ -57,9 +57,8 @@ class ImageAttachmentsContainerView @JvmOverloads constructor(
         val thumbnailView = LayoutInflater.from(context).inflate(R.layout.view_image_attachment_thumbnail, this, false)
         thumbnailView.tag = attachment.id
         val image = thumbnailView.findViewById<ImageView>(R.id.thumbnailImage)
-        val removeButton = thumbnailView.findViewById<ImageView>(R.id.thumbnailRemove)
         image.setImageBitmap(attachment.bitmap)
-        removeButton.setOnClickListener {
+        thumbnailView.setOnClickListener {
             val id = attachment.id
             removeAttachmentById(id)
             onAttachmentRemoved?.invoke(id)

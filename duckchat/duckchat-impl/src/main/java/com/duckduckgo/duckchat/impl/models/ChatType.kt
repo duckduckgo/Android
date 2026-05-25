@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.history
+package com.duckduckgo.duckchat.impl.models
+
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
 
 enum class ChatType {
     Discussion,
     ImageGeneration,
     Voice,
+}
+
+internal fun DuckAiChat.toChatType(): ChatType = when {
+    isImageGeneration -> ChatType.ImageGeneration
+    isVoice -> ChatType.Voice
+    else -> ChatType.Discussion
 }

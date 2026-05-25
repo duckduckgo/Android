@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.history
 
+import com.duckduckgo.duckchat.impl.models.ChatType
+
 data class ChatHistoryItem(
     val chatId: String,
     val displayTitle: String,

@@ -35,8 +35,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -52,13 +57,23 @@ class ReasoningModePickerView @JvmOverloads constructor(
 
     @Inject lateinit var viewModelFactory: ViewViewModelFactory
 
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private val viewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ReasoningModePickerViewModel::class.java]
     }
 
     private val button: ImageView by lazy { findViewById(R.id.reasoningModePickerButton) }
     private var stateJob: Job? = null
+    private var inputContextJob: Job? = null
+    private var commandJob: Job? = null
     private var popupWindow: PopupWindow? = null
+
+    // Mirrors the input context from the per-tab native input state so currentSurface() can be
+    // read synchronously from popup callbacks. Updated by observeInputContext().
+    private var lastInputContext: InputContext = InputContext.BROWSER
 
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
@@ -69,13 +84,26 @@ class ReasoningModePickerView @JvmOverloads constructor(
         super.onAttachedToWindow()
         button.setOnClickListener { showMenu() }
         observeState()
+        observeInputContext()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        inputContextJob?.cancel()
+        inputContextJob = null
+        commandJob?.cancel()
+        commandJob = null
         dismissPopup()
+    }
+
+    private fun observeInputContext() {
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        inputContextJob?.cancel()
+        inputContextJob = nativeInputStateProvider.state
+            .onEach { lastInputContext = it.inputContext }
+            .launchIn(scope)
     }
 
     private fun observeState() {
@@ -83,17 +111,40 @@ class ReasoningModePickerView @JvmOverloads constructor(
         stateJob?.cancel()
         stateJob = viewModel.state
             .onEach { state ->
-                isVisible = state.availableReasoningModes.size > 1
-                viewModel.resolvedMode(state)?.let { mode ->
+                isVisible = state.visible
+                // Popup is positioned by screen coordinates, not parented to the button. Dismiss
+                // it explicitly when picker hides or stale rows stay tappable for the new chat.
+                if (!state.visible) dismissPopup()
+                state.displayedMode?.let { mode ->
                     button.setImageResource(viewModel.iconResFor(mode))
                 }
             }
             .launchIn(scope)
+
+        commandJob?.cancel()
+        commandJob = viewModel.commands
+            .onEach { processCommand(it) }
+            .launchIn(scope)
     }
+
+    private fun processCommand(command: UpsellCommand) {
+        when (command) {
+            is UpsellCommand.LaunchPurchase ->
+                globalActivityStarter.start(context, SubscriptionPurchase(origin = command.origin, featurePage = DUCK_AI_FEATURE_PAGE))
+            is UpsellCommand.LaunchUpgrade ->
+                globalActivityStarter.start(context, SubscriptionUpgrade(origin = command.origin))
+        }
+    }
+
+    private fun currentSurface(): PickerSurface =
+        when (lastInputContext) {
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.REASONING_PICKER_DUCK_AI_TAB
+            InputContext.BROWSER -> PickerSurface.REASONING_PICKER_ADDRESS_BAR
+        }
 
     private fun showMenu() {
         val state = viewModel.state.value
-        if (state.availableReasoningModes.size <= 1) return
+        if (!state.visible) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -117,8 +168,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
         showAtPosition(popup)
     }
 
-    private fun populate(container: LinearLayout, popup: PopupWindow, state: ModelState) {
-        viewModel.rows(state).forEach { row ->
+    private fun populate(container: LinearLayout, popup: PopupWindow, state: ReasoningModePickerState) {
+        state.rows.forEach { row ->
             val item = LayoutInflater.from(context)
                 .inflate(R.layout.view_reasoning_mode_picker_item, container, false)
             item.findViewById<ImageView>(R.id.reasoningModeItemLeadingIcon)
@@ -129,7 +180,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
             trailingIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_check_24)
             trailingIcon.visibility = if (row.selected) VISIBLE else INVISIBLE
             item.setOnClickListener {
-                viewModel.selectMode(row.mode)
+                viewModel.onModeTapped(row.mode, currentSurface())
                 popup.dismiss()
             }
             container.addView(item)

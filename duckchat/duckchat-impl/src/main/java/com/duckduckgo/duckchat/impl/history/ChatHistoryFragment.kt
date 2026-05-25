@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.dataclearing.api.fire.FireDialog
@@ -41,10 +42,12 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentChatHistoryBinding
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
@@ -56,6 +59,15 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var chatHistoryReader: ChatHistoryReader
+
+    @Inject
+    lateinit var duckChatFeature: DuckChatFeature
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
 
     private val binding: FragmentChatHistoryBinding by viewBinding()
     private val viewModel: ChatHistoryViewModel by lazy {
@@ -76,6 +88,16 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 viewModel.isSelectMode() -> viewModel.onSelectModeCancelled()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewLifecycleOwner.lifecycleScope.launch { chatHistoryReader.refresh() }
+    }
+
+    override fun onDestroyView() {
+        chatHistoryReader.tearDown()
+        super.onDestroyView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -309,18 +331,27 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     }
 
     private fun showRowPopup(item: ChatHistoryItem, anchor: View) {
-        val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
-        val view = popup.contentView
-        val pinAction = view.findViewById<PopupMenuItemView>(R.id.pin)
-        val pinLabel = if (item.pinned) R.string.duck_ai_chat_history_action_unpin else R.string.duck_ai_chat_history_action_pin
-        pinAction.setPrimaryText(getString(pinLabel))
-        popup.onMenuItemClicked(pinAction) { viewModel.onTogglePin(item.chatId) }
-        popup.onMenuItemClicked(view.findViewById(R.id.rename)) {
-            viewModel.onRenameRequested(item.chatId, item.displayTitle)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val isRenameEnabled = withContext(dispatchers.io()) { duckChatFeature.renameChat().isEnabled() }
+            val popup = PopupMenu(layoutInflater, R.layout.popup_chat_history_row)
+            val view = popup.contentView
+            val pinAction = view.findViewById<PopupMenuItemView>(R.id.pin)
+            val pinLabel = if (item.pinned) R.string.duck_ai_chat_history_action_unpin else R.string.duck_ai_chat_history_action_pin
+            pinAction.setPrimaryText(getString(pinLabel))
+            popup.onMenuItemClicked(pinAction) { viewModel.onTogglePin(item.chatId) }
+            val renameAction = view.findViewById<PopupMenuItemView>(R.id.rename)
+            if (isRenameEnabled) {
+                renameAction.show()
+                popup.onMenuItemClicked(renameAction) {
+                    viewModel.onRenameRequested(item.chatId, item.displayTitle)
+                }
+            } else {
+                renameAction.gone()
+            }
+            popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
+            popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
+            popup.show(binding.root, anchor)
         }
-        popup.onMenuItemClicked(view.findViewById(R.id.download)) { showComingSoonSnackbar() }
-        popup.onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteSingleChat(item.chatId) }
-        popup.show(binding.root, anchor)
     }
 
     private fun showComingSoonSnackbar() {

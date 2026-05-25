@@ -45,8 +45,15 @@ data class ModelState(
     val selectedModelShortName: String? = null,
     val userTier: UserTier = UserTier.FREE,
     val attachmentLimits: AttachmentLimits = AttachmentLimits(),
+    /** User's persisted global reasoning mode. Used for new chats. */
     val selectedReasoningMode: ReasoningMode? = null,
     val availableReasoningModes: List<AvailableReasoningMode> = emptyList(),
+    /** Reasoning mode for the current chat. Session only (not persisted)
+     * Note: if we ever want to preserve picks across unsubmitted chats
+     * (User selected a mode but navigated away or switched tab without submission)
+     * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
+     * */
+    val chatScopedReasoningMode: ReasoningMode? = null,
 )
 
 interface DuckAiModelManager {
@@ -57,6 +64,8 @@ interface DuckAiModelManager {
     suspend fun selectModel(model: AIChatModel)
 
     suspend fun selectReasoningMode(mode: ReasoningMode)
+
+    suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
 
     fun getSelectedModelId(): String?
 
@@ -124,7 +133,7 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
-                val response = fetchModelsResponse()
+                val response = fetchModelsResponse().withHardcodedReasoningGates()
                 val models = response.models
                     .map { resolveModel(it, userTier) }
                     .filterNot { it.accessTier.isEmpty() && !it.isAccessible }
@@ -132,10 +141,13 @@ class RealDuckAiModelManager @Inject constructor(
                 stateMutex.withLock {
                     val selectedModelId = validateAndPersistSelection(models)
                     val selectedModel = models.find { it.id == selectedModelId }
-                    val available = ReasoningResolver.availableModes(selectedModel?.supportedReasoningEfforts.orEmpty())
-                    val nextReasoningMode = clearStaleReasoningModeIfNeeded(_modelState.value.selectedReasoningMode, available)
+                    val available = ReasoningResolver.availableModes(
+                        supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+                        effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                    )
+                    val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
 
-                    _modelState.value = ModelState(
+                    _modelState.value = _modelState.value.copy(
                         models = models,
                         selectedModelId = selectedModelId,
                         selectedModelShortName = selectedModel?.shortName,
@@ -176,8 +188,11 @@ class RealDuckAiModelManager @Inject constructor(
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
-                val available = ReasoningResolver.availableModes(model.supportedReasoningEfforts)
-                val nextReasoningMode = clearStaleReasoningModeIfNeeded(_modelState.value.selectedReasoningMode, available)
+                val available = ReasoningResolver.availableModes(
+                    supported = model.supportedReasoningEfforts,
+                    effortAccess = model.reasoningEffortAccess,
+                )
+                val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
                 _modelState.value = _modelState.value.copy(
                     selectedModelId = model.id,
                     selectedModelShortName = model.shortName,
@@ -192,12 +207,18 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun selectReasoningMode(mode: ReasoningMode) {
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
-                val available = _modelState.value.availableReasoningModes
-                if (available.none { it.mode == mode }) return@withLock
+                val match = _modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }
+                if (match == null || !match.isAccessible) return@withLock
                 dataStore.setSelectedReasoningMode(mode.rawValue)
                 _modelState.value = _modelState.value.copy(selectedReasoningMode = mode)
                 logcat { "Duck.ai Model Manager: selected reasoning mode ${mode.rawValue}" }
             }
+        }
+    }
+
+    override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) {
+        stateMutex.withLock {
+            _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
         }
     }
 
@@ -208,14 +229,17 @@ class RealDuckAiModelManager @Inject constructor(
         return ReasoningResolver.effortFor(state.selectedReasoningMode, state.availableReasoningModes)?.rawValue
     }
 
-    private suspend fun clearStaleReasoningModeIfNeeded(
+    private suspend fun validateAndPersistReasoningMode(
         persisted: ReasoningMode?,
         available: List<AvailableReasoningMode>,
     ): ReasoningMode? {
-        if (persisted == null) return null
-        if (available.any { it.mode == persisted }) return persisted
-        dataStore.setSelectedReasoningMode(null)
-        return null
+        val match = available.firstOrNull { it.mode == persisted }
+        if (match != null && match.isAccessible) return persisted
+        val next = available.firstOrNull { it.isAccessible }?.mode
+        if (next != persisted) {
+            dataStore.setSelectedReasoningMode(next?.rawValue)
+        }
+        return next
     }
 
     private suspend fun resolveUserTier(): UserTier {
@@ -278,6 +302,12 @@ class RealDuckAiModelManager @Inject constructor(
             supportedImageFormats = if (remote.supportsImageUpload) AIChatModel.NATIVE_SUPPORTED_IMAGE_FORMATS else emptyList(),
             supportedFileTypes = remote.supportedFileTypes.orEmpty(),
             supportedReasoningEfforts = remote.supportedReasoningEffort.orEmpty().mapNotNull(ReasoningEffort::from),
+            reasoningEffortAccess = remote.reasoningEffortAccess.orEmpty().mapNotNull { entry ->
+                val effort = ReasoningEffort.from(entry.id) ?: return@mapNotNull null
+                val tiers = entry.accessTier.orEmpty()
+                val accessible = if (tiers.isEmpty()) entry.entityHasAccess else tiers.contains(userTier.rawValue)
+                ReasoningEffortAccess(effort = effort, accessTier = tiers, isAccessible = accessible)
+            },
             supportedTools = remote.supportedTools.orEmpty().mapNotNull(Tool::from),
         )
     }
@@ -295,6 +325,26 @@ class RealDuckAiModelManager @Inject constructor(
         return currentSelectedId
     }
 }
+
+// TODO: Remove this hardcoded gate once the backend ships per-effort `reasoningEffortAccess` for gpt-5.2.
+//  EXTENDED_REASONING on gpt-5.2 is PRO-only. We gate every candidate effort of EXTENDED_REASONING.
+//  To remove: delete this function and the `.withHardcodedReasoningGates()` call in fetchModels.
+//  Follow up task: https://app.asana.com/1/137249556945/project/1212810093780571/task/1214980387692321?focus=true
+private fun AIChatModelsResponse.withHardcodedReasoningGates(): AIChatModelsResponse = copy(
+    models = models.map { model ->
+        if (model.id != "gpt-5.2") return@map model
+        // Server entries win, hardcode only fills gaps. Lets the gate auto-deactivate as
+        // the backend rolls out, and avoids dropping unrelated server-side data.
+        val existing = model.reasoningEffortAccess.orEmpty()
+        val existingIds = existing.mapTo(mutableSetOf()) { it.id }
+        val hardcoded = ReasoningMode.EXTENDED_REASONING.candidateEfforts
+            .filter { it.rawValue !in existingIds }
+            .map { effort ->
+                RemoteReasoningEffortAccess(id = effort.rawValue, accessTier = listOf("pro"), entityHasAccess = false)
+            }
+        model.copy(reasoningEffortAccess = existing + hardcoded)
+    },
+)
 
 private fun com.duckduckgo.subscriptions.api.SubscriptionStatus.isActiveOrWaiting(): Boolean {
     return this == com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE ||

@@ -115,7 +115,6 @@ class WelcomePageViewModel @Inject constructor(
 
     private var addressBarPositionOption: OmnibarType = OmnibarType.SINGLE_TOP
     private var inputScreenSelected: Boolean = true
-    private var maxPageCount: Int = 2
     private var reinstallUser: Boolean = false
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -128,16 +127,6 @@ class WelcomePageViewModel @Inject constructor(
             coroutineContext.ensureActive()
             logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
             false
-        }
-    }
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
         }
     }
 
@@ -256,11 +245,7 @@ class WelcomePageViewModel @Inject constructor(
                             // Top is the default, no pixel needed
                         }
                     }
-                    if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
-                    } else {
-                        _commands.send(Finish)
-                    }
+                    _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
@@ -431,9 +416,7 @@ class WelcomePageViewModel @Inject constructor(
         inputScreenSelected = withAi
     }
 
-    fun getMaxPageCount(): Int {
-        return maxPageCount
-    }
+    fun getMaxPageCount(): Int = MAX_PAGE_COUNT
 
     fun loadDaxDialog() {
         viewModelScope.launch {
@@ -459,6 +442,7 @@ class WelcomePageViewModel @Inject constructor(
 
     companion object {
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
+        private const val MAX_PAGE_COUNT = 3
     }
 
     private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {

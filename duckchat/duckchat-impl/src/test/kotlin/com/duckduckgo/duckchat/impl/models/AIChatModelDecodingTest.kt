@@ -55,4 +55,92 @@ class AIChatModelDecodingTest {
         val parsed = adapter.fromJson(json)!!
         assertEquals(listOf("low", "mystery", "high"), parsed.supportedReasoningEffort)
     }
+
+    @Test
+    fun whenReasoningEffortAccessMissingThenFieldIsNull() {
+        val json = """{"id":"m","name":"n"}"""
+        val parsed = adapter.fromJson(json)!!
+        assertNull(parsed.reasoningEffortAccess)
+    }
+
+    @Test
+    fun whenReasoningEffortAccessNullThenFieldIsNull() {
+        val json = """{"id":"m","name":"n","reasoningEffortAccess":null}"""
+        val parsed = adapter.fromJson(json)!!
+        assertNull(parsed.reasoningEffortAccess)
+    }
+
+    @Test
+    fun whenReasoningEffortAccessPopulatedThenFieldDecoded() {
+        val json = """
+            {
+              "id":"m",
+              "name":"n",
+              "reasoningEffortAccess":[
+                {"id":"low","accessTier":["free","plus","pro"],"entityHasAccess":true},
+                {"id":"medium","accessTier":["pro"],"entityHasAccess":false}
+              ]
+            }
+        """.trimIndent()
+        val parsed = adapter.fromJson(json)!!
+        assertEquals(
+            listOf(
+                RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free", "plus", "pro"), entityHasAccess = true),
+                RemoteReasoningEffortAccess(id = "medium", accessTier = listOf("pro"), entityHasAccess = false),
+            ),
+            parsed.reasoningEffortAccess,
+        )
+    }
+
+    @Test
+    fun whenReasoningEffortAccessContainsUnknownIdThenStillDecodesAsRawString() {
+        val json = """
+            {
+              "id":"m",
+              "name":"n",
+              "reasoningEffortAccess":[
+                {"id":"very_high","accessTier":["pro"],"entityHasAccess":false}
+              ]
+            }
+        """.trimIndent()
+        val parsed = adapter.fromJson(json)!!
+        assertEquals(
+            listOf(RemoteReasoningEffortAccess(id = "very_high", accessTier = listOf("pro"), entityHasAccess = false)),
+            parsed.reasoningEffortAccess,
+        )
+    }
+
+    @Test
+    fun whenReasoningEffortAccessEntryOmitsAccessTierThenFieldIsNull() {
+        val json = """
+            {
+              "id":"m",
+              "name":"n",
+              "reasoningEffortAccess":[{"id":"low","entityHasAccess":true}]
+            }
+        """.trimIndent()
+        val parsed = adapter.fromJson(json)!!
+        val entry = parsed.reasoningEffortAccess!!.single()
+        assertEquals("low", entry.id)
+        assertNull(entry.accessTier)
+        assertEquals(true, entry.entityHasAccess)
+    }
+
+    @Test
+    fun whenReasoningEffortAccessEntryHasUnknownFieldsThenIgnoredAndKnownFieldsDecoded() {
+        val json = """
+            {
+              "id":"m",
+              "name":"n",
+              "reasoningEffortAccess":[
+                {"id":"low","accessTier":["free"],"entityHasAccess":true,"futureField":"ignoreMe"}
+              ]
+            }
+        """.trimIndent()
+        val parsed = adapter.fromJson(json)!!
+        assertEquals(
+            listOf(RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free"), entityHasAccess = true)),
+            parsed.reasoningEffortAccess,
+        )
+    }
 }

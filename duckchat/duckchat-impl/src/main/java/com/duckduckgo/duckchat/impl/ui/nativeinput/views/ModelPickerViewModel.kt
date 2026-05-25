@@ -63,8 +63,8 @@ class ModelPickerViewModel @Inject constructor(
         }
     }
 
-    private val command = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val commands: Flow<Command> = command.receiveAsFlow()
+    private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val commands: Flow<UpsellCommand> = command.receiveAsFlow()
 
     fun onModelTapped(model: AIChatModel, surface: PickerSurface) {
         if (model.isAccessible) {
@@ -76,16 +76,7 @@ class ModelPickerViewModel @Inject constructor(
             logcat { "Duck.ai picker: tapped model has no public required tier (id=${model.id}, accessTier=${model.accessTier}), ignoring." }
             return
         }
-        when {
-            requiredTier == UserTier.FREE -> {
-                logcat { "Duck.ai picker: inaccessible model with FREE required tier (id=${model.id}), no upsell route." }
-            }
-            userTier == UserTier.FREE -> command.trySend(Command.LaunchPurchase(surface.origin))
-            userTier == UserTier.PLUS && requiredTier == UserTier.PRO -> command.trySend(Command.LaunchUpgrade(surface.origin))
-            else -> {
-                logcat { "Duck.ai picker: no native subscription flow for tap (userTier=$userTier, requiredTier=$requiredTier, id=${model.id})." }
-            }
-        }
+        routeUpsell(userTier, requiredTier, surface.origin)?.let { command.trySend(it) }
     }
 
     fun buildSections(state: ModelState): List<ModelSection> {
@@ -107,16 +98,6 @@ class ModelPickerViewModel @Inject constructor(
         ModelProvider.META -> R.drawable.ic_ai_model_llama_16
         ModelProvider.OSS -> R.drawable.ic_ai_model_oss_16
         ModelProvider.UNKNOWN -> null
-    }
-
-    sealed class Command {
-        data class LaunchPurchase(val origin: String) : Command()
-        data class LaunchUpgrade(val origin: String) : Command()
-    }
-
-    enum class PickerSurface(val origin: String) {
-        ADDRESS_BAR("funnel_nativeinput_androidapp__modelpicker"),
-        DUCK_AI_TAB("funnel_duckai_androidapp__modelpicker"),
     }
 
     private fun List<AIChatModel>.toSectionOrNull(@StringRes headerRes: Int?): ModelSection? =

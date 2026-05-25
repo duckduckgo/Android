@@ -172,19 +172,19 @@ class ModelPickerView @JvmOverloads constructor(
             .launchIn(scope)
     }
 
-    private fun processCommand(command: ModelPickerViewModel.Command) {
+    private fun processCommand(command: UpsellCommand) {
         when (command) {
-            is ModelPickerViewModel.Command.LaunchPurchase ->
+            is UpsellCommand.LaunchPurchase ->
                 globalActivityStarter.start(context, SubscriptionPurchase(origin = command.origin, featurePage = DUCK_AI_FEATURE_PAGE))
-            is ModelPickerViewModel.Command.LaunchUpgrade ->
+            is UpsellCommand.LaunchUpgrade ->
                 globalActivityStarter.start(context, SubscriptionUpgrade(origin = command.origin))
         }
     }
 
-    private fun currentSurface(): ModelPickerViewModel.PickerSurface =
+    private fun currentSurface(): PickerSurface =
         when (lastInputContext) {
-            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> ModelPickerViewModel.PickerSurface.DUCK_AI_TAB
-            InputContext.BROWSER -> ModelPickerViewModel.PickerSurface.ADDRESS_BAR
+            InputContext.DUCK_AI, InputContext.DUCK_AI_CONTEXTUAL -> PickerSurface.MODEL_PICKER_DUCK_AI_TAB
+            InputContext.BROWSER -> PickerSurface.MODEL_PICKER_ADDRESS_BAR
         }
 
     private fun showMenu() {

@@ -65,6 +65,7 @@ class DuckChatDataClearingPlugin @Inject constructor(
             val timestamp = duckChatFeatureRepository.getAppBackgroundTimestamp() ?: currentTimeProvider.currentTimeMillis()
             duckChatSyncRepository.recordDuckAiChatsDeleted(timestamp)
             duckChatSyncRepository.clearPendingChatDeletions()
+            duckChatSyncRepository.clearPendingChatUpdates()
             syncEngine.triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
         }
     }

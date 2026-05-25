@@ -1,0 +1,60 @@
+appId: com.duckduckgo.mobile.android
+---
+# wait for the unified input widget to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+
+# switch to Duck.ai mode
+- tapOn:
+    text: "Duck.ai"
+    childOf:
+      id: "inputModeWidget"
+- extendedWaitUntil:
+    visible:
+      id: "optionsButtonContainer"
+    timeout: 10000
+
+# select Web Search via the options menu
+- tapOn:
+    id: "optionsButtonContainer"
+- tapOn:
+    text: "Web Search"
+- assertVisible:
+    text: "Remove Web Search"
+
+# type the first prompt and submit
+- tapOn:
+    id: "inputField"
+- inputText: "weather in Lisbon"
+- assertVisible:
+    text: "Remove Web Search"
+- tapOn:
+    id: "actionSend"
+
+# handle the duck.ai T&C if it appears (first run only)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
+
+# wait for the response to load — the chat puts the user's prompt at the top
+# of the conversation and the unified input slides back in at the bottom
+- extendedWaitUntil:
+    visible:
+      text: "Weather in Lisbon"
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      id: "optionsButtonContainer"
+    timeout: 15000
+
+# Web Search should NOT be auto-selected for the follow-up prompt — selecting it
+# is a per-prompt choice, not a sticky preference
+- assertNotVisible:
+    text: "Remove Web Search"
+
+# type a follow-up prompt and confirm the pill stays off
+- tapOn:
+    id: "inputField"
+- inputText: "follow up question"
+- assertNotVisible:
+    text: "Remove Web Search"

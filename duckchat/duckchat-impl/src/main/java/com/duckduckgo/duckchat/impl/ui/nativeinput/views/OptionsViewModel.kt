@@ -17,40 +17,41 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.Tool
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
-class OptionsViewModel @Inject constructor() : ViewModel() {
+class OptionsViewModel @Inject constructor(
+    nativeInputStateProvider: NativeInputStateProvider,
+) : ViewModel() {
 
-    private val _selectedTool = MutableStateFlow<Tool?>(null)
-    val selectedTool: StateFlow<Tool?> = _selectedTool.asStateFlow()
+    val selectedTool: StateFlow<Tool?> = nativeInputStateProvider.state
+        .map { state -> state.selectedTool?.let { Tool.from(it) } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val _visibleTools = MutableStateFlow(Tool.entries.toSet())
     val visibleTools: StateFlow<Set<Tool>> = _visibleTools.asStateFlow()
 
-    val shouldShowPickers: Boolean get() = _selectedTool.value != Tool.IMAGE_GENERATION
+    val shouldShowPickers: Boolean get() = selectedTool.value != Tool.IMAGE_GENERATION
 
-    fun toggleTool(tool: Tool) {
-        _selectedTool.value = if (tool == _selectedTool.value) null else tool
-    }
-
-    fun clearTool() {
-        _selectedTool.value = null
-    }
-
+    /**
+     * Update the set of tools the menu should display. Returns true if the currently selected tool
+     * is no longer in the visible set (caller is responsible for pushing the cleared selection
+     * through [com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost.toolSelected]).
+     */
     fun updateVisibleTools(tools: Set<Tool>): Boolean {
         _visibleTools.value = tools
-        return if (_selectedTool.value != null && _selectedTool.value !in tools) {
-            _selectedTool.value = null
-            true
-        } else {
-            false
-        }
+        val current = selectedTool.value
+        return current != null && current !in tools
     }
 }

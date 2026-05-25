@@ -17,8 +17,6 @@
 package com.duckduckgo.common.ui.compose.dialog
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
@@ -28,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
+import com.duckduckgo.common.ui.compose.checkbox.DaxCheckbox
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.compose.tools.PreviewBox
@@ -144,15 +143,9 @@ private fun DaxTextAlertDialogCheckboxRow(state: DaxTextAlertDialogCheckboxState
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // TODO: replace with DaxCheckbox once the ADS checkbox is migrated to Compose.
-        Checkbox(
+        DaxCheckbox(
             checked = state.checked,
             onCheckedChange = state.onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = DuckDuckGoTheme.colors.brand.accentBlue,
-                uncheckedColor = DuckDuckGoTheme.textColors.secondary,
-                checkmarkColor = DuckDuckGoTheme.colors.icons.white,
-            ),
         )
         DaxText(
             text = state.text,
