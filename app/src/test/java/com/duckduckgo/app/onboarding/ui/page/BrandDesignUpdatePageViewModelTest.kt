@@ -47,6 +47,9 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -59,6 +62,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -95,6 +99,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
+    private val mockSyncAutoRestore: SyncAutoRestore = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -113,6 +118,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockOnboardingQuickSetupExperimentManager,
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
+            mockSyncAutoRestore,
         )
     }
 
@@ -477,6 +483,117 @@ class BrandDesignUpdatePageViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
         verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
+    }
+
+    // endregion
+
+    // region Sync Restore
+
+    @Test
+    fun whenLoadDaxDialogAndCanRestoreThenViewStateShowsSyncRestoreDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.SYNC_RESTORE, state.currentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoadDaxDialogAndCanRestoreAndReinstallThenSyncRestoreTakesPriority() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.SYNC_RESTORE, state.currentDialog)
+            // isAppReinstall() side effect still runs, so the flag is captured
+            assertTrue(state.isReinstallUser)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCanRestoreThrowsThenLoadDaxDialogFallsBackToInitialDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenThrow(RuntimeException("Block Store error"))
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.INITIAL, state.currentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoadDaxDialogAndCanRestoreThenFiresSyncRestoreShownPixel() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        verify(mockPixel).fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenPrimaryCtaFromSyncRestoreThenRestoreAccountAndShowComparisonChart() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem() // SYNC_RESTORE
+            testee.onPrimaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(mockSyncAutoRestore).restoreSyncAccount()
+    }
+
+    @Test
+    fun whenPrimaryCtaFromSyncRestoreThenFiresSyncRestoreTappedPixel() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onPrimaryCtaClicked()
+        verify(mockPixel).fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreThenShowSkipOnboardingOption() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem() // SYNC_RESTORE
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION, state.currentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(mockSyncAutoRestore, never()).restoreSyncAccount()
+    }
+
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreThenFiresSkipRestoreTappedPixel() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        verify(mockPixel).fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
     }
 
     // endregion
