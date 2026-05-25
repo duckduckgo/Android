@@ -296,7 +296,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this, currentBrowserMode)
+        TabPagerAdapter(this)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -604,8 +604,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val mode = if (isExternal) BrowserMode.REGULAR else currentBrowserMode
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, mode)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
