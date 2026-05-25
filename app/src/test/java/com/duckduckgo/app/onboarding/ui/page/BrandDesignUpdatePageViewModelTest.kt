@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -90,6 +91,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
     private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
+    private val mockSyncAutoRestore: SyncAutoRestore = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -106,6 +108,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
             mockDuckAiOnboardingExperimentManager,
             mockOnboardingQuickSetupExperimentManager,
+            mockSyncAutoRestore,
         )
     }
 

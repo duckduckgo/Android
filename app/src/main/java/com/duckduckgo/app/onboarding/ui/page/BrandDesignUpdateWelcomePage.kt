@@ -591,8 +591,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             isAnimating = true
             viewModel.onDialogAnimationStarted()
             when (onboardingDialogType) {
-                INITIAL, INITIAL_REINSTALL_USER -> {
-                    val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
+                INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
+                    val isSyncRestore = onboardingDialogType == SYNC_RESTORE
+                    val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
                     if (showSecondaryCta) {
                         // Pin the title at its current position before the secondaryCta
                         // visibility change. The CL is wrap_content in landscape, so
@@ -607,6 +608,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
+                    val titleRes = if (isSyncRestore) R.string.syncRestoreDialogBrandDesignTitle else R.string.preOnboardingWelcomeDialogTitle
+                    if (isSyncRestore) {
+                        // SYNC_RESTORE reuses welcomeContent with its own copy and the sync-restore CTAs.
+                        binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(titleRes)
+                        binding.daxDialogCta.welcomeContent.bodyText1.text =
+                            getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
+                        binding.daxDialogCta.welcomeContent.bodyText2.text =
+                            getString(R.string.syncRestoreDialogBrandDesignBody2).preventWidows().html(requireContext())
+                        binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
+                        binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                    }
+
                     val showWalkingDax = applyWalkingDaxLayout()
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
@@ -618,7 +631,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         onAnimationEnd = {
                             fadeInDialog {
                                 binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
-                                    getString(R.string.preOnboardingWelcomeDialogTitle),
+                                    getString(titleRes),
                                 ) {
                                     val animators = mutableListOf<Animator>(
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
@@ -749,10 +762,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingReinstallStartBrowsing)
                     binding.daxDialogCta.primaryCta.alpha = 0f
-                }
-
-                SYNC_RESTORE -> {
-                    // TODO - SyncRestore: add dialog UI
                 }
 
                 COMPARISON_CHART -> {
@@ -1220,14 +1229,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         snapToIntroEndState()
 
         when (onboardingDialogType) {
-            INITIAL, INITIAL_REINSTALL_USER -> {
+            INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
+                val isSyncRestore = onboardingDialogType == SYNC_RESTORE
+                val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
+
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
-                binding.daxDialogCta.secondaryCta.visibility =
-                    if (onboardingDialogType == INITIAL_REINSTALL_USER) View.INVISIBLE else View.GONE
+                binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
                 val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
@@ -1244,20 +1255,30 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
-                binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
+                val titleString = if (isSyncRestore) {
+                    getString(R.string.syncRestoreDialogBrandDesignTitle)
+                } else {
+                    getString(R.string.preOnboardingWelcomeDialogTitle)
+                }
+                binding.daxDialogCta.welcomeContent.titleText.text = titleString
+                if (isSyncRestore) {
+                    binding.daxDialogCta.welcomeContent.hiddenTitleText.text = titleString
+                    binding.daxDialogCta.welcomeContent.bodyText1.text =
+                        getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
+                    binding.daxDialogCta.welcomeContent.bodyText2.text =
+                        getString(R.string.syncRestoreDialogBrandDesignBody2).preventWidows().html(requireContext())
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
+                    binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
+                }
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
                 binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-                if (onboardingDialogType == INITIAL_REINSTALL_USER) {
+                if (showSecondaryCta) {
                     binding.daxDialogCta.secondaryCta.isVisible = true
                     binding.daxDialogCta.secondaryCta.alpha = 1f
                     binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                 }
-            }
-
-            SYNC_RESTORE -> {
-                // TODO - SyncRestore: add dialog UI
             }
 
             COMPARISON_CHART -> {
