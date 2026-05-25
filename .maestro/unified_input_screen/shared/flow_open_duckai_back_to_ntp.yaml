@@ -1,0 +1,49 @@
+appId: com.duckduckgo.mobile.android
+---
+# unified input is open by default with nativeInputToggle="true";
+# wait for it to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+
+# focus the input field and type a question
+- tapOn:
+    id: "inputField"
+- inputText: "what is a car"
+
+# with inputWithAiToggle=false there is no Duck.ai tab — a Duck.ai icon
+# inside the input mode widget is the entry point to chat
+- assertVisible:
+    id: "aiChatIconMenu"
+- tapOn:
+    id: "aiChatIconMenu"
+
+# handle the duck.ai T&C if it appears (first run only)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
+
+# duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
+- runFlow: reload_duckai_if_needed.yaml
+
+# Duck.ai opened — header replaces the omnibar and the back arrow appears
+- extendedWaitUntil:
+    visible:
+      id: "duckAIHeader"
+    timeout: 15000
+- assertVisible:
+    id: "duckAIHeader"
+- assertVisible:
+    id: "inputModeUnifiedBack"
+
+# tap the back arrow — only present in this AI-off entry path — and verify
+# we land back on the NTP
+- tapOn:
+    id: "inputModeUnifiedBack"
+- extendedWaitUntil:
+    visible:
+      id: "newTabPage"
+    timeout: 15000
+- assertVisible:
+    id: "newTabPage"
+- assertVisible:
+    id: "ddgLogo"
