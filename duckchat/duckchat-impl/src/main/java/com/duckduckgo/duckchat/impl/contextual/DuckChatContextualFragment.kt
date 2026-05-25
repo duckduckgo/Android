@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.gone
@@ -184,6 +186,12 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var contextualNativeInputManager: ContextualNativeInputManager
 
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
+    lateinit var browserMode: BrowserMode
+
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
@@ -252,6 +260,8 @@ class DuckChatContextualFragment :
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
         simpleWebview.let {
+            webViewModeInitializer.bind(it, browserMode)
+
             it.webViewClient = webViewClient
             webViewClient
                 .onPageFinishedListener = { url ->

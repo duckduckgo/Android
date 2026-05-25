@@ -126,7 +126,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -1071,14 +1070,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
-        val mode = currentBrowserMode
         val fragment =
             DuckChatWebViewFragment().apply {
                 arguments =
                     Bundle().apply {
                         duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
                         putInt(KEY_DUCK_AI_TABS, tabs)
-                        putString(KEY_DUCK_AI_BROWSER_MODE, mode.name)
                     }
             }
 
