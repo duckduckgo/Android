@@ -284,6 +284,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
+    // prevents new Browser mode's ViewPager showing old webviews when the mode changes
     private var skipTabPagerStateSaveOnRecreate = false
 
     private lateinit var renderer: BrowserStateRenderer
