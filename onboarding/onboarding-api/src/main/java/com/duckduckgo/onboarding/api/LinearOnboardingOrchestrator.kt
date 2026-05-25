@@ -41,8 +41,9 @@ sealed interface LinearOnboardingState {
  * A plan is a list of steps plus terminal callbacks. The orchestrator awaits
  * [onCompleted] / [onSkipped] before emitting the matching terminal state, so
  * any state written inside the callback is visible to listeners that route off
- * Completed / Skipped. Only the bottom-of-stack (main) plan's callbacks fire
- * when the orchestrator terminates; side plans only run on Return/AbortPlan.
+ * Completed / Skipped. Only the main (bottom-of-stack) plan's callbacks ever
+ * fire — a side plan that AbortPlans, or that exhausts its steps without an
+ * explicit Return, surfaces through the main plan's [onSkipped] / [onCompleted].
  */
 data class LinearOnboardingPlan(
     val steps: List<LinearOnboardingStep>,
