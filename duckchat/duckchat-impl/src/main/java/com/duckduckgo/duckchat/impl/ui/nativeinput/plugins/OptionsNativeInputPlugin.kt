@@ -23,9 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.OptionsView
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @ContributesActivePlugin(
@@ -38,14 +36,5 @@ class OptionsNativeInputPlugin @Inject constructor() : NativeInputPlugin {
 
     override val containerId: Int = R.id.optionsButtonContainer
 
-    private var optionsView: WeakReference<OptionsView> = WeakReference(null)
-
-    override fun createView(context: Context, host: NativeInputHost): View {
-        return OptionsView(context, host).also { optionsView = WeakReference(it) }
-    }
-
-    override fun getPromptContribution(): PromptContribution? {
-        val tool = optionsView.get()?.getSelectedTool() ?: return null
-        return PromptContribution.ToolSelection(tool.rawValue)
-    }
+    override fun createView(context: Context, host: NativeInputHost): View = OptionsView(context, host)
 }

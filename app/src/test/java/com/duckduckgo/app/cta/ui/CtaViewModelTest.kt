@@ -56,6 +56,7 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -140,6 +141,8 @@ class CtaViewModelTest {
 
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
+    private val mockDeviceInfo: DeviceInfo = mock()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -201,6 +204,7 @@ class CtaViewModelTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
+            deviceInfo = mockDeviceInfo,
         )
     }
 
@@ -1079,7 +1083,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenOnUserClickCtaOkButtonWithSubscriptionPromoModalCtaThenDismissedCtaIsInserted() = runTest {
-        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
     }
 
@@ -1091,7 +1095,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSubscriptionPromoModalCtaIsShownThenSubscriptionPromoPluginsAreCalled() = runTest {
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockSubscriptionPromoCtaShownPlugin).onSubscriptionPromoCtaShown()
     }
 
@@ -1199,7 +1203,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenSubscriptionPromoModalCtaIsShownThenDismissedCtaIsInserted() = runTest {
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
     }
 
@@ -1335,7 +1339,7 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
-        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, origin = "funnel_modal_android__subscriptionnudge"))
+        testee.onCtaShown(SubscriptionPromoModalCta(isFreeTrialCopy = false, flow = SubscriptionPromoFlow.NUDGE))
 
         // After modal is shown, DAX_INTRO_PRIVACY_PRO is in dismissed_cta, so bubble must not show
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)).thenReturn(true)

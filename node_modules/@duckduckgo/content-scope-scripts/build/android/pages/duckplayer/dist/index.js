@@ -389,6 +389,7 @@
   var JSONparse = JSON.parse;
   var Arrayfrom = Array.from;
   var ReflectDeleteProperty = Reflect2.deleteProperty.bind(Reflect2);
+  var ReflectApply = Reflect2.apply.bind(Reflect2);
   var getRandomValues = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
   var generateKey = globalThis.crypto?.subtle?.generateKey?.bind(globalThis.crypto?.subtle);
   var exportKey = globalThis.crypto?.subtle?.exportKey?.bind(globalThis.crypto?.subtle);

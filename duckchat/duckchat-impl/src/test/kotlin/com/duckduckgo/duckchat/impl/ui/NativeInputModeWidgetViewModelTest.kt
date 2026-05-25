@@ -21,6 +21,8 @@ import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
@@ -34,6 +36,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -42,18 +45,30 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningEffort
+import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
+import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -63,9 +78,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -89,7 +107,16 @@ class NativeInputModeWidgetViewModelTest {
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val pixel: Pixel = mock()
-    private val nativeInputStatePublisher: NativeInputStatePublisher = mock()
+    private val modelManager: DuckAiModelManager = mock()
+    private val duckAiChatStore: DuckAiChatStore = mock()
+
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val tabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
+    }
+    private val realNativeInputStateStore = RealNativeInputStateStore { tabRepository }
+    private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
+    private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
     private val showSettingsFlow = MutableStateFlow(false)
     private val duckChatUserEnabledFlow = MutableStateFlow(false)
@@ -137,8 +164,16 @@ class NativeInputModeWidgetViewModelTest {
             inputScreenConfigResolver = inputScreenConfigResolver,
             pixel = pixel,
             nativeInputStatePublisher = nativeInputStatePublisher,
+            nativeInputStateProvider = nativeInputStateProvider,
+            modelManager = modelManager,
+            duckAiChatStore = duckAiChatStore,
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
         )
+    }
+
+    @After
+    fun tearDownStore() {
+        realNativeInputStateStore.clearAll()
     }
 
     private fun setIsEnabled(enabled: Boolean) {
@@ -235,12 +270,12 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiThenDefaultToggleSelectionIsDuckAi() = runTest {
         testee.setDuckAiMode(true)
 
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
     fun whenContextIsBrowserThenDefaultToggleSelectionIsSearch() = runTest {
-        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
@@ -272,7 +307,7 @@ class NativeInputModeWidgetViewModelTest {
     fun whenContextIsDuckAiContextualThenDefaultToggleSelectionIsDuckAi() = runTest {
         testee.configureContextual(tabId = "test-tab")
 
-        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.defaultToggleSelection)
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, testee.state.firstOrNull()!!.toggleSelection)
     }
 
     @Test
@@ -340,7 +375,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenStorePendingPromptThenDelegatesToStoreWithModelId() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "model-1")
+        val plugin = fakePlugin(containerId = 1)
         val viewModel = createViewModel(plugins = listOf(plugin))
 
         viewModel.storePendingPrompt("hello", "model-1", null)
@@ -456,7 +491,7 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenPluginsExistThenPluginsStateContainsThem() = runTest {
-        val plugin = fakePlugin(containerId = 42, modelId = "gpt-4o")
+        val plugin = fakePlugin(containerId = 42)
         val viewModel = createViewModel(plugins = listOf(plugin))
 
         val plugins = viewModel.plugins.value
@@ -465,32 +500,25 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenNoPluginsThenGetSelectedModelIdReturnsNull() = runTest {
-        val viewModel = createViewModel(plugins = emptyList())
+    fun whenModelManagerHasNoSelectedModelThenGetSelectedModelIdReturnsNull() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn(null)
+        val viewModel = createViewModel()
 
         assertNull(viewModel.getSelectedModelId())
     }
 
     @Test
-    fun whenPluginReturnsModelSelectionThenGetSelectedModelIdReturnsIt() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenModelManagerReportsSelectedModelThenGetSelectedModelIdReturnsIt() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("claude-3")
+        val viewModel = createViewModel()
 
         assertEquals("claude-3", viewModel.getSelectedModelId())
     }
 
     @Test
-    fun whenPluginReturnsNullContributionThenGetSelectedModelIdReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = null)
-        val viewModel = createViewModel(plugins = listOf(plugin))
-
-        assertNull(viewModel.getSelectedModelId())
-    }
-
-    @Test
     fun whenModelPickerDisabledThenGetSelectedModelIdReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+        whenever(modelManager.getSelectedModelId()).thenReturn("claude-3")
+        val viewModel = createViewModel()
 
         viewModel.setModelPickerEnabled(false)
 
@@ -499,8 +527,8 @@ class NativeInputModeWidgetViewModelTest {
 
     @Test
     fun whenModelPickerReEnabledThenGetSelectedModelIdReturnsSelection() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+        whenever(modelManager.getSelectedModelId()).thenReturn("claude-3")
+        val viewModel = createViewModel()
 
         viewModel.setModelPickerEnabled(false)
         assertNull(viewModel.getSelectedModelId())
@@ -510,40 +538,329 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenPluginReturnsReasoningEffortSelectionThenGetResolvedReasoningEffortReturnsIt() = runTest {
-        val plugin = fakeReasoningPlugin(containerId = 7, effort = "low")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenModelManagerResolvesReasoningEffortThenGetResolvedReasoningEffortReturnsIt() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+        val viewModel = createViewModel()
 
         assertEquals("low", viewModel.getResolvedReasoningEffort())
     }
 
     @Test
-    fun whenNoPluginContributesReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenModelManagerReturnsNoReasoningEffortThenGetResolvedReasoningEffortReturnsNull() = runTest {
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn(null)
+        val viewModel = createViewModel()
 
         assertNull(viewModel.getResolvedReasoningEffort())
     }
 
-    @Test
-    fun whenNoPluginsThenGetSelectedToolReturnsNull() = runTest {
-        val viewModel = createViewModel(plugins = emptyList())
+    // region chat-aware submission getters
 
-        assertNull(viewModel.getSelectedTool())
+    @Test
+    fun whenChatIdSetThenGetSelectedModelIdReturnsChatsModel() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        assertEquals("chat-model", viewModel.getSelectedModelId())
     }
 
     @Test
-    fun whenPluginReturnsToolSelectionThenGetSelectedToolReturnsIt() = runTest {
-        val plugin = fakeToolPlugin(containerId = 3, tool = "WebSearch")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenChatModelNotInModelsListThenGetSelectedModelIdFallsBackToGlobal() = runTest {
+        // Chat references "missing-model" no longer offered server-side. Submission must fall back to
+        // global on both halves — chat-model + global-effort would be a mismatched pair.
+        // Picker is disabled here to mirror production (host binds modelPickerEnabled to chatId == null).
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(aiModel(id = "other-model", supported = listOf(ReasoningEffort.NONE))),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "missing-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
 
-        assertEquals("WebSearch", viewModel.getSelectedTool())
+        assertEquals("global-model", viewModel.getSelectedModelId())
     }
 
     @Test
-    fun whenNoPluginContributesToolSelectionThenGetSelectedToolReturnsNull() = runTest {
-        val plugin = fakePlugin(containerId = 1, modelId = "claude-3")
-        val viewModel = createViewModel(plugins = listOf(plugin))
+    fun whenChatIdSetAndPickerDisabledThenGetSelectedModelIdStillReturnsChatsModel() = runTest {
+        // Production binds modelPickerEnabled to `chatId == null`, so existing chats always have the
+        // picker disabled. Submission must still carry the chat's stored model.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "chat-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertEquals("chat-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdNullAndPickerDisabledThenGetSelectedModelIdReturnsNull() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdFlipsAndNewLookupInFlightThenGetSelectedModelIdFallsBackToGlobalNotPreviousChat() = runTest {
+        // Warm transition: currentChat is still chat-A while _chatId is "chat-B" and the lookup
+        // for chat-B is suspended. Submission must fall back to global rather than return chat-A's
+        // model tagged to chat-B.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-A-model", supported = listOf(ReasoningEffort.NONE)),
+                    aiModel(id = "chat-B-model", supported = listOf(ReasoningEffort.NONE)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
+            DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-A")
+        advanceUntilIdle()
+        assertEquals("chat-A-model", viewModel.getSelectedModelId())
+
+        val pending = CompletableDeferred<DuckAiChat?>()
+        duckAiChatStore.stub {
+            onBlocking { getChatById("chat-B") } doSuspendableAnswer { pending.await() }
+        }
+        viewModel.setActiveChatId("chat-B")
+        advanceUntilIdle()
+
+        // During the transition: currentChat is null, submission falls back to global.
+        assertEquals("global-model", viewModel.getSelectedModelId())
+
+        pending.complete(
+            DuckAiChat(chatId = "chat-B", title = "t", model = "chat-B-model", lastEdit = "now", pinned = false),
+        )
+        advanceUntilIdle()
+        assertEquals("chat-B-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdJustSetAndLookupInFlightThenSubmissionFallsBackToGlobal() = runTest {
+        // setActiveChatId nulls currentChat synchronously and launches the lookup. During the in-
+        // flight window, submission must fall back to global rather than return chat-A's data.
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val modelStateFlow = MutableStateFlow(
+            ModelState(models = listOf(aiModel(id = "chat-A-model", supported = listOf(ReasoningEffort.NONE)))),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-A")).thenReturn(
+            DuckAiChat(chatId = "chat-A", title = "t", model = "chat-A-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-A")
+        advanceUntilIdle()
+        assertEquals("chat-A-model", viewModel.getSelectedModelId())
+
+        // Flip to chat-B without yielding — currentChat is now null, lookup is launched but unfinished.
+        viewModel.setActiveChatId("chat-B")
+        // Intentionally no advanceUntilIdle() here.
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatIdNullThenGetSelectedModelIdReturnsGlobal() = runTest {
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatHasReasoningModeThenGetResolvedReasoningEffortMatchesChatsMode() = runTest {
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.REASONING.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        assertEquals(ReasoningEffort.LOW.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenChatStoredModeIsGatedForCurrentTierThenGetResolvedReasoningEffortFallsBackToAccessible() = runTest {
+        // Chat was saved with extended_reasoning (PRO-only on this model). Current user is FREE.
+        // Submission must NOT send the gated effort; it must fall back to the first accessible mode's
+        // effort — mirroring what the picker UI shows via resolveMode's accessibility filter.
+        val gatedModel = AIChatModel(
+            id = "chat-model",
+            name = "chat-model",
+            displayName = "chat-model",
+            shortName = "chat-model",
+            accessTier = listOf("free", "plus", "pro"),
+            isAccessible = true,
+            supportedReasoningEfforts = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW, ReasoningEffort.MEDIUM),
+            reasoningEffortAccess = listOf(
+                ReasoningEffortAccess(effort = ReasoningEffort.NONE, accessTier = listOf("free", "plus", "pro"), isAccessible = true),
+                ReasoningEffortAccess(effort = ReasoningEffort.LOW, accessTier = listOf("free", "plus", "pro"), isAccessible = true),
+                ReasoningEffortAccess(effort = ReasoningEffort.MEDIUM, accessTier = listOf("pro"), isAccessible = false),
+            ),
+        )
+        val modelStateFlow = MutableStateFlow(ModelState(models = listOf(gatedModel)))
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.EXTENDED_REASONING.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        // FAST is the first accessible mode (effort NONE). MEDIUM (extended_reasoning) is gated.
+        assertEquals(ReasoningEffort.NONE.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenChatScopedReasoningModeSetThenGetResolvedReasoningEffortOverridesChatStoredMode() = runTest {
+        val modelStateFlow = MutableStateFlow(
+            ModelState(
+                models = listOf(
+                    aiModel(id = "chat-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+                ),
+            ),
+        )
+        whenever(modelManager.modelState).thenReturn(modelStateFlow)
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(
+                chatId = "chat-1",
+                title = "t",
+                model = "chat-model",
+                lastEdit = "now",
+                pinned = false,
+                reasoningMode = ReasoningMode.FAST.rawValue,
+            ),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+        modelStateFlow.value = modelStateFlow.value.copy(chatScopedReasoningMode = ReasoningMode.REASONING)
+
+        assertEquals(ReasoningEffort.LOW.rawValue, viewModel.getResolvedReasoningEffort())
+    }
+
+    // endregion
+
+    // region tab-switch chatId clear
+
+    @Test
+    fun whenChatIdChangesThenChatScopedReasoningModeIsClearedOnManager() = runTest {
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        viewModel.setActiveChatId("chat-X")
+        advanceUntilIdle()
+        // Manager's setter is called every time _chatId emits (including the initial null on configure
+        // and the chat-X value). Reset verification to focus on the chatId-Y transition.
+        clearInvocations(modelManager)
+
+        viewModel.setActiveChatId("chat-Y")
+        advanceUntilIdle()
+
+        verify(modelManager).setChatScopedReasoningMode(null)
+    }
+
+    private fun aiModel(id: String, supported: List<ReasoningEffort>): AIChatModel = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = listOf("free", "plus", "pro"),
+        isAccessible = true,
+        supportedReasoningEfforts = supported,
+    )
+
+    // endregion
+
+    @Test
+    fun whenNoTabIsActiveThenGetSelectedToolReturnsNull() = runTest {
+        val freshViewModel = createViewModel()
+
+        assertNull(freshViewModel.getSelectedTool())
+    }
+
+    @Test
+    fun whenSelectedToolWasPublishedThenGetSelectedToolReturnsIt() = runTest {
+        val tabId = "tab-A"
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool("WEB_SEARCH")
+
+        assertEquals("WEB_SEARCH", viewModel.getSelectedTool())
+    }
+
+    @Test
+    fun whenSelectedToolClearedThenGetSelectedToolReturnsNull() = runTest {
+        val tabId = "tab-A"
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setSelectedTool("WEB_SEARCH")
+        viewModel.setSelectedTool(null)
 
         assertNull(viewModel.getSelectedTool())
     }
@@ -557,27 +874,9 @@ class NativeInputModeWidgetViewModelTest {
         verify(pendingNativePromptStore).store("hello", "model-1", null, "GenerateImage", emptyList(), emptyList())
     }
 
-    private fun fakeReasoningPlugin(containerId: Int, effort: String?): NativeInputPlugin {
-        return object : NativeInputPlugin {
-            override val containerId: Int = containerId
-            override fun createView(context: Context, host: NativeInputHost): View = View(context)
-            override fun getPromptContribution(): PromptContribution? =
-                effort?.let { PromptContribution.ReasoningEffortSelection(it) }
-        }
-    }
-
-    private fun fakeToolPlugin(containerId: Int, tool: String?): NativeInputPlugin {
-        return object : NativeInputPlugin {
-            override val containerId: Int = containerId
-            override fun createView(context: Context, host: NativeInputHost): View = View(context)
-            override fun getPromptContribution(): PromptContribution? =
-                tool?.let { PromptContribution.ToolSelection(it) }
-        }
-    }
-
     @Test
     fun whenUpdatePluginContainerVisibilityThenSendsCommand() = runTest {
-        val plugin = fakePlugin(containerId = 99, modelId = null)
+        val plugin = fakePlugin(containerId = 99)
         val viewModel = createViewModel(plugins = listOf(plugin))
 
         viewModel.updatePluginContainerVisibility(isChatTab = true)
@@ -589,12 +888,10 @@ class NativeInputModeWidgetViewModelTest {
         assertTrue(update.visible)
     }
 
-    private fun fakePlugin(containerId: Int, modelId: String?): NativeInputPlugin {
+    private fun fakePlugin(containerId: Int): NativeInputPlugin {
         return object : NativeInputPlugin {
             override val containerId: Int = containerId
             override fun createView(context: Context, host: NativeInputHost): View = View(context)
-            override fun getPromptContribution(): PromptContribution? =
-                modelId?.let { PromptContribution.ModelSelection(it) }
         }
     }
 
@@ -757,6 +1054,106 @@ class NativeInputModeWidgetViewModelTest {
 
     // endregion
 
+    // region publisher.update preserves plugin-owned fields
+
+    @Test
+    fun whenWidgetVmPublishesThenPluginOwnedSelectedToolIsPreserved() = runTest {
+        val tabId = "tab-A"
+        // Plugin writes selectedTool first (via the publisher interface of the same store)
+        nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = "WEB_SEARCH") }
+
+        // Widget VM configures and triggers its publish loop
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+
+        // Allow the combine to emit and the publish loop to run
+        advanceUntilIdle()
+
+        // selectedTool must survive the widget VM's update
+        assertEquals("WEB_SEARCH", nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    // endregion
+
+    // region setSelectedTool
+
+    @Test
+    fun whenSetSelectedToolThenPublisherUpdatesSelectedToolForActiveTab() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        testee.setSelectedTool("WEB_SEARCH")
+
+        assertEquals("WEB_SEARCH", nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    @Test
+    fun whenSetSelectedToolWithNullThenPublisherClearsSelectedTool() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+        testee.setSelectedTool("WEB_SEARCH")
+
+        testee.setSelectedTool(null)
+
+        assertNull(nativeInputStateProvider.stateForTab(tabId).value.selectedTool)
+    }
+
+    @Test
+    fun whenSetSelectedToolAndNoActiveTabThenNothingHappens() = runTest {
+        val freshViewModel = createViewModel()
+
+        freshViewModel.setSelectedTool("WEB_SEARCH")
+
+        // No active tab → no publisher write. Sample an arbitrary tab to confirm.
+        assertNull(nativeInputStateProvider.stateForTab("any-tab").value.selectedTool)
+    }
+
+    // endregion
+
+    // region setActiveChatId
+
+    @Test
+    fun whenSetActiveChatIdThenPublisherUpdatesChatIdForActiveTab() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        assertEquals("chat-123", nativeInputStateProvider.stateForTab(tabId).value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdWithNullThenPublisherClearsChatId() = runTest {
+        val tabId = "tab-A"
+        testee.configure(tabId = tabId, isDuckAiMode = false, isBottom = false)
+        testee.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        testee.setActiveChatId(null)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab(tabId).value.chatId)
+    }
+
+    @Test
+    fun whenSetActiveChatIdBeforeConfigureThenChatIdIsBufferedAndPublishedOnConfigure() = runTest {
+        // Defensive: setActiveChatId fires before activeTabId is set. The pending value must be
+        // replayed once configure runs.
+        val freshViewModel = createViewModel()
+
+        freshViewModel.setActiveChatId("chat-123")
+        advanceUntilIdle()
+
+        freshViewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("chat-123", nativeInputStateProvider.stateForTab("tab-A").value.chatId)
+    }
+
+    // endregion
+
     // region fireChatHistorySelectedPixel
 
     @Test
@@ -777,6 +1174,30 @@ class NativeInputModeWidgetViewModelTest {
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+    }
+
+    // endregion
+
+    // region setToggleSelection
+
+    @Test
+    fun whenSetToggleSelectionThenStateReflectsTheSelection() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+
+        val emitted = testee.state.first()
+
+        assertEquals(NativeInputState.ToggleSelection.DUCK_AI, emitted.toggleSelection)
+    }
+
+    @Test
+    fun whenConfigureCalledThenToggleSelectionFallsBackToContextDefault() = runTest {
+        testee.setToggleSelection(NativeInputState.ToggleSelection.DUCK_AI)
+        testee.state.first { it.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI }
+
+        testee.configure(tabId = "test-tab", isDuckAiMode = false, isBottom = false)
+
+        val emitted = testee.state.first()
+        assertEquals(NativeInputState.ToggleSelection.SEARCH, emitted.toggleSelection)
     }
 
     // endregion

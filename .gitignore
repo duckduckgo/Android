@@ -17,6 +17,7 @@ out/
 .gradle/
 build/
 .externalNativeBuild/
+.kotlin/
 
 #Autoconsent
 /node_modules/@duckduckgo/autoconsent/

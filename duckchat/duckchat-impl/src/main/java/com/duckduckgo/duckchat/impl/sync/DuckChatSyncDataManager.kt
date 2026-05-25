@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncDataManager.Adapters.Companion.patchResponseAdapter
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.ModifiedSince
@@ -62,6 +63,7 @@ class DuckChatSyncDataManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val duckAiChatStore: DuckAiChatStore,
 ) : DeletableDataManager, SyncableDataProvider, SyncableDataPersister {
 
     override fun getDeletableType(): DeletableType = DeletableType.DUCK_AI_CHATS
@@ -82,8 +84,10 @@ class DuckChatSyncDataManager @Inject constructor(
                 return@runBlocking getEmptyRequest()
             }
 
-            val pendingIds = duckChatSyncRepository.getPendingChatDeletions()
-            formatPatchRequest(pendingIds)
+            val pendingDeletions = duckChatSyncRepository.getPendingChatDeletions()
+            // Deletion wins over update when a chatId is in both queues.
+            val pendingUpdates = duckChatSyncRepository.getPendingChatUpdates() - pendingDeletions
+            formatPatchRequest(pendingDeletions, pendingUpdates)
         }
     }
 
@@ -136,10 +140,11 @@ class DuckChatSyncDataManager @Inject constructor(
                 return SyncMergeResult.Error(reason = "Error parsing patch response ${it.message}")
             }
 
-            val entryIds = response.aiChats.entries.map { it.id }
+            val entryIds = response.aiChats.entries.map { it.id }.toSet()
             logcat { "DuckChat-Sync: patch successful for ${entryIds.size} entries" }
             appCoroutineScope.launch(dispatchers.io()) {
-                duckChatSyncRepository.removePendingChatDeletions(entryIds.toSet())
+                duckChatSyncRepository.removePendingChatDeletions(entryIds)
+                duckChatSyncRepository.removePendingChatUpdates(entryIds)
             }
         }
         return SyncMergeResult.Success()
@@ -155,6 +160,7 @@ class DuckChatSyncDataManager @Inject constructor(
     override fun onSyncDisabled() {
         appCoroutineScope.launch(dispatchers.io()) {
             duckChatSyncRepository.clearPendingChatDeletions()
+            duckChatSyncRepository.clearPendingChatUpdates()
         }
     }
 
@@ -178,16 +184,21 @@ class DuckChatSyncDataManager @Inject constructor(
         )
     }
 
-    private fun formatPatchRequest(pendingIds: Set<String>): SyncChangesRequest {
-        if (pendingIds.isEmpty()) {
-            logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat deletions to patch" }
+    private suspend fun formatPatchRequest(
+        pendingDeletions: Set<String>,
+        pendingUpdates: Set<String>,
+    ): SyncChangesRequest {
+        if (pendingDeletions.isEmpty() && pendingUpdates.isEmpty()) {
+            logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat changes to patch" }
             return getEmptyRequest()
         }
 
-        logcat { "DuckChat-Sync: formatting patch request for ${pendingIds.size} pending chat deletions" }
+        logcat {
+            "DuckChat-Sync: formatting patch request — ${pendingDeletions.size} deletion(s), ${pendingUpdates.size} update(s)"
+        }
 
         val jsonArray = org.json.JSONArray()
-        pendingIds.forEach { chatId ->
+        pendingDeletions.forEach { chatId ->
             jsonArray.put(
                 org.json.JSONObject().apply {
                     put("id", chatId)
@@ -195,6 +206,26 @@ class DuckChatSyncDataManager @Inject constructor(
                 },
             )
         }
+
+        if (pendingUpdates.isNotEmpty()) {
+            val now = SyncDateProvider.now()
+            val byId = duckAiChatStore.getChats().associateBy { it.chatId }
+            pendingUpdates.forEach { chatId ->
+                val chat = byId[chatId] ?: return@forEach
+                jsonArray.put(
+                    org.json.JSONObject().apply {
+                        put("id", chat.chatId)
+                        put("client_last_modified", now)
+                        put("edit_timestamp", now)
+                        // Title is omitted until JWE encryption lands on native.
+                        put("pinned", if (chat.pinned) "pinned" else org.json.JSONObject.NULL)
+                    },
+                )
+            }
+        }
+
+        // Every update may have been skipped above if its chat was concurrently deleted.
+        if (jsonArray.length() == 0) return getEmptyRequest()
 
         return SyncChangesRequest(
             type = SyncableType.DUCK_AI_CHATS,

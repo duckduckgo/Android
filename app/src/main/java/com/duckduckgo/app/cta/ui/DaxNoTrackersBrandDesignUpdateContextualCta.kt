@@ -24,12 +24,15 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxNoTrackersBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_OTHER,
     description = R.string.daxNonSerpCtaText,
@@ -42,14 +45,18 @@ data class DaxNoTrackersBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
-) {
+),
+    OnboardingDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
+
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            context.getString(R.string.daxNonSerpCtaText).html(context)
+            context.getString(R.string.daxNonSerpCtaText).preventWidows().html(context)
     }
 
     override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {

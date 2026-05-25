@@ -23,16 +23,15 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.extensions.html
 
-/**
- * STUB: brand-design rebrand of [OnboardingDaxDialogCta.DaxFireButtonCta]. A Stage 2 agent will
- * replace [activeIncludeId] and populate [configureContentViews] to render the fire-button
- * educational in-context dialog.
- */
 data class DaxFireButtonBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_FIRE_BUTTON,
     description = R.string.onboardingFireButtonDaxDialogDescription,
@@ -45,10 +44,22 @@ data class DaxFireButtonBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
+    backgroundRes = R.drawable.bg_onboarding_fire_button,
 ) {
-    override val activeIncludeId: Int = 0 // TODO: replace in stage 2.
+    override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
+
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
-        // TODO: implement in stage 2.
+        val context = view.context
+        view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
+            context.getString(R.string.onboardingFireButtonDaxDialogDescription).html(context)
+    }
+
+    override fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
+        ctaView?.findViewById<View>(R.id.contextualBrandDesignPrimaryCta)?.setOnClickListener {
+            onButtonClicked.invoke()
+        }
     }
 }

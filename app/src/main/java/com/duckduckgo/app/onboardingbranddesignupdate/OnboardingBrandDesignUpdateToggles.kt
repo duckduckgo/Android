@@ -21,26 +21,22 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-/**
- * Feature toggles for the onboarding brand design updates.
- */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "onboardingBrandDesignUpdate",
 )
 interface OnboardingBrandDesignUpdateToggles {
 
-    /**
-     * Main toggle for the onboarding brand design update feature.
-     * Default value: false (disabled).
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
-    /**
-     * Toggle for the brand design update variant.
-     * Default value: false (disabled).
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun brandDesignUpdate(): Toggle
+
+    /**
+     * Gates the new fire animation work: new Inferno default in Data Clearing
+     * settings + bottom-sheet Lottie swap.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun fireAnimationUpdate(): Toggle
 }

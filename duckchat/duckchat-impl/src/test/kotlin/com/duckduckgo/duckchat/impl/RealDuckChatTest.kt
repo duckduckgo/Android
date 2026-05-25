@@ -649,6 +649,51 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenNativeInputEnabledAndOpenDuckChatThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?native-input=true&duckai=5",
+        )
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndOpenDuckChatWithQueryThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openDuckChatWithPrefill(query = "example")
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?q=example&native-input=true&duckai=5",
+        )
+    }
+
+    @Test
+    fun whenNativeInputEnabledAndOpenVoiceDuckChatThenUrlContainsNativeInputParam() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&native-input=true&duckai=5",
+        )
+    }
+
+    @Test
     fun whenIsDuckDuckGoHostAndDuckChatEnabledAndIsDuckChatLinkThenIsDuckChatUrl() {
         assertTrue(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
     }
@@ -1385,6 +1430,39 @@ class RealDuckChatTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
 
         assertTrue(url == "https://duck.ai/chat?placement=sidebar&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and get duck chat url with query then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?q=query&native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and get duck chat url with autoprompt then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and get duck chat url with empty query then url contains native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
+
+        assertTrue(url == "https://duck.ai/chat?native-input=true&duckai=5")
     }
 
     @Test

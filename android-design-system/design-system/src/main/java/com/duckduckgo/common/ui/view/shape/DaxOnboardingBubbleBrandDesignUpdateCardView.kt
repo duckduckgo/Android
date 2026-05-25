@@ -46,6 +46,7 @@ constructor(
     private val cornerRadius: Float
     private var showArrow: Boolean = true
     private var bottomEdgeTreatment: EdgeTreatment
+    private val baseBottomEdgeTreatment: DaxBubbleBottomEdgeTreatment
     private var originalBottomMargin: Int? = null
 
     private val arrowMinMargin: Int
@@ -84,6 +85,7 @@ constructor(
         strokeWidth = resources.getDimensionPixelSize(R.dimen.dax_brand_design_bubble_stroke_width)
 
         val edgeTreatment = DaxBubbleBottomEdgeTreatment()
+        baseBottomEdgeTreatment = edgeTreatment
         bottomEdgeTreatment = if (offsetStart != 0) {
             AnimatableOffsetEdgeTreatment(edgeTreatment, offsetStart.toFloat()).also {
                 animatableEdgeTreatment = it
@@ -160,6 +162,15 @@ constructor(
                 layoutParams = params
             }
         }
+    }
+
+    val arrowDepthFraction: Float
+        get() = baseBottomEdgeTreatment.depthFraction
+
+    fun setArrowDepthFraction(fraction: Float) {
+        if (!showArrow) return
+        baseBottomEdgeTreatment.depthFraction = fraction
+        shapeAppearanceModel = shapeAppearanceModel
     }
 
     /**

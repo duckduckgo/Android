@@ -32,6 +32,7 @@ data class DashboardExtractedProfileResult(
     val extractedProfile: ExtractedProfile,
     val broker: DashboardBroker,
     val optOutSubmittedDateInMillis: Long? = null,
+    val optOutFormSubmittedDateInMillis: Long? = null,
     val optOutRemovedDateInMillis: Long? = null,
     val estimatedRemovalDateInMillis: Long? = null,
     val hasMatchingRecordOnParentBroker: Boolean = false,

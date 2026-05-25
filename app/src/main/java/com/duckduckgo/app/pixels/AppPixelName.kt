@@ -67,6 +67,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
+    SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SHOWN("m_subscription_promo_modal_skipped_onboarding_shown"),
+    SUBSCRIPTION_PROMO_MODAL_SKIPPED_ONBOARDING_SUBSCRIBE_CLICKED("m_subscription_promo_modal_skipped_onboarding_subscribe_clicked"),
+    SUBSCRIPTION_PROMO_MODAL_NUDGE_SHOWN("m_subscription_promo_modal_nudge_shown"),
+    SUBSCRIPTION_PROMO_MODAL_NUDGE_SUBSCRIBE_CLICKED("m_subscription_promo_modal_nudge_subscribe_clicked"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),

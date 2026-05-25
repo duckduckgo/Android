@@ -57,6 +57,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         fun onHatchPressed()
         fun onHatchRendered(visible: Boolean)
         fun onBurnTabPressed()
+        fun onAfterInactivityPressed()
     }
 
     @Inject
@@ -158,13 +159,19 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     private fun initPopupMenu() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuReturnToTab)) {
+            viewModel.onHatchPressed()
             hatchHatchListener?.onHatchPressed()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuCloseTab)) {
             viewModel.closeTab()
         }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuBurnTab)) {
+            viewModel.onBurnTabPressed()
             hatchHatchListener?.onBurnTabPressed()
+        }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.hatchMenuAfterInactivity)) {
+            viewModel.onAfterInactivityPressed()
+            hatchHatchListener?.onAfterInactivityPressed()
         }
     }
 

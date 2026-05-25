@@ -97,8 +97,11 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
+    fun beginEnterAnimationPreview()
+    fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
+    fun showKeyboard()
     fun selectChatTab()
     fun applyDefaultTogglePosition()
     fun saveLastUsedTogglePosition(isChat: Boolean)
@@ -130,6 +133,12 @@ interface NativeInputWidget {
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
+
+    /**
+     * Binds a reactive source of the active chat id for this tab.
+     * The widget forwards changes into the [NativeInputState] so observers can react.
+     */
+    fun bindChatIdSource(source: Flow<String?>)
 
     fun bindAttachmentCallbacks(
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
@@ -200,6 +209,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pluginsJob: Job? = null
     private var modelPickerEnabledJob: Job? = null
     private var modelPickerEnabledSource: Flow<Boolean>? = null
+    private var chatIdJob: Job? = null
+    private var chatIdSource: Flow<String?>? = null
     private var modelPickerView: ModelPicker? = null
     private var optionsView: OptionsView? = null
     private var chatSuggestionsUserEnabled: Boolean = true
@@ -238,7 +249,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var pendingCameraCaptureCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null
     private var pendingFilePickerCallback: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
-    private var pendingIsDuckAiMode: Boolean = false
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -248,18 +258,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // toggle row and reset the parent card's corners.
     private var isContextualWidget: Boolean = false
 
+    // Held during the enter animation so padding/bottom-row compute as if focused; without
+    // it they'd flip from 4dp→8dp after focusInput and look like a second step.
+    private var previewEnterFocus = false
+
     private var attachmentView: AttachmentView? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setupPlugins()
         observeModelPickerEnabledSource()
+        observeChatIdSource()
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
-        // observeNativeInputState() is started from configure()/configureContextual() once
-        // the tabId is known — the widget reads its state from NativeInputStateProvider per-tab.
-        if (activeTabId != null) observeNativeInputState()
+        observeNativeInputState()
         if (onPaidTierChanged != null) observeTier()
     }
 
@@ -320,7 +333,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
             pluginView.onCameraCaptureRequested = pendingCameraCaptureCallback
             pluginView.onFilePickerRequested = pendingFilePickerCallback
             pluginView.bind(scope, viewModelFactory)
-            pluginView.setDuckAiMode(pendingIsDuckAiMode)
         }
         (pluginView as? ModelPicker)?.let { picker ->
             picker.onMenuShown = { isModelMenuVisible = true }
@@ -355,6 +367,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pluginsJob = null
         modelPickerEnabledJob?.cancel()
         modelPickerEnabledJob = null
+        chatIdJob?.cancel()
+        chatIdJob = null
         modelPickerView = null
         optionsView = null
         widgetRoot = null
@@ -440,7 +454,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = isChatTabSelected() && (inputField.hasFocus() || isStreaming)
+        val visible = isChatTabSelected() && (inputField.hasFocus() || previewEnterFocus || isStreaming)
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -463,7 +477,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserOmnibarMinimized = nativeInputState?.let {
             it.inputContext == NativeInputState.InputContext.BROWSER && !it.toggleVisible
         } ?: true
-        val expanded = !isBrowserOmnibarMinimized && inputField.hasFocus()
+        val expanded = !isBrowserOmnibarMinimized && (inputField.hasFocus() || previewEnterFocus)
         val verticalPadAttr = if (expanded) {
             com.duckduckgo.mobile.android.R.dimen.keyline_2
         } else {
@@ -531,16 +545,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun updateSelectedTab(toggle: TabLayout, state: NativeInputState) {
-        val targetIndex = if (state.defaultToggleSelection == NativeInputState.ToggleSelection.DUCK_AI) 1 else 0
+        val targetIndex = if (state.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI) 1 else 0
         if (toggle.selectedTabPosition != targetIndex) {
             toggle.getTabAt(targetIndex)?.select()
         }
     }
 
     private fun updateToggleVisibility(toggle: TabLayout, state: NativeInputState) {
-        if (!state.toggleVisible) {
-            updateSelectedTab(toggle, state)
-        }
+        // Always sync the TabLayout selection to state.toggleSelection so a tab switch (which
+        // resets the stored selection via configure()) doesn't leave the previous tab's position
+        // showing. updateSelectedTab is a no-op when current and target match; the resulting
+        // onTabSelected listener call is gated by pushToggleSelectionIfUserDriven which guards
+        // against feedback loops.
+        updateSelectedTab(toggle, state)
         updateToggleVisibilityForState()
     }
 
@@ -605,15 +622,32 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     applyTabUi()
+                    pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
+                    pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
                 }
             },
         )
+    }
+
+    // Only propagate the TabLayout selection into NativeInputState when the toggle row is actually
+    // visible — i.e. the change came from a user tap. Programmatic selections from paths like
+    // applyDefaultTogglePosition() can run for SEARCH_ONLY users (toggle hidden); pushing those
+    // would make the chat-tab selection sticky in state and prevent updateSelectedTab() from
+    // reverting it to the context-derived default when applyState() next fires.
+    private fun pushToggleSelectionIfUserDriven() {
+        if (nativeInputState?.toggleVisible != true) return
+        val selection = if (isChatTabSelected()) {
+            NativeInputState.ToggleSelection.DUCK_AI
+        } else {
+            NativeInputState.ToggleSelection.SEARCH
+        }
+        viewModel.setToggleSelection(selection)
     }
 
     override fun EditText.applyChatInputType() {
@@ -658,8 +692,48 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
+    override fun beginEnterAnimationPreview() {
+        doOnAttach {
+            if (inputField.hasFocus()) return@doOnAttach
+            // State observation is async; apply it synchronously so toggle-row visibility etc. are
+            // in their final positions before the enter animation measures the widget.
+            if (nativeInputState == null) {
+                activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }?.let(::applyState)
+            }
+            previewEnterFocus = true
+            updateBottomRowVisibility()
+            applyVerticalPaddingForFocus()
+            // Bottom omnibar only: trigger the IME slide-up now so it overlaps the enter animation —
+            // the activity shrinks (and the widget's bottom-anchored FrameLayout slides up) alongside
+            // the widget's expansion instead of pushing it up afterwards as a second step. Top omnibar
+            // keyboard position is independent of the widget, so its show stays deferred to focusInput
+            // in onEnterComplete.
+            //
+            // Side effect to be aware of: Activity.showKeyboard() calls inputField.requestFocus()
+            // under the hood, so the input field gains focus here — ~200ms earlier than in top mode
+            // (where focus is set in onEnterComplete via focusInput). The onFocusChangeListener will
+            // therefore fire synchronously inside showKeyboard(). The asymmetry is intentional, but
+            // it does mean any cancel path has to undo focus + IME for bottom mode (see the manager's
+            // animateEnter.onCancel).
+            if (isWidgetBottom()) {
+                showKeyboard()
+            }
+        }
+    }
+
+    override fun endEnterAnimationPreview() {
+        if (!previewEnterFocus) return
+        previewEnterFocus = false
+        updateBottomRowVisibility()
+        applyVerticalPaddingForFocus()
+    }
+
     override fun hideKeyboard() {
         (context as? Activity)?.hideKeyboard(inputField)
+    }
+
+    override fun showKeyboard() {
+        (context as? Activity)?.showKeyboard(inputField)
     }
 
     override fun selectChatTab() {
@@ -673,6 +747,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         doOnAttach {
             if (!duckChatFeature.rememberTogglePosition().isEnabled()) return@doOnAttach
             findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                // Wait for the first state emission so we know whether the toggle row is even shown.
+                // For SEARCH_ONLY users (input-screen setting off) the toggle is hidden, and flipping
+                // selectedTabPosition to 1 would leak chat-tab UI (plugin containers, chat styling)
+                // into the search-only experience.
+                val state = viewModel.state.firstOrNull() ?: return@launch
+                if (!state.toggleVisible) return@launch
                 val position = viewModel.defaultTogglePosition.firstOrNull() ?: return@launch
                 val resolved = if (position == DefaultTogglePosition.LAST_USED) {
                     DefaultTogglePosition.fromName(viewModel.lastUsedTogglePosition.firstOrNull())
@@ -744,6 +824,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
             .launchIn(scope)
     }
 
+    override fun bindChatIdSource(source: Flow<String?>) {
+        chatIdSource = source
+        if (isAttachedToWindow) observeChatIdSource()
+    }
+
+    private fun observeChatIdSource() {
+        val source = chatIdSource ?: return
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        chatIdJob?.cancel()
+        chatIdJob = source
+            .distinctUntilChanged()
+            .onEach { viewModel.setActiveChatId(it) }
+            .launchIn(scope)
+    }
+
     override fun getImageAttachmentsJson(): JSONArray? = attachmentView?.getImageAttachmentsJson()
 
     override fun getFileAttachmentsJson(): JSONArray? = attachmentView?.getFileAttachmentsJson()
@@ -766,24 +861,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean) {
         activeTabId = tabId
-        pendingIsDuckAiMode = isDuckAiMode
         doOnAttach {
             viewModel.configure(tabId, isDuckAiMode, isBottom)
-            observeNativeInputState()
             if (isDuckAiMode) selectChatTab()
-            attachmentView?.setDuckAiMode(isDuckAiMode)
         }
     }
 
     override fun configureContextual(tabId: String) {
         activeTabId = tabId
-        pendingIsDuckAiMode = true
         isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
-            observeNativeInputState()
             selectChatTab()
-            attachmentView?.setDuckAiMode(true)
         }
     }
 
@@ -917,9 +1006,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeNativeInputState() {
         nativeInputStateJob?.cancel()
-        val tabId = activeTabId ?: return
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
-        nativeInputStateJob = nativeInputStateProvider.stateForTab(tabId)
+        // Use viewModel.state for the widget's own UI rather than the provider: the provider's
+        // per-tab StateFlow is seeded with NativeInputState.zero() so a subscriber that attaches
+        // before the widget VM has published the real state would briefly receive the placeholder
+        // (SEARCH_AND_DUCK_AI by default) and render the wrong UI for users in SEARCH_ONLY mode.
+        // viewModel.state combines activeTabId.filterNotNull() and only emits real values.
+        nativeInputStateJob = viewModel.state
             .onEach(::applyState)
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -1023,9 +1116,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    override fun getInputState(): NativeInputState =
-        activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }
-            ?: error("getInputState called before widget was configured")
+    override fun toolSelected(tool: String?) {
+        viewModel.setSelectedTool(tool)
+    }
+
     override fun showModelPicker(showing: Boolean) {
         findViewById<FrameLayout?>(R.id.modelPickerContainer)?.isVisible = showing
     }

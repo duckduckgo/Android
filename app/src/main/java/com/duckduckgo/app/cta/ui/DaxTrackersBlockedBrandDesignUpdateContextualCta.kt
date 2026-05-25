@@ -29,7 +29,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.button.DaxButtonPrimary
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -37,6 +39,7 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     val trackers: List<Entity>,
     val settingsDataStore: SettingsDataStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_TRACKERS_FOUND,
     description = null,
@@ -49,14 +52,18 @@ data class DaxTrackersBlockedBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
-) {
+),
+    OnboardingDaxDialogCta.ShowsWingBottom {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
+
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.text =
-            getTrackersDescription(context, trackers).html(context)
+            getTrackersDescription(context, trackers).preventWidows().html(context)
     }
 
     override fun onTypingAnimationSettled(onTypingAnimationFinished: () -> Unit) {

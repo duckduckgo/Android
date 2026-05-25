@@ -27,6 +27,7 @@ import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
+import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY
@@ -51,6 +52,7 @@ import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
@@ -62,6 +64,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -88,7 +92,11 @@ class SingleTabFireDialogViewModelTest {
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockDuckChat: DuckChat = mock()
+    private val mockBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+
+    private val enabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
+    private val disabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
     @Before
     fun setup() {
@@ -100,12 +108,14 @@ class SingleTabFireDialogViewModelTest {
 
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
 
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(disabledToggle)
+
         runTest {
             whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
             whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
             whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
-            whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.Success)
+            whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Success)
             whenever(mockDataClearing.clearTabContextualChat(any())).thenReturn(ClearDataResult.Success)
         }
     }
@@ -124,6 +134,7 @@ class SingleTabFireDialogViewModelTest {
         webViewCapabilityChecker = mockWebViewCapabilityChecker,
         downloadsRepository = mockDownloadsRepository,
         duckChat = mockDuckChat,
+        brandDesignUpdateToggles = mockBrandDesignUpdateToggles,
     )
 
     // region Initialization
@@ -506,6 +517,39 @@ class SingleTabFireDialogViewModelTest {
             val state = awaitItem()
 
             assertFalse(state.stateData.isFirePictogramVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation update toggle is disabled then isFireAnimationUpdateEnabled is false`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.stateData.isFireAnimationUpdateEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation update toggle is enabled then isFireAnimationUpdateEnabled is true`() = runTest {
+        whenever(mockBrandDesignUpdateToggles.fireAnimationUpdate()).thenReturn(enabledToggle)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.stateData.isFireAnimationUpdateEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -899,6 +943,21 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete all clicked with Inferno selected then m_fd_a fires with inferno value`() = runTest {
+        whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.Inferno)
+        testee = createViewModel()
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(
+            pixel = FIRE_DIALOG_ANIMATION,
+            parameters = mapOf(FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO_NEW),
+        )
+    }
+
+    @Test
     fun `when delete all clicked for first time then daily pixel is fired and timestamp is stored`() = runTest {
         val today = "2025-12-15"
         whenever(mockFireButtonStore.lastEventSendTime).thenReturn(null)
@@ -1042,6 +1101,126 @@ class SingleTabFireDialogViewModelTest {
 
     // endregion
 
+    // region onDeleteSelectedChatsClicked
+
+    @Test
+    fun `when delete selected chats clicked then clearSelectedDuckAiChats is dispatched with the origin urls`() = runTest {
+        val urls = setOf("https://duck.ai?chatID=a", "https://duck.ai?chatID=b")
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = urls))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing).clearSelectedDuckAiChats(urls)
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+    }
+
+    @Test
+    fun `when delete selected chats clicked then process is not restarted`() = runTest {
+        val urls = setOf("https://duck.ai?chatID=a")
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = urls))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(testee.shouldRestartAfterClearing)
+    }
+
+    @Test
+    fun `when delete selected chats clicked then no fire-dialog pixels are fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_CLEAR_PRESSED_DAILY), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING), any(), any(), any())
+        verify(mockPixel, never()).enqueueFire(eq(FIRE_DIALOG_ANIMATION), any(), any(), any())
+    }
+
+    @Test
+    fun `when delete selected chats clicked then fire button counters are not touched`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockFireButtonStore, never()).incrementFireButtonUseCount()
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+    }
+
+    @Test
+    fun `when delete selected chats clicked then data clearing wide event is not started`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearingWideEvent, never()).start(any(), any())
+        verify(mockDataClearingWideEvent, never()).finishSuccess()
+    }
+
+    @Test
+    fun `when delete selected chats clicked with animation enabled then play animation command is sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.commands().test {
+            testee.onDeleteSelectedChatsClicked()
+
+            awaitItem() // OnShow from init
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.PlayAnimation, awaitItem())
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete selected chats clicked with animation disabled then play animation command is not sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.ChatHistory(selectedChatUrls = setOf("https://duck.ai?chatID=a")))
+
+        testee.commands().test {
+            testee.onDeleteSelectedChatsClicked()
+
+            awaitItem() // OnShow from init
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.ClearingComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete selected chats clicked without ChatHistory origin then nothing happens`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.Browser)
+
+        testee.onDeleteSelectedChatsClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearSelectedDuckAiChats(any())
+        verify(mockDataClearing, never()).clearDataUsingManualFireOptions(any(), any())
+    }
+
+    // endregion
+
     // region onDeleteThisTabClicked
 
     @Test
@@ -1140,7 +1319,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing).clearSingleTabData("tab1")
+        verify(mockDataClearing).clearSingleTabData(tabId = "tab1", replaceCurrentTab = true)
     }
 
     @Test
@@ -1152,7 +1331,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearSingleTabData(any())
+        verify(mockDataClearing, never()).clearSingleTabData(any(), any())
     }
 
     @Test
@@ -1193,7 +1372,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
         testee = createViewModel()
 
         testee.commands().test {
@@ -1213,7 +1392,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
         testee = createViewModel()
 
         testee.commands().test {
@@ -1233,7 +1412,7 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
-        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockDataClearing.clearSingleTabData(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
         testee = createViewModel()
 
         testee.commands().test {
@@ -1371,7 +1550,7 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockDataClearing, never()).clearSingleTabData(any())
+        verify(mockDataClearing, never()).clearSingleTabData(any(), any())
     }
 
     @Test
@@ -1567,8 +1746,8 @@ class SingleTabFireDialogViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
 
-        verify(mockDataClearing).clearSingleTabData("hatch-tab")
-        verify(mockDataClearing, never()).clearSingleTabData("selected-tab")
+        verify(mockDataClearing).clearSingleTabData(tabId = "hatch-tab", replaceCurrentTab = false)
+        verify(mockDataClearing, never()).clearSingleTabData(eq("selected-tab"), any())
     }
 
     // endregion

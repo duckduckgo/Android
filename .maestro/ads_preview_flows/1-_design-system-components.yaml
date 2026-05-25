@@ -124,12 +124,30 @@ tags:
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/close"
             index: 0
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Medium Message"
+            direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/close"
             index: 0
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Big Single Message"
+            direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/close"
             index: 0
+        - scrollUntilVisible:
+            timeout: 50000
+            speed: 60
+            element:
+              text: "Big Two Actions Message"
+            direction: DOWN
         - tapOn:
             id: "com.duckduckgo.mobile.android:id/secondaryActionButton"
             index: 0

@@ -17,6 +17,9 @@
 package com.duckduckgo.app.cta.ui
 
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -27,12 +30,15 @@ import com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_INTRO_VISIT_SITE,
     description = R.string.onboardingSitesDaxDialogDescription,
@@ -45,16 +51,19 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_site_suggestions,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignOptionsContent
+
+    override val showArrow: Boolean = true
 
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTypeAnimationTextView>(R.id.contextualBrandDesignTitle)
             .text = context.getString(R.string.onboardingSitesSuggestionsDaxDialogTitle).html(context)
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)
-            .text = context.getString(R.string.onboardingSitesDaxDialogDescription).html(context)
+            .text = context.getString(R.string.onboardingSitesDaxDialogDescription).preventWidows().html(context)
 
         val options = onboardingStore.getSitesOptions()
         val optionsViews = listOf(
@@ -68,6 +77,33 @@ data class DaxSiteSuggestionsBrandDesignUpdateContextualCta(
                 options[index].setOptionView(buttonView)
             }
         }
+
+        applyWavingDaxState(view)
+    }
+
+    internal fun applyWavingDaxState(view: View) {
+        view.findViewById<LottieAnimationView>(R.id.wavingDax)?.apply {
+            if (isPhoneLandscape()) {
+                if (isAnimating) cancelAnimation()
+                isVisible = false
+                return@apply
+            }
+            (layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
+                lp.startToStart =
+                    if (isTablet()) R.id.contextualBrandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                layoutParams = lp
+            }
+            if (isTablet()) {
+                translationX = TABLET_WAVING_DAX_TRANSLATION_X_DP * resources.displayMetrics.density
+            }
+            isVisible = true
+            // Container is still GONE here; Lottie.playAnimation() no-ops unless isShown() is true.
+            post { playAnimation() }
+        }
+    }
+
+    private companion object {
+        private const val TABLET_WAVING_DAX_TRANSLATION_X_DP = -70f
     }
 
     override fun setOnOptionClicked(onOptionClicked: ((DaxDialogIntroOption) -> Unit)?) {

@@ -47,6 +47,7 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -110,6 +111,8 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
+    private val mockDeviceInfo: DeviceInfo = mock()
+
     private val detectedRefreshPatterns: Set<RefreshPattern> = emptySet()
 
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
@@ -159,6 +162,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
+            deviceInfo = mockDeviceInfo,
         )
     }
 
@@ -252,6 +256,7 @@ class DaxEndBrandDesignUpdateContextualCtaTest {
         onboardingStore = mockOnboardingStore,
         appInstallStore = mockAppInstallStore,
         isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
     )
 
     private fun givenBrandDesignUpdateEnabled() {

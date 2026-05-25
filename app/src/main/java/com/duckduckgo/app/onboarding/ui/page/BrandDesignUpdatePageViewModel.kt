@@ -109,25 +109,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewSearchSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewIsSearchSelected: Boolean = false,
-    )
+    ) {
+        val maxPageCount = 3
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
-
-    private var maxPageCount: Int = 2
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
-        }
-    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -272,14 +262,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                         }
                     }
-                    val showInputScreen = withContext(dispatchers.io()) {
-                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-                    }
-                    if (showInputScreen) {
-                        setCurrentDialog(INPUT_SCREEN)
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
+                    setCurrentDialog(INPUT_SCREEN)
                 }
             }
 
@@ -396,10 +379,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
-    }
-
-    fun getMaxPageCount(): Int {
-        return maxPageCount
     }
 
     private suspend fun isAppReinstall(): Boolean =

@@ -65,6 +65,7 @@ class TrackerDataLoader @Inject constructor(
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
+    private val entityLookupRefresher: EntityLookupRefresher,
     private val dispatcherProvider: DispatcherProvider,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
     private val precompileTdsRegexRCWrapper: PrecompileTdsRegexRCWrapper,
@@ -127,6 +128,7 @@ class TrackerDataLoader @Inject constructor(
             precompileRegex = precompileTdsRegexRCWrapper.enabled,
         )
         trackerDetectorClientProvider.addClient(client)
+        entityLookupRefresher.refresh()
     }
 
     companion object {

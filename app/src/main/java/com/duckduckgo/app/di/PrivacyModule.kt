@@ -41,11 +41,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -65,14 +61,6 @@ import dagger.multibindings.IntoSet
 @Module
 @ContributesTo(AppScope::class)
 object PrivacyModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun entityLookup(
-        entityDao: TdsEntityDao,
-        domainEntityDao: TdsDomainEntityDao,
-    ): EntityLookup =
-        TdsEntityLookup(entityDao, domainEntityDao)
 
     @Provides
     fun clearDataAction(

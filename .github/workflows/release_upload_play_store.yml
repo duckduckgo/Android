@@ -24,7 +24,7 @@ env:
 jobs:
   release-production:
     runs-on: ubuntu-latest
-    name: Publish Bundle to Play Store Internal track
+    name: Publish Bundle to Play Store for review
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
@@ -80,12 +80,21 @@ jobs:
           fileName: api.json
           destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
+      - name: Notify Mattermost that Play Store build is starting
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{ env.emoji_info }} Building release ${{ inputs.ref }}. This will be uploaded to Play Store when complete.
+          action: 'send-mattermost-message'
+
       - name: Assemble the bundle
         env:
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
           DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
-        run: ./gradlew bundleRelease -PuseUploadSigning -Pbuild-date-time
+        run: ./gradlew bundlePlayRelease -PuseUploadSigning -Pbuild-date-time
 
       - name: Capture App Bundle Path
         id: capture_output
@@ -112,7 +121,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.ref }} uploaded to Play Store. See https://play.google.com/console/u/0/developers/5949020878215944484/app/4974643806384870294/releases/overview
+          mattermost-message: ${{env.emoji_info}} Release ${{ inputs.ref }} uploaded to Play Store. See https://play.google.com/console/u/0/developers/5949020878215944484/app/4974643806384870294/releases/overview
           action: 'send-mattermost-message'
 
       - name: Upload Universal APK to Github
@@ -127,7 +136,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.ref }} uploaded to Github https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.ref }}
+          mattermost-message: ${{env.emoji_info}} Release ${{ inputs.ref }} uploaded to Github https://github.com/duckduckgo/Android/releases/tag/${{ inputs.ref }}
           action: 'send-mattermost-message'
 
       - name: Notify Mattermost of Release completed
@@ -137,7 +146,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.ref }} completed successfully and is now in review.
+          mattermost-message: ${{env.emoji_end}} Release ${{ inputs.ref }} completed successfully and is now in review.
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

@@ -20,16 +20,20 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.webkit.ValueCallback
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.duckchat.impl.R
@@ -52,6 +56,7 @@ class AttachmentView(
     var onFilePickerRequested: ((ValueCallback<Array<Uri>>, List<String>) -> Unit)? = null
 
     private var viewModel: AttachmentViewModel? = null
+    private var popupWindow: PopupWindow? = null
     private var thumbnailsLayout: LinearLayout? = null
     private var imageAttachmentsContainer: ImageAttachmentsContainerView? = null
     private var fileAttachmentsContainer: FileAttachmentsContainerView? = null
@@ -59,7 +64,7 @@ class AttachmentView(
 
     init {
         addView(buildAttachButton())
-        setOnClickListener { showChooserDialog() }
+        setOnClickListener { showPopupMenu() }
     }
 
     fun bind(scope: CoroutineScope, factory: ViewViewModelFactory) {
@@ -84,8 +89,6 @@ class AttachmentView(
     fun clearAttachments() = viewModel?.clearAttachments()
 
     fun clearAttachmentsForNewChat() = viewModel?.clearAttachmentsForNewChat()
-
-    fun setDuckAiMode(enabled: Boolean) = viewModel?.setDuckAiMode(enabled)
 
     private fun buildAttachButton(): ImageView {
         val iconSize = context.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.toolbarIcon)
@@ -212,63 +215,97 @@ class AttachmentView(
         )
     }
 
-    private fun showChooserDialog() {
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        dismissPopup()
+    }
+
+    private fun showPopupMenu() {
         val state = viewModel?.attachmentState?.value
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
-        val mimeTypes = state?.acceptedMimeTypes ?: listOf("image/*")
 
-        host?.showAttachmentChooser(true)
-        val title = if (supportsImages) {
-            context.getString(R.string.imageCaptureCameraGalleryDisambiguationTitle)
-        } else {
-            context.getString(R.string.fileCaptureBrowseDisambiguationTitle)
+        if (!supportsImages && supportedFileTypes.isEmpty()) return
+
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(com.duckduckgo.mobile.android.R.drawable.popup_menu_bg)
         }
-        ActionBottomSheetDialog.Builder(context)
-            .setTitle(title)
-            .setPrimaryItem(
-                context.getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption),
-                com.duckduckgo.mobile.android.R.drawable.ic_image_24,
-            )
-            .apply {
-                if (supportsImages) {
-                    setSecondaryItem(
-                        context.getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption),
-                        com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
-                    )
-                }
+        val popup = PopupWindow(
+            ScrollView(context).apply {
+                addView(container)
+                isVerticalScrollBarEnabled = false
+            },
+            resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuWidth),
+            LayoutParams.WRAP_CONTENT,
+            false,
+        ).apply {
+            elevation = resources.getDimension(R.dimen.modelPickerMenuElevation)
+            isOutsideTouchable = true
+            setOnDismissListener { popupWindow = null }
+        }
+
+        if (supportsImages) {
+            addMenuItem(
+                container = container,
+                iconRes = com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
+                titleRes = R.string.attachmentTakePhoto,
+            ) {
+                popup.dismiss()
+                host?.showAttachmentChooser(true)
+                onCameraCaptureRequested?.invoke(buildImagePickerCallback())
             }
-            .addEventListener(buildDialogListener(supportsImages, supportedFileTypes, mimeTypes))
-            .show()
+
+            addMenuItem(
+                container = container,
+                iconRes = com.duckduckgo.mobile.android.R.drawable.ic_image_24,
+                titleRes = R.string.attachmentAttachPhoto,
+            ) {
+                popup.dismiss()
+                host?.showAttachmentChooser(true)
+                onFilePickerRequested?.invoke(buildImagePickerCallback(), listOf("image/*"))
+            }
+        }
+
+        if (supportedFileTypes.isNotEmpty()) {
+            addMenuItem(
+                container = container,
+                iconRes = R.drawable.ic_folder_24,
+                titleRes = R.string.attachmentAttachFile,
+            ) {
+                popup.dismiss()
+                host?.showAttachmentChooser(true)
+                onFilePickerRequested?.invoke(buildFilePickerCallback(), supportedFileTypes)
+            }
+        }
+
+        popupWindow = popup
+        showAtPosition(popup)
     }
 
-    private fun buildDialogListener(
-        supportsImages: Boolean,
-        supportedFileTypes: List<String>,
-        mimeTypes: List<String>,
-    ) = object : ActionBottomSheetDialog.EventListener() {
-        private var pickerLaunched = false
+    private fun addMenuItem(container: LinearLayout, iconRes: Int, titleRes: Int, onClick: () -> Unit) {
+        val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
+        row.minimumHeight = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.popupMenuItemHeight)
+        row.findViewById<ImageView>(R.id.optionsMenuItemIcon).setImageResource(iconRes)
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemTitle).setText(titleRes)
+        row.findViewById<DaxTextView>(R.id.optionsMenuItemSubtitle).visibility = GONE
+        row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon).visibility = GONE
+        row.setOnClickListener { onClick() }
+        container.addView(row)
+    }
 
-        override fun onPrimaryItemClicked() {
-            pickerLaunched = true
-            val callback = if (supportsImages && supportedFileTypes.isNotEmpty()) {
-                buildCombinedPickerCallback()
-            } else if (supportedFileTypes.isNotEmpty()) {
-                buildFilePickerCallback()
-            } else {
-                buildImagePickerCallback()
-            }
-            onFilePickerRequested?.invoke(callback, mimeTypes)
-        }
+    private fun showAtPosition(popup: PopupWindow) {
+        val button = getChildAt(0) ?: this
+        val loc = IntArray(2).also { button.getLocationOnScreen(it) }
+        popup.showAtLocation(rootView, Gravity.TOP or Gravity.START, loc[0], loc[1])
+    }
 
-        override fun onSecondaryItemClicked() {
-            pickerLaunched = true
-            onCameraCaptureRequested?.invoke(buildImagePickerCallback())
+    private fun dismissPopup() {
+        popupWindow?.let {
+            it.setOnDismissListener(null)
+            if (it.isShowing) it.dismiss()
         }
-
-        override fun onBottomSheetDismissed() {
-            if (!pickerLaunched) host?.showAttachmentChooser(false)
-        }
+        popupWindow = null
     }
 
     private fun buildImagePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
@@ -279,10 +316,5 @@ class AttachmentView(
     private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
         if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
-    }
-
-    private fun buildCombinedPickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
-        val list = uris?.toList() ?: return@ValueCallback
-        if (list.isNotEmpty()) viewModel?.onMixedAttachmentsPicked(list)
     }
 }

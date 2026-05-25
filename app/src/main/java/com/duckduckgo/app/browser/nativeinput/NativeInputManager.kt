@@ -100,6 +100,7 @@ interface NativeInputManager {
     fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
     fun setPickingImage(picking: Boolean)
+    fun setText(text: String)
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -153,6 +154,12 @@ class RealNativeInputManager @Inject constructor(
         isPickingImage = picking
     }
 
+    override fun setText(text: String) {
+        if (!::rootView.isInitialized) return
+        val widget = widgetFrom(rootView) ?: return
+        widget.text = text
+    }
+
     override fun handleDuckAiVoiceResult(query: String) {
         val widget = widgetFrom(rootView)
         if (widget != null) {
@@ -199,6 +206,12 @@ class RealNativeInputManager @Inject constructor(
         val isBottom = widgetFrom(widgetView)?.isWidgetBottom() ?: false
         isExiting = true
         if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
+            if (isBottom) {
+                // Bottom omnibar: trigger IME hide synchronously so the activity resizes
+                // (adjustResize), letting the bottom-anchored widgetView descend to its
+                // post-IME-hide layout position before the exit animation captures its snapshot.
+                widgetFrom(widgetView)?.hideKeyboard()
+            }
             layoutCoordinator.setWidgetAnimating(true)
             animator.animateExit(
                 widgetCard = card,
@@ -475,21 +488,23 @@ class RealNativeInputManager @Inject constructor(
             )
             onPaidTierChanged = { isPaid ->
                 val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
-                omnibarController.updateTierTitle(tier) { launchUpgrade() }
+                omnibarController.updateTierTitle(tier) { launchPurchase() }
             }
             if (!isBottom) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
+            // Per-tab chatId (null on new chats) published into NativeInputState for
+            // consumers (reasoning picker, submission) to resolve per-chat state.
+            val chatIdFlow = currentTabUrl.map { extractDuckAiChatId(it) }
+            // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
+            bindModelPickerEnabledSource(chatIdFlow.map { it == null })
+            bindChatIdSource(chatIdFlow)
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         bindVoiceButtons(widgetView, callbacks)
-        // Picker tied to whether the current tab is a Duck.ai page that already has a chatId (existing chat) or new chat.
-        widgetFrom(widgetView)?.bindModelPickerEnabledSource(
-            currentTabUrl.map { !isExistingDuckAiChat(it) },
-        )
     }
 
     private fun bindVoiceButtons(
@@ -609,6 +624,9 @@ class RealNativeInputManager @Inject constructor(
         if (omnibarController.isDuckAiMode()) return false
         val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return false
         val omnibarCard = omnibarController.getCardView() ?: return false
+        // Apply focused-state layout so the widget is measured at its final size; otherwise
+        // padding/bottom-row/toggle-row visibility land after the 200ms enter as a second step.
+        widgetFrom(widgetView)?.beginEnterAnimationPreview()
         val margins = animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, isBottom)
             ?: return false
 
@@ -619,7 +637,21 @@ class RealNativeInputManager @Inject constructor(
             widgetView = widgetView,
             margins = margins,
             onUpdate = { layoutCoordinator.onWidgetAnimationFrame(widgetCard) },
-            onCancel = { layoutCoordinator.setWidgetAnimating(false) },
+            onCancel = {
+                layoutCoordinator.setWidgetAnimating(false)
+                widgetFrom(widgetView)?.let { widget ->
+                    widget.endEnterAnimationPreview()
+                    // Symmetric teardown for bottom mode: beginEnterAnimationPreview's
+                    // showKeyboard() requested focus + raised the IME. onEnterComplete is what
+                    // "owns" the focused state on success, so on cancel we undo it here —
+                    // otherwise the widget is left half-entered (focused, IME up) without the
+                    // animation having completed.
+                    if (widget.isWidgetBottom()) {
+                        widget.hideKeyboard()
+                        widget.clearInputFocus()
+                    }
+                }
+            },
             onComplete = {
                 layoutCoordinator.setWidgetAnimating(false)
                 onEnterComplete(widgetView)
@@ -632,7 +664,10 @@ class RealNativeInputManager @Inject constructor(
         layoutCoordinator.enableContentLayoutTransition()
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
-        widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+        widgetFrom(widgetView)?.apply {
+            focusInput(rootView.context as? Activity)
+            endEnterAnimationPreview()
+        }
     }
 
     private fun bindChatSuggestions(
@@ -707,16 +742,19 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun launchUpgrade() {
+    private fun launchPurchase() {
         globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
     }
 
     /** True if [rawUrl] points at an in-progress Duck.ai chat (Duck.ai URL with a non-blank `chatID`). */
-    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean {
-        if (rawUrl.isNullOrBlank()) return false
-        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return false
-        if (!duckChat.isDuckChatUrl(uri)) return false
-        return !uri.getQueryParameter("chatID").isNullOrBlank()
+    internal fun isExistingDuckAiChat(rawUrl: String?): Boolean = extractDuckAiChatId(rawUrl) != null
+
+    /** Returns the `chatID` query param if [rawUrl] is a Duck.ai chat URL, else `null`. */
+    internal fun extractDuckAiChatId(rawUrl: String?): String? {
+        if (rawUrl.isNullOrBlank()) return null
+        val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
+        if (!duckChat.isDuckChatUrl(uri)) return null
+        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
     }
 
     companion object {

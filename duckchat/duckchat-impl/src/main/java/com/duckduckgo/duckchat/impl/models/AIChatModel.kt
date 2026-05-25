@@ -34,6 +34,7 @@ data class RemoteAIChatModel(
     @field:Json(name = "supportsImageUpload") val supportsImageUpload: Boolean = false,
     @field:Json(name = "supportedFileTypes") val supportedFileTypes: List<String>? = null,
     @field:Json(name = "supportedReasoningEffort") val supportedReasoningEffort: List<String>? = null,
+    @field:Json(name = "reasoningEffortAccess") val reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
     @field:Json(name = "supportedTools") val supportedTools: List<String>? = null,
 )
 
@@ -91,6 +92,12 @@ data class AIChatAttachmentUsage(
     val fileSizeBytesUsed: Long = 0L,
 )
 
+data class RemoteReasoningEffortAccess(
+    val id: String,
+    @field:Json(name = "accessTier") val accessTier: List<String>? = null,
+    @field:Json(name = "entityHasAccess") val entityHasAccess: Boolean = false,
+)
+
 data class AIChatModel(
     val id: String,
     val name: String,
@@ -103,12 +110,16 @@ data class AIChatModel(
     val supportedImageFormats: List<String> = emptyList(),
     val supportedFileTypes: List<String> = emptyList(),
     val supportedReasoningEfforts: List<ReasoningEffort> = emptyList(),
+    val reasoningEffortAccess: List<ReasoningEffortAccess> = emptyList(),
     val supportedTools: List<Tool> = emptyList(),
 ) {
     val supportsFileUpload: Boolean
         get() = supportedFileTypes.isNotEmpty()
 
     fun supportsTool(tool: Tool): Boolean = supportedTools.contains(tool)
+
+    val requiredTier: UserTier?
+        get() = lowestRequiredTier(accessTier, isAccessible)
 
     companion object {
         val NATIVE_SUPPORTED_IMAGE_FORMATS = listOf("png", "jpeg", "webp")
@@ -126,6 +137,15 @@ enum class UserTier(val rawValue: String) {
     }
 }
 
+/** Lowest public [UserTier] in [accessTier]; falls back to FREE when the list is empty and [isAccessible], else `null`. */
+internal fun lowestRequiredTier(accessTier: List<String>, isAccessible: Boolean): UserTier? = when {
+    accessTier.contains(UserTier.FREE.rawValue) -> UserTier.FREE
+    accessTier.contains(UserTier.PLUS.rawValue) -> UserTier.PLUS
+    accessTier.contains(UserTier.PRO.rawValue) -> UserTier.PRO
+    accessTier.isEmpty() && isAccessible -> UserTier.FREE
+    else -> null
+}
+
 enum class ModelProvider {
     OPENAI,
     META,
@@ -139,7 +159,7 @@ enum class ModelProvider {
         fun from(id: String, providerString: String?): ModelProvider {
             return when {
                 id.startsWith("meta-llama/") || id.startsWith("meta-llama_") || providerString == "azure" -> META
-                id.startsWith("mistralai/") || id.startsWith("mistralai_") -> MISTRAL
+                id.startsWith("mistralai/") || id.startsWith("mistralai_") || providerString == "mistral" -> MISTRAL
                 id.contains("gpt-oss") -> OSS
                 providerString == "anthropic" -> ANTHROPIC
                 providerString == "openai" -> OPENAI

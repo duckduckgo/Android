@@ -20,11 +20,15 @@ import android.content.Context
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -40,6 +44,8 @@ class ChatHistoryRepositoryTest {
 
     private val chatStore: DuckAiChatStore = mock()
     private val context: Context = mock()
+    private val duckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val syncEngine: SyncEngine = mock()
     private val source = MutableStateFlow<List<DuckAiChat>>(emptyList())
     private lateinit var repository: RealChatHistoryRepository
 
@@ -47,7 +53,13 @@ class ChatHistoryRepositoryTest {
     fun setup() {
         whenever(context.getString(R.string.duck_ai_chat_history_untitled)).thenReturn(FALLBACK)
         whenever(chatStore.getChatsFlow()).thenReturn(source)
-        repository = RealChatHistoryRepository(chatStore, coroutineRule.testDispatcherProvider, context)
+        repository = RealChatHistoryRepository(
+            chatStore = chatStore,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            context = context,
+            duckChatSyncRepository = duckChatSyncRepository,
+            syncEngine = syncEngine,
+        )
     }
 
     @Test
@@ -88,8 +100,8 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives ImageGeneration when model is image-generation`() = runTest {
-        source.value = listOf(chat(chatId = "abc", title = "Image", model = "image-generation"))
+    fun `observeChats derives ImageGeneration when isImageGeneration flag is true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Image", isImageGeneration = true))
 
         repository.observeChats().test {
             assertEquals(ChatType.ImageGeneration, awaitItem().single().type)
@@ -97,8 +109,8 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Voice when model is voice-mode`() = runTest {
-        source.value = listOf(chat(chatId = "abc", title = "Voice", model = "voice-mode"))
+    fun `observeChats derives Voice when isVoice flag is true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Voice", isVoice = true))
 
         repository.observeChats().test {
             assertEquals(ChatType.Voice, awaitItem().single().type)
@@ -106,7 +118,16 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Discussion fallback when model is unknown`() = runTest {
+    fun `observeChats prefers ImageGeneration over Voice when both flags are true`() = runTest {
+        source.value = listOf(chat(chatId = "abc", title = "Mixed", isImageGeneration = true, isVoice = true))
+
+        repository.observeChats().test {
+            assertEquals(ChatType.ImageGeneration, awaitItem().single().type)
+        }
+    }
+
+    @Test
+    fun `observeChats derives Discussion fallback when no classification flag is set`() = runTest {
         source.value = listOf(chat(chatId = "abc", title = "Just text", model = "gpt-5-mini"))
 
         repository.observeChats().test {
@@ -115,7 +136,7 @@ class ChatHistoryRepositoryTest {
     }
 
     @Test
-    fun `observeChats derives Discussion fallback when model is empty`() = runTest {
+    fun `observeChats derives Discussion fallback when model is empty and no flags set`() = runTest {
         source.value = listOf(chat(chatId = "abc", title = "Just text", model = ""))
 
         repository.observeChats().test {
@@ -165,6 +186,43 @@ class ChatHistoryRepositoryTest {
         verify(chatStore).deleteAllChats()
     }
 
+    @Test
+    fun `renameChat delegates to store and returns true on success`() = runTest {
+        whenever(chatStore.renameChat("abc", "New")).thenReturn(true)
+
+        val result = repository.renameChat("abc", "New")
+
+        assertTrue(result)
+        verify(chatStore).renameChat("abc", "New")
+    }
+
+    @Test
+    fun `renameChat returns false when store reports the chat could not be updated`() = runTest {
+        whenever(chatStore.renameChat("missing", "New")).thenReturn(false)
+
+        val result = repository.renameChat("missing", "New")
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `setPinned true delegates to pinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = true)
+
+        verify(chatStore).pinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `setPinned false delegates to unpinChat and records sync update`() = runTest {
+        repository.setPinned("abc", pinned = false)
+
+        verify(chatStore).unpinChat("abc")
+        verify(duckChatSyncRepository).recordSingleChatUpdate("abc")
+        verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
     private fun chat(
         chatId: String,
         title: String = "Title",
@@ -172,6 +230,8 @@ class ChatHistoryRepositoryTest {
         lastEdit: String = "2026-04-01T00:00:00.000Z",
         pinned: Boolean = false,
         fileRefs: List<String> = emptyList(),
+        isImageGeneration: Boolean = false,
+        isVoice: Boolean = false,
     ): DuckAiChat = DuckAiChat(
         chatId = chatId,
         title = title,
@@ -179,6 +239,8 @@ class ChatHistoryRepositoryTest {
         lastEdit = lastEdit,
         pinned = pinned,
         fileRefs = fileRefs,
+        isImageGeneration = isImageGeneration,
+        isVoice = isVoice,
     )
 
     private companion object {

@@ -23,9 +23,8 @@
     <string name="native_input_chat_hint">Ask anything privately…</string>
 
     <!-- Model Picker -->
-    <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
-    <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
-    <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
+    <string name="duckAiModelPickerPlusModels" translatable="false">Plus</string>
+    <string name="duckAiModelPickerProModels" translatable="false">Pro</string>
 
     <!-- Reasoning Mode Picker -->
     <string name="duckChatReasoningModeContentDescription" translatable="false">Reasoning mode</string>
@@ -57,6 +56,12 @@
     <string name="duckAiEndCtaTitle">You\'ve got this!</string>
     <string name="duckAiEndCtaDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
     <string name="duckAiEndCtaButton">High five!</string>
+
+    <!-- File/image attachment menu options -->
+    <string name="attachmentTakePhoto">Take Photo</string>
+    <string name="attachmentAttachPhoto">Attach Photo</string>
+    <string name="attachmentAttachFile">Attach File</string>
+
     <!-- File attachment -->
     <string name="duckChatFileAttachmentRemoveContentDescription">Remove file</string>
     <string name="duckChatFileAttachmentLimitPerConversation" instruction="%1$d is the maximum number of files allowed in a single conversation.">You can only attach %1$d files per conversation.</string>
@@ -91,4 +96,18 @@
     <string name="duck_ai_chat_history_search_hint">Search chats</string>
     <string name="duck_ai_chat_history_search_close_content_description">Close search</string>
     <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Delete chats</string>
+    <string name="duck_ai_chat_history_select_all">Select all</string>
+    <string name="duck_ai_chat_history_unselect_all">Unselect all</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Selected</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Not selected</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Exit selection mode</string>
+    <string name="duck_ai_chat_history_rename_title">Rename Chat</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Chat Title</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Save</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Save chat title</string>
+    <string name="duck_ai_chat_history_rename_error">Couldn\'t rename chat</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Chat pinned</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Chat unpinned</string>
+    <string name="duck_ai_chat_history_undo">Undo</string>
 </resources>

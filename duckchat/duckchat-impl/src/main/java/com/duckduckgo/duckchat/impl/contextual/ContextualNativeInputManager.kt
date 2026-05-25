@@ -30,6 +30,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONArray
@@ -43,6 +44,7 @@ interface ContextualNativeInputManager {
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
+        chatIdFlow: Flow<String?>,
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit = {},
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit = { _, _ -> },
@@ -68,6 +70,7 @@ class RealContextualNativeInputManager @Inject constructor(
         widget: NativeInputModeWidget,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
+        chatIdFlow: Flow<String?>,
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
@@ -77,7 +80,7 @@ class RealContextualNativeInputManager @Inject constructor(
         this.widget = widget
 
         applyCardShape(card)
-        setupWidget(tabId, widget, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
+        setupWidget(tabId, widget, chatIdFlow, onSearchSubmitted, onCameraCaptureRequested, onFilePickerRequested)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -113,11 +116,13 @@ class RealContextualNativeInputManager @Inject constructor(
     private fun setupWidget(
         tabId: String,
         widget: NativeInputModeWidget,
+        chatIdFlow: Flow<String?>,
         onSearchSubmitted: (String) -> Unit,
         onCameraCaptureRequested: (ValueCallback<Array<Uri>>) -> Unit,
         onFilePickerRequested: (ValueCallback<Array<Uri>>, List<String>) -> Unit,
     ) {
         widget.configureContextual(tabId)
+        widget.bindChatIdSource(chatIdFlow)
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.bindAttachmentCallbacks(

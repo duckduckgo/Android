@@ -105,12 +105,13 @@
                 app:srcCompat="@drawable/ic_vpn_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/comparisonChartItem1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartItem1"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                tools:text="@string/preOnboardingComparisonChartItem1" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -158,12 +159,13 @@
                 app:srcCompat="@drawable/ic_duck_ai_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/comparisonChartDuckAi"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartDuckAi"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                tools:text="@string/preOnboardingComparisonChartDuckAi" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -212,12 +214,13 @@
                 app:srcCompat="@drawable/ic_shield_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/comparisonChartItem2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartItem2"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                tools:text="@string/preOnboardingComparisonChartItem2" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -265,12 +268,13 @@
                 app:srcCompat="@drawable/ic_cookies_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/comparisonChartItem3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartItem3"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                tools:text="@string/preOnboardingComparisonChartItem3" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -319,12 +323,13 @@
                 app:srcCompat="@drawable/ic_profile_blocker_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/comparisonChartItem4"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartItem4"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison"
+                tools:text="@string/preOnboardingComparisonChartItem4" />
 
             <ImageView
                 android:layout_width="40dp"

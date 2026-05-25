@@ -56,7 +56,13 @@ class FakeDuckChatInternal(
     // DuckChat interface methods
     override fun isEnabled(): Boolean = enabled
 
-    override fun openDuckChat() { }
+    val openWithChatIdCalls: MutableList<String> = mutableListOf()
+    var openDuckChatCalls: Int = 0
+        private set
+
+    override fun openDuckChat() {
+        openDuckChatCalls += 1
+    }
 
     override fun openDuckChatWithAutoPrompt(query: String) { }
 
@@ -117,8 +123,8 @@ class FakeDuckChatInternal(
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
-    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
-        nativeInputFieldUserSettingEnabled.value = isEnabled
+    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
+        nativeInputFieldUserSettingEnabled.value = enabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting
@@ -189,7 +195,11 @@ class FakeDuckChatInternal(
 
     override suspend fun isChatHistoryAvailable(): Boolean = false
 
-    override fun openWithChatId(chatId: String) { }
+    override fun openWithChatId(chatId: String) {
+        openWithChatIdCalls += chatId
+    }
+
+    override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

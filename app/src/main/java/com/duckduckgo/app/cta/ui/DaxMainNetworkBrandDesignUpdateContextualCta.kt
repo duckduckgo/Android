@@ -28,7 +28,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 
 data class DaxMainNetworkBrandDesignUpdateContextualCta(
     override val onboardingStore: OnboardingStore,
@@ -36,6 +38,7 @@ data class DaxMainNetworkBrandDesignUpdateContextualCta(
     val network: String,
     val siteHost: String,
     override val isLightTheme: Boolean,
+    override val deviceInfo: DeviceInfo,
 ) : OnboardingDaxDialogCta.BrandDesignContextualDaxDialogCta(
     ctaId = CtaId.DAX_DIALOG_NETWORK,
     description = null,
@@ -48,14 +51,17 @@ data class DaxMainNetworkBrandDesignUpdateContextualCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
     backgroundRes = R.drawable.bg_onboarding_trackers_blocked,
 ) {
     override val activeIncludeId: Int = R.id.contextualBrandDesignPrimaryCtaContent
 
+    override val showArrow: Boolean = true
+
     override fun configureContentViews(view: View) {
         val context = view.context
         view.findViewById<DaxTextView>(R.id.contextualBrandDesignDescription)?.apply {
-            text = getTrackersDescription(context).html(context)
+            text = getTrackersDescription(context).preventWidows().html(context)
         }
     }
 
