@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "UnifiedInput: duck.ai tool pills select and remove × omnibar positions"
 tags:
   - unifiedInputTest
