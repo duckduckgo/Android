@@ -1544,23 +1544,33 @@ sealed class DaxBubbleCta(
 
     interface ShowsWavingDax {
         val restartWavingDax: Boolean get() = false
+        val wavingDaxSpec: WavingDaxSpec
+
         fun configureWavingDax(dax: LottieAnimationView, deviceInfo: DeviceInfo) {
+            val spec = wavingDaxSpec
             val density = dax.resources.displayMetrics.density
-            dax.rotation = 0f
-            dax.translationX = DEFAULT_WAVING_DAX_TRANSLATION_X_DP * density
-            dax.translationY = DEFAULT_WAVING_DAX_TRANSLATION_Y_DP * density
+            dax.rotation = spec.rotationDegrees
+            dax.translationX = spec.translationXDp * density
+            dax.translationY = spec.translationYDp * density
             (dax.layoutParams as? ConstraintLayout.LayoutParams)?.let { lp ->
-                lp.startToStart =
-                    if (deviceInfo.isTablet()) R.id.brandDesignCardView else ConstraintLayout.LayoutParams.PARENT_ID
+                lp.startToStart = if (spec.anchorToCardOnTablet && deviceInfo.isTablet()) {
+                    R.id.brandDesignCardView
+                } else {
+                    ConstraintLayout.LayoutParams.PARENT_ID
+                }
+                lp.height = (spec.heightDp * density).toInt()
                 dax.layoutParams = lp
             }
         }
-
-        companion object {
-            private const val DEFAULT_WAVING_DAX_TRANSLATION_X_DP = -54f
-            private const val DEFAULT_WAVING_DAX_TRANSLATION_Y_DP = -110f
-        }
     }
+
+    data class WavingDaxSpec(
+        val rotationDegrees: Float,
+        val translationXDp: Float,
+        val translationYDp: Float,
+        val heightDp: Float,
+        val anchorToCardOnTablet: Boolean,
+    )
 
     abstract class BrandDesignUpdateBubbleCta(
         ctaId: CtaId,

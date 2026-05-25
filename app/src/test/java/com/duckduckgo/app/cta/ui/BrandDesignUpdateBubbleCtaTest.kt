@@ -152,6 +152,22 @@ class BrandDesignUpdateBubbleCtaTest {
     }
 
     @Test
+    fun visitSiteConfigureWavingDax_resetsRotationToZero() {
+        val dax: LottieAnimationView = mock()
+        stubDaxForFormFactor(dax, FormFactor.PHONE)
+        val cta = DaxVisitSiteOptionsBrandDesignUpdateBubbleCta(
+            onboardingStore = onboardingStore,
+            appInstallStore = appInstallStore,
+            isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
+        )
+
+        cta.configureWavingDax(dax, mockDeviceInfo)
+
+        verify(dax).rotation = 0f
+    }
+
+    @Test
     fun subscriptionConfigureWavingDax_phone_anchorsStartToParent() {
         val dax: LottieAnimationView = mock()
         val lp = stubDaxForFormFactor(dax, FormFactor.PHONE)
@@ -219,6 +235,13 @@ class BrandDesignUpdateBubbleCtaTest {
         DaxBubbleCta.ShowsWavingDax {
         override val activeIncludeId: Int = R.id.primaryCta
         override val showArrow: Boolean = false
+        override val wavingDaxSpec = DaxBubbleCta.WavingDaxSpec(
+            rotationDegrees = 0f,
+            translationXDp = -40f,
+            translationYDp = -150f,
+            heightDp = 178f,
+            anchorToCardOnTablet = true,
+        )
 
         override fun configureContentViews(view: View) {}
     }
