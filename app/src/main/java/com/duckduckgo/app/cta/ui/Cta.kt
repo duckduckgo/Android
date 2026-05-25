@@ -970,14 +970,16 @@ sealed class OnboardingDaxDialogCta(
                     wing.isVisible = true
                 }
                 showsWing && wing.isVisible -> {
-                    // Persist across same-wing content transitions: leave at resting state, no replay.
-                    // Abort any in-flight exit from a prior non-wing CTA — its end-listener would otherwise hide the wing.
-                    if (wing.isAnimating && wing.progress >= WING_STOP_PROGRESS) {
+                    // Persist across same-wing transitions: snap to resting and clear any in-flight
+                    // animator. Covers a settled wing from the previous wing CTA (no visible change),
+                    // an in-flight exit from a non-wing predecessor (whose end-listener would otherwise
+                    // hide the wing), and an in-flight play-in we don't want to restart.
+                    if (wing.isAnimating) {
                         wing.removeAllAnimatorListeners()
                         wing.cancelAnimation()
-                        wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
-                        wing.progress = WING_STOP_PROGRESS
                     }
+                    wing.setMinAndMaxProgress(0f, WING_STOP_PROGRESS)
+                    wing.progress = WING_STOP_PROGRESS
                 }
                 !showsWing && wing.isVisible -> {
                     wing.setMinAndMaxProgress(WING_STOP_PROGRESS, 1f)
@@ -1001,12 +1003,19 @@ sealed class OnboardingDaxDialogCta(
                 stripWingForPhoneLandscape(wing)
                 return
             }
-            if (!wing.isVisible || wing.isAnimating || wing.progress >= WING_STOP_PROGRESS) return
+            // Frame-based comparison instead of `progress >= WING_STOP_PROGRESS`: Lottie's
+            // [LottieDrawable.setMaxFrame] adds a fixed `+0.99f` offset after truncating the
+            // requested max frame to int, so `setMinAndMaxProgress(0f, 0.5f)` on a composition
+            // whose `endFrame` isn't an even integer (the wing's is `89.99`) leaves the animator
+            // max at `44.99` — read back as `progress ≈ 0.4999`, never quite `>= 0.5`. The int
+            // truncation of `wing.maxFrame` and `wing.frame` cancels that offset out.
+            val stopFrame = wing.maxFrame.toInt()
+            if (!wing.isVisible || wing.isAnimating || wing.frame >= stopFrame) return
             val generation = wingPlayInGeneration
             wing.postDelayed(
                 {
                     if (wingPlayInGeneration != generation) return@postDelayed
-                    if (wing.isVisible && !wing.isAnimating && wing.progress < WING_STOP_PROGRESS) {
+                    if (wing.isVisible && !wing.isAnimating && wing.frame < stopFrame) {
                         wing.playAnimation()
                     }
                 },
