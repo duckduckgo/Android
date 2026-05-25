@@ -659,6 +659,14 @@ sealed class OnboardingDaxDialogCta(
         abstract val showArrow: Boolean
 
         /**
+         * Whether the persistent top-right dismiss button is shown for this CTA. Defaults to true.
+         * Override to `false` for CTAs that have no in-dialog dismissal affordance — for instance,
+         * a contextual prompt that the user is expected to resolve by interacting with a target
+         * UI element outside the card (e.g. the fire button in the toolbar).
+         */
+        open val showDismiss: Boolean = true
+
+        /**
          * Populate the card with subclass-specific content: set title/description text, configure
          * option buttons, etc. Called before the card fade-in begins so all text is set while views
          * have `alpha=0` to avoid visible growth.
@@ -943,6 +951,7 @@ sealed class OnboardingDaxDialogCta(
             resetSharedViewState(container, isContentTransition = isContentTransition)
             resetAllIncludesExcept(container, activeInclude)
             applyPrimaryCtaText(container)
+            applyDismissButtonVisibility(container)
             configureContentViews(container)
             applyWingBottomState(container)
             hiddenTitle.text = titleView.text
@@ -1108,6 +1117,10 @@ sealed class OnboardingDaxDialogCta(
             container.findViewById<DaxButtonPrimary>(R.id.contextualBrandDesignPrimaryCta)?.setText(text)
         }
 
+        private fun applyDismissButtonVisibility(container: View) {
+            container.findViewById<View>(R.id.contextualBrandDesignDismissButton)?.isVisible = showDismiss
+        }
+
         // GONE (not INVISIBLE) so the FrameLayout's marginBottom drops out of the LinearLayout
         // flow, leaving the description sitting at the card's top padding.
         private fun applyTitleSlotVisibility(container: View, titleView: DaxTypeAnimationTextView) {
@@ -1229,6 +1242,7 @@ sealed class OnboardingDaxDialogCta(
         protected open val allContentIncludeIds: List<Int> = listOf(
             R.id.contextualBrandDesignPrimaryCtaContent,
             R.id.contextualBrandDesignOptionsContent,
+            R.id.contextualBrandDesignNoCtaContent,
         )
 
         /** Returns all content-include slots in the card. Used to hide inactive includes. */

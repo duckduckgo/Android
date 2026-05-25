@@ -502,6 +502,14 @@ class CtaViewModel @Inject constructor(
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
                 if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
                     if (!duckAiFireButtonShown()) {
+                        if (isBrandDesignUpdateEnabled()) {
+                            return DaxDuckAiFireButtonBrandDesignUpdateContextualCta(
+                                onboardingStore = onboardingStore,
+                                appInstallStore = appInstallStore,
+                                isLightTheme = appTheme.isLightModeEnabled(),
+                                deviceInfo = deviceInfo,
+                            )
+                        }
                         return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
                     }
                 }
