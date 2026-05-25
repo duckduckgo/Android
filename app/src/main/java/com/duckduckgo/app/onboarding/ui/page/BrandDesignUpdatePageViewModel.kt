@@ -127,6 +127,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class FinishAndSubmitChatPrompt(val prompt: String) : Command
         data object OnboardingSkipped : Command
         data object SkipDialogAnimation : Command
+        data class ShowQuickSetupAddressBarPositionBottomSheet(
+            val initialSelection: OmnibarType,
+            val showSplitOption: Boolean,
+        ) : Command
+        data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
     }
 
     fun onDialogTapped() {
@@ -323,6 +328,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 _viewState.update { it.copy(isReinstallUser = true) }
                 viewModelScope.launch {
                     if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
                         setCurrentDialog(QUICK_SETUP)
                     } else {
                         setCurrentDialog(SKIP_ONBOARDING_OPTION)
@@ -368,6 +374,24 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun onInputScreenOptionSelected(withAi: Boolean) {
         _viewState.update { it.copy(inputScreenSelected = withAi) }
+    }
+
+    fun onQuickSetupAddressBarPositionEditClicked() {
+        val state = _viewState.value
+        viewModelScope.launch {
+            _commands.send(
+                Command.ShowQuickSetupAddressBarPositionBottomSheet(
+                    initialSelection = state.selectedAddressBarPosition,
+                    showSplitOption = state.showSplitOption,
+                ),
+            )
+        }
+    }
+
+    fun onQuickSetupSearchOptionsEditClicked() {
+        viewModelScope.launch {
+            _commands.send(Command.ShowQuickSetupSearchOptionsBottomSheet(initialWithAi = _viewState.value.inputScreenSelected))
+        }
     }
 
     fun notificationRuntimePermissionRequested() {

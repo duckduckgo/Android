@@ -33,7 +33,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -52,7 +51,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
-import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
@@ -68,11 +66,13 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREE
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.QUICK_SETUP
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
-import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -83,10 +83,10 @@ import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -127,9 +127,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var inputScreenPreviewFadeInAnimatorSet: AnimatorSet? = null
     private var quickSetupFadeInAnimatorSet: AnimatorSet? = null
+    private var quickSetupSelectionJob: Job? = null
     private var stepIndicatorFadeOutAnimator: ObjectAnimator? = null
     private var suggestionButtonsAnimatorSet: AnimatorSet? = null
-    private var inputToggleLottieJob: Job? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
@@ -171,63 +171,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         return inflater.cloneInContext(contextThemeWrapper)
     }
 
-    private fun setAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
-        val isLightMode = appTheme.isLightModeEnabled()
-
-        with(binding.daxDialogCta.addressBarContent) {
-            val topRes = omnibarToggleImageRes(OmnibarType.SINGLE_TOP, selectedOption, isLightMode)
-            val bottomRes = omnibarToggleImageRes(OmnibarType.SINGLE_BOTTOM, selectedOption, isLightMode)
-            val splitRes = omnibarToggleImageRes(OmnibarType.SPLIT, selectedOption, isLightMode)
-
-            if (animate) {
-                crossfadeImage(topOmnibarToggleImage, topOmnibarToggleImageBack, topRes)
-                crossfadeImage(bottomOmnibarToggleImage, bottomOmnibarToggleImageBack, bottomRes)
-                crossfadeImage(splitOmnibarToggleImage, splitOmnibarToggleImageBack, splitRes)
-            } else {
-                topOmnibarToggleImage.setImageResource(topRes)
-                bottomOmnibarToggleImage.setImageResource(bottomRes)
-                splitOmnibarToggleImage.setImageResource(splitRes)
-            }
-
-            topOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_TOP
-            bottomOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_BOTTOM
-            splitOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SPLIT
-
-            splitOmnibarContainer.isVisible = showSplitOption
-
-            topOmnibarContainer.setOnClickListener {
-                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-            }
-            bottomOmnibarContainer.setOnClickListener {
-                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-            }
-            splitOmnibarContainer.setOnClickListener {
-                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
-            }
-        }
-    }
-
-    private fun omnibarToggleImageRes(type: OmnibarType, selected: OmnibarType, isLightMode: Boolean): Int {
-        val isActive = type == selected
-        return when (type) {
-            OmnibarType.SINGLE_TOP -> when {
-                isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_brand_design_update_light
-                isActive -> R.drawable.mobile_toolbar_top_selected_brand_design_update_dark
-                isLightMode -> R.drawable.mobile_toolbar_top_unselected_brand_design_update_light
-                else -> R.drawable.mobile_toolbar_top_unselected_brand_design_update_dark
-            }
-            OmnibarType.SINGLE_BOTTOM -> when {
-                isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_brand_design_update_light
-                isActive -> R.drawable.mobile_toolbar_bottom_selected_brand_design_update_dark
-                isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_brand_design_update_light
-                else -> R.drawable.mobile_toolbar_bottom_unselected_brand_design_update_dark
-            }
-            OmnibarType.SPLIT -> when {
-                isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_brand_design_update_light
-                isActive -> R.drawable.mobile_toolbar_split_selected_brand_design_update_dark
-                isLightMode -> R.drawable.mobile_toolbar_split_unselected_brand_design_update_light
-                else -> R.drawable.mobile_toolbar_split_unselected_brand_design_update_dark
-            }
+    private fun updateAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
+        with(binding.daxDialogCta.addressBarContent.addressBarPicker) {
+            setLightMode(appTheme.isLightModeEnabled())
+            isSplitOptionVisible = showSplitOption
+            setSelection(selectedOption, animate = animate)
+            setOnSelectionChangedListener { viewModel.onAddressBarPositionOptionSelected(it) }
         }
     }
 
@@ -515,6 +464,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
                     BrandDesignUpdatePageViewModel.Command.SkipDialogAnimation -> skipCurrentDialogAnimation()
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupAddressBarPositionBottomSheet -> {
+                        showQuickSetupAddressBarPositionBottomSheet(
+                            initialSelection = command.initialSelection,
+                            showSplitOption = command.showSplitOption,
+                        )
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet -> {
+                        showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
+                    }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -566,22 +524,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         quickSetupFadeInAnimatorSet?.removeAllListeners()
         quickSetupFadeInAnimatorSet?.cancel()
         quickSetupFadeInAnimatorSet = null
+        quickSetupSelectionJob?.cancel()
+        quickSetupSelectionJob = null
         stepIndicatorFadeOutAnimator?.removeAllListeners()
         stepIndicatorFadeOutAnimator?.cancel()
         stepIndicatorFadeOutAnimator = null
         suggestionButtonsAnimatorSet?.cancel()
         suggestionButtonsAnimatorSet = null
         binding.daxDialogCta.inputScreenPreviewContent.inputScreenPreviewTitle.cancelAnimation()
-        inputToggleLottieJob?.cancel()
-        inputToggleLottieJob = null
-        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront.apply {
-            removeAllAnimatorListeners()
-            cancelAnimation()
-        }
-        binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationBack.apply {
-            removeAllAnimatorListeners()
-            cancelAnimation()
-        }
+        binding.daxDialogCta.inputScreenContent.inputScreenPicker.cancelLottieAnimations()
         bobbingDaxAnimator?.cancel()
         bobbingDaxAnimator = null
         binding.bobbingDaxAnimation.cancelAnimation()
@@ -964,7 +915,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
-                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                    updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
                     val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                         rootView = binding.root,
@@ -1014,7 +965,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 addressBarFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
                                         ObjectAnimator.ofFloat(
-                                            binding.daxDialogCta.addressBarContent.addressBarPositionContainer,
+                                            binding.daxDialogCta.addressBarContent.addressBarPicker,
                                             View.ALPHA,
                                             1f,
                                         ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -1041,7 +992,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
-                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
+                    updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
                 }
 
                 INPUT_SCREEN -> {
@@ -1057,7 +1008,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = false
                     binding.daxDialogCta.inputScreenContent.root.isVisible = true
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                     val leftWingView = binding.leftWingAnimation
                     val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
@@ -1084,7 +1035,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 inputScreenFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
                                         ObjectAnimator.ofFloat(
-                                            binding.daxDialogCta.inputScreenContent.inputScreenOptionsContainer,
+                                            binding.daxDialogCta.inputScreenContent.inputScreenPicker,
                                             View.ALPHA,
                                             1f,
                                         ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
@@ -1099,10 +1050,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
-                                            playInputToggleLottieAnimation(
-                                                binding.daxDialogCta.inputScreenContent.inputScreenWithAiAnimationFront,
-                                                delayedStart = true,
-                                            )
+                                            binding.daxDialogCta.inputScreenContent.inputScreenPicker.startWithAiAnimation(delayedStart = true)
                                         }
                                     })
                                     start()
@@ -1427,7 +1375,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 // Address bar already visible — just update the selected option without re-running full dialog setup.
                 if (binding.daxDialogCta.addressBarContent.root.isVisible) {
-                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
+                    updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
                     return
                 }
 
@@ -1441,7 +1389,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
-                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
                 val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                     rootView = binding.root,
                     dialogView = binding.daxDialogCta.root,
@@ -1466,7 +1414,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
                 binding.daxDialogCta.addressBarContent.addressBarTitle.text =
                     getString(R.string.preOnboardingAddressBarTitle)
-                binding.daxDialogCta.addressBarContent.addressBarPositionContainer.alpha = 1f
+                binding.daxDialogCta.addressBarContent.addressBarPicker.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
@@ -1495,14 +1443,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                 }
 
-                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
             }
 
             INPUT_SCREEN -> {
                 if (binding.daxDialogCta.inputScreenContent.root.isVisible) {
                     // If the dialog is already showing, update toggle selection (crossfade state) without re-running the full setup.
                     // Also update and resume lottie animations.
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.CROSSFADE_ANIMATE)
+                    updateAiChatToggleState(
+                        binding,
+                        withAi = inputScreenSelected,
+                        transition = BrandDesignInputScreenPicker.Transition.CROSSFADE_ANIMATE,
+                    )
                     return
                 }
 
@@ -1514,7 +1466,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                 binding.daxDialogCta.addressBarContent.root.isVisible = false
                 binding.daxDialogCta.inputScreenContent.root.isVisible = true
-                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                 val leftWingView = binding.leftWingAnimation
                 val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
@@ -1561,7 +1513,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.text =
                     getString(R.string.preOnboardingInputScreenTitleUpdated)
-                binding.daxDialogCta.inputScreenContent.inputScreenOptionsContainer.alpha = 1f
+                binding.daxDialogCta.inputScreenContent.inputScreenPicker.alpha = 1f
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
@@ -1577,12 +1529,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
                 // when view is opened without animations, do not crossfade state but start lottie animations
-                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.ANIMATE)
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.ANIMATE)
             }
 
             QUICK_SETUP -> {
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
+
+                // Quick setup already visible — observeQuickSetupSelection keeps the row state in sync, nothing else needs re-running.
+                if (binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible) {
+                    return
+                }
+
                 binding.welcomeScreenWalkingDax.isVisible = false
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.QuickSetup)
 
@@ -1740,10 +1698,96 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun setQuickSetupListeners() {
-        binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
+        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+            setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
+            }
+            addWidgetItem.setOnCheckedChangeListener { checked ->
+            }
+            addressBarPositionItem.setOnEditClickListener {
+                viewModel.onQuickSetupAddressBarPositionEditClicked()
+            }
+            addressBarSearchOptionsItem.setOnEditClickListener {
+                viewModel.onQuickSetupSearchOptionsEditClicked()
+            }
         }
 
-        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem.setOnCheckedChangeListener { checked ->
+        registerQuickSetupBottomSheetResultListeners()
+        observeQuickSetupSelection()
+    }
+
+    private fun observeQuickSetupSelection() {
+        quickSetupSelectionJob?.cancel()
+        quickSetupSelectionJob = viewModel.viewState
+            .map { it.selectedAddressBarPosition to it.inputScreenSelected }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { (position, withAi) -> bindQuickSetupSelection(position, withAi) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun bindQuickSetupSelection(position: OmnibarType, withAi: Boolean) {
+        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+            addressBarPositionItem.setIcon(addressBarPositionIconRes(position))
+            addressBarPositionItem.setSecondaryText(addressBarPositionLabelRes(position))
+            addressBarSearchOptionsItem.setIcon(searchOptionsIconRes(withAi))
+            addressBarSearchOptionsItem.setSecondaryText(searchOptionsLabelRes(withAi))
+        }
+    }
+
+    private fun addressBarPositionIconRes(type: OmnibarType): Int = when (type) {
+        OmnibarType.SINGLE_TOP -> R.drawable.ic_address_bar_top_24
+        OmnibarType.SINGLE_BOTTOM -> R.drawable.ic_address_bar_bottom_24
+        OmnibarType.SPLIT -> R.drawable.ic_address_bar_split_24
+    }
+
+    private fun addressBarPositionLabelRes(type: OmnibarType): Int = when (type) {
+        OmnibarType.SINGLE_TOP -> R.string.preOnboardingAddressBarPositionTop
+        OmnibarType.SINGLE_BOTTOM -> R.string.preOnboardingAddressBarPositionBottom
+        OmnibarType.SPLIT -> R.string.preOnboardingAddressBarPositionSplit
+    }
+
+    private fun searchOptionsIconRes(withAi: Boolean): Int =
+        if (withAi) {
+            R.drawable.ic_ai_24
+        } else {
+            R.drawable.ic_search_24
+        }
+
+    private fun searchOptionsLabelRes(withAi: Boolean): Int =
+        if (withAi) {
+            R.string.quickSetupInputScreenSearchAndDuckAi
+        } else {
+            R.string.quickSetupInputScreenSearchOnly
+        }
+
+    private fun showQuickSetupAddressBarPositionBottomSheet(initialSelection: OmnibarType, showSplitOption: Boolean) {
+        QuickSetupAddressBarPositionBottomSheet
+            .newInstance(initialSelection = initialSelection, showSplitOption = showSplitOption)
+            .show(childFragmentManager, QuickSetupAddressBarPositionBottomSheet.TAG)
+    }
+
+    private fun showQuickSetupSearchOptionsBottomSheet(initialWithAi: Boolean) {
+        QuickSetupSearchOptionsBottomSheet
+            .newInstance(initialWithAi = initialWithAi)
+            .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
+    }
+
+    private fun registerQuickSetupBottomSheetResultListeners() {
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupAddressBarPositionBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val selectedName = bundle.getString(
+                QuickSetupAddressBarPositionBottomSheet.RESULT_KEY_SELECTED_POSITION,
+            ) ?: return@setFragmentResultListener
+            viewModel.onAddressBarPositionOptionSelected(OmnibarType.valueOf(selectedName))
+        }
+        childFragmentManager.setFragmentResultListener(
+            QuickSetupSearchOptionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI)
+            viewModel.onInputScreenOptionSelected(withAi = withAi)
         }
     }
 
@@ -2119,128 +2163,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
-    private enum class InputToggleTransition {
-        /**
-         * Set the state and doesn't start toggle animation.
-         */
-        NONE,
-
-        /**
-         * Set the state and starts/resumes toggle animation.
-         */
-        ANIMATE,
-
-        /**
-         * Crossfades the state and starts/resumes toggle animation.
-         */
-        CROSSFADE_ANIMATE,
-    }
-
     private enum class InputMode { SEARCH, CHAT }
 
     private fun updateAiChatToggleState(
         binding: ContentOnboardingWelcomePageUpdateBinding,
         withAi: Boolean,
-        transition: InputToggleTransition,
+        transition: BrandDesignInputScreenPicker.Transition,
     ) {
-        val isLightMode = appTheme.isLightModeEnabled()
-
-        val withoutAiImageRes = when {
-            withAi && isLightMode -> CommonR.drawable.searchbox_withoutai_inactive_brand_design_update
-            withAi -> CommonR.drawable.searchbox_withoutai_inactive_dark_brand_design_update
-            isLightMode -> CommonR.drawable.searchbox_withoutai_active_brand_design_update
-            else -> CommonR.drawable.searchbox_withoutai_active_dark_brand_design_update
+        with(binding.daxDialogCta.inputScreenContent.inputScreenPicker) {
+            setLightMode(appTheme.isLightModeEnabled())
+            setSelection(withAi, transition)
+            setOnSelectionChangedListener { viewModel.onInputScreenOptionSelected(withAi = it) }
         }
-        val withAiImageRes = when {
-            withAi && isLightMode -> CommonR.raw.searchbox_with_ai_active
-            withAi -> CommonR.raw.searchbox_with_ai_active_dark
-            isLightMode -> CommonR.raw.searchbox_with_ai_inactive
-            else -> CommonR.raw.searchbox_with_ai_inactive_dark
-        }
-
-        val content = binding.daxDialogCta.inputScreenContent
-        when (transition) {
-            InputToggleTransition.NONE -> {
-                content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
-                content.inputScreenWithAiAnimationFront.setAnimation(withAiImageRes)
-            }
-            InputToggleTransition.ANIMATE -> {
-                content.inputScreenSearchOnlyImageFront.setImageResource(withoutAiImageRes)
-                content.inputScreenWithAiAnimationFront.setAnimation(withAiImageRes)
-                playInputToggleLottieAnimation(content.inputScreenWithAiAnimationFront)
-            }
-            InputToggleTransition.CROSSFADE_ANIMATE -> {
-                crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
-                crossfadeInputToggleImage(content.inputScreenWithAiAnimationFront, content.inputScreenWithAiAnimationBack, withAiImageRes)
-            }
-        }
-
-        content.inputScreenSearchOnlyCheck.quietlySetIsChecked(newCheckedState = !withAi, changeListener = null)
-        content.inputScreenWithAiCheck.quietlySetIsChecked(newCheckedState = withAi, changeListener = null)
-
-        content.inputScreenSearchOnlyCaption.setText(com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_without_ai_updated)
-        content.inputScreenWithAiCaption.setText(com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_with_ai_updated)
-
-        content.inputScreenSearchOnlyContainer.setOnClickListener {
-            viewModel.onInputScreenOptionSelected(withAi = false)
-        }
-        content.inputScreenWithAiContainer.setOnClickListener {
-            viewModel.onInputScreenOptionSelected(withAi = true)
-        }
-    }
-
-    private fun playInputToggleLottieAnimation(view: LottieAnimationView, fromProgress: Float? = null, delayedStart: Boolean = false) {
-        inputToggleLottieJob?.cancel()
-        view.removeAllAnimatorListeners()
-        view.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                inputToggleLottieJob = viewLifecycleOwner.lifecycleScope.launch {
-                    delay(INPUT_TOGGLE_LOTTIE_REPEAT_DELAY)
-                    view.playAnimation()
-                }
-            }
-        })
-        if (fromProgress != null) {
-            view.progress = fromProgress
-        }
-        inputToggleLottieJob = viewLifecycleOwner.lifecycleScope.launch {
-            if (delayedStart) {
-                delay(INPUT_TOGGLE_LOTTIE_INITIAL_DELAY)
-            }
-            if (fromProgress != null) view.resumeAnimation() else view.playAnimation()
-        }
-    }
-
-    private fun crossfadeInputToggleImage(frontView: LottieAnimationView, backView: LottieAnimationView, newRes: Int) {
-        val currentProgress = frontView.progress
-        frontView.composition?.let { backView.setComposition(it) }
-        backView.removeAllAnimatorListeners()
-        backView.progress = currentProgress
-        backView.resumeAnimation()
-        frontView.setAnimation(newRes)
-        playInputToggleLottieAnimation(frontView, fromProgress = currentProgress)
-        crossfadeImageTransition(frontView = frontView, backView = backView)
-    }
-
-    private fun crossfadeImage(frontView: ImageView, backView: ImageView, newRes: Int) {
-        backView.setImageDrawable(frontView.drawable)
-        frontView.setImageResource(newRes)
-        crossfadeImageTransition(frontView = frontView, backView = backView)
-    }
-
-    private fun crossfadeImageTransition(frontView: ImageView, backView: ImageView) {
-        frontView.animate().cancel()
-        backView.animate().cancel()
-        backView.alpha = 1f
-        frontView.alpha = 0f
-        frontView.animate()
-            .alpha(1f)
-            .setDuration(TOGGLE_CROSSFADE_DURATION.toLong())
-            .setListener(null)
-        backView.animate()
-            .alpha(0f)
-            .setDuration(TOGGLE_CROSSFADE_DURATION.toLong())
-            .setListener(null)
     }
 
     companion object {
@@ -2266,9 +2200,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val DIALOG_FADE_IN_DURATION = 400L
         private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
 
-        private const val TYPING_DELAY_MS = 20L
-        private const val TYPING_POST_DELAY_MS = 20L
-
         private const val CHECK_ICON_ANIMATION_DURATION = 400L
         private const val CHECK_ICON_FADE_DURATION = 130L
         private const val CHECK_ICON_STAGGER_DELAY = 130L
@@ -2276,8 +2207,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val CHECK_ICON_AVD_START_DELAY = 180L
 
         private const val DIALOG_TRANSITION_DURATION = 400L
-        private const val INPUT_TOGGLE_LOTTIE_REPEAT_DELAY = 2000L
-        private const val INPUT_TOGGLE_LOTTIE_INITIAL_DELAY = 2000L
+        private const val TYPING_DELAY_MS = 20L
+        private const val TYPING_POST_DELAY_MS = 20L
         private const val INPUT_SCREEN_PREVIEW_SUGGESTION_ANIMATION_DURATION = 500L
         private const val INPUT_SCREEN_PREVIEW_SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val MIN_SCREEN_HEIGHT_FOR_KEYBOARD_DP = 600
@@ -2294,8 +2225,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_FINAL_X_DP = 22
         private const val WALKING_DAX_MAX_HEIGHT_DP = 274
         private const val WALKING_DAX_MIN_HEIGHT_DP = 174
-
-        private const val TOGGLE_CROSSFADE_DURATION = 200
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
 

@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboardingquicksetup.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -62,7 +61,7 @@ class QuickSetupEditRow @JvmOverloads constructor(
         binding.quickSetupEditRowSecondaryText.setText(res)
     }
 
-    fun setOnEditClickListener(listener: View.OnClickListener) {
+    fun setOnEditClickListener(listener: OnClickListener) {
         binding.quickSetupEditRowEditButton.setOnClickListener(listener)
     }
 }

@@ -101,12 +101,19 @@
     <string name="preOnboardingReinstallSetDefaultLabel">Set DuckDuckGo as default</string>
     <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add home screen widget</string>
     <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
-    <string name="preOnboardingReinstallAddressBarTop">Top</string>
     <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
-    <string name="preOnboardingReinstallAddressBarSearchOptionsValue">Search and Duck.ai</string>
     <string name="preOnboardingReinstallEditAction">Edit</string>
     <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
 
+    <!-- Quick setup bottom sheets -->
+    <string name="quickSetupAddressBarPositionTitle">Where do you want your address bar?</string>
+    <string name="quickSetupAddressBarPositionCaption"><![CDATA[You can make changes in <b>Settings > Appearance</b>.]]></string>
+    <string name="quickSetupSearchOptionsTitle">Want Search &amp; AI chat in the address bar?</string>
+    <string name="quickSetupBottomSheetDone">Done</string>
+    <string name="quickSetupInputScreenSearchOnly">Search Only</string>
+    <string name="quickSetupInputScreenSearchAndDuckAi">Search &amp; Duck.ai</string>
+
+    <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>

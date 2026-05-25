@@ -92,7 +92,7 @@
             android:layout_height="wrap_content"
             app:quickSetupRowIcon="@drawable/ic_address_bar_top_24"
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddressBarLabel"
-            app:quickSetupRowSecondaryText="@string/preOnboardingReinstallAddressBarTop" />
+            app:quickSetupRowSecondaryText="@string/preOnboardingAddressBarPositionTop" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             app:quickSetupRowIcon="@drawable/ic_ai_24"
             app:quickSetupRowPrimaryText="@string/preOnboardingReinstallAddressBarSearchOptionsLabel"
-            app:quickSetupRowSecondaryText="@string/preOnboardingReinstallAddressBarSearchOptionsValue" />
+            app:quickSetupRowSecondaryText="@string/quickSetupInputScreenSearchAndDuckAi" />
 
     </LinearLayout>
 
