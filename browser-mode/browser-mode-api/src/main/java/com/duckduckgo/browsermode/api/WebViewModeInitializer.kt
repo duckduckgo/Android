@@ -29,7 +29,7 @@ import android.webkit.WebView
  * No-op on devices that do not support the `MULTI_PROFILE` WebView feature; such callers
  * implicitly share the default profile across modes.
  */
-interface WebViewProfileBinder {
+interface WebViewModeInitializer {
 
     /**
      * Must be called on the main thread.

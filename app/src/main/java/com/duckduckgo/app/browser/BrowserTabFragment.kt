@@ -273,7 +273,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.WebViewProfileBinder
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -443,7 +443,7 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
-    lateinit var webViewProfileBinder: WebViewProfileBinder
+    lateinit var webViewModeInitializer: WebViewModeInitializer
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -3995,7 +3995,7 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            webViewProfileBinder.bind(it, browserMode)
+            webViewModeInitializer.bind(it, browserMode)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
