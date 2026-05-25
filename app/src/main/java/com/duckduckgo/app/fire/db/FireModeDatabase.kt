@@ -24,6 +24,13 @@ import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 
+/**
+ * Standalone database used during Fire mode to retain tab state across the wipe of [AppDatabase].
+ *
+ * Shares [TabEntity] and [TabSelectionEntity] with [com.duckduckgo.app.global.db.AppDatabase].
+ * Any schema change to these entities must be accompanied by a migration in BOTH databases —
+ * forgetting one will result in a runtime crash for the affected users.
+ */
 @Database(
     exportSchema = true,
     version = 1,
