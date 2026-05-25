@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 name: "UnifiedInput: ask duck.ai suggestion opens chat × omnibar positions"
 tags:
   - unifiedInputTest

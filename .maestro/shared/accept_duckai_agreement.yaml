@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 ---
 # Handle the duck.ai agreement/terms prompt that appears on first use.
 # This dialog is rendered in the duck.ai WebView frontend.

@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 ---
 # move to Duck chat mode — "Duck.ai" only appears as the tab title, so a
 # text tap is unambiguous here

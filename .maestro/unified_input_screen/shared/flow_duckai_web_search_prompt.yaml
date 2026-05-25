@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 ---
 # wait for the unified input widget to settle after onboarding skip
 - extendedWaitUntil:
@@ -44,8 +44,11 @@ appId: com.duckduckgo.mobile.android
 # rather than depend on the response content)
 - extendedWaitUntil:
     visible:
-      id: "optionsButtonContainer"
+      id: "inputField"
     timeout: 30000
+
+- tapOn:
+    id: "inputField"
 
 # Web Search should NOT be auto-selected for the follow-up prompt — selecting it
 # is a per-prompt choice, not a sticky preference

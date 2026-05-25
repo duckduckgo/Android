@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 ---
 # unified input is open by default with nativeInputToggle="true";
 # wait for it to settle after onboarding skip

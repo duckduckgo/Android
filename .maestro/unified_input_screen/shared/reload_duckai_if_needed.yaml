@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 ---
 # Duck.ai's web view occasionally fails to load and shows an
 # "Oops! Something went wrong" screen with a "Reload Duck.ai" button.

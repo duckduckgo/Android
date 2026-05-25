@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 name: "UnifiedInput: seeded favorites visible across omnibar × AI combos"
 tags:
   - unifiedInputTest
