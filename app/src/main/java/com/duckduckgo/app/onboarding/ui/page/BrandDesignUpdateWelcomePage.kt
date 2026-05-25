@@ -915,7 +915,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     dismissBottomWingAnimation()
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
-                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                    updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
 
                     val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                         rootView = binding.root,
@@ -1008,7 +1008,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = false
                     binding.daxDialogCta.inputScreenContent.root.isVisible = true
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                     val leftWingView = binding.leftWingAnimation
                     val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
@@ -1389,7 +1389,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
-                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
                 val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                     rootView = binding.root,
                     dialogView = binding.daxDialogCta.root,
@@ -1466,7 +1466,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                 binding.daxDialogCta.addressBarContent.root.isVisible = false
                 binding.daxDialogCta.inputScreenContent.root.isVisible = true
-                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = InputToggleTransition.NONE)
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                 val leftWingView = binding.leftWingAnimation
                 val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
