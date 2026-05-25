@@ -82,6 +82,7 @@ object DatabaseModule {
     fun provideFireModeDatabase(context: Context): FireModeDatabase {
         return Room.databaseBuilder(context, FireModeDatabase::class.java, "fire_mode.db")
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+            .fallbackToDestructiveMigration(true)
             .build()
     }
 }
