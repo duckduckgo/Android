@@ -1426,6 +1426,7 @@ class BrowserTabFragment :
                 onFilePickerRequested = { callback, mimeTypes ->
                     launchFilePicker(callback, mimeTypes)
                 },
+                restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
             ),
         )
     }
@@ -1530,6 +1531,12 @@ class BrowserTabFragment :
         hasFocus: Boolean = true,
     ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
+    }
+
+    private fun restoreOmnibarAutocomplete(forQuery: String): Boolean {
+        val cached = viewModel.restoreOmnibarAutocomplete(forQuery) ?: return false
+        autoCompleteSuggestionsAdapter.updateData(cached.query, cached.suggestions)
+        return true
     }
 
     private fun onOmnibarCustomTabClosed() {
@@ -2044,7 +2051,10 @@ class BrowserTabFragment :
         viewModel.omnibarViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it?.let { renderer.renderOmnibar(it) }
+                it?.let {
+                    renderer.renderOmnibar(it)
+                    viewModel.onOmnibarTextRendered(it.omnibarText)
+                }
             },
         )
 

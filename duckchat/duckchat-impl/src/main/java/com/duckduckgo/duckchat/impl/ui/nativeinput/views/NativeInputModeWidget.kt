@@ -97,7 +97,7 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
-    fun beginEnterAnimationPreview()
+    fun beginEnterAnimationPreview(isBottom: Boolean)
     fun endEnterAnimationPreview()
     fun selectAllText()
     fun hideKeyboard()
@@ -692,13 +692,24 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun beginEnterAnimationPreview() {
+    override fun beginEnterAnimationPreview(isBottom: Boolean) {
         doOnAttach {
             if (inputField.hasFocus()) return@doOnAttach
-            // State observation is async; apply it synchronously so toggle-row visibility etc. are
-            // in their final positions before the enter animation measures the widget.
             if (nativeInputState == null) {
-                activeTabId?.let { nativeInputStateProvider.stateForTab(it).value }?.let(::applyState)
+                // Apply the synchronously-readable per-tab state so toggle-row visibility etc.
+                // are in their final positions before the enter animation measures the widget.
+                // Falling back to NativeInputState.zero() defaults toggle visible, which causes
+                // a measure-then-snap jump on tabs whose real state hides the toggle (e.g.
+                // SEARCH_ONLY or DUCK_AI_CONTEXTUAL). Fall back to a position-only seed only
+                // if the state provider hasn't been injected yet.
+                val publishedState = activeTabId
+                    ?.takeIf { ::nativeInputStateProvider.isInitialized }
+                    ?.let { nativeInputStateProvider.stateForTab(it).value }
+                applyState(
+                    publishedState ?: NativeInputState.zero().copy(
+                        inputPosition = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP,
+                    ),
+                )
             }
             previewEnterFocus = true
             updateBottomRowVisibility()
