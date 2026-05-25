@@ -22,9 +22,9 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.onboarding.api.AppStage
-import com.duckduckgo.onboarding.api.OnboardingSkipper
-import com.duckduckgo.onboarding.api.UserStageStore
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding

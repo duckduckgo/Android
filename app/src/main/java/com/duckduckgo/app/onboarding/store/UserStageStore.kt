@@ -18,14 +18,28 @@ package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.onboarding.api.AppStage
-import com.duckduckgo.onboarding.api.UserStageStore
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
+
+interface UserStageStore {
+    fun userAppStageFlow(): Flow<AppStage>
+    suspend fun getUserAppStage(): AppStage
+    suspend fun stageCompleted(appStage: AppStage): AppStage
+    suspend fun moveToStage(appStage: AppStage)
+    val currentAppStage: Flow<AppStage>
+}
+
+suspend fun UserStageStore.isNewUser(): Boolean {
+    return this.getUserAppStage() == AppStage.NEW
+}
+
+suspend fun UserStageStore.daxOnboardingActive(): Boolean {
+    return this.getUserAppStage() == AppStage.DAX_ONBOARDING
+}
 
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,

@@ -16,15 +16,15 @@
 
 package com.duckduckgo.app.onboarding.orchestrator
 
-import com.duckduckgo.onboarding.api.LinearOnboardingPlan
-import com.duckduckgo.onboarding.api.LinearOnboardingPlanProvider
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Return
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
-import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
+import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
@@ -34,25 +34,46 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingPlan
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.AbortPlan
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Return
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
+import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
+// :app owns the linear-onboarding lifecycle. On app start, if the user is still
+// in AppStage.NEW, we build the main plan with terminal callbacks bound to
+// UserStageStore / OnboardingSkipper and hand it to the orchestrator. The
+// orchestrator awaits those callbacks before emitting Completed / Skipped,
+// preserving the "AppStage write happens before any consumer sees the terminal
+// state" ordering that the legacy in-VM flow had.
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class LinearOnboardingPlanProviderImpl @Inject constructor(
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
+class OnboardingPlanBootstrapper @Inject constructor(
+    private val orchestrator: LinearOnboardingOrchestrator,
+    private val userStageStore: UserStageStore,
+    private val onboardingSkipper: OnboardingSkipper,
     private val onboardingStore: OnboardingStore,
     private val duckChat: DuckChat,
     private val appBuildConfig: AppBuildConfig,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-) : LinearOnboardingPlanProvider {
+    @AppCoroutineScope private val appScope: CoroutineScope,
+) : MainProcessLifecycleObserver {
 
-    // Cross-step context kept private to the planner. Steps close over it via
-    // transitions / resolveAction. Typed data class beats a scattering of @Volatile fields.
+    // Cross-step context kept private to the bootstrapper. Steps close over it.
     private val context = MutableStateFlow(OnboardingPocContext())
 
     // Side plan reached via SwitchTo from initial_reinstall_user.
@@ -60,7 +81,15 @@ class LinearOnboardingPlanProviderImpl @Inject constructor(
         LinearOnboardingPlan(steps = listOf(skipOnboardingOptionStep()))
     }
 
-    override suspend fun buildMainPlan(): LinearOnboardingPlan = LinearOnboardingPlan(
+    override fun onCreate(owner: LifecycleOwner) {
+        appScope.launch {
+            if (userStageStore.isNewUser()) {
+                orchestrator.startPlan(buildMainPlan())
+            }
+        }
+    }
+
+    private fun buildMainPlan(): LinearOnboardingPlan = LinearOnboardingPlan(
         steps = listOf(
             introAnimationStep(),
             initialReinstallUserStep(),
@@ -71,6 +100,8 @@ class LinearOnboardingPlanProviderImpl @Inject constructor(
             defaultBrowserPromptStep(),
             addressBarPositionStep(),
         ),
+        onCompleted = { userStageStore.stageCompleted(AppStage.NEW) },
+        onSkipped = { onboardingSkipper.markOnboardingAsCompleted() },
     )
 
     private fun introAnimationStep() = OnboardingActivityStep(

@@ -23,10 +23,10 @@ import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionMan
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.onboarding.api.AppStage
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.onboarding.api.OnboardingSkipper
-import com.duckduckgo.onboarding.api.UserStageStore
+import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment

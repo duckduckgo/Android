@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.onboarding.api
+package com.duckduckgo.app.onboarding.ui
 
-interface LinearOnboardingPlanProvider {
-    suspend fun buildMainPlan(): LinearOnboardingPlan
+import kotlinx.coroutines.flow.StateFlow
+
+interface OnboardingSkipperReadiness {
+    val privacyConfigDownloaded: StateFlow<ViewState>
+
+    data class ViewState(val skipOnboardingPossible: Boolean = false)
 }

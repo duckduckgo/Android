@@ -18,8 +18,8 @@ package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.firebutton.FireButtonStore
-import com.duckduckgo.onboarding.api.UserStageStore
-import com.duckduckgo.onboarding.api.daxOnboardingActive
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.browser.api.UserBrowserProperties

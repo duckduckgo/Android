@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface LinearOnboardingOrchestrator {
     val state: StateFlow<LinearOnboardingState>
+    suspend fun startPlan(plan: LinearOnboardingPlan)
     suspend fun onEvent(event: LinearOnboardingEvent)
 }
 
@@ -36,7 +37,18 @@ sealed interface LinearOnboardingState {
     data object Skipped : LinearOnboardingState
 }
 
-data class LinearOnboardingPlan(val steps: List<LinearOnboardingStep>)
+/**
+ * A plan is a list of steps plus terminal callbacks. The orchestrator awaits
+ * [onCompleted] / [onSkipped] before emitting the matching terminal state, so
+ * any state written inside the callback is visible to listeners that route off
+ * Completed / Skipped. Only the bottom-of-stack (main) plan's callbacks fire
+ * when the orchestrator terminates; side plans only run on Return/AbortPlan.
+ */
+data class LinearOnboardingPlan(
+    val steps: List<LinearOnboardingStep>,
+    val onCompleted: suspend () -> Unit = {},
+    val onSkipped: suspend () -> Unit = {},
+)
 
 typealias LinearOnboardingStepId = String
 

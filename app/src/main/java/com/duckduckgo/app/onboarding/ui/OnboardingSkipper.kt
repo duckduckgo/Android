@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.onboarding.api
+package com.duckduckgo.app.onboarding.ui
 
 interface OnboardingSkipper {
     suspend fun markOnboardingAsCompleted()

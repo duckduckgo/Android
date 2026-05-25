@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.duckduckgo.onboarding.api.AppStage
+import com.duckduckgo.app.onboarding.store.AppStage
 
 const val USER_STAGE_TABLE_NAME = "userStage"
 

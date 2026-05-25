@@ -18,9 +18,9 @@ package com.duckduckgo.app.onboarding
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.onboarding.api.AppStage
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.onboarding.api.UserStageStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat

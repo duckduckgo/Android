@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.store
 
 import androidx.room.*
-import com.duckduckgo.onboarding.api.AppStage
+import com.duckduckgo.app.onboarding.store.AppStage
 import kotlinx.coroutines.flow.Flow
 
 @Dao
