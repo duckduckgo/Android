@@ -513,17 +513,17 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private suspend fun applyInputScreenSelection(fireTelemetry: Boolean = true) {
         val inputSelected = _viewState.value.inputScreenSelected
-        duckChat.setCosmeticInputScreenUserSetting(inputSelected)
-        onboardingStore.storeInputScreenSelection(inputSelected)
         if (fireTelemetry) {
             fireInputScreenSelectionTelemetry(inputSelected)
         }
+        duckChat.setCosmeticInputScreenUserSetting(inputSelected)
+        onboardingStore.storeInputScreenSelection(inputSelected)
     }
 
     private fun fireInputScreenSelectionTelemetry(inputSelected: Boolean) {
         if (inputSelected) {
-            inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = _viewState.value.isReinstallUser)
             pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+            inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = _viewState.value.isReinstallUser)
         } else {
             pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
         }
