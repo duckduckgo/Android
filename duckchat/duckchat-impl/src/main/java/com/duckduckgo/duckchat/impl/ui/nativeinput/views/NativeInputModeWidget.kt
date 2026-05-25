@@ -976,6 +976,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val previousOnChatSelected = this.onChatSelected
         this.onChatSelected = { animate ->
             previousOnChatSelected?.invoke(animate)
+            // Show the chat list adapter synchronously so async chat-history fetch doesn't leave a
+            // gap. On NTP the focusedView never covers the page (browserShowing=false), so the gap
+            // exposes the NTP logo. The list's match_parent overlay background covers it even with
+            // zero items; real chat history populates when the WebView-backed fetch returns.
+            onShowSuggestions(ensureBinding().adapter)
             showSuggestions(text)
         }
 
