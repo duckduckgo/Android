@@ -38,6 +38,7 @@ jobs:
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           ducksans_package_auth_user: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           ducksans_package_auth_token: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
+          gradle_flags: '-Pconfig_patches=".maestro/duckplayer/patches/ad_blocking_enabled_patch.json"'
 
       - name: Run Duck Player Maestro Tests
         id: maestro-cloud-asana

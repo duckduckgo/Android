@@ -28,6 +28,9 @@ tags:
           direction: DOWN
 
       - tapOn:
+          text: "YouTube Ad Blocking"
+
+      - tapOn:
           text: "Duck Player"
 
       - assertVisible:
