@@ -632,20 +632,25 @@ class TabSwitcherActivity :
     private fun scrollToPosition(index: Int) {
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val innerHeight = tabsRecycler.height - tabsRecycler.paddingTop - tabsRecycler.paddingBottom
+        if (innerHeight <= 0) {
+            layoutManager.scrollToPosition(index)
+            return
+        }
         val rowHeight = tabsRecycler.children.firstOrNull {
             val pos = tabsRecycler.getChildAdapterPosition(it)
             pos != RecyclerView.NO_POSITION && tabsAdapter.getTabSwitcherItem(pos) !is TrackersAnimationInfoPanel
         }?.height ?: 0
-        if (innerHeight <= 0 || rowHeight <= 0) {
-            layoutManager.scrollToPosition(index)
-            return
-        }
-        val columns = (layoutManager as? GridLayoutManager)?.spanCount ?: 1
-        val itemCount = tabsRecycler.adapter?.itemCount ?: 0
-        val rowsBelow = ((itemCount + columns - 1) / columns) - (index / columns) - 1
         val centerOffset = (innerHeight - rowHeight) / 2
-        val pinToBottomOffset = innerHeight - (rowsBelow + 1) * rowHeight - 20.toPx()
-        layoutManager.scrollToPositionWithOffset(index, maxOf(centerOffset, pinToBottomOffset).coerceAtLeast(0))
+        val offset = if (rowHeight > 0) {
+            val columns = (layoutManager as? GridLayoutManager)?.spanCount ?: 1
+            val itemCount = tabsRecycler.adapter?.itemCount ?: 0
+            val rowsBelow = ((itemCount + columns - 1) / columns) - (index / columns) - 1
+            val pinToBottomOffset = innerHeight - (rowsBelow + 1) * rowHeight - 20.toPx()
+            maxOf(centerOffset, pinToBottomOffset)
+        } else {
+            centerOffset
+        }
+        layoutManager.scrollToPositionWithOffset(index, offset.coerceAtLeast(0))
     }
 
     private fun processCommand(command: Command) {
