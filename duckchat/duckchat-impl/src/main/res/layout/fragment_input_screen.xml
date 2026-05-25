@@ -33,6 +33,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <View
+        android:id="@+id/onboardingBackdropBrandDesign"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/onboardingSurfaceBackdrop"
+        android:importantForAccessibility="no"
+        android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"

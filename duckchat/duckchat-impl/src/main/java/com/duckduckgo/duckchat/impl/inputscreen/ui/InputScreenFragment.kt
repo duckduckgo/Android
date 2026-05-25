@@ -1014,14 +1014,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.visibility = View.INVISIBLE
         binding.newTabContainerScrollView.isVisible = false
 
-        val backgroundRes = if (appTheme.isLightModeEnabled()) {
-            CommonR.drawable.onboarding_background_bitmap_light
-        } else {
-            CommonR.drawable.onboarding_background_bitmap_dark
-        }
-        binding.onboardingBackground.setImageResource(backgroundRes)
-        binding.onboardingBackground.isVisible = true
-
         val descriptionHtml = Html.fromHtml(getString(R.string.duckAiEndCtaDescription), Html.FROM_HTML_MODE_COMPACT)
         val descriptionWithIcon = requireContext().appendIconToText(descriptionHtml, CommonR.drawable.ic_ai_chat_16)
 
@@ -1030,11 +1022,19 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val okButton: View
         when (variant) {
             DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE -> {
+                binding.onboardingBackdropBrandDesign.isVisible = true
                 ctaView = binding.duckAiEndCtaBrandDesign.root
                 descriptionView = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignDescription
                 okButton = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignOkButton
             }
             else -> {
+                val backgroundRes = if (appTheme.isLightModeEnabled()) {
+                    CommonR.drawable.onboarding_background_bitmap_light
+                } else {
+                    CommonR.drawable.onboarding_background_bitmap_dark
+                }
+                binding.onboardingBackground.setImageResource(backgroundRes)
+                binding.onboardingBackground.isVisible = true
                 ctaView = binding.duckAiEndCta.root
                 descriptionView = binding.duckAiEndCta.duckAiEndCtaDescription
                 okButton = binding.duckAiEndCta.duckAiEndCtaOkButton
@@ -1068,6 +1068,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 ctaView.isVisible = false
                 binding.onboardingBackground.isVisible = false
                 binding.onboardingBackground.setImageResource(0)
+                binding.onboardingBackdropBrandDesign.isVisible = false
                 binding.ddgLogoContainer.isVisible = true
                 binding.viewPager.isVisible = true
                 val state = viewModel.visibilityState.value
