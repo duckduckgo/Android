@@ -30,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -115,6 +116,63 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
+    fun `getChats parses reasoningMode when present`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertEquals("reasoning", store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field missing`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is empty string`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":""}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChats returns null reasoningMode when field is JSON null`() = runTest {
+        // JSONObject.optString returns the literal string "null" for explicit JSON null; guard via isNull.
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":null}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertNull(store.getChats()[0].reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns parsed chat when found`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"x","pinned":false,"reasoningMode":"reasoning"}"""
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", json))
+
+        val chat = store.getChatById("abc")
+
+        assertEquals("abc", chat?.chatId)
+        assertEquals("gpt-5-mini", chat?.model)
+        assertEquals("reasoning", chat?.reasoningMode)
+    }
+
+    @Test
+    fun `getChatById returns null when chat not found`() = runTest {
+        whenever(chatsDao.getById("missing")).thenReturn(null)
+        assertNull(store.getChatById("missing"))
+    }
+
+    @Test
+    fun `getChatById returns null when stored JSON is malformed`() = runTest {
+        whenever(chatsDao.getById("abc")).thenReturn(DuckAiBridgeChatEntity("abc", "not json"))
+        assertNull(store.getChatById("abc"))
+    }
+
+    @Test
     fun `getChats uses Untitled Chat for missing title`() = runTest {
         val json = """{"chatId":"abc","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false}"""
         whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
@@ -139,6 +197,150 @@ class RealDuckAiChatStoreTest {
     fun `getChats returns empty list when store is empty`() = runTest {
         whenever(chatsDao.getAll()).thenReturn(emptyList())
         assertTrue(store.getChats().isEmpty())
+    }
+
+    // --- derived classification flags ---
+
+    @Test
+    fun `getChats sets isImageGeneration when assistant message has generate-image ui-component part`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "Image",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                { "role": "user", "content": "draw a cat" },
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "ui-component", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertTrue(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration when generate-image part is on a non-assistant message`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "user",
+                  "parts": [
+                    { "type": "ui-component", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration for other ui-component names`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "ui-component", "name": "something-else" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isImageGeneration when part type is not ui-component`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                {
+                  "role": "assistant",
+                  "parts": [
+                    { "type": "text", "name": "generate-image" }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats defaults isImageGeneration to false when messages is missing`() = runTest {
+        val json = """{"chatId":"abc","title":"x","model":"gpt-5-mini","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats defaults isImageGeneration to false when parts is missing on assistant message`() = runTest {
+        val json = """
+            {
+              "chatId": "abc",
+              "title": "x",
+              "model": "gpt-5-mini",
+              "lastEdit": "2026-05-15T14:23:16.313Z",
+              "pinned": false,
+              "messages": [
+                { "role": "assistant", "content": "hi" }
+              ]
+            }
+        """.trimIndent()
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isImageGeneration)
+    }
+
+    @Test
+    fun `getChats sets isVoice when model is voice-mode`() = runTest {
+        val json = """{"chatId":"abc","title":"v","model":"voice-mode","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        val chat = store.getChats()[0]
+        assertTrue(chat.isVoice)
+        assertFalse(chat.isImageGeneration)
+    }
+
+    @Test
+    fun `getChats does not set isVoice for other models`() = runTest {
+        val json = """{"chatId":"abc","title":"x","model":"gpt-5-mini","lastEdit":"2026-05-15T14:23:16.313Z","pinned":false}"""
+        whenever(chatsDao.getAll()).thenReturn(listOf(DuckAiBridgeChatEntity("abc", json)))
+
+        assertFalse(store.getChats()[0].isVoice)
     }
 
     @Test

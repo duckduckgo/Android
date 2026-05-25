@@ -42,6 +42,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -89,6 +90,7 @@ class OnboardingDaxDialogTests {
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = org.mockito.kotlin.mock { on { isLightModeEnabled() } doReturn true }
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -126,6 +128,7 @@ class OnboardingDaxDialogTests {
             mockOnboardingBrandDesignUpdateToggles,
             mockAppTheme,
             mock(DuckAiOnboardingExperimentMetrics::class.java),
+            mockDeviceInfo,
         )
     }
 

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions
 
+import com.duckduckgo.duckchat.impl.models.ChatType
 import java.time.LocalDateTime
 
 /**
@@ -26,4 +27,5 @@ data class ChatSuggestion(
     val title: String,
     val lastEdit: LocalDateTime,
     val pinned: Boolean,
+    val type: ChatType = ChatType.Discussion,
 )

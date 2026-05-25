@@ -26,7 +26,8 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel
-import com.duckduckgo.duckchat.impl.ui.nativeinput.views.ModelPickerViewModel.PickerSurface
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.UpsellCommand
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runCurrent
@@ -205,7 +206,7 @@ class ModelPickerViewModelTest {
         val model = freeModel("f")
 
         testee.commands.test {
-            testee.onModelTapped(model, PickerSurface.ADDRESS_BAR)
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
             runCurrent()
 
             verify(modelManager).selectModel(model)
@@ -220,10 +221,10 @@ class ModelPickerViewModelTest {
         val model = plusModel("p")
 
         testee.commands.test {
-            testee.onModelTapped(model, PickerSurface.ADDRESS_BAR)
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchPurchase(PickerSurface.ADDRESS_BAR.origin),
+                UpsellCommand.LaunchPurchase(PickerSurface.MODEL_PICKER_ADDRESS_BAR.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -236,10 +237,10 @@ class ModelPickerViewModelTest {
         val model = proModel("pr")
 
         testee.commands.test {
-            testee.onModelTapped(model, PickerSurface.DUCK_AI_TAB)
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchPurchase(PickerSurface.DUCK_AI_TAB.origin),
+                UpsellCommand.LaunchPurchase(PickerSurface.MODEL_PICKER_DUCK_AI_TAB.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -252,10 +253,10 @@ class ModelPickerViewModelTest {
         val model = proModel("pr")
 
         testee.commands.test {
-            testee.onModelTapped(model, PickerSurface.ADDRESS_BAR)
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchUpgrade(PickerSurface.ADDRESS_BAR.origin),
+                UpsellCommand.LaunchUpgrade(PickerSurface.MODEL_PICKER_ADDRESS_BAR.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -268,10 +269,10 @@ class ModelPickerViewModelTest {
         val model = proModel("pr")
 
         testee.commands.test {
-            testee.onModelTapped(model, PickerSurface.DUCK_AI_TAB)
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
 
             assertEquals(
-                ModelPickerViewModel.Command.LaunchUpgrade(PickerSurface.DUCK_AI_TAB.origin),
+                UpsellCommand.LaunchUpgrade(PickerSurface.MODEL_PICKER_DUCK_AI_TAB.origin),
                 awaitItem(),
             )
             cancelAndConsumeRemainingEvents()
@@ -291,7 +292,7 @@ class ModelPickerViewModelTest {
         )
 
         testee.commands.test {
-            testee.onModelTapped(ghost, PickerSurface.ADDRESS_BAR)
+            testee.onModelTapped(ghost, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -311,7 +312,7 @@ class ModelPickerViewModelTest {
         )
 
         testee.commands.test {
-            testee.onModelTapped(internalModel, PickerSurface.ADDRESS_BAR)
+            testee.onModelTapped(internalModel, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
 
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -331,7 +332,7 @@ class ModelPickerViewModelTest {
         )
 
         testee.commands.test {
-            testee.onModelTapped(internalModel, PickerSurface.DUCK_AI_TAB)
+            testee.onModelTapped(internalModel, PickerSurface.MODEL_PICKER_DUCK_AI_TAB)
 
             expectNoEvents()
             cancelAndConsumeRemainingEvents()

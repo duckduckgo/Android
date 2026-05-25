@@ -69,6 +69,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository).clearPendingChatDeletions()
+        verify(duckChatSyncRepository).clearPendingChatUpdates()
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -102,6 +103,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
     }
 

@@ -335,33 +335,26 @@ class BrandDesignUpdatePageViewModelTest {
     // region onPrimaryCtaClicked - address bar position
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithTopThenSaveTopAndSendFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
+    fun whenPrimaryCtaFromAddressBarPositionWithTopThenSaveTopAndAdvanceToInputScreen() = runTest {
         val testee = createViewModel()
-        // Navigate to ADDRESS_BAR_POSITION via onDefaultBrowserSet
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
-        testee.commands.test {
-            testee.onPrimaryCtaClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
         verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
     }
 
     @Test
-    fun whenPrimaryCtaFromAddressBarPositionWithBottomThenSaveBottomAndFirePixelAndFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
+    fun whenPrimaryCtaFromAddressBarPositionWithBottomThenSaveBottomAndFirePixelAndAdvanceToInputScreen() = runTest {
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
-        testee.commands.test {
-            testee.onPrimaryCtaClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.Finish)
-        }
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
         verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
         verify(mockPixel).fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+        assertEquals(PreOnboardingDialogType.INPUT_SCREEN, testee.viewState.value.currentDialog)
     }
 
     @Test
@@ -400,7 +393,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedThenFireAiPixelAndStoreAndFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -419,7 +411,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenFireSearchOnlyPixelAndStoreAndFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -439,7 +430,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithReinstallUserTrueAndAiSelectedThenCallWideEventWithReinstallTrue() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         val testee = createViewModel()
         testee.loadDaxDialog() // sets isReinstallUser = true
@@ -586,19 +576,10 @@ class BrandDesignUpdatePageViewModelTest {
     // region maxPageCount
 
     @Test
-    fun whenInputScreenOnboardingEnabledThenMaxPageCountIs3() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+    fun whenViewModelCreatedThenMaxPageCountIs3() = runTest {
         val testee = createViewModel()
         advanceUntilIdle()
-        assertEquals(3, testee.getMaxPageCount())
-    }
-
-    @Test
-    fun whenInputScreenOnboardingDisabledThenMaxPageCountIs2() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
-        val testee = createViewModel()
-        advanceUntilIdle()
-        assertEquals(2, testee.getMaxPageCount())
+        assertEquals(3, testee.viewState.value.maxPageCount)
     }
 
     // endregion
@@ -721,7 +702,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenInputScreenDialogShownThenFiresChooseSearchExperiencePixel() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -735,7 +715,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsNullThenFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
@@ -751,7 +730,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsControlThenFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
@@ -767,7 +745,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentDuckAiThenShowInputScreenPreview() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
         val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
         val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
@@ -793,7 +770,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithAiSelectedAndEnrollReturnsTreatmentSearchThenShowInputScreenPreviewWithSearchDefault() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
         val searchOptions = listOf(DaxDialogIntroOption("search1", 0, "link1"))
         val chatSuggestions = listOf(DaxDialogIntroOption("chat1", 0, "link2"))
@@ -819,7 +795,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenWithSearchOnlySelectedThenDoNotEnrollAndFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         val testee = createViewModel()
         testee.onDefaultBrowserSet()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
@@ -839,7 +814,6 @@ class BrandDesignUpdatePageViewModelTest {
 
     @Test
     fun whenPrimaryCtaFromInputScreenPreviewThenFinish() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
         whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
         whenever(mockOnboardingStore.getChatSuggestions()).thenReturn(emptyList())

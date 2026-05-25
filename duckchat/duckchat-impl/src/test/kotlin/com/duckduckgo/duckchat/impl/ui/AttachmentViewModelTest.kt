@@ -20,8 +20,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.AttachmentLimits
@@ -29,6 +32,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -89,6 +93,12 @@ class AttachmentViewModelTest {
             .thenReturn("Total file size limit exceeded")
     }
 
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
+    private val tabRepository: TabRepository = mock<TabRepository>().also {
+        whenever(it.flowSelectedTab).thenReturn(selectedTabFlow)
+    }
+    private val nativeInputStateStore = RealNativeInputStateStore { tabRepository }
+
     private lateinit var viewModel: AttachmentViewModel
 
     @Before
@@ -101,7 +111,16 @@ class AttachmentViewModelTest {
             fileAttachmentProcessor = fileAttachmentProcessor,
             context = context,
             appBuildConfig = appBuildConfig,
+            nativeInputStateProvider = nativeInputStateStore,
         )
+    }
+
+    private fun selectDuckAiTab(tabId: String = "tab-duckai") {
+        nativeInputStateStore.publish(
+            tabId,
+            NativeInputState.zero().copy(inputContext = NativeInputState.InputContext.DUCK_AI),
+        )
+        selectedTabFlow.value = TabEntity(tabId = tabId, position = 0)
     }
 
     @Test
@@ -186,7 +205,8 @@ class AttachmentViewModelTest {
     fun whenTotalImagesOverConversationLimitThenConversationErrorShown() = runTest {
         val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationImagesSent(3)
         addImages(3)
 
@@ -206,7 +226,8 @@ class AttachmentViewModelTest {
     fun whenConversationImagesSentCountedInTotal() = runTest {
         val limits = ImageLimits(maxPerTurn = 10, maxPerConversation = 5)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(images = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationImagesSent(4)
         addImages(2)
 
@@ -331,7 +352,8 @@ class AttachmentViewModelTest {
     fun whenTotalFilesOverConversationLimitThenFileLimitErrorShown() = runTest {
         val limits = FileLimits(maxPerConversation = 2)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationFilesSent(2)
         addFiles(aFileAttachment())
 
@@ -342,7 +364,8 @@ class AttachmentViewModelTest {
     fun whenConversationFilesSentCountedInTotal() = runTest {
         val limits = FileLimits(maxPerConversation = 3)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationFilesSent(2)
         addFiles(aFileAttachment(), aFileAttachment())
 
@@ -471,7 +494,8 @@ class AttachmentViewModelTest {
         val maxTotal = 5L * 1024 * 1024
         val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationFileSizeSent(4L * 1024 * 1024)
         addFiles(aFileAttachment(sizeBytes = 2L * 1024 * 1024))
 
@@ -483,7 +507,8 @@ class AttachmentViewModelTest {
         val maxTotal = 5L * 1024 * 1024
         val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationFileSizeSent(maxTotal + 1)
 
         assertEquals("Total file size limit exceeded", viewModel.attachmentState.value.fileTotalSizeError)
@@ -519,7 +544,8 @@ class AttachmentViewModelTest {
         val maxTotal = 5L * 1024 * 1024
         val limits = FileLimits(maxTotalFileSizeBytes = maxTotal)
         modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
-        viewModel.setDuckAiMode(true)
+        selectDuckAiTab()
+        advanceUntilIdle()
         limitsHandler.addConversationFileSizeSent(maxTotal + 1)
 
         viewModel.clearAttachmentsForNewChat()

@@ -218,17 +218,17 @@ class RealDuckChatJSHelper @Inject constructor(
                                 if (duckChat.isAutomaticContextAttachmentEnabled()) {
                                     getPageContextResponse(featureName, method, it, pageContext, tabId)
                                 } else {
-                                    null
+                                    getEmptyPageContextResponse(featureName, method, it)
                                 }
                             }
 
                             else -> {
-                                null
+                                getEmptyPageContextResponse(featureName, method, it)
                             }
                         }
                     } else {
                         logcat { "Duck.ai Contextual: page context is empty, can't add it" }
-                        null
+                        getEmptyPageContextResponse(featureName, method, it)
                     }
                 }
             }
@@ -450,6 +450,17 @@ class RealDuckChatJSHelper @Inject constructor(
             }
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getEmptyPageContextResponse(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val params = JSONObject().apply {
+            put(PAGE_CONTEXT, JSONObject.NULL)
+        }
+        return JsCallbackData(params, featureName, method, id)
     }
 
     private suspend fun getPageContextResponse(

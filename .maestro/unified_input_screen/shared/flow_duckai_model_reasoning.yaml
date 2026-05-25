@@ -1,0 +1,71 @@
+appId: com.duckduckgo.mobile.android
+---
+# wait for the unified input widget to settle after onboarding skip
+- extendedWaitUntil:
+    visible:
+      id: "inputModeWidget"
+    timeout: 15000
+
+# switch to Duck.ai mode (Search is the default tab)
+- tapOn:
+    text: "Duck.ai"
+    childOf:
+      id: "inputModeWidget"
+
+# wait for the Duck.ai bottom row to settle — model picker is the marker
+- extendedWaitUntil:
+    visible:
+      id: "modelPickerChip"
+    timeout: 10000
+
+# default model is GPT-5 mini, chip text shows "GPT-5" (truncated)
+- assertVisible:
+    text: "GPT-5"
+    childOf:
+      id: "modelPickerChip"
+
+# open the model picker and assert at least one non-default model is listed
+- tapOn:
+    id: "modelPickerChip"
+- assertVisible:
+    text: "GPT-4o mini"
+
+# pick GPT-4o mini and assert the chip text changes to "4o-mini"
+- tapOn: "GPT-4o mini"
+- assertVisible:
+    text: "4o-mini"
+    childOf:
+      id: "modelPickerChip"
+
+# switch back to GPT-5 mini so the reasoning picker is available
+- tapOn:
+    id: "modelPickerChip"
+- tapOn: "GPT-5 mini"
+- extendedWaitUntil:
+    visible:
+      id: "reasoningModePickerButton"
+    timeout: 5000
+
+# open the reasoning picker and assert both options are listed
+- tapOn:
+    id: "reasoningModePickerButton"
+- assertVisible:
+    text: "Fast"
+- assertVisible:
+    text: "Reasoning"
+- assertVisible:
+    text: "For complex tasks"
+
+# pick the non-default ("Reasoning") and assert the picker dismisses
+- tapOn:
+    text: "Reasoning"
+- assertNotVisible:
+    text: "For complex tasks"
+
+# re-open the reasoning picker and confirm the "Reasoning" option is still selected
+- tapOn:
+    id: "reasoningModePickerButton"
+- assertVisible:
+    text: "Reasoning"
+- assertVisible:
+    text: "Fast"

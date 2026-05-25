@@ -115,7 +115,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
-    )
+    ) {
+        val maxPageCount = 3
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -123,18 +125,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var maxPageCount: Int = 2
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
-        }
-    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -275,6 +266,25 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
+                    val selectedPosition = _viewState.value.selectedAddressBarPosition
+                    when (selectedPosition) {
+                        OmnibarType.SINGLE_BOTTOM -> {
+                            settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
+                            pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
+                        }
+                        OmnibarType.SPLIT -> {
+                            if (isSplitOmnibarEnabled()) {
+                                settingsDataStore.omnibarType = OmnibarType.SPLIT
+                                pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
+                            } else {
+                                settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+                            }
+                        }
+                        OmnibarType.SINGLE_TOP -> {
+                            settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
+                        }
+                    }
+                    setCurrentDialog(INPUT_SCREEN)
                     applyAddressBarPositionSelection()
                     val showInputScreen = withContext(dispatchers.io()) {
                         androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
@@ -291,6 +301,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     applyInputScreenSelection()
                     val inputSelected = _viewState.value.inputScreenSelected
+                    val isReinstall = _viewState.value.isReinstallUser
+                    if (inputSelected) {
+                        pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = isReinstall)
+                    } else {
+                        pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
+                    }
+                    duckChat.setCosmeticInputScreenUserSetting(inputSelected)
+                    onboardingStore.storeInputScreenSelection(inputSelected)
                     if (inputSelected) {
                         when (duckAiOnboardingExperimentManager.enroll()) {
                             null,
@@ -495,10 +514,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             AppPixelName.NOTIFICATIONS_ENABLED,
             mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
-    }
-
-    fun getMaxPageCount(): Int {
-        return maxPageCount
     }
 
     private suspend fun isAppReinstall(): Boolean =

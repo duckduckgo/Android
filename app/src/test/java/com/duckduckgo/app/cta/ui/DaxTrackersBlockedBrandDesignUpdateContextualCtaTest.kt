@@ -49,6 +49,7 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -113,6 +114,8 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles = mock()
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
+
+    private val mockDeviceInfo: DeviceInfo = mock()
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
@@ -157,6 +160,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
+            deviceInfo = mockDeviceInfo,
         )
     }
 
@@ -305,6 +309,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
             trackers = trackers,
             settingsDataStore = mockSettingsDataStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
         val legacyCta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
             onboardingStore = mockOnboardingStore,
@@ -337,6 +342,7 @@ class DaxTrackersBlockedBrandDesignUpdateContextualCtaTest {
         trackers = emptyList(),
         settingsDataStore = mockSettingsDataStore,
         isLightTheme = true,
+        deviceInfo = mockDeviceInfo,
     )
 
     private suspend fun givenDaxOnboardingActive() {

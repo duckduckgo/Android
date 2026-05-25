@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.ui.view.OnboardingSelectionButton
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.device.DeviceInfo
 
 /**
  * Base class for bubble CTAs that present the user with a list of selectable options
@@ -46,6 +47,8 @@ abstract class OptionsBubbleCta(
     onboardingStore: OnboardingStore,
     appInstallStore: AppInstallStore,
     isLightTheme: Boolean,
+    deviceInfo: DeviceInfo,
+    showArrow: Boolean,
 ) : DaxBubbleCta.BrandDesignUpdateBubbleCta(
     ctaId = ctaId,
     title = title,
@@ -58,8 +61,10 @@ abstract class OptionsBubbleCta(
     onboardingStore = onboardingStore,
     appInstallStore = appInstallStore,
     isLightTheme = isLightTheme,
+    deviceInfo = deviceInfo,
 ) {
     override val activeIncludeId: Int = R.id.optionsContent
+    override val showArrow: Boolean = showArrow
 
     override fun configureContentViews(view: View) {
         val optionViews: List<OnboardingSelectionButton> = listOf(

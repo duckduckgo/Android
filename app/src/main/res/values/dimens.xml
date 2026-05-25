@@ -22,10 +22,7 @@
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
     <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
     <dimen name="onboardingBackgroundMaxHeight">126dp</dimen>
-    <!-- Paired: the contextual brand-design dialog overlaps its background banner under the card.
-         The container's bottom padding equals the banner's negative bottom margin; both must move together. -->
-    <dimen name="onboardingContextualBackgroundOverlap">56dp</dimen>
-    <dimen name="onboardingContextualBackgroundOverlapNegative">-56dp</dimen>
+    <dimen name="onboardingContextualBackgroundOverlap">90dp</dimen>
     <dimen name="contextualOptionsCappedHeight">100dp</dimen>
     <dimen name="onboardingBottomSheetCornerRadius">36dp</dimen>
     <dimen name="quickSetupBottomSheetHorizontalPadding">40dp</dimen>

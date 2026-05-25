@@ -16,14 +16,13 @@
 
 package com.duckduckgo.common.ui.view.shape
 
-import com.google.android.material.shape.EdgeTreatment
 import com.google.android.material.shape.ShapePath
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class AnimatableOffsetEdgeTreatmentTest {
 
-    private class CenterCapturingTreatment : EdgeTreatment() {
+    private class CenterCapturingTreatment : DaxBubbleBottomEdgeTreatment(heightPx = 120) {
         var capturedCenter: Float = Float.NaN
 
         override fun getEdgePath(
@@ -119,5 +118,23 @@ class AnimatableOffsetEdgeTreatmentTest {
         treatment.getEdgePath(400f, 200f, 1f, shapePath)
 
         assertEquals(304f, base.capturedCenter, 0.01f)
+    }
+
+    @Test
+    fun `depthFraction setter writes through to base treatment`() {
+        val base = DaxBubbleBottomEdgeTreatment(heightPx = 120)
+        val wrapper = AnimatableOffsetEdgeTreatment(base, offsetFromStartPx = 96f)
+
+        wrapper.depthFraction = 0.5f
+
+        assertEquals(0.5f, base.depthFraction, 0.001f)
+    }
+
+    @Test
+    fun `depthFraction getter reads through from base treatment`() {
+        val base = DaxBubbleBottomEdgeTreatment(heightPx = 120).apply { depthFraction = 0.25f }
+        val wrapper = AnimatableOffsetEdgeTreatment(base, offsetFromStartPx = 96f)
+
+        assertEquals(0.25f, wrapper.depthFraction, 0.001f)
     }
 }

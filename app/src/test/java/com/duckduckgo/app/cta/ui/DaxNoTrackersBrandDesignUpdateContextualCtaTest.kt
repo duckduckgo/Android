@@ -50,6 +50,7 @@ import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -117,6 +118,8 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
     private val mockDuckAiOnboardingExperimentMetrics: DuckAiOnboardingExperimentMetrics = mock()
 
+    private val mockDeviceInfo: DeviceInfo = mock()
+
     private lateinit var testee: CtaViewModel
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -165,6 +168,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
             appTheme = mockAppTheme,
             duckAiOnboardingExperimentMetrics = mockDuckAiOnboardingExperimentMetrics,
+            deviceInfo = mockDeviceInfo,
         )
     }
 
@@ -210,6 +214,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
 
         testee.onCtaShown(cta)
@@ -228,6 +233,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
 
         testee.onUserClickCtaOkButton(cta)
@@ -246,6 +252,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
 
         testee.onUserDismissedCta(cta, viaCloseBtn = true)
@@ -264,6 +271,7 @@ class DaxNoTrackersBrandDesignUpdateContextualCtaTest {
             mockOnboardingStore,
             mockAppInstallStore,
             isLightTheme = true,
+            deviceInfo = mockDeviceInfo,
         )
 
         testee.onUserDismissedCta(cta)

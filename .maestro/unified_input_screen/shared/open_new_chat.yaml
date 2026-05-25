@@ -1,0 +1,31 @@
+appId: com.duckduckgo.mobile.android
+---
+# move to Duck chat mode
+- tapOn: "Duck.ai"
+- assertVisible: "Ask anything privately\u2026"
+
+# verify that Duck.ai web view is opened when submitting a query in chat mode
+- tapOn:
+    id: "inputField"
+- inputText: "what is a car?"
+- tapOn:
+    id: "actionSend"
+
+# accept T&C if visible
+- assertVisible:
+    optional: true
+    text: 'Agree and Continue'
+- tapOn: 
+    optional: true
+    text: "Agree and Continue"
+
+# move to search mode
+- tapOn: "Ask anything privately\u2026"
+- tapOn: "Search"
+- inputText: "back to search"
+- tapOn: "back to search"
+- pressKey: enter
+- assertVisible:
+    id: "daxIcon"
+- assertVisible:
+    id: "browserLayout"

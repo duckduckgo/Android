@@ -28,16 +28,45 @@ android {
     anvil {
         generateDaggerFactories = true
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
+    implementation AndroidX.core.ktx
+    implementation  AndroidX.work.runtimeKtx
+    implementation AndroidX.room.runtime
+    ksp AndroidX.room.compiler
     ksp project(':anvil-ksp')
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':browser-api')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':data-store-api')
     implementation project(path: ':di')
     implementation project(path: ':feature-toggles-api')
 
+    implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation KotlinX.coroutines.core
+
+    testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
+    testImplementation AndroidX.work.testing
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
 }
