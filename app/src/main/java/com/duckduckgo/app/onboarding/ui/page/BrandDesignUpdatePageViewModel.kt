@@ -266,51 +266,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
-                    val selectedPosition = _viewState.value.selectedAddressBarPosition
-                    when (selectedPosition) {
-                        OmnibarType.SINGLE_BOTTOM -> {
-                            settingsDataStore.omnibarType = OmnibarType.SINGLE_BOTTOM
-                            pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
-                        }
-                        OmnibarType.SPLIT -> {
-                            if (isSplitOmnibarEnabled()) {
-                                settingsDataStore.omnibarType = OmnibarType.SPLIT
-                                pixel.fire(PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE)
-                            } else {
-                                settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                            }
-                        }
-                        OmnibarType.SINGLE_TOP -> {
-                            settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
-                        }
-                    }
-                    setCurrentDialog(INPUT_SCREEN)
                     applyAddressBarPositionSelection()
-                    val showInputScreen = withContext(dispatchers.io()) {
-                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-                    }
-                    if (showInputScreen) {
-                        setCurrentDialog(INPUT_SCREEN)
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
+                    setCurrentDialog(INPUT_SCREEN)
                 }
             }
 
             INPUT_SCREEN -> {
                 viewModelScope.launch {
                     applyInputScreenSelection()
-                    val inputSelected = _viewState.value.inputScreenSelected
-                    val isReinstall = _viewState.value.isReinstallUser
-                    if (inputSelected) {
-                        pixel.fire(PREONBOARDING_AICHAT_SELECTED)
-                        inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = isReinstall)
-                    } else {
-                        pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
-                    }
-                    duckChat.setCosmeticInputScreenUserSetting(inputSelected)
-                    onboardingStore.storeInputScreenSelection(inputSelected)
-                    if (inputSelected) {
+                    if (_viewState.value.inputScreenSelected) {
                         when (duckAiOnboardingExperimentManager.enroll()) {
                             null,
                             CONTROL,
