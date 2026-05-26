@@ -1030,6 +1030,11 @@
     <string name="syncRestoreDialogPrimaryCta">Obnovit moje věci</string>
     <string name="syncRestoreDialogSecondaryCta">Přeskočit</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Pojďme navázat tam, kde jsi na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvé uložené záložky, hesla a další položky jsou připraveny.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stáhnout PDF</string>
 
@@ -1041,7 +1046,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Zdravíme tě.</string>
     <string name="preOnboardingWelcomeDialogBody1">Chceš rychlejší prohlížeč, se kterým budeš mít vše pod kontrolou?</string>
     <string name="preOnboardingWelcomeDialogBody2">Umělá inteligence je vždy volitelná a ochrana soukromí je vždy zapnutá.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
     <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak se anglicky řekne „kachna“</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se španělsky řekne „kachna“</string>
 </resources>
