@@ -46,6 +46,7 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.FillForm
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GenerateEmail
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.impl.scripts.models.DataSource.EXTRACTED_PROFILE
@@ -97,18 +98,6 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                 actionToExecute.needsEmail &&
                 !hasEmail(currentBrokerStep)
             ) {
-                val extractedProfile = when (currentBrokerStep) {
-                    is OptOutStep -> {
-                        currentBrokerStep.profileToOptOut
-                    }
-
-                    is EmailConfirmationStep -> {
-                        currentBrokerStep.profileToOptOut
-                    }
-
-                    else -> null // Invalid state
-                }
-
                 Next(
                     nextState = state.copy(
                         stageStatus = PirStageStatus(
@@ -120,8 +109,19 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                     GetEmailForProfile(
                         actionId = actionToExecute.id,
                         brokerName = currentBrokerStep.broker.name,
-                        extractedProfile = extractedProfile!!,
-                        profileQuery = state.profileQuery,
+                    ),
+                )
+            } else if (actionToExecute is GenerateEmail) {
+                Next(
+                    nextState = state.copy(
+                        stageStatus = PirStageStatus(
+                            currentStage = PirStage.EMAIL_GENERATE,
+                            stageStartMs = currentTimeProvider.currentTimeMillis(),
+                        ),
+                    ),
+                    sideEffect = GetEmailForProfile(
+                        actionId = actionToExecute.id,
+                        brokerName = currentBrokerStep.broker.name,
                     ),
                 )
             } else {

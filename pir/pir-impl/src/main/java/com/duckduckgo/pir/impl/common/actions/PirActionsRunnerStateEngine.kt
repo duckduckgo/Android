@@ -18,7 +18,6 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType
-import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction
@@ -175,8 +174,6 @@ interface PirActionsRunnerStateEngine {
         data class GetEmailForProfile(
             override val actionId: String,
             val brokerName: String,
-            val extractedProfile: ExtractedProfile,
-            val profileQuery: ProfileQuery?,
         ) : SideEffect(),
             BrokerActionSideEffect
 
