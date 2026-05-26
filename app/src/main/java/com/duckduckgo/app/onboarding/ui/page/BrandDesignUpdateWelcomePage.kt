@@ -34,6 +34,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +43,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.children
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -77,6 +80,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -384,14 +388,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
-        with(binding.daxDialogCta.comparisonChartContent) {
-            comparisonChartItem1.text = getString(R.string.preOnboardingComparisonChartItem1).preventWidows()
-            comparisonChartDuckAi.text = getString(R.string.preOnboardingComparisonChartDuckAi).preventWidows()
-            comparisonChartItem2.text = getString(R.string.preOnboardingComparisonChartItem2).preventWidows()
-            comparisonChartItem3.text = getString(R.string.preOnboardingComparisonChartItem3).preventWidows()
-            comparisonChartItem4.text = getString(R.string.preOnboardingComparisonChartItem4).preventWidows()
-        }
 
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
@@ -816,6 +812,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
+                    populateComparisonChart(currentComparisonConfig())
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.ComparisonChart,
                     )
@@ -851,7 +848,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             // not a synchronous stop.
                             if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
-                                getString(R.string.preOnboardingDaxDialog2Title).preventWidows(),
+                                getString(currentComparisonConfig().titleRes).preventWidows(),
                             ) {
                                 comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -908,7 +905,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
-                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
+                    binding.daxDialogCta.primaryCta.text = getString(currentComparisonConfig().primaryCtaTextRes)
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
@@ -1334,6 +1331,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             COMPARISON_CHART -> {
+                populateComparisonChart(currentComparisonConfig())
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
@@ -1374,15 +1372,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
-                    getString(R.string.preOnboardingDaxDialog2Title).preventWidows()
+                    getString(currentComparisonConfig().titleRes).preventWidows()
                 binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
-                listOf(
-                    binding.daxDialogCta.comparisonChartContent.check1,
-                    binding.daxDialogCta.comparisonChartContent.check2,
-                    binding.daxDialogCta.comparisonChartContent.check3,
-                    binding.daxDialogCta.comparisonChartContent.check4,
-                    binding.daxDialogCta.comparisonChartContent.check5,
-                ).forEach { checkView ->
+                comparisonCheckViews().forEach { checkView ->
                     checkView.alpha = 1f
                     checkView.scaleX = 1f
                     checkView.scaleY = 1f
@@ -1393,7 +1385,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.stepIndicator.alpha = 1f
                 binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
+                binding.daxDialogCta.primaryCta.text = getString(currentComparisonConfig().primaryCtaTextRes)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
@@ -2066,26 +2058,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun snapCheckIconsToFinalState() {
-        with(binding.daxDialogCta.comparisonChartContent) {
-            listOf(check1, check2, check3, check4, check5).forEach { checkView ->
-                checkView.alpha = 1f
-                checkView.scaleX = 1f
-                checkView.scaleY = 1f
-                checkView.setImageResource(CommonR.drawable.ic_check_green_24)
-            }
+        comparisonCheckViews().forEach { checkView ->
+            checkView.alpha = 1f
+            checkView.scaleX = 1f
+            checkView.scaleY = 1f
+            checkView.setImageResource(CommonR.drawable.ic_check_green_24)
         }
     }
 
     private fun playCheckIconAnimation() {
         val overshoot = OvershootInterpolator(CHECK_ICON_OVERSHOOT_TENSION)
-        val comparisonTable = binding.daxDialogCta.comparisonChartContent.comparisonTable
-        val checkViews = listOf(
-            binding.daxDialogCta.comparisonChartContent.check1,
-            binding.daxDialogCta.comparisonChartContent.check2,
-            binding.daxDialogCta.comparisonChartContent.check3,
-            binding.daxDialogCta.comparisonChartContent.check4,
-            binding.daxDialogCta.comparisonChartContent.check5,
-        ).sortedBy { comparisonTable.indexOfChild(it.parent as View) }
+        val checkViews = comparisonCheckViews()
 
         // Reset trimPathEnd up-front: the alpha fade-in completes ~50ms before the postDelayed AVD start,
         // so any stale trimPathEnd=1 from a previous run would render the tick fully drawn during the gap.
@@ -2296,6 +2279,40 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             setOnSelectionChangedListener { viewModel.onInputScreenOptionSelected(withAi = it) }
         }
     }
+
+    private fun currentComparisonConfig(): ComparisonChartConfig = ComparisonChartConfig.Default
+
+    private fun populateComparisonChart(config: ComparisonChartConfig) {
+        with(binding.daxDialogCta.comparisonChartContent) {
+            comparisonChartHeaderLeftIcon.setImageResource(config.headerLeftIconRes)
+            if (config.headerLeftLabelRes != null) {
+                comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes)
+                comparisonChartHeaderLabel.isVisible = true
+            } else {
+                comparisonChartHeaderLabel.isVisible = false
+            }
+            comparisonRows.removeAllViews()
+            val inflater = LayoutInflater.from(requireContext())
+            config.rows.forEachIndexed { index, row ->
+                val rowView = inflater.inflate(
+                    R.layout.include_brand_design_comparison_chart_row,
+                    comparisonRows,
+                    false,
+                ) as LinearLayout
+                rowView.findViewById<ImageView>(R.id.rowIcon).setImageResource(row.iconRes)
+                rowView.findViewById<DaxTextView>(R.id.rowText).text = getString(row.textRes).preventWidows()
+                if (index % 2 == 0) {
+                    rowView.setBackgroundResource(R.drawable.background_comparison_chart_row_highlighted)
+                }
+                comparisonRows.addView(rowView)
+            }
+        }
+    }
+
+    private fun comparisonCheckViews(): List<ImageView> =
+        binding.daxDialogCta.comparisonChartContent.comparisonRows.children
+            .map { it.findViewById<ImageView>(R.id.rowCheck) }
+            .toList()
 
     companion object {
         private const val GUIDELINE_START_PERCENT = 0.5f
