@@ -35,7 +35,7 @@ private const val VIEW_ALL_CHATS_THRESHOLD = 8
 
 /**
  * Builds the chat-tab ConcatAdapter:
- * chat history → divider → URL suggestions → divider → "Search for [query]" → divider → "View all Chats".
+ * chat history → divider → "View all Chats" → divider → URL suggestions → divider → "Search for [query]".
  */
 class NativeInputChatSuggestionsBinder @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
@@ -125,12 +125,12 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
 
         val concat = ConcatAdapter(
             chatSuggestionsAdapter,
+            historyShortcutDivider,
+            historyShortcutAdapter,
             urlDivider,
             urlAdapter,
             searchDivider,
             searchForAdapter,
-            historyShortcutDivider,
-            historyShortcutAdapter,
         )
 
         return Binding(

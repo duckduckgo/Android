@@ -17,10 +17,13 @@
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
@@ -123,6 +126,23 @@ class NativeInputChatSuggestionsBinderTest {
         holder.itemView.performClick()
 
         assertTrue(clicked)
+    }
+
+    @Test
+    fun whenConcatAdapterAssembledThenHistoryShortcutAppearsBeforeUrlSuggestions() {
+        val binding = binder.create(
+            onChatSuggestionSelected = {},
+            onChatUrlSuggestionClicked = {},
+            onSearchForQuerySubmitted = {},
+            onChatHistoryShortcutClicked = {},
+        )
+
+        val concat = binding.adapter as ConcatAdapter
+        val adapters = concat.adapters
+        val shortcutIndex = adapters.indexOfFirst { it is ChatHistoryShortcutAdapter }
+        val urlAdapterIndex = adapters.indexOfFirst { it is BrowserAutoCompleteSuggestionsAdapter }
+
+        assertTrue("Shortcut should be before URL suggestions in the ConcatAdapter", shortcutIndex < urlAdapterIndex)
     }
 
     @Test

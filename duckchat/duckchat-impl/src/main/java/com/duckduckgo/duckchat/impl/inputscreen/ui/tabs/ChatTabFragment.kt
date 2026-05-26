@@ -205,12 +205,12 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         }
         concatAdapter = ConcatAdapter(
             chatSuggestionsAdapter,
+            historyShortcutDividerAdapter,
+            historyShortcutAdapter,
             chatUrlDividerAdapter,
             chatUrlSuggestionsAdapter,
             searchDividerAdapter,
             chatSearchSuggestionAdapter,
-            historyShortcutDividerAdapter,
-            historyShortcutAdapter,
         )
         chatSuggestionsRecyclerView?.adapter = concatAdapter
     }
