@@ -1030,6 +1030,11 @@
     <string name="syncRestoreDialogPrimaryCta">Przywróć moje dane</string>
     <string name="syncRestoreDialogSecondaryCta">Pomiń</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Kontynuujmy tam, gdzie przerwałeś na DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Twoje zapisane zakładki, hasła i inne są gotowe.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Pobierz PDF</string>
 
@@ -1041,7 +1046,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Cześć!</string>
     <string name="preOnboardingWelcomeDialogBody1">Chcesz skorzystać z szybszej przeglądarki, która daje Ci kontrolę?</string>
     <string name="preOnboardingWelcomeDialogBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
-    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d z %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „kaczka” po angielsku</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"kaczka\" po hiszpańsku</string>
+    <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d %2$d</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">jak się mówi „duck” po angielsku</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak się mówi \"duck\" po hiszpańsku</string>
 </resources>
