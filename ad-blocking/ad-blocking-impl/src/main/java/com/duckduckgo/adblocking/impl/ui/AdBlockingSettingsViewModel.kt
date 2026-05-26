@@ -77,7 +77,6 @@ class AdBlockingSettingsViewModel @Inject constructor(
     }
 
     private companion object {
-        // TODO: replace with the real Learn More URL once published
-        const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/youtube/"
+        const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/ad-blocking"
     }
 }
