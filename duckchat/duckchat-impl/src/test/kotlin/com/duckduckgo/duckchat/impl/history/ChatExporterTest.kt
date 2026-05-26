@@ -26,8 +26,8 @@ import java.time.ZoneId
 
 class ChatExporterTest {
 
-    // ZoneId Europe/Paris matches the device that produced the spec's export-example.txt
-    // (UTC+2 in May 2026 → 14:23:15 UTC reads as 4:23:15 PM local).
+    // Fixed ZoneId so the asserted "4:23:15 PM" timestamps reproduce on any CI machine
+    // (Europe/Paris = UTC+2 in May 2026; the test JSON's 14:23:15 UTC renders as 4:23:15 PM local).
     private val exporter = ChatExporter(ZoneId.of("Europe/Paris"))
 
     private val gpt5MiniDisplay = ModelDisplay(
@@ -94,9 +94,7 @@ class ChatExporterTest {
 
         assertTrue(result is ExportResult.Text)
         val output = result.content
-        // First turn (user-only) should run straight into the turn separator with no Voice Chat block.
         assertTrue("user-only turn has no assistant block", output.contains("hi\n\n--------------------"))
-        // Second turn still renders the Voice Chat response.
         assertTrue("responded turn keeps Voice Chat block", output.contains("Voice Chat:\nGoodbye!"))
     }
 
@@ -120,8 +118,7 @@ class ChatExporterTest {
             "turn 2 carries the image-2 placeholder",
             result.content.contains("GPT-5 mini:\n\n[Generated image: image-2.jpeg]"),
         )
-        // The model's text response is replaced — original text MUST NOT appear in the output.
-        assertFalse(result.content.contains("Hello!"))
+        assertFalse("model's text response is replaced by the placeholder", result.content.contains("Hello!"))
         assertFalse(result.content.contains("Goodbye!"))
     }
 
@@ -137,9 +134,8 @@ class ChatExporterTest {
         assertTrue(result is ExportResult.Zip)
         result as ExportResult.Zip
         assertTrue("no fileRefs consumed", result.imageFileRefs.isEmpty())
-        // With no fileRefs, the model header is still emitted but no placeholder line follows.
-        assertTrue(result.content.contains("GPT-5 mini:"))
-        assertFalse(result.content.contains("[Generated image:"))
+        assertTrue("model header is still emitted", result.content.contains("GPT-5 mini:"))
+        assertFalse("no placeholder line without a fileRef", result.content.contains("[Generated image:"))
     }
 
     @Test
@@ -213,7 +209,6 @@ class ChatExporterTest {
     }
 
     private companion object {
-        // Verbatim from specs/click-access-chat-history/chat-example.json (encryptedText abbreviated).
         const val SPEC_CHAT_JSON = """{
   "title" : "cat name",
   "model" : "gpt-5-mini",

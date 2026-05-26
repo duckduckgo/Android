@@ -16,27 +16,14 @@
 
 package com.duckduckgo.duckchat.impl.models
 
-/**
- * Plain-text rendering of a chat's model attribution, used by the chat-history export header.
- *
- *  - `fullName` is the long label rendered in `using <Provider>'s <fullName> Model`. Null collapses
- *    the header to `using an AI Model`.
- *  - `shortName` is the per-turn prefix (e.g. `GPT-5 mini:`) for Discussion / ImageGeneration outputs.
- *    Always non-null; defaults to the raw model id when nothing better is available.
- *  - `providerPossessive` (e.g. `OpenAI's`) is dropped when null; the header falls back to
- *    `using the <fullName> Model`.
- */
+/** Plain-text model attribution for the chat-history export header. */
 data class ModelDisplay(
     val fullName: String?,
     val shortName: String,
     val providerPossessive: String?,
 )
 
-/**
- * Possessive form of the provider name, used by [ModelDisplay.providerPossessive] when the model
- * comes from the live `/duckchat/v1/models` API. Null when there isn't a clean possessive — the
- * export header falls back to `using the <Model> Model` in that case.
- */
+/** Possessive form of the provider name. Null for providers without a clean possessive (OSS, UNKNOWN). */
 val ModelProvider.possessive: String?
     get() = when (this) {
         ModelProvider.OPENAI -> "OpenAI's"
@@ -46,7 +33,6 @@ val ModelProvider.possessive: String?
         ModelProvider.OSS, ModelProvider.UNKNOWN -> null
     }
 
-/** Builds the export-header display strings from a live API model. */
 fun AIChatModel.toModelDisplay(): ModelDisplay = ModelDisplay(
     fullName = name,
     shortName = shortName,

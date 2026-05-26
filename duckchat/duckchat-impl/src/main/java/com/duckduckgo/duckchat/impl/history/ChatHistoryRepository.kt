@@ -42,19 +42,6 @@ interface ChatHistoryRepository {
     suspend fun deleteAllChats()
     suspend fun renameChat(chatId: String, newTitle: String): Boolean
     suspend fun setPinned(chatId: String, pinned: Boolean)
-
-    /**
-     * Formats [chatId] per the cross-platform reference (research.md R-16) and writes it as a
-     * `.txt` (Discussion/Voice) or `.zip` (ImageGeneration) file to the public Downloads
-     * directory, registering it in the in-app Downloads list. Returns the resulting file.
-     *
-     * [modelDisplay] is the pre-resolved provider/model attribution rendered in the export header.
-     * Callers (the ViewModel) look it up against the live /duckchat/v1/models cache. Pass `null`
-     * when the model is not yet known to the cache; the exporter falls back to displaying the raw
-     * model id without a provider possessive.
-     *
-     * Throws if the chat is missing or the write fails.
-     */
     suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File
 }
 

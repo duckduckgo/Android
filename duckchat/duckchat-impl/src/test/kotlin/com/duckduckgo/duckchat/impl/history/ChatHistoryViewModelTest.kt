@@ -71,8 +71,7 @@ class ChatHistoryViewModelTest {
 
     @Test
     fun `init warms the model manager cache by calling fetchModels`() = coroutineRule.testScope.runTest {
-        // viewModel is constructed in the test fixture; the init block fires fetchModels once.
-        // Advance to let the launched coroutine run before we assert.
+        // Subscribing to uiState advances the test scheduler so the init-block launch runs.
         viewModel.uiState.test {
             awaitInitialNonLoading()
             assertEquals(1, duckAiModelManager.fetchModelsCount)

@@ -77,9 +77,8 @@ class ChatHistoryViewModel @Inject constructor(
     )
 
     init {
-        // Warm the /duckchat/v1/models cache so the next Download tap has the provider/model
-        // labels ready. Best-effort: failures are swallowed by the manager, and the export
-        // path falls back to the raw model id when the cache is still empty at click time.
+        // Warm the models cache so a Download tap has provider/model labels ready;
+        // failures are swallowed and exports fall back to the raw model id.
         viewModelScope.launch { duckAiModelManager.fetchModels() }
     }
 
@@ -159,9 +158,8 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onDownloadRequested(chatId: String) {
-        // Snapshot-read /duckchat/v1/models cache so the export header carries provider attribution
-        // (e.g. "using OpenAI's GPT-5 mini Model"). Null when the model isn't cached — the exporter
-        // then falls back to "using the <raw-id> Model", which is still valid output.
+        // Snapshot-read the models cache; null when the model isn't cached and the exporter
+        // falls back to the raw model id.
         val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
         val modelDisplay = modelId
             ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }

@@ -34,15 +34,9 @@ import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 
 /**
- * Writes a formatted chat export to the public Downloads directory and registers it in the app's
- * Downloads database so it appears in the in-app Downloads screen.
- *
- * For Text payloads a `.txt` file is written. For Zip payloads a `.zip` is written containing
- * a UTF-8-BOM `chat.txt` and the supplied images as `image-N.jpeg` entries (N matches the
- * placeholder index assigned by [ChatExporter]).
- *
- * Filename pattern: `duck.ai_yyyy-MM-dd_HH-mm-ss.<txt|zip>` per the cross-platform reference.
- * Collisions are resolved by appending `-1`, `-2`, ... before the extension.
+ * Writes a chat export to the public Downloads directory. Filename pattern
+ * `duck.ai_yyyy-MM-dd_HH-mm-ss.<txt|zip>` matches the cross-platform reference;
+ * collisions get a `-1`, `-2`, ... suffix before the extension.
  */
 interface ChatExportWriter {
     suspend fun write(payload: ExportPayload): File
@@ -116,8 +110,7 @@ class RealChatExportWriter @Inject constructor(
                 filePath = file.absolutePath,
             ),
         )
-        // Fires the same callback as a regular browser download — surfaces the "new download" dot
-        // on the browser menu via DownloadBadgePlugin (and any other registered plugins).
+        // Surfaces the "new download" dot on the browser menu, same path as a browser download.
         fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
     }
 
@@ -135,7 +128,7 @@ class RealChatExportWriter @Inject constructor(
     }
 
     private companion object {
-        const val DOWNLOAD_FINISHED = 1 // mirrors com.duckduckgo.downloads.store.DownloadStatus.FINISHED
+        const val DOWNLOAD_FINISHED = 1
         const val EXTENSION_TXT = "txt"
         const val EXTENSION_ZIP = "zip"
         val FILENAME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")

@@ -55,10 +55,8 @@ data class DuckAiChat(
 )
 
 /**
- * The decoded payload of a chat fileRef. The on-disk file is a JSON envelope written by the FE
- * containing the base64-encoded image data plus metadata; [DuckAiChatStore.readFileRef] returns
- * the decoded bytes along with the FE-provided [fileName] and [mimeType] (both may be null when
- * the FE omitted them).
+ * Decoded payload of a chat fileRef — base64-decoded [bytes] plus FE-supplied [fileName] /
+ * [mimeType] (either may be null when the FE omitted them).
  */
 data class FileRefContent(
     val fileName: String?,
@@ -98,11 +96,9 @@ interface DuckAiChatStore {
     suspend fun getChatContent(chatId: String): String?
 
     /**
-     * Reads the file backing [uuid] (a fileRef UUID surfaced on [DuckAiChat]) and returns its
-     * decoded payload. The on-disk file is a JSON envelope written by the FE bridge; this method
-     * parses it and base64-decodes the `data` field. Returns null if the file is missing, the
-     * JSON is malformed, the `data` field is absent, or [uuid] resolves outside the chat-files
-     * directory.
+     * Reads the FE-written JSON envelope for [uuid] (a fileRef from [DuckAiChat.fileRefs]),
+     * base64-decoding the `data` field. Returns null when the file is missing, the JSON is
+     * malformed, the `data` field is absent, or [uuid] resolves outside the chat-files directory.
      */
     suspend fun readFileRef(uuid: String): FileRefContent?
 }

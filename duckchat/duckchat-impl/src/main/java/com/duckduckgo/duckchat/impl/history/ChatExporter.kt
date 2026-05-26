@@ -25,17 +25,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Formats a Duck.ai chat (FE-owned JSON blob) into the platform-standard plain-text shape.
+ * Formats a Duck.ai chat (FE-owned JSON blob) into the cross-platform plain-text shape.
  * Pure — no I/O, no DI. Inject a [ZoneId] to keep tests deterministic across machine timezones.
- *
- * Output shape varies by [ChatType] (see research.md R-16):
- *  - [ChatType.Discussion]: assistant turns prefixed with `<Model>:`.
- *  - [ChatType.Voice]: assistant turns prefixed with literal "Voice Chat:" and omitted entirely
- *    when the model produced no text (matches the macOS/Windows reference voice format where
- *    user-only turns appear without a response block).
- *  - [ChatType.ImageGeneration]: assistant text replaced by `[Generated image: image-N.jpeg]`;
- *    the resulting [ExportResult.Zip] carries the consumed fileRefs in turn order. Positional
- *    fileRef ↔ assistant-turn association is a known assumption — see R-16 open question (1).
  */
 internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault()) {
 
