@@ -64,6 +64,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -811,7 +812,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
-                COMPARISON_CHART -> {
+                COMPARISON_CHART, AI_COMPARISON_CHART -> {
                     populateComparisonChart(currentComparisonConfig())
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.ComparisonChart,
@@ -1330,7 +1331,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
             }
 
-            COMPARISON_CHART -> {
+            COMPARISON_CHART, AI_COMPARISON_CHART -> {
                 populateComparisonChart(currentComparisonConfig())
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
@@ -2052,7 +2053,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         // Only do this on the comparison chart: those runnables are only ever scheduled by playCheckIconAnimation(),
         // and snapping outside that screen leaves the check views at alpha=1/scale=1 with a static drawable, which
         // makes them appear pre-rendered when the comparison chart later fades in.
-        if (viewModel.viewState.value.currentDialog == COMPARISON_CHART) {
+        if (viewModel.viewState.value.currentDialog in setOf(COMPARISON_CHART, AI_COMPARISON_CHART)) {
             snapCheckIconsToFinalState()
         }
     }
@@ -2280,7 +2281,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    private fun currentComparisonConfig(): ComparisonChartConfig = ComparisonChartConfig.Default
+    private fun currentComparisonConfig(): ComparisonChartConfig = when (viewModel.viewState.value.currentDialog) {
+        AI_COMPARISON_CHART -> ComparisonChartConfig.Ai
+        else -> ComparisonChartConfig.Default
+    }
 
     private fun populateComparisonChart(config: ComparisonChartConfig) {
         with(binding.daxDialogCta.comparisonChartContent) {

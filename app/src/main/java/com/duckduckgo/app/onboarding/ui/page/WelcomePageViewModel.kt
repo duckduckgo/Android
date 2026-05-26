@@ -31,6 +31,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnb
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -216,6 +217,10 @@ class WelcomePageViewModel @Inject constructor(
                 }
             }
 
+            AI_COMPARISON_CHART -> {
+                // no-op, only used in BrandDesignUpdate path
+            }
+
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
@@ -319,6 +324,10 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
+            AI_COMPARISON_CHART -> {
+                // no-op
+            }
+
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
                     _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
@@ -388,6 +397,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             COMPARISON_CHART -> {
                 pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            }
+            AI_COMPARISON_CHART -> {
+                // no pixel yet
             }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> {
