@@ -25,6 +25,7 @@ import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdap
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAdapter
 import com.duckduckgo.duckchat.impl.models.ChatType
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
 import org.junit.Assert.assertEquals
@@ -67,8 +68,8 @@ class NativeInputChatSuggestionsBinderTest {
             onCommit = {},
         )
 
-        assertEquals(1, binding.historyShortcutAdapter().itemCount)
-        assertEquals(1, binding.historyShortcutDivider().itemCount)
+        assertEquals(1, binding.shortcutAdapter().itemCount)
+        assertEquals(1, binding.shortcutDivider().itemCount)
     }
 
     @Test
@@ -85,8 +86,8 @@ class NativeInputChatSuggestionsBinderTest {
             onCommit = {},
         )
 
-        assertEquals(0, binding.historyShortcutAdapter().itemCount)
-        assertEquals(0, binding.historyShortcutDivider().itemCount)
+        assertEquals(0, binding.shortcutAdapter().itemCount)
+        assertEquals(0, binding.shortcutDivider().itemCount)
     }
 
     @Test
@@ -103,8 +104,8 @@ class NativeInputChatSuggestionsBinderTest {
             onCommit = {},
         )
 
-        assertEquals(0, binding.historyShortcutAdapter().itemCount)
-        assertEquals(0, binding.historyShortcutDivider().itemCount)
+        assertEquals(0, binding.shortcutAdapter().itemCount)
+        assertEquals(0, binding.shortcutDivider().itemCount)
     }
 
     @Test
@@ -117,7 +118,7 @@ class NativeInputChatSuggestionsBinderTest {
             onChatHistoryShortcutClicked = { clicked = true },
         )
 
-        val shortcut = binding.historyShortcutAdapter()
+        val shortcut = binding.shortcutAdapter()
         shortcut.setVisible(true)
 
         val parent = FrameLayout(context)
@@ -158,12 +159,12 @@ class NativeInputChatSuggestionsBinderTest {
             isHistoryAvailable = true,
             onCommit = {},
         )
-        assertEquals(1, binding.historyShortcutAdapter().itemCount)
+        assertEquals(1, binding.shortcutAdapter().itemCount)
 
         binding.clear()
 
-        assertEquals(0, binding.historyShortcutAdapter().itemCount)
-        assertEquals(0, binding.historyShortcutDivider().itemCount)
+        assertEquals(0, binding.shortcutAdapter().itemCount)
+        assertEquals(0, binding.shortcutDivider().itemCount)
     }
 
     private fun createBinding(): NativeInputChatSuggestionsBinder.Binding =
@@ -184,4 +185,17 @@ class NativeInputChatSuggestionsBinderTest {
                 type = ChatType.Discussion,
             )
         }
+
+    private fun NativeInputChatSuggestionsBinder.Binding.shortcutAdapter(): ChatHistoryShortcutAdapter {
+        val concat = adapter as ConcatAdapter
+        return concat.adapters.filterIsInstance<ChatHistoryShortcutAdapter>().single()
+    }
+
+    private fun NativeInputChatSuggestionsBinder.Binding.shortcutDivider(): SectionDividerAdapter {
+        val concat = adapter as ConcatAdapter
+        val adapters = concat.adapters
+        val shortcutIndex = adapters.indexOfFirst { it is ChatHistoryShortcutAdapter }
+        check(shortcutIndex > 0) { "ChatHistoryShortcutAdapter should not be first in the ConcatAdapter" }
+        return adapters[shortcutIndex - 1] as SectionDividerAdapter
+    }
 }

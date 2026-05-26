@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
-import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -94,12 +93,6 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             historyShortcutAdapter.setVisible(false)
             historyShortcutDivider.setVisible(false)
         }
-
-        @VisibleForTesting
-        internal fun historyShortcutAdapter(): ChatHistoryShortcutAdapter = historyShortcutAdapter
-
-        @VisibleForTesting
-        internal fun historyShortcutDivider(): SectionDividerAdapter = historyShortcutDivider
     }
 
     fun create(
