@@ -330,7 +330,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     if (!isDuckAiIntroAnimationEnabled) {
                         introInProgress.value = false
-                        viewModel.onIntroEnded()
+                        viewModel.onIntroAnimationFinished()
                     }
                 }
             })
@@ -351,7 +351,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             introInProgress.value = false
-                            viewModel.onIntroEnded()
+                            viewModel.onIntroAnimationFinished()
                         }
                     })
                     binding.duckAiIntroAnimation.playAnimation()
@@ -514,7 +514,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         snapToIntroEndState()
                         // Idempotent in the VM; also covers rotation-mid-intro where the
                         // animator end listener never fires.
-                        viewModel.onIntroEnded()
+                        viewModel.onIntroAnimationFinished()
                     }
                     isAnimating -> { /* animation in progress — ignore re-emissions from onDialogAnimationStarted() */ }
                     state.hasAnimatedCurrentDialog -> {

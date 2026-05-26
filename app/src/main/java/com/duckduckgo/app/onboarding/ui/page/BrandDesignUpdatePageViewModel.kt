@@ -199,7 +199,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
     }
 
-    fun onIntroEnded() {
+    fun onIntroAnimationFinished() {
         if (notificationPermissionFlowStarted) return
         notificationPermissionFlowStarted = true
         viewModelScope.launch {

@@ -142,13 +142,13 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenOnIntroEndedIsCalledOnceThenRequestNotificationPermissionsIsSent() = runTest {
+    fun whenOnIntroAnimationFinishedIsCalledOnceThenRequestNotificationPermissionsIsSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
             // drain the initial Play command
             awaitItem()
 
-            testee.onIntroEnded()
+            testee.onIntroAnimationFinished()
             advanceUntilIdle()
 
             val command = awaitItem()
@@ -158,14 +158,14 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenOnIntroEndedIsCalledMultipleTimesThenRequestNotificationPermissionsIsSentOnlyOnce() = runTest {
+    fun whenOnIntroAnimationFinishedIsCalledMultipleTimesThenRequestNotificationPermissionsIsSentOnlyOnce() = runTest {
         val testee = createViewModel()
         testee.commands.test {
             awaitItem() // drain initial Play
 
-            testee.onIntroEnded()
-            testee.onIntroEnded()
-            testee.onIntroEnded()
+            testee.onIntroAnimationFinished()
+            testee.onIntroAnimationFinished()
+            testee.onIntroAnimationFinished()
             advanceUntilIdle()
 
             val first = awaitItem()
