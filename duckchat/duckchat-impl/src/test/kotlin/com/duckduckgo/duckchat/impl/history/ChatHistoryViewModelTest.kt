@@ -70,6 +70,17 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `init warms the model manager cache by calling fetchModels`() = coroutineRule.testScope.runTest {
+        // viewModel is constructed in the test fixture; the init block fires fetchModels once.
+        // Advance to let the launched coroutine run before we assert.
+        viewModel.uiState.test {
+            awaitInitialNonLoading()
+            assertEquals(1, duckAiModelManager.fetchModelsCount)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `empty source emits Empty state`() = coroutineRule.testScope.runTest {
         viewModel.uiState.test {
             assertEquals(ChatHistoryUiState.Empty, awaitInitialNonLoading())
@@ -1101,13 +1112,20 @@ private class FakeDuckAiModelManager : DuckAiModelManager {
     private val _modelState = MutableStateFlow(ModelState())
     override val modelState: kotlinx.coroutines.flow.StateFlow<ModelState> = _modelState
 
+    var fetchModelsCount: Int = 0
+        private set
+
     fun setModels(models: List<AIChatModel>) {
         _modelState.value = ModelState(models = models)
     }
 
-    override suspend fun fetchModels() = Unit
+    override suspend fun fetchModels() {
+        fetchModelsCount++
+    }
+
     override suspend fun selectModel(model: AIChatModel) = Unit
     override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
+    override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) = Unit
     override fun getSelectedModelId(): String? = null
     override fun getResolvedReasoningEffort(): String? = null
 }

@@ -76,6 +76,13 @@ class ChatHistoryViewModel @Inject constructor(
         initialValue = ChatHistoryUiState.Loading,
     )
 
+    init {
+        // Warm the /duckchat/v1/models cache so the next Download tap has the provider/model
+        // labels ready. Best-effort: failures are swallowed by the manager, and the export
+        // path falls back to the raw model id when the cache is still empty at click time.
+        viewModelScope.launch { duckAiModelManager.fetchModels() }
+    }
+
     fun isSelectMode(): Boolean = controls.value.mode is Mode.Selecting
 
     fun onChatRowClicked(chatId: String) {
