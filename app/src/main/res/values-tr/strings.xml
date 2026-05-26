@@ -990,6 +990,11 @@
     <string name="syncRestoreDialogPrimaryCta">Geri Yükle</string>
     <string name="syncRestoreDialogSecondaryCta">Atla</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">DuckDuckGo\'da kaldığınız yerden devam edelim.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Kaydedilmiş yer işaretleriniz, şifreleriniz ve daha fazlası hazır.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Yapay zeka her zaman isteğe bağlıdır ve gizlilik koruması her zaman etkindir.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF indir</string>
 
