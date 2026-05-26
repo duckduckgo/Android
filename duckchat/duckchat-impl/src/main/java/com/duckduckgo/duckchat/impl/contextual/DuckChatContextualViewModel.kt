@@ -63,6 +63,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
+    private val contextualNativeInputManager: ContextualNativeInputManager,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -412,6 +413,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
+        contextualNativeInputManager.onContextualClosed(sheetTabId)
     }
 
     private fun persistTabClosed() {
