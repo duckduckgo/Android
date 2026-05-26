@@ -35,6 +35,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailDataReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ErrorReceived
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
@@ -42,10 +43,12 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryAwaitCaptchaSolution
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryAwaitEmailData
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.RetryGetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.Started
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailData
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
@@ -117,6 +120,7 @@ class RealPirActionsRunner @AssistedInject constructor(
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
     private val brokerActionProcessor: BrokerActionProcessor,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
+    private val emailDataResolver: EmailDataResolver,
     private val engineFactory: PirActionsRunnerStateEngineFactory,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     @Assisted private val runType: RunType,
@@ -271,7 +275,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 }
 
             is AwaitCaptchaSolution -> handleAwaitCaptchaSolution(effect)
-            is SideEffect.AwaitEmailData -> handleAwaitEmailData(effect)
+            is AwaitEmailData -> handleAwaitEmailData(effect)
         }
     }
 
@@ -359,9 +363,77 @@ class RealPirActionsRunner @AssistedInject constructor(
             }
         }
 
-    private suspend fun handleAwaitEmailData(effect: SideEffect.AwaitEmailData) {
-        // TODO: Implement in step 5 — poll for email data via EmailDataResolver
-    }
+    private suspend fun handleAwaitEmailData(effect: AwaitEmailData) =
+        withContext(dispatcherProvider.io()) {
+            if (effect.emailAddress.isEmpty() || effect.attemptId.isEmpty()) {
+                onError(
+                    ClientError(
+                        actionID = effect.actionId,
+                        message = "Invalid state: missing email address or attempt id for email data poll",
+                    ),
+                )
+                return@withContext
+            }
+
+            val maxAttempts = if (effect.pollingIntervalSeconds > 0) {
+                effect.maxTimeoutSeconds / effect.pollingIntervalSeconds
+            } else {
+                0
+            }
+
+            when (val result = emailDataResolver.poll(effect.emailAddress, effect.attemptId)) {
+                is EmailDataResolver.EmailDataResolverResult.Success -> {
+                    if (effect.extractFields.all { result.extractedData.containsKey(it) }) {
+                        engine?.dispatch(
+                            EmailDataReceived(
+                                emailExtractedData = result.extractedData,
+                            ),
+                        )
+                    } else {
+                        onError(
+                            ClientError(
+                                actionID = effect.actionId,
+                                message = "Email data ready but missing required fields: ${effect.extractFields - result.extractedData.keys}",
+                            ),
+                        )
+                    }
+                }
+
+                is EmailDataResolver.EmailDataResolverResult.Pending -> {
+                    if (effect.attempt >= maxAttempts) {
+                        onError(
+                            ClientError(
+                                actionID = effect.actionId,
+                                message = "Email data poll timeout after ${effect.maxTimeoutSeconds}s",
+                            ),
+                        )
+                    } else {
+                        delay(effect.pollingIntervalSeconds * 1000L)
+                        engine?.dispatch(
+                            RetryAwaitEmailData(
+                                actionId = effect.actionId,
+                                brokerName = effect.brokerName,
+                                emailAddress = effect.emailAddress,
+                                attemptId = effect.attemptId,
+                                extractFields = effect.extractFields,
+                                pollingIntervalSeconds = effect.pollingIntervalSeconds,
+                                maxTimeoutSeconds = effect.maxTimeoutSeconds,
+                                attempt = effect.attempt,
+                            ),
+                        )
+                    }
+                }
+
+                is EmailDataResolver.EmailDataResolverResult.Failure -> {
+                    onError(
+                        ClientError(
+                            actionID = effect.actionId,
+                            message = result.message,
+                        ),
+                    )
+                }
+            }
+        }
 
     private suspend fun handleGetCaptchaSolution(effect: GetCaptchaSolution) =
         withContext(dispatcherProvider.io()) {

@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOut
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
+import com.duckduckgo.pir.impl.common.RealEmailDataResolver
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerActionFailedEventHandler
 import com.duckduckgo.pir.impl.common.actions.BrokerStepCompletedEventHandler
@@ -314,6 +315,7 @@ class PirEndToEndTest {
             pirDetachedWebViewProvider = fakePirDetachedWebViewProvider,
             brokerActionProcessor = brokerActionProcessor,
             nativeBrokerActionHandler = fakeNativeBrokerActionHandler,
+            emailDataResolver = RealEmailDataResolver(fakeDbpService, dispatcherProvider, moshi),
             engineFactory = engineFactory,
             coroutineScope = testScope,
         )
