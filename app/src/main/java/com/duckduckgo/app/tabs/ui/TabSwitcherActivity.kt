@@ -506,7 +506,7 @@ class TabSwitcherActivity :
                     // If no active tab yet (race with flowSelectedTab), retry on next emission.
                     val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
                     if (scrolled) firstTimeLoadingTabsList = false
-                    if (freshAfterModeSwitch && scrolled) {
+                    if (freshAfterModeSwitch) {
                         tabsRecycler.post(::revealNewMode)
                     }
                 }
