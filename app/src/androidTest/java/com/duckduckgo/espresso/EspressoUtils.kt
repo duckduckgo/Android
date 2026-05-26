@@ -18,7 +18,13 @@ package com.duckduckgo.espresso
 
 import android.view.*
 import androidx.test.espresso.*
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.*
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import com.duckduckgo.app.browser.R
 import org.hamcrest.*
 
 // used to introduce a delay not blocking main thread
@@ -29,5 +35,15 @@ fun waitFor(delay: Long): ViewAction {
         override fun perform(uiController: UiController, v: View?) {
             uiController.loopMainThreadForAtLeast(delay)
         }
+    }
+}
+
+// The Home screen widget promo bottom sheet (CtaViewModel.canShowWidgetCta) can appear on top of
+// BrowserActivity on fresh installs and obscure the activity's own root, breaking unrelated tests.
+fun dismissWidgetPromoIfPresent() {
+    runCatching {
+        onView(isRoot()).inRoot(isDialog())
+            .perform(waitForView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton), timeout = 3000))
+        onView(withId(R.id.homeScreenWidgetBottomSheetDialogGhostButton)).perform(click())
     }
 }
