@@ -35,7 +35,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
-import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -97,7 +97,7 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockUserStageStore: UserStageStore = mock()
-    private val mockTabRepository: TabRepository = mock()
+    private val mockAggregateTabRepository: AggregateTabRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockSubscriptions: Subscriptions = mock()
@@ -147,7 +147,7 @@ class DaxFireButtonBrandDesignUpdateContextualCtaTest {
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
-            tabRepository = mockTabRepository,
+            aggregateTabRepository = mockAggregateTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckChat = mockDuckChat,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
