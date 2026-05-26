@@ -326,7 +326,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             addAnimatorListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     if (!isDuckAiIntroAnimationEnabled) {
-                        viewModel.onIntroAnimationFinished()
+                        viewModel.onIntroEnded()
                     }
                 }
             })
@@ -346,7 +346,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.duckAiIntroAnimation.isVisible = true
                     binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            viewModel.onIntroAnimationFinished()
+                            viewModel.onIntroEnded()
                         }
                     })
                     binding.duckAiIntroAnimation.playAnimation()
@@ -555,6 +555,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet -> {
                         showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.PlayIntroAnimation -> {
+                        // Handled by the view-side refactor (separate batch); intentional no-op for now.
                     }
                 }
             }

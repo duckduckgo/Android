@@ -111,7 +111,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewSearchSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewChatSuggestions: List<DaxDialogIntroOption> = emptyList(),
         val inputScreenPreviewIsSearchSelected: Boolean = false,
-        val isDuckAiIntroAnimationEnabled: Boolean? = null,
+        val isDuckAiIntroAnimationEnabled: Boolean = false,
     ) {
         val maxPageCount = 3
     }
@@ -122,10 +122,18 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
+    private var notificationPermissionFlowStarted = false
+
     init {
         viewModelScope.launch(dispatchers.io()) {
             val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
-            _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
+            _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
+            _viewState.update {
+                it.copy(
+                    isDuckAiIntroAnimationEnabled = introAnimationEnabled,
+                    hasPlayedIntroAnimation = true,
+                )
+            }
         }
     }
 
@@ -142,6 +150,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             val showSplitOption: Boolean,
         ) : Command
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
+        data class PlayIntroAnimation(val withDuckAi: Boolean) : Command
     }
 
     fun onDialogTapped() {
@@ -191,8 +200,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    fun onIntroAnimationFinished() {
-        _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
+    fun onIntroEnded() {
+        if (notificationPermissionFlowStarted) return
+        notificationPermissionFlowStarted = true
         viewModelScope.launch {
             delay(2.seconds)
             _commands.send(Command.RequestNotificationPermissions)
