@@ -454,7 +454,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun updateBottomRowVisibility() {
         val bottomRow = findViewById<View?>(R.id.inputModeWidgetBottomRow) ?: return
-        val visible = isChatTabSelected() && (inputField.hasFocus() || previewEnterFocus || isStreaming)
+        val suppress = nativeInputState?.shouldSuppressBottomRow() == true
+        val visible = isChatTabSelected() &&
+            (inputField.hasFocus() || previewEnterFocus || isStreaming) &&
+            !suppress
         bottomRow.visibility = if (visible) VISIBLE else GONE
     }
 
@@ -1188,3 +1191,12 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
+ * In search-only mode opened from the browser address bar, those tools should never appear —
+ * even if a stale `toggleSelection=DUCK_AI` from a prior interaction makes `isChatTabSelected()` true.
+ */
+internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
+    inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
+        inputContext == NativeInputState.InputContext.BROWSER

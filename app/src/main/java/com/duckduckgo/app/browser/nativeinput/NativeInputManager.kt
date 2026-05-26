@@ -78,6 +78,7 @@ class NativeInputCallbacks(
      * the caller uses the return value to decide whether to re-show the suggestions list.
      */
     val restoreOmnibarAutocomplete: (forQuery: String) -> Boolean = { _ -> false },
+    val onContextualSheetRequested: () -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -405,10 +406,10 @@ class RealNativeInputManager @Inject constructor(
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
-                if (queryUrlPredictor.isUrl(query)) {
-                    hideNativeInput(isNavigation = true)
-                    callbacks.onSearchSubmitted(query)
-                } else if (omnibarController.isDuckAiMode()) {
+                if (omnibarController.isDuckAiMode()) {
+                    // In Duck.ai context the user is actively chatting — a pasted URL is a chat
+                    // message, never a contextual-sheet trigger or a navigation. Fall through to
+                    // the standard chat-submit path so the message reaches the Duck.ai webview.
                     widget.saveLastUsedTogglePosition(isChat = true)
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
@@ -424,6 +425,9 @@ class RealNativeInputManager @Inject constructor(
                         filesJson,
                     )
                     widget.clearSelectedTool()
+                } else if (queryUrlPredictor.isUrl(query)) {
+                    hideNativeInput(isNavigation = true)
+                    callbacks.onContextualSheetRequested()
                 } else {
                     widget.saveLastUsedTogglePosition(isChat = true)
                     widget.storePendingPrompt(query)

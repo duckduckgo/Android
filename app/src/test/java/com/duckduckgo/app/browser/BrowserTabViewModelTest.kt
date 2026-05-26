@@ -10081,6 +10081,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOpenDuckAIContextualModeThenShowDuckAIContextualModeCommandSent() = runTest {
+        testee.openDuckAIContextualMode()
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
+    }
+
+    @Test
     fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNTPThenContextualNotCalled() = runTest {
         val duckAIUrl = "https://duckduckgo.com/?q=test"
 
