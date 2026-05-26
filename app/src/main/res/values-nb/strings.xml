@@ -990,6 +990,11 @@
     <string name="syncRestoreDialogPrimaryCta">Gjenopprett innholdet mitt</string>
     <string name="syncRestoreDialogSecondaryCta">Hopp over</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">La oss fortsette der du slapp på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dine lagrede bokmerker, passord osv. er klare.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">AI er alltid valgfritt, og personvern er alltid på.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Last ned PDF</string>
 
@@ -1002,6 +1007,6 @@
     <string name="preOnboardingWelcomeDialogBody1">Klar for en raskere nettleser som du har kontroll over?</string>
     <string name="preOnboardingWelcomeDialogBody2">AI er alltid valgfritt, og personvern er alltid på.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d av %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «and» på engelsk</string>
-    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «and» på spansk</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">hvordan si «duck» på engelsk</string>
+    <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si duck» på spansk</string>
 </resources>
