@@ -1030,6 +1030,11 @@
     <string name="syncRestoreDialogPrimaryCta">Obnovi moje stvari</string>
     <string name="syncRestoreDialogSecondaryCta">Preskoči</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nadaljujte tam, kjer ste končali na DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Shranjeni zaznamki, gesla in drugo so pripravljeni.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Umetna inteligenca je vedno neobvezna, zaščita zasebnosti pa je vedno vklopljena.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Prenesi PDF</string>
 
