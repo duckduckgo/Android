@@ -575,8 +575,9 @@ class RealNativeInputManager @Inject constructor(
         }
 
         val isDuckAiTabSelected = widget.isChatTabSelected()
-        val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
-        widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
+        // Voice search and voice chat now occupy separate slots (in-field vs. bottom-row), so they
+        // can coexist on the Duck.ai tab. Voice search there is gated only by its own feature flag.
+        widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || voiceSearchDuckAiAvailable))
         widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)
     }
 
