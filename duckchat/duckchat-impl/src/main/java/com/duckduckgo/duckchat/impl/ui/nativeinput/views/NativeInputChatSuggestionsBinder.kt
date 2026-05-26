@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
@@ -29,7 +30,12 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAda
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
 import javax.inject.Inject
 
-/** Builds the chat-tab ConcatAdapter: chat history → divider → URL suggestions → divider → "Search for [query]". */
+private const val VIEW_ALL_CHATS_THRESHOLD = 8
+
+/**
+ * Builds the chat-tab ConcatAdapter:
+ * chat history → divider → URL suggestions → divider → "Search for [query]" → divider → "View all Chats".
+ */
 class NativeInputChatSuggestionsBinder @Inject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
 ) {
@@ -41,6 +47,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         private val urlDivider: SectionDividerAdapter,
         private val searchDivider: SectionDividerAdapter,
         private val searchForAdapter: ChatSearchSuggestionAdapter,
+        private val historyShortcutDivider: SectionDividerAdapter,
+        private val historyShortcutAdapter: ChatHistoryShortcutAdapter,
     ) {
         /**
          * Applies content to all sub-adapters; [onCommit] fires after the async chat history
@@ -51,12 +59,14 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         fun submit(
             suggestions: ChatTabSuggestions,
             query: String,
+            isHistoryAvailable: Boolean,
             onCommit: (hasContent: Boolean) -> Unit,
         ) {
             val isTyping = query.isNotEmpty()
             val hasChat = suggestions.chatHistory.isNotEmpty()
             val hasUrl = suggestions.urlSuggestions.suggestions.isNotEmpty()
             val showUrl = isTyping && hasUrl
+            val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > VIEW_ALL_CHATS_THRESHOLD
             val hasContent = hasChat || isTyping
 
             chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
@@ -70,6 +80,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             searchForAdapter.update(query, visible = isTyping)
             urlDivider.setVisible(hasChat && showUrl)
             searchDivider.setVisible((hasChat || showUrl) && isTyping)
+            historyShortcutAdapter.setVisible(showShortcut)
+            historyShortcutDivider.setVisible(showShortcut)
         }
 
         fun clear() {
@@ -78,6 +90,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             searchForAdapter.update("", visible = false)
             urlDivider.setVisible(false)
             searchDivider.setVisible(false)
+            historyShortcutAdapter.setVisible(false)
+            historyShortcutDivider.setVisible(false)
         }
     }
 
@@ -85,6 +99,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         onChatSuggestionSelected: (ChatSuggestion) -> Unit,
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
+        onChatHistoryShortcutClicked: () -> Unit,
     ): Binding {
         val chatSuggestionsAdapter = ChatSuggestionsAdapter { onChatSuggestionSelected(it) }
         val urlAdapter = BrowserAutoCompleteSuggestionsAdapter(
@@ -98,6 +113,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
         val urlDivider = SectionDividerAdapter()
         val searchDivider = SectionDividerAdapter()
         val searchForAdapter = ChatSearchSuggestionAdapter { onSearchForQuerySubmitted(it) }
+        val historyShortcutDivider = SectionDividerAdapter()
+        val historyShortcutAdapter = ChatHistoryShortcutAdapter { onChatHistoryShortcutClicked() }
 
         val concat = ConcatAdapter(
             chatSuggestionsAdapter,
@@ -105,6 +122,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             urlAdapter,
             searchDivider,
             searchForAdapter,
+            historyShortcutDivider,
+            historyShortcutAdapter,
         )
 
         return Binding(
@@ -114,6 +133,8 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             urlDivider = urlDivider,
             searchDivider = searchDivider,
             searchForAdapter = searchForAdapter,
+            historyShortcutDivider = historyShortcutDivider,
+            historyShortcutAdapter = historyShortcutAdapter,
         )
     }
 }

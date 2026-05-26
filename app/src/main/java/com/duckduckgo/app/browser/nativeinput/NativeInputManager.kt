@@ -68,6 +68,7 @@ class NativeInputCallbacks(
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
+    val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
@@ -733,6 +734,10 @@ class RealNativeInputManager @Inject constructor(
             onSearchForQuerySubmitted = { query ->
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
+            },
+            onChatHistoryShortcutClicked = {
+                hideNativeInput(isNavigation = true)
+                callbacks.onChatHistoryShortcutClicked()
             },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {

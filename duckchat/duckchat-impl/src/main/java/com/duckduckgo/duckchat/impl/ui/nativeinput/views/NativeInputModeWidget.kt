@@ -161,6 +161,7 @@ interface NativeInputWidget {
         onChatSuggestionSelected: (String) -> Unit,
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
+        onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     )
@@ -955,6 +956,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatSuggestionSelected: (String) -> Unit,
         onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit,
         onSearchForQuerySubmitted: (String) -> Unit,
+        onChatHistoryShortcutClicked: () -> Unit,
         onShowSuggestions: (RecyclerView.Adapter<*>) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     ) {
@@ -974,6 +976,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     onChatUrlSuggestionClicked(suggestion)
                 },
                 onSearchForQuerySubmitted = onSearchForQuerySubmitted,
+                onChatHistoryShortcutClicked = onChatHistoryShortcutClicked,
             ).also { chatSuggestionsBinding = it }
         }
 
@@ -1048,13 +1051,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val result = viewModel.fetchChatTabSuggestions(query, chatSuggestionsUserEnabled)
             // Defer the adapter swap until the chat history arrives, so the RecyclerView
             // lays out from position 0 with chat history on top and avoids repositioning.
-            binding.submit(result, query) { hasContent ->
-                if (hasContent) {
-                    onShowSuggestions?.invoke(binding.adapter)
-                } else {
-                    onClearSuggestions?.invoke(true)
-                }
-            }
+            binding.submit(
+                suggestions = result,
+                query = query,
+                isHistoryAvailable = viewModel.isHistoryAvailable.value,
+                onCommit = { hasContent ->
+                    if (hasContent) {
+                        onShowSuggestions?.invoke(binding.adapter)
+                    } else {
+                        onClearSuggestions?.invoke(true)
+                    }
+                },
+            )
         }
     }
 
