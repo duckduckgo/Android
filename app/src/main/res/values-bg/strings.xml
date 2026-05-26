@@ -990,6 +990,11 @@
     <string name="syncRestoreDialogPrimaryCta">Възстановяване на моите неща</string>
     <string name="syncRestoreDialogSecondaryCta">Пропускане</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Нека продължим оттам, откъдето спряхте в DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Запазените отметки, пароли и други са готови.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Изтегляне на PDF</string>
 
@@ -1002,6 +1007,6 @@
     <string name="preOnboardingWelcomeDialogBody1">Готови ли сте за по-бърз браузър,\nкойто осигурява контрол?</string>
     <string name="preOnboardingWelcomeDialogBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d от %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва “патица“ на английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва \"патица\" на испански</string>
 </resources>
