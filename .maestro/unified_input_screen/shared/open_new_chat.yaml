@@ -12,13 +12,9 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "actionSend"
 
-# accept T&C if visible
-- assertVisible:
-    optional: true
-    text: 'Agree and Continue'
-- tapOn:
-    optional: true
-    text: "Agree and Continue"
+# accept the duck.ai T&C if it appears AND dismiss the chat-history
+# "Got It!" tooltip if it appears (first-run states; both optional)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
 
 # duck.ai's web view sometimes fails to load — tap "Reload Duck.ai" if shown
 - runFlow: reload_duckai_if_needed.yaml
