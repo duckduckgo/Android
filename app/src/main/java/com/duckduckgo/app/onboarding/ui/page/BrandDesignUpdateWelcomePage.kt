@@ -90,6 +90,8 @@ import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -118,6 +120,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         ViewModelProvider(this, viewModelFactory)[BrandDesignUpdatePageViewModel::class.java]
     }
 
+    private val introInProgress = MutableStateFlow(false)
     private var introAnimatorSet: AnimatorSet? = null
     private var outroAnimatorSet: AnimatorSet? = null
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
@@ -267,7 +270,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         val animators = mutableListOf<android.animation.Animator>(logoFade, textFade)
-        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled == true) {
+        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled) {
             val duckAiIntroFade = ObjectAnimator.ofFloat(binding.duckAiIntroAnimation, View.ALPHA, 1f, 0f).apply {
                 duration = OUTRO_FADE_DURATION
                 interpolator = fadeEasing
@@ -326,6 +329,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             addAnimatorListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     if (!isDuckAiIntroAnimationEnabled) {
+                        introInProgress.value = false
                         viewModel.onIntroEnded()
                     }
                 }
@@ -346,6 +350,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.duckAiIntroAnimation.isVisible = true
                     binding.duckAiIntroAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
+                            introInProgress.value = false
                             viewModel.onIntroEnded()
                         }
                     })
@@ -419,7 +424,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             setMinFrame(BACKGROUND_MIN_FRAME)
             progress = 1f
         }
-        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled == true) {
+        if (viewModel.viewState.value.isDuckAiIntroAnimationEnabled) {
             prepareDuckAiIntroAnimation()
             with(binding.duckAiIntroAnimation) {
                 isVisible = true
@@ -497,14 +502,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.cardContainer.setOnClickListener { viewModel.onDialogTapped() }
         binding.root.setOnClickListener { viewModel.onBackgroundTapped() }
 
-        viewModel.viewState
+        combine(viewModel.viewState, introInProgress) { state, inProgress -> state to inProgress }
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { state ->
+            .onEach { (state, inProgress) ->
                 when {
-                    !state.hasPlayedIntroAnimation -> state.isDuckAiIntroAnimationEnabled?.let { enabled ->
-                        binding.root.doOnLayout { playIntroAnimation(isDuckAiIntroAnimationEnabled = enabled) }
+                    inProgress -> {
+                        // Suppress snap while the intro animator is mid-flight in this view;
+                        // the animator end listener will flip the flag and re-emit through combine.
                     }
-                    state.hasPlayedIntroAnimation && state.currentDialog == null -> snapToIntroEndState()
+                    state.hasPlayedIntroAnimation && state.currentDialog == null -> {
+                        snapToIntroEndState()
+                        // Idempotent in the VM; also covers rotation-mid-intro where the
+                        // animator end listener never fires.
+                        viewModel.onIntroEnded()
+                    }
                     isAnimating -> { /* animation in progress — ignore re-emissions from onDialogAnimationStarted() */ }
                     state.hasAnimatedCurrentDialog -> {
                         val dialog = state.currentDialog ?: return@onEach
@@ -557,7 +568,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
                     }
                     is BrandDesignUpdatePageViewModel.Command.PlayIntroAnimation -> {
-                        // Handled by the view-side refactor (separate batch); intentional no-op for now.
+                        introInProgress.value = true
+                        binding.root.doOnLayout {
+                            playIntroAnimation(isDuckAiIntroAnimationEnabled = command.withDuckAi)
+                        }
                     }
                 }
             }
@@ -568,6 +582,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onDestroyView()
 
         introAnimatorSet?.cancel()
+        introInProgress.value = false
         outroAnimatorSet?.cancel()
         backgroundIntroAnimatorSet?.cancel()
         walkingDaxAnimatorSet?.cancel()
