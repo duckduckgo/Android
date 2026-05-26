@@ -24,7 +24,7 @@ tags:
 
       - scrollUntilVisible:
           element:
-            text: "Duck Player"
+            text: "YouTube Ad Blocking"
           direction: DOWN
 
       - tapOn:
