@@ -1030,6 +1030,11 @@
     <string name="syncRestoreDialogPrimaryCta">Восстановить мои данные</string>
     <string name="syncRestoreDialogSecondaryCta">Пропустить</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Давайте продолжим с того места, где вы остановились в DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Ваши сохраненные закладки, пароли и т. д. готовы.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">Здесь ИИ — всегда лишь дополнительная опция, а защита конфиденциальности всегда включена.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Скачать PDF</string>
 
