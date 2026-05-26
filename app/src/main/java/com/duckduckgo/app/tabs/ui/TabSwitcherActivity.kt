@@ -181,6 +181,8 @@ class TabSwitcherActivity :
 
     private var currentLayoutType: LayoutType? = null
 
+    private var isOnScrolledListenerAttached = false
+
     private var skipTabPurge: Boolean = false
 
     private lateinit var tabTouchHelper: TabTouchHelper
@@ -539,11 +541,12 @@ class TabSwitcherActivity :
 
     private fun updateLayoutType(layoutType: LayoutType) {
         if (layoutType == currentLayoutType) {
+            attachOnScrolledListener()
             tabsRecycler.show()
             return
         }
         tabsRecycler.hide()
-        tabsRecycler.removeOnScrollListener(onScrolledListener)
+        detachOnScrolledListener()
 
         val centerOffsetPercent = getCurrentCenterOffset()
 
@@ -553,15 +556,29 @@ class TabSwitcherActivity :
             scrollToPreviousCenterOffset(
                 centerOffsetPercent = centerOffsetPercent,
                 onScrollCompleted = {
-                    tabsRecycler.addOnScrollListener(onScrolledListener)
+                    attachOnScrolledListener()
                 },
             )
         } else {
             scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
-            tabsRecycler.addOnScrollListener(onScrolledListener)
+            attachOnScrolledListener()
         }
 
         tabsRecycler.show()
+    }
+
+    private fun attachOnScrolledListener() {
+        if (isOnScrolledListenerAttached) return
+
+        tabsRecycler.addOnScrollListener(onScrolledListener)
+        isOnScrolledListenerAttached = true
+    }
+
+    private fun detachOnScrolledListener() {
+        if (!isOnScrolledListenerAttached) return
+
+        tabsRecycler.removeOnScrollListener(onScrolledListener)
+        isOnScrolledListenerAttached = false
     }
 
     private fun applyLayoutType(layoutType: LayoutType) {
