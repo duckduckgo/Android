@@ -23,6 +23,7 @@ import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -86,7 +87,8 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private suspend fun getFaviconFromDiskAsync(file: File): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
+        Glide.with(context).asBitmap().load(file).downsample(DownsampleStrategy.CENTER_INSIDE)
+            .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
     }.getOrNull()
 
     private suspend fun getFaviconFromDiskAsync(
@@ -105,7 +107,8 @@ class GlideFaviconDownloader @Inject constructor(
     }.getOrNull()
 
     private suspend fun getFaviconFromUrlAsync(uri: Uri): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
+        Glide.with(context).asBitmap().load(uri).downsample(DownsampleStrategy.CENTER_INSIDE)
+            .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).awaitBitmap(context)
     }.getOrNull()
 
     private suspend fun RequestBuilder<Bitmap>.awaitBitmap(
@@ -174,7 +177,8 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private fun getFaviconFromDiskSync(file: File): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+        Glide.with(context).asBitmap().load(file).downsample(DownsampleStrategy.CENTER_INSIDE)
+            .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
             .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 
@@ -195,7 +199,8 @@ class GlideFaviconDownloader @Inject constructor(
     }.getOrNull()
 
     private fun getFaviconFromUrlSync(uri: Uri): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+        Glide.with(context).asBitmap().load(uri).downsample(DownsampleStrategy.CENTER_INSIDE)
+            .diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
             .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 }

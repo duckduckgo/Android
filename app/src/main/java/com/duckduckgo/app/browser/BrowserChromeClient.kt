@@ -91,6 +91,7 @@ class BrowserChromeClient @Inject constructor(
         webView: WebView,
         icon: Bitmap,
     ) {
+        logcat(INFO) { "lp_test; onReceivedIcon url=${webView.url} size=${icon.width}x${icon.height}" }
         webView.url?.let {
             logcat(INFO) { "Favicon bitmap received: ${webView.url}" }
             webViewClientListener?.iconReceived(it, icon)
@@ -102,6 +103,7 @@ class BrowserChromeClient @Inject constructor(
         url: String?,
         precomposed: Boolean,
     ) {
+        logcat(INFO) { "lp_test; onReceivedTouchIconUrl visitedUrl=${view?.url} iconUrl=$url precomposed=$precomposed" }
         logcat(INFO) { "Favicon touch received: ${view?.url}, $url" }
         val visitedUrl = view?.url ?: return
         val iconUrl = url ?: return

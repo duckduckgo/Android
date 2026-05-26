@@ -1610,19 +1610,39 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         icon: Bitmap,
     ) {
-        val currentTab = tabRepository.liveSelectedTab.value ?: return
-        val currentUrl = currentTab.url ?: return
+        logcat {
+            "lp_test; iconReceived[bitmap] enter url=$url icon=${icon.width}x${icon.height} " +
+                "selectedTabId=${tabRepository.liveSelectedTab.value?.tabId} " +
+                "selectedTabUrl=${tabRepository.liveSelectedTab.value?.url} " +
+                "thisTabId=${if (::tabId.isInitialized) tabId else "<uninit>"}"
+        }
+        val currentTab = tabRepository.liveSelectedTab.value ?: run {
+            logcat { "lp_test; iconReceived[bitmap] dropped: no selected tab" }
+            return
+        }
+        val currentUrl = currentTab.url ?: run {
+            logcat { "lp_test; iconReceived[bitmap] dropped: selected tab has null url" }
+            return
+        }
         if (currentUrl != url) {
+            logcat { "lp_test; iconReceived[bitmap] dropped: url mismatch incoming=$url selected=$currentUrl" }
             logcat { "Favicon received for a url $url, different than the current one $currentUrl" }
             return
         }
         viewModelScope.launch(dispatchers.io()) {
             if (faviconFetchingFixFeature.self().isEnabled()) {
                 val existing = faviconManager.loadFromDisk(currentTab.tabId, url)
-                if (existing != null && existing.width >= icon.width) return@launch
+                if (existing != null && existing.width >= icon.width) {
+                    logcat { "lp_test; iconReceived[bitmap] skipped by pre-check existing=${existing.width} new=${icon.width}" }
+                    return@launch
+                }
             }
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, ImageFavicon(icon, url))
+            logcat { "lp_test; iconReceived[bitmap] storeFavicon -> ${faviconFile?.name ?: "null"}" }
             faviconFile?.let {
+                if (currentTab.tabId != tabId) {
+                    logcat { "lp_test; updateTabFavicon mismatch; currentTab.tabId: ${currentTab.tabId}; tabId: $tabId" }
+                }
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
         }
@@ -1632,15 +1652,32 @@ class BrowserTabViewModel @Inject constructor(
         visitedUrl: String,
         iconUrl: String,
     ) {
-        val currentTab = tabRepository.liveSelectedTab.value ?: return
-        val currentUrl = currentTab.url ?: return
+        logcat {
+            "lp_test; iconReceived[url] enter visitedUrl=$visitedUrl iconUrl=$iconUrl " +
+                "selectedTabId=${tabRepository.liveSelectedTab.value?.tabId} " +
+                "selectedTabUrl=${tabRepository.liveSelectedTab.value?.url} " +
+                "thisTabId=${if (::tabId.isInitialized) tabId else "<uninit>"}"
+        }
+        val currentTab = tabRepository.liveSelectedTab.value ?: run {
+            logcat { "lp_test; iconReceived[url] dropped: no selected tab" }
+            return
+        }
+        val currentUrl = currentTab.url ?: run {
+            logcat { "lp_test; iconReceived[url] dropped: selected tab has null url" }
+            return
+        }
         if (currentUrl.toUri().host != visitedUrl.toUri().host) {
+            logcat { "lp_test; iconReceived[url] dropped: host mismatch incoming=$visitedUrl selected=$currentUrl" }
             logcat { "Favicon received for a url $visitedUrl, different than the current one $currentUrl" }
             return
         }
         viewModelScope.launch {
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, UrlFavicon(iconUrl, visitedUrl))
+            logcat { "lp_test; iconReceived[url] storeFavicon -> ${faviconFile?.name ?: "null"} (iconUrl=$iconUrl)" }
             faviconFile?.let {
+                if (currentTab.tabId != tabId) {
+                    logcat { "lp_test; updateTabFavicon mismatch; currentTab.tabId: ${currentTab.tabId}; tabId: $tabId" }
+                }
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
         }

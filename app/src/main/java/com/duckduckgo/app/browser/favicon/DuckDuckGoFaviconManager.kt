@@ -41,6 +41,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.io.File
 
 private const val FAVICON_LOAD_RETRY_DELAY = 2000L
@@ -91,6 +92,7 @@ class DuckDuckGoFaviconManager constructor(
             val domain = url.extractDomain() ?: return@withContext null
 
             val favicon = downloadFaviconFor(domain)
+            logcat { "lp_test; tryFetchFaviconForUrl tabId=$tabId domain=$domain downloadedWidth=${favicon?.width ?: "null"}" }
 
             return@withContext if (favicon != null) {
                 saveFavicon(tabId, favicon, domain)
@@ -105,6 +107,7 @@ class DuckDuckGoFaviconManager constructor(
             val domain = url.extractDomain() ?: return@withContext null
 
             val favicon = downloadFaviconFor(domain)
+            logcat { "lp_test; tryFetchFaviconForUrl(noTab) domain=$domain downloadedWidth=${favicon?.width ?: "null"}" }
 
             return@withContext if (favicon != null) {
                 saveFavicon(null, favicon, domain)
@@ -279,11 +282,12 @@ class DuckDuckGoFaviconManager constructor(
     private suspend fun downloadFaviconFor(domain: String): Bitmap? {
         val faviconUrl = getFaviconUrl(domain) ?: return null
         val touchFaviconUrl = getTouchFaviconUrl(domain) ?: return null
-        faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
-            return it
-        } ?: faviconDownloader.getFaviconFromUrl(faviconUrl).let {
-            return it
-        }
+        val touchResult = faviconDownloader.getFaviconFromUrl(touchFaviconUrl)
+        logcat { "lp_test; downloadFaviconFor domain=$domain touchUrl=$touchFaviconUrl touchWidth=${touchResult?.width ?: "null"}" }
+        if (touchResult != null) return touchResult
+        val fallbackResult = faviconDownloader.getFaviconFromUrl(faviconUrl)
+        logcat { "lp_test; downloadFaviconFor domain=$domain fallbackUrl=$faviconUrl fallbackWidth=${fallbackResult?.width ?: "null"}" }
+        return fallbackResult
     }
 
     private fun getFaviconUrl(domain: String): Uri? {

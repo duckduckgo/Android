@@ -192,16 +192,23 @@ class FileBasedFaviconPersister(
         if (existingFile.exists()) {
             logcat(INFO) { "Favicon favicon exists for $domain in $subFolder" }
             val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
+            logcat {
+                "lp_test; persister.writeToDisk[legacy] dir=$directory sub=$subFolder existingWidth=${existingFavicon?.width ?: "null"} newWidth=${bitmap.width}"
+            }
 
             existingFavicon?.let {
                 if (it.width > bitmap.width) {
+                    logcat { "lp_test; persister.writeToDisk[legacy] SKIP existing=${it.width} new=${bitmap.width}" }
                     return null // Stored file has better quality
                 }
             }
+        } else {
+            logcat { "lp_test; persister.writeToDisk[legacy] dir=$directory sub=$subFolder newWidth=${bitmap.width} (no existing)" }
         }
 
         val faviconFile = prepareDestinationFile(directory, subFolder, domain)
         writeBytesToFile(faviconFile, bitmap)
+        logcat { "lp_test; persister.writeToDisk[legacy] WROTE ${faviconFile.name} width=${bitmap.width}" }
 
         return if (faviconFile.exists()) {
             faviconFile
@@ -222,12 +229,18 @@ class FileBasedFaviconPersister(
             if (existingFile.exists()) {
                 logcat(INFO) { "Favicon favicon exists for $domain in $subFolder" }
                 val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
+                logcat {
+                    "lp_test; persister.writeToDiskAsync dir=$directory sub=$subFolder existingWidth=${existingFavicon?.width ?: "null"} newWidth=${bitmap.width}"
+                }
 
                 existingFavicon?.let {
                     if (it.width > bitmap.width) {
+                        logcat { "lp_test; persister.writeToDiskAsync SKIP existing=${it.width} new=${bitmap.width}" }
                         return null // Stored file has better quality
                     }
                 }
+            } else {
+                logcat { "lp_test; persister.writeToDiskAsync dir=$directory sub=$subFolder newWidth=${bitmap.width} (no existing)" }
             }
 
             val faviconFile = prepareDestinationFile(directory, subFolder, domain)
@@ -241,6 +254,7 @@ class FileBasedFaviconPersister(
                     }
                 }
             }
+            logcat { "lp_test; persister.writeToDiskAsync WROTE ${faviconFile.name} width=${bitmap.width}" }
 
             return if (faviconFile.exists()) {
                 faviconFile
