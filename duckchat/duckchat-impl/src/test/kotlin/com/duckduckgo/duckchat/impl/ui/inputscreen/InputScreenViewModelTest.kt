@@ -1712,12 +1712,13 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when onChatHistoryShortcutClicked then emit LaunchDuckChatHistory command`() =
+    fun `when onChatHistoryShortcutClicked then emit LaunchDuckChatHistory command and fire pixel`() =
         runTest {
             val viewModel = createViewModel()
 
             viewModel.onChatHistoryShortcutClicked()
 
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
             assertEquals(Command.LaunchDuckChatHistory, viewModel.command.value)
         }
 

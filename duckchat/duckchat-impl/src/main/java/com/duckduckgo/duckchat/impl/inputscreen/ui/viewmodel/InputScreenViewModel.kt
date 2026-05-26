@@ -853,6 +853,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatHistoryShortcutClicked() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
         command.value = Command.LaunchDuckChatHistory
     }
 
