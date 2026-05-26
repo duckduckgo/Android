@@ -32,7 +32,11 @@ appId: com.duckduckgo.mobile.android
     timeout: 15000
 
 # tap the back arrow — only present in this AI-off entry path — and verify
-# we land back on the NTP
+# we land back on the NTP. We avoid asserting on ddgLogo because there are
+# two views with that id (one on the NTP, one a Lottie inside the unified
+# input fragment), and after the back-pop the unified input re-opens over
+# the NTP so the NTP logo can be obscured. Instead assert the NTP container
+# is present and that the Duck.ai chat header is gone.
 - tapOn:
     id: "duckAiBack"
 - extendedWaitUntil:
@@ -41,5 +45,5 @@ appId: com.duckduckgo.mobile.android
     timeout: 15000
 - assertVisible:
     id: "newTabPage"
-- assertVisible:
-    id: "ddgLogo"
+- assertNotVisible:
+    id: "duckAIHeader"
