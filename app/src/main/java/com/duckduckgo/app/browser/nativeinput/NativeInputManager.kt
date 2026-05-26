@@ -438,7 +438,12 @@ class RealNativeInputManager @Inject constructor(
                     omnibarController.restore()
                     omnibarController.show()
                     removeWidget()
-                    hideNtp()
+                    // Only tear down the NTP layer if we were over the browser — the submitted
+                    // Duck.ai URL is intercepted by SpecialUrlDetector and opens an overlay
+                    // fragment without webview navigation, so the underlying view must stay.
+                    if (omnibarController.isBrowserMode()) {
+                        hideNtp()
+                    }
                     isExiting = false
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
