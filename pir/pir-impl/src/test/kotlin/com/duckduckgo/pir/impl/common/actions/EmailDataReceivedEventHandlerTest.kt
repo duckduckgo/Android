@@ -124,7 +124,6 @@ class EmailDataReceivedEventHandlerTest {
     fun whenEmailDataReceivedThenPreservesOtherStateFields() = runTest {
         val state = baseState.copy(
             currentBrokerStepIndex = 4,
-            actionRetryCount = 1,
             attemptId = "test-attempt",
         )
         val event = EmailDataReceived(emailExtractedData = mapOf("verificationCode" to "abc"))
@@ -132,7 +131,16 @@ class EmailDataReceivedEventHandlerTest {
         val result = testee.invoke(state, event)
 
         assertEquals(4, result.nextState.currentBrokerStepIndex)
-        assertEquals(1, result.nextState.actionRetryCount)
         assertEquals("test-attempt", result.nextState.attemptId)
+    }
+
+    @Test
+    fun whenEmailDataReceivedThenResetsActionRetryCount() = runTest {
+        val state = baseState.copy(actionRetryCount = 3)
+        val event = EmailDataReceived(emailExtractedData = mapOf("verificationCode" to "abc"))
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(0, result.nextState.actionRetryCount)
     }
 }

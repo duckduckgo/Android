@@ -1061,4 +1061,203 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val sideEffect = result.sideEffect as AwaitEmailData
         assertEquals("", sideEffect.emailAddress)
     }
+
+    @Test
+    fun whenScanStepFillFormWithGeneratedEmailDataThenIncludesEmailInRequestData() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-fill",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = GeneratedEmailData(
+                emailAddress = "scan-generated@example.com",
+                pattern = "pattern-123",
+            ),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertEquals(testProfileQuery, userData.userProfile)
+        assertEquals("scan-generated@example.com", userData.extractedProfile?.email)
+        assertNull(userData.extractedProfile?.name)
+        assertNull(userData.extractedProfile?.emailExtractedData)
+    }
+
+    @Test
+    fun whenScanStepFillFormWithoutGeneratedEmailDataThenExtractedProfileIsNull() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-fill",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = null,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertNull(userData.extractedProfile)
+    }
+
+    @Test
+    fun whenOptOutFillFormWithEmailExtractedDataThenIncludesItInRequestData() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-fill",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(action),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            emailExtractedData = mapOf("verificationCode" to "123456"),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertEquals("John Doe", userData.extractedProfile?.name)
+        assertEquals(mapOf("verificationCode" to "123456"), userData.extractedProfile?.emailExtractedData)
+    }
+
+    @Test
+    fun whenScanStepFillFormWithGeneratedEmailAndEmailExtractedDataThenIncludesBoth() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-fill",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStepsToExecute = listOf(scanStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            generatedEmailData = GeneratedEmailData(
+                emailAddress = "scan-generated@example.com",
+                pattern = "pattern-123",
+            ),
+            emailExtractedData = mapOf("verificationCode" to "654321"),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertEquals("scan-generated@example.com", userData.extractedProfile?.email)
+        assertEquals(mapOf("verificationCode" to "654321"), userData.extractedProfile?.emailExtractedData)
+    }
+
+    @Test
+    fun whenEmailExtractedDataIsEmptyThenFieldIsNull() = runTest {
+        val action = BrokerAction.FillForm(
+            id = "action-fill",
+            elements = emptyList(),
+            selector = "form",
+            dataSource = DataSource.EXTRACTED_PROFILE,
+        )
+        val optOutStep = OptOutStep(
+            broker = testBroker,
+            step = OptOutStepActions(
+                stepType = "optout",
+                actions = listOf(action),
+                optOutType = "form",
+            ),
+            profileToOptOut = testExtractedProfile,
+        )
+        val state = State(
+            runType = RunType.OPTOUT,
+            brokerStepsToExecute = listOf(optOutStep),
+            profileQuery = testProfileQuery,
+            currentBrokerStepIndex = 0,
+            currentActionIndex = 0,
+            emailExtractedData = emptyMap(),
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        val sideEffect = result.sideEffect as PushJsAction
+        val userData = sideEffect.requestParamsData as UserProfile
+        assertNull(userData.extractedProfile?.emailExtractedData)
+    }
 }
