@@ -479,7 +479,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
             is Command.LaunchDuckChatHistory -> {
                 globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
-                activity?.finish()
+                exitInputScreen()
             }
         }
     }
