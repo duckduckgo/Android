@@ -639,6 +639,7 @@ class BrokerStepCompletedEventHandlerTest {
             currentActionIndex = 1,
             actionRetryCount = 5,
             generatedEmailData = testGeneratedEmailData,
+            emailExtractedData = mapOf("verificationCode" to "123456"),
             transactionID = "txn-123",
             brokerStepStartTime = testBrokerStartTime,
             stageStatus = PirStageStatus(
@@ -656,6 +657,7 @@ class BrokerStepCompletedEventHandlerTest {
         assertEquals(1, result.nextState.currentBrokerStepIndex)
         assertEquals(0, result.nextState.actionRetryCount)
         assertNull(result.nextState.generatedEmailData)
+        assertEquals(emptyMap<String, String>(), result.nextState.emailExtractedData)
         assertEquals(PirStage.VALIDATE, result.nextState.stageStatus.currentStage)
         assertEquals(testCurrentTimeInMillis, result.nextState.stageStatus.stageStartMs)
         assertEquals("txn-123", result.nextState.transactionID)
