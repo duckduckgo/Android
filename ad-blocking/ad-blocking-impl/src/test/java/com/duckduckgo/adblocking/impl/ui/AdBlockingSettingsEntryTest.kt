@@ -16,46 +16,34 @@
 
 package com.duckduckgo.adblocking.impl.ui
 
-import android.content.Context
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class AdBlockingSettingsEntryTest {
 
     private val statusChecker: AdBlockingStatusChecker = mock()
-    private val adBlockingTileFactory: AdBlockingTileFactory = mock()
-    private val duckPlayerTileFactory: DuckPlayerTileFactory = mock()
-    private val context: Context = mock()
+    private val activityStarter: GlobalActivityStarter = mock()
 
     private val entry = AdBlockingSettingsEntry(
         statusChecker = statusChecker,
-        adBlockingTileFactory = adBlockingTileFactory,
-        duckPlayerTileFactory = duckPlayerTileFactory,
+        globalActivityStarter = activityStarter,
     )
 
     @Test
-    fun whenAdBlockingShownInSettingsThenAdBlockingTileIsReturned() {
+    fun whenAdBlockingShownInSettingsThenShownInSettings() {
         whenever(statusChecker.isShownInSettings()) doReturn true
-
-        entry.getView(context)
-
-        verify(adBlockingTileFactory).getView(context)
-        verify(duckPlayerTileFactory, never()).getView(any())
+        assertTrue(entry.isShownInSettings())
     }
 
     @Test
-    fun whenAdBlockingNotShownInSettingsThenDuckPlayerTileIsReturned() {
+    fun whenAdBlockingShownInSettingsFalseThenShownInSettingsFalse() {
         whenever(statusChecker.isShownInSettings()) doReturn false
-
-        entry.getView(context)
-
-        verify(duckPlayerTileFactory).getView(context)
-        verify(adBlockingTileFactory, never()).getView(any())
+        assertFalse(entry.isShownInSettings())
     }
 }

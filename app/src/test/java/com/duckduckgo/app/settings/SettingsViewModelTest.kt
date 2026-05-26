@@ -40,6 +40,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -48,6 +49,8 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
+import com.duckduckgo.settings.api.AdBlockingSettingsPlugin
+import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -121,6 +124,9 @@ class SettingsViewModelTest {
 
     private val mockAppInstallStore: AppInstallStore = mock()
 
+    private val mockAdBlockingSettingsPlugins: PluginPoint<AdBlockingSettingsPlugin> = mock()
+    private val mockDuckPlayerSettingsPlugins: PluginPoint<DuckPlayerSettingsPlugin> = mock()
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
@@ -141,7 +147,6 @@ class SettingsViewModelTest {
             dispatcherProvider = dispatcherProviderMock,
             autoconsent = autoconsentMock,
             subscriptions = subscriptionsMock,
-            duckPlayer = duckPlayerMock,
             duckChat = duckChatMock,
             duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
@@ -154,6 +159,8 @@ class SettingsViewModelTest {
             widgetCapabilities = mockWidgetCapabilities,
             settingsDataStore = fakeSettingsDataStore,
             appInstallStore = mockAppInstallStore,
+            adBlockingSettingsPlugins = mockAdBlockingSettingsPlugins,
+            duckPlayerSettingsPlugins = mockDuckPlayerSettingsPlugins,
         )
     }
 
