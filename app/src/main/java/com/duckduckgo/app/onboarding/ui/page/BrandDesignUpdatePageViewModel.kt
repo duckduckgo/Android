@@ -127,13 +127,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
+            _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
             _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
-            _viewState.update {
-                it.copy(
-                    isDuckAiIntroAnimationEnabled = introAnimationEnabled,
-                    hasPlayedIntroAnimation = true,
-                )
-            }
         }
     }
 
@@ -198,6 +193,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 // TODO Quick setup: add pixel for dialog shown
             }
         }
+    }
+
+    fun onIntroAnimationStarted() {
+        _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
     }
 
     fun onIntroEnded() {

@@ -117,11 +117,26 @@ class BrandDesignUpdatePageViewModelTest {
     // region hasPlayedIntroAnimation
 
     @Test
-    fun whenViewModelCreatedThenHasPlayedIntroAnimationFlipsToTrueAfterFlagResolution() = runTest {
+    fun whenViewModelCreatedThenHasPlayedIntroAnimationIsFalse() = runTest {
         val testee = createViewModel()
         testee.viewState.test {
-            val resolvedState = awaitItem()
-            assertTrue(resolvedState.hasPlayedIntroAnimation)
+            val state = awaitItem()
+            assertFalse(state.hasPlayedIntroAnimation)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnIntroAnimationStartedThenHasPlayedIntroAnimationIsTrue() = runTest {
+        val testee = createViewModel()
+        testee.viewState.test {
+            val initialState = awaitItem()
+            assertFalse(initialState.hasPlayedIntroAnimation)
+
+            testee.onIntroAnimationStarted()
+
+            val updatedState = awaitItem()
+            assertTrue(updatedState.hasPlayedIntroAnimation)
             cancelAndConsumeRemainingEvents()
         }
     }

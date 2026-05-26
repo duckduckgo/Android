@@ -569,6 +569,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     is BrandDesignUpdatePageViewModel.Command.PlayIntroAnimation -> {
                         introInProgress.value = true
+                        viewModel.onIntroAnimationStarted()
                         binding.root.doOnLayout {
                             playIntroAnimation(isDuckAiIntroAnimationEnabled = command.withDuckAi)
                         }
