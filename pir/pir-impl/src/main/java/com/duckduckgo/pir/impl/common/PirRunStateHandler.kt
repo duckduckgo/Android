@@ -125,6 +125,7 @@ interface PirRunStateHandler {
             val lastActionId: String,
             val durationMs: Long,
             val currentActionAttemptCount: Int,
+            val generatedEmail: String? = null,
         ) : PirRunState(broker)
 
         data class BrokerRecordEmailConfirmationStarted(
@@ -626,11 +627,16 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerRecordEmailConfirmationNeeded(pirRunState: BrokerRecordEmailConfirmationNeeded) {
+        // Fall back to the generated email when the extracted profile has none. Brokers that use an
+        // explicit generateEmail action (e.g. SpyFly) store the address on the state's generatedEmailData
+        // rather than on extractedProfile, and the polling worker keys off this value to fetch the
+        // confirmation link.
+        val email = pirRunState.extractedProfile.email.ifEmpty { pirRunState.generatedEmail.orEmpty() }
         jobRecordUpdater.markOptOutAsWaitingForEmailConfirmation(
             profileQueryId = pirRunState.extractedProfile.profileQueryId,
             extractedProfileId = pirRunState.extractedProfile.dbId,
             brokerName = pirRunState.broker.name,
-            email = pirRunState.extractedProfile.email,
+            email = email,
             attemptId = pirRunState.attemptId,
         )
         pixelSender.reportStagePendingEmailConfirmation(
