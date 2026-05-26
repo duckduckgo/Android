@@ -1010,6 +1010,11 @@
     <string name="syncRestoreDialogPrimaryCta">Restaurează lucrurile mele</string>
     <string name="syncRestoreDialogSecondaryCta">Ignorare</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Hai să reluăm de unde ai rămas cu DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Marcajele salvate, parolele și multe altele sunt gata.</string>
+    <string name="syncRestoreDialogBrandDesignBody2">IA este întotdeauna opțională, iar protecția confidențialității este întotdeauna activată.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Descarcă PDF</string>
 
