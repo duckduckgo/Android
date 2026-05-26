@@ -2297,7 +2297,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 comparisonChartHeaderLabel.isVisible = false
             }
             comparisonRows.removeAllViews()
-            val inflater = LayoutInflater.from(requireContext())
+            val inflater = LayoutInflater.from(comparisonRows.context)
             config.rows.forEachIndexed { index, row ->
                 val rowView = inflater.inflate(
                     R.layout.include_brand_design_comparison_chart_row,
