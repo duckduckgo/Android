@@ -31,6 +31,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -178,6 +179,8 @@ class TabSwitcherActivity :
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
 
+    private var currentLayoutType: LayoutType? = null
+
     private var skipTabPurge: Boolean = false
 
     private lateinit var tabTouchHelper: TabTouchHelper
@@ -233,8 +236,6 @@ class TabSwitcherActivity :
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
-
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
         }
@@ -272,12 +273,6 @@ class TabSwitcherActivity :
         } else {
             binding.navigationBar.gone()
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putBoolean(KEY_FIRST_TIME_LOADING, firstTimeLoadingTabsList)
     }
 
     private fun configureViewReferences() {
@@ -325,6 +320,14 @@ class TabSwitcherActivity :
         tabsRecycler.setHasFixedSize(true)
 
         handleSelectionModeCancellation()
+
+        // Seed the LayoutManager from the cached layoutType before observers start. Without
+        // this, the layoutType collector's first emission on rotation would swap the LM and
+        // discard the viewState collector's pending scrollToActiveTab.
+        viewModel.layoutType.value?.let {
+            applyLayoutType(it)
+            tabsRecycler.show()
+        }
     }
 
     private fun handleSelectionModeCancellation() {
@@ -535,34 +538,45 @@ class TabSwitcherActivity :
     }
 
     private fun updateLayoutType(layoutType: LayoutType) {
+        if (layoutType == currentLayoutType) {
+            tabsRecycler.show()
+            return
+        }
         tabsRecycler.hide()
         tabsRecycler.removeOnScrollListener(onScrolledListener)
 
         val centerOffsetPercent = getCurrentCenterOffset()
 
+        applyLayoutType(layoutType)
+
+        if (centerOffsetPercent.isFinite()) {
+            scrollToPreviousCenterOffset(
+                centerOffsetPercent = centerOffsetPercent,
+                onScrollCompleted = {
+                    tabsRecycler.addOnScrollListener(onScrolledListener)
+                },
+            )
+        } else {
+            scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
+            tabsRecycler.addOnScrollListener(onScrolledListener)
+        }
+
+        tabsRecycler.show()
+    }
+
+    private fun applyLayoutType(layoutType: LayoutType) {
         when (layoutType) {
             LayoutType.GRID -> {
                 val columnCount = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
-
-                val gridLayoutManager = getGridLayoutManager(columnCount)
-                tabsRecycler.layoutManager = gridLayoutManager
+                tabsRecycler.layoutManager = getGridLayoutManager(columnCount)
             }
             LayoutType.LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
             }
         }
-
         tabsAdapter.onLayoutTypeChanged(layoutType)
         tabTouchHelper.onLayoutTypeChanged(layoutType)
-
-        scrollToPreviousCenterOffset(
-            centerOffsetPercent = centerOffsetPercent,
-            onScrollCompleted = {
-                tabsRecycler.addOnScrollListener(onScrolledListener)
-            },
-        )
-
-        tabsRecycler.show()
+        currentLayoutType = layoutType
     }
 
     private fun getGridLayoutManager(columnCount: Int): GridLayoutManager =
@@ -633,7 +647,7 @@ class TabSwitcherActivity :
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val innerHeight = tabsRecycler.height - tabsRecycler.paddingTop - tabsRecycler.paddingBottom
         if (innerHeight <= 0) {
-            layoutManager.scrollToPosition(index)
+            tabsRecycler.doOnPreDraw { scrollToPosition(index) }
             return
         }
         val rowHeight = tabsRecycler.children.firstOrNull {
@@ -1037,7 +1051,6 @@ class TabSwitcherActivity :
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
-        private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
         private const val FADE_DURATION_MS = 180L
         private const val FADE_IN_FALLBACK_MS = 1200L
     }
