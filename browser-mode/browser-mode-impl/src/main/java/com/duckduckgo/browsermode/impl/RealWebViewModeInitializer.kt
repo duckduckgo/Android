@@ -29,11 +29,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@SuppressLint("RequiresFeature")
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealWebViewModeInitializer @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
+    private val webViewProfileBinder: WebViewProfileBinder,
 ) : WebViewModeInitializer {
     override fun bind(webView: WebView, mode: BrowserMode): Result<Unit> {
         if (!fireModeAvailability.isAvailable()) {
@@ -48,8 +48,21 @@ class RealWebViewModeInitializer @Inject constructor(
                 Result.success(Unit)
             }
         }
-        ProfileStore.getInstance().getOrCreateProfile(mode.profileName)
-        WebViewCompat.setProfile(webView, mode.profileName)
-        return Result.success(Unit)
+        return runCatching {
+            webViewProfileBinder.bind(webView, mode.profileName)
+        }
+    }
+}
+
+interface WebViewProfileBinder {
+    fun bind(webView: WebView, profileName: String)
+}
+
+@ContributesBinding(AppScope::class)
+@SuppressLint("RequiresFeature")
+class AndroidXWebViewProfileBinder @Inject constructor() : WebViewProfileBinder {
+    override fun bind(webView: WebView, profileName: String) {
+        ProfileStore.getInstance().getOrCreateProfile(profileName)
+        WebViewCompat.setProfile(webView, profileName)
     }
 }
