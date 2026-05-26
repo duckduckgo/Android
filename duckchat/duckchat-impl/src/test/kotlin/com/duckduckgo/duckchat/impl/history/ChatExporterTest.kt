@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.history
 
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -29,9 +30,15 @@ class ChatExporterTest {
     // (UTC+2 in May 2026 → 14:23:15 UTC reads as 4:23:15 PM local).
     private val exporter = ChatExporter(ZoneId.of("Europe/Paris"))
 
+    private val gpt5MiniDisplay = ModelDisplay(
+        fullName = "GPT-5 mini",
+        shortName = "GPT-5 mini",
+        providerPossessive = "OpenAI's",
+    )
+
     @Test
     fun `Discussion single turn matches the cross-platform reference output`() {
-        val result = exporter.export(SPEC_CHAT_JSON, ChatType.Discussion)
+        val result = exporter.export(SPEC_CHAT_JSON, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
 
         val expected = """
             This conversation was generated with Duck.ai (https://duck.ai) using OpenAI's GPT-5 mini Model. AI chats may display inaccurate or offensive information (see https://duckduckgo.com/duckai/privacy-terms for more info).
@@ -51,7 +58,7 @@ class ChatExporterTest {
 
     @Test
     fun `multi-turn output inserts the turn separator between turns`() {
-        val result = exporter.export(TWO_TURN_JSON, ChatType.Discussion)
+        val result = exporter.export(TWO_TURN_JSON, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         val output = result.content
@@ -62,7 +69,7 @@ class ChatExporterTest {
 
     @Test
     fun `Voice assistant prefix is the literal Voice Chat label`() {
-        val result = exporter.export(TWO_TURN_JSON, ChatType.Voice)
+        val result = exporter.export(TWO_TURN_JSON, ChatType.Voice, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         val output = result.content
@@ -83,7 +90,7 @@ class ChatExporterTest {
             }
         """.trimIndent()
 
-        val result = exporter.export(json, ChatType.Voice)
+        val result = exporter.export(json, ChatType.Voice, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         val output = result.content
@@ -95,7 +102,12 @@ class ChatExporterTest {
 
     @Test
     fun `ImageGeneration replaces assistant text with image placeholder and consumes fileRefs positionally`() {
-        val result = exporter.export(TWO_TURN_JSON, ChatType.ImageGeneration, listOf("uuid-1", "uuid-2"))
+        val result = exporter.export(
+            rawJson = TWO_TURN_JSON,
+            chatType = ChatType.ImageGeneration,
+            fileRefs = listOf("uuid-1", "uuid-2"),
+            modelDisplay = gpt5MiniDisplay,
+        )
 
         assertTrue(result is ExportResult.Zip)
         result as ExportResult.Zip
@@ -115,7 +127,12 @@ class ChatExporterTest {
 
     @Test
     fun `ImageGeneration handles missing fileRefs gracefully`() {
-        val result = exporter.export(TWO_TURN_JSON, ChatType.ImageGeneration, fileRefs = emptyList())
+        val result = exporter.export(
+            rawJson = TWO_TURN_JSON,
+            chatType = ChatType.ImageGeneration,
+            fileRefs = emptyList(),
+            modelDisplay = gpt5MiniDisplay,
+        )
 
         assertTrue(result is ExportResult.Zip)
         result as ExportResult.Zip
@@ -137,7 +154,7 @@ class ChatExporterTest {
             }
         """.trimIndent()
 
-        val result = exporter.export(json, ChatType.Discussion)
+        val result = exporter.export(json, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         assertTrue(result.content.contains("GPT-5 mini:\nplain-content fallback"))
@@ -158,7 +175,7 @@ class ChatExporterTest {
             }
         """.trimIndent()
 
-        val result = exporter.export(json, ChatType.Discussion)
+        val result = exporter.export(json, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         assertTrue(result.content.contains("only this is visible"))
@@ -166,7 +183,7 @@ class ChatExporterTest {
     }
 
     @Test
-    fun `unknown model falls back to raw id and generic provider wording`() {
+    fun `null modelDisplay falls back to raw id and generic provider wording`() {
         val json = """
             {
               "model": "some-future-model-v2",
@@ -188,7 +205,7 @@ class ChatExporterTest {
     fun `empty messages array yields header and separator only`() {
         val json = """{"model":"gpt-5-mini","messages":[]}"""
 
-        val result = exporter.export(json, ChatType.Discussion)
+        val result = exporter.export(json, ChatType.Discussion, modelDisplay = gpt5MiniDisplay)
 
         assertTrue(result is ExportResult.Text)
         assertTrue(result.content.startsWith("This conversation was generated"))

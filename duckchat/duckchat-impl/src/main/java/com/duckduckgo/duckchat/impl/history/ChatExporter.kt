@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.history
 
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import org.json.JSONObject
 import java.time.Instant
 import java.time.ZoneId
@@ -42,9 +43,10 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
         rawJson: String,
         chatType: ChatType = ChatType.Discussion,
         fileRefs: List<String> = emptyList(),
+        modelDisplay: ModelDisplay? = null,
     ): ExportResult {
         val json = JSONObject(rawJson)
-        val display = ModelDisplay.from(json.optString("model"))
+        val display = modelDisplay ?: rawIdFallback(json.optString("model"))
         val turns = extractTurns(json.optJSONArray("messages"))
 
         return when (chatType) {
@@ -146,6 +148,13 @@ internal class ChatExporter(private val zoneId: ZoneId = ZoneId.systemDefault())
         return TIMESTAMP_FORMATTER.withZone(zoneId).format(instant)
     }
 
+    /** Used when the caller didn't supply a resolved [ModelDisplay] — renders the raw model id with no provider. */
+    private fun rawIdFallback(modelId: String): ModelDisplay = ModelDisplay(
+        fullName = modelId.takeIf { it.isNotBlank() },
+        shortName = modelId.takeIf { it.isNotBlank() } ?: "AI",
+        providerPossessive = null,
+    )
+
     private fun header(display: ModelDisplay): String {
         val using = when {
             display.providerPossessive != null -> "using ${display.providerPossessive} ${display.fullName} Model"
@@ -175,27 +184,4 @@ internal sealed interface ExportResult {
 
     data class Text(override val content: String) : ExportResult
     data class Zip(override val content: String, val imageFileRefs: List<String>) : ExportResult
-}
-
-internal data class ModelDisplay(
-    val fullName: String?,
-    val shortName: String,
-    val providerPossessive: String?,
-) {
-    companion object {
-        fun from(modelId: String): ModelDisplay = TABLE[modelId] ?: ModelDisplay(
-            fullName = modelId.takeIf { it.isNotBlank() },
-            shortName = modelId.takeIf { it.isNotBlank() } ?: "AI",
-            providerPossessive = null,
-        )
-
-        private val TABLE: Map<String, ModelDisplay> = mapOf(
-            "gpt-5-mini" to ModelDisplay("GPT-5 mini", "GPT-5 mini", "OpenAI's"),
-            "gpt-4o" to ModelDisplay("GPT-4o", "GPT-4o", "OpenAI's"),
-            "gpt-4o-mini" to ModelDisplay("GPT-4o mini", "GPT-4o mini", "OpenAI's"),
-            "claude-3-5-sonnet-latest" to ModelDisplay("Claude 3.5 Sonnet", "Claude 3.5 Sonnet", "Anthropic's"),
-            "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo" to ModelDisplay("Llama 3.1 70B", "Llama 3.1 70B", "Meta's"),
-            "mistralai/Mixtral-8x7B-Instruct-v0.1" to ModelDisplay("Mixtral 8x7B", "Mixtral 8x7B", "Mistral's"),
-        )
-    }
 }

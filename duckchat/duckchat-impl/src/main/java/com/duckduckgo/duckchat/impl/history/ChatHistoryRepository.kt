@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -46,9 +47,15 @@ interface ChatHistoryRepository {
      * Formats [chatId] per the cross-platform reference (research.md R-16) and writes it as a
      * `.txt` (Discussion/Voice) or `.zip` (ImageGeneration) file to the public Downloads
      * directory, registering it in the in-app Downloads list. Returns the resulting file.
+     *
+     * [modelDisplay] is the pre-resolved provider/model attribution rendered in the export header.
+     * Callers (the ViewModel) look it up against the live /duckchat/v1/models cache. Pass `null`
+     * when the model is not yet known to the cache; the exporter falls back to displaying the raw
+     * model id without a provider possessive.
+     *
      * Throws if the chat is missing or the write fails.
      */
-    suspend fun exportChat(chatId: String): File
+    suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File
 }
 
 @ContributesBinding(AppScope::class)
@@ -91,13 +98,13 @@ class RealChatHistoryRepository @Inject constructor(
         }
     }
 
-    override suspend fun exportChat(chatId: String): File =
+    override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): File =
         withContext(dispatchers.io()) {
             val chat = chatStore.getChatById(chatId)
                 ?: throw IllegalStateException("Chat $chatId not found")
             val rawJson = chatStore.getChatContent(chatId)
                 ?: throw IllegalStateException("Chat $chatId content not found")
-            val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs)
+            val result = chatExporter.export(rawJson, chat.toChatType(), chat.fileRefs, modelDisplay)
             val payload = when (result) {
                 is ExportResult.Text -> ExportPayload.Text(result.content)
                 is ExportResult.Zip -> ExportPayload.Zip(
@@ -116,6 +123,7 @@ class RealChatHistoryRepository @Inject constructor(
         chatId = chat.chatId,
         displayTitle = chat.title.takeIf { it.isNotBlank() && it != UPSTREAM_UNTITLED } ?: fallbackTitle,
         type = chat.toChatType(),
+        model = chat.model,
         pinned = chat.pinned,
         lastEditMillis = chat.lastEdit.parseIsoMillis(),
     )

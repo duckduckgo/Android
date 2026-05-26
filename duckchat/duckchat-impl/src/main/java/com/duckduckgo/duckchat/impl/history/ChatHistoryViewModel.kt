@@ -150,7 +150,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     fun onDownloadRequested(chatId: String) {
         viewModelScope.launch {
-            runCatching { chatHistoryRepository.exportChat(chatId) }
+            runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay = null) }
                 .onSuccess { file -> navigationChannel.trySend(NavigationEvent.ShowDownloadComplete(file.name)) }
                 .onFailure { navigationChannel.trySend(NavigationEvent.ShowExportError) }
         }

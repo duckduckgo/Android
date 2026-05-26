@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -966,10 +967,12 @@ class ChatHistoryViewModelTest {
         pinned: Boolean = false,
         lastEdit: Long = 0L,
         title: String = chatId,
+        model: String = "gpt-5-mini",
     ): ChatHistoryItem = ChatHistoryItem(
         chatId = chatId,
         displayTitle = title,
         type = ChatType.Discussion,
+        model = model,
         pinned = pinned,
         lastEditMillis = lastEdit,
     )
@@ -982,6 +985,8 @@ private class FakeChatHistoryRepository(
     val renamedChats: MutableList<Pair<String, String>> = mutableListOf()
     val pinnedChats: MutableList<Pair<String, Boolean>> = mutableListOf()
     val exportedChats: MutableList<String> = mutableListOf()
+    var lastExportModelDisplay: ModelDisplay? = null
+        private set
     var exportResult: java.io.File = java.io.File("/tmp/chat-export.txt")
     var exportError: Throwable? = null
     var deleteAllChatsCalled: Boolean = false
@@ -1009,8 +1014,9 @@ private class FakeChatHistoryRepository(
         source.value = source.value.map { if (it.chatId == chatId) it.copy(pinned = pinned) else it }
     }
 
-    override suspend fun exportChat(chatId: String): java.io.File {
+    override suspend fun exportChat(chatId: String, modelDisplay: ModelDisplay?): java.io.File {
         exportedChats += chatId
+        lastExportModelDisplay = modelDisplay
         exportError?.let { throw it }
         return exportResult
     }
