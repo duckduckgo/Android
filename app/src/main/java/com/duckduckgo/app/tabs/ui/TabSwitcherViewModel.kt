@@ -108,10 +108,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(currentMode.value)
 
-    val deletableTabs: LiveData<List<TabEntity>> =
-        currentMode.flatMapLatest { mode -> tabRepositoryProvider.forMode(mode).flowDeletableTabs }
-            .asLiveData(context = viewModelScope.coroutineContext)
-
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val tabSwitcherItemsFlow = currentMode.flatMapLatest { mode ->

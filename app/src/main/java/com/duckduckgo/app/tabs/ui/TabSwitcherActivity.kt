@@ -52,7 +52,6 @@ import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
@@ -710,18 +709,6 @@ class TabSwitcherActivity :
         tabsRecycler.addItemDecoration(tabItemDecorator)
     }
 
-    private fun showTabDeletedSnackbar(tab: TabEntity) {
-        DefaultSnackbar(
-            parentView = binding.root,
-            message = getString(R.string.tabClosed),
-            anchor = snackbarAnchorView,
-            action = getString(R.string.tabClosedUndo),
-            showAction = true,
-            onAction = { launch { viewModel.onUndoDeleteTab(tab) } },
-            onDismiss = { launch { viewModel.purgeDeletableTabs() } },
-        ).show()
-    }
-
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {
         DefaultSnackbar(
             parentView = binding.root,
@@ -803,7 +790,6 @@ class TabSwitcherActivity :
 
     private fun removeObservers() {
         viewModel.tabSwitcherItemsLiveData.removeObservers(this)
-        viewModel.deletableTabs.removeObservers(this)
     }
 
     private fun showCloseAllTabsConfirmation(numTabs: Int) {
