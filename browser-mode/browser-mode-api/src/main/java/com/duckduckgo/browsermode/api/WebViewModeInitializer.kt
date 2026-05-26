@@ -36,6 +36,9 @@ interface WebViewModeInitializer {
      *
      * @param webView a freshly-created [WebView] that has not yet been used.
      * @param mode the [BrowserMode] whose profile should back this [WebView].
+     * @return [Result.success] when the [WebView] is bound (or when binding is a no-op on
+     * unsupported devices); [Result.failure] when [mode] is not available in the current
+     * configuration and the [WebView] was attempting to bind to [BrowserMode.FIRE].
      */
-    fun bind(webView: WebView, mode: BrowserMode)
+    fun bind(webView: WebView, mode: BrowserMode): Result<Unit>
 }

@@ -35,9 +35,16 @@ import javax.inject.Inject
 class RealWebViewModeInitializer @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
 ) : WebViewModeInitializer {
-    override fun bind(webView: WebView, mode: BrowserMode) {
-        if (!fireModeAvailability.isAvailable()) return
+    override fun bind(webView: WebView, mode: BrowserMode): Result<Unit> {
+        if (!fireModeAvailability.isAvailable()) {
+            if (mode == BrowserMode.FIRE) {
+                return Result.failure(
+                    IllegalStateException("Attempting to bind a WebView profile to Fire mode when the Fire mode feature is not available."),
+                )
+            }
+        }
         ProfileStore.getInstance().getOrCreateProfile(mode.profileName)
         WebViewCompat.setProfile(webView, mode.profileName)
+        return Result.success(Unit)
     }
 }
