@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.voice
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.tabs.model.AggregateTabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
@@ -62,7 +62,7 @@ interface VoiceSessionStateManager {
 @ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
 class RealVoiceSessionStateManager @Inject constructor(
     private val context: Context,
-    private val tabRepository: AggregateTabRepository,
+    private val tabRepository: AggregateTabProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val duckChatFeature: DuckChatFeature,
 ) : VoiceSessionStateManager, BrowserLifecycleObserver {
@@ -128,7 +128,7 @@ class RealVoiceSessionStateManager @Inject constructor(
 
     private fun listenToTabRemoval() {
         listenJob += appCoroutineScope.launch {
-            tabRepository.flowTabs.drop(1).collect { tabs ->
+            tabRepository.observe().drop(1).collect { tabs ->
                 val existingTabIds = tabs.mapTo(mutableSetOf()) { it.tabId }
                 synchronized(this@RealVoiceSessionStateManager) {
                     _activeVoiceSessions.update { current ->

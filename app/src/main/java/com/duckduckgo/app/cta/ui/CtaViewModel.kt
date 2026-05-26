@@ -41,7 +41,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.model.AggregateTabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -83,7 +83,7 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
-    private val aggregateTabRepository: AggregateTabRepository,
+    private val aggregateTabProvider: AggregateTabProvider,
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -664,7 +664,7 @@ class CtaViewModel @Inject constructor(
         return requiredDaxOnboardingCtas().all { dismissedCtaDao.exists(it) }
     }
 
-    private fun forceStopFireButtonPulseAnimationFlow() = aggregateTabRepository.flowTabs.distinctUntilChanged()
+    private fun forceStopFireButtonPulseAnimationFlow() = aggregateTabProvider.observe().distinctUntilChanged()
         .map { tabs ->
             if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
             return@map false

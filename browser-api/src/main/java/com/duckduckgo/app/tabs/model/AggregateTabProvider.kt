@@ -16,21 +16,13 @@
 
 package com.duckduckgo.app.tabs.model
 
-import kotlinx.coroutines.flow.Flow
+import com.duckduckgo.browsermode.api.AggregateBrowserModeProvider
 
 /**
- * Cross-mode view over [TabRepository]. Use this when consumers need to react to tabs
- * from both regular and fire mode at once — counting, stats, or any flow-based aggregation
- * that should not be tied to a single mode.
+ * Observes tabs across one or more [com.duckduckgo.browsermode.api.BrowserMode]s. Callers pass the
+ * set of modes they want tabs from — a single mode for a per-mode view, or omit the argument for a
+ * cross-mode view.
  *
- * For everything that operates on one mode at a time, inject the mode-qualified
- * [TabRepository] directly.
+ * For mutating tab state, use the mode-qualified [TabRepository] directly.
  */
-interface AggregateTabRepository {
-
-    /**
-     * Emits the concatenation of regular-mode and fire-mode tabs. Re-emits whenever either
-     * underlying repository's [TabRepository.flowTabs] emits.
-     */
-    val flowTabs: Flow<List<TabEntity>>
-}
+interface AggregateTabProvider : AggregateBrowserModeProvider<List<TabEntity>>

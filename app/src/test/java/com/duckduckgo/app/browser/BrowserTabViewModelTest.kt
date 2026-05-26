@@ -216,7 +216,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_CTA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
-import com.duckduckgo.app.tabs.model.AggregateTabRepository
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -427,7 +427,7 @@ class BrowserTabViewModelTest {
 
     private val mockTabRepository: TabRepository = mock()
 
-    private val mockAggregateTabRepository: AggregateTabRepository = mock()
+    private val mockAggregateTabProvider: AggregateTabProvider = mock()
 
     private val webViewSessionStorage: WebViewSessionStorage = mock()
 
@@ -756,7 +756,7 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
             whenever(mockTabRepository.flowSelectedTab).thenReturn(flowSelectedTab)
             whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
-            whenever(mockAggregateTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+            whenever(mockAggregateTabProvider.observe()).thenReturn(flowOf(emptyList()))
             whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
             whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
             whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
@@ -806,7 +806,7 @@ class BrowserTabViewModelTest {
                     settingsDataStore = ctaViewModelMockSettingsStore,
                     onboardingStore = mockOnboardingStore,
                     userStageStore = mockUserStageStore,
-                    aggregateTabRepository = mockAggregateTabRepository,
+                    aggregateTabProvider = mockAggregateTabProvider,
                     dispatchers = coroutineRule.testDispatcherProvider,
                     duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                     extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,

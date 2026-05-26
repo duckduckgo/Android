@@ -16,28 +16,31 @@
 
 package com.duckduckgo.app.tabs.model
 
-import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireModeAvailability
-import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealAggregateTabRepository @Inject constructor(
-    @RegularMode regularRepo: TabRepository,
-    @FireMode fireRepo: TabRepository,
-    fireModeAvailability: FireModeAvailability,
-) : AggregateTabRepository {
+class RealAggregateTabProvider @Inject constructor(
+    private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
+    private val fireModeAvailability: FireModeAvailability,
+) : AggregateTabProvider {
 
-    override val flowTabs: Flow<List<TabEntity>> =
-        if (fireModeAvailability.isAvailable()) {
-            combine(regularRepo.flowTabs, fireRepo.flowTabs) { regular, fire -> regular + fire }
-        } else {
-            regularRepo.flowTabs
+    override fun observe(modes: Set<BrowserMode>): Flow<List<TabEntity>> {
+        val effectiveModes = if (fireModeAvailability.isAvailable()) modes else modes - BrowserMode.FIRE
+        val flows = effectiveModes.map { tabRepositoryProvider.forMode(it).flowTabs }
+        return when {
+            flows.isEmpty() -> flowOf(emptyList())
+            flows.size == 1 -> flows.single()
+            else -> combine(flows) { lists -> lists.flatMap { it } }
         }
+    }
 }
