@@ -16,7 +16,14 @@
 
 package com.duckduckgo.pir.impl.common.actions
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.PirRunStateHandler
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageEmailGetDataReceived
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStageEmailGetDataReceived
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.EmailDataReceived
@@ -31,7 +38,10 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class EmailDataReceivedEventHandler @Inject constructor() : EventHandler {
+class EmailDataReceivedEventHandler @Inject constructor(
+    private val pirRunStateHandler: PirRunStateHandler,
+    private val currentTimeProvider: CurrentTimeProvider,
+) : EventHandler {
     override val event: KClass<out Event> = EmailDataReceived::class
 
     override suspend fun invoke(
@@ -39,6 +49,32 @@ class EmailDataReceivedEventHandler @Inject constructor() : EventHandler {
         event: Event,
     ): Next {
         val actualEvent = event as EmailDataReceived
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+
+        val durationMs = currentTimeProvider.currentTimeMillis() - state.stageStatus.stageStartMs
+        val actionId = currentBrokerStep.step.actions[state.currentActionIndex].id
+        val tries = state.actionRetryCount + 1
+        when (currentBrokerStep) {
+            is OptOutStep -> pirRunStateHandler.handleState(
+                BrokerOptOutStageEmailGetDataReceived(
+                    broker = currentBrokerStep.broker,
+                    actionID = actionId,
+                    attemptId = state.attemptId,
+                    durationMs = durationMs,
+                    currentActionAttemptCount = tries,
+                ),
+            )
+            is ScanStep -> pirRunStateHandler.handleState(
+                BrokerScanStageEmailGetDataReceived(
+                    broker = currentBrokerStep.broker,
+                    actionID = actionId,
+                    durationMs = durationMs,
+                    currentActionAttemptCount = tries,
+                ),
+            )
+            is EmailConfirmationStep -> Unit
+        }
+
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
