@@ -24,8 +24,13 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.ChatType
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
+import com.duckduckgo.duckchat.impl.models.ModelProvider
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -49,7 +54,15 @@ class ChatHistoryViewModelTest {
     private val duckAiFeatureState: DuckAiFeatureState = mock {
         whenever(it.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
     }
-    private val viewModel = ChatHistoryViewModel(repository, coroutineRule.testScope, duckChat, dataClearingTrigger, duckAiFeatureState)
+    private val duckAiModelManager = FakeDuckAiModelManager()
+    private val viewModel = ChatHistoryViewModel(
+        repository,
+        coroutineRule.testScope,
+        duckChat,
+        dataClearingTrigger,
+        duckAiFeatureState,
+        duckAiModelManager,
+    )
 
     @Test
     fun `initial state is Loading`() = coroutineRule.testScope.runTest {
@@ -824,6 +837,45 @@ class ChatHistoryViewModelTest {
         }
 
     @Test
+    fun `onDownloadRequested resolves the model display from the model manager cache`() =
+        coroutineRule.testScope.runTest {
+            source.value = listOf(item(chatId = "chat-7", model = "gpt-5-mini"))
+            duckAiModelManager.setModels(listOf(fakeApiModel(id = "gpt-5-mini", name = "GPT-5 mini", provider = ModelProvider.OPENAI)))
+
+            viewModel.uiState.test {
+                awaitInitialLoaded() // populates latestItems
+                viewModel.navigationEvents.test {
+                    viewModel.onDownloadRequested("chat-7")
+                    awaitItem() // ShowDownloadComplete
+
+                    val display = repository.lastExportModelDisplay
+                    assertEquals("GPT-5 mini", display?.fullName)
+                    assertEquals("GPT-5 mini", display?.shortName)
+                    assertEquals("OpenAI's", display?.providerPossessive)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `onDownloadRequested falls back to null modelDisplay when manager cache misses the model id`() =
+        coroutineRule.testScope.runTest {
+            source.value = listOf(item(chatId = "chat-7", model = "gpt-5.2"))
+            duckAiModelManager.setModels(emptyList())
+
+            viewModel.uiState.test {
+                awaitInitialLoaded()
+                viewModel.navigationEvents.test {
+                    viewModel.onDownloadRequested("chat-7")
+                    awaitItem() // ShowDownloadComplete
+
+                    assertEquals(null, repository.lastExportModelDisplay)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `onDownloadRequested emits ShowExportError when repository throws`() =
         coroutineRule.testScope.runTest {
             repository.exportError = IllegalStateException("boom")
@@ -976,6 +1028,21 @@ class ChatHistoryViewModelTest {
         pinned = pinned,
         lastEditMillis = lastEdit,
     )
+
+    private fun fakeApiModel(
+        id: String,
+        name: String,
+        provider: ModelProvider = ModelProvider.UNKNOWN,
+        shortName: String = name,
+    ): AIChatModel = AIChatModel(
+        id = id,
+        name = name,
+        displayName = name,
+        shortName = shortName,
+        accessTier = emptyList(),
+        isAccessible = true,
+        provider = provider,
+    )
 }
 
 private class FakeChatHistoryRepository(
@@ -1028,4 +1095,19 @@ private class RecordingDataClearingTrigger : DataClearingTrigger {
     override suspend fun clearData(types: Set<ClearableData>) {
         calls += types
     }
+}
+
+private class FakeDuckAiModelManager : DuckAiModelManager {
+    private val _modelState = MutableStateFlow(ModelState())
+    override val modelState: kotlinx.coroutines.flow.StateFlow<ModelState> = _modelState
+
+    fun setModels(models: List<AIChatModel>) {
+        _modelState.value = ModelState(models = models)
+    }
+
+    override suspend fun fetchModels() = Unit
+    override suspend fun selectModel(model: AIChatModel) = Unit
+    override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
+    override fun getSelectedModelId(): String? = null
+    override fun getResolvedReasoningEffort(): String? = null
 }

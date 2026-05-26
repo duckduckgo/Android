@@ -28,6 +28,8 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.toModelDisplay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -50,6 +52,7 @@ class ChatHistoryViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val dataClearingTrigger: DataClearingTrigger,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiModelManager: DuckAiModelManager,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -149,8 +152,15 @@ class ChatHistoryViewModel @Inject constructor(
     }
 
     fun onDownloadRequested(chatId: String) {
+        // Snapshot-read /duckchat/v1/models cache so the export header carries provider attribution
+        // (e.g. "using OpenAI's GPT-5 mini Model"). Null when the model isn't cached — the exporter
+        // then falls back to "using the <raw-id> Model", which is still valid output.
+        val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
+        val modelDisplay = modelId
+            ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
+            ?.toModelDisplay()
         viewModelScope.launch {
-            runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay = null) }
+            runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay) }
                 .onSuccess { file -> navigationChannel.trySend(NavigationEvent.ShowDownloadComplete(file.name)) }
                 .onFailure { navigationChannel.trySend(NavigationEvent.ShowExportError) }
         }
