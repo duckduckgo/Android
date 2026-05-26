@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboardingquicksetup.ui
 
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,25 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.setFragmentResult
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.BottomSheetRemoveWidgetInstructionsBinding
-import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
-import dagger.android.support.AndroidSupportInjection
 import com.duckduckgo.app.browser.R as BrowserR
 
-@InjectWith(FragmentScope::class)
 class RemoveWidgetInstructionsBottomSheet : BottomSheetDialogFragment() {
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
