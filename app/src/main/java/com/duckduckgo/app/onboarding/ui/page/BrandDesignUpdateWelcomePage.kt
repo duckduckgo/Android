@@ -80,8 +80,8 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -2285,8 +2285,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun populateComparisonChart(config: ComparisonChartConfig) {
         with(binding.daxDialogCta.comparisonChartContent) {
             comparisonChartHeaderLeftIcon.setImageResource(config.headerLeftIconRes)
+            comparisonChartTitleHidden.text = getString(config.titleRes).preventWidows()
             if (config.headerLeftLabelRes != null) {
-                comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes)
+                comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes).preventWidows()
                 comparisonChartHeaderLabel.isVisible = true
             } else {
                 comparisonChartHeaderLabel.isVisible = false
