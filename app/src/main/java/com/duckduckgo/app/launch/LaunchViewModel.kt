@@ -18,6 +18,7 @@ package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.onboarding.orchestrator.OnboardingPlanBootstrapper
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName
@@ -36,6 +37,7 @@ class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val pixel: Pixel,
+    private val onboardingPlanBootstrapper: OnboardingPlanBootstrapper,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -51,7 +53,7 @@ class LaunchViewModel @Inject constructor(
     }
 
     suspend fun showOnboardingOrHome() {
-        if (userStageStore.isNewUser()) {
+        if (onboardingPlanBootstrapper.engageIfNeeded()) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()

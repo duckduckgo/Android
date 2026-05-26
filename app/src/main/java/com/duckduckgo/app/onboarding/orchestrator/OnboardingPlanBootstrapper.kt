@@ -25,11 +25,14 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.onboarding.ui.OnboardingSkipper
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
+import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 // :app owns the linear-onboarding lifecycle. On app start, if the user is still
 // in AppStage.NEW, we ask the plan provider to build the main plan with terminal
@@ -50,16 +53,26 @@ class OnboardingPlanBootstrapper @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
+    private val mutex = Mutex()
+
     override fun onCreate(owner: LifecycleOwner) {
-        appScope.launch {
-            if (userStageStore.isNewUser()) {
+        appScope.launch { engageIfNeeded() }
+    }
+
+    /** Idempotent. Returns true if linear onboarding is or has been started. */
+    suspend fun engageIfNeeded(): Boolean = mutex.withLock {
+        when (orchestrator.state.value) {
+            LinearOnboardingState.NotStarted -> if (userStageStore.isNewUser()) {
                 orchestrator.startPlan(
                     planProvider.buildMainPlan(
                         onCompleted = { userStageStore.stageCompleted(AppStage.NEW) },
                         onSkipped = { onboardingSkipper.markOnboardingAsCompleted() },
                     ),
                 )
-            }
+                true
+            } else false
+            is LinearOnboardingState.InProgress -> true
+            else -> false
         }
     }
 }
