@@ -656,9 +656,17 @@ class TabSwitcherActivity :
         }?.height ?: 0
         val centerOffset = (innerHeight - rowHeight) / 2
         val offset = if (rowHeight > 0) {
-            val columns = (layoutManager as? GridLayoutManager)?.spanCount ?: 1
+            val gridLayoutManager = layoutManager as? GridLayoutManager
+            val spanCount = gridLayoutManager?.spanCount ?: 1
+            val spanSizeLookup = gridLayoutManager?.spanSizeLookup
             val itemCount = tabsRecycler.adapter?.itemCount ?: 0
-            val rowsBelow = ((itemCount + columns - 1) / columns) - (index / columns) - 1
+            val targetRow = spanSizeLookup?.getSpanGroupIndex(index, spanCount) ?: index
+            val lastRow = if (itemCount > 0) {
+                spanSizeLookup?.getSpanGroupIndex(itemCount - 1, spanCount) ?: (itemCount - 1)
+            } else {
+                targetRow
+            }
+            val rowsBelow = lastRow - targetRow
             val pinToBottomOffset = innerHeight - (rowsBelow + 1) * rowHeight - 20.toPx()
             maxOf(centerOffset, pinToBottomOffset)
         } else {
