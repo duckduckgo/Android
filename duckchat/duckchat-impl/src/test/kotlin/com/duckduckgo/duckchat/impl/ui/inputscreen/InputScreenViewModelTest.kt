@@ -1690,6 +1690,38 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when chat history available then isHistoryAvailable state flow emits true`() =
+        runTest {
+            whenever(duckChat.isChatHistoryAvailable()).thenReturn(true)
+
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.isHistoryAvailable.value)
+        }
+
+    @Test
+    fun `when chat history not available then isHistoryAvailable state flow stays false`() =
+        runTest {
+            whenever(duckChat.isChatHistoryAvailable()).thenReturn(false)
+
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.isHistoryAvailable.value)
+        }
+
+    @Test
+    fun `when onChatHistoryShortcutClicked then emit LaunchDuckChatHistory command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatHistoryShortcutClicked()
+
+            assertEquals(Command.LaunchDuckChatHistory, viewModel.command.value)
+        }
+
+    @Test
     fun `when any button is visible then actionButtonsContainerVisible should be true`() =
         runTest {
             data class TestCase(

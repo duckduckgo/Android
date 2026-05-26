@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
@@ -40,7 +41,9 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenFragment
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSearchSuggestionAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
@@ -51,6 +54,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import kotlin.math.roundToInt
+
+private const val VIEW_ALL_CHATS_THRESHOLD = 8
 
 @InjectWith(FragmentScope::class)
 class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
@@ -74,6 +79,8 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
     private var chatSearchSuggestionAdapter: ChatSearchSuggestionAdapter? = null
     private var chatUrlDividerAdapter: SectionDividerAdapter? = null
     private var searchDividerAdapter: SectionDividerAdapter? = null
+    private var historyShortcutDividerAdapter: SectionDividerAdapter? = null
+    private var historyShortcutAdapter: ChatHistoryShortcutAdapter? = null
     private var concatAdapter: ConcatAdapter? = null
     private var bottomBlurView: BottomBlurView? = null
     private var bottomBlurLayoutListener: View.OnLayoutChangeListener? = null
@@ -133,10 +140,11 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
             viewModel.chatSuggestions,
             viewModel.chatUrlSuggestions,
             viewModel.chatInputText,
-        ) { chatSuggestions, urlSuggestions, chatInput ->
-            Triple(chatSuggestions, urlSuggestions, chatInput)
+            viewModel.isHistoryAvailable,
+        ) { chatSuggestions, urlSuggestions, chatInput, isHistoryAvailable ->
+            ObservedState(chatSuggestions, urlSuggestions, chatInput, isHistoryAvailable)
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { (chatSuggestions, urlSuggestions, chatInput) ->
+            .onEach { (chatSuggestions, urlSuggestions, chatInput, isHistoryAvailable) ->
                 if (viewModel.visibilityState.value.searchMode) return@onEach
                 val isTyping = chatInput.isNotEmpty()
                 val hasChatSuggestions = chatSuggestions.isNotEmpty()
@@ -156,6 +164,10 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
                 // Dividers show between non-empty adjacent sections
                 chatUrlDividerAdapter?.setVisible(hasChatSuggestions && showUrlSuggestions)
                 searchDividerAdapter?.setVisible((hasChatSuggestions || showUrlSuggestions) && isTyping)
+
+                val showShortcut = isHistoryAvailable && chatSuggestions.size > VIEW_ALL_CHATS_THRESHOLD
+                historyShortcutAdapter?.setVisible(showShortcut)
+                historyShortcutDividerAdapter?.setVisible(showShortcut)
 
                 val hasAnySuggestions = hasChatSuggestions || isTyping
                 parentFragment.updateChatSuggestionsVisibility(hasAnySuggestions)
@@ -187,12 +199,18 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         }
         chatUrlDividerAdapter = SectionDividerAdapter()
         searchDividerAdapter = SectionDividerAdapter()
+        historyShortcutDividerAdapter = SectionDividerAdapter()
+        historyShortcutAdapter = ChatHistoryShortcutAdapter {
+            viewModel.onChatHistoryShortcutClicked()
+        }
         concatAdapter = ConcatAdapter(
             chatSuggestionsAdapter,
             chatUrlDividerAdapter,
             chatUrlSuggestionsAdapter,
             searchDividerAdapter,
             chatSearchSuggestionAdapter,
+            historyShortcutDividerAdapter,
+            historyShortcutAdapter,
         )
         chatSuggestionsRecyclerView?.adapter = concatAdapter
     }
@@ -257,4 +275,11 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
         chatSuggestionsRecyclerView = null
         super.onDestroyView()
     }
+
+    private data class ObservedState(
+        val chatSuggestions: List<ChatSuggestion>,
+        val urlSuggestions: AutoComplete.AutoCompleteResult,
+        val chatInput: String,
+        val isHistoryAvailable: Boolean,
+    )
 }
