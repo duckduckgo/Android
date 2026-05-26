@@ -40,7 +40,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -100,9 +99,6 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockBrowserModeStateHolder: BrowserModeStateHolder
 
-    @Mock
-    private lateinit var mockFireModeAvailability: FireModeAvailability
-
     private val currentModeFlow = MutableStateFlow(BrowserMode.REGULAR)
 
     @Mock
@@ -137,7 +133,6 @@ class AutoCompleteApiTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(listOf(TabEntity("1", position = 1))))
         whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
-        whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
         whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
@@ -2088,7 +2083,6 @@ class AutoCompleteApiTest {
             RealAutoCompleteScorer(),
             mockTabRepositoryProvider,
             mockBrowserModeStateHolder,
-            mockFireModeAvailability,
             mockAutocompleteTabsFeature,
             mockDuckChat,
             mockHistory,

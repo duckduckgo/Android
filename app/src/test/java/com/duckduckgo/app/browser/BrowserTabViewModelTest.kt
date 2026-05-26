@@ -254,7 +254,6 @@ import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -722,8 +721,6 @@ class BrowserTabViewModelTest {
             whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockTabRepository)
             val browserModeStateHolder: BrowserModeStateHolder = mock()
             whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
-            val fireModeAvailability: FireModeAvailability = mock()
-            whenever(fireModeAvailability.isAvailable()).thenReturn(true)
 
             mockAutoCompleteApi =
                 AutoCompleteApi(
@@ -733,7 +730,6 @@ class BrowserTabViewModelTest {
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
                     browserModeStateHolder,
-                    fireModeAvailability,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,

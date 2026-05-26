@@ -45,7 +45,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -67,7 +66,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -101,7 +99,6 @@ class AutoCompleteApi constructor(
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserModeStateHolder: BrowserModeStateHolder,
-    private val fireModeAvailability: FireModeAvailability,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -112,12 +109,7 @@ class AutoCompleteApi constructor(
     private val config: AutoComplete.Config,
 ) : AutoComplete {
 
-    private val currentMode: StateFlow<BrowserMode> =
-        if (fireModeAvailability.isAvailable()) {
-            browserModeStateHolder.currentMode
-        } else {
-            MutableStateFlow(BrowserMode.REGULAR)
-        }
+    private val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(currentMode.value)

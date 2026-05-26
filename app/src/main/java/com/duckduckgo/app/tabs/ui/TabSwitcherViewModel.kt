@@ -56,7 +56,6 @@ import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -91,7 +90,6 @@ import kotlin.time.Duration.Companion.milliseconds
 class TabSwitcherViewModel @Inject constructor(
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserModeStateHolder: BrowserModeStateHolder,
-    private val fireModeAvailability: FireModeAvailability,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
@@ -105,12 +103,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
 
-    private val currentMode: StateFlow<BrowserMode> =
-        if (fireModeAvailability.isAvailable()) {
-            browserModeStateHolder.currentMode
-        } else {
-            MutableStateFlow(BrowserMode.REGULAR)
-        }
+    private val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(currentMode.value)
