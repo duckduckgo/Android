@@ -1149,6 +1149,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             ).apply {
                 onSendClick = { submitMessage() }
                 onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
@@ -1161,11 +1162,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val buttons = InputScreenButtons(
                 context = context,
                 useTopBar = true,
-                layoutResId = R.layout.view_native_input_screen_buttons,
+                layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
                 onNewLineClick = { printNewLine() }
                 onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
-                onVoiceChatClick = this@NativeInputModeWidget.onVoiceChatClick
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
@@ -1175,7 +1175,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         updateVoiceButtonVisibility()
     }
 
-    private fun voiceHostButtons(): InputScreenButtons? = floatingButtons ?: submitButtons
+    private fun voiceHostButtons(): InputScreenButtons? = submitButtons
 
     companion object {
         private const val MAX_LINES = 5

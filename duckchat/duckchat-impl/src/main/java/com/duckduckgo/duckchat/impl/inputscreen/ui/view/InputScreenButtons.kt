@@ -42,7 +42,7 @@ class InputScreenButtons @JvmOverloads constructor(
     private val actionSend: ImageView by lazy { findViewById(R.id.actionSend) }
     private val actionNewLine: ImageView by lazy { findViewById(R.id.actionNewLine) }
     private val actionVoiceSearch: ImageView by lazy { findViewById(R.id.actionVoiceSearch) }
-    private val actionVoiceChat: ImageView by lazy { findViewById(R.id.actionVoiceChat) }
+    private val actionVoiceChat: ImageView? by lazy { findViewById(R.id.actionVoiceChat) }
 
     var onSendClick: (() -> Unit)? = null
         set(value) {
@@ -67,7 +67,7 @@ class InputScreenButtons @JvmOverloads constructor(
     var onVoiceChatClick: (() -> Unit)? = null
         set(value) {
             field = value
-            actionVoiceChat.setOnClickListener { value?.invoke() }
+            actionVoiceChat?.setOnClickListener { value?.invoke() }
         }
 
     init {
@@ -131,7 +131,7 @@ class InputScreenButtons @JvmOverloads constructor(
     }
 
     fun setVoiceChatVisible(visible: Boolean) {
-        actionVoiceChat.isVisible = visible
+        actionVoiceChat?.isVisible = visible
     }
 
     private fun transformButtonsToFloating() {
@@ -149,7 +149,7 @@ class InputScreenButtons @JvmOverloads constructor(
             width = buttonSizePx
             height = buttonSizePx
         }
-        actionVoiceChat.updateLayoutParams {
+        actionVoiceChat?.updateLayoutParams {
             width = buttonSizePx
             height = buttonSizePx
         }
@@ -164,11 +164,11 @@ class InputScreenButtons @JvmOverloads constructor(
         // three buttons only need it when floating, so we apply it here.
         val backgroundRes = R.drawable.background_input_screen_button
         actionNewLine.setBackgroundResource(backgroundRes)
-        actionVoiceChat.setBackgroundResource(backgroundRes)
+        actionVoiceChat?.setBackgroundResource(backgroundRes)
         actionVoiceSearch.setBackgroundResource(backgroundRes)
         val circularRippleDrawable = ContextCompat.getDrawable(context, CommonR.drawable.selectable_circular_ripple)
         actionNewLine.foreground = circularRippleDrawable
         actionVoiceSearch.foreground = circularRippleDrawable
-        actionVoiceChat.foreground = circularRippleDrawable
+        actionVoiceChat?.foreground = circularRippleDrawable
     }
 }
