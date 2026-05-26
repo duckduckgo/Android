@@ -320,11 +320,7 @@ class WelcomePageViewModel @Inject constructor(
                 // no-op
             }
 
-            COMPARISON_CHART -> {
-                // no-op
-            }
-
-            AI_COMPARISON_CHART -> {
+            COMPARISON_CHART, AI_COMPARISON_CHART -> {
                 // no-op
             }
 
