@@ -37,10 +37,13 @@ class RealWebViewModeInitializer @Inject constructor(
 ) : WebViewModeInitializer {
     override fun bind(webView: WebView, mode: BrowserMode): Result<Unit> {
         if (!fireModeAvailability.isAvailable()) {
-            if (mode == BrowserMode.FIRE) {
-                return Result.failure(
-                    IllegalStateException("Attempting to bind a WebView profile to Fire mode when the Fire mode feature is not available."),
+            return if (mode == BrowserMode.FIRE) {
+                Result.failure(
+                    IllegalStateException("Attempting to bind a WebView profile to " +
+                            "Fire mode when the Fire mode feature is not available."),
                 )
+            } else {
+                Result.success(Unit)
             }
         }
         ProfileStore.getInstance().getOrCreateProfile(mode.profileName)
