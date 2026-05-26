@@ -126,4 +126,13 @@
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
+
+    <!-- Pre-onboarding: AI comparison chart screen. Move to strings.xml when localized. -->
+    <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
+    <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>
+    <string name="preOnboardingAiComparisonChartItem1">All chats are anonymized</string>
+    <string name="preOnboardingAiComparisonChartItem2">No account needed to access all AI features</string>
+    <string name="preOnboardingAiComparisonChartItem3">Never uses your chats to train AI</string>
+    <string name="preOnboardingAiComparisonChartItem4">Access ChatGPT, Claude, and more, all in one place.</string>
+    <string name="preOnboardingAiComparisonChartButton">Give Duck.ai a try!</string>
 </resources>
