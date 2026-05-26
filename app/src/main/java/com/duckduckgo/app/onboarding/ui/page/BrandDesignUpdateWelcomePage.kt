@@ -1923,14 +1923,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playWalkingDaxAnimation() {
-        walkingDaxDelayedRunnable = binding.welcomeScreenWalkingDax.postDelayed(WALKING_DAX_DELAY) {
+        val daxView = binding.welcomeScreenWalkingDax
+        walkingDaxDelayedRunnable = daxView.postDelayed(WALKING_DAX_DELAY) {
+            // Defensive: the View's postDelayed message can outlive the fragment view
+            // if onDestroyView's removeCallbacks didn't catch it. Avoid re-resolving
+            // `binding` here (it would throw if the view is already detached) and
+            // skip the work entirely once we're detached.
+            if (view == null) return@postDelayed
             walkingDaxAnimatorSet = AnimatorSet().apply {
                 interpolator = WELCOME_DAX_INTERPOLATOR
                 playTogether(
-                    ObjectAnimator.ofFloat(binding.welcomeScreenWalkingDax, View.ALPHA, 0f, 1f)
+                    ObjectAnimator.ofFloat(daxView, View.ALPHA, 0f, 1f)
                         .setDuration(WALKING_DAX_FADE_DURATION),
                     ObjectAnimator.ofFloat(
-                        binding.welcomeScreenWalkingDax,
+                        daxView,
                         View.TRANSLATION_X,
                         -WALKING_DAX_START_X_DP.toPx().toFloat(),
                         -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
@@ -1938,7 +1944,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 )
                 start()
             }
-            binding.welcomeScreenWalkingDax.playAnimation()
+            daxView.playAnimation()
         }
     }
 
