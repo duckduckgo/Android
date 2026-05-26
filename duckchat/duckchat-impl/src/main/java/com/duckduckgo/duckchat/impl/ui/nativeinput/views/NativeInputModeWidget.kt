@@ -1165,7 +1165,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 layoutResId = R.layout.view_native_input_screen_floating_buttons,
             ).apply {
                 onNewLineClick = { printNewLine() }
-                onVoiceSearchClick = this@NativeInputModeWidget.onVoiceSearchClick
                 setSendButtonVisible(false)
                 setNewLineButtonVisible(false)
             }
