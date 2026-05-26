@@ -373,10 +373,6 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
     }
 
-    private fun showComingSoonSnackbar() {
-        Snackbar.make(binding.root, R.string.duck_ai_chat_history_coming_soon, Snackbar.LENGTH_SHORT).show()
-    }
-
     companion object {
         private const val FIRE_DIALOG_TAG = "chat_history_fire_dialog"
 
