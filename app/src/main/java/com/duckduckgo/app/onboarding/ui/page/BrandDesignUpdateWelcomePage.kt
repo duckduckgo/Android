@@ -440,6 +440,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
                                 maxPageCount = state.maxPageCount,
+                                comparisonChartConfig = state.currentComparisonChartConfig(),
                             )
                         }
                     }
@@ -451,6 +452,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             showSplitOption = state.showSplitOption,
                             inputScreenSelected = state.inputScreenSelected,
                             maxPageCount = state.maxPageCount,
+                            comparisonChartConfig = state.currentComparisonChartConfig(),
                         )
                     }
                 }
@@ -630,6 +632,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
         maxPageCount: Int,
+        comparisonChartConfig: ComparisonChartConfig,
     ) {
         context?.let {
             isAnimating = true
@@ -813,7 +816,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART, AI_COMPARISON_CHART -> {
-                    populateComparisonChart(currentComparisonConfig())
+                    populateComparisonChart(comparisonChartConfig)
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.ComparisonChart,
                     )
@@ -849,7 +852,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             // not a synchronous stop.
                             if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
-                                getString(currentComparisonConfig().titleRes).preventWidows(),
+                                getString(comparisonChartConfig.titleRes).preventWidows(),
                             ) {
                                 comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -906,7 +909,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
-                    binding.daxDialogCta.primaryCta.text = getString(currentComparisonConfig().primaryCtaTextRes)
+                    binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
@@ -1274,6 +1277,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
         maxPageCount: Int,
+        comparisonChartConfig: ComparisonChartConfig,
     ) {
         snapToIntroEndState()
 
@@ -1332,7 +1336,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             COMPARISON_CHART, AI_COMPARISON_CHART -> {
-                populateComparisonChart(currentComparisonConfig())
+                populateComparisonChart(comparisonChartConfig)
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
@@ -1373,7 +1377,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
-                    getString(currentComparisonConfig().titleRes).preventWidows()
+                    getString(comparisonChartConfig.titleRes).preventWidows()
                 binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
                 comparisonCheckViews().forEach { checkView ->
                     checkView.alpha = 1f
@@ -1386,7 +1390,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.stepIndicator.alpha = 1f
                 binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
-                binding.daxDialogCta.primaryCta.text = getString(currentComparisonConfig().primaryCtaTextRes)
+                binding.daxDialogCta.primaryCta.text = getString(comparisonChartConfig.primaryCtaTextRes)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
 
                 binding.daxDialogCta.root.isVisible = true
@@ -2281,7 +2285,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    private fun currentComparisonConfig(): ComparisonChartConfig = when (viewModel.viewState.value.currentDialog) {
+    private fun BrandDesignUpdatePageViewModel.ViewState.currentComparisonChartConfig(): ComparisonChartConfig = when (this.currentDialog) {
         AI_COMPARISON_CHART -> ComparisonChartConfig.Ai
         else -> ComparisonChartConfig.Default
     }
@@ -2289,6 +2293,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun populateComparisonChart(config: ComparisonChartConfig) {
         with(binding.daxDialogCta.comparisonChartContent) {
             comparisonChartHeaderLeftIcon.setImageResource(config.headerLeftIconRes)
+            comparisonChartHeaderLeftIcon.updateLayoutParams {
+                width = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
+                height = config.headerLeftIconSizeDp.toPx(comparisonTable.context).toInt()
+            }
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                comparisonChartHeaderLeftIconCard.addBottomShadow()
+                comparisonChartHeaderRightIconCard.addBottomShadow()
+            }
             comparisonChartTitleHidden.text = getString(config.titleRes).preventWidows()
             if (config.headerLeftLabelRes != null) {
                 comparisonChartHeaderLabel.text = getString(config.headerLeftLabelRes).preventWidows()

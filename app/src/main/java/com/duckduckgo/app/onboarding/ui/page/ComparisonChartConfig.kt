@@ -25,6 +25,7 @@ data class ComparisonChartConfig(
     @StringRes val titleRes: Int,
     @StringRes val primaryCtaTextRes: Int,
     @DrawableRes val headerLeftIconRes: Int,
+    val headerLeftIconSizeDp: Float,
     @StringRes val headerLeftLabelRes: Int?,
     val rows: List<Row>,
 ) {
@@ -37,7 +38,8 @@ data class ComparisonChartConfig(
         val Default = ComparisonChartConfig(
             titleRes = R.string.preOnboardingDaxDialog2Title,
             primaryCtaTextRes = R.string.preOnboardingDaxDialog2Button,
-            headerLeftIconRes = CommonR.drawable.ic_chrome_comparison_chart,
+            headerLeftIconRes = CommonR.drawable.ic_chrome,
+            headerLeftIconSizeDp = 32f, // the target size is 31.5dp but the icon already has some padding
             headerLeftLabelRes = null,
             rows = listOf(
                 Row(CommonR.drawable.ic_vpn_color_24_rebrand, R.string.preOnboardingComparisonChartItem1),
@@ -48,18 +50,17 @@ data class ComparisonChartConfig(
             ),
         )
 
-        // Placeholder icons reuse existing rebrand drawables for visual distinction during dev.
-        // Replace headerLeftIconRes and each Row(iconRes) with real AI-specific assets when supplied.
         val Ai = ComparisonChartConfig(
             titleRes = R.string.preOnboardingDaxDialogAiTitle,
             primaryCtaTextRes = R.string.preOnboardingAiComparisonChartButton,
-            headerLeftIconRes = CommonR.drawable.ic_duck_ai_color_24_rebrand,
+            headerLeftIconRes = CommonR.drawable.ic_ai_general_16,
+            headerLeftIconSizeDp = 18f,
             headerLeftLabelRes = R.string.preOnboardingAiComparisonChartPopularAis,
             rows = listOf(
                 Row(CommonR.drawable.ic_shield_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem1),
-                Row(CommonR.drawable.ic_profile_blocker_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem2),
-                Row(CommonR.drawable.ic_vpn_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem3),
-                Row(CommonR.drawable.ic_cookies_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem4),
+                Row(CommonR.drawable.ic_duck_ai_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem2),
+                Row(CommonR.drawable.ic_lock_color_24, R.string.preOnboardingAiComparisonChartItem3),
+                Row(CommonR.drawable.ai_general_color_24, R.string.preOnboardingAiComparisonChartItem4),
             ),
         )
     }

@@ -79,22 +79,46 @@
                 tools:text="Popular AIs"
                 tools:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/comparisonChartHeaderLeftIcon"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/comparisonChartHeaderLeftIconCard"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/ic_chrome_comparison_chart" />
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                tools:ignore="InvalidColorAttribute">
+
+                <ImageView
+                    android:id="@+id/comparisonChartHeaderLeftIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_chrome" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <View
                 android:layout_width="8dp"
                 android:layout_height="0dp" />
 
-            <ImageView
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/comparisonChartHeaderRightIconCard"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/ic_ddg_comparison_chart" />
+                app:cardBackgroundColor="#DE5833"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                tools:ignore="InvalidColorAttribute">
+
+                <ImageView
+                    android:layout_width="31.5dp"
+                    android:layout_height="31.5dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/logo_medium" />
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
