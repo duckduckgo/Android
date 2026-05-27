@@ -626,15 +626,26 @@ class NativeInputModeWidget @JvmOverloads constructor(
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
+                    refreshTabDependentButtons()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     applyTabUi()
                     pushToggleSelectionIfUserDriven()
                     viewModel.updatePluginContainerVisibility(isChatTabSelected())
+                    refreshTabDependentButtons()
                 }
             },
         )
+    }
+
+    // send and new-line both gate on `isChatTabSelected()`. Voice buttons re-evaluate on tab
+    // change via NativeInputManager's `onSearchSelected`/`onChatSelected` hooks (which call
+    // `setVoice*Available`), but send and new-line have no such external trigger, so without
+    // this their visibility stays stale across tab switches.
+    private fun refreshTabDependentButtons() {
+        updateSendButtonVisibility()
+        updateNewLineButtonVisibility()
     }
 
     // Only propagate the TabLayout selection into NativeInputState when the toggle row is actually
