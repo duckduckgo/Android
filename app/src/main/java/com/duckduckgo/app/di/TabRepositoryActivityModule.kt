@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.di
 
+import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
@@ -45,11 +47,20 @@ class TabRepositoryActivityModule {
      * mode for the activity's lifetime even if [BrowserModeStateHolder.currentMode] changes
      * mid-construction — the activity recreates on real mode changes, so the next instance
      * captures the new value cleanly.
+     *
+     * [CustomTabActivity] always resolves to [BrowserMode.REGULAR] regardless of the state holder:
+     * Custom Tabs are launched by third-party apps and must not inherit the user's Fire-mode
+     * session, nor leak Custom Tab browsing into Fire-mode storage.
      */
     @Provides
     @SingleInstanceIn(ActivityScope::class)
-    fun provideActivityBrowserMode(browserModeStateHolder: BrowserModeStateHolder): BrowserMode =
-        browserModeStateHolder.currentMode.value
+    fun provideActivityBrowserMode(
+        activity: AppCompatActivity,
+        browserModeStateHolder: BrowserModeStateHolder,
+    ): BrowserMode = when (activity) {
+        is CustomTabActivity -> BrowserMode.REGULAR
+        else -> browserModeStateHolder.currentMode.value
+    }
 
     /**
      * AppScope-singleton consumers cannot reach this binding — they must inject the qualified
