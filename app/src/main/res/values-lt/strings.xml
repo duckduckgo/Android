@@ -1033,7 +1033,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Pratęskime nuo ten, kur baigėte naudotis „DuckDuckGo“.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Jau paruoštos jūsų išsaugotos žymės, slaptažodžiai ir kita.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">DI neprivalomas, o privatumo apsauga yra visada įjungta.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Atsisiųsti PDF</string>

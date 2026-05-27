@@ -1033,7 +1033,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Poďme pokračovať tam, kde si na DuckDuckGo skončil.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Tvoje uložené záložky, heslá a ďalšie údaje sú pripravené.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Umelá inteligencia je vždy voliteľná a ochrana súkromia je vždy zapnutá.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>

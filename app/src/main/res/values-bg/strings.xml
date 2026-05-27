@@ -993,7 +993,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Нека продължим оттам, откъдето спряхте в DuckDuckGo.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Запазените отметки, пароли и други са готови.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Изтегляне на PDF</string>

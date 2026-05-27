@@ -1013,7 +1013,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Turpināsim darbu ar DuckDuckGo no vietas, kur beidzāt.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Tavas saglabātās grāmatzīmes, paroles un citi dati ir gatavi.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Mākslīgais intelekts vienmēr ir izvēles iespēja, un privātuma aizsardzība vienmēr ir ieslēgta.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Lejupielādēt PDF</string>

@@ -1033,7 +1033,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Nastavimo tamo gdje si stao na DuckDuckGou.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Tvoje spremljene oznake, lozinke (i još mnogo toga) su spremne.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Umjetna inteligencija uvijek je neobavezna, a zaštita privatnosti uvijek aktivna.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Preuzmi PDF</string>

@@ -661,11 +661,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         binding.daxDialogCta.welcomeContent.hiddenTitleText.text = getString(titleRes)
                         binding.daxDialogCta.welcomeContent.bodyText1.text =
                             getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
-                        binding.daxDialogCta.welcomeContent.bodyText2.text =
-                            getString(R.string.syncRestoreDialogBrandDesignBody2).preventWidows().html(requireContext())
                         binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                         binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
                     }
+                    // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                    // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
+                    binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
 
                     val showWalkingDax = applyWalkingDaxLayout()
                     binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
@@ -683,11 +684,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     val animators = mutableListOf<Animator>(
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText1, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                     )
+                                    if (!isSyncRestore) {
+                                        animators += ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText2, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                    }
                                     if (showSecondaryCta) {
                                         binding.daxDialogCta.secondaryCta.isVisible = true
                                         animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
@@ -1313,11 +1316,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.welcomeContent.hiddenTitleText.text = titleString
                     binding.daxDialogCta.welcomeContent.bodyText1.text =
                         getString(R.string.syncRestoreDialogBrandDesignBody1).preventWidows().html(requireContext())
-                    binding.daxDialogCta.welcomeContent.bodyText2.text =
-                        getString(R.string.syncRestoreDialogBrandDesignBody2).preventWidows().html(requireContext())
                     binding.daxDialogCta.primaryCta.text = getString(R.string.syncRestoreDialogPrimaryCta)
                     binding.daxDialogCta.secondaryCta.text = getString(R.string.syncRestoreDialogSecondaryCta)
                 }
+                // SYNC_RESTORE shows no second body line; INITIAL/INITIAL_REINSTALL_USER do.
+                // Set isVisible explicitly so a prior dialog that hid bodyText2 doesn't leak into this one.
+                binding.daxDialogCta.welcomeContent.bodyText2.isVisible = !isSyncRestore
                 binding.daxDialogCta.welcomeContent.bodyText1.alpha = 1f
                 binding.daxDialogCta.welcomeContent.bodyText2.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f

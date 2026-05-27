@@ -993,7 +993,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Jätkame DuckDuckGo-ga sealt, kus pooleli jäid.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Sinu salvestatud järjehoidjad, paroolid ja muu on valmis.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Tehisintellekt on alati valikuline ja privaatsuskaitse on alati sisse lülitatud.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Laadi alla PDF</string>

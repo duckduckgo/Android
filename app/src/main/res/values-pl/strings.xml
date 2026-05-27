@@ -1033,7 +1033,6 @@
     <!-- Sync Restore (brand-design onboarding) -->
     <string name="syncRestoreDialogBrandDesignTitle">Kontynuujmy tam, gdzie przerwałeś na DuckDuckGo.</string>
     <string name="syncRestoreDialogBrandDesignBody1">Twoje zapisane zakładki, hasła i inne są gotowe.</string>
-    <string name="syncRestoreDialogBrandDesignBody2">Funkcje AI są zawsze opcjonalne, a ochrona prywatności jest zawsze aktywna.</string>
 
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Pobierz PDF</string>
