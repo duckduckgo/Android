@@ -1407,7 +1407,8 @@ class BrowserTabFragment :
                         ),
                     )
                 },
-                onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+                onChatSuggestionSelected = { chatUrl -> viewModel.openDuckAiChatById(chatUrl) },
+                onDuckAiQuerySubmitted = { query -> viewModel.openDuckAiQuery(query, autoPrompt = true) },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
@@ -2953,7 +2954,6 @@ class BrowserTabFragment :
                 // NO OP
             }
 
-            is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
