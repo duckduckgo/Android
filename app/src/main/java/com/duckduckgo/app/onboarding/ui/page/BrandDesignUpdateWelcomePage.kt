@@ -385,6 +385,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        with(binding.daxDialogCta.comparisonChartContent) {
+            comparisonChartItem1.text = getString(R.string.preOnboardingComparisonChartItem1).preventWidows()
+            comparisonChartDuckAi.text = getString(R.string.preOnboardingComparisonChartDuckAi).preventWidows()
+            comparisonChartItem2.text = getString(R.string.preOnboardingComparisonChartItem2).preventWidows()
+            comparisonChartItem3.text = getString(R.string.preOnboardingComparisonChartItem3).preventWidows()
+            comparisonChartItem4.text = getString(R.string.preOnboardingComparisonChartItem4).preventWidows()
+        }
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
@@ -434,6 +442,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
                                 showSplitOption = state.showSplitOption,
                                 inputScreenSelected = state.inputScreenSelected,
+                                maxPageCount = state.maxPageCount,
                             )
                         }
                     }
@@ -444,6 +453,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             selectedAddressBarPosition = state.selectedAddressBarPosition,
                             showSplitOption = state.showSplitOption,
                             inputScreenSelected = state.inputScreenSelected,
+                            maxPageCount = state.maxPageCount,
                         )
                     }
                 }
@@ -622,6 +632,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
+        maxPageCount: Int,
     ) {
         context?.let {
             isAnimating = true
@@ -644,6 +655,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
                     val showWalkingDax = applyWalkingDaxLayout()
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
                     playOutroAnimation(
                         nextStep = OnboardingBackgroundStep.Welcome,
@@ -814,6 +826,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBottomWingAnimation) 1f else 0f)
 
                     val transition = ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -826,7 +839,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             // not a synchronous stop.
                             if (view == null) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
-                                getString(R.string.preOnboardingDaxDialog2Title),
+                                getString(R.string.preOnboardingDaxDialog2Title).preventWidows(),
                             ) {
                                 comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
                                     playTogether(
@@ -852,7 +865,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
-                    binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                     binding.daxDialogCta.stepIndicator.isVisible = true
                     binding.daxDialogCta.stepIndicator.alpha = 0f
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
@@ -948,8 +961,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = true
+                    updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+
+                    val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = binding.bobbingDaxAnimation,
+                    )
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                        if (deviceInfo.isTablet()) {
+                        if (showBobbingDax && deviceInfo.isTablet()) {
                             verticalBias = 0.5f
                             bottomToTop = binding.bobbingDaxAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -963,8 +985,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         step = OnboardingBackgroundStep.AddressBar,
                     )
 
-                    animateBobbingDaxIn()
+                    if (showBobbingDax) {
+                        animateBobbingDaxIn()
+                    } else {
+                        bobbingDaxAnimator?.cancel()
+                        bobbingDaxAnimator = null
+                        binding.bobbingDaxAnimation.apply {
+                            if (this.isAnimating) cancelAnimation()
+                            isVisible = false
+                        }
+                    }
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
 
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
                     val transition = ChangeBounds().apply {
@@ -1004,9 +1037,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.root.translationZ = 1f.toPx()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
 
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addressBarContent.root.isVisible = true
-
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
@@ -1019,6 +1049,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     )
 
                     animateBobbingDaxOut()
+
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = false
+                    binding.daxDialogCta.inputScreenContent.root.isVisible = true
+                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                     val leftWingView = binding.leftWingAnimation
                     val showLeftWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
@@ -1071,12 +1109,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     changeBoundsTransitionListener = listener
                     transition.addListener(listener)
 
+                    binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 2)
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
 
                     binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        if (deviceInfo.isTablet()) {
+                        if (showLeftWingAnimation && deviceInfo.isTablet()) {
                             verticalBias = 0.5f
                             bottomToTop = binding.leftWingAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1086,22 +1125,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
-
-                    binding.welcomeScreenWalkingDax.isVisible = false
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addressBarContent.root.isVisible = false
+                    binding.daxDialogCta.cardView.setArrowDepthFraction(if (showLeftWingAnimation) 1f else 0f)
 
                     val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                     binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
-                    binding.daxDialogCta.inputScreenContent.root.isVisible = true
-
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
-
-                    // set the toggle state without crossfade, and do not start lottie animations yet, we'll start them once the view fully fades in
-                    updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
                 }
 
                 INPUT_SCREEN_PREVIEW -> {
@@ -1232,6 +1263,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
         inputScreenSelected: Boolean,
+        maxPageCount: Int,
     ) {
         snapToIntroEndState()
 
@@ -1254,6 +1286,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
                     }
                 }
+                binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
@@ -1313,9 +1346,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                     }
                 }
+                binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWing) 1f else 0f)
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
-                    getString(R.string.preOnboardingDaxDialog2Title)
+                    getString(R.string.preOnboardingDaxDialog2Title).preventWidows()
                 binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
                 listOf(
                     binding.daxDialogCta.comparisonChartContent.check1,
@@ -1332,7 +1366,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1365,6 +1399,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
                     }
                 }
+                binding.daxDialogCta.cardView.setArrowDepthFraction(if (showWalkingDax) 1f else 0f)
 
                 binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingDaxDialog3Title)
@@ -1397,8 +1432,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+
+                binding.daxDialogCta.addressBarContent.root.isVisible = true
+                updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
+                val showBobbingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = binding.bobbingDaxAnimation,
+                )
                 binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    if (deviceInfo.isTablet()) {
+                    if (showBobbingDax && deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.bobbingDaxAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1411,11 +1457,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.secondaryCta.isVisible = false
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-
-                binding.daxDialogCta.addressBarContent.root.isVisible = true
+                cardView.setArrowDepthFraction(if (showBobbingDax) 1f else 0f)
                 binding.daxDialogCta.addressBarContent.root.alpha = 1f
                 binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
                 binding.daxDialogCta.addressBarContent.addressBarTitle.text =
@@ -1424,7 +1466,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 2)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 2)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1433,11 +1475,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.translationZ = 1f.toPx()
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
-                binding.bobbingDaxAnimation.apply {
-                    isVisible = true
-                    alpha = 1f
-                    translationX = 0f
-                    if (!this.isAnimating) playAnimation()
+                if (showBobbingDax) {
+                    binding.bobbingDaxAnimation.apply {
+                        isVisible = true
+                        alpha = 1f
+                        translationX = 0f
+                        if (!this.isAnimating) playAnimation()
+                    }
+                } else {
+                    bobbingDaxAnimator?.cancel()
+                    bobbingDaxAnimator = null
+                    binding.bobbingDaxAnimation.apply {
+                        if (this.isAnimating) cancelAnimation()
+                        isVisible = false
+                    }
                 }
 
                 updateAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption, animate = false)
@@ -1456,6 +1507,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 binding.bottomWingAnimation.isVisible = false
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.addressBarContent.root.isVisible = false
+                binding.daxDialogCta.inputScreenContent.root.isVisible = true
+                updateAiChatToggleState(binding, withAi = inputScreenSelected, transition = BrandDesignInputScreenPicker.Transition.NONE)
 
                 val leftWingView = binding.leftWingAnimation
                 val showLeftWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
@@ -1479,9 +1538,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
-                binding.welcomeScreenWalkingDax.isVisible = false
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    if (deviceInfo.isTablet()) {
+                    if (showLeftWing && deviceInfo.isTablet()) {
                         verticalBias = 0.5f
                         bottomToTop = binding.leftWingAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -1495,15 +1553,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.secondaryCta.isVisible = false
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                binding.daxDialogCta.addressBarContent.root.isVisible = false
+                cardView.setArrowDepthFraction(if (showLeftWing) 1f else 0f)
 
                 val descriptionText = getString(R.string.preOnboardingInputScreenDescription).preventWidows()
                 binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
 
-                binding.daxDialogCta.inputScreenContent.root.isVisible = true
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
                 binding.daxDialogCta.inputScreenContent.inputScreenTitle.text =
                     getString(R.string.preOnboardingInputScreenTitleUpdated)
@@ -1512,7 +1566,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
-                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 3)
+                binding.daxDialogCta.stepIndicator.setSteps(totalSteps = maxPageCount, currentStep = 3)
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
@@ -1977,8 +2031,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         quickSetupFadeInAnimatorSet?.end()
         suggestionButtonsAnimatorSet?.end()
 
-        // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
-        snapCheckIconsToFinalState()
+        // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one.
+        // Only do this on the comparison chart: those runnables are only ever scheduled by playCheckIconAnimation(),
+        // and snapping outside that screen leaves the check views at alpha=1/scale=1 with a static drawable, which
+        // makes them appear pre-rendered when the comparison chart later fades in.
+        if (viewModel.viewState.value.currentDialog == COMPARISON_CHART) {
+            snapCheckIconsToFinalState()
+        }
     }
 
     private fun snapCheckIconsToFinalState() {
@@ -2002,6 +2061,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             binding.daxDialogCta.comparisonChartContent.check4,
             binding.daxDialogCta.comparisonChartContent.check5,
         ).sortedBy { comparisonTable.indexOfChild(it.parent as View) }
+
+        // Reset trimPathEnd up-front: the alpha fade-in completes ~50ms before the postDelayed AVD start,
+        // so any stale trimPathEnd=1 from a previous run would render the tick fully drawn during the gap.
+        checkViews.forEach { checkView ->
+            (checkView.drawable?.mutate() as? AnimatedVectorDrawable)?.reset()
+        }
 
         val iconAnimators = checkViews.mapIndexed { index, checkView ->
             AnimatorSet().apply {

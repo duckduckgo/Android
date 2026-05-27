@@ -1466,6 +1466,28 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when native input disabled and build chat url then url contains chatID without native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertTrue(url == "https://duck.ai/chat?chatID=abc-123&duckai=5")
+    }
+
+    @Test
+    fun `when native input enabled and build chat url then url contains both chatID and native input param`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertTrue(url == "https://duck.ai/chat?chatID=abc-123&native-input=true&duckai=5")
+    }
+
+    @Test
     fun `when url can be handled by webview return true`() {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))

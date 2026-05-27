@@ -25,12 +25,12 @@ import com.google.android.material.shape.ShapePath
  * The bottom edge in Material is drawn right-to-left (clockwise path), so edge-local x=0
  * is the visual right side of the view.
  *
- * @param base the underlying edge treatment (e.g. [DaxBubbleBottomEdgeTreatment])
+ * @param base the underlying edge treatment (a [DaxBubbleBottomEdgeTreatment])
  * @param offsetFromStartPx the initial arrow position as a visual offset from the left edge.
  *   Edge-local center = `length - offsetFromStartPx`.
  */
 class AnimatableOffsetEdgeTreatment(
-    private val base: EdgeTreatment,
+    private val base: DaxBubbleBottomEdgeTreatment,
     private val offsetFromStartPx: Float,
 ) : EdgeTreatment() {
 
@@ -44,6 +44,10 @@ class AnimatableOffsetEdgeTreatment(
      * Animation fraction: 0 = arrow at [offsetFromStartPx], 1 = arrow at [offsetFromEndPx].
      */
     var fraction: Float = 0f
+
+    var depthFraction: Float
+        get() = base.depthFraction
+        set(value) { base.depthFraction = value }
 
     override fun getEdgePath(
         length: Float,

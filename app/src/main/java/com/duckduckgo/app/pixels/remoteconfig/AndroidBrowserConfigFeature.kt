@@ -71,6 +71,14 @@ interface AndroidBrowserConfigFeature {
     fun precompileTdsRegex(): Toggle
 
     /**
+     * Routes entity lookups through the in-memory cached path
+     * (CachedTdsEntityLookup). When disabled, the legacy DB-walking
+     * TdsEntityLookup is used. Default INTERNAL during rollout.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun cachedEntityLookup(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "errorPagePixel" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `true`
@@ -259,14 +267,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun newCustomTab(): Toggle
-
-    /**
-     * @return `true` when the remote config has the global "showInputScreenOnboarding" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `internal`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun showInputScreenOnboarding(): Toggle
 
     /**
      * Controls the duck-ai related copy updates related to browser onboarding

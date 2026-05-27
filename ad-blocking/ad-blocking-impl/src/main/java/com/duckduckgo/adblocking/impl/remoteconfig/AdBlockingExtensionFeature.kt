@@ -14,33 +14,30 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.adblocking.impl
+package com.duckduckgo.adblocking.impl.remoteconfig
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "adBlockingExtension",
 )
 interface AdBlockingExtensionFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    /**
+     * Kill-switch. When false, the feature is completely inaccessible.
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enabledByDefault(): Toggle
+
+    /**
+     * When enabled, the feature settings will still be accessible, but no scripts
+     * will be injected, and a contingency message will be shown
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun enableContingencyMode(): Toggle
 }
-
-data class AdBlockingExtensionSettings(
-    val version: String? = null,
-    val scriptlets: Map<String, ScriptletEntry>? = null,
-    val domains: List<Domain>? = null,
-)
-
-data class ScriptletEntry(
-    val url: String,
-    val signature: String,
-)

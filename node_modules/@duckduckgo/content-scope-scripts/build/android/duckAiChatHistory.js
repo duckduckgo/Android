@@ -52,6 +52,7 @@
   var JSONparse = JSON.parse;
   var Arrayfrom = Array.from;
   var ReflectDeleteProperty = Reflect2.deleteProperty.bind(Reflect2);
+  var ReflectApply = Reflect2.apply.bind(Reflect2);
   var getRandomValues = globalThis.crypto?.getRandomValues?.bind(globalThis.crypto);
   var generateKey = globalThis.crypto?.subtle?.generateKey?.bind(globalThis.crypto?.subtle);
   var exportKey = globalThis.crypto?.subtle?.exportKey?.bind(globalThis.crypto?.subtle);
@@ -765,6 +766,35 @@
       return Reflect.get(target, prop, receiver);
     };
   }
+  function mergePropertyDescriptors(origDescriptor, partialDescriptor) {
+    if ("value" in origDescriptor && "value" in partialDescriptor || "get" in origDescriptor && "get" in partialDescriptor || "set" in origDescriptor && "set" in partialDescriptor) {
+      const merged = {
+        ...origDescriptor,
+        ...partialDescriptor
+      };
+      if ("value" in merged) {
+        return (
+          /** @type {import('./wrapper-utils').StrictPropertyDescriptor} */
+          {
+            value: merged.value,
+            writable: typeof merged.writable === "boolean" ? merged.writable : true,
+            configurable: typeof merged.configurable === "boolean" ? merged.configurable : true,
+            enumerable: typeof merged.enumerable === "boolean" ? merged.enumerable : true
+          }
+        );
+      }
+      return (
+        /** @type {import('./wrapper-utils').StrictPropertyDescriptor} */
+        {
+          get: merged.get,
+          set: merged.set,
+          configurable: typeof merged.configurable === "boolean" ? merged.configurable : true,
+          enumerable: typeof merged.enumerable === "boolean" ? merged.enumerable : true
+        }
+      );
+    }
+    return void 0;
+  }
   function wrapProperty(object, propertyName, descriptor, definePropertyFn) {
     if (!object) {
       return;
@@ -773,15 +803,12 @@
     if (!origDescriptor) {
       return;
     }
-    if ("value" in origDescriptor && "value" in descriptor || "get" in origDescriptor && "get" in descriptor || "set" in origDescriptor && "set" in descriptor) {
-      definePropertyFn(object, propertyName, {
-        ...origDescriptor,
-        ...descriptor
-      });
-      return origDescriptor;
-    } else {
+    const merged = mergePropertyDescriptors(origDescriptor, descriptor);
+    if (!merged) {
       throw new Error(`Property descriptor for ${propertyName} may only include the following keys: ${objectKeys(origDescriptor)}`);
     }
+    definePropertyFn(object, propertyName, merged);
+    return origDescriptor;
   }
   function wrapMethod(object, propertyName, wrapperFn, definePropertyFn) {
     if (!object) {

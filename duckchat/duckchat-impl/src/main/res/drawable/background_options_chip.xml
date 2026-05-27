@@ -26,7 +26,7 @@
             <solid android:color="?attr/daxColorContainer" />
             <corners android:radius="100dp" />
             <stroke
-                android:width="@dimen/modelPickerChipStrokeWidth"
+                android:width="@dimen/chipStrokeWidth"
                 android:color="?attr/daxColorLines" />
         </shape>
     </item>

@@ -22,66 +22,85 @@ import org.junit.Test
 
 class AIChatModelTest {
 
+    // ---- requiredTier wrapper smoke tests ----
+    // Confirm AIChatModel.requiredTier forwards both fields to lowestRequiredTier.
+    // Branch coverage for the resolution logic itself lives in the lowestRequiredTier tests below.
+
     @Test
-    fun whenAccessTierIsEmptyThenRequiredTierIsFree() {
-        assertEquals(UserTier.FREE, model(accessTier = emptyList()).requiredTier)
+    fun requiredTierForwardsAccessTierToHelper() {
+        assertEquals(UserTier.PLUS, model(accessTier = listOf("plus"), isAccessible = false).requiredTier)
     }
 
     @Test
-    fun whenAccessTierContainsOnlyFreeThenRequiredTierIsFree() {
-        assertEquals(UserTier.FREE, model(accessTier = listOf("free")).requiredTier)
+    fun requiredTierForwardsIsAccessibleToHelper() {
+        assertEquals(UserTier.FREE, model(accessTier = emptyList(), isAccessible = true).requiredTier)
+    }
+
+    // ---- lowestRequiredTier helper ----
+
+    @Test
+    fun whenAccessTierIsEmptyAndNotAccessibleThenLowestRequiredTierIsNull() {
+        assertNull(lowestRequiredTier(accessTier = emptyList(), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsOnlyPlusThenRequiredTierIsPlus() {
-        assertEquals(UserTier.PLUS, model(accessTier = listOf("plus")).requiredTier)
+    fun whenAccessTierIsEmptyAndAccessibleThenLowestRequiredTierIsFree() {
+        assertEquals(UserTier.FREE, lowestRequiredTier(accessTier = emptyList(), isAccessible = true))
     }
 
     @Test
-    fun whenAccessTierContainsOnlyProThenRequiredTierIsPro() {
-        assertEquals(UserTier.PRO, model(accessTier = listOf("pro")).requiredTier)
+    fun whenAccessTierContainsOnlyFreeThenLowestRequiredTierIsFree() {
+        assertEquals(UserTier.FREE, lowestRequiredTier(accessTier = listOf("free"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsFreeAndPlusThenRequiredTierIsFree() {
-        // FREE has priority over PLUS in the lookup.
-        assertEquals(UserTier.FREE, model(accessTier = listOf("plus", "free")).requiredTier)
+    fun whenAccessTierContainsOnlyPlusThenLowestRequiredTierIsPlus() {
+        assertEquals(UserTier.PLUS, lowestRequiredTier(accessTier = listOf("plus"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsPlusAndProThenRequiredTierIsPlus() {
-        // PLUS has priority over PRO in the lookup.
-        assertEquals(UserTier.PLUS, model(accessTier = listOf("pro", "plus")).requiredTier)
+    fun whenAccessTierContainsOnlyProThenLowestRequiredTierIsPro() {
+        assertEquals(UserTier.PRO, lowestRequiredTier(accessTier = listOf("pro"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsFreePlusProThenRequiredTierIsFree() {
-        assertEquals(UserTier.FREE, model(accessTier = listOf("pro", "plus", "free")).requiredTier)
+    fun whenAccessTierContainsFreeAndPlusThenLowestRequiredTierIsFree() {
+        assertEquals(UserTier.FREE, lowestRequiredTier(accessTier = listOf("plus", "free"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsOnlyNonPublicTierThenRequiredTierIsNull() {
-        assertNull(model(accessTier = listOf("internal")).requiredTier)
+    fun whenAccessTierContainsPlusAndProThenLowestRequiredTierIsPlus() {
+        assertEquals(UserTier.PLUS, lowestRequiredTier(accessTier = listOf("pro", "plus"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierContainsMultipleNonPublicTiersThenRequiredTierIsNull() {
-        assertNull(model(accessTier = listOf("internal", "enterprise")).requiredTier)
+    fun whenAccessTierContainsFreePlusProThenLowestRequiredTierIsFree() {
+        assertEquals(UserTier.FREE, lowestRequiredTier(accessTier = listOf("pro", "plus", "free"), isAccessible = false))
     }
 
     @Test
-    fun whenAccessTierMixesPublicAndNonPublicTiersThenRequiredTierIsTheLowestPublic() {
-        assertEquals(UserTier.PLUS, model(accessTier = listOf("internal", "plus")).requiredTier)
-        assertEquals(UserTier.PRO, model(accessTier = listOf("internal", "pro")).requiredTier)
-        assertEquals(UserTier.FREE, model(accessTier = listOf("internal", "free")).requiredTier)
+    fun whenAccessTierContainsOnlyNonPublicTierThenLowestRequiredTierIsNull() {
+        assertNull(lowestRequiredTier(accessTier = listOf("internal"), isAccessible = false))
     }
 
-    private fun model(accessTier: List<String>) = AIChatModel(
+    @Test
+    fun whenAccessTierContainsMultipleNonPublicTiersThenLowestRequiredTierIsNull() {
+        assertNull(lowestRequiredTier(accessTier = listOf("internal", "enterprise"), isAccessible = false))
+    }
+
+    @Test
+    fun whenAccessTierMixesPublicAndNonPublicTiersThenLowestRequiredTierIsTheLowestPublic() {
+        assertEquals(UserTier.PLUS, lowestRequiredTier(accessTier = listOf("internal", "plus"), isAccessible = false))
+        assertEquals(UserTier.PRO, lowestRequiredTier(accessTier = listOf("internal", "pro"), isAccessible = false))
+        assertEquals(UserTier.FREE, lowestRequiredTier(accessTier = listOf("internal", "free"), isAccessible = false))
+    }
+
+    private fun model(accessTier: List<String>, isAccessible: Boolean) = AIChatModel(
         id = "id",
         name = "name",
         displayName = "name",
         shortName = "name",
         accessTier = accessTier,
-        isAccessible = false,
+        isAccessible = isAccessible,
     )
 }

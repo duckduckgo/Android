@@ -30,6 +30,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -63,6 +66,7 @@ class AttachmentViewModel @Inject constructor(
     private val fileAttachmentProcessor: FileAttachmentProcessor,
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    nativeInputStateProvider: NativeInputStateProvider,
 ) : ViewModel() {
 
     data class AttachmentState(
@@ -89,13 +93,16 @@ class AttachmentViewModel @Inject constructor(
     @VisibleForTesting
     internal val imageAttachments = MutableStateFlow<List<ImageAttachment>>(emptyList())
     private val _fileAttachments = MutableStateFlow<List<FileAttachment>>(emptyList())
-    private val _isDuckAiMode = MutableStateFlow(false)
+
+    private val isDuckAiModeFlow: StateFlow<Boolean> = nativeInputStateProvider.state
+        .map { it.inputContext != NativeInputState.InputContext.BROWSER }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(imageAttachments, _fileAttachments) { images, files -> Pair(images, files) },
         modelManager.modelState,
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
-        _isDuckAiMode,
+        isDuckAiModeFlow,
     ) { (images, files), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
@@ -182,10 +189,6 @@ class AttachmentViewModel @Inject constructor(
         clearAttachments()
         limitsHandler.setConversationImagesUsed(0)
         limitsHandler.setConversationFilesUsed(0, 0L)
-    }
-
-    fun setDuckAiMode(enabled: Boolean) {
-        _isDuckAiMode.value = enabled
     }
 
     fun getImageAttachments(): List<ImageAttachment> = imageAttachments.value

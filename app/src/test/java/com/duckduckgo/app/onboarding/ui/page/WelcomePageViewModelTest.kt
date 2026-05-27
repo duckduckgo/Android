@@ -266,13 +266,13 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenOnPrimaryCtaClickedThenFinishFlow() =
+    fun whenOnPrimaryCtaClickedFromAddressBarPositionThenShowInputScreenDialog() =
         runTest {
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
 
             testee.commands.test {
                 val command = awaitItem()
-                assertEquals(Finish, command)
+                assertTrue(command is ShowInputScreenDialog)
             }
         }
 
@@ -513,7 +513,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedThenFireAiChatSelectedPixelAndStoreSelectionAndShowInputScreenPreview() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
@@ -531,7 +530,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenNotSelectedThenFireSearchOnlySelectedPixelAndStoreSelectionAndFinishFlow() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             testee.onInputScreenOptionSelected(false)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
 
@@ -545,26 +543,15 @@ class WelcomePageViewModelTest {
         }
 
     @Test
-    fun whenInputScreenOnboardingIsEnabledThenGetMaxPageCountReturns3() =
+    fun whenGetMaxPageCountThenReturns3() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             val viewModel = createViewModel()
 
             Assert.assertEquals(3, viewModel.getMaxPageCount())
         }
 
     @Test
-    fun whenInputScreenOnboardingIsDisabledThenGetMaxPageCountReturns2() =
-        runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
-            val viewModel = createViewModel()
-
-            Assert.assertEquals(2, viewModel.getMaxPageCount())
-        }
-
-    @Test
     fun whenShowingInputScreenDialogAndDuckAiCopyEligibleThenShowInputScreenDialogWithDuckAiCopyEnabled() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDeviceInfo.language).thenReturn("en")
         mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
 
@@ -577,7 +564,6 @@ class WelcomePageViewModelTest {
 
     @Test
     fun whenShowingInputScreenDialogAndDuckAiCopyNotEligibleThenShowInputScreenDialogWithDuckAiCopyDisabled() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
         whenever(mockDeviceInfo.language).thenReturn("pl")
         mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
 
@@ -598,7 +584,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndReinstallUserTrueThenCallWideEventWithReinstallUserTrue() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
             testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
 
@@ -715,7 +700,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsNullThenFinish() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(null)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
@@ -728,7 +712,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsControlThenFinish() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.CONTROL)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
@@ -741,7 +724,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsTreatmentWithDuckAiDefaultThenShowPreviewWithDuckAiDefault() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
@@ -756,7 +738,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedWithInputScreenSelectedAndEnrollReturnsTreatmentWithSearchDefaultThenShowPreviewWithSearchDefault() =
         runTest {
-            mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
             whenever(mockDuckAiOnboardingExperimentManager.enroll()).thenReturn(DuckAiOnboardingExperimentVariant.TREATMENT_WITH_SEARCH_DEFAULT)
             testee.onInputScreenOptionSelected(true)
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
@@ -794,17 +775,5 @@ class WelcomePageViewModelTest {
         testee.onInputModeDemoQuerySubmitted("custom", isChat = false, optionIndex = null)
 
         verify(mockDuckAiOnboardingExperimentMetrics).fireSearchType(null)
-    }
-
-    @Test
-    fun givenAddressBarPositionDialogWhenInputScreenDisabledThenFinishFlow() = runTest {
-        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = false))
-        val viewModel = createViewModel()
-        viewModel.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
-
-        viewModel.commands.test {
-            val command = awaitItem()
-            assertTrue(command is Finish)
-        }
     }
 }

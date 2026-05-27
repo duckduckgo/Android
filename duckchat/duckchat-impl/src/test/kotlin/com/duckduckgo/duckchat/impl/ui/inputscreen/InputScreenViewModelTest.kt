@@ -122,6 +122,7 @@ class InputScreenViewModelTest {
             )
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
             whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.buildChatUrl(any())).thenAnswer { "$duckChatURL&chatID=${it.arguments[0]}" }
             whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
             whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)

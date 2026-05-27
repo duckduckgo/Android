@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
-import com.duckduckgo.duckchat.impl.nativeinput.PromptContribution
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.StartChatView
 import javax.inject.Inject
 
@@ -40,6 +39,4 @@ class StartChatNativeInputPlugin @Inject constructor() : NativeInputPlugin {
     override fun createView(context: Context, host: NativeInputHost): View = StartChatView(context).apply {
         onIconClicked = { host.submit() }
     }
-
-    override fun getPromptContribution(): PromptContribution? = null
 }

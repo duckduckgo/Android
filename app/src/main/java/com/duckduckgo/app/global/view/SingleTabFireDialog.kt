@@ -51,6 +51,7 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -311,10 +312,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
         val subtitleParts = buildList {
             if (state.isSiteDataSubtitleVisible) {
-                add(getString(R.string.singleTabFireDialogSubtitleSiteData))
+                add(getString(R.string.singleTabFireDialogSubtitleSiteData).preventWidows())
             }
             if (state.isDownloadsSubtitleVisible) {
-                add(getString(R.string.singleTabFireDialogSubtitleDownloads))
+                add(getString(R.string.singleTabFireDialogSubtitleDownloads).preventWidows())
             }
         }
         if (subtitleParts.isNotEmpty()) {

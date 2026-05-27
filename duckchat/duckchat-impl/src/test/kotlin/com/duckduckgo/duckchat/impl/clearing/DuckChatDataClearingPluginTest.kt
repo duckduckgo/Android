@@ -69,6 +69,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository).clearPendingChatDeletions()
+        verify(duckChatSyncRepository).clearPendingChatUpdates()
         verify(syncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
     }
 
@@ -102,6 +103,7 @@ class DuckChatDataClearingPluginTest {
         verify(duckChatDeleter).deleteAllChats()
         verify(duckChatSyncRepository, never()).recordDuckAiChatsDeleted(any())
         verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).clearPendingChatUpdates()
         verify(syncEngine, never()).triggerSync(any())
     }
 
@@ -201,7 +203,6 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `DuckChats Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
-        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)

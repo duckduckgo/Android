@@ -71,6 +71,7 @@ class DuckChatContextualViewModelTest {
     private val contextualFireButtonToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
+    private val contextualNativeInputManager: ContextualNativeInputManager = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
     private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
         parentName = "androidBrowserConfig",
@@ -107,6 +108,7 @@ class DuckChatContextualViewModelTest {
             duckChatFeature = duckChatFeature,
             featureTogglesInventory = featureTogglesInventory,
             modelManager = modelManager,
+            contextualNativeInputManager = contextualNativeInputManager,
         )
     }
 
@@ -388,6 +390,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val tabId = "tab-1"
@@ -581,7 +584,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received without content then state unchanged`() =
+    fun `when page context received without content then state unchanged and invalid no content pixel fired`() =
         runTest {
             val serializedPageData =
                 """
@@ -599,7 +602,47 @@ class DuckChatContextualViewModelTest {
             assertEquals("", state.contextUrl)
             assertEquals("", state.tabId)
             assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received without title then invalid no title pixel fired`() =
+        runTest {
+            val serializedPageData =
+                """
+                {
+                    "url": "https://ctx.com",
+                    "content": "some content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData)
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received empty then invalid empty pixel fired`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "")
+
+            assertEquals("", testee.updatedPageContext)
+            verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextCollectionEmpty()
+        }
+
+    @Test
+    fun `when page context received with malformed json then collection empty pixel fired and no crash`() =
+        runTest {
+            testee.onPageContextReceived("tab-1", "{not valid json")
+
+            assertEquals("", testee.updatedPageContext)
             verify(duckChatPixels).reportContextualPageContextCollectionEmpty()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels, never()).reportContextualPageContextInvalidNoContent()
         }
 
     @Test
@@ -756,6 +799,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -793,6 +837,7 @@ class DuckChatContextualViewModelTest {
                     duckChatFeature = duckChatFeature,
                     featureTogglesInventory = featureTogglesInventory,
                     modelManager = modelManager,
+                    contextualNativeInputManager = contextualNativeInputManager,
                 )
 
             val serializedPageData =
@@ -1162,6 +1207,67 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `chatId starts null`() {
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `when sheet opened with stored chat url then chatId set before page load`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("abc-123", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in WEBVIEW mode then chatId set from url`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        val newUrl = "https://duck.ai/chat?chatID=xyz-789"
+        testee.onChatPageLoaded(newUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("xyz-789", testee.chatId.value)
+    }
+
+    @Test
+    fun `onChatPageLoaded in INPUT mode then chatId not set`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(testee.chatId.value)
+
+        val staleUrl = "https://duck.ai/chat?chatID=stale-123"
+        testee.onChatPageLoaded(staleUrl)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
+    fun `onNewChatRequested clears chatId`() = runTest {
+        val tabId = "tab-1"
+        val storedUrl = "https://duck.ai/chat?chatID=abc-123"
+        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
+        testee.onSheetOpened(tabId)
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("abc-123", testee.chatId.value)
+
+        testee.onNewChatRequested()
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.chatId.value)
+    }
+
+    @Test
     fun `onNewChatRequested clears stored url for current tab`() = runTest {
         val tabId = "tab-1"
         val url = "https://duck.ai/chat?chatID=123"
@@ -1201,6 +1307,16 @@ class DuckChatContextualViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(now, contextualDataStore.getTabClosedTimestamp(tabId))
+    }
+
+    @Test
+    fun `when sheet closed then contextual native input manager is notified with active tabId`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+
+        testee.onSheetClosed()
+
+        verify(contextualNativeInputManager).onContextualClosed(tabId)
     }
 
     @Test
@@ -1459,6 +1575,7 @@ class DuckChatContextualViewModelTest {
         duckChatFeature = duckChatFeature,
         featureTogglesInventory = featureTogglesInventory,
         modelManager = modelManager,
+        contextualNativeInputManager = contextualNativeInputManager,
     )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
@@ -1476,7 +1593,8 @@ class DuckChatContextualViewModelTest {
             sidebar: Boolean,
         ): String = nextUrl
 
-        override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
+        override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
+            uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(
             context: android.content.Context,

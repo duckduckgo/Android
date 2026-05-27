@@ -119,7 +119,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
-    )
+    ) {
+        val maxPageCount = 3
+    }
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -127,18 +129,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private var maxPageCount: Int = 2
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
-
-    init {
-        viewModelScope.launch(dispatchers.io()) {
-            maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
-            } else {
-                2
-            }
-        }
-    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -152,7 +143,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             val initialSelection: OmnibarType,
             val showSplitOption: Boolean,
         ) : Command
-
         data class ShowQuickSetupSearchOptionsBottomSheet(val initialWithAi: Boolean) : Command
         data class ShowQuickSetupDefaultBrowserDialog(val intent: Intent) : Command
         data object OpenDefaultBrowserSystemSettings : Command
@@ -282,22 +272,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             ADDRESS_BAR_POSITION -> {
                 viewModelScope.launch {
                     applyAddressBarPositionSelection()
-                    val showInputScreen = withContext(dispatchers.io()) {
-                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
-                    }
-                    if (showInputScreen) {
-                        setCurrentDialog(INPUT_SCREEN)
-                    } else {
-                        _commands.send(Command.Finish)
-                    }
+                    setCurrentDialog(INPUT_SCREEN)
                 }
             }
 
             INPUT_SCREEN -> {
                 viewModelScope.launch {
                     applyInputScreenSelection()
-                    val inputSelected = _viewState.value.inputScreenSelected
-                    if (inputSelected) {
+                    if (_viewState.value.inputScreenSelected) {
                         when (duckAiOnboardingExperimentManager.enroll()) {
                             null,
                             CONTROL,
@@ -511,10 +493,6 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         )
     }
 
-    fun getMaxPageCount(): Int {
-        return maxPageCount
-    }
-
     private suspend fun isAppReinstall(): Boolean =
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
@@ -548,17 +526,17 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private suspend fun applyInputScreenSelection(fireTelemetry: Boolean = true) {
         val inputSelected = _viewState.value.inputScreenSelected
-        duckChat.setCosmeticInputScreenUserSetting(inputSelected)
-        onboardingStore.storeInputScreenSelection(inputSelected)
         if (fireTelemetry) {
             fireInputScreenSelectionTelemetry(inputSelected)
         }
+        duckChat.setCosmeticInputScreenUserSetting(inputSelected)
+        onboardingStore.storeInputScreenSelection(inputSelected)
     }
 
     private fun fireInputScreenSelectionTelemetry(inputSelected: Boolean) {
         if (inputSelected) {
-            inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = _viewState.value.isReinstallUser)
             pixel.fire(PREONBOARDING_AICHAT_SELECTED)
+            inputScreenOnboardingWideEvent.onInputScreenEnabledDuringOnboarding(reinstallUser = _viewState.value.isReinstallUser)
         } else {
             pixel.fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
         }

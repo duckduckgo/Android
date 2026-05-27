@@ -1426,6 +1426,10 @@ class BrowserTabFragment :
                 onFilePickerRequested = { callback, mimeTypes ->
                     launchFilePicker(callback, mimeTypes)
                 },
+                restoreOmnibarAutocomplete = { forQuery -> restoreOmnibarAutocomplete(forQuery) },
+                onContextualSheetRequested = {
+                    viewModel.openDuckAIContextualMode()
+                },
             ),
         )
     }
@@ -1530,6 +1534,12 @@ class BrowserTabFragment :
         hasFocus: Boolean = true,
     ) {
         viewModel.triggerAutocomplete(text, hasFocus, true)
+    }
+
+    private fun restoreOmnibarAutocomplete(forQuery: String): Boolean {
+        val cached = viewModel.restoreOmnibarAutocomplete(forQuery) ?: return false
+        autoCompleteSuggestionsAdapter.updateData(cached.query, cached.suggestions)
+        return true
     }
 
     private fun onOmnibarCustomTabClosed() {
@@ -2044,7 +2054,10 @@ class BrowserTabFragment :
         viewModel.omnibarViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it?.let { renderer.renderOmnibar(it) }
+                it?.let {
+                    renderer.renderOmnibar(it)
+                    viewModel.onOmnibarTextRendered(it.omnibarText)
+                }
             },
         )
 
@@ -6314,7 +6327,10 @@ class BrowserTabFragment :
         permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
-        if (!isActiveCustomTab() && !isActiveTab) {
+        // Use liveSelectedTab.value, not isActiveTab — the latter lags the observer dispatch
+        // and the permission command can land before it updates, opening on the wrong tab.
+        val activeTabId = viewModel.liveSelectedTab.value?.tabId
+        if (!isActiveCustomTab() && tabId != activeTabId) {
             logcat(INFO) { "Will not launch a dialog for an inactive tab" }
             return
         }

@@ -44,7 +44,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -863,12 +862,7 @@ class InputScreenViewModel @AssistedInject constructor(
         saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
-            val url = duckChat.getDuckChatUrl("", false)
-                .toUri()
-                .buildUpon()
-                .appendQueryParameter(CHAT_ID_PARAM, chatId)
-                .build()
-                .toString()
+            val url = duckChat.buildChatUrl(chatId)
             command.value = Command.SubmitSearch(url)
 
             if (pinned) {

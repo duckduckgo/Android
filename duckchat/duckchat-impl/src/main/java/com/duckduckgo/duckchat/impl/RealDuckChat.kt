@@ -82,6 +82,11 @@ interface DuckChatInternal : DuckChat {
     suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
 
     /**
+     * Set user setting to determine whether the native input field should be used.
+     */
+    suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
+
+    /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
      */
     suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean)
@@ -105,11 +110,6 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether DuckChat should automatically update the page context in Contextual Mode
      */
     suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
-
-    /**
-     * Set user setting to determine whether the native input field should be used.
-     */
-    suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
 
     /**
      * Sets the user's preferred default toggle position.
@@ -488,9 +488,9 @@ class RealDuckChat @Inject constructor(
         }
     }
 
-    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
+    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
         withContext(dispatchers.io()) {
-            duckChatFeatureRepository.setNativeInputFieldUserSetting(isEnabled)
+            duckChatFeatureRepository.setNativeInputFieldUserSetting(enabled)
             cacheUserSettings()
         }
     }
@@ -833,7 +833,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun buildChatUrl(chatId: String): String {
-        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId), getDuckChatLink())
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeInputParameters(), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

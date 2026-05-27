@@ -80,8 +80,7 @@
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep1"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body"
                     android:textSize="18sp"
-                    app:textType="secondary"
-                    app:typography="body1" />
+                    app:textType="secondary" />
             </LinearLayout>
 
             <LinearLayout
@@ -108,8 +107,8 @@
                     android:gravity="center_vertical"
                     android:text="@string/quickSetupRemoveHomeScreenWidgetStep2"
                     android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body"
-                    app:textType="secondary"
-                    app:typography="body1" />
+                    android:textSize="18sp"
+                    app:textType="secondary" />
             </LinearLayout>
 
             <LinearLayout

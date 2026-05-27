@@ -24,7 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -62,6 +63,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
     private val modelManager: DuckAiModelManager,
+    private val contextualNativeInputManager: ContextualNativeInputManager,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -78,6 +80,11 @@ class DuckChatContextualViewModel @Inject constructor(
     private var fullModeUrl: String = ""
     var updatedPageContext: String = ""
     var sheetTabId: String = ""
+
+    // Chat id currently shown in the contextual webview, derived from the URL query param.
+    // Null when in INPUT mode (composing a new chat) or when the URL has no chatID yet.
+    private val _chatId = MutableStateFlow<String?>(null)
+    val chatId: StateFlow<String?> = _chatId.asStateFlow()
 
     @VisibleForTesting
     internal var isPageContextRequested: Boolean = false
@@ -171,6 +178,7 @@ class DuckChatContextualViewModel @Inject constructor(
         if (existingChatUrl == null) {
             val urlToLoad = duckChat.getDuckChatUrl("", false, sidebar = true)
             withContext(dispatchers.main()) {
+                setSheetUrl(urlToLoad)
                 commandChannel.trySend(Command.LoadUrl(urlToLoad))
                 _viewState.update { state ->
                     state.copy(
@@ -181,6 +189,7 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             withContext(dispatchers.main()) {
+                setSheetUrl(existingChatUrl)
                 _viewState.update { state ->
                     state.copy(
                         sheetMode = SheetMode.WEBVIEW,
@@ -232,6 +241,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 val hasChatHistory = hasChatId(existingChatUrl)
 
                 withContext(dispatchers.main()) {
+                    setSheetUrl(existingChatUrl)
                     _viewState.update { current ->
                         current.copy(
                             sheetMode = SheetMode.WEBVIEW,
@@ -276,9 +286,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (url == null) {
             return
         } else {
-            fullModeUrl = url
             val sheetMode = _viewState.value.sheetMode
             if (sheetMode == SheetMode.WEBVIEW) {
+                setSheetUrl(url)
                 val hasChatId = hasChatId(url)
 
                 viewModelScope.launch {
@@ -403,6 +413,7 @@ class DuckChatContextualViewModel @Inject constructor(
         isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
+        contextualNativeInputManager.onContextualClosed(sheetTabId)
     }
 
     private fun persistTabClosed() {
@@ -458,7 +469,13 @@ class DuckChatContextualViewModel @Inject constructor(
             if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
             return false
         }
-        val json = JSONObject(pageContext)
+        val json = try {
+            JSONObject(pageContext)
+        } catch (_: JSONException) {
+            logcat { "Duck.ai: pageContext is not valid JSON" }
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextCollectionEmpty()
+            return false
+        }
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
         if (reportInvalidPixels) {
@@ -543,7 +560,7 @@ class DuckChatContextualViewModel @Inject constructor(
             return
         }
 
-        if (isContextValid(pageContext)) {
+        if (isContextValid(pageContext, reportInvalidPixels = true)) {
             updatedPageContext = pageContext
             val json = JSONObject(updatedPageContext)
             val title = json.optString("title")
@@ -588,7 +605,6 @@ class DuckChatContextualViewModel @Inject constructor(
             }
         } else {
             updatedPageContext = ""
-            duckChatPixels.reportContextualPageContextCollectionEmpty()
         }
     }
 
@@ -630,6 +646,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextualDataStore.clearTabChatUrl(currentTabId)
 
                 withContext(dispatchers.main()) {
+                    clearSheetUrl()
                     _viewState.update {
                         it.copy(
                             sheetMode = SheetMode.INPUT,
@@ -649,10 +666,22 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun hasChatId(url: String?): Boolean {
-        return url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)
-            .orEmpty()
-            .isNotBlank()
+    private fun hasChatId(url: String?): Boolean = !extractChatId(url).isNullOrBlank()
+
+    private fun extractChatId(url: String?): String? {
+        val uri = url?.toUri() ?: return null
+        return uri.toChatIdOrNull(duckChat)
+    }
+
+    // Owns the coupled (fullModeUrl, _chatId) invariant: _chatId is always extractChatId(fullModeUrl).
+    private fun setSheetUrl(url: String) {
+        fullModeUrl = url
+        _chatId.value = extractChatId(url)
+    }
+
+    private fun clearSheetUrl() {
+        fullModeUrl = ""
+        _chatId.value = null
     }
 
     private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {

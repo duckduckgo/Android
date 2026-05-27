@@ -34,8 +34,7 @@ import javax.inject.Inject
 
 /**
  * Stable metadata extracted from FE-owned chat JSON.
- * Only top-level fields that are unlikely to change are parsed here.
- * Message content is intentionally excluded — it is complex and FE-owned.
+ * The raw message tree is not exposed — consumers get precomputed classification flags instead.
  */
 data class DuckAiChat(
     val chatId: String,
@@ -46,6 +45,12 @@ data class DuckAiChat(
     val pinned: Boolean,
     /** UUIDs of files referenced by this chat, stored in the native file store */
     val fileRefs: List<String> = emptyList(),
+    /** Reasoning mode chosen for this chat, or `null` if the FE didn't record one. */
+    val reasoningMode: String? = null,
+    /** True when any assistant message contains a `ui-component` part named `generate-image` (FE-owned rule). */
+    val isImageGeneration: Boolean = false,
+    /** True when [model] equals `voice-mode`. */
+    val isVoice: Boolean = false,
 )
 
 interface DuckAiChatStore {
@@ -54,6 +59,9 @@ interface DuckAiChatStore {
 
     /** Returns all chats currently in the native store. Skips entries with malformed JSON or missing chatId. */
     suspend fun getChats(): List<DuckAiChat>
+
+    /** Returns the chat with [chatId], or `null` if it doesn't exist or its stored JSON is malformed. */
+    suspend fun getChatById(chatId: String): DuckAiChat?
 
     /** Reactive equivalent of [getChats]. Re-emits on insert/update/delete via Room's Flow contract. */
     fun getChatsFlow(): Flow<List<DuckAiChat>>
@@ -91,6 +99,9 @@ class RealDuckAiChatStore @Inject constructor(
 
     override suspend fun getChats(): List<DuckAiChat> =
         withContext(dispatchers.io()) { chatsDao.getAll().mapNotNull { it.toDuckAiChat() } }
+
+    override suspend fun getChatById(chatId: String): DuckAiChat? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.toDuckAiChat() }
 
     override fun getChatsFlow(): Flow<List<DuckAiChat>> =
         chatsDao.getAllAsFlow().map { entities -> entities.mapNotNull { it.toDuckAiChat() } }
@@ -167,15 +178,46 @@ class RealDuckAiChatStore @Inject constructor(
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)
         val chatId = json.optString("chatId").takeIf { it.isNotEmpty() } ?: return@runCatching null
+        val model = json.optString("model")
         DuckAiChat(
             chatId = chatId,
             title = json.optString("title").ifEmpty { "Untitled Chat" },
-            model = json.optString("model"),
+            model = model,
             lastEdit = json.optString("lastEdit"),
             pinned = json.optBoolean("pinned", false),
             fileRefs = json.optJSONArray("fileRefs")?.let { arr ->
                 (0 until arr.length()).map { arr.getString(it) }
             } ?: emptyList(),
+            reasoningMode = if (json.isNull("reasoningMode")) {
+                null
+            } else {
+                json.optString("reasoningMode").takeIf { it.isNotEmpty() }
+            },
+            isImageGeneration = json.hasGenerateImageUiComponent(),
+            isVoice = model == VOICE_MODEL,
         )
     }.getOrNull()
+
+    private fun JSONObject.hasGenerateImageUiComponent(): Boolean {
+        val messages = optJSONArray("messages") ?: return false
+        for (i in 0 until messages.length()) {
+            val message = messages.optJSONObject(i) ?: continue
+            if (message.optString("role") != ASSISTANT_ROLE) continue
+            val parts = message.optJSONArray("parts") ?: continue
+            for (j in 0 until parts.length()) {
+                val part = parts.optJSONObject(j) ?: continue
+                if (part.optString("type") == UI_COMPONENT_TYPE && part.optString("name") == GENERATE_IMAGE_NAME) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private companion object {
+        const val VOICE_MODEL = "voice-mode"
+        const val ASSISTANT_ROLE = "assistant"
+        const val UI_COMPONENT_TYPE = "ui-component"
+        const val GENERATE_IMAGE_NAME = "generate-image"
+    }
 }
