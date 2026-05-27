@@ -2056,9 +2056,22 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun `when onBrowserModeToggled to fire then switches mode on state holder`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+
         testee.onBrowserModeToggled(BrowserMode.FIRE)
 
         verify(mockBrowserModeStateHolder).switchTo(BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `when onBrowserModeToggled then purges deletable tabs on leaving repo`() = runTest {
+        whenever(mockTabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockFireTabRepository)
+
+        testee.onBrowserModeToggled(BrowserMode.FIRE)
+        advanceUntilIdle()
+
+        verify(mockTabRepository).purgeDeletableTabs()
+        verify(mockFireTabRepository, never()).purgeDeletableTabs()
     }
 
     @Test
@@ -2067,6 +2080,14 @@ class TabSwitcherViewModelTest {
         testee.onBrowserModeToggled(BrowserMode.REGULAR)
 
         verify(mockBrowserModeStateHolder, never()).switchTo(any())
+    }
+
+    @Test
+    fun `when onBrowserModeToggled to current mode then does not purge`() = runTest {
+        testee.onBrowserModeToggled(BrowserMode.REGULAR)
+        advanceUntilIdle()
+
+        verify(mockTabRepository, never()).purgeDeletableTabs()
     }
 
     @Test

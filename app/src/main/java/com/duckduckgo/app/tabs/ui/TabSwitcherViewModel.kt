@@ -245,9 +245,14 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBrowserModeToggled(mode: BrowserMode) {
-        if (!isBrowserModeToggleVisible) return
-        if (mode == currentMode.value) return
+        val previousMode = currentMode.value
+        if (!isBrowserModeToggleVisible || mode == previousMode) return
+
+        val previousRepo = tabRepositoryProvider.forMode(previousMode)
+        viewModelScope.launch { previousRepo.purgeDeletableTabs() }
+
         command.value = Command.DismissSnackbar
+
         browserModeStateHolder.switchTo(mode)
     }
 
