@@ -6327,7 +6327,10 @@ class BrowserTabFragment :
         permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
-        if (!isActiveCustomTab() && !isActiveTab) {
+        // Use liveSelectedTab.value, not isActiveTab — the latter lags the observer dispatch
+        // and the permission command can land before it updates, opening on the wrong tab.
+        val activeTabId = viewModel.liveSelectedTab.value?.tabId
+        if (!isActiveCustomTab() && tabId != activeTabId) {
             logcat(INFO) { "Will not launch a dialog for an inactive tab" }
             return
         }
