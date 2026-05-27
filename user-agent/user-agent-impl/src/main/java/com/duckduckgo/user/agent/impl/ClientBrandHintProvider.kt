@@ -23,7 +23,6 @@ import androidx.webkit.UserAgentMetadata
 import androidx.webkit.UserAgentMetadata.BrandVersion
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.impl.remoteconfig.BrandingChange
@@ -45,7 +44,6 @@ import javax.inject.Inject
 class RealClientBrandHintProvider @Inject constructor(
     private val clientBrandHintFeature: ClientBrandHintFeature,
     private val repository: ClientBrandHintFeatureSettingsRepository,
-    private val userAllowListRepository: UserAllowListRepository,
 ) : ClientBrandHintProvider {
 
     private var currentDomain: String? = null
@@ -80,16 +78,6 @@ class RealClientBrandHintProvider @Inject constructor(
                 } else {
                     logcat(VERBOSE) { "ClientBrandHintProvider: branding for is disabled, default branding already applied" }
                     None
-                }
-            }
-
-            val isDomainInUserAllowList = documentDomain != null && userAllowListRepository.isDomainInUserAllowList(documentDomain)
-            if (isDomainInUserAllowList) {
-                logcat(INFO) { "ClientBrandHintProvider: $documentDomain is in user allow list, using Chrome branding" }
-                return if (currentBranding == CHROME) {
-                    None
-                } else {
-                    Change(CHROME)
                 }
             }
 
