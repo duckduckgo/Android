@@ -523,9 +523,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
         val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
-        // Top-bar uses the floating row; bottom-bar has no floating row, so the new-line button
-        // in `submitButtons` (card's bottom row) is the only host available there.
-        (floatingButtons ?: submitButtons)?.setNewLineButtonVisible(visible)
+        // Only the top-bar floating row hosts the new-line button. Bottom-bar mode has no
+        // on-screen new-line; carriage return there is the IME enter key while on a Duck.ai
+        // page (see `applyChatInputType`: IME_ACTION_NONE + TYPE_TEXT_FLAG_MULTI_LINE).
+        floatingButtons?.setNewLineButtonVisible(visible)
     }
 
     private fun applyState(state: NativeInputState) {
