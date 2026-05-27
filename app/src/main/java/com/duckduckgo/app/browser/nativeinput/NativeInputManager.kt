@@ -41,6 +41,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -791,8 +792,7 @@ class RealNativeInputManager @Inject constructor(
     internal fun extractDuckAiChatId(rawUrl: String?): String? {
         if (rawUrl.isNullOrBlank()) return null
         val uri = runCatching { rawUrl.toUri() }.getOrNull() ?: return null
-        if (!duckChat.isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
+        return uri.toChatIdOrNull(duckChat)
     }
 
     companion object {

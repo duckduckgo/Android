@@ -203,7 +203,6 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun `DuckChats Selected deletes each chat in the set and records per-chat sync deletions`() = runTest {
-        whenever(duckChat.isDuckChatUrl(any())).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=alpha")))).thenReturn(true)
         whenever(duckChat.isDuckChatUrl(eq(Uri.parse("https://duck.ai?chatID=beta")))).thenReturn(true)
         whenever(duckChatDeleter.deleteChat("alpha")).thenReturn(true)

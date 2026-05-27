@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -40,7 +39,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
-import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
@@ -396,12 +394,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun buildChatSuggestionUrl(suggestion: ChatSuggestion): String =
-        duckChatInternal.getDuckChatUrl("", false)
-            .toUri()
-            .buildUpon()
-            .appendQueryParameter(CHAT_ID_PARAM, suggestion.chatId)
-            .build()
-            .toString()
+        duckChatInternal.buildChatUrl(suggestion.chatId)
 
     private fun getInputMode(
         isEnabled: Boolean,

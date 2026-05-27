@@ -1593,7 +1593,8 @@ class DuckChatContextualViewModelTest {
             sidebar: Boolean,
         ): String = nextUrl
 
-        override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
+        override fun isDuckChatUrl(uri: android.net.Uri): Boolean =
+            uri.host == "duck.ai" || uri.host == "duckduckgo.com"
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(
             context: android.content.Context,

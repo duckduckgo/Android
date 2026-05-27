@@ -409,8 +409,9 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenBuildChatSuggestionUrlThenAppendsChatIdParam() {
-        whenever(duckChatInternal.getDuckChatUrl("", false)).thenReturn("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+    fun whenBuildChatSuggestionUrlThenDelegatesToDuckChat() {
+        whenever(duckChatInternal.buildChatUrl("abc-123"))
+            .thenReturn("https://duckduckgo.com/?ia=chat&duckai=5&chatID=abc-123")
         val suggestion = ChatSuggestion(
             chatId = "abc-123",
             title = "Title",
