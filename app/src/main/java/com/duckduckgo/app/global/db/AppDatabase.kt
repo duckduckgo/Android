@@ -33,6 +33,8 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
+import com.duckduckgo.app.browser.session.WebViewSessionDao
+import com.duckduckgo.app.browser.session.WebViewSessionEntity
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -83,7 +85,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 61,
+    version = 62,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -95,6 +97,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         TabEntity::class,
         TabSelectionEntity::class,
         TabPageContextEntity::class,
+        WebViewSessionEntity::class,
         BookmarkEntity::class,
         FavoriteEntity::class,
         BookmarkFolderEntity::class,
@@ -145,6 +148,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun tabPageContextDao(): TabPageContextDao
+    abstract fun webViewSessionDao(): WebViewSessionDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun favoritesDao(): FavoritesDao
     abstract fun bookmarkFoldersDao(): BookmarkFoldersDao
@@ -735,6 +739,20 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_61_TO_62: Migration = object : Migration(61, 62) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `webview_sessions` (" +
+                    "`tabId` TEXT NOT NULL, " +
+                    "`sessionBundle` BLOB NOT NULL, " +
+                    "`savedAt` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`tabId`), " +
+                    "FOREIGN KEY(`tabId`) REFERENCES `tabs`(`tabId`) ON UPDATE NO ACTION ON DELETE CASCADE" +
+                    ")",
+            )
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -821,6 +839,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_58_TO_59,
             MIGRATION_59_TO_60,
             MIGRATION_60_TO_61,
+            MIGRATION_61_TO_62,
         )
 
     @Deprecated(
