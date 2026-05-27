@@ -3995,9 +3995,13 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            if (webViewModeInitializer.bind(it, browserMode).isFailure) {
+            val bindResult = webViewModeInitializer.bind(it, browserMode)
+            if (bindResult.isFailure) {
                 if (browserMode != BrowserMode.REGULAR) {
-                    logcat(ERROR) { "Attempting to open a FIRE tab while Fire mode is unsupported." }
+                    bindResult.exceptionOrNull()?.message?.let {
+                            message ->
+                        logcat(ERROR) { message }
+                    }
                     this.closeCurrentTab()
                     return
                 }

@@ -20,8 +20,8 @@ import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ProfileStore
 import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.di.scopes.AppScope
@@ -32,15 +32,14 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealWebViewModeInitializer @Inject constructor(
-    private val fireModeAvailability: FireModeAvailability,
     private val webViewProfileBinder: WebViewProfileBinder,
 ) : WebViewModeInitializer {
     override fun bind(webView: WebView, mode: BrowserMode): Result<Unit> {
-        if (!fireModeAvailability.isAvailable()) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
             return Result.failure(
                 IllegalStateException(
                     "Attempting to bind a WebView profile to " +
-                        "Fire mode when the Fire mode feature is not available.",
+                        "{${mode.name}} mode when MULTI_PROFILE feature is not available.",
                 ),
             )
         }
