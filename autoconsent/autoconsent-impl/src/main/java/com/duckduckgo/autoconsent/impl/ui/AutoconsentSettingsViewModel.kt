@@ -22,10 +22,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_OFF
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_ON
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_SHOWN
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -40,8 +42,10 @@ import javax.inject.Inject
 class AutoconsentSettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val pixel: Pixel,
+    private val autoconsentFeature: AutoconsentFeature,
 ) : ViewModel() {
     data class ViewState(
+        val selectedPreference: CookiePopUpPreference,
         val autoconsentEnabled: Boolean,
     )
 
@@ -54,8 +58,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private val viewStateFlow: MutableStateFlow<ViewState> =
-        MutableStateFlow(ViewState(autoconsent.isSettingEnabled()))
+    private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(buildViewState())
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     init {
@@ -66,7 +69,23 @@ class AutoconsentSettingsViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
+    fun onCookiePopUpPreferenceSelected(preference: CookiePopUpPreference) {
+        if (!isCookiePopUpPreferenceSettingEnabled()) return
+        viewModelScope.launch {
+            pixel.fire(
+                if (preference == CookiePopUpPreference.DO_NOT_BLOCK) {
+                    SETTINGS_AUTOCONSENT_OFF
+                } else {
+                    SETTINGS_AUTOCONSENT_ON
+                },
+            )
+            autoconsent.changeCookiePopUpPreference(preference)
+            viewStateFlow.emit(buildViewState())
+        }
+    }
+
     fun onUserToggleAutoconsent(enabled: Boolean) {
+        if (isCookiePopUpPreferenceSettingEnabled()) return
         viewModelScope.launch {
             pixel.fire(
                 if (enabled) {
@@ -76,7 +95,7 @@ class AutoconsentSettingsViewModel @Inject constructor(
                 },
             )
             autoconsent.changeSetting(enabled)
-            viewStateFlow.emit(ViewState(autoconsent.isSettingEnabled()))
+            viewStateFlow.emit(buildViewState())
         }
     }
 
@@ -86,5 +105,23 @@ class AutoconsentSettingsViewModel @Inject constructor(
 
     companion object {
         const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-pop-up-management"
+    }
+
+    private fun buildViewState(): ViewState {
+        if (!isCookiePopUpPreferenceSettingEnabled()) {
+            val enabled = autoconsent.isSettingEnabled()
+            return ViewState(
+                selectedPreference = if (enabled) CookiePopUpPreference.BLOCK_STANDARD else CookiePopUpPreference.DO_NOT_BLOCK,
+                autoconsentEnabled = enabled,
+            )
+        }
+        return ViewState(
+            selectedPreference = autoconsent.getCookiePopUpPreference(),
+            autoconsentEnabled = autoconsent.isSettingEnabled(),
+        )
+    }
+
+    private fun isCookiePopUpPreferenceSettingEnabled(): Boolean {
+        return autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
     }
 }

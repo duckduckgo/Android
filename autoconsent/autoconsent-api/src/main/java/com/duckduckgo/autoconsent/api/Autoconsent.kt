@@ -37,6 +37,16 @@ interface Autoconsent {
     fun changeSetting(setting: Boolean)
 
     /**
+     * Updates the user's cookie pop-up blocking preference.
+     */
+    fun changeCookiePopUpPreference(preference: CookiePopUpPreference)
+
+    /**
+     * @return the user's cookie pop-up blocking preference.
+     */
+    fun getCookiePopUpPreference(): CookiePopUpPreference
+
+    /**
      * @return `true` if autoconsent was enabled by the user, `false` otherwise.
      */
     fun isSettingEnabled(): Boolean

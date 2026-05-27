@@ -24,8 +24,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,14 +42,18 @@ class AutoconsentSettingsViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val autoconsent: Autoconsent = FakeAutoconsent()
+    private val fakeAutoconsent = FakeAutoconsent()
+    private val autoconsent: Autoconsent = fakeAutoconsent
     private val pixel: FakePixel = FakePixel()
+    private val feature = FakeFeatureToggleFactory.create(AutoconsentFeature::class.java)
 
     private lateinit var viewModel: AutoconsentSettingsViewModel
 
     @Before
     fun setup() {
         pixel.firedPixels.clear()
+        fakeAutoconsent.preference = CookiePopUpPreference.DO_NOT_BLOCK
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = false))
     }
 
     @Test
@@ -61,7 +69,7 @@ class AutoconsentSettingsViewModelTest {
         initViewModel()
 
         viewModel.viewState.test {
-            assertFalse(awaitItem().autoconsentEnabled)
+            assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, awaitItem().selectedPreference)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -78,16 +86,12 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnUserToggleAutoconsentToTrueThenAutoconsentEnabledIsTrue() = runTest {
+    fun whenOnUserToggleAutoconsentToTrueThenLegacySettingUpdated() = runTest {
         initViewModel()
 
-        viewModel.viewState.test {
-            assertFalse(awaitItem().autoconsentEnabled)
-            viewModel.onUserToggleAutoconsent(true)
-            assertTrue(autoconsent.isSettingEnabled())
-            assertTrue(awaitItem().autoconsentEnabled)
-            cancelAndIgnoreRemainingEvents()
-        }
+        viewModel.onUserToggleAutoconsent(true)
+
+        assertTrue(autoconsent.isSettingEnabled())
     }
 
     @Test
@@ -101,32 +105,56 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnUserToggleAutoconsentToFalseThenAutoconsentEnabledIsFalse() = runTest {
+    fun whenOnUserToggleAutoconsentToFalseThenAutoconsentOffPixelIsFired() {
         initViewModel()
-
-        viewModel.viewState.test {
-            viewModel.onUserToggleAutoconsent(false)
-            assertFalse(awaitItem().autoconsentEnabled)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnUserToggleAutoconsentToTrueThenAutoconsentOffPixelIsFired() {
-        initViewModel()
-
         viewModel.onUserToggleAutoconsent(false)
 
         assertEquals(2, pixel.firedPixels.size)
         assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_OFF.pixelName, pixel.firedPixels[1])
     }
 
+    @Test
+    fun whenOnCookiePopUpPreferenceSelectedToBlockStandardThenPreferenceUpdated() = runTest {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        initViewModel()
+
+        viewModel.viewState.test {
+            assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, awaitItem().selectedPreference)
+            viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.BLOCK_STANDARD)
+            assertEquals(CookiePopUpPreference.BLOCK_STANDARD, autoconsent.getCookiePopUpPreference())
+            assertEquals(CookiePopUpPreference.BLOCK_STANDARD, awaitItem().selectedPreference)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnCookiePopUpPreferenceSelectedToDoNotBlockThenPreferenceUpdated() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        initViewModel()
+        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.BLOCK_ALL)
+        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.DO_NOT_BLOCK)
+
+        assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, autoconsent.getCookiePopUpPreference())
+        assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, viewModel.viewState.value.selectedPreference)
+    }
+
+    @Test
+    fun whenOnCookiePopUpPreferenceSelectedToBlockAllThenAutoconsentOnPixelIsFired() {
+        feature.cookiePopUpPreferenceSetting().setRawStoredState(Toggle.State(enable = true))
+        initViewModel()
+
+        viewModel.onCookiePopUpPreferenceSelected(CookiePopUpPreference.BLOCK_ALL)
+
+        assertEquals(2, pixel.firedPixels.size)
+        assertEquals(AutoConsentPixel.SETTINGS_AUTOCONSENT_ON.pixelName, pixel.firedPixels[1])
+    }
+
     private fun initViewModel() {
-        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel)
+        viewModel = AutoconsentSettingsViewModel(autoconsent, pixel, feature)
     }
 
     internal class FakeAutoconsent : Autoconsent {
-        var test: Boolean = false
+        var preference: CookiePopUpPreference = CookiePopUpPreference.DO_NOT_BLOCK
 
         override fun injectAutoconsent(
             webView: WebView,
@@ -143,10 +171,16 @@ class AutoconsentSettingsViewModelTest {
         }
 
         override fun changeSetting(setting: Boolean) {
-            test = setting
+            preference = if (setting) CookiePopUpPreference.BLOCK_STANDARD else CookiePopUpPreference.DO_NOT_BLOCK
         }
 
-        override fun isSettingEnabled(): Boolean = test
+        override fun changeCookiePopUpPreference(preference: CookiePopUpPreference) {
+            this.preference = preference
+        }
+
+        override fun getCookiePopUpPreference(): CookiePopUpPreference = preference
+
+        override fun isSettingEnabled(): Boolean = preference != CookiePopUpPreference.DO_NOT_BLOCK
 
         override fun isAutoconsentEnabled(): Boolean {
             return isSettingEnabled()

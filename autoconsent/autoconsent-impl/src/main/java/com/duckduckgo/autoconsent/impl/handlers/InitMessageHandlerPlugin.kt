@@ -21,6 +21,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -75,10 +76,15 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     reloadLoopDetector.updateUrl(webView, url)
 
-                    // Remove comment to promote feature and remove @Ignore from tests
-                    val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
+                    val preference = if (autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()) {
+                        settingsRepository.cookiePopUpPreference
+                    } else if (settingsRepository.userSetting) {
+                        CookiePopUpPreference.BLOCK_STANDARD
+                    } else {
+                        CookiePopUpPreference.DO_NOT_BLOCK
+                    }
 
-                    if (isAutoconsentDisabled) {
+                    if (preference == CookiePopUpPreference.DO_NOT_BLOCK) {
                         autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DISABLED_FOR_SITE_DAILY)
                         return@launch
                     }
@@ -98,22 +104,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val autoAction = getAutoAction(webView)
-                    val enablePreHide = settingsRepository.userSetting
-                    val detectRetries = 20
-                    val disabledCmps = settings.disabledCMPs
-                    val config =
-                        Config(
-                            enabled = true,
-                            autoAction,
-                            disabledCmps,
-                            enablePreHide,
-                            detectRetries,
-                            isMainWorld = true,
-                            enableCosmeticRules = true,
-                            enableHeuristicDetection = true,
-                            enableHeuristicAction = autoconsentFeature.heuristicAction().isEnabled(),
-                        )
+                    val config = buildConfig(preference, settings.disabledCMPs, webView)
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
                     } else {
@@ -141,6 +132,25 @@ class InitMessageHandlerPlugin @Inject constructor(
         // Remove comment to promote feature
         // return if (!settingsRepository.firstPopupHandled) null else "optOut"
         return "optOut"
+    }
+
+    private fun buildConfig(
+        preference: CookiePopUpPreference,
+        disabledCmps: List<String>,
+        webView: WebView,
+    ): Config {
+        val blockAll = preference == CookiePopUpPreference.BLOCK_ALL
+        return Config(
+            enabled = true,
+            autoAction = getAutoAction(webView),
+            disabledCmps = disabledCmps,
+            enablePrehide = true,
+            detectRetries = 20,
+            isMainWorld = true,
+            enableCosmeticRules = true,
+            enableHeuristicDetection = blockAll,
+            enableHeuristicAction = blockAll && autoconsentFeature.heuristicAction().isEnabled(),
+        )
     }
 
     private fun parseMessage(jsonString: String): InitMessage? {

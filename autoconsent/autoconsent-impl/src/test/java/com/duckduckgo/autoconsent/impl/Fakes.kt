@@ -21,6 +21,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -52,7 +53,16 @@ class FakeMessageHandlerPlugin : MessageHandlerPlugin {
 }
 
 class FakeSettingsRepository : AutoconsentSettingsRepository {
-    override var userSetting: Boolean = false
+    override var cookiePopUpPreference: CookiePopUpPreference = CookiePopUpPreference.DO_NOT_BLOCK
+    override var userSetting: Boolean
+        get() = cookiePopUpPreference != CookiePopUpPreference.DO_NOT_BLOCK
+        set(value) {
+            cookiePopUpPreference = if (value) {
+                CookiePopUpPreference.BLOCK_STANDARD
+            } else {
+                CookiePopUpPreference.DO_NOT_BLOCK
+            }
+        }
     override var firstPopupHandled: Boolean = false
     override fun invalidateCache() {}
 }

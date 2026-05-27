@@ -90,6 +90,58 @@
                 app:primaryTextTruncated="false"
                 app:showSwitch="true" />
 
+            <LinearLayout
+                android:id="@+id/cookiePopUpPreferenceContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/autoconsentPreferenceHeader" />
+
+                <RadioGroup
+                    android:id="@+id/autoconsentPreferenceGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
+                        android:id="@+id/autoconsentPreferenceBlockAll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/oneLineItemHeight"
+                        app:primaryText="@string/autoconsentPreferenceBlockAll" />
+
+                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
+                        android:id="@+id/autoconsentPreferenceBlockStandard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/oneLineItemHeight"
+                        app:primaryText="@string/autoconsentPreferenceBlockStandard" />
+
+                    <com.duckduckgo.common.ui.view.listitem.RadioListItem
+                        android:id="@+id/autoconsentPreferenceDoNotBlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/oneLineItemHeight"
+                        app:primaryText="@string/autoconsentPreferenceDoNotBlock" />
+
+                </RadioGroup>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/autoconsentPreferenceClarification"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/keyline_4"
+                    android:paddingTop="@dimen/keyline_2"
+                    android:paddingBottom="@dimen/keyline_4"
+                    android:text="@string/autoconsentPreferenceClarification"
+                    app:textType="secondary"
+                    app:typography="body2" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
