@@ -53,23 +53,29 @@
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="@+id/chatHistoryIconContainer"
-        app:layout_constraintEnd_toStartOf="@+id/chatHistoryMore"
+        app:layout_constraintEnd_toStartOf="@+id/chatHistoryMoreContainer"
         app:layout_constraintStart_toEndOf="@+id/chatHistoryIconContainer"
         app:layout_constraintTop_toTopOf="@+id/chatHistoryIconContainer"
         app:typography="body1"
         tools:text="My very long chat title that should be truncated when it overflows" />
 
-    <ImageView
-        android:id="@+id/chatHistoryMore"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/duck_ai_chat_history_more_options"
-        android:padding="12dp"
-        android:src="@drawable/ic_menu_vertical_24"
+    <FrameLayout
+        android:id="@+id/chatHistoryMoreContainer"
+        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/chatHistoryIconContainer"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chatHistoryIconContainer"
-        app:tint="?attr/daxColorPrimaryIcon" />
+        app:layout_constraintTop_toTopOf="@+id/chatHistoryIconContainer">
+
+        <ImageView
+            android:id="@+id/chatHistoryMore"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/duck_ai_chat_history_more_options"
+            android:src="@drawable/ic_menu_vertical_24"
+            app:tint="?attr/daxColorPrimaryIcon" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
