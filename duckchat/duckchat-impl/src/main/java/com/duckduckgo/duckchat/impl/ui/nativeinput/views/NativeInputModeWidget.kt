@@ -530,7 +530,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun applyState(state: NativeInputState) {
-        val contextChanged = nativeInputState?.inputContext != state.inputContext
+        val previousState = nativeInputState
+        val firstStateEmission = previousState == null
+        val contextChanged = previousState?.inputContext != state.inputContext
+        val positionChanged = previousState?.isBottom != state.isBottom
         nativeInputState = state
         findViewById<TabLayout?>(R.id.inputModeSwitch)?.let { toggle ->
             setToggleMatchParent()
@@ -541,7 +544,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
         applyOmnibarShape()
-        if (contextChanged && isChatTabSelected()) {
+        // Re-apply chat input type whenever the inputs to `applyChatInputType` (context, position)
+        // change, or on the first emission. This corrects stale IME setup from a tab listener
+        // that fired before the state-flow caught up.
+        if ((firstStateEmission || contextChanged || positionChanged) && isChatTabSelected()) {
             inputField.applyChatInputType()
             (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
         }
@@ -669,7 +675,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
         // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
         // mode has no on-screen new-line button, so the IME enter key is the only carriage-
-        // return affordance there.
+        // return affordance there. We read position from `isWidgetBottom()` (state-driven), and
+        // `applyState` re-fires this on the first state emission / position change so a stale
+        // value at tab-selection time gets corrected via `restartInput`.
         val newLineOnEnter = isDuckAiPageContext() || isWidgetBottom()
         val actionFlag = if (newLineOnEnter) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
