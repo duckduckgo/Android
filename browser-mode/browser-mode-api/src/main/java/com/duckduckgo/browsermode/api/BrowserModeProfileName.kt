@@ -16,14 +16,16 @@
 
 package com.duckduckgo.browsermode.api
 
+import androidx.webkit.Profile
+
 /**
- * Single facade for whether Fire Mode is available to the user right now.
+ * Stable mapping from a [BrowserMode] to its WebView profile name.
  *
- * Combines two independent checks:
- *  1. The Fire mode feature flag
- *  2. Whether the installed WebView reports support for the `MultiProfile` capability
+ * [REGULAR][BrowserMode.REGULAR] shares the default WebView profile;
+ * [FIRE][BrowserMode.FIRE] gets its own isolated profile.
  */
-interface FireModeAvailability {
-    /** Returns true if the prerequisites are satisfied, false otherwise **/
-    fun isAvailable(): Boolean
-}
+val BrowserMode.profileName: String
+    get() = when (this) {
+        BrowserMode.REGULAR -> Profile.DEFAULT_PROFILE_NAME
+        BrowserMode.FIRE -> "Fire"
+    }

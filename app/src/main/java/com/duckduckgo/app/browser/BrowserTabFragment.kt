@@ -273,6 +273,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -440,6 +441,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webChromeClient: BrowserChromeClient
+
+    @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -3991,6 +3995,19 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            val bindResult = webViewModeInitializer.bind(it, browserMode)
+            if (bindResult.isFailure) {
+                if (browserMode != BrowserMode.REGULAR) {
+                    bindResult.exceptionOrNull()?.message?.let {
+                            message ->
+                        logcat(ERROR) { message }
+                    }
+                    this.closeCurrentTab()
+                    destroyWebView()
+                    return
+                }
+            }
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
