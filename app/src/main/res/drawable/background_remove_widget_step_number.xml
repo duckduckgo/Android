@@ -14,9 +14,10 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners
-        android:topLeftRadius="@dimen/onboardingBottomSheetCornerRadius"
-        android:topRightRadius="@dimen/onboardingBottomSheetCornerRadius" />
-    <solid android:color="?attr/daxColorWindow" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="24dp"
+        android:height="24dp" />
+    <solid android:color="?attr/onboardingAccentAltPrimary" />
 </shape>

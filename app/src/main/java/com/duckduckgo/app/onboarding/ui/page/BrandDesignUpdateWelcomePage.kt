@@ -24,6 +24,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
@@ -33,6 +34,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -54,6 +56,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
@@ -69,6 +72,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTOR
 import com.duckduckgo.app.onboardingquicksetup.ui.BrandDesignInputScreenPicker
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupAddressBarPositionBottomSheet
 import com.duckduckgo.app.onboardingquicksetup.ui.QuickSetupSearchOptionsBottomSheet
+import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottomSheet
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -87,6 +92,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -104,6 +112,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     private val binding: ContentOnboardingWelcomePageUpdateBinding by viewBinding()
     private val viewModel by lazy {
@@ -473,6 +484,28 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupSearchOptionsBottomSheet -> {
                         showQuickSetupSearchOptionsBottomSheet(initialWithAi = command.initialWithAi)
                     }
+                    is BrandDesignUpdatePageViewModel.Command.ShowQuickSetupDefaultBrowserDialog -> {
+                        showQuickSetupDefaultBrowserDialog(command.intent)
+                    }
+                    BrandDesignUpdatePageViewModel.Command.OpenDefaultBrowserSystemSettings -> {
+                        openDefaultBrowserSystemSettings()
+                    }
+                    BrandDesignUpdatePageViewModel.Command.LaunchAddWidgetPrompt -> {
+                        addWidgetLauncher.launchAddWidget(activity)
+                    }
+                    BrandDesignUpdatePageViewModel.Command.ShowRemoveWidgetBottomSheet -> {
+                        showRemoveWidgetInstructionsBottomSheet()
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.SyncAddWidgetSwitch -> {
+                        binding.daxDialogCta.reinstallerQuickSetupContent.addWidgetItem
+                            .setCheckedSilently(command.isChecked)
+                    }
+                    is BrandDesignUpdatePageViewModel.Command.SyncQuickSetupSwitches -> {
+                        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+                            setDefaultBrowserItem.setCheckedSilently(command.defaultBrowserChecked)
+                            addWidgetItem.setCheckedSilently(command.widgetChecked)
+                        }
+                    }
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -554,19 +587,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.leftWingAnimation.cancelAnimation()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkQuickSetupSwitchesState()
+    }
+
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
     ) {
-        if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
-            if (resultCode == Activity.RESULT_OK) {
-                viewModel.onDefaultBrowserSet()
-            } else {
-                viewModel.onDefaultBrowserNotSet()
+        when (requestCode) {
+            DEFAULT_BROWSER_ROLE_MANAGER_DIALOG -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    viewModel.onDefaultBrowserSet()
+                } else {
+                    viewModel.onDefaultBrowserNotSet()
+                }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+            QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    viewModel.onQuickSetupDefaultBrowserSet()
+                } else {
+                    viewModel.onQuickSetupDefaultBrowserNotSet()
+                    binding.daxDialogCta.reinstallerQuickSetupContent.setDefaultBrowserItem.setCheckedSilently(false)
+                }
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -664,6 +711,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.secondaryCta.isVisible = false
 
                     binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                    updateQuickSetupRowsVisibility()
                     binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
                         getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
 
@@ -1551,6 +1599,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.reinstallerQuickSetupContent.root.alpha = 1f
                 binding.daxDialogCta.reinstallerQuickSetupContent.root.isVisible = true
+                updateQuickSetupRowsVisibility()
                 binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupOptionsContainer.alpha = 1f
                 binding.daxDialogCta.reinstallerQuickSetupContent.quickSetupTitleHidden.text =
                     getString(R.string.preOnboardingReinstallQuickSetupTitle).html(requireContext())
@@ -1697,11 +1746,31 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun updateQuickSetupRowsVisibility() {
+        val state = viewModel.viewState.value
+        with(binding.daxDialogCta.reinstallerQuickSetupContent) {
+            setDefaultBrowserItem.isVisible = !state.hideSetDefaultBrowserRow
+            setDefaultBrowserDivider.isVisible = !state.hideSetDefaultBrowserRow
+            addWidgetItem.isVisible = !state.hideAddWidgetRow
+            addWidgetDivider.isVisible = !state.hideAddWidgetRow
+        }
+    }
+
     private fun setQuickSetupListeners() {
         with(binding.daxDialogCta.reinstallerQuickSetupContent) {
             setDefaultBrowserItem.setOnCheckedChangeListener { checked ->
+                if (checked) {
+                    viewModel.onQuickSetupSetAsDefaultClicked()
+                } else {
+                    viewModel.onQuickSetupSetAsDefaultUnchecked()
+                }
             }
             addWidgetItem.setOnCheckedChangeListener { checked ->
+                if (checked) {
+                    viewModel.onQuickSetupAddHomescreenWidgetClicked()
+                } else {
+                    viewModel.onQuickSetupRemoveHomescreenWidgetClicked()
+                }
             }
             addressBarPositionItem.setOnEditClickListener {
                 viewModel.onQuickSetupAddressBarPositionEditClicked()
@@ -1766,6 +1835,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .show(childFragmentManager, QuickSetupAddressBarPositionBottomSheet.TAG)
     }
 
+    private fun showRemoveWidgetInstructionsBottomSheet() {
+        RemoveWidgetInstructionsBottomSheet()
+            .show(childFragmentManager, RemoveWidgetInstructionsBottomSheet.TAG)
+    }
+
     private fun showQuickSetupSearchOptionsBottomSheet(initialWithAi: Boolean) {
         QuickSetupSearchOptionsBottomSheet
             .newInstance(initialWithAi = initialWithAi)
@@ -1788,6 +1862,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         ) { _, bundle ->
             val withAi = bundle.getBoolean(QuickSetupSearchOptionsBottomSheet.RESULT_KEY_WITH_AI)
             viewModel.onInputScreenOptionSelected(withAi = withAi)
+        }
+        childFragmentManager.setFragmentResultListener(
+            RemoveWidgetInstructionsBottomSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            viewModel.checkWidgetAddedState()
         }
     }
 
@@ -2163,6 +2243,21 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
+    private fun showQuickSetupDefaultBrowserDialog(intent: Intent) {
+        startActivityForResult(intent, QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+    }
+
+    private fun openDefaultBrowserSystemSettings() {
+        try {
+            startActivity(DefaultBrowserSystemSettings.intent())
+        } catch (e: ActivityNotFoundException) {
+            val errorMessage = getString(R.string.cannotLaunchDefaultAppSettings)
+            logcat(WARN) { "$errorMessage: ${e.asLog()}" }
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            viewModel.checkQuickSetupSwitchesState()
+        }
+    }
+
     private enum class InputMode { SEARCH, CHAT }
 
     private fun updateAiChatToggleState(
@@ -2227,6 +2322,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_MIN_HEIGHT_DP = 174
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+        private const val QUICK_SETUP_DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 102
 
         private val WELCOME_DAX_INTERPOLATOR = PathInterpolator(0.33f, 0f, 0.67f, 1f)
     }

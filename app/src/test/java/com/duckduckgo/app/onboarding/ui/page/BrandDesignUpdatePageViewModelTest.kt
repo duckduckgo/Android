@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -51,6 +52,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
@@ -68,6 +70,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -90,6 +93,8 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
     private val mockOnboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager = mock()
+    private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -106,6 +111,8 @@ class BrandDesignUpdatePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
             mockDuckAiOnboardingExperimentManager,
             mockOnboardingQuickSetupExperimentManager,
+            mockDefaultBrowserDetector,
+            mockWidgetCapabilities,
         )
     }
 
@@ -990,6 +997,376 @@ class BrandDesignUpdatePageViewModelTest {
             assertEquals(false, (command as Command.ShowQuickSetupSearchOptionsBottomSheet).initialWithAi)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    // endregion
+
+    // region onQuickSetupSetAsDefaultClicked
+
+    @Test
+    fun whenQuickSetupSetAsDefaultClickedFirstTimeWithValidIntentThenSendShowQuickSetupDefaultBrowserDialog() = runTest {
+        val mockIntent: Intent = mock()
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupSetAsDefaultClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowQuickSetupDefaultBrowserDialog)
+            assertEquals(mockIntent, (command as Command.ShowQuickSetupDefaultBrowserDialog).intent)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupSetAsDefaultClickedFirstTimeWithNullIntentThenSendOpenSystemSettings() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupSetAsDefaultClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupSetAsDefaultClickedSecondTimeAfterDialogShownThenSendOpenSystemSettings() = runTest {
+        val mockIntent: Intent = mock()
+        whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupSetAsDefaultClicked() // first time: dialog
+            assertTrue(awaitItem() is Command.ShowQuickSetupDefaultBrowserDialog)
+            testee.onQuickSetupSetAsDefaultClicked() // second time: settings
+            val command = awaitItem()
+            assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region onQuickSetupSetAsDefaultUnchecked
+
+    @Test
+    fun whenQuickSetupSetAsDefaultUncheckedThenSendOpenDefaultBrowserSystemSettings() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupSetAsDefaultUnchecked()
+            val command = awaitItem()
+            assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region onQuickSetupDefaultBrowserSet / onQuickSetupDefaultBrowserNotSet
+
+    @Test
+    fun whenQuickSetupDefaultBrowserSetThenRecordResultAndDoNotAdvanceDialog() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.viewState.test {
+            val before = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, before.currentDialog)
+            testee.onQuickSetupDefaultBrowserSet()
+            // No state change expected; ensure no new emission switches dialog
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(mockAppInstallStore).defaultBrowser = true
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+    }
+
+    @Test
+    fun whenQuickSetupDefaultBrowserNotSetThenRecordResultAndDoNotAdvanceDialog() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.viewState.test {
+            val before = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, before.currentDialog)
+            testee.onQuickSetupDefaultBrowserNotSet()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockDefaultRoleBrowserDialog).dialogShown()
+    }
+
+    // endregion
+
+    // region checkQuickSetupSwitchesState
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupThenSendCombinedSyncWithBothStates() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertTrue(command.defaultBrowserChecked)
+            assertFalse(command.widgetChecked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateInQuickSetupWithWidgetInstalledAndNotDefaultThenSendCombinedSync() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncQuickSetupSwitches)
+            command as Command.SyncQuickSetupSwitches
+            assertFalse(command.defaultBrowserChecked)
+            assertTrue(command.widgetChecked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckQuickSetupSwitchesStateNotInQuickSetupThenNoCommandSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.checkQuickSetupSwitchesState()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+        verifyNoInteractions(mockDefaultBrowserDetector)
+        verifyNoInteractions(mockWidgetCapabilities)
+    }
+
+    // endregion
+
+    // region Widget switch commands
+
+    @Test
+    fun whenQuickSetupAddHomescreenWidgetClickedThenSendLaunchAddWidgetPrompt() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupAddHomescreenWidgetClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchAddWidgetPrompt)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenQuickSetupRemoveHomescreenWidgetClickedThenSendShowRemoveWidgetBottomSheet() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.onQuickSetupRemoveHomescreenWidgetClicked()
+            val command = awaitItem()
+            assertTrue(command is Command.ShowRemoveWidgetBottomSheet)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region checkWidgetAddedState
+
+    @Test
+    fun whenCheckWidgetAddedStateAndWidgetInstalledThenSendSyncAddWidgetSwitchChecked() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.checkWidgetAddedState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncAddWidgetSwitch)
+            assertTrue((command as Command.SyncAddWidgetSwitch).isChecked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCheckWidgetAddedStateAndWidgetNotInstalledThenSendSyncAddWidgetSwitchUnchecked() = runTest {
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val testee = createViewModel()
+        testee.commands.test {
+            testee.checkWidgetAddedState()
+            val command = awaitItem()
+            assertTrue(command is Command.SyncAddWidgetSwitch)
+            assertFalse((command as Command.SyncAddWidgetSwitch).isChecked)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region QUICK_SETUP entry row visibility
+
+    @Test
+    fun whenSecondaryCtaFromReinstallTreatmentAndIsDefaultBrowserThenHideSetDefaultBrowserRow() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            awaitItem() // INITIAL_REINSTALL_USER
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertTrue(state.hideSetDefaultBrowserRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSecondaryCtaFromReinstallTreatmentAndNotDefaultBrowserThenShowSetDefaultBrowserRow() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem()
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertFalse(state.hideSetDefaultBrowserRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSecondaryCtaFromReinstallTreatmentAndHasInstalledWidgetsThenHideAddWidgetRow() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem()
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertTrue(state.hideAddWidgetRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSecondaryCtaFromReinstallTreatmentAndNoInstalledWidgetsThenShowAddWidgetRow() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem()
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertFalse(state.hideAddWidgetRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
+    // region QUICK_SETUP primary CTA persistence
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithBottomThenPersistBottom() = runTest {
+        enterQuickSetupTreatment()
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+        testee.onPrimaryCtaClicked()
+        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_BOTTOM
+    }
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithSplitAndFeatureEnabledThenPersistSplit() = runTest {
+        enterQuickSetupTreatment()
+        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = true))
+        mockAndroidBrowserConfigFeature.splitOmnibarWelcomePage().setRawStoredState(Toggle.State(remoteEnableState = true))
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+        testee.onPrimaryCtaClicked()
+        verify(mockSettingsDataStore).omnibarType = OmnibarType.SPLIT
+    }
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithSplitAndFeatureDisabledThenFallbackToTop() = runTest {
+        enterQuickSetupTreatment()
+        mockAndroidBrowserConfigFeature.splitOmnibar().setRawStoredState(Toggle.State(remoteEnableState = false))
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+        testee.onPrimaryCtaClicked()
+        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
+        verify(mockSettingsDataStore, never()).omnibarType = OmnibarType.SPLIT
+    }
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithTopThenPersistTop() = runTest {
+        enterQuickSetupTreatment()
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+        testee.onPrimaryCtaClicked()
+        verify(mockSettingsDataStore).omnibarType = OmnibarType.SINGLE_TOP
+    }
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithAiSelectedThenPersist() = runTest {
+        enterQuickSetupTreatment()
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        testee.onInputScreenOptionSelected(withAi = true)
+        testee.onPrimaryCtaClicked()
+        verify(mockDuckChat).setCosmeticInputScreenUserSetting(true)
+        verify(mockOnboardingStore).storeInputScreenSelection(true)
+    }
+
+    @Test
+    fun whenPrimaryCtaFromQuickSetupWithSearchOnlyThenPersist() = runTest {
+        enterQuickSetupTreatment()
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        testee.onInputScreenOptionSelected(withAi = false)
+        testee.onPrimaryCtaClicked()
+        verify(mockDuckChat).setCosmeticInputScreenUserSetting(false)
+        verify(mockOnboardingStore).storeInputScreenSelection(false)
+    }
+
+    private suspend fun enterQuickSetupTreatment() {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
     }
 
     // endregion
