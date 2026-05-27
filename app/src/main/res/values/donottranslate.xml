@@ -95,6 +95,7 @@
     <!-- Custom AI onboarding copy, gated by BrandDesignUpdatePageViewModel.ViewState.isCustomAiOnboardingCopyEnabled -->
     <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
     <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
+    <string name="preOnboardingDaxDialog3ButtonCustomAi">Start AI Chat</string>
 
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
