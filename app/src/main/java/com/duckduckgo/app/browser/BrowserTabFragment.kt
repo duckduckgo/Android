@@ -4003,6 +4003,7 @@ class BrowserTabFragment :
                         logcat(ERROR) { message }
                     }
                     this.closeCurrentTab()
+                    destroyWebView()
                     return
                 }
             }
