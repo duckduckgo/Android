@@ -121,7 +121,7 @@ class BrowserViewModel @Inject constructor(
 
     val currentMode: StateFlow<BrowserMode> = browserModeStateHolder.currentMode
 
-    suspend fun switchToMode(mode: BrowserMode): Boolean {
+    fun switchToMode(mode: BrowserMode): Boolean {
         if (mode != BrowserMode.REGULAR && !fireModeAvailability.isAvailable()) return false
         browserModeStateHolder.switchTo(mode)
         return true

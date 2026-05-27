@@ -283,9 +283,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
-    // prevents new Browser mode's ViewPager showing old webviews when the mode changes
-    private var skipTabPagerStateSaveOnRecreate = false
-
     private lateinit var renderer: BrowserStateRenderer
 
     private val binding: ActivityBrowserBinding by viewBinding()
@@ -370,6 +367,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
+
+        val savedMode = savedInstanceState?.getString(KEY_SAVED_BROWSER_MODE)
+        val modeChangedSinceSave = savedMode != null && savedMode != currentBrowserMode.name
+        if (modeChangedSinceSave) {
+            savedInstanceState?.remove(KEY_TAB_PAGER_STATE)
+        }
+
         intent?.sanitize()
         logcat(INFO) { "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState" }
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
@@ -381,6 +385,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+
+        if (modeChangedSinceSave) {
+            // remove restored VM and fragments
+            viewModelStore.clear()
+            removeStaleTabFragments()
+        }
 
         bindMockupToolbars()
 
@@ -424,7 +434,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (swipingTabsFeature.isEnabled && !skipTabPagerStateSaveOnRecreate) {
+        outState.putString(KEY_SAVED_BROWSER_MODE, currentBrowserMode.name)
+        if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
         pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
@@ -1222,19 +1233,25 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
-     * one mode at a time (single adapter, single currentTab, single lastActiveTabs).
-     *
-     * The previous mode's BrowserTabFragments must NOT be restored, otherwise the new mode's
-     * ViewPager renders the old mode's webviews on top. We flag this so onSaveInstanceState
-     * skips the tab pager bundle.
+     * one mode at a time. The previous mode's tab state is stripped from the saved bundle, and any
+     * stale tab fragments are removed after restoration.
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
             viewModel.currentMode.drop(1).collect {
-                skipTabPagerStateSaveOnRecreate = true
                 recreate()
             }
         }
+    }
+
+    private fun removeStaleTabFragments() {
+        val staleFragments = supportFragmentManager.fragments.filterIsInstance<BrowserTabFragment>()
+        if (staleFragments.isEmpty()) return
+        val transaction = supportFragmentManager.beginTransaction()
+        staleFragments.forEach { transaction.remove(it) }
+        // The activity is still in pre-onResume territory here; commitNowAllowingStateLoss is
+        // the right tool — synchronous and tolerant of an in-progress save/restore.
+        transaction.commitNowAllowingStateLoss()
     }
 
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
@@ -1341,6 +1358,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
         private const val KEY_PENDING_FIRE_TO_REGULAR_INTENT = "pendingFireToRegularIntent"
+        private const val KEY_SAVED_BROWSER_MODE = "savedBrowserMode"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
