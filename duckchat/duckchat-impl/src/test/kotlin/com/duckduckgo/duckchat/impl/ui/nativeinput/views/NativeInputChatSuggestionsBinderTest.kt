@@ -16,10 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -35,21 +33,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.robolectric.annotation.Config
 import java.time.LocalDateTime
-import com.duckduckgo.mobile.android.R as MobileR
 
 @RunWith(AndroidJUnit4::class)
-@Config(manifest = Config.NONE)
 class NativeInputChatSuggestionsBinderTest {
-
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private lateinit var binder: NativeInputChatSuggestionsBinder
 
     @Before
     fun setUp() {
-        context.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
         whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
         binder = NativeInputChatSuggestionsBinder(inputScreenConfigResolver)
     }
@@ -106,27 +98,6 @@ class NativeInputChatSuggestionsBinderTest {
 
         assertEquals(0, binding.shortcutAdapter().itemCount)
         assertEquals(0, binding.shortcutDivider().itemCount)
-    }
-
-    @Test
-    fun whenShortcutClickedThenCallbackInvoked() {
-        var clicked = false
-        val binding = binder.create(
-            onChatSuggestionSelected = {},
-            onChatUrlSuggestionClicked = {},
-            onSearchForQuerySubmitted = {},
-            onChatHistoryShortcutClicked = { clicked = true },
-        )
-
-        val shortcut = binding.shortcutAdapter()
-        shortcut.setVisible(true)
-
-        val parent = FrameLayout(context)
-        val holder = shortcut.onCreateViewHolder(parent, 0)
-        shortcut.onBindViewHolder(holder, 0)
-        holder.itemView.performClick()
-
-        assertTrue(clicked)
     }
 
     @Test

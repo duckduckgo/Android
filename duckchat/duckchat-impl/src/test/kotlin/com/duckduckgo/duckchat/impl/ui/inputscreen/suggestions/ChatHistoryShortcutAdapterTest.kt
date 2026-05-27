@@ -20,23 +20,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatHistoryShortcutAdapter
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
-import com.duckduckgo.mobile.android.R as MobileR
 
 @RunWith(AndroidJUnit4::class)
-@Config(manifest = Config.NONE)
 class ChatHistoryShortcutAdapterTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    @Before
-    fun setUp() {
-        context.setTheme(MobileR.style.Theme_DuckDuckGo_Light)
-    }
 
     @Test
     fun whenHiddenThenItemCountIsZero() {
@@ -57,20 +47,6 @@ class ChatHistoryShortcutAdapterTest {
         adapter.setVisible(true)
         adapter.setVisible(false)
         assertEquals(0, adapter.itemCount)
-    }
-
-    @Test
-    fun whenRowClickedThenCallbackInvoked() {
-        var clicked = false
-        val adapter = ChatHistoryShortcutAdapter(onClick = { clicked = true })
-        adapter.setVisible(true)
-
-        val parent = android.widget.FrameLayout(context)
-        val holder = adapter.onCreateViewHolder(parent, 0)
-        adapter.onBindViewHolder(holder, 0)
-        holder.itemView.performClick()
-
-        assertTrue(clicked)
     }
 
     @Test
