@@ -37,11 +37,19 @@ class RealWebViewModeInitializerTest {
     )
 
     @Test
-    fun `bind returns success when Fire mode is available and profile binding succeeds`() {
+    fun `bind returns success when Fire mode is available and Fire profile binding succeeds`() {
         val result = testee.bind(webView, BrowserMode.FIRE)
 
         assertTrue(result.isSuccess)
         assertEquals(listOf(BoundProfile(webView, BrowserMode.FIRE.profileName)), webViewProfileBinder.boundProfiles)
+    }
+
+    @Test
+    fun `bind returns success when Fire mode is available and regular profile binding succeeds`() {
+        val result = testee.bind(webView, BrowserMode.REGULAR)
+
+        assertTrue(result.isSuccess)
+        assertEquals(listOf(BoundProfile(webView, BrowserMode.REGULAR.profileName)), webViewProfileBinder.boundProfiles)
     }
 
     @Test
@@ -67,12 +75,13 @@ class RealWebViewModeInitializerTest {
     }
 
     @Test
-    fun `bind returns success and skips profile binding when Fire mode is unavailable for regular profile`() {
+    fun `bind returns failure and skips profile binding when Fire mode is unavailable for regular profile`() {
         fireModeAvailability.available = false
 
         val result = testee.bind(webView, BrowserMode.REGULAR)
 
-        assertTrue(result.isSuccess)
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is IllegalStateException)
         assertTrue(webViewProfileBinder.boundProfiles.isEmpty())
     }
 
