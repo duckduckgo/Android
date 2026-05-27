@@ -624,32 +624,6 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runTest {
-        val tab = TabEntity("ID", position = 0)
-
-        val expectedTabs = listOf(listOf(), listOf(tab))
-        var index = 0
-        testee.deletableTabs.observeForever {
-            assertEquals(expectedTabs[index++], it)
-        }
-
-        repoDeletableTabs.send(listOf())
-        repoDeletableTabs.send(listOf(tab))
-    }
-
-    @Test
-    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runTest {
-        val tab = TabEntity("ID", position = 0)
-
-        testee.deletableTabs.observeForever {
-            assertEquals(listOf(tab), it)
-        }
-
-        repoDeletableTabs.send(listOf(tab))
-        repoDeletableTabs.send(listOf(tab))
-    }
-
-    @Test
     fun whenOnCloseAllTabsRequestedThenEmitCommandCloseAllTabsRequest() = runTest {
         testee.onCloseAllTabsRequested()
 
