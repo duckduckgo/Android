@@ -140,6 +140,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
+        val isCustomAiOnboardingCopyEnabled: Boolean = false,
     ) {
         val maxPageCount = 3
     }
