@@ -12,7 +12,7 @@ jobs:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
         with:
-            ref: v2.1
+            ref: la/decouple-dispatch-pat
             # Do not change the below path (downstream actions expect it)
             path: native-github-asana-sync
             repository: duckduckgo/native-github-asana-sync
@@ -23,3 +23,4 @@ jobs:
           team_name: 'Android'
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           github_pat: ${{ secrets.DAXMOBILE_ANDROID_AUTOMATION }}
+          dispatch_pat: ${{ secrets.GT_DAXMOBILE }}
