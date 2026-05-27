@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NativeInputWidget Plugin Data Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    background: #F5F5F7;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+<svg width="740" height="724" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════════════════════════
+       PHASE 1: SETUP
+  ═══════════════════════════════════════ -->
+  <rect x="0" y="0" width="740" height="232" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="8" y="8" width="88" height="20" rx="10" fill="#1E293B"/>
+  <text x="52" y="22" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">① SETUP</text>
+
+  <!-- NativeInputModeWidget -->
+  <rect x="150" y="36" width="440" height="30" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="370" y="56" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="600" fill="#3730A3">NativeInputModeWidget</text>
+
+  <!-- Widget → PluginPoint arrow -->
+  <line x1="370" y1="66" x2="370" y2="84" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="376" y="79" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">getPlugins()</text>
+
+  <!-- NativeInputPluginPoint -->
+  <rect x="170" y="88" width="400" height="38" rx="8" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="370" y="104" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" font-weight="600" fill="#6B21A8">NativeInputPluginPoint</text>
+  <text x="370" y="118" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#7E22CE">ActivePluginPoint&lt;NativeInputPlugin&gt;</text>
+
+  <!-- Vertical spine + horizontal bus to plugins -->
+  <line x1="370" y1="126" x2="370" y2="152" stroke="#CBD5E1" stroke-width="1.5"/>
+  <line x1="100" y1="152" x2="640" y2="152" stroke="#CBD5E1" stroke-width="1.5"/>
+  <line x1="100" y1="152" x2="100" y2="162" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="152" x2="640" y2="162" stroke="#CBD5E1" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- VoiceNativeInputPlugin -->
+  <rect x="10" y="165" width="180" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="100" y="183" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">VoiceNativeInputPlugin</text>
+
+  <!-- ImageNativeInputPlugin -->
+  <rect x="550" y="165" width="180" height="28" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="640" y="183" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">ImageNativeInputPlugin</text>
+
+  <!-- createView() arrows to containers -->
+  <line x1="100" y1="193" x2="100" y2="206" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="106" y="203" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">createView()</text>
+  <line x1="640" y1="193" x2="640" y2="206" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="646" y="203" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">createView()</text>
+
+  <!-- nativeInputVoiceContainer -->
+  <rect x="10" y="209" width="180" height="18" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="100" y="222" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">nativeInputVoiceContainer</text>
+
+  <!-- nativeInputImageContainer -->
+  <rect x="550" y="209" width="180" height="18" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="640" y="222" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">nativeInputImageContainer</text>
+
+  <!-- ═══════════════════════════════════════
+       PHASE 2: RUNTIME — BUTTON TAP
+  ═══════════════════════════════════════ -->
+  <rect x="0" y="242" width="740" height="172" rx="12" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+  <rect x="8" y="250" width="202" height="20" rx="10" fill="#92400E"/>
+  <text x="109" y="264" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">② RUNTIME — BUTTON TAP</text>
+
+  <!-- Left: Voice plugin handles click -->
+  <rect x="10" y="276" width="180" height="24" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="100" y="292" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">VoiceNativeInputPlugin</text>
+  <line x1="100" y1="300" x2="100" y2="314" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="106" y="311" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">handles click</text>
+  <rect x="10" y="317" width="180" height="34" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="100" y="331" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">VoiceSearch / VoiceChat</text>
+  <text x="100" y="344" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">screen opened</text>
+
+  <!-- Right: Image plugin handles click -->
+  <rect x="550" y="276" width="180" height="24" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="640" y="292" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">ImageNativeInputPlugin</text>
+  <line x1="640" y1="300" x2="640" y2="314" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="646" y="311" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">handles click</text>
+  <rect x="550" y="317" width="180" height="34" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="640" y="331" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">Image Picker</text>
+  <text x="640" y="344" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">screen opened</text>
+
+  <!-- Centre note -->
+  <rect x="250" y="284" width="240" height="48" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="370" y="303" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#475569">Each plugin independently</text>
+  <text x="370" y="317" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#475569">stores its own result state</text>
+  <text x="370" y="328" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">(transcript, URI, etc.)</text>
+
+  <!-- ═══════════════════════════════════════
+       PHASE 3: RUNTIME — SEND
+  ═══════════════════════════════════════ -->
+  <rect x="0" y="424" width="740" height="300" rx="12" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <rect x="8" y="432" width="184" height="20" rx="10" fill="#14532D"/>
+  <text x="100" y="446" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">③ RUNTIME — SEND</text>
+
+  <!-- User taps Send -->
+  <rect x="285" y="454" width="170" height="26" rx="8" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="370" y="471" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" font-weight="600" fill="#3730A3">User taps Send</text>
+
+  <!-- Arrow down to split bus -->
+  <line x1="370" y1="480" x2="370" y2="500" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="100" y1="500" x2="640" y2="500" stroke="#CBD5E1" stroke-width="1.5"/>
+  <line x1="100" y1="500" x2="100" y2="510" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="640" y1="500" x2="640" y2="510" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="106" y="508" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">getPromptContribution()</text>
+  <text x="450" y="508" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">getPromptContribution()</text>
+
+  <!-- Left plugin contribution -->
+  <rect x="10" y="513" width="180" height="38" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="100" y="529" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">VoiceNativeInputPlugin</text>
+  <text x="100" y="543" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">AppendedText("…") | null</text>
+
+  <!-- Right plugin contribution -->
+  <rect x="550" y="513" width="180" height="38" rx="8" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="640" y="529" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="600" fill="#9A3412">ImageNativeInputPlugin</text>
+  <text x="640" y="543" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">Attachment(uri, mimeType) | null</text>
+
+  <!-- Merge lines down to NativeInputPrompt -->
+  <line x1="100" y1="551" x2="100" y2="566" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="640" y1="551" x2="640" y2="566" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="100" y1="566" x2="285" y2="566" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="640" y1="566" x2="455" y2="566" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="370" y1="566" x2="370" y2="578" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- NativeInputPrompt -->
+  <rect x="205" y="581" width="330" height="38" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="370" y="597" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" font-weight="600" fill="#166534">NativeInputPrompt</text>
+  <text x="370" y="611" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">text + contributions: List&lt;PromptContribution&gt;</text>
+
+  <!-- Arrow to callback -->
+  <line x1="370" y1="619" x2="370" y2="632" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- onDuckAiChatSubmitted -->
+  <rect x="195" y="635" width="350" height="26" rx="8" fill="#E0E7FF" stroke="#A5B4FC" stroke-width="1.5"/>
+  <text x="370" y="652" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="600" fill="#312E81">onDuckAiChatSubmitted(NativeInputPrompt)</text>
+
+</svg>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NativeInputWidget — State Management</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    background: #F5F5F7;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+<svg width="760" height="640" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowG" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#34D399"/>
+    </marker>
+    <marker id="arrowB" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#60A5FA"/>
+    </marker>
+    <marker id="arrowO" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0.5 L7,3.5 L0,6.5 Z" fill="#FB923C"/>
+    </marker>
+  </defs>
+
+  <!-- ══════════════════════════════════════════
+       ZONE 1 — VIEWMODEL
+  ══════════════════════════════════════════ -->
+  <rect x="0" y="0" width="760" height="178" rx="12" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.5"/>
+  <rect x="8" y="8" width="164" height="20" rx="10" fill="#4C1D95"/>
+  <text x="90" y="22" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">VIEWMODEL INPUTS → OUTPUTS</text>
+
+  <!-- Input source boxes (left) -->
+  <!-- 1: DuckAiFeatureState.showSettings -->
+  <rect x="5" y="34" width="196" height="28" rx="7" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="103" y="47" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="600" fill="#9A3412">DuckAiFeatureState</text>
+  <text x="103" y="58" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#C2410C">.showSettings: StateFlow&lt;Boolean&gt;</text>
+
+  <!-- 2: observeEnableDuckChatUserSetting -->
+  <rect x="5" y="72" width="196" height="28" rx="7" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="103" y="85" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="600" fill="#9A3412">DuckChatInternal</text>
+  <text x="103" y="96" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#C2410C">.observeEnableDuckChatUserSetting()</text>
+
+  <!-- 3: observeInputScreenUserSettingEnabled -->
+  <rect x="5" y="110" width="196" height="28" rx="7" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="103" y="123" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="600" fill="#9A3412">DuckChatInternal</text>
+  <text x="103" y="134" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#C2410C">.observeInputScreenUserSettingEnabled()</text>
+
+  <!-- 4: widgetConfig MutableStateFlow -->
+  <rect x="5" y="148" width="196" height="26" rx="7" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="103" y="161" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="600" fill="#3730A3">widgetConfig</text>
+  <text x="103" y="170" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#4338CA">MutableStateFlow — set by configure() / setWidgetPosition()</text>
+
+  <!-- Bus from inputs → ViewModel -->
+  <line x1="201" y1="48" x2="213" y2="48" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="201" y1="86" x2="213" y2="86" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="201" y1="124" x2="213" y2="124" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="201" y1="161" x2="213" y2="161" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="213" y1="48" x2="213" y2="161" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="213" y1="104" x2="226" y2="104" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ViewModel box (center) -->
+  <rect x="228" y="28" width="240" height="148" rx="8" fill="#FDF4FF" stroke="#E9D5FF" stroke-width="1.5"/>
+  <text x="348" y="46" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="700" fill="#6B21A8">NativeInputModeWidgetViewModel</text>
+  <text x="348" y="59" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">@ContributesViewModel(ViewScope::class)</text>
+  <line x1="248" y1="63" x2="448" y2="63" stroke="#E9D5FF" stroke-width="1"/>
+  <text x="348" y="76" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">combine(showSettings, userEnabled,</text>
+  <text x="348" y="88" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">  inputScreenEnabled, widgetConfig)</text>
+  <text x="348" y="102" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">  → NativeInputState</text>
+  <text x="348" y="115" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#A855F7">shareIn(Eagerly, replay = 1)</text>
+  <line x1="248" y1="120" x2="448" y2="120" stroke="#E9D5FF" stroke-width="1"/>
+  <text x="348" y="133" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">chatState ← DuckChatInternal.chatState</text>
+  <text x="348" y="146" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">isPaidTier ← Subscriptions.getEntitlementStatus()</text>
+  <text x="348" y="158" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#7E22CE">chatSuggestionsUserEnabled ← DuckChatInternal</text>
+
+  <!-- Bus from ViewModel → outputs -->
+  <line x1="468" y1="104" x2="480" y2="104" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="480" y1="48" x2="480" y2="161" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="480" y1="48" x2="492" y2="48" stroke="#34D399" stroke-width="1.5" marker-end="url(#arrowG)"/>
+  <line x1="480" y1="86" x2="492" y2="86" stroke="#60A5FA" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <line x1="480" y1="124" x2="492" y2="124" stroke="#FB923C" stroke-width="1.5" marker-end="url(#arrowO)"/>
+  <line x1="480" y1="157" x2="492" y2="157" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Output flow boxes (right) -->
+  <!-- ① state: SharedFlow<NativeInputState> -->
+  <rect x="494" y="34" width="260" height="26" rx="7" fill="#DCFCE7" stroke="#6EE7B7" stroke-width="2"/>
+  <text x="624" y="47" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="700" fill="#065F46">① state: SharedFlow&lt;NativeInputState&gt;</text>
+  <text x="624" y="57" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#15803D">observeNativeInputState() in widget</text>
+
+  <!-- ② chatState: Flow<ChatState> -->
+  <rect x="494" y="72" width="260" height="26" rx="7" fill="#EFF6FF" stroke="#93C5FD" stroke-width="2"/>
+  <text x="624" y="85" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="700" fill="#1D4ED8">② chatState: Flow&lt;ChatState&gt;</text>
+  <text x="624" y="95" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#3B82F6">observeChatState() — drop(1), skips initial</text>
+
+  <!-- ③ isPaidTier: Flow<Boolean> -->
+  <rect x="494" y="110" width="260" height="26" rx="7" fill="#FFF7ED" stroke="#FDBA74" stroke-width="2"/>
+  <text x="624" y="123" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="700" fill="#C2410C">③ isPaidTier: Flow&lt;Boolean&gt;</text>
+  <text x="624" y="133" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#EA580C">observeTier() — only when onPaidTierChanged set</text>
+
+  <!-- ④ chatSuggestionsUserEnabled -->
+  <rect x="494" y="146" width="260" height="26" rx="7" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="624" y="159" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="600" fill="#475569">④ chatSuggestionsUserEnabled: Flow&lt;Boolean&gt;</text>
+  <text x="624" y="169" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">observeChatSuggestionsEnabled()</text>
+
+  <!-- ══════════════════════════════════════════
+       ZONE 2 — NATIVEINPUTSTATE
+  ══════════════════════════════════════════ -->
+  <rect x="0" y="188" width="760" height="94" rx="12" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.5"/>
+  <rect x="8" y="196" width="132" height="20" rx="10" fill="#065F46"/>
+  <text x="74" y="210" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">NATIVEINPUTSTATE</text>
+
+  <!-- NativeInputState data class box -->
+  <rect x="50" y="218" width="660" height="56" rx="8" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="380" y="233" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="11" font-weight="700" fill="#065F46">NativeInputState  (data class)</text>
+  <text x="190" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">inputMode</text>
+  <text x="190" y="260" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#065F46">SEARCH_AND_DUCK_AI | SEARCH_ONLY</text>
+  <line x1="290" y1="233" x2="290" y2="266" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="380" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">inputContext</text>
+  <text x="380" y="260" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#065F46">BROWSER | DUCK_AI</text>
+  <line x1="470" y1="233" x2="470" y2="266" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="560" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#047857">inputPosition</text>
+  <text x="560" y="260" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#065F46">TOP | BOTTOM</text>
+  <line x1="630" y1="233" x2="630" y2="266" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="680" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#059669">derived:</text>
+  <text x="680" y="260" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#065F46">toggleVisible · isBottom · defaultToggleSelection</text>
+
+  <!-- ══════════════════════════════════════════
+       ZONE 3 — WIDGET REACTIONS
+  ══════════════════════════════════════════ -->
+  <rect x="0" y="292" width="760" height="300" rx="12" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+  <rect x="8" y="300" width="138" height="20" rx="10" fill="#1E40AF"/>
+  <text x="77" y="314" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="white">WIDGET REACTIONS</text>
+
+  <!-- Column dividers -->
+  <line x1="253" y1="296" x2="253" y2="590" stroke="#BFDBFE" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="507" y1="296" x2="507" y2="590" stroke="#BFDBFE" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ─── Col 1: observeNativeInputState ─── -->
+  <!-- Header -->
+  <rect x="5" y="322" width="243" height="24" rx="7" fill="#DCFCE7" stroke="#6EE7B7" stroke-width="1.5"/>
+  <text x="127" y="338" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" font-weight="700" fill="#065F46">① applyState(NativeInputState)</text>
+
+  <!-- Effect: toggleVisible=true -->
+  <rect x="5" y="356" width="243" height="32" rx="7" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="127" y="369" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">toggleVisible = true</text>
+  <text x="127" y="381" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">TabLayout.VISIBLE — toggle shown</text>
+
+  <!-- Effect: toggleVisible=false -->
+  <rect x="5" y="398" width="243" height="44" rx="7" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="127" y="411" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">toggleVisible = false</text>
+  <text x="127" y="423" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">TabLayout.GONE + minimize()</text>
+  <text x="127" y="435" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">shrinks spacers · omnibar shape</text>
+
+  <!-- Effect: tab selection -->
+  <rect x="5" y="452" width="243" height="32" rx="7" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="127" y="465" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#166534">defaultToggleSelection</text>
+  <text x="127" y="477" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">select tab 0 (Search) or 1 (Duck AI)</text>
+
+  <!-- Effect: cache -->
+  <rect x="5" y="494" width="243" height="26" rx="7" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="127" y="511" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">cached in nativeInputState field</text>
+
+  <!-- ─── Col 2: observeChatState ─── -->
+  <!-- Header -->
+  <rect x="259" y="322" width="243" height="24" rx="7" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="381" y="338" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" font-weight="700" fill="#1D4ED8">② observeChatState()  drop(1)</text>
+
+  <!-- ChatState: HIDE -->
+  <rect x="259" y="356" width="243" height="44" rx="7" fill="#FEF2F2" stroke="#FCA5A5" stroke-width="1.5"/>
+  <text x="381" y="369" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#991B1B">ChatState.HIDE</text>
+  <text x="381" y="381" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#B91C1C">dismiss keyboard · clear focus</text>
+  <text x="381" y="393" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#B91C1C">widgetRoot?.visibility = GONE</text>
+
+  <!-- ChatState: SHOW -->
+  <rect x="259" y="410" width="243" height="32" rx="7" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="381" y="423" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#166534">ChatState.SHOW / READY</text>
+  <text x="381" y="435" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#15803D">widgetRoot?.visibility = VISIBLE</text>
+
+  <!-- ChatState: STREAMING/LOADING -->
+  <rect x="259" y="452" width="243" height="44" rx="7" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+  <text x="381" y="465" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#92400E">STREAMING / LOADING</text>
+  <text x="381" y="477" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#B45309">showStopButton · disable send</text>
+  <text x="381" y="489" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#B45309">isStreaming = true</text>
+
+  <!-- ChatState: back to idle -->
+  <rect x="259" y="506" width="243" height="26" rx="7" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1.5"/>
+  <text x="381" y="523" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#166534">idle → showSendButton · re-enable if text non-blank</text>
+
+  <!-- ─── Col 3: isPaidTier + suggestions ─── -->
+  <!-- Header -->
+  <rect x="513" y="322" width="243" height="24" rx="7" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.5"/>
+  <text x="635" y="334" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" font-weight="700" fill="#C2410C">③④ observeTier() + observeSuggestions()</text>
+
+  <!-- isPaidTier -->
+  <rect x="513" y="356" width="243" height="44" rx="7" fill="#FFF7ED" stroke="#FED7AA" stroke-width="1.5"/>
+  <text x="635" y="369" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#9A3412">③ isPaidTier: Flow&lt;Boolean&gt;</text>
+  <text x="635" y="381" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">forwards via onPaidTierChanged callback</text>
+  <text x="635" y="393" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#C2410C">→ BrowserFragment (e.g. show Plus badge)</text>
+
+  <!-- chatSuggestionsEnabled -->
+  <rect x="513" y="410" width="243" height="44" rx="7" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="635" y="423" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="600" fill="#475569">④ chatSuggestionsUserEnabled</text>
+  <text x="635" y="435" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">cached as local Boolean</text>
+  <text x="635" y="447" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748B">gates fetchChatSuggestions() call</text>
+
+  <!-- External setters box (bottom of col 3) -->
+  <rect x="513" y="464" width="243" height="68" rx="7" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1.5"/>
+  <text x="635" y="479" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#3730A3">External state setters</text>
+  <text x="635" y="492" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4338CA">configure(isDuckAiMode, isBottom)</text>
+  <text x="635" y="503" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4338CA">→ viewModel.configure() → widgetConfig ↑</text>
+  <text x="635" y="516" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4338CA">setVoiceSearchAvailable()</text>
+  <text x="635" y="527" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#6366F1">setVoiceChatAvailable()</text>
+  <text x="635" y="539" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#818CF8">→ local flags only · no ViewModel</text>
+
+  <!-- Connector dots / flow tags at zone border -->
+  <!-- ① green dot on Zone 2/3 border at col 1 centre -->
+  <circle cx="127" cy="291" r="5" fill="#6EE7B7" stroke="#059669" stroke-width="1.5"/>
+  <line x1="127" y1="284" x2="127" y2="292" stroke="#6EE7B7" stroke-width="1.5"/>
+  <!-- ② blue dot at col 2 -->
+  <circle cx="381" cy="291" r="5" fill="#93C5FD" stroke="#2563EB" stroke-width="1.5"/>
+  <line x1="381" y1="284" x2="381" y2="292" stroke="#93C5FD" stroke-width="1.5"/>
+  <!-- ③ orange dot at col 3 -->
+  <circle cx="635" cy="291" r="5" fill="#FDBA74" stroke="#D97706" stroke-width="1.5"/>
+  <line x1="635" y1="284" x2="635" y2="292" stroke="#FDBA74" stroke-width="1.5"/>
+
+  <!-- Zone 1 → Zone 2 connector from SharedFlow output -->
+  <line x1="624" y1="60" x2="624" y2="185" stroke="#6EE7B7" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <line x1="624" y1="185" x2="380" y2="185" stroke="#6EE7B7" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrowG)"/>
+
+  <!-- ══ Footer ══ -->
+  <text x="380" y="608" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">All flows collected in lifecycleScope of the widget's LifecycleOwner · Jobs cancelled onDetachedFromWindow · ViewModel scoped to ViewScope (recreated with view)</text>
+  <text x="380" y="622" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#94A3B8">User text input and tab selection drive additional local button visibility logic (updateSendButtonVisibility, updateVoiceButtonVisibility) independently of ViewModel</text>
+
+</svg>
+</body>
+</html>
