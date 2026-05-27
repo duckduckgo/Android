@@ -47,6 +47,7 @@ class RealMetricsPixelSender @Inject constructor(
 ) : MetricsPixelExtension {
 
     override suspend fun send(metricsPixel: MetricsPixel) {
+        if (!metricsPixel.toggle.isEnabled()) return
         val definitions = metricsPixel.getPixelDefinitions()
         if (definitions.isEmpty()) return
         withContext(dispatcherProvider.io()) {
