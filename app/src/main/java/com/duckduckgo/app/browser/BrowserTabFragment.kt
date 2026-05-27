@@ -3995,7 +3995,13 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
-            webViewModeInitializer.bind(it, browserMode)
+            if (webViewModeInitializer.bind(it, browserMode).isFailure) {
+                if (browserMode != BrowserMode.REGULAR) {
+                    logcat(ERROR) { "Attempting to open a FIRE tab while Fire mode is unsupported." }
+                    this.closeCurrentTab()
+                    return
+                }
+            }
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
