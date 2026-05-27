@@ -502,8 +502,8 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    val browserMode: BrowserMode get() = requireArguments().getString(BROWSER_MODE_ARG)
-        ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -5228,7 +5228,6 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
-        private const val BROWSER_MODE_ARG = "BROWSER_MODE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5621,14 +5620,12 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
-            browserMode: BrowserMode = BrowserMode.REGULAR,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, browserMode.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -5650,7 +5647,6 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, BrowserMode.REGULAR.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

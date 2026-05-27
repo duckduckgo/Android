@@ -126,7 +126,6 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_BROWSER_MODE
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -228,6 +227,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var currentBrowserMode: BrowserMode
+
     private val lastActiveTabs = TabList()
 
     private var duckAiFragment: DuckChatWebViewFragment? = null
@@ -281,6 +283,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // we don't store isExternal in the tab model, as it's only meant for the first time the tab is loaded.
     private val externalLaunchTabIds = mutableSetOf<String>()
 
+    // prevents new Browser mode's ViewPager showing old webviews when the mode changes
+    private var skipTabPagerStateSaveOnRecreate = false
+
     private lateinit var renderer: BrowserStateRenderer
 
     private val binding: ActivityBrowserBinding by viewBinding()
@@ -290,7 +295,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(this, viewModel.currentMode.value)
+        TabPagerAdapter(this)
     }
 
     private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -419,7 +424,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (swipingTabsFeature.isEnabled) {
+        if (swipingTabsFeature.isEnabled && !skipTabPagerStateSaveOnRecreate) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
         pendingFireToRegularIntent?.let { outState.putParcelable(KEY_PENDING_FIRE_TO_REGULAR_INTENT, it) }
@@ -598,8 +603,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isExternal: Boolean,
     ): BrowserTabFragment {
         logcat(INFO) { "Opening new tab, url: $url, tabId: $tabId" }
-        val mode = if (isExternal) BrowserMode.REGULAR else viewModel.currentMode.value
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal, mode)
+        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome, isExternal)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
@@ -682,7 +686,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Intents stamped with LAUNCH_REQUIRES_REGULAR_MODE must reach BrowserActivity in REGULAR
         // mode. Stash the intent and carry it to the recreated REGULAR-bound instance.
         val requiresRegularBrowserMode = intent.getBooleanExtra(LAUNCH_REQUIRES_REGULAR_MODE, false)
-        if (requiresRegularBrowserMode && viewModel.currentMode.value != BrowserMode.REGULAR) {
+        if (requiresRegularBrowserMode && currentBrowserMode != BrowserMode.REGULAR) {
             logcat(INFO) { "Intent requires REGULAR mode while in a non-regular mode — switching before processing" }
             pendingFireToRegularIntent = intent
             lifecycleScope.launch {
@@ -1066,14 +1070,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabs: Int,
     ) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
-        val mode = viewModel.currentMode.value
         val fragment =
             DuckChatWebViewFragment().apply {
                 arguments =
                     Bundle().apply {
                         duckChatUrl?.let { putString(KEY_DUCK_AI_URL, it) }
                         putInt(KEY_DUCK_AI_TABS, tabs)
-                        putString(KEY_DUCK_AI_BROWSER_MODE, mode.name)
                     }
             }
 
@@ -1221,10 +1223,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     /**
      * Recreates the activity whenever the user switches browser mode. The activity is built for
      * one mode at a time (single adapter, single currentTab, single lastActiveTabs).
+     *
+     * The previous mode's BrowserTabFragments must NOT be restored, otherwise the new mode's
+     * ViewPager renders the old mode's webviews on top. We flag this so onSaveInstanceState
+     * skips the tab pager bundle.
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
             viewModel.currentMode.drop(1).collect {
+                skipTabPagerStateSaveOnRecreate = true
                 recreate()
             }
         }

@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browsermode.impl
+package com.duckduckgo.app.tabs.model
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.browsermode.api.AggregateBrowserModeProvider
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "fireMode",
-)
-interface FireModeFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun fireTabs(): Toggle
-}
+/**
+ * Observes tabs across one or more [com.duckduckgo.browsermode.api.BrowserMode]s. Callers pass the
+ * set of modes they want tabs from — a single mode for a per-mode view, or omit the argument for a
+ * cross-mode view.
+ *
+ * For mutating tab state, use the mode-qualified [TabRepository] directly.
+ */
+interface AggregateTabProvider : AggregateBrowserModeProvider<List<TabEntity>>

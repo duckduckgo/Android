@@ -216,6 +216,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_INITIAL_CTA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
+import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -250,6 +251,9 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
@@ -421,6 +425,8 @@ class BrowserTabViewModelTest {
     private val mockOmnibarConverter: OmnibarEntryConverter = mock()
 
     private val mockTabRepository: TabRepository = mock()
+
+    private val mockAggregateTabProvider: AggregateTabProvider = mock()
 
     private val webViewSessionStorage: WebViewSessionStorage = mock()
 
@@ -710,13 +716,20 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao = db.fireproofWebsiteDao()
             locationPermissionsDao = db.locationPermissionsDao()
 
+            val tabRepositoryProvider: BrowserModeDataProvider<TabRepository> = mock()
+            whenever(tabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+            whenever(tabRepositoryProvider.forMode(BrowserMode.FIRE)).thenReturn(mockTabRepository)
+            val browserModeStateHolder: BrowserModeStateHolder = mock()
+            whenever(browserModeStateHolder.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
+
             mockAutoCompleteApi =
                 AutoCompleteApi(
                     mockAutoCompleteService,
                     mockSavedSitesRepository,
                     mockNavigationHistory,
                     mockAutoCompleteScorer,
-                    mockTabRepository,
+                    tabRepositoryProvider,
+                    browserModeStateHolder,
                     mockAutocompleteTabsFeature,
                     mockDuckChat,
                     mockHistory,
@@ -739,6 +752,7 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
             whenever(mockTabRepository.flowSelectedTab).thenReturn(flowSelectedTab)
             whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
+            whenever(mockAggregateTabProvider.observe()).thenReturn(flowOf(emptyList()))
             whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
             whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
             whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
@@ -788,7 +802,7 @@ class BrowserTabViewModelTest {
                     settingsDataStore = ctaViewModelMockSettingsStore,
                     onboardingStore = mockOnboardingStore,
                     userStageStore = mockUserStageStore,
-                    tabRepository = mockTabRepository,
+                    aggregateTabProvider = mockAggregateTabProvider,
                     dispatchers = coroutineRule.testDispatcherProvider,
                     duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
                     extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,

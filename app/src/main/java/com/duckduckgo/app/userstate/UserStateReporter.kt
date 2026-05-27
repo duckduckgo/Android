@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -35,7 +36,7 @@ import javax.inject.Inject
 )
 class UserStateReporter @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val repository: TabDataRepository,
+    @RegularMode private val repository: TabDataRepository,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
