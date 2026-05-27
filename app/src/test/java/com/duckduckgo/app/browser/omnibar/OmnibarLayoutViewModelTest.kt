@@ -1577,69 +1577,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenNativeInputEnabledAndAiToggleDisabledThenIsDuckAiBackAvailableTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertTrue(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputEnabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleDisabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = false
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNativeInputDisabledAndAiToggleEnabledThenIsDuckAiBackAvailableFalse() = runTest {
-        nativeInputFieldSettingFlow.value = false
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAiToggleFlipsOffWhileNativeInputEnabledThenIsDuckAiBackAvailableBecomesTrue() = runTest {
-        nativeInputFieldSettingFlow.value = true
-        inputScreenUserSettingFlow.value = true
-
-        testee.viewState.test {
-            assertFalse(expectMostRecentItem().isDuckAiBackAvailable)
-
-            inputScreenUserSettingFlow.value = false
-
-            assertTrue(expectMostRecentItem().isDuckAiBackAvailable)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `when input text click catcher clicked and no URL then input screen launched with draft query`() = runTest {
         testee.onInputStateChanged(query = "draft", hasFocus = false, clearQuery = false, deleteLastCharacter = false)
 
