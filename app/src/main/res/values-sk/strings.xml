@@ -1030,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Obnoviť moje veci</string>
     <string name="syncRestoreDialogSecondaryCta">Preskočiť</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Poďme pokračovať tam, kde si na DuckDuckGo skončil.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Tvoje uložené záložky, heslá a ďalšie údaje sú pripravené.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Stiahnuť PDF</string>
 

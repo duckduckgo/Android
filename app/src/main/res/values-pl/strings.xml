@@ -1030,6 +1030,10 @@
     <string name="syncRestoreDialogPrimaryCta">Przywróć moje dane</string>
     <string name="syncRestoreDialogSecondaryCta">Pomiń</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Kontynuujmy tam, gdzie przerwałeś na DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Twoje zapisane zakładki, hasła i inne są gotowe.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Pobierz PDF</string>
 

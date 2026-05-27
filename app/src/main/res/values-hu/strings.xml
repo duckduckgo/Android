@@ -990,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Saját adataim visszaállítása</string>
     <string name="syncRestoreDialogSecondaryCta">Kihagyás</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Folytassuk ott, ahol abbahagytad a DuckDuckGo használatát.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Mentett könyvjelzőid, jelszavaid és a további elemek készen állnak.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">PDF letöltése</string>
 

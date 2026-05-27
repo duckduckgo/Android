@@ -990,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Återställ mitt innehåll</string>
     <string name="syncRestoreDialogSecondaryCta">Hoppa över</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Nu fortsätter vi där du slutade på DuckDuckGo.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Dina sparade bokmärken, lösenord och mer är redo.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Ladda ner PDF</string>
 
