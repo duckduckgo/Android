@@ -26,8 +26,8 @@ import android.webkit.WebView
  * binding is permanent for the lifetime of the [WebView] — it cannot be changed once the
  * [WebView] has been used.
  *
- * No-op on devices that do not support the `MULTI_PROFILE` WebView feature; such callers
- * implicitly share the default profile across modes.
+ * Fails on devices that do not support the `MULTI_PROFILE` WebView feature, regardless of the
+ * requested [BrowserMode].
  */
 interface WebViewModeInitializer {
 
@@ -36,9 +36,9 @@ interface WebViewModeInitializer {
      *
      * @param webView a freshly-created [WebView] that has not yet been used.
      * @param mode the [BrowserMode] whose profile should back this [WebView].
-     * @return [Result.success] when the [WebView] is bound (or when binding is a no-op on
-     * unsupported devices); [Result.failure] when [mode] is not available in the current
-     * configuration and the [WebView] was attempting to bind to [BrowserMode.FIRE].
+     * @return [Result.success] when the profile is bound to the [WebView]; [Result.failure] when
+     * the `MULTI_PROFILE` WebView feature is unsupported on this device, or when the underlying
+     * profile binding call throws.
      */
     fun bind(webView: WebView, mode: BrowserMode): Result<Unit>
 }
