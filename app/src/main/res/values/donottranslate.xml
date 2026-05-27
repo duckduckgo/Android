@@ -92,6 +92,10 @@
     <string name="onboardingDuckAiFireButtonDaxDialogTitle">That\'s Duck.ai!</string>
     <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>. Give it a try! 🔥]]></string>
 
+    <!-- Custom AI onboarding copy, gated by BrandDesignUpdatePageViewModel.ViewState.isCustomAiOnboardingCopyEnabled -->
+    <string name="preOnboardingWelcomeDialogBodyCustomAi">Ready to chat privately with ChatGPT, Claude, and other AIs for free, in a browser that actively protects you?</string>
+    <string name="preOnboardingDaxDialog3TextCustomAi">Remember: you can use Duck.ai from anywhere you see the chat icon</string>
+
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
