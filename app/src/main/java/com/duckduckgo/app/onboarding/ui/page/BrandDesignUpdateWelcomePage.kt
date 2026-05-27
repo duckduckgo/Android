@@ -442,6 +442,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 inputScreenSelected = state.inputScreenSelected,
                                 maxPageCount = state.maxPageCount,
                                 comparisonChartConfig = state.currentComparisonChartConfig(),
+                                isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                             )
                         }
                     }
@@ -454,6 +455,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             inputScreenSelected = state.inputScreenSelected,
                             maxPageCount = state.maxPageCount,
                             comparisonChartConfig = state.currentComparisonChartConfig(),
+                            isCustomAiCopy = state.isCustomAiOnboardingCopyEnabled,
                         )
                     }
                 }
@@ -634,6 +636,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         context?.let {
             isAnimating = true
@@ -642,7 +645,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
                     val isSyncRestore = onboardingDialogType == SYNC_RESTORE
                     val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
-                    val isCustomAiCopy = viewModel.viewState.value.isCustomAiOnboardingCopyEnabled
                     if (showSecondaryCta) {
                         // Pin the title at its current position before the secondaryCta
                         // visibility change. The CL is wrap_content in landscape, so
@@ -919,7 +921,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
-                    val isCustomAiCopy = viewModel.viewState.value.isCustomAiOnboardingCopyEnabled
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
@@ -1293,6 +1294,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         inputScreenSelected: Boolean,
         maxPageCount: Int,
         comparisonChartConfig: ComparisonChartConfig,
+        isCustomAiCopy: Boolean,
     ) {
         snapToIntroEndState()
 
@@ -1300,7 +1302,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             INITIAL, INITIAL_REINSTALL_USER, SYNC_RESTORE -> {
                 val isSyncRestore = onboardingDialogType == SYNC_RESTORE
                 val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER || isSyncRestore
-                val isCustomAiCopy = viewModel.viewState.value.isCustomAiOnboardingCopyEnabled
 
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
@@ -1417,7 +1418,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             SKIP_ONBOARDING_OPTION -> {
-                val isCustomAiCopy = viewModel.viewState.value.isCustomAiOnboardingCopyEnabled
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
