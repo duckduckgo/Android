@@ -523,7 +523,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val isBrowserContext = nativeInputState?.inputContext == NativeInputState.InputContext.BROWSER
         val hasText = inputField.text.isNotBlank()
         val visible = isBrowserContext && isChatTabSelected() && hasText && !isStreaming
-        floatingButtons?.setNewLineButtonVisible(visible)
+        // Top-bar uses the floating row; bottom-bar has no floating row, so the new-line button
+        // in `submitButtons` (card's bottom row) is the only host available there.
+        (floatingButtons ?: submitButtons)?.setNewLineButtonVisible(visible)
     }
 
     private fun applyState(state: NativeInputState) {
