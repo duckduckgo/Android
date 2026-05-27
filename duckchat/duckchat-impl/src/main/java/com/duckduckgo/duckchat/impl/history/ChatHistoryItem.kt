@@ -22,6 +22,7 @@ data class ChatHistoryItem(
     val chatId: String,
     val displayTitle: String,
     val type: ChatType,
+    val model: String,
     val pinned: Boolean,
     val lastEditMillis: Long,
 )

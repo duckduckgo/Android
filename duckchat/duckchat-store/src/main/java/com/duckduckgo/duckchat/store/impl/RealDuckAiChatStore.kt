@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
 import java.io.File
+import java.util.Base64
 import javax.inject.Inject
 
 /**
@@ -51,6 +52,16 @@ data class DuckAiChat(
     val isImageGeneration: Boolean = false,
     /** True when [model] equals `voice-mode`. */
     val isVoice: Boolean = false,
+)
+
+/**
+ * Decoded payload of a chat fileRef — base64-decoded [bytes] plus FE-supplied [fileName] /
+ * [mimeType] (either may be null when the FE omitted them).
+ */
+data class FileRefContent(
+    val fileName: String?,
+    val mimeType: String?,
+    val bytes: ByteArray,
 )
 
 interface DuckAiChatStore {
@@ -80,6 +91,16 @@ interface DuckAiChatStore {
 
     /** Unpins [chatId]. Silent no-op if the chat is not found or the stored JSON is malformed. */
     suspend fun unpinChat(chatId: String)
+
+    /** Returns the raw FE-owned JSON blob stored for [chatId], or null if the chat does not exist. */
+    suspend fun getChatContent(chatId: String): String?
+
+    /**
+     * Reads the FE-written JSON envelope for [uuid] (a fileRef from [DuckAiChat.fileRefs]),
+     * base64-decoding the `data` field. Returns null when the file is missing, the JSON is
+     * malformed, the `data` field is absent, or [uuid] resolves outside the chat-files directory.
+     */
+    suspend fun readFileRef(uuid: String): FileRefContent?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -174,6 +195,37 @@ class RealDuckAiChatStore @Inject constructor(
             chatsDao.upsert(entity.copy(data = updatedJson))
         }
     }
+
+    override suspend fun getChatContent(chatId: String): String? =
+        withContext(dispatchers.io()) { chatsDao.getById(chatId)?.data }
+
+    override suspend fun readFileRef(uuid: String): FileRefContent? =
+        withContext(dispatchers.io()) {
+            val filesDir = filesDirLazy.get()
+            val file = File(filesDir, uuid)
+            // Same path-traversal guard as deleteChat — reject anything resolving outside the dir.
+            if (!file.canonicalPath.startsWith(filesDir.canonicalPath + File.separator)) {
+                logcat { "DuckAI: RealDuckAiChatStore.readFileRef -- invalid uuid=$uuid" }
+                return@withContext null
+            }
+            if (!file.exists()) return@withContext null
+            runCatching {
+                val json = JSONObject(file.readText())
+                val rawData = json.optString("data").takeIf { it.isNotEmpty() } ?: return@runCatching null
+                // Accept both plain base64 and `data:<mime>;base64,<payload>` data URLs.
+                val base64 = if (rawData.startsWith("data:")) {
+                    rawData.substringAfter(',', missingDelimiterValue = "")
+                } else {
+                    rawData
+                }
+                if (base64.isEmpty()) return@runCatching null
+                FileRefContent(
+                    fileName = json.optString("fileName").ifEmpty { null },
+                    mimeType = json.optString("mimeType").ifEmpty { null },
+                    bytes = Base64.getDecoder().decode(base64),
+                )
+            }.getOrNull()
+        }
 
     private fun DuckAiBridgeChatEntity.toDuckAiChat(): DuckAiChat? = runCatching {
         val json = JSONObject(data)
