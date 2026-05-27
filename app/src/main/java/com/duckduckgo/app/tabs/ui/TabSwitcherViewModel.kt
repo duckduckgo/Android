@@ -248,8 +248,8 @@ class TabSwitcherViewModel @Inject constructor(
         val previousMode = currentMode.value
         if (!isBrowserModeToggleVisible || mode == previousMode) return
 
-        val previousRepo = tabRepositoryProvider.forMode(previousMode)
-        viewModelScope.launch { previousRepo.purgeDeletableTabs() }
+        val repo = tabRepository
+        appCoroutineScope.launch { repo.purgeDeletableTabs() }
 
         command.value = Command.DismissSnackbar
 
