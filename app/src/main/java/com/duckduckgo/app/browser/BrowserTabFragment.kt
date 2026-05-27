@@ -5915,15 +5915,24 @@ class BrowserTabFragment :
                 when {
                     viewState.cta != null -> {
                         hideNewTab()
-                        showCta(viewState.cta)
+                        // Bubble lives inside newTabLayout, which is shown outside this renderer.
+                        // Hiding the parent doesn't reset the bubble's visibility, so we clear it here.
+                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
+
+                        // Non-bubble CTAs paint outside newTabLayout, so they're never at risk of leaking.
+                        // If we're on the NTP, the bubbles paint normally.
+                        if (viewState.cta !is DaxBubbleCta || !viewState.isBrowserShowing) {
+                            showCta(viewState.cta)
+                        }
                     }
 
                     viewState.isBrowserShowing -> {
+                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
                         hideNewTab()
                     }
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
-                        hideDaxBubbleCta(previousCta as? DaxBubbleCta)
+                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
                         showNewTab()
                     }
                 }
@@ -5983,7 +5992,7 @@ class BrowserTabFragment :
                         onboardingExperimentEnabled = false,
                         configuration = configuration,
                     ) { option, index ->
-                        userEnteredQuery(option.link)
+                        submitQuery(option.link)
                         viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
                     }
                 }
@@ -6064,7 +6073,7 @@ class BrowserTabFragment :
                 }
             val onSuggestedOptionsSelected: ((DaxDialogIntroOption) -> Unit)? =
                 if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
-                    { option: DaxDialogIntroOption -> userEnteredQuery(option.link) }
+                    { option: DaxDialogIntroOption -> submitQuery(option.link) }
                 } else {
                     null
                 }
@@ -6102,7 +6111,7 @@ class BrowserTabFragment :
                 // CTA-type-specific notifications (e.g. DaxTrackersBlocked) live on the
                 // subclass override, not on the fragment.
                 onTypingAnimationFinished = { viewModel.onOnboardingDaxTypingAnimationFinished() },
-                onSuggestedOptionClicked = { option: DaxDialogIntroOption -> userEnteredQuery(option.link) },
+                onSuggestedOptionClicked = { option: DaxDialogIntroOption -> submitQuery(option.link) },
                 onDismissCtaClicked = { viewModel.onUserClickCtaDismissButton(configuration) },
                 instantShow = instantShow,
             )
