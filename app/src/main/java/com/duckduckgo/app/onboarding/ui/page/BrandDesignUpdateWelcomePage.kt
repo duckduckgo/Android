@@ -919,6 +919,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
+                    val isCustomAiCopy = viewModel.viewState.value.isCustomAiOnboardingCopyEnabled
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
@@ -939,7 +940,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.welcomeContent.hiddenTitleText.text =
                                     getString(R.string.preOnboardingDaxDialog3Title)
                                 binding.daxDialogCta.welcomeContent.bodyText1.text =
-                                    if (viewModel.viewState.value.isCustomAiOnboardingCopyEnabled) {
+                                    if (isCustomAiCopy) {
                                         requireContext().appendIconToText(
                                             getString(R.string.preOnboardingDaxDialog3TextCustomAi).preventWidows(),
                                             CommonR.drawable.ic_ai_chat_16,
