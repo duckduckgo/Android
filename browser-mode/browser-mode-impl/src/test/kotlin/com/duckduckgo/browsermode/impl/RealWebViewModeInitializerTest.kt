@@ -17,27 +17,40 @@
 package com.duckduckgo.browsermode.impl
 
 import android.webkit.WebView
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profileName
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.MockedStatic
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.mock
 
 class RealWebViewModeInitializerTest {
 
     private val webView: WebView = mock()
-    private val fireModeAvailability = FakeFireModeAvailability()
     private val webViewProfileBinder = FakeWebViewProfileBinder()
-    private val testee = RealWebViewModeInitializer(
-        fireModeAvailability = fireModeAvailability,
-        webViewProfileBinder = webViewProfileBinder,
-    )
+    private val testee = RealWebViewModeInitializer(webViewProfileBinder)
+
+    private lateinit var webViewFeatureMock: MockedStatic<WebViewFeature>
+
+    @Before
+    fun setUp() {
+        webViewFeatureMock = mockStatic(WebViewFeature::class.java)
+        setMultiProfileSupported(true)
+    }
+
+    @After
+    fun tearDown() {
+        webViewFeatureMock.close()
+    }
 
     @Test
-    fun `bind returns success when Fire mode is available and Fire profile binding succeeds`() {
+    fun `bind returns success when MULTI_PROFILE is supported and Fire profile binding succeeds`() {
         val result = testee.bind(webView, BrowserMode.FIRE)
 
         assertTrue(result.isSuccess)
@@ -45,7 +58,7 @@ class RealWebViewModeInitializerTest {
     }
 
     @Test
-    fun `bind returns success when Fire mode is available and regular profile binding succeeds`() {
+    fun `bind returns success when MULTI_PROFILE is supported and regular profile binding succeeds`() {
         val result = testee.bind(webView, BrowserMode.REGULAR)
 
         assertTrue(result.isSuccess)
@@ -64,8 +77,8 @@ class RealWebViewModeInitializerTest {
     }
 
     @Test
-    fun `bind returns failure and skips profile binding when Fire mode is unavailable for Fire profile`() {
-        fireModeAvailability.available = false
+    fun `bind returns failure and skips profile binding when MULTI_PROFILE is unsupported for Fire profile`() {
+        setMultiProfileSupported(false)
 
         val result = testee.bind(webView, BrowserMode.FIRE)
 
@@ -75,8 +88,8 @@ class RealWebViewModeInitializerTest {
     }
 
     @Test
-    fun `bind returns failure and skips profile binding when Fire mode is unavailable for regular profile`() {
-        fireModeAvailability.available = false
+    fun `bind returns failure and skips profile binding when MULTI_PROFILE is unsupported for regular profile`() {
+        setMultiProfileSupported(false)
 
         val result = testee.bind(webView, BrowserMode.REGULAR)
 
@@ -85,10 +98,10 @@ class RealWebViewModeInitializerTest {
         assertTrue(webViewProfileBinder.boundProfiles.isEmpty())
     }
 
-    private class FakeFireModeAvailability : FireModeAvailability {
-        var available = true
-
-        override fun isAvailable(): Boolean = available
+    private fun setMultiProfileSupported(supported: Boolean) {
+        webViewFeatureMock.`when`<Boolean> {
+            WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)
+        }.thenReturn(supported)
     }
 
     private class FakeWebViewProfileBinder : WebViewProfileBinder {
