@@ -1023,6 +1023,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         when (variant) {
             DuckAiOnboardingEndCtaVariant.BRAND_DESIGN_UPDATE -> {
                 binding.onboardingBackdropBrandDesign.isVisible = true
+                binding.onboardingBackgroundBrandDesign.setImageResource(CommonR.drawable.bg_onboarding_end)
+                binding.onboardingBackgroundBrandDesign.isVisible = true
                 ctaView = binding.duckAiEndCtaBrandDesign.root
                 descriptionView = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignDescription
                 okButton = binding.duckAiEndCtaBrandDesign.duckAiEndCtaBrandDesignOkButton
@@ -1069,6 +1071,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 binding.onboardingBackground.isVisible = false
                 binding.onboardingBackground.setImageResource(0)
                 binding.onboardingBackdropBrandDesign.isVisible = false
+                binding.onboardingBackgroundBrandDesign.isVisible = false
+                binding.onboardingBackgroundBrandDesign.setImageResource(0)
                 binding.ddgLogoContainer.isVisible = true
                 binding.viewPager.isVisible = true
                 val state = viewModel.visibilityState.value
