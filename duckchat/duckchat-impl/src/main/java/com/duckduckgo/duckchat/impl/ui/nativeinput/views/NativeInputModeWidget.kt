@@ -932,7 +932,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         // fall through and reset card.radius to largeShapeCornerRadius on all four corners.
         if (isContextualWidget) return
         val state = nativeInputState ?: return
-        if (state.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) return
+        if (state.inputContext != NativeInputState.InputContext.BROWSER) return
         if (state.isBottom) return
         if (state.toggleVisible) return
         val card = parent as? MaterialCardView ?: return
