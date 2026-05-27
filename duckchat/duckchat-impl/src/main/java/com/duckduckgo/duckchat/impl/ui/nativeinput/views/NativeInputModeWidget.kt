@@ -666,19 +666,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun EditText.applyChatInputType() {
         hint = context.getString(R.string.native_input_chat_hint)
-        val isDuckAiChat = isDuckAiPageContext()
-        val actionFlag = if (isDuckAiChat) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
+        // Enter inserts a newline when we're on a Duck.ai chat page (existing behavior) or when
+        // the widget sits in bottom-bar position with the Duck.ai toggle selected. Bottom-bar
+        // mode has no on-screen new-line button, so the IME enter key is the only carriage-
+        // return affordance there.
+        val newLineOnEnter = isDuckAiPageContext() || isWidgetBottom()
+        val actionFlag = if (newLineOnEnter) EditorInfo.IME_ACTION_NONE else EditorInfo.IME_ACTION_GO
         imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or actionFlag
         val baseInputType = InputType.TYPE_CLASS_TEXT or
             InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         setRawInputType(
-            if (isDuckAiChat) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
+            if (newLineOnEnter) baseInputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE else baseInputType,
         )
         setHorizontallyScrolling(false)
     }
 
     override fun shouldSubmitOnHardwareEnter(): Boolean =
-        !(isDuckAiPageContext() && isChatTabSelected())
+        !(isChatTabSelected() && (isDuckAiPageContext() || isWidgetBottom()))
 
     override fun submitMessage(message: String?) {
         if (message == null && isChatTabSelected() && attachmentLimitExceeded) {
