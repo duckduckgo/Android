@@ -1006,6 +1006,6 @@
     <string name="preOnboardingWelcomeDialogBody1">Готови ли сте за по-бърз браузър,\nкойто осигурява контрол?</string>
     <string name="preOnboardingWelcomeDialogBody2">Изкуственият интелект винаги е по избор, а защитата на поверителността винаги е включена.</string>
     <string name="onboardingStepIndicatorText" instruction="a counter above our instructions in onboarding that tells a user what step they are on">%1$d от %2$d</string>
-    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва “патица“ на английски</string>
+    <string name="onboardingSearchDaxDialogOption1Quoted" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
     <string name="onboardingSearchDaxDialogOption1EnglishQuoted" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва \"патица\" на испански</string>
 </resources>
