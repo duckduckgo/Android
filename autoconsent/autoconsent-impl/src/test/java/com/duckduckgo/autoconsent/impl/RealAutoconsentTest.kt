@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autoconsent.api.CookiePopUpPreference
 import com.duckduckgo.autoconsent.impl.cache.RealAutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
@@ -116,6 +117,15 @@ class RealAutoconsentTest {
 
         autoconsent.changeSetting(true)
         assertTrue(settingsRepository.userSetting)
+    }
+
+    @Test
+    fun whenChangeCookiePopUpPreferenceThenRepoSetValueChanged() {
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.BLOCK_ALL)
+        assertEquals(CookiePopUpPreference.BLOCK_ALL, settingsRepository.cookiePopUpPreference)
+
+        autoconsent.changeCookiePopUpPreference(CookiePopUpPreference.DO_NOT_BLOCK)
+        assertEquals(CookiePopUpPreference.DO_NOT_BLOCK, autoconsent.getCookiePopUpPreference())
     }
 
     @Test

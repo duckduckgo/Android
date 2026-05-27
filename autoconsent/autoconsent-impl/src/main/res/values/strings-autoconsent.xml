@@ -20,4 +20,9 @@
     <string name="autoconsentTitle">Cookie Pop-Up Protection</string>
     <string name="autoconsentDescription"><![CDATA[DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.\n<a href="">Learn More</a>]]></string>
     <string name="autoconsentToggle">Let DuckDuckGo handle cookie pop-ups</string>
+    <string name="autoconsentPreferenceHeader">Cookie Pop-up Preference</string>
+    <string name="autoconsentPreferenceBlockAll">Block All Cookie Pop-ups</string>
+    <string name="autoconsentPreferenceBlockStandard">Block Standard Pop-ups</string>
+    <string name="autoconsentPreferenceDoNotBlock">Do not Block Pop-ups</string>
+    <string name="autoconsentPreferenceClarification">Some cookie pop-ups do not have a Reject option. By default, we will not block them. Choose Block All to allow DuckDuckGo to handle these for you.</string>
 </resources>
