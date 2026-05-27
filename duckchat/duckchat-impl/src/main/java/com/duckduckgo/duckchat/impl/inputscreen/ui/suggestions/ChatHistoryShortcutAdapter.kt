@@ -25,6 +25,10 @@ class ChatHistoryShortcutAdapter(
     private val onClick: () -> Unit,
 ) : RecyclerView.Adapter<ChatHistoryShortcutAdapter.ViewHolder>() {
 
+    companion object {
+        const val VIEW_ALL_CHATS_THRESHOLD = 8
+    }
+
     private var visible: Boolean = false
 
     fun setVisible(visible: Boolean) {

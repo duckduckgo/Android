@@ -55,8 +55,6 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-private const val VIEW_ALL_CHATS_THRESHOLD = 8
-
 @InjectWith(FragmentScope::class)
 class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
 
@@ -165,7 +163,7 @@ class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
                 chatUrlDividerAdapter?.setVisible(hasChatSuggestions && showUrlSuggestions)
                 searchDividerAdapter?.setVisible((hasChatSuggestions || showUrlSuggestions) && isTyping)
 
-                val showShortcut = isHistoryAvailable && chatSuggestions.size > VIEW_ALL_CHATS_THRESHOLD
+                val showShortcut = isHistoryAvailable && chatSuggestions.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
                 historyShortcutAdapter?.setVisible(showShortcut)
                 historyShortcutDividerAdapter?.setVisible(showShortcut)
 

@@ -30,8 +30,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.SectionDividerAda
 import com.duckduckgo.duckchat.impl.ui.ChatTabSuggestions
 import javax.inject.Inject
 
-private const val VIEW_ALL_CHATS_THRESHOLD = 8
-
 /**
  * Builds the chat-tab ConcatAdapter:
  * chat history → divider → "View all Chats" → divider → URL suggestions → divider → "Search for [query]".
@@ -66,7 +64,7 @@ class NativeInputChatSuggestionsBinder @Inject constructor(
             val hasChat = suggestions.chatHistory.isNotEmpty()
             val hasUrl = suggestions.urlSuggestions.suggestions.isNotEmpty()
             val showUrl = isTyping && hasUrl
-            val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > VIEW_ALL_CHATS_THRESHOLD
+            val showShortcut = isHistoryAvailable && suggestions.chatHistory.size > ChatHistoryShortcutAdapter.VIEW_ALL_CHATS_THRESHOLD
             val hasContent = hasChat || isTyping
 
             chatSuggestionsAdapter.submitList(suggestions.chatHistory) {
