@@ -61,7 +61,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_SKIP_ONBOARDING_PRESSED("m_preonboarding_skip-onboarding-pressed"),
     PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED("m_preonboarding_confirm-skip-onboarding-pressed"),
     PREONBOARDING_RESUME_ONBOARDING_PRESSED("m_preonboarding_resume-onboarding-pressed"),
-    ONBOARDING_QUICK_SETUP("m_onboarding_quick-setup"),
+    ONBOARDING_QUICK_SETUP("onboarding_quick-setup"),
     ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
     ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),

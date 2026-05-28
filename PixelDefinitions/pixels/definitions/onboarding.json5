@@ -56,7 +56,7 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_onboarding_quick-setup": {
+    "onboarding_quick-setup": {
         "description": "Fires when the Quick Setup screen is shown to a reinstall user during onboarding and again when the user taps the Start browsing CTA. Sent as Unique once per user per event (shown/clicked).",
         "owners": ["catalinradoiu"],
         "triggers": ["other"],
