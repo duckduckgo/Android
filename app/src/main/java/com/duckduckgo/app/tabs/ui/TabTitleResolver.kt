@@ -58,6 +58,6 @@ class RealTabTitleResolver @Inject constructor(
 
     private companion object {
         const val MAX_TITLE_LENGTH = 50
-        const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
+        const val DUCKDUCKGO_TITLE_SUFFIX = " at DuckDuckGo"
     }
 }

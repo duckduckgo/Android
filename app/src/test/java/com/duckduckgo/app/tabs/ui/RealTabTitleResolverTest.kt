@@ -41,7 +41,7 @@ class RealTabTitleResolverTest {
     @Test
     fun whenTabHasTitleEndingInDuckDuckGoSuffixThenSuffixIsStripped() {
         val raw = "Search results at DuckDuckGo"
-        assertEquals("Search results ", testee.resolveTitle(TabEntity("", URL, raw, position = 0), BrowserMode.REGULAR))
+        assertEquals("Search results", testee.resolveTitle(TabEntity("", URL, raw, position = 0), BrowserMode.REGULAR))
     }
 
     @Test
