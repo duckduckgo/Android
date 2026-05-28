@@ -37,14 +37,14 @@ class QuickSetupEditRow @JvmOverloads constructor(
         ViewQuickSetupEditRowBinding.inflate(LayoutInflater.from(context), this)
 
     init {
-        val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
-        setPadding(paddingLeft, verticalPadding, paddingRight, verticalPadding)
         isClickable = true
         isFocusable = true
         val selectableBackground = TypedValue().also {
             context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
         }
         setBackgroundResource(selectableBackground.resourceId)
+        val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        setPadding(paddingLeft, verticalPadding, paddingRight, verticalPadding)
         context.theme.obtainStyledAttributes(attrs, R.styleable.QuickSetupEditRow, 0, 0).use { attrs ->
             attrs.getResourceId(R.styleable.QuickSetupEditRow_quickSetupRowIcon, 0)
                 .takeIf { it != 0 }
