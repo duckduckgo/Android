@@ -27,6 +27,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.util.TypedValue
+import androidx.annotation.AttrRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -106,6 +108,10 @@ class TabSwitcherAdapter(
 
     @Volatile
     var isFullUrlEnabled: Boolean = true
+
+    @Volatile
+    var themedContext: Context? = null
+
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -504,7 +510,8 @@ class TabSwitcherAdapter(
         val url = tab.url
         if (url.isNullOrBlank()) {
             glide.clear(view)
-            glide.load(AndroidR.drawable.ic_dax_icon).into(view)
+            val placeholder = view.resolveThemedDrawableAttr(CommonR.attr.daxDrawableTabPlaceholderIcon)
+            glide.load(placeholder).into(view)
         } else {
             holder.trackJob(
                 lifecycleOwner.lifecycleScope.launch {
@@ -537,7 +544,8 @@ class TabSwitcherAdapter(
 
         val previewFile = tab.tabPreviewFile
         if (tab.url.isNullOrBlank() && !tab.isAboutBlank) {
-            glide.load(AndroidR.drawable.ic_dax_icon_72)
+            val placeholder = tabPreview.resolveThemedDrawableAttr(CommonR.attr.daxDrawableTabPlaceholderPreview)
+            glide.load(placeholder)
                 .into(tabPreview)
         } else if (previewFile != null) {
             holder.trackJob(
@@ -638,8 +646,10 @@ class TabSwitcherAdapter(
         onAnimationTileCloseClickListener = onClick
     }
 
-    companion object {
-        private const val DUCKDUCKGO_TITLE_SUFFIX = "at DuckDuckGo"
+    private fun View.resolveThemedDrawableAttr(@AttrRes attr: Int): Int {
+        val typedValue = TypedValue()
+        (themedContext ?: context).theme.resolveAttribute(attr, typedValue, true)
+        return typedValue.resourceId
     }
 
     sealed class TabSwitcherViewHolder(rootView: View) : ViewHolder(rootView) {

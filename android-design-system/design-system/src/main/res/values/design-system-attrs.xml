@@ -31,4 +31,7 @@
 
     <attr name="daxIconTabSwitcher" format="reference"/>
 
+    <attr name="daxDrawableTabPlaceholderIcon" format="reference"/>
+    <attr name="daxDrawableTabPlaceholderPreview" format="reference"/>
+
 </resources>

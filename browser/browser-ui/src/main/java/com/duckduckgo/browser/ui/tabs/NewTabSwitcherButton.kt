@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.tabs
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import com.duckduckgo.browser.ui.databinding.ViewNewToolbarTabSwitcherButtonBinding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -32,14 +33,20 @@ class NewTabSwitcherButton @JvmOverloads constructor(
 
     private val binding: ViewNewToolbarTabSwitcherButtonBinding by viewBinding()
 
+    private val baseTabsDrawable: Int = TypedValue().run {
+        context.theme.resolveAttribute(CommonR.attr.daxIconTabSwitcher, this, true)
+        if (resourceId != 0) resourceId else CommonR.drawable.ic_tab_24
+    }
+
     override var hasUnread: Boolean = false
         set(value) {
             if (field != value) {
-                if (value) {
-                    binding.tabsImageView.setImageResource(CommonR.drawable.ic_tab_24_highlighted)
+                val drawable = if (value) {
+                    CommonR.drawable.ic_tab_24_highlighted
                 } else {
-                    binding.tabsImageView.setImageResource(CommonR.drawable.ic_tab_24)
+                    baseTabsDrawable
                 }
+                binding.tabsImageView.setImageResource(drawable)
             }
             field = value
         }

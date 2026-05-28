@@ -156,6 +156,7 @@ import javax.inject.Inject
 @HasMemberInjections
 @InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity() {
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -230,6 +231,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var currentBrowserMode: BrowserMode
+
+    override val applyFireTheme: Boolean
+        get() = currentBrowserMode == BrowserMode.FIRE
 
     private val lastActiveTabs = TabList()
 

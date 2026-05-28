@@ -36,6 +36,8 @@
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
+        <item name="daxDrawableTabPlaceholderIcon">@drawable/ic_fire_color_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/img_fire_96</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Dark.Fire" parent="Theme.DuckDuckGo.Dark">
@@ -57,6 +59,8 @@
         <item name="daxColorBackdrop">@color/omnibar_card_fire_dark</item>
 
         <item name="daxIconTabSwitcher">@drawable/ic_tab_fire_mode_24</item>
+        <item name="daxDrawableTabPlaceholderIcon">@drawable/ic_fire_color_24</item>
+        <item name="daxDrawableTabPlaceholderPreview">@drawable/img_fire_96</item>
     </style>
 
     <color name="omnibar_card_fire_light">#3D3D3D</color>
