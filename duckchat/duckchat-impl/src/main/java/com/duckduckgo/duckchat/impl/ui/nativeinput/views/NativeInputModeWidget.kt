@@ -287,8 +287,20 @@ class NativeInputModeWidget @JvmOverloads constructor(
         leadingFireButtonView()?.setOnClickListener { onFireButtonTapped?.invoke() }
     }
 
-    private fun leadingFireButtonView(): View? =
-        (parent as? ViewGroup)?.findViewById(R.id.inputFieldLeadingFireButton)
+    /**
+     * Walk up the view hierarchy looking for the leading fire button. The button is a
+     * sibling-of-an-ancestor rather than a direct sibling of this widget — in the bottom-bar
+     * layout it lives outside the MaterialCardView that wraps this widget — so a single
+     * `parent.findViewById` isn't enough.
+     */
+    private fun leadingFireButtonView(): View? {
+        var current: android.view.ViewParent? = parent
+        while (current is ViewGroup) {
+            current.findViewById<View?>(R.id.inputFieldLeadingFireButton)?.let { return it }
+            current = current.parent
+        }
+        return null
+    }
 
     private fun setupPlugins() {
         pluginsJob?.cancel()
