@@ -26,28 +26,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/inputModeWidgetLayout" />
 
-    <ImageView
-        android:id="@+id/inputFieldLeadingFireButton"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/selectable_circular_container_ripple"
-        android:contentDescription="@string/duckChatFireButtonContentDescription"
-        android:padding="@dimen/keyline_1"
-        android:scaleType="center"
-        android:src="@drawable/ic_fire_24"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/inputModeWidgetLayout" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/leadingButtonsBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierAllowsGoneWidgets="false"
-        app:barrierDirection="end"
-        app:constraint_referenced_ids="inputModeUnifiedBack,inputFieldLeadingFireButton" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/inputModeWidgetLayout"
         android:layout_width="0dp"
@@ -55,7 +33,7 @@
         android:layout_marginStart="@dimen/keyline_2"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/leadingButtonsBarrier"
+        app:layout_constraintStart_toEndOf="@id/inputModeUnifiedBack"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginStart="@dimen/nativeInputModeWidgetMarginHorizontal">
 

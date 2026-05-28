@@ -592,8 +592,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * placement.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
-        findViewById<View?>(R.id.inputFieldLeadingFireButton)?.visibility =
-            if (state.shouldShowLeadingFireButton()) VISIBLE else GONE
         findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
