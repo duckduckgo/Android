@@ -168,11 +168,6 @@ class TabSwitcherViewModel @Inject constructor(
         initialValue = _viewState.value,
     )
 
-    val layoutType = tabRepositoryFlow
-        .flatMapLatest { it.tabSwitcherData }
-        .map { it.layoutType }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
     // all tab items, including the animated tile
     val tabSwitcherItems: List<TabSwitcherItem>
         get() = viewState.value.tabSwitcherItems
@@ -558,17 +553,9 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onLayoutTypeToggled() {
-        when (layoutType.value) {
-            GRID -> onListLayoutSelected()
-            LIST -> onGridLayoutSelected()
-            else -> Unit
-        }
-    }
-
     fun onListLayoutSelected() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (layoutType.value != LIST) {
+            if (viewState.value.layoutType != LIST) {
                 pixel.fire(TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
                 tabRepository.setTabLayoutType(LIST)
             }
@@ -577,7 +564,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onGridLayoutSelected() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (layoutType.value != GRID) {
+            if (viewState.value.layoutType != GRID) {
                 pixel.fire(TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
                 tabRepository.setTabLayoutType(GRID)
             }

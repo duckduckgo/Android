@@ -376,10 +376,7 @@ class TabSwitcherActivity :
 
         handleSelectionModeCancellation()
 
-        // Seed the LayoutManager from the cached layoutType before observers start. Without
-        // this, the layoutType collector's first emission on rotation would swap the LM and
-        // discard the viewState collector's pending scrollToActiveTab.
-        viewModel.layoutType.value?.let {
+        viewModel.viewState.value.layoutType?.let {
             applyLayoutType(it)
             tabsRecycler.show()
         }
@@ -548,6 +545,10 @@ class TabSwitcherActivity :
     private fun configureObservers() {
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
+                // Apply layout type first so the LayoutManager is in place before the adapter
+                // commits items and any scroll-to-active runs against the correct layout.
+                it.layoutType?.let(::updateLayoutType)
+
                 tabsRecycler.invalidateItemDecorations()
 
                 val staleItems = modeSwitch?.staleItems
@@ -571,13 +572,9 @@ class TabSwitcherActivity :
 
                 tabTouchHelper.mode = it.mode
 
-                invalidateOptionsMenu()
-            }
-        }
+                fadeInTabsAfterRecreate(it)
 
-        lifecycleScope.launch {
-            viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
-                updateLayoutType(it)
+                invalidateOptionsMenu()
             }
         }
 

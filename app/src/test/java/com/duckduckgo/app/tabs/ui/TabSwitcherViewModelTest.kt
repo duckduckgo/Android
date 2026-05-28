@@ -755,61 +755,6 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenListLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledCorrectPixelsAreFired() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-    }
-
-    @Test
-    fun whenListLayoutTypeToggledTheTypeIsChangedToGrid() = runTest {
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        // the default layout type is GRID
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(LIST)
-    }
-
-    @Test
-    fun whenGridLayoutTypeToggledTheTypeIsChangedToList() = runTest {
-        whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData.copy(layoutType = LIST)))
-
-        // we need to use the new stubbing here
-        initializeViewModel()
-
-        coroutinesTestRule.testScope.launch {
-            testee.layoutType.collect()
-        }
-
-        testee.onLayoutTypeToggled()
-
-        verify(mockTabRepository).setTabLayoutType(GRID)
-    }
-
-    @Test
     fun `when Duck Chat menu item clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
         whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
 
