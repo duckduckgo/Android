@@ -1409,6 +1409,10 @@ class BrowserTabFragment :
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
+                onChatHistoryShortcutClicked = {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+                    viewModel.openDuckChatHistory()
+                },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(

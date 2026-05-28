@@ -204,6 +204,9 @@ class InputScreenViewModel @AssistedInject constructor(
     val tabAttachmentState: StateFlow<TabAttachmentState> = _tabAttachmentState.asStateFlow()
     private var cachedTabs: List<TabAttachmentItem> = emptyList()
 
+    private val _isHistoryAvailable = MutableStateFlow(false)
+    val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
+
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
     private val defaultTogglePosition: StateFlow<DefaultTogglePosition> =
@@ -426,6 +429,10 @@ class InputScreenViewModel @AssistedInject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            _isHistoryAvailable.value = duckChat.isChatHistoryAvailable()
+        }
     }
 
     fun onActivityResume() {
@@ -843,6 +850,11 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onBrowserMenuTapped() {
         command.value = Command.MenuRequested
+    }
+
+    fun onChatHistoryShortcutClicked() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+        command.value = Command.LaunchDuckChatHistory
     }
 
     fun onClearTextTapped() {

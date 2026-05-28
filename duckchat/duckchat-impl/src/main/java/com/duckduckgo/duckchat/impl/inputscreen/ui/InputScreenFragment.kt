@@ -61,6 +61,7 @@ import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChatHistoryNoParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -94,6 +95,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -149,6 +151,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var browserMenuHighlight: BrowserMenuHighlight
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
@@ -470,6 +475,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
             is Command.ShowAppNotFoundMessage -> {
                 Toast.makeText(requireContext(), R.string.autocompleteDeviceAppNotFound, LENGTH_SHORT).show()
+            }
+
+            is Command.LaunchDuckChatHistory -> {
+                globalActivityStarter.start(requireContext(), DuckChatHistoryNoParams)
+                exitInputScreen()
             }
         }
     }

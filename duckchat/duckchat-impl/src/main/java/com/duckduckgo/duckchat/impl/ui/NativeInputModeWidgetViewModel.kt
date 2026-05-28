@@ -124,6 +124,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val _modelPickerEnabled = MutableStateFlow(true)
     val modelPickerEnabled: StateFlow<Boolean> = _modelPickerEnabled.asStateFlow()
 
+    private val _isHistoryAvailable = MutableStateFlow(false)
+    val isHistoryAvailable: StateFlow<Boolean> = _isHistoryAvailable.asStateFlow()
+
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
 
@@ -138,6 +141,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _plugins.value = nativeInputPlugins.getPlugins().toList()
+        }
+        viewModelScope.launch {
+            _isHistoryAvailable.value = duckChatInternal.isChatHistoryAvailable()
         }
     }
 
