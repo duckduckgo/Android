@@ -25,7 +25,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -37,7 +36,6 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
 class RealWebViewSessionStorage @Inject constructor(
     private val dao: WebViewSessionDao,
     @AppCoroutineScope private val appScope: CoroutineScope,
