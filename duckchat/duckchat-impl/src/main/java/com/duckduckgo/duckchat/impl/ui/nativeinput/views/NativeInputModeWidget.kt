@@ -465,6 +465,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             if (hasFocus) beginFocusTransition()
             updateBottomRowVisibility()
             applyVerticalPaddingForFocus()
+            nativeInputState?.let { updateFireButtonVisibility(it) }
             if (!hasFocus && isDuckAiPageContext()) {
                 hideKeyboard()
             }
@@ -616,10 +617,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
      * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
      * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
      * fire affordance; other contexts keep today's trailing placement.
+     *
+     * The leading fire is additionally hidden while the input field has focus — the user is
+     * typing and the chrome around the input should yield space to the keyboard / input area.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
-        leadingFireButtonView()?.visibility =
-            if (state.shouldShowLeadingFireButton()) VISIBLE else GONE
+        val showLeading = state.shouldShowLeadingFireButton() && !inputField.hasFocus()
+        leadingFireButtonView()?.visibility = if (showLeading) VISIBLE else GONE
         findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
