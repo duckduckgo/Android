@@ -596,6 +596,74 @@ class BrandDesignUpdatePageViewModelTest {
         verify(mockPixel).fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
     }
 
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentThenShowQuickSetupDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.loadDaxDialog()
+            awaitItem() // SYNC_RESTORE
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertFalse(state.isReinstallUser)
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(mockSyncAutoRestore, never()).restoreSyncAccount()
+    }
+
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentThenFiresSkipRestoreTappedPixel() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked()
+        verify(mockPixel).fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+    }
+
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentAndIsDefaultBrowserThenHideSetDefaultBrowserRow() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem()
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertTrue(state.hideSetDefaultBrowserRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSecondaryCtaFromSyncRestoreAndQuickSetupTreatmentAndHasInstalledWidgetsThenHideAddWidgetRow() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem()
+            testee.onSecondaryCtaClicked()
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.QUICK_SETUP, state.currentDialog)
+            assertTrue(state.hideAddWidgetRow)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     // endregion
 
     // region onDefaultBrowserSet / onDefaultBrowserNotSet

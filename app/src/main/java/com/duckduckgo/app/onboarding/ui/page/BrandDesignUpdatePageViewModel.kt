@@ -371,18 +371,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 _viewState.update { it.copy(isReinstallUser = true) }
                 viewModelScope.launch {
                     if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
-                        val splitEnabled = isSplitOmnibarEnabled()
-                        val (isDefault, hasWidget) = withContext(dispatchers.io()) {
-                            defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
-                        }
-                        _viewState.update {
-                            it.copy(
-                                showSplitOption = splitEnabled,
-                                hideSetDefaultBrowserRow = isDefault,
-                                hideAddWidgetRow = hasWidget,
-                            )
-                        }
-                        setCurrentDialog(QUICK_SETUP)
+                        showQuickSetupDialog()
                     } else {
                         setCurrentDialog(SKIP_ONBOARDING_OPTION)
                         pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
@@ -399,7 +388,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     logcat { "Sync-AutoRestore: user skipped restore" }
                     pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        showQuickSetupDialog()
+                    } else {
+                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                    }
                 }
             }
 
@@ -542,6 +535,21 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    private suspend fun showQuickSetupDialog() {
+        val splitEnabled = isSplitOmnibarEnabled()
+        val (isDefault, hasWidget) = withContext(dispatchers.io()) {
+            defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+        }
+        _viewState.update {
+            it.copy(
+                showSplitOption = splitEnabled,
+                hideSetDefaultBrowserRow = isDefault,
+                hideAddWidgetRow = hasWidget,
+            )
+        }
+        setCurrentDialog(QUICK_SETUP)
+    }
 
     private suspend fun isSplitOmnibarEnabled(): Boolean =
         withContext(dispatchers.io()) {
