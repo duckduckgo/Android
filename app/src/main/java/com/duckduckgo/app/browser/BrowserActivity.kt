@@ -1290,9 +1290,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
      */
     private fun observeBrowserModeChanges() {
         lifecycleScope.launch {
-            viewModel.currentMode.drop(1).collect {
-                recreate()
-            }
+            viewModel.currentMode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect { mode ->
+                    if (mode != currentBrowserMode) {
+                        recreate()
+                    }
+                }
         }
     }
 
