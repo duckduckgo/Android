@@ -98,6 +98,7 @@ open class InputModeWidget @JvmOverloads constructor(
     private val menuIconImageView: ImageView
     private val browserMenuHighlight: View
     private val fireButton: View
+    private val leadingFireButton: View
     private val voiceInputButton: View
     private var bottomButtonsMode: Boolean = false
 
@@ -190,6 +191,7 @@ open class InputModeWidget @JvmOverloads constructor(
         menuIconImageView = findViewById(R.id.browserMenuImageView)
         browserMenuHighlight = findViewById(R.id.browserMenuHighlight)
         fireButton = findViewById(R.id.inputFieldFireButton)
+        leadingFireButton = findViewById(R.id.inputFieldLeadingFireButton)
         tabSwitcherButton = findViewById(R.id.inputFieldTabsMenu)
         voiceInputButton = findViewById(R.id.inputFieldVoiceInputButton)
         inputScreenButtonsContainer = findViewById(R.id.inputScreenButtonsContainer)
@@ -280,6 +282,9 @@ open class InputModeWidget @JvmOverloads constructor(
             onTabSwitcherTapped?.invoke()
         }
         fireButton.setOnClickListener {
+            onFireButtonTapped?.invoke()
+        }
+        leadingFireButton.setOnClickListener {
             onFireButtonTapped?.invoke()
         }
         voiceInputButton.setOnClickListener {

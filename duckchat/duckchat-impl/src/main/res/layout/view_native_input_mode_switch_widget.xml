@@ -113,6 +113,18 @@
                     android:paddingEnd="@dimen/keyline_empty"
                     android:paddingBottom="@dimen/keyline_empty">
 
+                    <ImageView
+                        android:id="@+id/inputFieldLeadingFireButton"
+                        android:layout_width="@dimen/toolbarIcon"
+                        android:layout_height="@dimen/toolbarIcon"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/selectable_circular_container_ripple"
+                        android:contentDescription="@string/duckChatFireButtonContentDescription"
+                        android:padding="@dimen/keyline_1"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_fire_24"
+                        android:visibility="gone" />
+
                     <EditText
                         android:id="@+id/inputField"
                         android:layout_width="0dp"

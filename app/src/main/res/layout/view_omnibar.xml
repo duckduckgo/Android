@@ -549,6 +549,27 @@
                         android:src="@drawable/ic_fire_24" />
                 </FrameLayout>
 
+                <FrameLayout
+                    android:id="@+id/plusIconMenu"
+                    android:layout_width="@dimen/toolbarIcon"
+                    android:layout_height="@dimen/toolbarIcon"
+                    android:background="@drawable/selectable_item_rounded_corner_background"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/fireIconMenu"
+                    app:layout_constraintEnd_toEndOf="@id/fireIconMenu"
+                    app:layout_constraintStart_toStartOf="@id/fireIconMenu"
+                    app:layout_constraintTop_toTopOf="@id/fireIconMenu">
+
+                    <ImageView
+                        android:id="@+id/plusIconImageView"
+                        android:layout_width="@dimen/bottomNavIcon"
+                        android:layout_height="@dimen/bottomNavIcon"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/duckChatPlusButtonContentDescription"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_add_24" />
+                </FrameLayout>
+
                 <Space
                     android:layout_width="@dimen/omnibarCardExtendedMarginEnd"
                     android:layout_height="match_parent"

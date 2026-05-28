@@ -3768,6 +3768,10 @@ class BrowserTabFragment :
                     this@BrowserTabFragment.onFireButtonPressed()
                 }
 
+                override fun onPlusButtonPressed() {
+                    // Placeholder: the + popup menu will be wired in a follow-up PR.
+                }
+
                 override fun onBrowserMenuPressed() {
                     onBrowserMenuButtonPressed()
                 }

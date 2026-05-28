@@ -160,6 +160,7 @@ class OmnibarLayout @JvmOverloads constructor(
         val showVoiceSearch: Boolean,
         val showTabsMenu: Boolean,
         val showFireIcon: Boolean,
+        val showPlusIcon: Boolean,
         val showBrowserMenu: Boolean,
         val showBrowserMenuHighlight: Boolean,
         val showChatMenu: Boolean,
@@ -283,6 +284,7 @@ class OmnibarLayout @JvmOverloads constructor(
     override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    internal val plusIconMenu: FrameLayout by lazy { findViewById(R.id.plusIconMenu) }
     internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
@@ -334,6 +336,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     addTarget(clearTextButton)
                     addTarget(voiceSearchButton)
                     addTarget(fireIconMenu)
+                    addTarget(plusIconMenu)
                     addTarget(tabsMenu)
                     addTarget(aiChatMenu)
                     addTarget(browserMenu)
@@ -565,6 +568,9 @@ class OmnibarLayout @JvmOverloads constructor(
                 viewModel.onFireIconPressed(isPulseAnimationPlaying())
             }
             omnibarItemPressedListener?.onFireButtonPressed()
+        }
+        plusIconMenu.setOnClickListener {
+            omnibarItemPressedListener?.onPlusButtonPressed()
         }
         browserMenu.setOnClickListener {
             omnibarItemPressedListener?.onBrowserMenuPressed()
@@ -837,6 +843,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showVoiceSearch = viewState.showVoiceSearch,
                 showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
                 showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
+                showPlusIcon = viewState.showPlusIcon && !viewState.showFindInPage,
                 showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
                 showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
                 showChatMenu = viewState.showChatMenu,
@@ -860,6 +867,7 @@ class OmnibarLayout @JvmOverloads constructor(
         voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
         fireIconMenu.isVisible = newTransitionState.showFireIcon
+        plusIconMenu.isVisible = newTransitionState.showPlusIcon
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu

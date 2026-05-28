@@ -544,6 +544,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             updateToggleVisibility(toggle, state)
         }
         updateBackButtons(state)
+        updateFireButtonVisibility(state)
         updateBottomRowVisibility()
         applyVerticalPaddingForFocus()
         updateNewLineButtonVisibility()
@@ -582,6 +583,19 @@ class NativeInputModeWidget @JvmOverloads constructor(
         findViewById<View?>(R.id.inputModeWidgetBack)?.setBackgroundResource(
             com.duckduckgo.mobile.android.R.drawable.selectable_circular_container_ripple,
         )
+    }
+
+    /**
+     * In a fullscreen Duck.ai chat the fire button moves into the input field card at the
+     * leading edge; the trailing fire (next to tabs/menu in [inputModeMainButtonsContainer])
+     * hides so the user only sees one fire affordance. Other contexts keep today's trailing
+     * placement.
+     */
+    private fun updateFireButtonVisibility(state: NativeInputState) {
+        findViewById<View?>(R.id.inputFieldLeadingFireButton)?.visibility =
+            if (state.shouldShowLeadingFireButton()) VISIBLE else GONE
+        findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
+            if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
 
     private fun removeMargins() {
@@ -1229,6 +1243,14 @@ internal fun NativeInputState.shouldShowToggleRowBack(): Boolean =
 
 internal fun NativeInputState.shouldShowCardRowBack(): Boolean =
     !toggleVisible && inputContext == NativeInputState.InputContext.BROWSER
+
+/** Fire button placed inside the input field card at the leading edge — only in a fullscreen Duck.ai chat. */
+internal fun NativeInputState.shouldShowLeadingFireButton(): Boolean =
+    inputContext == NativeInputState.InputContext.DUCK_AI
+
+/** Trailing fire button (in the buttons row next to tabs/menu) — hidden in fullscreen Duck.ai chat, otherwise shown. */
+internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
+    inputContext != NativeInputState.InputContext.DUCK_AI
 
 /**
  * The bottom row hosts chat-mode tools (attachments, options, reasoning, model picker).
