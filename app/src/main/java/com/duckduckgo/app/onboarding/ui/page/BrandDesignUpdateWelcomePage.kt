@@ -393,6 +393,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             comparisonChartItem4.text = getString(R.string.preOnboardingComparisonChartItem4).preventWidows()
         }
 
+        with(binding.daxDialogCta.welcomeContent) {
+            bodyText1.text = getString(R.string.preOnboardingWelcomeDialogBody1).preventWidows()
+            bodyText2.text = getString(R.string.preOnboardingWelcomeDialogBody2).preventWidows()
+        }
+
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
         if (deviceInfo.isTablet()) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->

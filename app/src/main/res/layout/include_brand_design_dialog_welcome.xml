@@ -55,9 +55,9 @@
         android:alpha="0"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="@string/preOnboardingWelcomeDialogBody1"
         app:typography="onboarding_body"
-        tools:alpha="1" />
+        tools:alpha="1"
+        tools:text="@string/preOnboardingWelcomeDialogBody1" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/bodyText2"
@@ -67,8 +67,8 @@
         android:alpha="0"
         android:gravity="center"
         android:includeFontPadding="false"
-        android:text="@string/preOnboardingWelcomeDialogBody2"
         app:typography="onboarding_body"
-        tools:alpha="1" />
+        tools:alpha="1"
+        tools:text="@string/preOnboardingWelcomeDialogBody2" />
 
 </LinearLayout>
