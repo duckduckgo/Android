@@ -29,19 +29,25 @@
         android:paddingStart="@dimen/keyline_2"
         android:paddingEnd="@dimen/keyline_2">
 
-    <!-- Fire button sits outside the card so the card's 26dp corner radius doesn't
-         clip its top/bottom; it gets its own circular ripple background. -->
-    <ImageView
-        android:id="@+id/inputFieldLeadingFireButton"
-        android:layout_width="@dimen/toolbarIcon"
-        android:layout_height="@dimen/toolbarIcon"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:background="@drawable/selectable_circular_container_ripple"
-        android:contentDescription="@string/duckChatFireButtonContentDescription"
-        android:padding="@dimen/keyline_1"
-        android:scaleType="center"
-        android:src="@drawable/ic_fire_24"
-        android:visibility="gone" />
+        <FrameLayout
+            android:id="@+id/inputFieldFireIconMenu"
+            android:layout_width="@dimen/toolbarIcon"
+            android:layout_height="@dimen/toolbarIcon"
+            android:background="@drawable/selectable_item_rounded_corner_background"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/inputFieldFireIconImageview"
+                android:layout_width="@dimen/bottomNavIcon"
+                android:layout_height="@dimen/bottomNavIcon"
+                android:layout_gravity="center"
+                android:contentDescription="@string/fireMenu"
+                android:scaleType="center"
+                android:src="@drawable/ic_fire_24" />
+        </FrameLayout>
 
 
     <!-- Negative bottom margin pulls the card down to account for the shadow -->

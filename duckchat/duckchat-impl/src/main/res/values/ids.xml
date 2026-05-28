@@ -16,9 +16,9 @@
 
 <resources>
     <item name="inputModeWidget" type="id"/>
-    <!-- Declared here (not in a layout) because the leading fire button lives in the host
+    <!-- Declared here (not in a layout) because the leading fire menu lives in the host
          module's bottom-bar layout (app/.../input_mode_widget_card_view_bottom.xml) as a
          sibling of the NativeInputModeWidget. Declaring the id in duckchat-impl lets the
          widget bind its visibility and click via R.id. -->
-    <item name="inputFieldLeadingFireButton" type="id"/>
+    <item name="inputFieldFireIconMenu" type="id"/>
 </resources>

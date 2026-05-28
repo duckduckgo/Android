@@ -279,7 +279,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * The leading fire button in the bottom-bar layout lives as a sibling of this widget
+     * The leading fire menu in the bottom-bar layout lives as a sibling of this widget
      * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
      * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
      */
@@ -288,7 +288,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * Walk up the view hierarchy looking for the leading fire button. The button is a
+     * Walk up the view hierarchy looking for the leading fire menu. The button is a
      * sibling-of-an-ancestor rather than a direct sibling of this widget — in the bottom-bar
      * layout it lives outside the MaterialCardView that wraps this widget — so a single
      * `parent.findViewById` isn't enough.
@@ -296,7 +296,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun leadingFireButtonView(): View? {
         var current: android.view.ViewParent? = parent
         while (current is ViewGroup) {
-            current.findViewById<View?>(R.id.inputFieldLeadingFireButton)?.let { return it }
+            current.findViewById<View?>(R.id.inputFieldFireIconMenu)?.let { return it }
             current = current.parent
         }
         return null
