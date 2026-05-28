@@ -67,6 +67,7 @@ class NativeInputCallbacks(
         filesJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
+    val onDuckAiQuerySubmitted: (query: String) -> Unit = {},
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
     val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
@@ -440,14 +441,16 @@ class RealNativeInputManager @Inject constructor(
                     omnibarController.restore()
                     omnibarController.show()
                     removeWidget()
-                    // Only tear down the NTP layer if we were over the browser — the submitted
-                    // Duck.ai URL is intercepted by SpecialUrlDetector and opens an overlay
-                    // fragment without webview navigation, so the underlying view must stay.
+                    // Only tear down the NTP layer if we were over the browser. Under fullscreen
+                    // mode the host opens the chat in a new tab (or reuses the NTP tab); under
+                    // legacy mode the URL is intercepted by SpecialUrlDetector and opens an
+                    // overlay fragment without webview navigation. Either way the underlying
+                    // view must stay visible while we hand off.
                     if (omnibarController.isBrowserMode()) {
                         hideNtp()
                     }
                     isExiting = false
-                    callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
+                    callbacks.onDuckAiQuerySubmitted(query)
                 }
             },
         )
