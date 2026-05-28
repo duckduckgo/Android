@@ -87,13 +87,6 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePlugin @Inject constructor(
             MetricsPixel(
                 metric = "search",
                 type = MetricType.COUNT_WHEN_IN_WINDOW,
-                value = "6",
-                toggle = toggle,
-                conversionWindow = d0toD7Daily,
-            ),
-            MetricsPixel(
-                metric = "search",
-                type = MetricType.COUNT_WHEN_IN_WINDOW,
                 value = "7",
                 toggle = toggle,
                 conversionWindow = d0toD7Daily,

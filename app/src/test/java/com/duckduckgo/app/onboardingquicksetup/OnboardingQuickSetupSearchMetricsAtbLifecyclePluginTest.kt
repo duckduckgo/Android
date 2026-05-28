@@ -59,7 +59,7 @@ class OnboardingQuickSetupSearchMetricsAtbLifecyclePluginTest {
         plugin.onSearchRetentionAtbRefreshed("", "")
 
         val values = fakeMetricsPixelExtension.sentMetrics.map { it.value }.toSet()
-        assertEquals(setOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), values)
+        assertEquals(setOf("1", "2", "3", "4", "5", "7", "8", "9", "10"), values)
     }
 
     @Test
