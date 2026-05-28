@@ -59,8 +59,8 @@ data class ComparisonChartConfig(
             rows = listOf(
                 Row(CommonR.drawable.ic_shield_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem1),
                 Row(CommonR.drawable.ic_duck_ai_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem2),
-                Row(CommonR.drawable.ic_lock_color_24, R.string.preOnboardingAiComparisonChartItem3),
-                Row(CommonR.drawable.ai_general_color_24, R.string.preOnboardingAiComparisonChartItem4),
+                Row(CommonR.drawable.ic_lock_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem3),
+                Row(CommonR.drawable.ic_ai_general_color_24_rebrand, R.string.preOnboardingAiComparisonChartItem4),
             ),
         )
     }
