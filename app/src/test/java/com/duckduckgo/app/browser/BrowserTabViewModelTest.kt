@@ -994,6 +994,7 @@ class BrowserTabViewModelTest {
                 downloadMenuStateProvider = mockDownloadMenuStateProvider,
                 downloadsRepository = mockDownloadsRepository,
                 onboardingBrandDesignUpdateToggles = mockOnboardingBrandDesignUpdateToggles,
+                onboardingStore = mockOnboardingStore,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3534,6 +3535,23 @@ class BrowserTabViewModelTest {
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchSubscription> {
             assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+            assertNull(uri.getQueryParameter("featurePage"))
+        }
+    }
+
+    @Test
+    fun whenUserClickedDaxSubscriptionCtaInCustomAiOnboardingFlowThenLaunchSubscriptionWithFeaturePageDuckAi() {
+        whenever(mockOnboardingStore.isCustomAiOnboardingFlow()).thenReturn(true)
+        val cta = DaxBubbleCta.DaxSubscriptionCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            isFreeTrialCopy = false,
+        )
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+            assertEquals("duckai", uri.getQueryParameter("featurePage"))
         }
     }
 

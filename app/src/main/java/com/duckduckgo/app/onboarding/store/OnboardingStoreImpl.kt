@@ -221,6 +221,10 @@ class OnboardingStoreImpl @Inject constructor(
         return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
     }
 
+    override fun isCustomAiOnboardingFlow(): Boolean {
+        return false
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
