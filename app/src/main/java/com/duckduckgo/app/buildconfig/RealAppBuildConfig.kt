@@ -127,7 +127,7 @@ class RealAppBuildConfig @Inject constructor(
         get() = BuildConfig.BUILD_DATE_MILLIS
 
     override val canSkipOnboarding: Boolean
-        get() = BuildConfig.CAN_SKIP_ONBOARDING || isInternalBuild()
+        get() = false
 
     private fun getDownloadsDirectory(): File {
         val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
