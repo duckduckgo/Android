@@ -4187,6 +4187,10 @@ class BrowserTabFragment :
         brandDesignDialogScrollView.gone()
     }
 
+    private fun hideIfDaxBubble(cta: Cta?) {
+        if (cta is DaxBubbleCta) hideDaxBubbleCta(cta)
+    }
+
     @SuppressLint("AddDocumentStartJavaScriptUsage")
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
@@ -5917,7 +5921,7 @@ class BrowserTabFragment :
                         hideNewTab()
                         // Bubble lives inside newTabLayout, which is shown outside this renderer.
                         // Hiding the parent doesn't reset the bubble's visibility, so we clear it here.
-                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
+                        hideIfDaxBubble(previousCta)
 
                         // Non-bubble CTAs paint outside newTabLayout, so they're never at risk of leaking.
                         // If we're on the NTP, the bubbles paint normally.
@@ -5927,12 +5931,12 @@ class BrowserTabFragment :
                     }
 
                     viewState.isBrowserShowing -> {
-                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
+                        hideIfDaxBubble(previousCta)
                         hideNewTab()
                     }
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
-                        if (previousCta is DaxBubbleCta) hideDaxBubbleCta(previousCta)
+                        hideIfDaxBubble(previousCta)
                         showNewTab()
                     }
                 }
