@@ -2969,6 +2969,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRestoringWebViewSessionNotRestorableAndLastUrlBlankThenTabEntityUrlLoaded() = runTest {
+        val tabUrl = "https://example.com/"
+        whenever(mockOmnibarConverter.convertQueryToUrl(tabUrl)).thenReturn(tabUrl)
+        testee.loadData("TAB_ID", tabUrl, skipHome = false, isExternal = false)
+        webViewSessionStorage.stub { onBlocking { restoreSession(anyOrNull(), anyString()) }.thenReturn(false) }
+
+        testee.restoreWebViewState(null, "")
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val command = commandCaptor.allValues.filterIsInstance<Navigate>().last()
+        assertEquals(tabUrl, command.url)
+    }
+
+    @Test
     fun whenUrlNullThenSetBrowserNotShowing() =
         runTest {
             testee.loadData("id", null, false, false)
