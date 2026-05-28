@@ -4992,7 +4992,9 @@ class BrowserTabFragment :
     }
 
     override fun onViewStateRestored(bundle: Bundle?) {
-        viewModel.restoreWebViewState(webView, omnibar.getText())
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.restoreWebViewState(webView, omnibar.getText())
+        }
         viewModel.determineShowBrowser()
         super.onViewStateRestored(bundle)
     }
