@@ -115,4 +115,41 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Гласов чат</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Чатове</string>
+    <string name="duck_ai_chat_history_section_pinned">Закачени</string>
+    <string name="duck_ai_chat_history_section_recent">Последни</string>
+    <string name="duck_ai_chat_history_untitled">Чат без заглавие</string>
+    <string name="duck_ai_chat_history_empty_title">Все още няма чатове</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Отваряне на Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Още опции</string>
+    <string name="duck_ai_chat_history_action_select">Избор</string>
+    <string name="duck_ai_chat_history_action_pin">Добавяне като отметка</string>
+    <string name="duck_ai_chat_history_action_unpin">Премахване на отметка</string>
+    <string name="duck_ai_chat_history_action_rename">Преименуване</string>
+    <string name="duck_ai_chat_history_action_download">Изтегляне</string>
+    <string name="duck_ai_chat_history_action_delete">Изтриване</string>
+    <string name="duck_ai_chat_history_search_hint">Търсене в чатове</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Търсене в чатове</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Затваряне на търсенето</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Изчистване на търсенето</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Изтриване на чатовете</string>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Отваряне на менюто с допълнителни опции</string>
+    <string name="duck_ai_chat_history_select_all">Избиране на всички</string>
+    <string name="duck_ai_chat_history_unselect_all">Отказ от избора на всички</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Избрани</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Неизбрани</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Изход от режим на избор</string>
+    <string name="duck_ai_chat_history_rename_title">Преименуване на чата</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Заглавие на чата</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Запазване</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Запазване на заглавието на чата</string>
+    <string name="duck_ai_chat_history_rename_error">Неуспешно преименуване на чата</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Закачен чат</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Незакачен чат</string>
+    <string name="duck_ai_chat_history_undo">Отмяна</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Завършено изтегляне на %1$s</string>
+    <string name="duck_ai_chat_history_download_view">Показване</string>
+    <string name="duck_ai_chat_history_download_error">Неуспешно експортиране на чата</string>
 </resources>
