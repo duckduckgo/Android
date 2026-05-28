@@ -38,7 +38,6 @@ class QuickSetupEditRow @JvmOverloads constructor(
 
     init {
         isClickable = true
-        isFocusable = true
         val selectableBackground = TypedValue().also {
             context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
         }
