@@ -240,7 +240,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showClearButton: Boolean = false,
         val showTabsMenu: Boolean = true,
         val showFireIcon: Boolean = true,
-        val showPlusIcon: Boolean = false,
         val showBrowserMenu: Boolean = true,
         val showChatMenu: Boolean = true,
         val showBrowserMenuHighlight: Boolean = false,
@@ -409,7 +408,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showClearButton = showClearButton,
                     showTabsMenu = showControls,
                     showFireIcon = showControls,
-                    showPlusIcon = false,
                     showBrowserMenu = showControls,
                     showVoiceSearch = shouldShowVoiceSearch(
                         viewMode = _viewState.value.viewMode,
@@ -475,7 +473,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                     showClearButton = false,
                     showTabsMenu = !isSplitOmnibarEnabled,
                     showFireIcon = !isSplitOmnibarEnabled,
-                    showPlusIcon = false,
                     showBrowserMenu = !isSplitOmnibarEnabled,
                     showVoiceSearch = shouldShowVoiceSearch(
                         viewMode = _viewState.value.viewMode,
@@ -639,8 +636,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                             updateOmnibarText = true,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
                             showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
-                            showFireIcon = false,
-                            showPlusIcon = true,
                         )
                     }
                 }
@@ -680,7 +675,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showShadows = false,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
                             showDuckAISidebar = shouldShowDuckAiSidebar(viewMode, hasFocus),
-                            showPlusIcon = false,
                         )
                     }
                 }
@@ -720,7 +714,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = !isSplitOmnibarEnabled,
                 showTabsMenu = !isSplitOmnibarEnabled,
                 showFireIcon = !isSplitOmnibarEnabled,
-                showPlusIcon = false,
             )
         }
     }
@@ -804,7 +797,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 showBrowserMenu = showControls,
                 showTabsMenu = showControls,
                 showFireIcon = showControls,
-                showPlusIcon = false,
                 showClearButton = showClearButton,
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,

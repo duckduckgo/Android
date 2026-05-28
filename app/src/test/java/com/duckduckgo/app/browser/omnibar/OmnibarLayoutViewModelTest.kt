@@ -1600,41 +1600,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModeChangedToDuckAiThenFireIconHiddenAndPlusIconShown() = runTest {
-        testee.onViewModeChanged(ViewMode.DuckAI)
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showFireIcon)
-            assertTrue(viewState.showPlusIcon)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModeChangedFromDuckAiToBrowserThenPlusIconHidden() = runTest {
-        testee.onViewModeChanged(ViewMode.DuckAI)
-        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showPlusIcon)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenViewModeIsBrowserThenPlusIconHidden() = runTest {
-        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
-
-        testee.viewState.test {
-            val viewState = expectMostRecentItem()
-            assertFalse(viewState.showPlusIcon)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `when input text click catcher clicked and no URL then input screen launched with draft query`() = runTest {
         testee.onInputStateChanged(query = "draft", hasFocus = false, clearQuery = false, deleteLastCharacter = false)
 
