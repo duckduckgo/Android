@@ -34,6 +34,7 @@
     <style name="Widget.DuckDuckGo.TabLayout.Rounded.Native" parent="Widget.DuckDuckGo.TabLayout.Rounded">
         <item name="android:background">@drawable/native_tab_layout_background</item>
         <item name="tabIndicatorColor">?attr/daxColorControlRaisedFillPrimary</item>
+        <item name="tabMaxWidth">0dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SettingsPictogram">
