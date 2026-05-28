@@ -37,7 +37,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
-import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -430,7 +429,7 @@ class TabSwitcherActivity :
     }
 
     private fun configureBrowserModeToggle(viewState: TabSwitcherViewModel.ViewState) {
-        if (viewState.isBrowserModeToggleVisible == (browserModeToggle?.isVisible ?: false)) return
+        if (browserModeToggle != null || !viewState.isBrowserModeToggleVisible) return
 
         val toggle = BrowserModeToggleView(this).also { browserModeToggle = it }
         toolbar.addView(
