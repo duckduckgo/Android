@@ -1063,13 +1063,13 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenSecondaryCtaFromReinstallUserAndQuickSetupTreatmentThenDoNotFireSkipOnboardingPixel() = runTest {
+    fun whenSecondaryCtaFromReinstallUserAndQuickSetupTreatmentThenFireSkipOnboardingPixel() = runTest {
         whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
         whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
         val testee = createViewModel()
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked()
-        verify(mockPixel, never()).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
+        verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
     }
 
     @Test

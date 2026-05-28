@@ -370,11 +370,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INITIAL_REINSTALL_USER -> {
                 _viewState.update { it.copy(isReinstallUser = true) }
                 viewModelScope.launch {
+                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                     if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
                         showQuickSetupDialog()
                     } else {
                         setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                     }
                 }
             }
