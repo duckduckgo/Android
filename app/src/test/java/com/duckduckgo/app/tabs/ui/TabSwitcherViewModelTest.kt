@@ -155,6 +155,8 @@ class TabSwitcherViewModelTest {
 
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
+    private val mockTabTitleResolver: TabTitleResolver = mock()
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -222,6 +224,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
         testee.command.observeForever(mockCommandObserver)
@@ -2006,6 +2009,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -2021,7 +2025,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when fire mode available then isBrowserModeToggleVisible is true`() = runTest {
         // @Before sets isAvailable() = true
-        assertTrue(testee.isBrowserModeToggleVisible)
+        assertTrue(testee.viewState.value.isBrowserModeToggleVisible)
     }
 
     @Test
@@ -2048,10 +2052,11 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
 
-        assertFalse(isolatedViewModel.isBrowserModeToggleVisible)
+        assertFalse(isolatedViewModel.viewState.value.isBrowserModeToggleVisible)
     }
 
     @Test
@@ -2114,6 +2119,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockTabTitleResolver,
             coroutinesTestRule.testScope,
         )
 

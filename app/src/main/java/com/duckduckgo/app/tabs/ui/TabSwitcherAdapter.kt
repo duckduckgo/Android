@@ -231,7 +231,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         holder.url.text = formatUrl(tab.tabEntity.url)
         holder.url.visibility = if (tab.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab.tabEntity)
@@ -248,7 +248,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         updateUnreadIndicator(holder, tab.tabEntity)
         loadFavicon(tab.tabEntity, glide, holder.favicon, holder)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
@@ -264,7 +264,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.title.text = tab.title
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
@@ -333,12 +333,6 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun extractTabTitle(tab: TabEntity, context: Context): String {
-        var title = tab.displayTitle(context)
-        title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
-        return title
-    }
-
     private fun formatUrl(url: String?): String {
         if (url.isNullOrEmpty()) return ""
         return if (isFullUrlEnabled) url else addressDisplayFormatter.getShortUrl(url)
@@ -404,7 +398,7 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -436,7 +430,7 @@ class TabSwitcherAdapter(
             }
 
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
 
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
@@ -463,7 +457,7 @@ class TabSwitcherAdapter(
                 loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
             }
             if (bundle.containsKey(DIFF_KEY_TITLE)) {
-                viewHolder.title.text = extractTabTitle(tab.tabEntity, viewHolder.rootView.context)
+                viewHolder.title.text = tab.title
             }
             if (bundle.containsKey(DIFF_KEY_SELECTION)) {
                 loadSelectionState(viewHolder, tab)
@@ -676,8 +670,6 @@ class TabSwitcherAdapter(
             const val SELECTABLE_DUCK_AI_LIST = 6
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
-
-            const val MAX_TITLE_LENGTH = 50
         }
 
         interface TabViewHolder {

@@ -32,10 +32,12 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.drawToBitmap
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -83,6 +85,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.getThemeId
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -202,6 +205,7 @@ class TabSwitcherActivity :
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabsContainer: FrameLayout
     private lateinit var tabItemDecorator: TabItemDecorator
+    private var decoratorBrowserMode: BrowserMode = BrowserMode.REGULAR
     private lateinit var toolbar: Toolbar
 
     private var layoutTypeMenuItem: MenuItem? = null
@@ -268,7 +272,6 @@ class TabSwitcherActivity :
 
         configureViewReferences()
         setupToolbar(toolbar)
-        configureBrowserModeToggle()
         configureRecycler()
         configureNavigationBar()
 
@@ -418,8 +421,8 @@ class TabSwitcherActivity :
         )
     }
 
-    private fun configureBrowserModeToggle() {
-        if (!viewModel.isBrowserModeToggleVisible) return
+    private fun configureBrowserModeToggle(viewState: TabSwitcherViewModel.ViewState) {
+        if (viewState.isBrowserModeToggleVisible == (browserModeToggle?.isVisible ?: false)) return
 
         val toggle = BrowserModeToggleView(this).also { browserModeToggle = it }
         toolbar.addView(
@@ -433,11 +436,9 @@ class TabSwitcherActivity :
         toggle.setOnModeChangedListener { mode ->
             fadeOutAndSwitchMode(mode)
         }
-
-        applyViewState(viewModel.viewState.value)
     }
 
-    private fun applyViewState(state: TabSwitcherViewModel.ViewState) {
+    private fun applyToolbarViewState(state: TabSwitcherViewModel.ViewState) {
         browserModeToggle?.setMode(state.browserMode)
         state.regularTabCount?.let { browserModeToggle?.setRegularTabCount(it) }
         updateToolbarTitle(state.mode, state.tabs.size)
@@ -563,8 +564,10 @@ class TabSwitcherActivity :
                     }
                 }
 
-                applyViewState(it)
-                updateTabGridItemDecorator()
+                configureBrowserModeToggle(it)
+                applyToolbarViewState(it)
+
+                updateTabGridItemDecorator(it)
 
                 tabTouchHelper.mode = it.mode
 
@@ -868,7 +871,17 @@ class TabSwitcherActivity :
         launch { viewModel.onTabSelected(tabId) }
     }
 
-    private fun updateTabGridItemDecorator() {
+    private fun updateTabGridItemDecorator(viewState: TabSwitcherViewModel.ViewState) {
+        val browserMode = viewState.browserMode
+        if (decoratorBrowserMode != browserMode) {
+            tabsRecycler.removeItemDecoration(tabItemDecorator)
+            val themeRes = getThemeId(themingDataStore.theme, isFireMode = browserMode == BrowserMode.FIRE)
+            val themedContext = ContextThemeWrapper(this, themeRes)
+            tabItemDecorator = TabItemDecorator(themedContext)
+            tabsRecycler.addItemDecoration(tabItemDecorator)
+            tabsAdapter.themedContext = themedContext
+            decoratorBrowserMode = browserMode
+        }
         tabsRecycler.invalidateItemDecorations()
     }
 
