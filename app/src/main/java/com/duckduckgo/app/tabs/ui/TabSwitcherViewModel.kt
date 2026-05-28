@@ -75,6 +75,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -112,12 +113,23 @@ class TabSwitcherViewModel @Inject constructor(
     @param:AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val tabRepositoryFlow = browserModeStateHolder.currentMode.mapLatest {
+    private val fireModeAvailable = fireModeAvailability.isAvailable()
+
+    // When fire mode is unavailable the toggle is never shown, so the view model ignores the
+    // shared browser-mode state and always operates on the regular profile.
+    private val currentMode: StateFlow<BrowserMode> =
+        if (fireModeAvailable) {
+            browserModeStateHolder.currentMode
+        } else {
+            MutableStateFlow(BrowserMode.REGULAR)
+        }
+
+    private val tabRepositoryFlow = currentMode.mapLatest {
         tabRepositoryProvider.forMode(it)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        tabRepositoryProvider.forMode(browserModeStateHolder.currentMode.value),
+        tabRepositoryProvider.forMode(currentMode.value),
     )
 
     private val tabRepository: TabRepository
@@ -134,7 +146,7 @@ class TabSwitcherViewModel @Inject constructor(
                     repo.flowSelectedTab,
                     _viewState,
                     tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-                    browserModeStateHolder.currentMode,
+                    currentMode,
                 ) { activeTab, viewState, isAnimationTileDismissed, browserMode ->
                     getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
                 }
@@ -147,7 +159,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(
         ViewState(
             isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
-            isBrowserModeToggleVisible = fireModeAvailability.isAvailable(),
+            isBrowserModeToggleVisible = fireModeAvailable,
         ),
     )
     val viewState = combine(
@@ -155,7 +167,7 @@ class TabSwitcherViewModel @Inject constructor(
         tabSwitcherItemsFlow,
         tabRepositoryFlow.flatMapLatest { it.tabSwitcherData },
         duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
-        browserModeStateHolder.currentMode,
+        currentMode,
         tabRepositoryProvider.forMode(BrowserMode.REGULAR).flowTabs.map { it.size },
     ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton, browserMode, regularTabCount ->
         viewState.copy(
@@ -238,8 +250,8 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onBrowserModeToggled(mode: BrowserMode) {
-        val previousMode = browserModeStateHolder.currentMode.value
-        if (mode == previousMode) return
+        val previousMode = currentMode.value
+        if (!fireModeAvailable || mode == previousMode) return
 
         val repo = tabRepository
         appCoroutineScope.launch { repo.purgeDeletableTabs() }

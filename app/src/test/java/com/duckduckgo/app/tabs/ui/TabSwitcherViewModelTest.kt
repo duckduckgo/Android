@@ -196,6 +196,7 @@ class TabSwitcherViewModelTest {
         whenever(mockFireModeAvailability.isAvailable()).thenReturn(true)
         whenever(mockBrowserModeStateHolder.currentMode).thenReturn(currentModeFlow)
         whenever(mockTabRepositoryProvider.forMode(BrowserMode.REGULAR)).thenReturn(mockTabRepository)
+        whenever(mockTabTitleResolver.resolveTitle(any(), any())).thenReturn("")
 
         initializeMockTabEntitesData()
         initializeViewModel()
