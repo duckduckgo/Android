@@ -23,6 +23,7 @@ import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -113,7 +114,7 @@ class SearchUserAdditionalPixelParamPlugin @Inject constructor(
 
 @ContributesMultibinding(AppScope::class)
 class ValidOpenTabsCountAdditionalPixelParamPlugin @Inject constructor(
-    private val tabsDao: TabsDao,
+    @RegularMode private val tabsDao: TabsDao,
 ) : AdditionalPixelParamPlugin {
     override suspend fun params(): Pair<String, String> = Pair(
         "validOpenTabsCount",

@@ -62,6 +62,8 @@ sealed class Command {
 
     data object MenuRequested : Command()
 
+    data object LaunchDuckChatHistory : Command()
+
     data class LaunchDeviceApplication(val deviceAppSuggestion: AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion) : Command()
 
     data class ShowAppNotFoundMessage(val shortName: String) : Command()

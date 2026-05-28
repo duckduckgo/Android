@@ -127,6 +127,11 @@
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
 
+    <!-- Fire mode -->
+    <string name="browserModeToggleFireDescription">Switch to Fire mode tabs</string>
+    <string name="browserModeToggleRegularDescription">Switch to regular tabs</string>
+    <string name="browserModeToggleTabCountInfinite">∞</string>
+
     <!-- Pre-onboarding: AI comparison chart screen. Move to strings.xml when localized. -->
     <string name="preOnboardingDaxDialogAiTitle">AI protections activated!</string>
     <string name="preOnboardingAiComparisonChartPopularAis">Popular AIs</string>

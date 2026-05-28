@@ -36,7 +36,7 @@ data class NativeInputState(
 
     enum class InputPosition { TOP, BOTTOM }
 
-    val toggleVisible: Boolean get() = inputMode == InputMode.SEARCH_AND_DUCK_AI && inputContext != InputContext.DUCK_AI_CONTEXTUAL
+    val toggleVisible: Boolean get() = inputMode == InputMode.SEARCH_AND_DUCK_AI && inputContext == InputContext.BROWSER
 
     val isBottom: Boolean get() = inputPosition == InputPosition.BOTTOM
 
