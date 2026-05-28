@@ -35,6 +35,7 @@
             android:layout_height="@dimen/toolbarIcon"
             android:background="@drawable/selectable_item_rounded_corner_background"
             android:visibility="gone"
+            android:layout_marginEnd="@dimen/keyline_2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

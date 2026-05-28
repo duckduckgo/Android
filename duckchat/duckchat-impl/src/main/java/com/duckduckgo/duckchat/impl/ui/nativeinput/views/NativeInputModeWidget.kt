@@ -84,6 +84,7 @@ interface NativeInputWidget {
     var onSearchSelected: ((animate: Boolean) -> Unit)?
     var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
+    var onFireButtonTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
     var onVoiceSearchClick: (() -> Unit)?
     var onVoiceChatClick: (() -> Unit)?

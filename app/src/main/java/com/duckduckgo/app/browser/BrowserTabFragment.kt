@@ -1423,6 +1423,7 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onFireButtonPressed = { onFireButtonPressed() },
                 onVoiceSearchPressed = { isChatTab ->
                     val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
                     webView?.onPause()
