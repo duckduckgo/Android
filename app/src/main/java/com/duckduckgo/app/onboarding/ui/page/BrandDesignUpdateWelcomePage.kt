@@ -1797,10 +1797,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     viewModel.onQuickSetupRemoveHomescreenWidgetClicked()
                 }
             }
-            addressBarPositionItem.setOnEditClickListener {
+            addressBarPositionItem.setOnClickListener {
                 viewModel.onQuickSetupAddressBarPositionEditClicked()
             }
-            addressBarSearchOptionsItem.setOnEditClickListener {
+            addressBarSearchOptionsItem.setOnClickListener {
                 viewModel.onQuickSetupSearchOptionsEditClicked()
             }
         }

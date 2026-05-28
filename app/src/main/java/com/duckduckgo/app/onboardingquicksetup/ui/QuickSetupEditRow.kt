@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboardingquicksetup.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -36,8 +37,14 @@ class QuickSetupEditRow @JvmOverloads constructor(
         ViewQuickSetupEditRowBinding.inflate(LayoutInflater.from(context), this)
 
     init {
-        val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_3)
+        val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         setPadding(paddingLeft, verticalPadding, paddingRight, verticalPadding)
+        isClickable = true
+        isFocusable = true
+        val selectableBackground = TypedValue().also {
+            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
+        }
+        setBackgroundResource(selectableBackground.resourceId)
         context.theme.obtainStyledAttributes(attrs, R.styleable.QuickSetupEditRow, 0, 0).use { attrs ->
             attrs.getResourceId(R.styleable.QuickSetupEditRow_quickSetupRowIcon, 0)
                 .takeIf { it != 0 }
@@ -59,9 +66,5 @@ class QuickSetupEditRow @JvmOverloads constructor(
 
     fun setSecondaryText(@StringRes res: Int) {
         binding.quickSetupEditRowSecondaryText.setText(res)
-    }
-
-    fun setOnEditClickListener(listener: OnClickListener) {
-        binding.quickSetupEditRowEditButton.setOnClickListener(listener)
     }
 }

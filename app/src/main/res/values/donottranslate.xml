@@ -102,7 +102,6 @@
     <string name="preOnboardingReinstallAddHomeScreenWidgetLabel">Add Home screen widget</string>
     <string name="preOnboardingReinstallAddressBarLabel">Address bar position</string>
     <string name="preOnboardingReinstallAddressBarSearchOptionsLabel">Address bar search options</string>
-    <string name="preOnboardingReinstallEditAction">Edit</string>
     <string name="preOnboardingReinstallStartBrowsing">Start Browsing</string>
 
     <!-- Quick setup bottom sheets -->
