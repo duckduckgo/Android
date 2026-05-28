@@ -42,7 +42,7 @@ import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-class RealWebViewSessionStorageTest {
+class RoomWebViewSessionStorageTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -50,7 +50,7 @@ class RealWebViewSessionStorageTest {
     private val dao = FakeWebViewSessionDao()
     private val pixel: Pixel = mock()
 
-    private val storage = RealWebViewSessionStorage(
+    private val storage = RoomWebViewSessionStorage(
         dao = dao,
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,

@@ -36,7 +36,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class RealWebViewSessionStorage @Inject constructor(
+class RoomWebViewSessionStorage @Inject constructor(
     private val dao: WebViewSessionDao,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,

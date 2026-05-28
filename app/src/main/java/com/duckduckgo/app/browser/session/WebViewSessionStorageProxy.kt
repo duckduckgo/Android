@@ -26,13 +26,15 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class WebViewSessionStorageProxy @Inject constructor(
-    private val roomBacked: RealWebViewSessionStorage,
+    private val roomBacked: RoomWebViewSessionStorage,
     private val inMemory: InMemoryWebViewSessionStorage,
     private val browserConfig: AndroidBrowserConfigFeature,
 ) : WebViewSessionStorage {
 
+    private val useRoomBacked by lazy { browserConfig.webViewSessionPersistence().isEnabled() }
+
     private val active: WebViewSessionStorage
-        get() = if (browserConfig.webViewSessionPersistence().isEnabled()) roomBacked else inMemory
+        get() = if (useRoomBacked) roomBacked else inMemory
 
     override fun saveSession(webView: WebView?, tabId: String) =
         active.saveSession(webView, tabId)
