@@ -59,7 +59,7 @@ class OnboardingViewModel @Inject constructor(
         val isBrandDesignUpdateEnabled = withContext(dispatchers.io()) {
             onboardingBrandDesignUpdateToggles.brandDesignUpdate().isEnabled()
         }
-        if (isBrandDesignUpdateEnabled) {
+        if (true) {
             pageLayoutManager.buildBrandDesignUpdatePageBlueprints()
         } else {
             pageLayoutManager.buildPageBlueprints()

@@ -97,7 +97,7 @@ class RealAppBuildConfig @Inject constructor(
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {
             if (sdkInt < 30) {
-                return@withContext false
+                return@withContext true
             }
 
             if (preferences.contains(APP_REINSTALLED_KEY)) {
