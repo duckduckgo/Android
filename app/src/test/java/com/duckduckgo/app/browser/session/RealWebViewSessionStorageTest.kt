@@ -20,6 +20,8 @@ import android.os.Bundle
 import android.os.Parcel
 import android.webkit.WebBackForwardList
 import android.webkit.WebView
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -46,11 +48,13 @@ class RealWebViewSessionStorageTest {
     val coroutineRule = CoroutineTestRule()
 
     private val dao = FakeWebViewSessionDao()
+    private val pixel: Pixel = mock()
 
     private val storage = RealWebViewSessionStorage(
         dao = dao,
         appScope = coroutineRule.testScope,
         dispatchers = coroutineRule.testDispatcherProvider,
+        pixel = pixel,
     )
 
     @Test
@@ -160,6 +164,39 @@ class RealWebViewSessionStorageTest {
 
         assertTrue(dao.getSync("tab-1") == null)
         assertTrue(dao.getSync("tab-2") == null)
+    }
+
+    @Test
+    fun whenSaveSessionAndBundleSmallThenNoLargePixelFired() = runTest {
+        val webView = mock<WebView> {
+            on { saveState(any()) } doAnswer {
+                val bundle = it.getArgument<Bundle>(0)
+                bundle.putString("history", "A->B")
+                null
+            }
+        }
+
+        storage.saveSession(webView, tabId = "tab-1")
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel, never()).fire(AppPixelName.WEBVIEW_SESSION_LARGE_BYTES)
+    }
+
+    @Test
+    fun whenSaveSessionAndBundleOverThresholdThenLargePixelFired() = runTest {
+        val payload = ByteArray(300 * 1024) { 'x'.code.toByte() }
+        val webView = mock<WebView> {
+            on { saveState(any()) } doAnswer {
+                val bundle = it.getArgument<Bundle>(0)
+                bundle.putByteArray("payload", payload)
+                null
+            }
+        }
+
+        storage.saveSession(webView, tabId = "tab-1")
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel, times(1)).fire(AppPixelName.WEBVIEW_SESSION_LARGE_BYTES)
     }
 
     // Helper: produce a valid marshalled bundle ByteArray with a known key

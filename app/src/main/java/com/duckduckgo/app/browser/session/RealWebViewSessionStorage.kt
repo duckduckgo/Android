@@ -21,6 +21,8 @@ import android.os.Parcel
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,6 +42,7 @@ class RealWebViewSessionStorage @Inject constructor(
     private val dao: WebViewSessionDao,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val pixel: Pixel,
 ) : WebViewSessionStorage {
 
     override fun saveSession(webView: WebView?, tabId: String) {
@@ -47,6 +50,10 @@ class RealWebViewSessionStorage @Inject constructor(
 
         val bundle = Bundle().also { webView.saveState(it) }
         val bytes = bundle.toMarshalledBytes() ?: return
+
+        if (bytes.size > LARGE_SESSION_THRESHOLD_BYTES) {
+            pixel.fire(AppPixelName.WEBVIEW_SESSION_LARGE_BYTES)
+        }
 
         appScope.launch(dispatchers.io()) {
             runCatching {
@@ -110,5 +117,9 @@ class RealWebViewSessionStorage @Inject constructor(
         } finally {
             parcel.recycle()
         }
+    }
+
+    companion object {
+        private const val LARGE_SESSION_THRESHOLD_BYTES = 256 * 1024 // 256 KiB
     }
 }
