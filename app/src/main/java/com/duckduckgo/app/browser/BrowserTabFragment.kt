@@ -2566,6 +2566,16 @@ class BrowserTabFragment :
         when (it) {
             is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
+                // The new tab opens within the same activity, so the unified-input overlay
+                // and autocomplete list (which live on this fragment) would otherwise stay
+                // visible on top of it. Mirror Command.SwitchToTab and dismiss them first.
+                binding.focusedView.gone()
+                if (binding.autoCompleteSuggestionsList.isVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+                binding.autoCompleteSuggestionsList.gone()
+                nativeInputManager.hideNativeInput(animate = false, isNavigation = true)
+
                 if (swipingTabsFeature.isEnabled) {
                     browserActivity?.launchNewTab(it.query, it.sourceTabId)
                 } else {
