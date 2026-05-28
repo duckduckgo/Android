@@ -29,6 +29,6 @@ interface FireModeFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun fireTabs(): Toggle
 }

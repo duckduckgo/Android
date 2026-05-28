@@ -17,62 +17,42 @@
 package com.duckduckgo.browsermode.impl
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.MultiProfile
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verifyBlocking
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
 class RealFireModeAvailabilityTest {
 
     @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val fireModeFeature: FireModeFeature = FakeFeatureToggleFactory.create(FireModeFeature::class.java)
-    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
 
-    private val testee = RealFireModeAvailability(fireModeFeature, webViewCapabilityChecker, coroutineRule.testDispatcherProvider)
+    private val testee = RealFireModeAvailability(
+        fireModeFeature,
+        coroutineRule.testDispatcherProvider,
+        coroutineRule.testScope,
+    )
 
     @Test
-    fun `is unavailable when fireTabs flag is disabled`() = runTest {
+    fun `is unavailable when fireTabs flag is disabled`() {
         fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = false))
-        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
 
         assertFalse(testee.isAvailable())
     }
 
     @Test
-    fun `is unavailable when WebView does not support MultiProfile`() = runTest {
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
-        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(false) }
-
+    fun `availability is frozen on first computation even if flag flips later`() {
+        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = false))
         assertFalse(testee.isAvailable())
-    }
 
-    @Test
-    fun `is available when fireTabs is enabled and WebView supports MultiProfile`() = runTest {
         fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
-        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
-
-        assertTrue(testee.isAvailable())
-    }
-
-    @Test
-    fun `multi-profile capability check is cached across calls`() = runTest {
-        fireModeFeature.fireTabs().setRawStoredState(Toggle.State(enable = true))
-        webViewCapabilityChecker.stub { onBlocking { isSupported(MultiProfile) }.thenReturn(true) }
-
-        repeat(5) { testee.isAvailable() }
-
-        verifyBlocking(webViewCapabilityChecker, times(1)) { isSupported(MultiProfile) }
+        assertFalse(testee.isAvailable())
     }
 }

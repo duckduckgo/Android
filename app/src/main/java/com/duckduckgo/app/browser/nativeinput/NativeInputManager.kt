@@ -68,6 +68,7 @@ class NativeInputCallbacks(
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onChatUrlSuggestionClicked: (AutoCompleteSuggestion) -> Unit = {},
+    val onChatHistoryShortcutClicked: () -> Unit = {},
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
@@ -439,7 +440,12 @@ class RealNativeInputManager @Inject constructor(
                     omnibarController.restore()
                     omnibarController.show()
                     removeWidget()
-                    hideNtp()
+                    // Only tear down the NTP layer if we were over the browser — the submitted
+                    // Duck.ai URL is intercepted by SpecialUrlDetector and opens an overlay
+                    // fragment without webview navigation, so the underlying view must stay.
+                    if (omnibarController.isBrowserMode()) {
+                        hideNtp()
+                    }
                     isExiting = false
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
@@ -568,21 +574,15 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun updateVoiceButtons(widget: NativeInputWidget) {
-        val isOnActiveDuckChat = omnibarController.isDuckAiMode()
-        val voiceSearchAvailable = voiceSearchAvailability.isVoiceSearchAvailable
-        val voiceSearchDuckAiAvailable = duckAiFeatureState.showVoiceSearchToggle.value
-        val voiceChatEntryAvailable = duckAiFeatureState.showVoiceChatEntry.value
-
-        if (isOnActiveDuckChat) {
-            widget.setVoiceSearchAvailable(voiceSearchAvailable && voiceSearchDuckAiAvailable)
-            widget.setVoiceChatAvailable(false)
-            return
-        }
-
-        val isDuckAiTabSelected = widget.isChatTabSelected()
-        val shouldShowVoiceSearchForDuckAi = !voiceChatEntryAvailable && voiceSearchDuckAiAvailable
-        widget.setVoiceSearchAvailable(voiceSearchAvailable && (!isDuckAiTabSelected || shouldShowVoiceSearchForDuckAi))
-        widget.setVoiceChatAvailable(isDuckAiTabSelected && voiceChatEntryAvailable)
+        val state = computeVoiceButtonAvailability(
+            isOnActiveDuckChat = omnibarController.isDuckAiMode(),
+            isVoiceSearchDeviceAvailable = voiceSearchAvailability.isVoiceSearchAvailable,
+            isVoiceSearchDuckAiEnabled = duckAiFeatureState.showVoiceSearchToggle.value,
+            isVoiceChatEntryEnabled = duckAiFeatureState.showVoiceChatEntry.value,
+            isDuckAiTabSelected = widget.isChatTabSelected(),
+        )
+        widget.setVoiceSearchAvailable(state.voiceSearchAvailable)
+        widget.setVoiceChatAvailable(state.voiceChatAvailable)
     }
 
     private fun bindSearchTabAutocompleteClearing(
@@ -734,6 +734,10 @@ class RealNativeInputManager @Inject constructor(
                 hideNativeInput(isNavigation = true)
                 callbacks.onSearchSubmitted(query)
             },
+            onChatHistoryShortcutClicked = {
+                hideNativeInput(isNavigation = true)
+                callbacks.onChatHistoryShortcutClicked()
+            },
             onShowSuggestions = { chatAdapter ->
                 if (autoCompleteList.adapter === chatAdapter) {
                     // Force a fresh layout pass so the adapter behaviour
@@ -800,4 +804,40 @@ class RealNativeInputManager @Inject constructor(
         private const val FADE_OUT_DURATION_MS = 150L
         private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
+}
+
+internal data class VoiceButtonAvailability(
+    val voiceSearchAvailable: Boolean,
+    val voiceChatAvailable: Boolean,
+)
+
+/**
+ * Pure decision logic for which voice entry points the unified input should expose.
+ *
+ * Rules:
+ * - On an active Duck.ai chat page, voice chat is suppressed (you're already in the chat). Voice
+ *   search is offered only if both the device supports it and the Duck.ai voice-search flag is on.
+ * - Otherwise (NTP / search omnibar with the Search↔Duck.ai toggle):
+ *   - Search tab: voice search if device-available.
+ *   - Duck.ai tab: voice search if device-available AND [isVoiceSearchDuckAiEnabled]; voice chat
+ *     if [isVoiceChatEntryEnabled]. The two are independent now that they occupy separate slots
+ *     (in-field microphone vs. bottom-row chip).
+ */
+internal fun computeVoiceButtonAvailability(
+    isOnActiveDuckChat: Boolean,
+    isVoiceSearchDeviceAvailable: Boolean,
+    isVoiceSearchDuckAiEnabled: Boolean,
+    isVoiceChatEntryEnabled: Boolean,
+    isDuckAiTabSelected: Boolean,
+): VoiceButtonAvailability {
+    if (isOnActiveDuckChat) {
+        return VoiceButtonAvailability(
+            voiceSearchAvailable = isVoiceSearchDeviceAvailable && isVoiceSearchDuckAiEnabled,
+            voiceChatAvailable = false,
+        )
+    }
+    return VoiceButtonAvailability(
+        voiceSearchAvailable = isVoiceSearchDeviceAvailable && (!isDuckAiTabSelected || isVoiceSearchDuckAiEnabled),
+        voiceChatAvailable = isDuckAiTabSelected && isVoiceChatEntryEnabled,
+    )
 }

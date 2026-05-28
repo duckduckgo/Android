@@ -28,6 +28,8 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
+import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.toModelDisplay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -50,6 +52,7 @@ class ChatHistoryViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val dataClearingTrigger: DataClearingTrigger,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckAiModelManager: DuckAiModelManager,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -72,6 +75,12 @@ class ChatHistoryViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         initialValue = ChatHistoryUiState.Loading,
     )
+
+    init {
+        // Warm the models cache so a Download tap has provider/model labels ready;
+        // failures are swallowed and exports fall back to the raw model id.
+        viewModelScope.launch { duckAiModelManager.fetchModels() }
+    }
 
     fun isSelectMode(): Boolean = controls.value.mode is Mode.Selecting
 
@@ -146,6 +155,20 @@ class ChatHistoryViewModel @Inject constructor(
 
     fun onUndoTogglePin(chatId: String, restorePinned: Boolean) {
         appScope.launch { chatHistoryRepository.setPinned(chatId, restorePinned) }
+    }
+
+    fun onDownloadRequested(chatId: String) {
+        // Snapshot-read the models cache; null when the model isn't cached and the exporter
+        // falls back to the raw model id.
+        val modelId = latestItems.firstOrNull { it.chatId == chatId }?.model
+        val modelDisplay = modelId
+            ?.let { id -> duckAiModelManager.modelState.value.models.firstOrNull { it.id == id } }
+            ?.toModelDisplay()
+        viewModelScope.launch {
+            runCatching { chatHistoryRepository.exportChat(chatId, modelDisplay) }
+                .onSuccess { file -> navigationChannel.trySend(NavigationEvent.ShowDownloadComplete(file.name)) }
+                .onFailure { navigationChannel.trySend(NavigationEvent.ShowExportError) }
+        }
     }
 
     private fun dispatchSelectedClear(chatIds: Set<String>) {
@@ -274,6 +297,8 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
+        data class ShowDownloadComplete(val fileName: String) : NavigationEvent
+        data object ShowExportError : NavigationEvent
     }
 
     sealed interface MessageEvent {

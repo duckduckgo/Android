@@ -36,6 +36,8 @@ import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
@@ -617,7 +619,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.run {
                 pageFinished(webView, WebViewNavigationState(navigationList), url)
             }
-            flushCookies()
+            flushCookies(webView)
             printInjector.injectPrint(webView)
 
             if (url != null && url != ABOUT_BLANK) {
@@ -660,8 +662,15 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+    /**
+     * Flush cookies on the WebView's view-tree lifecycleScope (the fragment's
+     * viewLifecycleOwner) instead of appCoroutineScope. When the fragment's view is
+     * destroyed, the scope auto-cancels — preventing a post-destroy flush from SEGV'ing
+     * on the freed native cookie store of this WebView's profile.
+     */
+    private fun flushCookies(webView: WebView) {
+        val scope = webView.findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        scope.launch(dispatcherProvider.io()) {
             cookieManagerProvider.get()?.flush()
         }
     }

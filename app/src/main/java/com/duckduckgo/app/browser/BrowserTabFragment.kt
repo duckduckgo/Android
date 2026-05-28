@@ -273,6 +273,7 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.WebViewModeInitializer
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -442,6 +443,9 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
+    lateinit var webViewModeInitializer: WebViewModeInitializer
+
+    @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
@@ -498,8 +502,8 @@ class BrowserTabFragment :
 
     private val isLaunchedFromExternalApp get() = requireArguments().getBoolean(LAUNCH_FROM_EXTERNAL_EXTRA)
 
-    val browserMode: BrowserMode get() = requireArguments().getString(BROWSER_MODE_ARG)
-        ?.let(BrowserMode::valueOf) ?: BrowserMode.REGULAR
+    @Inject
+    lateinit var browserMode: BrowserMode
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -1405,6 +1409,10 @@ class BrowserTabFragment :
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
                 onChatUrlSuggestionClicked = { suggestion -> viewModel.userSelectedAutocomplete(suggestion, firePixel = false) },
+                onChatHistoryShortcutClicked = {
+                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
+                    viewModel.openDuckChatHistory()
+                },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1947,7 +1955,7 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        val intent = TabSwitcherActivity.intent(activity, tabId)
+        val intent = TabSwitcherActivity.intent(activity)
         tabSwitcherActivityResult.launch(intent)
     }
 
@@ -3991,6 +3999,19 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            val bindResult = webViewModeInitializer.bind(it, browserMode)
+            if (bindResult.isFailure) {
+                if (browserMode != BrowserMode.REGULAR) {
+                    bindResult.exceptionOrNull()?.message?.let {
+                            message ->
+                        logcat(ERROR) { message }
+                    }
+                    this.closeCurrentTab()
+                    destroyWebView()
+                    return
+                }
+            }
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
@@ -5211,7 +5232,6 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
-        private const val BROWSER_MODE_ARG = "BROWSER_MODE_ARG"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
@@ -5604,14 +5624,12 @@ class BrowserTabFragment :
             query: String? = null,
             skipHome: Boolean,
             isExternal: Boolean,
-            browserMode: BrowserMode = BrowserMode.REGULAR,
         ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, browserMode.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }
@@ -5633,7 +5651,6 @@ class BrowserTabFragment :
             args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             args.putBoolean(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
-            args.putString(BROWSER_MODE_ARG, BrowserMode.REGULAR.name)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
             }

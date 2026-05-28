@@ -990,6 +990,10 @@
     <string name="syncRestoreDialogPrimaryCta">Taasta minu andmed</string>
     <string name="syncRestoreDialogSecondaryCta">Jäta vahele</string>
 
+    <!-- Sync Restore (brand-design onboarding) -->
+    <string name="syncRestoreDialogBrandDesignTitle">Jätkame DuckDuckGo-ga sealt, kus pooleli jäid.</string>
+    <string name="syncRestoreDialogBrandDesignBody1">Sinu salvestatud järjehoidjad, paroolid ja muu on valmis.</string>
+
     <!-- PDF download tooltip -->
     <string name="pdfDownloadTooltipText">Laadi alla PDF</string>
 

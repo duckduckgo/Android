@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -353,6 +354,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
+                AI_COMPARISON_CHART -> {
+                    // no-op, only used in BrandDesignUpdate path
                 }
 
                 SKIP_ONBOARDING_OPTION -> {

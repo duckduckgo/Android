@@ -38,13 +38,13 @@
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/background_input_screen_button"
-        android:backgroundTint="?attr/daxColorAccentAltPrimary"
+        android:backgroundTint="?attr/daxColorControlFillPrimary"
         android:foreground="@drawable/selectable_circular_ripple"
         android:importantForAccessibility="no"
         android:scaleType="centerInside"
         android:src="@drawable/ic_ai_chat_voice_24"
         android:visibility="gone"
-        app:tint="?attr/daxColorAccentAltContentPrimary" />
+        app:tint="?attr/daxColorPrimaryIcon" />
 
     <ImageView
         android:id="@+id/actionNewLine"

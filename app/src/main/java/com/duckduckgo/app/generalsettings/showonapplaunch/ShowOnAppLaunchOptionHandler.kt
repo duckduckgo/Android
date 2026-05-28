@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -52,7 +53,7 @@ interface ShowOnAppLaunchOptionHandler {
 class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
     private val settingsDataStore: SettingsDataStore,
     private val systemAutofillEngagement: SystemAutofillEngagement,

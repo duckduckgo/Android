@@ -25,5 +25,5 @@ package com.duckduckgo.browsermode.api
  */
 interface FireModeAvailability {
     /** Returns true if the prerequisites are satisfied, false otherwise **/
-    suspend fun isAvailable(): Boolean
+    fun isAvailable(): Boolean
 }

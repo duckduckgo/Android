@@ -236,6 +236,25 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenChatHistoryAvailableThenIsHistoryAvailableEmitsTrue() = runTest {
+        whenever(duckChatInternal.isChatHistoryAvailable()).thenReturn(true)
+
+        val freshTestee = createViewModel()
+
+        assertTrue(freshTestee.isHistoryAvailable.first { it })
+    }
+
+    @Test
+    fun whenChatHistoryNotAvailableThenIsHistoryAvailableStaysFalse() = runTest {
+        whenever(duckChatInternal.isChatHistoryAvailable()).thenReturn(false)
+
+        val freshTestee = createViewModel()
+        advanceUntilIdle()
+
+        assertFalse(freshTestee.isHistoryAvailable.value)
+    }
+
+    @Test
     fun whenSearchAndDuckAiThenToggleVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
@@ -279,12 +298,12 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleVisible() = runTest {
+    fun whenContextIsDuckAiAndModeIsSearchAndDuckAiThenToggleNotVisible() = runTest {
         setIsEnabled(true)
         inputScreenUserSettingFlow.value = true
         testee.setDuckAiMode(true)
 
-        assertTrue(testee.state.firstOrNull()!!.toggleVisible)
+        assertFalse(testee.state.firstOrNull()!!.toggleVisible)
     }
 
     @Test

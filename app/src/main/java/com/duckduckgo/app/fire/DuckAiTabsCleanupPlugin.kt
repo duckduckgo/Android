@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -30,7 +31,7 @@ import javax.inject.Inject
 /** Closes Duck.ai tabs left pointing at cleared chat URLs. Never touches non-Duck.ai tabs. */
 @ContributesMultibinding(AppScope::class)
 class DuckAiTabsCleanupPlugin @Inject constructor(
-    private val tabRepository: TabRepository,
+    @RegularMode private val tabRepository: TabRepository,
     private val duckChat: DuckChat,
 ) : DataClearingPlugin {
 

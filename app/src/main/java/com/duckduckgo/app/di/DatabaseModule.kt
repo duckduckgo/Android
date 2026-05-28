@@ -22,6 +22,7 @@ import androidx.room.RoomDatabase
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallbackProvider
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
+import com.duckduckgo.app.fire.db.FireModeDatabase
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -74,5 +75,14 @@ object DatabaseModule {
         settingsDataStore: SettingsDataStore,
     ): MigrationsProvider {
         return MigrationsProvider(context, settingsDataStore)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideFireModeDatabase(context: Context): FireModeDatabase {
+        return Room.databaseBuilder(context, FireModeDatabase::class.java, "fire_mode.db")
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 }

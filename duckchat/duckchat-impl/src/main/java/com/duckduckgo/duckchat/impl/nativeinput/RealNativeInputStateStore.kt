@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.nativeinput
 
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
@@ -45,7 +46,11 @@ class RealNativeInputStateStore @Inject constructor(
     // NativeInputStatePublisher to clearTab on tab eviction. Resolving TabRepository
     // lazily lets Dagger construct both without circularity. The lazy is only
     // dereferenced when `state` is collected for the first time.
-    private val tabRepository: Lazy<TabRepository>,
+    //
+    // Qualified @RegularMode because the unqualified TabRepository is only bound in
+    // ActivityScope; AppScope consumers must pick a mode explicitly. Duck.ai native
+    // input state follows regular-mode tabs.
+    @RegularMode private val tabRepository: Lazy<TabRepository>,
 ) :
     NativeInputStateProvider,
     NativeInputStatePublisher {

@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnb
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.AI_COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
@@ -60,6 +61,9 @@ import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SPLIT_ADDRESS_BAR_SELECTED_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE
+import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -72,9 +76,13 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.sync.api.SyncAutoRestore
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,6 +90,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -103,8 +114,22 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val onboardingQuickSetupExperimentManager: OnboardingQuickSetupExperimentManager,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
+    private val syncAutoRestore: SyncAutoRestore,
     private val deviceInfo: DeviceInfo,
 ) : ViewModel() {
+
+    private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
+        try {
+            logcat { "Sync-AutoRestore: checking canRestore..." }
+            val result = syncAutoRestore.canRestore()
+            logcat(LogPriority.INFO) { "Sync-AutoRestore: canRestore=$result" }
+            result
+        } catch (t: Throwable) {
+            coroutineContext.ensureActive()
+            logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
+            false
+        }
+    }
 
     data class ViewState(
         val hasPlayedIntroAnimation: Boolean = false,
@@ -187,10 +212,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
         when (dialogType) {
-            SYNC_RESTORE -> {} // TODO - SyncRestore: add pixel for dialog shown
+            SYNC_RESTORE -> pixel.fire(PREONBOARDING_SYNC_RESTORE_SHOWN_UNIQUE, type = Unique())
             INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            AI_COMPARISON_CHART -> {
+                // TODO add pixel when trigger is wired
+            }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
@@ -213,8 +241,21 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
+            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
+                canRestoreDeferred.await()
+            } ?: false
+
+            // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
             val isReinstall = isAppReinstall()
-            val dialogType = if (isReinstall) INITIAL_REINSTALL_USER else INITIAL
+
+            val dialogType = when {
+                canRestore -> {
+                    logcat(LogPriority.INFO) { "Sync-AutoRestore: first dialog=SYNC_RESTORE" }
+                    SYNC_RESTORE
+                }
+                isReinstall -> INITIAL_REINSTALL_USER
+                else -> INITIAL
+            }
             _viewState.update {
                 it.copy(
                     isReinstallUser = isReinstall,
@@ -230,7 +271,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
             SYNC_RESTORE -> {
-                // TODO - SyncRestore: handle primary CTA click
+                viewModelScope.launch {
+                    logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
+                    pixel.fire(PREONBOARDING_SYNC_RESTORE_TAPPED_UNIQUE, type = Unique())
+                    syncAutoRestore.restoreSyncAccount()
+                    setCurrentDialog(COMPARISON_CHART)
+                }
             }
 
             INITIAL_REINSTALL_USER, INITIAL -> {
@@ -259,6 +305,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                         mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
                 }
+            }
+
+            AI_COMPARISON_CHART -> {
+                // TODO handle primary CTA when trigger is wired
             }
 
             SKIP_ONBOARDING_OPTION -> {
@@ -355,7 +405,15 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
+            SYNC_RESTORE -> {
+                viewModelScope.launch {
+                    logcat { "Sync-AutoRestore: user skipped restore" }
+                    pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
+                    setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                }
+            }
+
+            INITIAL, COMPARISON_CHART, AI_COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_SCREEN_PREVIEW, QUICK_SETUP -> {
                 // no-op
             }
         }
@@ -634,5 +692,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         private const val INPUT_TYPE_SEARCH_AND_DUCKAI = "search_and_duckai"
 
         private const val MAX_DAYS_SINCE_INSTALL_REPORTED = 28L
+
+        private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
 }

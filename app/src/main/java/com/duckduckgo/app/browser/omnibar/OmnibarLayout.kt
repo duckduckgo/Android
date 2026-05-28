@@ -842,7 +842,7 @@ class OmnibarLayout @JvmOverloads constructor(
                 showChatMenu = viewState.showChatMenu,
                 showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
                 showDuckSidebar = viewState.showDuckAISidebar,
-                showDuckBack = viewState.showDuckAISidebar && viewState.isDuckAiBackAvailable,
+                showDuckBack = viewState.showDuckAISidebar,
             )
 
         if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
