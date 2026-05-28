@@ -115,4 +115,41 @@
 
     <!-- Duck AI Voice Chat Shortcut Setting -->
     <string name="duckAiVoiceChatVisibilitySetting" instruction="Voice Chat is a feature that lets users talk to Duck.ai using their voice instead of typing.">Häälvestlus</string>
+
+    <!-- Native Duck.ai chat history -->
+    <string name="duck_ai_chat_history_title">Vestlused</string>
+    <string name="duck_ai_chat_history_section_pinned">Kinnitatud</string>
+    <string name="duck_ai_chat_history_section_recent">Hiljutised</string>
+    <string name="duck_ai_chat_history_untitled">Pealkirjata vestlus</string>
+    <string name="duck_ai_chat_history_empty_title">Ei ole veel ühtegi vestlust</string>
+    <string name="duck_ai_chat_history_empty_cta_open">Ava Duck.ai</string>
+    <string name="duck_ai_chat_history_more_options">Veel valikuid</string>
+    <string name="duck_ai_chat_history_action_select">Vali</string>
+    <string name="duck_ai_chat_history_action_pin">Kinnita</string>
+    <string name="duck_ai_chat_history_action_unpin">Eemalda kinnitamine</string>
+    <string name="duck_ai_chat_history_action_rename">Nimeta ümber</string>
+    <string name="duck_ai_chat_history_action_download">Laadi alla</string>
+    <string name="duck_ai_chat_history_action_delete">Kustuta</string>
+    <string name="duck_ai_chat_history_search_hint">Otsi vestlusi</string>
+    <string name="duck_ai_chat_history_action_search_content_description">Otsi vestlusi</string>
+    <string name="duck_ai_chat_history_search_close_content_description">Sulge otsing</string>
+    <string name="duck_ai_chat_history_search_clear_content_description">Tühjenda otsing</string>
+    <string name="duck_ai_chat_history_action_fire_content_description">Kustuta vestlused</string>
+    <string name="duck_ai_chat_history_action_overflow_content_description">Ava ülevoolu menüü</string>
+    <string name="duck_ai_chat_history_select_all">Vali kõik</string>
+    <string name="duck_ai_chat_history_unselect_all">Tühjenda kõik valikud</string>
+    <string name="duck_ai_chat_history_row_selected_content_description">Valitud</string>
+    <string name="duck_ai_chat_history_row_unselected_content_description">Ei ole valitud</string>
+    <string name="duck_ai_chat_history_exit_select_mode_content_description">Välju valikurežiimist</string>
+    <string name="duck_ai_chat_history_rename_title">Nimeta vestlus ümber</string>
+    <string name="duck_ai_chat_history_rename_chat_title_hint">Vestluse pealkiri</string>
+    <string name="duck_ai_chat_history_rename_confirm_title">Salvesta</string>
+    <string name="duck_ai_chat_history_rename_confirm_content_description">Salvesta vestluse pealkiri</string>
+    <string name="duck_ai_chat_history_rename_error">Vestlust ei õnnestunud ümber nimetada</string>
+    <string name="duck_ai_chat_history_pin_snackbar">Vestlus kinnitatud</string>
+    <string name="duck_ai_chat_history_unpin_snackbar">Vestlus kinnitamata</string>
+    <string name="duck_ai_chat_history_undo">Võta tagasi</string>
+    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \&apos;My Chat.txt\&apos;).">Faili %1$s allalaadimine jõudis lõpule</string>
+    <string name="duck_ai_chat_history_download_view">Kuva</string>
+    <string name="duck_ai_chat_history_download_error">Vestlust ei õnnestunud eksportida</string>
 </resources>
