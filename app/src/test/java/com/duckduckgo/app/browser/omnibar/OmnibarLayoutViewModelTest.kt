@@ -1131,6 +1131,29 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenOmnibarFocusedAndExternalOmnibarStateChangedThenUserTextAndCursorPreserved() = runTest {
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "ducks")
+        testee.onInputStateChanged(query = "newquery", hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.onExternalStateChange(
+            StateChange.OmnibarStateChange(
+                OmnibarViewState(omnibarText = "ducks", queryOrFullUrl = "ducks", forceExpand = false),
+            ),
+        )
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("newquery", viewState.omnibarText)
+            assertFalse(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
     fun whenOmnibarFocusedAndLoadingStateChangesThenViewStateCorrect() = runTest {
         val omnibarState = OmnibarViewState(
             navigationChange = false,
