@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.session
 
 import android.webkit.WebView
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -35,14 +36,14 @@ class WebViewSessionStorageProxyTest {
     private val roomBacked: RealWebViewSessionStorage = mock()
     private val inMemory: InMemoryWebViewSessionStorage = mock()
     private val toggle: Toggle = mock()
-    private val feature: WebViewSessionPersistenceFeature = mock {
-        on { self() } doReturn toggle
+    private val browserConfig: AndroidBrowserConfigFeature = mock {
+        on { webViewSessionPersistence() } doReturn toggle
     }
 
     private val proxy = WebViewSessionStorageProxy(
         roomBacked = roomBacked,
         inMemory = inMemory,
-        feature = feature,
+        browserConfig = browserConfig,
     )
 
     private val webView: WebView = mock()

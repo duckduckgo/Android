@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.session
 
 import android.webkit.WebView
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -27,11 +28,11 @@ import javax.inject.Inject
 class WebViewSessionStorageProxy @Inject constructor(
     private val roomBacked: RealWebViewSessionStorage,
     private val inMemory: InMemoryWebViewSessionStorage,
-    private val feature: WebViewSessionPersistenceFeature,
+    private val browserConfig: AndroidBrowserConfigFeature,
 ) : WebViewSessionStorage {
 
     private val active: WebViewSessionStorage
-        get() = if (feature.self().isEnabled()) roomBacked else inMemory
+        get() = if (browserConfig.webViewSessionPersistence().isEnabled()) roomBacked else inMemory
 
     override fun saveSession(webView: WebView?, tabId: String) =
         active.saveSession(webView, tabId)
