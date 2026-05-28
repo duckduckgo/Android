@@ -199,7 +199,8 @@
                                     android:importantForAccessibility="no"
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
-                                    android:src="@drawable/ic_find_search_small_24" />
+                                    android:src="@drawable/ic_find_search_small_24"
+                                    app:tint="?attr/daxColorOmnibarIcon" />
 
                                 <ImageView
                                     android:id="@+id/backIcon"
@@ -212,7 +213,8 @@
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
                                     android:src="@drawable/ic_arrow_left_small_24"
-                                    android:visibility="gone" />
+                                    android:visibility="gone"
+                                    app:tint="?attr/daxColorOmnibarIcon" />
 
                                 <ImageView
                                     android:id="@+id/globeIcon"
@@ -223,7 +225,8 @@
                                     android:padding="@dimen/keyline_2"
                                     android:scaleType="center"
                                     android:visibility="gone"
-                                    app:srcCompat="@drawable/ic_globe_24" />
+                                    app:srcCompat="@drawable/ic_globe_24"
+                                    app:tint="?attr/daxColorOmnibarIcon" />
 
                                 <FrameLayout
                                     android:id="@+id/sceneRoot"
@@ -319,9 +322,9 @@
                                 android:inputType="textUri|textNoSuggestions"
                                 android:maxLines="1"
                                 android:selectAllOnFocus="true"
-                                android:textColor="?attr/daxColorPrimaryText"
+                                android:textColor="?attr/daxColorOmnibarText"
                                 android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
-                                android:textColorHint="?attr/daxColorSecondaryText"
+                                android:textColorHint="?attr/daxColorOmnibarTextHint"
                                 android:textCursorDrawable="@drawable/text_cursor"
                                 android:textSize="16sp"
                                 android:textStyle="normal"
@@ -350,6 +353,7 @@
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                                     app:layout_constraintTop_toTopOf="parent"
+                                    app:tint="?attr/daxColorOmnibarIcon"
                                     tools:visibility="visible" />
 
                                 <ImageView
@@ -364,6 +368,7 @@
                                     app:layout_constraintEnd_toStartOf="@id/verticalDivider"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:srcCompat="@drawable/ic_microphone_24"
+                                    app:tint="?attr/daxColorOmnibarIcon"
                                     tools:visibility="visible" />
 
                                 <View
@@ -391,6 +396,7 @@
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
+                                    app:tint="?attr/daxColorOmnibarIcon"
                                     tools:visibility="visible" />
 
                             </androidx.constraintlayout.widget.ConstraintLayout>
