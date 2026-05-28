@@ -21,24 +21,23 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
-import androidx.core.view.drawToBitmap
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -51,6 +50,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
@@ -85,7 +85,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode.Selection
 import com.duckduckgo.browser.api.ui.BrowserScreens.TabSwitcherScreenNoParams
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.getThemeId
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -109,7 +108,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -161,6 +159,12 @@ class TabSwitcherActivity :
     lateinit var omnibarRepository: OmnibarRepository
 
     @Inject
+    lateinit var currentBrowserMode: BrowserMode
+
+    override val applyFireTheme: Boolean
+        get() = currentBrowserMode == BrowserMode.FIRE
+
+    @Inject
     lateinit var edgeToEdgeProvider: EdgeToEdgeProvider
 
     @Inject
@@ -205,7 +209,6 @@ class TabSwitcherActivity :
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabsContainer: FrameLayout
     private lateinit var tabItemDecorator: TabItemDecorator
-    private var decoratorBrowserMode: BrowserMode = BrowserMode.REGULAR
     private lateinit var toolbar: Toolbar
 
     private var layoutTypeMenuItem: MenuItem? = null
@@ -213,17 +216,9 @@ class TabSwitcherActivity :
     private var isTrackerAnimationPanelVisible = false
     private var browserModeToggle: BrowserModeToggleView? = null
 
-    private var modeSwitch: ModeSwitch? = null
-
-    /**
-     * Holds the bitmap overlay covering the recycler
-     * and a reference to the items list visible at fade-out time; the observer compares against
-     * [staleItems] to detect when the new mode's tabs have arrived.
-     */
-    private data class ModeSwitch(
-        val overlay: ImageView?,
-        val staleItems: List<TabSwitcherItem>,
-    )
+    private var fadingOutForRecreate = false
+    private var fadingInAfterRecreate = false
+    private var fadeInAnimationStarted = false
 
     private var lastSnackbar: DefaultSnackbar? = null
 
@@ -266,6 +261,8 @@ class TabSwitcherActivity :
 
         setContentView(binding.root)
 
+        fadingInAfterRecreate = savedInstanceState?.getBoolean(KEY_FADE_IN_AFTER_RECREATE) == true
+
         tabsAdapter.setAnimationTileCloseClickListener {
             viewModel.onTrackerAnimationInfoPanelClicked()
         }
@@ -283,6 +280,13 @@ class TabSwitcherActivity :
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (fadingOutForRecreate) {
+            outState.putBoolean(KEY_FADE_IN_AFTER_RECREATE, true)
+        }
     }
 
     private fun configureEdgeToEdgeInsets() {
@@ -356,6 +360,13 @@ class TabSwitcherActivity :
         // the tabs recycler view is initially hidden until we know what type of layout to show
         tabsRecycler.gone()
         tabsRecycler.adapter = tabsAdapter
+
+        if (fadingInAfterRecreate) {
+            tabsRecycler.alpha = 0f
+            // Suppress per-item add animations during the post-recreate diff so the new mode's
+            // items don't shimmer in on top of the container fade-in. Restored once fade-in ends.
+            tabsRecycler.itemAnimator = null
+        }
 
         tabTouchHelper =
             TabTouchHelper(
@@ -431,7 +442,15 @@ class TabSwitcherActivity :
             ),
         )
         toggle.setOnModeChangedListener { mode ->
-            fadeOutAndSwitchMode(mode)
+            fadeOutTabsThenRecreate(mode)
+        }
+
+        if (fadingInAfterRecreate) {
+            val previousMode = when (currentBrowserMode) {
+                BrowserMode.FIRE -> BrowserMode.REGULAR
+                BrowserMode.REGULAR -> BrowserMode.FIRE
+            }
+            toggle.setMode(previousMode)
         }
     }
 
@@ -441,55 +460,19 @@ class TabSwitcherActivity :
         updateToolbarTitle(state.mode, state.tabs.size)
     }
 
-    // Snapshot the recycler and overlay it; the recycler updates underneath, hidden by the
-    // bitmap. The observer reveals once fresh items arrive.
-    private fun fadeOutAndSwitchMode(newMode: BrowserMode) {
-        if (modeSwitch != null) return
-
-        val overlay = runCatching { tabsRecycler.drawToBitmap() }.getOrNull()?.let { bitmap ->
-            ImageView(this).apply {
-                setImageBitmap(bitmap)
-                scaleType = ImageView.ScaleType.FIT_XY
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                )
-            }.also(tabsContainer::addView)
-        }
-        if (overlay != null) {
-            tabsRecycler.alpha = 0f
-        }
-
-        val thisSwitch = ModeSwitch(overlay, viewModel.viewState.value.tabSwitcherItems)
-        modeSwitch = thisSwitch
-
-        // Suppress diff animations across the swap so items don't keep shuffling
-        tabsRecycler.itemAnimator = null
-
-        browserModeToggle?.setMode(newMode)
-        viewModel.onBrowserModeToggled(newMode)
-
-        // Fallback for when fresh items never arrive (e.g. both modes empty). Identity-checked so
-        // a stale timer from a previous switch can't reveal the current one.
-        tabsRecycler.postDelayed({
-            if (modeSwitch === thisSwitch) revealNewMode()
-        }, FADE_IN_FALLBACK_MS)
-    }
-
-    private fun revealNewMode() {
-        val state = modeSwitch ?: return
-        modeSwitch = null
-        tabsRecycler.itemAnimator = DefaultItemAnimator()
+    private fun fadeOutTabsThenRecreate(newMode: BrowserMode) {
+        if (fadingOutForRecreate) return
+        fadingOutForRecreate = true
 
         tabsRecycler.animate()
-            .alpha(1f)
-            .setDuration(FADE_DURATION_MS)
+            .alpha(0f)
+            .setDuration(MODE_SWITCH_FADE_OUT_MS)
+            .withEndAction {
+                tabsRecycler.visibility = View.INVISIBLE
+                viewModel.onBrowserModeToggled(newMode)
+                recreate()
+            }
             .start()
-        state.overlay?.animate()
-            ?.alpha(0f)
-            ?.setDuration(FADE_DURATION_MS)
-            ?.withEndAction { tabsContainer.removeView(state.overlay) }
-            ?.start()
     }
 
     private fun updateToolbarTitle(
@@ -551,28 +534,30 @@ class TabSwitcherActivity :
 
                 tabsRecycler.invalidateItemDecorations()
 
-                val staleItems = modeSwitch?.staleItems
-                val freshAfterModeSwitch = staleItems != null && it.tabSwitcherItems !== staleItems
-                val shouldTryScroll = it.tabs.isNotEmpty() && (firstTimeLoadingTabsList || freshAfterModeSwitch)
+                val shouldTryScroll = it.tabs.isNotEmpty() &&
+                    (firstTimeLoadingTabsList || fadingInAfterRecreate)
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
-                    // Scroll inside the commit callback so the new items are committed first.
-                    // If no active tab yet (race with flowSelectedTab), retry on next emission.
                     val scrolled = shouldTryScroll && scrollToActiveTab(it.tabSwitcherItems)
                     if (scrolled) firstTimeLoadingTabsList = false
-                    if (freshAfterModeSwitch) {
-                        tabsRecycler.post(::revealNewMode)
+                    if (fadingInAfterRecreate && !fadeInAnimationStarted && it.tabs.isNotEmpty()) {
+                        fadeInAnimationStarted = true
+                        tabsRecycler.show()
+                        tabsRecycler.animate()
+                            .alpha(1f)
+                            .setDuration(MODE_SWITCH_FADE_IN_MS)
+                            .withEndAction {
+                                fadingInAfterRecreate = false
+                                tabsRecycler.itemAnimator = DefaultItemAnimator()
+                            }
+                            .start()
                     }
                 }
 
                 configureBrowserModeToggle(it)
                 applyToolbarViewState(it)
 
-                updateTabGridItemDecorator(it)
-
                 tabTouchHelper.mode = it.mode
-
-                fadeInTabsAfterRecreate(it)
 
                 invalidateOptionsMenu()
             }
@@ -598,21 +583,10 @@ class TabSwitcherActivity :
         tabsRecycler.hide()
         detachOnScrolledListener()
 
-        val centerOffsetPercent = getCurrentCenterOffset()
-
         applyLayoutType(layoutType)
 
-        if (centerOffsetPercent.isFinite()) {
-            scrollToPreviousCenterOffset(
-                centerOffsetPercent = centerOffsetPercent,
-                onScrollCompleted = {
-                    attachOnScrolledListener()
-                },
-            )
-        } else {
-            scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
-            attachOnScrolledListener()
-        }
+        scrollToActiveTab(viewModel.viewState.value.tabSwitcherItems)
+        attachOnScrolledListener()
 
         tabsRecycler.show()
     }
@@ -661,29 +635,6 @@ class TabSwitcherActivity :
                         }
                 }
         }
-
-    private fun scrollToPreviousCenterOffset(
-        centerOffsetPercent: Float,
-        onScrollCompleted: () -> Unit = {},
-    ) {
-        tabsRecycler.post {
-            val newRange = tabsRecycler.computeVerticalScrollRange()
-            val newExtent = tabsRecycler.computeVerticalScrollExtent()
-            val newOffset = (centerOffsetPercent * newRange - newExtent / 2).toInt()
-            (tabsRecycler.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, -newOffset)
-            tabsRecycler.post {
-                onScrollCompleted()
-            }
-        }
-    }
-
-    private fun getCurrentCenterOffset(): Float {
-        val range = tabsRecycler.computeVerticalScrollRange()
-        val offset = tabsRecycler.computeVerticalScrollOffset()
-        val extent = tabsRecycler.computeVerticalScrollExtent()
-        val centerOffsetPercent = (offset + extent.toFloat() / 2) / range
-        return centerOffsetPercent
-    }
 
     private fun showGridLayoutButton() {
         layoutTypeMenuItem?.let { viewModeMenuItem ->
@@ -779,6 +730,7 @@ class TabSwitcherActivity :
             anchor = snackbarAnchorView,
             action = getString(R.string.undoSnackbarAction),
             showAction = numBookmarks > 0,
+            actionTextColor = resolveColorAttr(CommonR.attr.daxColorAccentBlue),
             onAction = viewModel::undoBookmarkAction,
             onDismiss = viewModel::finishBookmarkAction,
         )
@@ -868,18 +820,11 @@ class TabSwitcherActivity :
         launch { viewModel.onTabSelected(tabId) }
     }
 
-    private fun updateTabGridItemDecorator(viewState: TabSwitcherViewModel.ViewState) {
-        val browserMode = viewState.browserMode
-        if (decoratorBrowserMode != browserMode) {
-            tabsRecycler.removeItemDecoration(tabItemDecorator)
-            val themeRes = getThemeId(themingDataStore.theme, isFireMode = browserMode == BrowserMode.FIRE)
-            val themedContext = ContextThemeWrapper(this, themeRes)
-            tabItemDecorator = TabItemDecorator(themedContext)
-            tabsRecycler.addItemDecoration(tabItemDecorator)
-            tabsAdapter.themedContext = themedContext
-            decoratorBrowserMode = browserMode
-        }
-        tabsRecycler.invalidateItemDecorations()
+    @ColorInt
+    private fun resolveColorAttr(attr: Int): Int {
+        val typedValue = TypedValue()
+        theme.resolveAttribute(attr, typedValue, true)
+        return ContextCompat.getColor(this, typedValue.resourceId)
     }
 
     override fun onTabDeleted(
@@ -1136,7 +1081,8 @@ class TabSwitcherActivity :
 
         private const val TAB_GRID_COLUMN_WIDTH_DP = 180
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
-        private const val FADE_DURATION_MS = 180L
-        private const val FADE_IN_FALLBACK_MS = 1200L
+        private const val MODE_SWITCH_FADE_OUT_MS = 180L
+        private const val MODE_SWITCH_FADE_IN_MS = 220L
+        private const val KEY_FADE_IN_AFTER_RECREATE = "fadeInAfterModeSwitchRecreate"
     }
 }

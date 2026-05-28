@@ -109,9 +109,6 @@ class TabSwitcherAdapter(
     @Volatile
     var isFullUrlEnabled: Boolean = true
 
-    @Volatile
-    var themedContext: Context? = null
-
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -642,7 +639,7 @@ class TabSwitcherAdapter(
 
     private fun View.resolveThemedDrawableAttr(@AttrRes attr: Int): Int {
         val typedValue = TypedValue()
-        (themedContext ?: context).theme.resolveAttribute(attr, typedValue, true)
+        context.theme.resolveAttribute(attr, typedValue, true)
         return typedValue.resourceId
     }
 
