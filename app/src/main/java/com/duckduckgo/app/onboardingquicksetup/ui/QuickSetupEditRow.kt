@@ -40,7 +40,6 @@ class QuickSetupEditRow @JvmOverloads constructor(
         val verticalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         setPadding(paddingLeft, verticalPadding, paddingRight, verticalPadding)
         isClickable = true
-        isFocusable = true
         val selectableBackground = TypedValue().also {
             context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
         }
