@@ -274,8 +274,21 @@ class NativeInputModeWidget @JvmOverloads constructor(
         observeChatState()
         observeChatSuggestionsEnabled()
         observeNativeInputState()
+        bindLeadingFireButtonClick()
         if (onPaidTierChanged != null) observeTier()
     }
+
+    /**
+     * The leading fire button in the bottom-bar layout lives as a sibling of this widget
+     * (see input_mode_widget_card_view_bottom.xml). Wire its click here so it shares the
+     * same [onFireButtonTapped] callback as the trailing fire that lives inside the widget.
+     */
+    private fun bindLeadingFireButtonClick() {
+        leadingFireButtonView()?.setOnClickListener { onFireButtonTapped?.invoke() }
+    }
+
+    private fun leadingFireButtonView(): View? =
+        (parent as? ViewGroup)?.findViewById(R.id.inputFieldLeadingFireButton)
 
     private fun setupPlugins() {
         pluginsJob?.cancel()
@@ -586,12 +599,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     /**
-     * In a fullscreen Duck.ai chat the fire button moves into the input field card at the
-     * leading edge; the trailing fire (next to tabs/menu in [inputModeMainButtonsContainer])
-     * hides so the user only sees one fire affordance. Other contexts keep today's trailing
-     * placement.
+     * In a fullscreen Duck.ai chat the fire button moves into the bottom-bar layout
+     * (sibling to this widget, see input_mode_widget_card_view_bottom.xml). The trailing
+     * fire that lives inside the widget hides in DUCK_AI so the user only ever sees one
+     * fire affordance; other contexts keep today's trailing placement.
      */
     private fun updateFireButtonVisibility(state: NativeInputState) {
+        leadingFireButtonView()?.visibility =
+            if (state.shouldShowLeadingFireButton()) VISIBLE else GONE
         findViewById<View?>(R.id.inputFieldFireButton)?.visibility =
             if (state.shouldShowTrailingFireButton()) VISIBLE else GONE
     }
