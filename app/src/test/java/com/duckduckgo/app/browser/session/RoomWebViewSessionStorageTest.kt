@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.os.Parcel
 import android.webkit.WebBackForwardList
 import android.webkit.WebView
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -38,10 +39,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RoomWebViewSessionStorageTest {
 
     @get:Rule

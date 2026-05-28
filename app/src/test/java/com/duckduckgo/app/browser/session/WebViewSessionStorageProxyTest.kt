@@ -34,7 +34,7 @@ import org.mockito.kotlin.whenever
 class WebViewSessionStorageProxyTest {
 
     private val roomBacked: RoomWebViewSessionStorage = mock()
-    private val inMemory: InMemoryWebViewSessionStorage = mock()
+    private val inMemory: WebViewSessionInMemoryStorage = mock()
     private val toggle: Toggle = mock()
     private val browserConfig: AndroidBrowserConfigFeature = mock {
         on { webViewSessionPersistence() } doReturn toggle

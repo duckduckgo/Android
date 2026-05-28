@@ -539,5 +539,5 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
 
-    WEBVIEW_SESSION_LARGE_BYTES("m_webview_session_large_bytes_count"),
+    WEBVIEW_SESSION_LARGE_BYTES("webview_session_large_bytes"),
 }

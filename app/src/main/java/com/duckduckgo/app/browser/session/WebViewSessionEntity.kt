@@ -36,19 +36,4 @@ data class WebViewSessionEntity(
     @PrimaryKey val tabId: String,
     val sessionBundle: ByteArray,
     val savedAt: Long,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is WebViewSessionEntity) return false
-        return tabId == other.tabId &&
-            sessionBundle.contentEquals(other.sessionBundle) &&
-            savedAt == other.savedAt
-    }
-
-    override fun hashCode(): Int {
-        var result = tabId.hashCode()
-        result = 31 * result + sessionBundle.contentHashCode()
-        result = 31 * result + savedAt.hashCode()
-        return result
-    }
-}
+)

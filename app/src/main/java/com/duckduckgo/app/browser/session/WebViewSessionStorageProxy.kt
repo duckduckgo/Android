@@ -27,7 +27,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class WebViewSessionStorageProxy @Inject constructor(
     private val roomBacked: RoomWebViewSessionStorage,
-    private val inMemory: InMemoryWebViewSessionStorage,
+    private val inMemory: WebViewSessionInMemoryStorage,
     private val browserConfig: AndroidBrowserConfigFeature,
 ) : WebViewSessionStorage {
 

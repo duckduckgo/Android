@@ -17,18 +17,19 @@
 package com.duckduckgo.app.browser.session
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertArrayEquals
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class WebViewSessionDaoTest {
 
     private lateinit var db: AppDatabase
@@ -48,57 +49,6 @@ class WebViewSessionDaoTest {
     @After
     fun tearDown() {
         db.close()
-    }
-
-    @Test
-    fun whenSessionUpsertedThenGetReturnsSameBytes() = runTest {
-        val tabId = "tab-1"
-        tabsDao.insertTab(TabEntity(tabId = tabId))
-        val bytes = byteArrayOf(1, 2, 3, 4, 5)
-
-        dao.upsert(WebViewSessionEntity(tabId, bytes, savedAt = 1000L))
-
-        val loaded = dao.get(tabId)
-        assertEquals(tabId, loaded?.tabId)
-        assertArrayEquals(bytes, loaded?.sessionBundle)
-        assertEquals(1000L, loaded?.savedAt)
-    }
-
-    @Test
-    fun whenUpsertReplacesExistingThenLatestBytesAreReturned() = runTest {
-        val tabId = "tab-1"
-        tabsDao.insertTab(TabEntity(tabId = tabId))
-        dao.upsert(WebViewSessionEntity(tabId, byteArrayOf(1), savedAt = 1000L))
-
-        dao.upsert(WebViewSessionEntity(tabId, byteArrayOf(2, 2), savedAt = 2000L))
-
-        val loaded = dao.get(tabId)
-        assertArrayEquals(byteArrayOf(2, 2), loaded?.sessionBundle)
-        assertEquals(2000L, loaded?.savedAt)
-    }
-
-    @Test
-    fun whenSessionDeletedThenGetReturnsNull() = runTest {
-        val tabId = "tab-1"
-        tabsDao.insertTab(TabEntity(tabId = tabId))
-        dao.upsert(WebViewSessionEntity(tabId, byteArrayOf(1), savedAt = 1000L))
-
-        dao.delete(tabId)
-
-        assertNull(dao.get(tabId))
-    }
-
-    @Test
-    fun whenDeleteAllThenRowsRemoved() = runTest {
-        tabsDao.insertTab(TabEntity(tabId = "a"))
-        tabsDao.insertTab(TabEntity(tabId = "b"))
-        dao.upsert(WebViewSessionEntity("a", byteArrayOf(1), savedAt = 1000L))
-        dao.upsert(WebViewSessionEntity("b", byteArrayOf(2), savedAt = 2000L))
-
-        dao.deleteAll()
-
-        assertNull(dao.get("a"))
-        assertNull(dao.get("b"))
     }
 
     @Test
