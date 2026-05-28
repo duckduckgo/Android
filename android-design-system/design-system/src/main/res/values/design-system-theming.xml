@@ -147,7 +147,6 @@
         <item name="daxColorOmnibarAccent">?attr/daxColorAccentBlue</item>
         <item name="daxColorSnackbarAction">?attr/daxColorAccentBlue</item>
         <item name="daxIconTabSwitcher">@drawable/ic_tab_24</item>
-        <item name="daxDrawableTabPlaceholderIcon">@drawable/ic_dax_icon</item>
         <item name="daxDrawableTabPlaceholderPreview">@drawable/ic_dax_icon_72</item>
 
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->

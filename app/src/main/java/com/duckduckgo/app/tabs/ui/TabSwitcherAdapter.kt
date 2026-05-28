@@ -501,8 +501,7 @@ class TabSwitcherAdapter(
         val url = tab.url
         if (url.isNullOrBlank()) {
             glide.clear(view)
-            val placeholder = view.resolveThemedDrawableAttr(CommonR.attr.daxDrawableTabPlaceholderIcon)
-            glide.load(placeholder).into(view)
+            glide.load(AndroidR.drawable.ic_dax_icon).into(view)
         } else {
             holder.trackJob(
                 lifecycleOwner.lifecycleScope.launch {
