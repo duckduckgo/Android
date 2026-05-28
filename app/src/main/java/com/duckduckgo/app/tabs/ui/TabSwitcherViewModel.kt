@@ -78,6 +78,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -88,6 +89,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import androidx.core.net.toUri
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
@@ -132,10 +134,12 @@ class TabSwitcherViewModel @Inject constructor(
                     repo.flowSelectedTab,
                     _viewState,
                     tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-                ) { activeTab, viewState, isAnimationTileDismissed ->
-                    getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+                    browserModeStateHolder.currentMode,
+                ) { activeTab, viewState, isAnimationTileDismissed, browserMode ->
+                    getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, browserMode)
                 }
             }
+            .onStart { emit(emptyList()) }
     }
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
@@ -143,7 +147,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(
         ViewState(
             isSplitOmnibarEnabled = omnibarRepository.omnibarType == OmnibarType.SPLIT,
-            browserMode = browserModeStateHolder.currentMode.value,
             isBrowserModeToggleVisible = fireModeAvailability.isAvailable(),
         ),
     )
@@ -628,12 +631,11 @@ class TabSwitcherViewModel @Inject constructor(
         activeTab: TabEntity?,
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
+        browserMode: BrowserMode,
     ): List<TabSwitcherItem> {
-        val browserMode = browserModeStateHolder.currentMode.value
-
         if (mode is Selection) {
             return tabEntities.map { entity ->
-                val uri = entity.url?.let { Uri.parse(it) }
+                val uri = entity.url?.toUri()
                 val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
                 SelectableTab(
                     entity = entity,
