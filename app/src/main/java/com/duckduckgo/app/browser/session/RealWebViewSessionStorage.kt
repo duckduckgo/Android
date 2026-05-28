@@ -103,7 +103,7 @@ class RealWebViewSessionStorage @Inject constructor(
         return try {
             parcel.unmarshall(this, 0, size)
             parcel.setDataPosition(0)
-            parcel.readBundle(this::class.java.classLoader)
+            parcel.readBundle(WebView::class.java.classLoader)
         } catch (t: Throwable) {
             logcat(WARN) { "Failed to unmarshal session bundle: ${t.asLog()}" }
             null
