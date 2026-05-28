@@ -75,48 +75,6 @@
     <string name="duckChatOptionsMenuWebSearch">Web Search</string>
     <string name="duckChatOptionsMenuWebSearchSubtitle">Source answers from the web</string>
 
-    <!-- Chat history -->
-    <string name="duck_ai_chat_history_title">Chats</string>
-    <string name="duck_ai_chat_history_section_pinned">Pinned</string>
-    <string name="duck_ai_chat_history_section_recent">Recent</string>
-    <string name="duck_ai_chat_history_untitled">Untitled chat</string>
-    <string name="duck_ai_chat_history_empty_title">No Chats yet</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Open Duck.ai</string>
-    <string name="duck_ai_chat_history_coming_soon">Coming soon</string>
-    <string name="duck_ai_chat_history_more_options">More options</string>
-    <string name="duck_ai_chat_history_action_pin">Pin</string>
-    <string name="duck_ai_chat_history_action_unpin">Unpin</string>
-    <string name="duck_ai_chat_history_action_rename">Rename</string>
-    <string name="duck_ai_chat_history_action_download">Download</string>
-    <string name="duck_ai_chat_history_action_delete">Delete</string>
-    <string name="duck_ai_chat_history_search_hint">Search chats</string>
-    <string name="duck_ai_chat_history_search_close_content_description">Close search</string>
-    <string name="duck_ai_chat_history_search_clear_content_description">Clear search</string>
-    <string name="duck_ai_chat_history_action_fire_content_description">Delete chats</string>
-    <string name="duck_ai_chat_history_action_new">New</string>
-    <string name="duck_ai_chat_history_action_download_selected_content_description">Download chats</string>
-    <plurals name="duck_ai_chat_history_bulk_download_complete">
-        <item quantity="one" instruction="%1$d is the number of chats downloaded">Download complete for %1$d chat</item>
-        <item quantity="other" instruction="%1$d is the number of chats downloaded">Download complete for %1$d chats</item>
-    </plurals>
-    <string name="duck_ai_chat_history_select_all">Select all</string>
-    <string name="duck_ai_chat_history_unselect_all">Unselect all</string>
-    <string name="duck_ai_chat_history_row_selected_content_description">Selected</string>
-    <string name="duck_ai_chat_history_row_unselected_content_description">Not selected</string>
-    <string name="duck_ai_chat_history_exit_select_mode_content_description">Exit selection mode</string>
-    <string name="duck_ai_chat_history_rename_title">Rename Chat</string>
-    <string name="duck_ai_chat_history_rename_chat_title_hint">Chat Title</string>
-    <string name="duck_ai_chat_history_rename_confirm_title">Save</string>
-    <string name="duck_ai_chat_history_rename_confirm_content_description">Save chat title</string>
-    <string name="duck_ai_chat_history_rename_error">Couldn\'t rename chat</string>
-    <string name="duck_ai_chat_history_pin_snackbar">Chat pinned</string>
-    <string name="duck_ai_chat_history_unpin_snackbar">Chat unpinned</string>
-    <string name="duck_ai_chat_history_undo">Undo</string>
-    <string name="duck_ai_chat_history_download_complete" instruction="%1$s is the saved chat filename (e.g. \'My Chat.txt\').">Download complete for %1$s</string>
-    <string name="duck_ai_chat_history_download_view">Show</string>
-    <string name="duck_ai_chat_history_download_error">Couldn\'t export chat</string>
-    <string name="duck_ai_chat_history_bulk_download_error">Couldn\'t export chats</string>
-
     <!-- Duck.ai header -->
     <string name="duckChatPlusButtonContentDescription">Open Duck.ai menu</string>
 </resources>
