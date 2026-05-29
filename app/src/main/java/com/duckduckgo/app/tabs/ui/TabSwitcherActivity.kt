@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -29,12 +28,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.ColorInt
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.flowWithLifecycle
@@ -729,7 +726,7 @@ class TabSwitcherActivity :
             anchor = snackbarAnchorView,
             action = getString(R.string.undoSnackbarAction),
             showAction = numBookmarks > 0,
-            actionTextColor = resolveColorAttr(CommonR.attr.daxColorAccentBlue),
+            actionTextColor = getColorFromAttr(CommonR.attr.daxColorAccentBlue),
             onAction = viewModel::undoBookmarkAction,
             onDismiss = viewModel::finishBookmarkAction,
         )
@@ -817,13 +814,6 @@ class TabSwitcherActivity :
 
     override fun onTabSelected(tabId: String) {
         launch { viewModel.onTabSelected(tabId) }
-    }
-
-    @ColorInt
-    private fun resolveColorAttr(attr: Int): Int {
-        val typedValue = TypedValue()
-        theme.resolveAttribute(attr, typedValue, true)
-        return ContextCompat.getColor(this, typedValue.resourceId)
     }
 
     override fun onTabDeleted(
