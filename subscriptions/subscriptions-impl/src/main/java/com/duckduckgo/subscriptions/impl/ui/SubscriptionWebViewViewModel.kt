@@ -313,7 +313,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
             pendingScheduleNotificationDaysBeforeCancel = runCatching {
                 data?.getJSONObject("scheduleNotification")?.getInt("daysBeforeCancel")
-            }.getOrNull()?.takeIf { it in 1..3 }
+            }.getOrNull()
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
