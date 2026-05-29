@@ -23,6 +23,6 @@ tags:
       - assertVisible:
           text: ".*browsing activity with the fire button.*"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*browsing activity with the Fire Button.*"

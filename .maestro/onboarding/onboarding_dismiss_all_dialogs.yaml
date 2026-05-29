@@ -12,9 +12,9 @@ tags:
           clearState: true
       - runFlow: ../shared/pre_onboarding.yaml
       - assertVisible:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|brandDesignDismissButton"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|brandDesignDismissButton"
       - assertVisible:
           id: ddgLogo
       - inputText: "https://www.search-company.site/#ad-id-14"
@@ -22,9 +22,9 @@ tags:
       - assertVisible:
           text: ".*As you tap and scroll, I'll block pesky trackers..*"
       - assertVisible:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*As you tap and scroll, I'll block pesky trackers..*"
       - assertVisible:
@@ -34,9 +34,9 @@ tags:
       - assertVisible:
           text: ".*was trying to track you here. I blocked them!.*"
       - assertVisible:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - assertNotVisible:
           text: ".*was trying to track you here. I blocked them!.*"
       - assertVisible:
@@ -44,13 +44,13 @@ tags:
       - tapOn:
           text: "Publisher site"
       - assertVisible:
-          text: ".*Remember: every time you browse with me a creepy ad loses its wings..*"
+          text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - assertVisible:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|contextualBrandDesignDismissButton"
       - assertNotVisible:
-          text: ".*Remember: every time you browse with me a creepy ad loses its wings..*"
+          text: ".*Remember: every time you browse with me a creepy ad loses its.wings..*"
       - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
       - assertVisible:

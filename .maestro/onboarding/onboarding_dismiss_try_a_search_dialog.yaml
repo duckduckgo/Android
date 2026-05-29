@@ -12,8 +12,8 @@ tags:
           clearState: true
       - runFlow: ../shared/pre_onboarding.yaml
       - assertVisible:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|brandDesignDismissButton"
       - tapOn:
-          id: daxDialogDismissButton
+          id: "daxDialogDismissButton|brandDesignDismissButton"
       - assertVisible:
           id: ddgLogo
