@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import logcat.logcat
 import org.json.JSONObject
@@ -90,6 +91,14 @@ class RealSyncCodeDispatcher @Inject constructor(
                 },
         )
         logcat { "$TAG: V2 Presenter flow completed" }
+    }.onCompletion { cause ->
+        if (cause != null) {
+            // Flow cancelled or threw before reaching a terminal SM state — tear down the
+            // runner session so the channel DELETE fires (best-effort).
+            // Spec: Unified Algorithm §Aborting; Track B subtask 1215139308232508.
+            logcat { "$TAG: V2 Presenter flow completed with cause=${cause::class.simpleName}; cancelling runner" }
+            runner.cancel()
+        }
     }
 
     /**
@@ -228,6 +237,14 @@ class RealSyncCodeDispatcher @Inject constructor(
                 },
         )
         logcat { "$TAG: V2 LinkingV2 flow completed" }
+    }.onCompletion { cause ->
+        if (cause != null) {
+            // Flow cancelled or threw before reaching a terminal SM state — tear down the
+            // runner session so the channel DELETE fires (best-effort).
+            // Spec: Unified Algorithm §Aborting; Track B subtask 1215139308232508.
+            logcat { "$TAG: V2 LinkingV2 flow completed with cause=${cause::class.simpleName}; cancelling runner" }
+            runner.cancel()
+        }
     }
 
     private fun DispatchOutcome.isTerminal(): Boolean = when (this) {

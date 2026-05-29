@@ -103,20 +103,31 @@ sealed interface RouteDecision {
 }
 
 /**
- * Outcomes emitted by a v2-owned dispatch. A single [RouteDecision.V2InProgress] flow emits
- * **zero or one** [JoinerConfirmationRequested] / [HostConfirmationRequested] (intermediate —
- * caller must show a prompt and call [SyncCodeDispatcher.confirmJoiner] / [denyJoiner] /
- * [confirmHost] / [denyHost] to resume the SM), followed by **exactly one** terminal
+ * Outcomes emitted by a v2-owned dispatch. Used by both [SyncCodeDispatcher.route]
+ * (Scanner side) and [SyncCodeDispatcher.presentV2] (Presenter side); the emitted
+ * sequence differs by side.
+ *
+ * Scanner side (returned via [RouteDecision.V2InProgress.outcomes]): zero or one
+ * [JoinerConfirmationRequested] / [HostConfirmationRequested] (intermediate — caller
+ * must show a prompt and call [SyncCodeDispatcher.confirmJoiner] / [denyJoiner] /
+ * [confirmHost] / [denyHost] to resume the SM), followed by exactly one terminal
  * ([LoggedIn] / [UpgradeRequired] / [Failed]).
  *
- * For v2 RecoveryCode flows (cid=ddg, cid=3party) there's no confirmation phase — only a
- * single terminal outcome.
+ * Presenter side: exactly one [LinkingCodeReady] first (the URL to render as a QR),
+ * then zero or one [HostConfirmationRequested] (caller surfaces a dialog and resumes
+ * via [confirmHost] / [denyHost]), then exactly one terminal ([LoggedIn] for Host.Done,
+ * [AlreadyConnected] for SameAccountAbort, [Failed] otherwise). [JoinerConfirmationRequested]
+ * is never emitted on the Presenter side under current callers (signed-in precondition);
+ * see [SyncCodeDispatcher.presentV2] KDoc.
  *
- * Note: v2 does **not** surface a v1-style `AskToSwitchAccount` prompt. The spec's Confirmations
- * phase is the consent step ("Sync your data with [peer]?"); by the time login runs, the user
- * has already opted out of any existing account. When the BE returns `ALREADY_SIGNED_IN`, the
- * dispatcher performs the logout-and-rejoin transparently and emits [LoggedIn] (or [Failed] if
- * the switch itself fails).
+ * For v2 RecoveryCode flows (cid=ddg, cid=3party) there's no confirmation phase — only
+ * a single terminal outcome.
+ *
+ * Note: v2 does **not** surface a v1-style `AskToSwitchAccount` prompt. The spec's
+ * Confirmations phase is the consent step ("Sync your data with [peer]?"); by the
+ * time login runs, the user has already opted out of any existing account. When the
+ * BE returns `ALREADY_SIGNED_IN`, the dispatcher performs the logout-and-rejoin
+ * transparently and emits [LoggedIn] (or [Failed] if the switch itself fails).
  */
 sealed interface DispatchOutcome {
     /**

@@ -604,6 +604,40 @@ class RealSyncCodeDispatcherTest {
         verify(runner).startPresent()
     }
 
+    @Test fun `presentV2 cancels runner when collecting coroutine is cancelled`() = runTest {
+        val flow = dispatcher.presentV2()
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            flow.collect { /* no-op */ }
+        }
+        verify(runner).startPresent()
+
+        job.cancel()
+        job.join()
+
+        verify(runner).cancel()
+    }
+
+    @Test fun `driveV2Linking cancels runner when collecting coroutine is cancelled`() = runTest {
+        setV2(true)
+        whenever(qrCode.parse(any())).thenReturn(
+            com.duckduckgo.sync.impl.exchange.v2.ExchangeV2CodeParseResult.LinkingV2(
+                channelId = "c",
+                publicKey = "k",
+                version = "2",
+            ),
+        )
+        val decision = dispatcher.route("v2-url") as RouteDecision.V2InProgress
+        val job = launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+            decision.outcomes.collect { /* no-op */ }
+        }
+        verify(runner).startScan(any())
+
+        job.cancel()
+        job.join()
+
+        verify(runner).cancel()
+    }
+
     @Test fun `presentV2 filters out events from before session start`() = runTest {
         // Seed a stale Host_Done from a prior session with timestamp=1L (well before now).
         val staleFlow = MutableSharedFlow<ExchangeV2Event>(replay = 10)
