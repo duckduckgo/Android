@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -93,6 +94,9 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(
         AndroidBrowserConfigFeature::class.java,
     )
+    private val mockCustomDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature = FakeFeatureToggleFactory.create(
+        CustomDuckAiOnboardingFeature::class.java,
+    )
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDuckAiOnboardingExperimentManager: DuckAiOnboardingExperimentManager = mock()
@@ -121,6 +125,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockWidgetCapabilities,
             mockSyncAutoRestore,
             mockQuickSetupPixelSender,
+            mockCustomDuckAiOnboardingFeature,
         )
     }
 
@@ -137,16 +142,50 @@ class BrandDesignUpdatePageViewModelTest {
     }
 
     @Test
-    fun whenIntroAnimationFinishedThenHasPlayedIntroAnimationIsTrue() = runTest {
+    fun whenOnIntroAnimationStartedThenHasPlayedIntroAnimationIsTrue() = runTest {
         val testee = createViewModel()
         testee.viewState.test {
             val initialState = awaitItem()
             assertFalse(initialState.hasPlayedIntroAnimation)
 
-            testee.onIntroAnimationFinished()
+            testee.onIntroAnimationStarted()
 
             val updatedState = awaitItem()
             assertTrue(updatedState.hasPlayedIntroAnimation)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnIntroAnimationFinishedIsCalledOnceThenRequestNotificationPermissionsIsSent() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            // drain the initial Play command
+            awaitItem()
+
+            testee.onIntroAnimationFinished()
+            advanceUntilIdle()
+
+            val command = awaitItem()
+            assertTrue(command is Command.RequestNotificationPermissions)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnIntroAnimationFinishedIsCalledMultipleTimesThenRequestNotificationPermissionsIsSentOnlyOnce() = runTest {
+        val testee = createViewModel()
+        testee.commands.test {
+            awaitItem() // drain initial Play
+
+            testee.onIntroAnimationFinished()
+            testee.onIntroAnimationFinished()
+            testee.onIntroAnimationFinished()
+            advanceUntilIdle()
+
+            val first = awaitItem()
+            assertTrue(first is Command.RequestNotificationPermissions)
+            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -165,6 +204,60 @@ class BrandDesignUpdatePageViewModelTest {
             assertTrue(state.inputScreenSelected)
             assertEquals(false, state.showSplitOption)
             assertEquals(false, state.isReinstallUser)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenIntroAnimationFlagEnabledThenViewStateIsDuckAiIntroAnimationEnabledIsTrue() = runTest {
+        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(true, state.isDuckAiIntroAnimationEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenIntroAnimationFlagDisabledThenViewStateIsDuckAiIntroAnimationEnabledIsFalse() = runTest {
+        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
+
+        val testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(false, state.isDuckAiIntroAnimationEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenViewModelCreatedAndFlagEnabledThenPlayIntroAnimationCommandWithDuckAiTrueIsEmitted() = runTest {
+        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = true))
+
+        val testee = createViewModel()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.PlayIntroAnimation)
+            assertEquals(true, (command as Command.PlayIntroAnimation).withDuckAi)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenViewModelCreatedAndFlagDisabledThenPlayIntroAnimationCommandWithDuckAiFalseIsEmitted() = runTest {
+        mockCustomDuckAiOnboardingFeature.introAnimation().setRawStoredState(Toggle.State(enable = false))
+
+        val testee = createViewModel()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.PlayIntroAnimation)
+            assertEquals(false, (command as Command.PlayIntroAnimation).withDuckAi)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -274,6 +367,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // COMPARISON_CHART -> ShowDefaultBrowserDialog
             val command = awaitItem()
             assertTrue(command is Command.ShowDefaultBrowserDialog)
@@ -288,6 +382,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // COMPARISON_CHART -> Finish
             val command = awaitItem()
             assertTrue(command is Command.Finish)
@@ -331,6 +426,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> SKIP_ONBOARDING_OPTION
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked()
             val command = awaitItem()
             assertTrue(command is Command.OnboardingSkipped)
@@ -406,6 +502,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
         testee.onInputScreenOptionSelected(true)
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN (no command)
             testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
             val command = awaitItem()
@@ -424,6 +521,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
         testee.onInputScreenOptionSelected(false)
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
             testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
             val command = awaitItem()
@@ -858,6 +956,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenOnDialogTappedThenSkipDialogAnimationCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onDialogTapped()
             val command = awaitItem()
             assertTrue(command is Command.SkipDialogAnimation)
@@ -868,6 +967,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenOnBackgroundTappedThenSkipDialogAnimationCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onBackgroundTapped()
             val command = awaitItem()
             assertTrue(command is Command.SkipDialogAnimation)
@@ -909,6 +1009,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onInputScreenOptionSelected(true)
         testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
             val command = awaitItem()
             assertTrue(command is Command.Finish)
@@ -924,6 +1025,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onInputScreenOptionSelected(true)
         testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
             val command = awaitItem()
             assertTrue(command is Command.Finish)
@@ -988,6 +1090,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onInputScreenOptionSelected(false)
         testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // INPUT_SCREEN -> Finish
             val command = awaitItem()
             assertTrue(command is Command.Finish)
@@ -1011,6 +1114,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.onPrimaryCtaClicked() // ADDRESS_BAR_POSITION -> INPUT_SCREEN
         testee.onPrimaryCtaClicked() // INPUT_SCREEN -> INPUT_SCREEN_PREVIEW
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked() // INPUT_SCREEN_PREVIEW -> Finish
             val command = awaitItem()
             assertTrue(command is Command.Finish)
@@ -1025,6 +1129,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenInputModeDemoQuerySubmittedWithChatThenSendFinishAndSubmitChatPromptCommand() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onInputModeDemoQuerySubmitted("hello world", isChat = true)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitChatPrompt)
@@ -1036,6 +1141,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenInputModeDemoQuerySubmittedWithSearchThenSendFinishAndSubmitSearchQueryCommand() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onInputModeDemoQuerySubmitted("search query", isChat = false)
             val command = awaitItem()
             assertTrue(command is Command.FinishAndSubmitSearchQuery)
@@ -1122,6 +1228,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onPrimaryCtaClicked()
             assertTrue(awaitItem() is Command.OnboardingSkipped)
         }
@@ -1172,6 +1279,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupAddressBarPositionEditClickedThenSendShowAddressBarPositionBottomSheetCommandWithDefaults() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddressBarPositionEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
@@ -1187,6 +1295,7 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddressBarPositionEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupAddressBarPositionBottomSheet)
@@ -1202,6 +1311,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupSearchOptionsEditClickedThenSendShowSearchOptionsBottomSheetCommandWithDefaultWithAiTrue() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSearchOptionsEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
@@ -1215,6 +1325,7 @@ class BrandDesignUpdatePageViewModelTest {
         val testee = createViewModel()
         testee.onInputScreenOptionSelected(withAi = false)
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSearchOptionsEditClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupSearchOptionsBottomSheet)
@@ -1233,6 +1344,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowQuickSetupDefaultBrowserDialog)
@@ -1246,6 +1358,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked()
             val command = awaitItem()
             assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
@@ -1259,6 +1372,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockIntent)
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultClicked() // first time: dialog
             assertTrue(awaitItem() is Command.ShowQuickSetupDefaultBrowserDialog)
             testee.onQuickSetupSetAsDefaultClicked() // second time: settings
@@ -1276,6 +1390,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupSetAsDefaultUncheckedThenSendOpenDefaultBrowserSystemSettings() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupSetAsDefaultUnchecked()
             val command = awaitItem()
             assertTrue(command is Command.OpenDefaultBrowserSystemSettings)
@@ -1338,6 +1453,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked() // -> QUICK_SETUP
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
             assertTrue(command is Command.SyncQuickSetupSwitches)
@@ -1358,6 +1474,7 @@ class BrandDesignUpdatePageViewModelTest {
         testee.loadDaxDialog()
         testee.onSecondaryCtaClicked() // -> QUICK_SETUP
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.checkQuickSetupSwitchesState()
             val command = awaitItem()
             assertTrue(command is Command.SyncQuickSetupSwitches)
@@ -1372,6 +1489,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenCheckQuickSetupSwitchesStateNotInQuickSetupThenNoCommandSent() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.checkQuickSetupSwitchesState()
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -1388,6 +1506,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupAddHomescreenWidgetClickedThenSendLaunchAddWidgetPrompt() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupAddHomescreenWidgetClicked()
             val command = awaitItem()
             assertTrue(command is Command.LaunchAddWidgetPrompt)
@@ -1399,6 +1518,7 @@ class BrandDesignUpdatePageViewModelTest {
     fun whenQuickSetupRemoveHomescreenWidgetClickedThenSendShowRemoveWidgetBottomSheet() = runTest {
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.onQuickSetupRemoveHomescreenWidgetClicked()
             val command = awaitItem()
             assertTrue(command is Command.ShowRemoveWidgetBottomSheet)
@@ -1415,6 +1535,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.checkWidgetAddedState()
             val command = awaitItem()
             assertTrue(command is Command.SyncAddWidgetSwitch)
@@ -1428,6 +1549,7 @@ class BrandDesignUpdatePageViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         val testee = createViewModel()
         testee.commands.test {
+            awaitItem() // drain initial PlayIntroAnimation
             testee.checkWidgetAddedState()
             val command = awaitItem()
             assertTrue(command is Command.SyncAddWidgetSwitch)

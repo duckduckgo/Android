@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
@@ -113,6 +114,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
     private val quickSetupPixelSender: QuickSetupPixelSender,
+    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
 ) : ViewModel() {
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -141,6 +143,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
+        val isDuckAiIntroAnimationEnabled: Boolean = false,
     ) {
         val maxPageCount = 3
     }
@@ -152,6 +155,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
+
+    private var notificationPermissionFlowStarted = false
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
+            _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
+            _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
+        }
+    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -175,6 +188,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             val defaultBrowserChecked: Boolean,
             val widgetChecked: Boolean,
         ) : Command
+        data class PlayIntroAnimation(val withDuckAi: Boolean) : Command
     }
 
     fun onDialogTapped() {
@@ -228,8 +242,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    fun onIntroAnimationFinished() {
+    fun onIntroAnimationStarted() {
         _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
+    }
+
+    fun onIntroAnimationFinished() {
+        if (notificationPermissionFlowStarted) return
+        notificationPermissionFlowStarted = true
         viewModelScope.launch {
             delay(2.seconds)
             _commands.send(Command.RequestNotificationPermissions)
