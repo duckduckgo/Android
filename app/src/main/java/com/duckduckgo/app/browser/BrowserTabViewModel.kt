@@ -275,6 +275,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingbranddesignupdate.OnboardingBrandDesignUpdateToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
@@ -557,6 +558,7 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val downloadsRepository: DownloadsRepository,
     private val onboardingBrandDesignUpdateToggles: OnboardingBrandDesignUpdateToggles,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -5071,8 +5073,15 @@ class BrowserTabViewModel @Inject constructor(
             is DaxSubscriptionBrandDesignUpdateBubbleCta,
             -> {
                 viewModelScope.launch {
-                    val origin = "funnel_onboarding_android"
-                    command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+                    val uri = "https://duckduckgo.com/pro".toUri().buildUpon()
+                        .appendQueryParameter("origin", "funnel_onboarding_android")
+                        .apply {
+                            if (onboardingStore.isCustomAiOnboardingFlow()) {
+                                appendQueryParameter("featurePage", "duckai")
+                            }
+                        }
+                        .build()
+                    command.value = LaunchSubscription(uri)
                 }
             }
             is DaxBubbleCta.DaxEndCta,
