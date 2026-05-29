@@ -38,6 +38,10 @@ class NewTabSwitcherButton @JvmOverloads constructor(
         if (resourceId != 0) resourceId else CommonR.drawable.ic_tab_24
     }
 
+    init {
+        binding.tabsImageView.setImageResource(baseTabsDrawable)
+    }
+
     override var hasUnread: Boolean = false
         set(value) {
             if (field != value) {
