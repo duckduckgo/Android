@@ -165,6 +165,7 @@ class EnterCodeViewModel @Inject constructor(
                 command.send(Command.AskJoinerConfirmation(outcome.peerName))
             is DispatchOutcome.HostConfirmationRequested ->
                 command.send(Command.AskHostConfirmation(outcome.peerName))
+            is DispatchOutcome.LinkingCodeReady -> {} // No-op; used only by presentV2() flow
         }
     }
 

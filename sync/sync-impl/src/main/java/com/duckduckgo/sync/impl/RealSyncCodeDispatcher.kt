@@ -30,6 +30,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.transformWhile
@@ -64,6 +65,11 @@ class RealSyncCodeDispatcher @Inject constructor(
     override fun denyHost() {
         logcat { "$TAG: user denied Host side" }
         runner.localTrigger(LocalTrigger.UserDeniedHost)
+    }
+
+    override fun presentV2(): Flow<DispatchOutcome> {
+        // Stub — implemented in Task 2.
+        return emptyFlow()
     }
 
     override fun route(pastedCode: String): RouteDecision {
@@ -174,6 +180,7 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     private fun DispatchOutcome.isTerminal(): Boolean = when (this) {
+        is DispatchOutcome.LinkingCodeReady,
         is DispatchOutcome.JoinerConfirmationRequested,
         is DispatchOutcome.HostConfirmationRequested,
         -> false

@@ -68,6 +68,26 @@ interface SyncCodeDispatcher {
      * recovery_code_denied to the peer. No-op if no session is in Host.Confirming.
      */
     fun denyHost()
+
+    /**
+     * Starts a v2 Presenter session. The returned Flow emits exactly one
+     * [DispatchOutcome.LinkingCodeReady] once the v2 channel is established (caller renders
+     * the URL as a QR), then zero or one [DispatchOutcome.HostConfirmationRequested] prompt
+     * (caller surfaces a dialog and resumes via [confirmHost] / [denyHost]), then exactly
+     * one terminal outcome ([LoggedIn] for Host.Done, [AlreadyConnected] for SameAccountAbort,
+     * [Failed] otherwise).
+     *
+     * Cancelling the collecting coroutine cancels the underlying runner session
+     * (best-effort channel DELETE).
+     *
+     * Today's callers are assumed to be on a UI surface reachable only when the device is
+     * signed in to a ddg sync account. Under that precondition the runner's role election
+     * always elects this device as Host, so the [Joiner.*] terminal states surfaced via
+     * [Failed]/[LoggedIn] are defensive and unreachable in practice. When Asana subtask
+     * `1215168582640073` ("Host pairs from no-account — create account inline") lands, the
+     * precondition relaxes and the Joiner branches become first-class.
+     */
+    fun presentV2(): Flow<DispatchOutcome>
 }
 
 sealed interface RouteDecision {
@@ -110,6 +130,13 @@ sealed interface DispatchOutcome {
      * sync & backup?") then call [SyncCodeDispatcher.confirmHost] or [SyncCodeDispatcher.denyHost].
      */
     data class HostConfirmationRequested(val peerName: String?) : DispatchOutcome
+
+    /**
+     * Emitted once per [SyncCodeDispatcher.presentV2] session, before any confirmation or
+     * terminal outcome. [linkingCode] is the URL the caller renders as a QR for the peer
+     * to scan. Non-terminal — the Flow continues.
+     */
+    data class LinkingCodeReady(val linkingCode: String) : DispatchOutcome
 
     /** Terminal — login completed (recovery code applied; account state updated). */
     data object LoggedIn : DispatchOutcome
