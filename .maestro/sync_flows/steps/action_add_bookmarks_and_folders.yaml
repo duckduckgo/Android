@@ -4,6 +4,7 @@ appId: com.duckduckgo.mobile.android
 - runScript: script_add_bookmark_domains.js
 # Until here we've joined an account that has predefined data
 # Now, we add a couple bookmarks
+- runFlow: ../../shared/dismiss_native_input.yaml
 - tapOn:
     id: "omnibarTextInput"
 - inputText: "${output.bookmarks.domains[0]}"

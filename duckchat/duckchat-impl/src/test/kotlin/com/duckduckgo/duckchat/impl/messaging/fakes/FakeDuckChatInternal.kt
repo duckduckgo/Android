@@ -123,8 +123,8 @@ class FakeDuckChatInternal(
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
     }
 
-    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
-        nativeInputFieldUserSettingEnabled.value = enabled
+    fun setNativeInputFieldEnabled(isEnabled: Boolean) {
+        nativeInputFieldUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting

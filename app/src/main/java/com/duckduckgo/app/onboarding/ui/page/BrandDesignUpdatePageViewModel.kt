@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.onboarding.CustomDuckAiOnboardingFeature
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.CONTROL
 import com.duckduckgo.app.onboarding.DuckAiOnboardingExperimentManager.DuckAiOnboardingExperimentVariant.TREATMENT_WITH_DUCK_AI_DEFAULT
@@ -112,6 +113,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
+    private val quickSetupPixelSender: QuickSetupPixelSender,
+    private val customDuckAiOnboardingFeature: CustomDuckAiOnboardingFeature,
 ) : ViewModel() {
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -140,6 +143,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         val inputScreenPreviewIsSearchSelected: Boolean = false,
         val hideSetDefaultBrowserRow: Boolean = false,
         val hideAddWidgetRow: Boolean = false,
+        val isDuckAiIntroAnimationEnabled: Boolean = false,
         val isCustomAiOnboardingCopyEnabled: Boolean = false,
     ) {
         val maxPageCount = 3
@@ -152,6 +156,16 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private var quickSetupDefaultBrowserDialogShown: Boolean = false
+
+    private var notificationPermissionFlowStarted = false
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val introAnimationEnabled = customDuckAiOnboardingFeature.introAnimation().isEnabled()
+            _viewState.update { it.copy(isDuckAiIntroAnimationEnabled = introAnimationEnabled) }
+            _commands.send(Command.PlayIntroAnimation(withDuckAi = introAnimationEnabled))
+        }
+    }
 
     sealed interface Command {
         data object RequestNotificationPermissions : Command
@@ -175,6 +189,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             val defaultBrowserChecked: Boolean,
             val widgetChecked: Boolean,
         ) : Command
+        data class PlayIntroAnimation(val withDuckAi: Boolean) : Command
     }
 
     fun onDialogTapped() {
@@ -221,14 +236,20 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             INPUT_SCREEN_PREVIEW -> {
             }
+
             QUICK_SETUP -> {
-                // TODO Quick setup: add pixel for dialog shown
+                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
             }
         }
     }
 
-    fun onIntroAnimationFinished() {
+    fun onIntroAnimationStarted() {
         _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
+    }
+
+    fun onIntroAnimationFinished() {
+        if (notificationPermissionFlowStarted) return
+        notificationPermissionFlowStarted = true
         viewModelScope.launch {
             delay(2.seconds)
             _commands.send(Command.RequestNotificationPermissions)
@@ -330,6 +351,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             null,
                             CONTROL,
                             -> _commands.send(Command.Finish)
+
                             TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
                             TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
                         }
@@ -349,13 +371,22 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     applyAddressBarPositionSelection(fireTelemetry = false)
                     applyInputScreenSelection(fireTelemetry = false)
+                    val state = _viewState.value
+                    quickSetupPixelSender.fireClicked(
+                        isReinstallUser = state.isReinstallUser,
+                        addressBarPosition = state.selectedAddressBarPosition,
+                        inputScreenSelected = state.inputScreenSelected,
+                    )
                     _commands.send(Command.OnboardingSkipped)
                 }
             }
         }
     }
 
-    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+    fun onInputModeDemoQuerySubmitted(
+        query: String,
+        isChat: Boolean,
+    ) {
         viewModelScope.launch {
             if (isChat) {
                 _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
@@ -371,22 +402,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INITIAL_REINSTALL_USER -> {
                 _viewState.update { it.copy(isReinstallUser = true) }
                 viewModelScope.launch {
+                    pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                     if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
-                        val splitEnabled = isSplitOmnibarEnabled()
-                        val (isDefault, hasWidget) = withContext(dispatchers.io()) {
-                            defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
-                        }
-                        _viewState.update {
-                            it.copy(
-                                showSplitOption = splitEnabled,
-                                hideSetDefaultBrowserRow = isDefault,
-                                hideAddWidgetRow = hasWidget,
-                            )
-                        }
-                        setCurrentDialog(QUICK_SETUP)
+                        showQuickSetupDialog()
                     } else {
                         setCurrentDialog(SKIP_ONBOARDING_OPTION)
-                        pixel.fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
                     }
                 }
             }
@@ -400,7 +420,11 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     logcat { "Sync-AutoRestore: user skipped restore" }
                     pixel.fire(PREONBOARDING_SYNC_SKIP_RESTORE_TAPPED_UNIQUE, type = Unique())
-                    setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                    if (onboardingQuickSetupExperimentManager.enroll() == QuickSetupExperimentVariant.TREATMENT) {
+                        showQuickSetupDialog()
+                    } else {
+                        setCurrentDialog(SKIP_ONBOARDING_OPTION)
+                    }
                 }
             }
 
@@ -434,7 +458,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         recordDefaultBrowserDialogResult(isSet = false, fireTelemetry = false)
     }
 
-    private fun recordDefaultBrowserDialogResult(isSet: Boolean, fireTelemetry: Boolean = true) {
+    private fun recordDefaultBrowserDialogResult(
+        isSet: Boolean,
+        fireTelemetry: Boolean = true,
+    ) {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = isSet
         if (fireTelemetry) {
@@ -544,6 +571,21 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             appBuildConfig.isAppReinstall()
         }
 
+    private suspend fun showQuickSetupDialog() {
+        val splitEnabled = isSplitOmnibarEnabled()
+        val (isDefault, hasWidget) = withContext(dispatchers.io()) {
+            defaultBrowserDetector.isDefaultBrowser() to widgetCapabilities.hasInstalledWidgets
+        }
+        _viewState.update {
+            it.copy(
+                showSplitOption = splitEnabled,
+                hideSetDefaultBrowserRow = isDefault,
+                hideAddWidgetRow = hasWidget,
+            )
+        }
+        setCurrentDialog(QUICK_SETUP)
+    }
+
     private suspend fun isSplitOmnibarEnabled(): Boolean =
         withContext(dispatchers.io()) {
             androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
@@ -594,7 +636,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    companion object {
+    private companion object {
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
 }

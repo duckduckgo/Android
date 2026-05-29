@@ -242,10 +242,6 @@ sealed class Command {
         val url: String,
     ) : Command()
 
-    class SubmitChat(
-        val query: String,
-    ) : Command()
-
     class LaunchPlayStore(
         val appPackage: String,
     ) : Command()
