@@ -16,7 +16,6 @@
 
 <resources>
     <string name="duckAiChatSearchDuckDuckGo">Search DuckDuckGo</string>
-    <string name="duckAiChatHistoryViewAllChats">View all Chats</string>
     <string name="native_input_chat_hint">Ask anything privately…</string>
 
     <!-- Model Picker -->
