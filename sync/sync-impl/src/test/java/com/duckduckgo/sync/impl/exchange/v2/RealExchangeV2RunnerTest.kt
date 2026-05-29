@@ -203,12 +203,12 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
 
-        runner.events.filterIsInstance<ExchangeV2Event.MessageRejected>().test {
+        runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
                 ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "3party"),
             )
             val event = awaitItem()
-            assertSame(RejectReason.SameAccount, event.reason)
+            assertSame(ExchangeV2State.SameAccountAbort, event.to)
         }
     }
 
@@ -364,12 +364,12 @@ class RealExchangeV2RunnerTest {
         val runner = newRunner()
         runner.startScan("")
 
-        runner.events.filterIsInstance<ExchangeV2Event.MessageRejected>().test {
+        runner.events.filterIsInstance<ExchangeV2Event.Transition>().test {
             runner.deliverIncomingMessage(
                 ExchangeV2Message.RecoveryCodeAvailable(rawJson = "{}", userId = "shared-user", name = "Peer", kind = "ddg"),
             )
             val event = awaitItem()
-            assertSame(RejectReason.SameAccount, event.reason)
+            assertSame(ExchangeV2State.SameAccountAbort, event.to)
         }
         // No follow-up Transition for RoleElected — auto-elect must skip after a rejected outcome.
         // SameAccountAbort is terminal → runner clears the session.

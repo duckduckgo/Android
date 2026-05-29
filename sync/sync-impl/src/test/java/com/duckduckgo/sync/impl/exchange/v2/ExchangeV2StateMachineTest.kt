@@ -106,14 +106,23 @@ class ExchangeV2StateMachineTest {
         assertEquals(RejectReason.ImplicitAbort, (second.outcome as TransitionOutcome.Aborted).reason)
     }
 
-    @Test fun `negotiating recv recovery_code_available with matching user_id aborts as SameAccount`() {
+    @Test fun `negotiating recv recovery_code_available with matching user_id transitions to SameAccountAbort`() {
         val machine = sm(localUserId = "shared-user")
         machine.receive(Hello("{}"))
-        val result = machine.receive(availableFromPeer(userId = "shared-user"))
+        val msg = availableFromPeer(userId = "shared-user")
+        val result = machine.receive(msg)
 
+        assertEquals(ExchangeV2State.SameAccountAbort, machine.currentState)
+        assertEquals(ExchangeV2State.SameAccountAbort, result.newState)
         assertTrue(result.outcome is TransitionOutcome.Aborted)
         assertEquals(RejectReason.SameAccount, (result.outcome as TransitionOutcome.Aborted).reason)
-        assertSame(ExchangeV2State.SameAccountAbort, machine.currentState)
+        val event = result.event
+        assertTrue("expected Transition event, got ${event::class.simpleName}", event is ExchangeV2Event.Transition)
+        event as ExchangeV2Event.Transition
+        assertEquals(ExchangeV2State.Negotiating, event.from)
+        assertEquals(ExchangeV2State.SameAccountAbort, event.to)
+        assertSame(msg, event.trigger)
+        assertEquals(null, event.localTrigger)
     }
 
     @Test fun `negotiating recv recovery_code_available with different user_id stays in Negotiating`() {

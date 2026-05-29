@@ -251,6 +251,13 @@ internal class RealExchangeV2StateMachine(
         )
     }
 
+    /**
+     * The SM rejected [msg] in state [from]. When [newState] == [from] the SM stays put (e.g.
+     * a duplicate `hello` in Negotiating) and the event is a [MessageRejected]; when [newState]
+     * differs the SM is actually transitioning into [newState] driven by [msg] (e.g. same-account
+     * detected, per Asana state-machine spec `1215056232572322`), and we emit a [Transition] so
+     * downstream consumers (dispatcher, dev tooling) can react to the new terminal state.
+     */
     private fun abort(
         from: ExchangeV2State,
         msg: ExchangeV2Message,
@@ -258,9 +265,20 @@ internal class RealExchangeV2StateMachine(
         newState: ExchangeV2State = from,
     ): TransitionResult {
         currentState = newState
+        val event = if (newState == from) {
+            ExchangeV2Event.MessageRejected(clock.nowMs(), msg, from, reason)
+        } else {
+            ExchangeV2Event.Transition(
+                timestampMs = clock.nowMs(),
+                from = from,
+                to = newState,
+                trigger = msg,
+                localTrigger = null,
+            )
+        }
         return TransitionResult(
             newState = newState,
-            event = ExchangeV2Event.MessageRejected(clock.nowMs(), msg, from, reason),
+            event = event,
             outcome = TransitionOutcome.Aborted(reason),
         )
     }
