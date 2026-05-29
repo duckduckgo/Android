@@ -112,6 +112,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val widgetCapabilities: WidgetCapabilities,
     private val syncAutoRestore: SyncAutoRestore,
+    private val quickSetupPixelSender: QuickSetupPixelSender,
 ) : ViewModel() {
 
     private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
@@ -220,8 +221,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
             INPUT_SCREEN_PREVIEW -> {
             }
+
             QUICK_SETUP -> {
-                // TODO Quick setup: add pixel for dialog shown
+                quickSetupPixelSender.fireShown(isReinstallUser = _viewState.value.isReinstallUser)
             }
         }
     }
@@ -329,6 +331,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             null,
                             CONTROL,
                             -> _commands.send(Command.Finish)
+
                             TREATMENT_WITH_DUCK_AI_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = false)
                             TREATMENT_WITH_SEARCH_DEFAULT -> setInputScreenPreviewDialog(isSearchDefault = true)
                         }
@@ -348,13 +351,22 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     applyAddressBarPositionSelection(fireTelemetry = false)
                     applyInputScreenSelection(fireTelemetry = false)
+                    val state = _viewState.value
+                    quickSetupPixelSender.fireClicked(
+                        isReinstallUser = state.isReinstallUser,
+                        addressBarPosition = state.selectedAddressBarPosition,
+                        inputScreenSelected = state.inputScreenSelected,
+                    )
                     _commands.send(Command.OnboardingSkipped)
                 }
             }
         }
     }
 
-    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+    fun onInputModeDemoQuerySubmitted(
+        query: String,
+        isChat: Boolean,
+    ) {
         viewModelScope.launch {
             if (isChat) {
                 _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
@@ -426,7 +438,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         recordDefaultBrowserDialogResult(isSet = false, fireTelemetry = false)
     }
 
-    private fun recordDefaultBrowserDialogResult(isSet: Boolean, fireTelemetry: Boolean = true) {
+    private fun recordDefaultBrowserDialogResult(
+        isSet: Boolean,
+        fireTelemetry: Boolean = true,
+    ) {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = isSet
         if (fireTelemetry) {
@@ -601,7 +616,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         }
     }
 
-    companion object {
+    private companion object {
         private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
 }

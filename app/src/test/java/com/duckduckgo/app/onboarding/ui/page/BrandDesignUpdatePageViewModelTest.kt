@@ -100,6 +100,7 @@ class BrandDesignUpdatePageViewModelTest {
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
     private val mockSyncAutoRestore: SyncAutoRestore = mock()
+    private val mockQuickSetupPixelSender: QuickSetupPixelSender = mock()
 
     private fun createViewModel(): BrandDesignUpdatePageViewModel {
         return BrandDesignUpdatePageViewModel(
@@ -119,6 +120,7 @@ class BrandDesignUpdatePageViewModelTest {
             mockDefaultBrowserDetector,
             mockWidgetCapabilities,
             mockSyncAutoRestore,
+            mockQuickSetupPixelSender,
         )
     }
 
@@ -1123,6 +1125,43 @@ class BrandDesignUpdatePageViewModelTest {
             testee.onPrimaryCtaClicked()
             assertTrue(awaitItem() is Command.OnboardingSkipped)
         }
+    }
+
+    // endregion
+
+    // region Quick setup pixels
+
+    @Test
+    fun whenQuickSetupShownThenSenderFiresShownWithReinstallState() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // INITIAL_REINSTALL_USER -> QUICK_SETUP
+        advanceUntilIdle()
+
+        verify(mockQuickSetupPixelSender).fireShown(isReinstallUser = true)
+    }
+
+    @Test
+    fun whenQuickSetupClickedThenSenderFiresClickedWithCurrentSelections() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockOnboardingQuickSetupExperimentManager.enroll()).thenReturn(QuickSetupExperimentVariant.TREATMENT)
+
+        val testee = createViewModel()
+        testee.loadDaxDialog()
+        testee.onSecondaryCtaClicked() // -> QUICK_SETUP
+        testee.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+        testee.onInputScreenOptionSelected(withAi = false)
+        testee.onPrimaryCtaClicked()
+        advanceUntilIdle()
+
+        verify(mockQuickSetupPixelSender).fireClicked(
+            isReinstallUser = true,
+            addressBarPosition = OmnibarType.SINGLE_BOTTOM,
+            inputScreenSelected = false,
+        )
     }
 
     // endregion
