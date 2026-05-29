@@ -1323,3 +1323,13 @@ internal fun NativeInputState.shouldShowTrailingFireButton(): Boolean =
 internal fun NativeInputState.shouldSuppressBottomRow(): Boolean =
     inputMode == NativeInputState.InputMode.SEARCH_ONLY &&
         inputContext == NativeInputState.InputContext.BROWSER
+
+/**
+ * Bottom-row controls (model / reasoning / options / attachment) are shown only on the Duck.ai
+ * chat tab and only when no chat is streaming. While streaming, the bottom row stays visible for
+ * the stop button but these controls are hidden.
+ */
+internal fun shouldShowInputControls(
+    onChatTab: Boolean,
+    isStreaming: Boolean,
+): Boolean = onChatTab && !isStreaming
